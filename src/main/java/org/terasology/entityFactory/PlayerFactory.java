@@ -17,6 +17,7 @@ package org.terasology.entityFactory;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.characters.CharacterComponent;
@@ -34,11 +35,13 @@ public class PlayerFactory {
     private EntityManager entityManager;
     private InventoryManager inventoryManager;
     private BlockItemFactory blockFactory;
+    private BlockManager blockManager;
 
     public PlayerFactory(EntityManager entityManager, InventoryManager inventoryManager) {
         this.entityManager = entityManager;
         this.inventoryManager = inventoryManager;
         blockFactory = new BlockItemFactory(entityManager);
+        blockManager = CoreRegistry.get(BlockManager.class);
     }
 
     public EntityRef newInstance(Vector3f spawnPosition) {
@@ -54,22 +57,22 @@ public class PlayerFactory {
         player.saveComponent(playerComponent);
 
         // Goodie chest
-        EntityRef chest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:chest"));
+        EntityRef chest = blockFactory.newInstance(blockManager.getBlockFamily("core:chest"));
         BlockItemComponent blockItem = chest.getComponent(BlockItemComponent.class);
         EntityRef chestContents = blockItem.placedEntity;
 
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:companion"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:brick:engine:stair"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Tnt"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("core:companion"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:brick:engine:stair"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("core:Tnt"), 99));
 
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:StoneStair"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:StoneStair"), 99));
 
         inventoryManager.giveItem(chestContents, entityManager.create("core:railgunTool"));
 
         inventoryManager.giveItem(chestContents, entityManager.create("core:mrbarsack"));
-                inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Brick"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Ice"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Plank"), 99));
+                inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Brick"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Ice"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Plank"), 99));
 
         EntityRef doorItem = entityManager.create("core:door");
         ItemComponent doorItemComp = doorItem.getComponent(ItemComponent.class);
@@ -78,24 +81,24 @@ public class PlayerFactory {
         inventoryManager.giveItem(chestContents, doorItem);
 
         // Inner goodie chest
-        EntityRef innerChest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Chest"));
+        EntityRef innerChest = blockFactory.newInstance(blockManager.getBlockFamily("core:Chest"));
         BlockItemComponent innerBlockItem = innerChest.getComponent(BlockItemComponent.class);
         EntityRef innerChestContents = innerBlockItem.placedEntity;
 
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Lava"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Water"), 99));
+        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Lava"), 99));
+        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Water"), 99));
 
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Iris"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Dandelion"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Tulip"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:YellowFlower"), 99));
+        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Iris"), 99));
+        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Dandelion"), 99));
+        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Tulip"), 99));
+        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:YellowFlower"), 99));
 
         // Place inner chest into outer chest
         inventoryManager.giveItem(chestContents, innerChest);
 
         inventoryManager.giveItem(player, entityManager.create("core:pickaxe"));
         inventoryManager.giveItem(player, entityManager.create("core:axe"));
-        inventoryManager.giveItem(player, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Torch"), 99));
+        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("engine:Torch"), 99));
         inventoryManager.giveItem(player, entityManager.create("core:explodeTool"));
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));

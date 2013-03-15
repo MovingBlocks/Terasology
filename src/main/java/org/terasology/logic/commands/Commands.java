@@ -365,12 +365,13 @@ public class Commands implements CommandProvider {
             "item in front of the player. You can simply pick it up.")
     public void spawnBlock(@CommandParam(name = "blockName") String blockName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
         offset.scale(3);
         spawnPos.add(offset);
 
-        Block block = BlockManager.getInstance().getBlock(blockName);
+        Block block = blockManager.getBlock(blockName);
         if (block == null) return;
 
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab("core:droppedBlock");

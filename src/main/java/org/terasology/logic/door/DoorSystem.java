@@ -229,7 +229,7 @@ public class DoorSystem implements ComponentSystem {
         DoorComponent door = entity.getComponent(DoorComponent.class);
         BlockRegionComponent blockRegionComponent = entity.getComponent(BlockRegionComponent.class);
         for (Vector3i blockPos : blockRegionComponent.region) {
-            worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), worldProvider.getBlock(blockPos));
+            worldProvider.setBlock(blockPos, BlockManager.getAir(), worldProvider.getBlock(blockPos));
         }
         EntityInfoComponent entityInfo = entity.getComponent(EntityInfoComponent.class);
         if (entityInfo != null) {

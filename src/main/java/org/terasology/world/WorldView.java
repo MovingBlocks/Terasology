@@ -39,6 +39,8 @@ public class WorldView {
     private Vector3i chunkSize;
     private Vector3i chunkFilterSize;
 
+    private Block air;
+
     public static WorldView createLocalView(Vector3i pos, ChunkProvider chunkProvider) {
         Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
         return createWorldView(region, Vector3i.one(), chunkProvider);
@@ -89,7 +91,7 @@ public class WorldView {
     // TODO: Review
     public Block getBlock(int blockX, int blockY, int blockZ) {
         if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
-            return BlockManager.getInstance().getAir();
+            return BlockManager.getAir();
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);

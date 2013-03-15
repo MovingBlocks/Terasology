@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
@@ -15,16 +16,20 @@ import org.terasology.world.chunks.Chunk;
 public class ChunkTest {
 
     private Chunk chunk;
+    private BlockManager blockManager;
 
     @Before
     public void setup() {
+        blockManager = new BlockManager();
+        CoreRegistry.put(BlockManager.class, blockManager);
         chunk = new Chunk(new Vector3i(0,0,0));
     }
 
     @Test
     public void testChangeBlock() {
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(new BlockUri("some:uri"), new Block()));
-        Block block = BlockManager.getInstance().getBlock("some:uri");
+
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("some:uri"), new Block()));
+        Block block = blockManager.getBlock("some:uri");
         chunk.setBlock(new Vector3i(1,2,3), block);
         assertEquals(block, chunk.getBlock(new Vector3i(1, 2, 3)));
     }

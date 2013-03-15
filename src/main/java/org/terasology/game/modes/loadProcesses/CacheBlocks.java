@@ -16,6 +16,7 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
@@ -45,7 +46,8 @@ public class CacheBlocks implements LoadProcess {
 
     @Override
     public int begin() {
-        blockFamilyIterator = BlockManager.getInstance().listRegisteredBlockFamilies().iterator();
-        return BlockManager.getInstance().registeredBlockFamiliesCount();
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        blockFamilyIterator = blockManager.listRegisteredBlockFamilies().iterator();
+        return blockManager.registeredBlockFamiliesCount();
     }
 }

@@ -15,14 +15,15 @@
  */
 package org.terasology.world.liquid;
 
-import java.util.Map;
-
+import org.terasology.game.CoreRegistry;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
+
+import java.util.Map;
 
 /**
  * First draft to generate procedurally generated liquid streams. The source blocks are currently
@@ -42,11 +43,12 @@ public class LiquidsGenerator implements ChunkGenerator {
     private Block lava;
 
     public LiquidsGenerator() {
-        grass = BlockManager.getInstance().getBlock("engine:Grass");
-        snow = BlockManager.getInstance().getBlock("engine:Snow");
-        water = BlockManager.getInstance().getBlock("engine:Water");
-        lava = BlockManager.getInstance().getBlock("engine:Lava");
-        stone = BlockManager.getInstance().getBlock("engine:Stone");
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        grass = blockManager.getBlock("engine:Grass");
+        snow = blockManager.getBlock("engine:Snow");
+        water = blockManager.getBlock("engine:Water");
+        lava = blockManager.getBlock("engine:Lava");
+        stone = blockManager.getBlock("engine:Stone");
     }
 
     @Override
@@ -60,7 +62,7 @@ public class LiquidsGenerator implements ChunkGenerator {
                 c.setBlock(8, y, 8, water, currentBlock);
                 c.setLiquid(8, y, 8, new LiquidData(LiquidType.WATER, 7));
                 grassGenerated = true;
-            } else if ((stone.equals(currentBlock)) && !lavaGenerated && c.getBlock(8, y + 1, 8).equals(BlockManager.getInstance().getAir())) {
+            } else if ((stone.equals(currentBlock)) && !lavaGenerated && c.getBlock(8, y + 1, 8).equals(BlockManager.getAir())) {
                 c.setBlock(8, y, 8, lava, currentBlock);
                 c.setLiquid(8, y, 8, new LiquidData(LiquidType.LAVA, 7));
                 lavaGenerated = true;

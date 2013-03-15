@@ -46,9 +46,10 @@ public class BlockCommands implements CommandProvider {
 
         BlockFamily blockFamily;
 
-        List<BlockUri> matchingUris = BlockManager.getInstance().resolveBlockUri(blockName);
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        List<BlockUri> matchingUris = blockManager.resolveBlockUri(blockName);
         if (matchingUris.size() == 1) {
-            blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
+            blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
 
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + blockName + "'");
@@ -96,12 +97,13 @@ public class BlockCommands implements CommandProvider {
 
     @Command(shortDescription = "List all available blocks")
     public void listBlocks() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("-----------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<BlockUri> registeredBlocks = sortItems(BlockManager.getInstance().listRegisteredBlockUris());
+        List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
             stringBuilder.append(blockUri.toString());
             stringBuilder.append(StringConstants.NEW_LINE);
@@ -112,7 +114,7 @@ public class BlockCommands implements CommandProvider {
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("----------------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<BlockUri> availableBlocks = sortItems(BlockManager.getInstance().listAvailableBlockUris());
+        List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
         for (BlockUri blockUri : availableBlocks) {
             stringBuilder.append(blockUri.toString());
             stringBuilder.append(StringConstants.NEW_LINE);
@@ -123,13 +125,14 @@ public class BlockCommands implements CommandProvider {
 
     @Command(shortDescription = "Lists all blocks by category")
     public void listBlocksByCategory() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         StringBuilder stringBuilder = new StringBuilder();
-        for (String category : BlockManager.getInstance().getBlockCategories()) {
+        for (String category : blockManager.getBlockCategories()) {
             stringBuilder.append(category);
             stringBuilder.append(StringConstants.NEW_LINE);
             stringBuilder.append("-----------");
             stringBuilder.append(StringConstants.NEW_LINE);
-            List<BlockUri> categoryBlocks = sortItems(BlockManager.getInstance().getBlockFamiliesWithCategory(category));
+            List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
             for (BlockUri uri : categoryBlocks) {
                 stringBuilder.append(uri.toString());
                 stringBuilder.append(StringConstants.NEW_LINE);
@@ -157,12 +160,13 @@ public class BlockCommands implements CommandProvider {
 
     @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
     public void listFreeShapeBlocks() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("-----------------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<BlockUri> sortedUris = sortItems(BlockManager.getInstance().listShapelessBlockUris());
+        List<BlockUri> sortedUris = sortItems(blockManager.listShapelessBlockUris());
         for (BlockUri uri : sortedUris) {
             stringBuilder.append(uri.toString());
             stringBuilder.append(StringConstants.NEW_LINE);
@@ -183,9 +187,10 @@ public class BlockCommands implements CommandProvider {
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
     public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
-        List<BlockUri> matchingUris = BlockManager.getInstance().resolveBlockUri(uri);
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        List<BlockUri> matchingUris = blockManager.resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
-            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
+            BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
             giveBlock(blockFamily, quantity);
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'");
@@ -199,7 +204,8 @@ public class BlockCommands implements CommandProvider {
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
     public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
-        List<BlockUri> resolvedBlockUris = BlockManager.getInstance().resolveBlockUri(uri);
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        List<BlockUri> resolvedBlockUris = blockManager.resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'");
 
@@ -233,8 +239,7 @@ public class BlockCommands implements CommandProvider {
 
         BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).getSimpleString());
         if (blockUri.isValid()) {
-            giveBlock(BlockManager.getInstance().getBlockFamily(blockUri), quantity);
-
+            giveBlock(blockManager.getBlockFamily(blockUri), quantity);
             return;
         }
 

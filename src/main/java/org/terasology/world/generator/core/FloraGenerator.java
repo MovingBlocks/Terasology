@@ -15,6 +15,7 @@
  */
 package org.terasology.world.generator.core;
 
+import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.game.CoreRegistry;
@@ -25,6 +26,7 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,19 +36,37 @@ import java.util.Map;
  */
 public class FloraGenerator implements ChunkGenerator {
 
+    private static final String[] FLOWER_BLOCKS = new String[]{"engine:YellowFlower", "engine:RedFlower", "engine:BrownShroom", "engine:BigBrownShroom", "engine:RedShroom",
+            "engine:RedClover", "engine:Lavender", "engine:Iris", "engine:GlowbellBloom", "engine:Glowbell",
+            "engine:DeadBush", "engine:Dandelion", "engine:Cotton1", "engine:Cotton2", "engine:Cotton3", "engine:Cotton4",
+            "engine:Cotton5", "engine:Cotton6", "engine:Tulip"};
+
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
 
+    private Block airBlock;
     private Block grassBlock;
     private Block snowBlock;
     private Block sandBlock;
+    private Block tallGrass1;
+    private Block tallGrass2;
+    private Block tallGrass3;
+    private List<Block> flowers = Lists.newArrayList();
 
     private WorldGenerationConfig config = CoreRegistry.get(Config.class).getWorldGeneration();
 
     public FloraGenerator() {
-        grassBlock = BlockManager.getInstance().getBlock("engine:Grass");
-        snowBlock = BlockManager.getInstance().getBlock("engine:Snow");
-        sandBlock = BlockManager.getInstance().getBlock("engine:Sand");
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        airBlock = BlockManager.getAir();
+        grassBlock = blockManager.getBlock("engine:Grass");
+        snowBlock = blockManager.getBlock("engine:Snow");
+        sandBlock = blockManager.getBlock("engine:Sand");
+        tallGrass1 = blockManager.getBlock("engine:TallGrass1");
+        tallGrass2 = blockManager.getBlock("engine:TallGrass2");
+        tallGrass3 = blockManager.getBlock("engine:TallGrass3");
+        for (String blockUrn : FLOWER_BLOCKS) {
+            flowers.add(blockManager.getBlock(blockUrn));
+        }
     }
 
     @Override
@@ -82,7 +102,7 @@ public class FloraGenerator implements ChunkGenerator {
      */
     private void generateGrassAndFlowers(Chunk c, int x, int y, int z, FastRandom random) {
         Block targetBlock = c.getBlock(x, y, z);
-        if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(BlockManager.getInstance().getAir())) {
+        if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 
             double grassRand = (random.randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
@@ -114,11 +134,11 @@ public class FloraGenerator implements ChunkGenerator {
                 double rand = random.standNormalDistrDouble();
 
                 if (rand > -0.4 && rand < 0.4) {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:TallGrass1"));
+                    c.setBlock(x, y + 1, z, tallGrass1);
                 } else if (rand > -0.6 && rand < 0.6) {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:TallGrass2"));
+                    c.setBlock(x, y + 1, z, tallGrass2);
                 } else {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:TallGrass3"));
+                    c.setBlock(x, y + 1, z, tallGrass3);
                 }
 
                 double flowerRand = random.randomDouble();
@@ -127,45 +147,8 @@ public class FloraGenerator implements ChunkGenerator {
                  * Generate flowers.
                  */
                 if (random.standNormalDistrDouble() < -2) {
-                    if (flowerRand >= -1.0 && flowerRand < -0.9) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:YellowFlower"));
-                    } else if (flowerRand >= -0.9 && flowerRand < -0.8) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedFlower"));
-                    } else if (flowerRand >= -0.8 && flowerRand < -0.7) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:BrownShroom"));
-                    } else if (flowerRand >= -0.7 && flowerRand < -0.6) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:BigBrownShroom"));
-                    } else if (flowerRand >= -0.6 && flowerRand < -0.5) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedShroom"));
-                    } else if (flowerRand >= -0.5 && flowerRand < -0.4) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedClover"));
-                    } else if (flowerRand >= -0.4 && flowerRand < -0.3) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Lavender"));
-                    } else if (flowerRand >= -0.3 && flowerRand < -0.2) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Iris"));
-                    } else if (flowerRand >= -0.2 && flowerRand < -0.1) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:GlowbellBloom"));
-                    } else if (flowerRand >= -0.1 && flowerRand < 0.0) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Glowbell"));
-                    } else if (flowerRand >= 0.0 && flowerRand < 0.1) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:DeadBush"));
-                    } else if (flowerRand >= 0.1 && flowerRand < 0.2) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Dandelion"));
-                    } else if (flowerRand >= 0.2 && flowerRand < 0.3) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton1"));
-                    } else if (flowerRand >= 0.3 && flowerRand < 0.4) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton2"));
-                    } else if (flowerRand >= 0.4 && flowerRand < 0.5) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton3"));
-                    } else if (flowerRand >= 0.5 && flowerRand < 0.6) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton4"));
-                    } else if (flowerRand >= 0.6 && flowerRand < 0.7) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton5"));
-                    } else if (flowerRand >= 0.7 && flowerRand < 0.8) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton6"));
-                    } else if (flowerRand >= 0.8 && flowerRand < 0.9) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Tulip"));
-                    }
+                    int index = random.randomIntAbs(flowers.size());
+                    c.setBlock(x, y + 1, z, flowers.get(index));
                 }
             }
         }

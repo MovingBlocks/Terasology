@@ -31,7 +31,7 @@ import org.terasology.game.CoreRegistry;
 /**
  * @author Immortius
  */
-@RegisterSystem(RegisterMode.ALWAYS)
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class SpawnPrefabAction implements ComponentSystem {
 
     private EntityManager entityManager;

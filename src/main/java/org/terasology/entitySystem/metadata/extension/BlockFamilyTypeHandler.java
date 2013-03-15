@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata.extension;
 import java.util.List;
 
 import org.terasology.entitySystem.metadata.TypeHandler;
+import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
@@ -29,13 +30,15 @@ import com.google.common.collect.Lists;
  */
 public class BlockFamilyTypeHandler implements TypeHandler<BlockFamily> {
 
+    private BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+
     public EntityData.Value serialize(BlockFamily value) {
         return EntityData.Value.newBuilder().addString(value.getURI().toString()).build();
     }
 
     public BlockFamily deserialize(EntityData.Value value) {
         if (value.getStringCount() > 0) {
-            return BlockManager.getInstance().getBlockFamily(value.getString(0));
+            return blockManager.getBlockFamily(value.getString(0));
         }
         return null;
     }
@@ -55,7 +58,7 @@ public class BlockFamilyTypeHandler implements TypeHandler<BlockFamily> {
     public List<BlockFamily> deserializeList(EntityData.Value value) {
         List<BlockFamily> result = Lists.newArrayListWithCapacity(value.getStringCount());
         for (String item : value.getStringList()) {
-            result.add(BlockManager.getInstance().getBlockFamily(item));
+            result.add(blockManager.getBlockFamily(item));
         }
         return result;
     }

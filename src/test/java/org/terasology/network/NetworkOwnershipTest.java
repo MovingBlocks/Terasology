@@ -22,11 +22,13 @@ import org.junit.Test;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.block.management.BlockManager;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -54,6 +56,8 @@ public class NetworkOwnershipTest {
 
     @Before
     public void setup() {
+        CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+        CoreRegistry.put(BlockManager.class, new BlockManager());
         entityManager.clear();
         mockTimer = mock(Timer.class);
         networkSystem = new NetworkSystemImpl(mockTimer);

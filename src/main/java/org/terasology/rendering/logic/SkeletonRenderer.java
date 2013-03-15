@@ -56,7 +56,7 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 /**
  * @author Immortius
  */
-@RegisterSystem
+@RegisterSystem(whenHeadless = false)
 public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(SkeletonRenderer.class);

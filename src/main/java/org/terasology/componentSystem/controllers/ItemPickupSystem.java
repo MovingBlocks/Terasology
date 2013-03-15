@@ -7,12 +7,13 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.physics.CollideEvent;
 
 
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemPickupSystem implements ComponentSystem {
 
     @In

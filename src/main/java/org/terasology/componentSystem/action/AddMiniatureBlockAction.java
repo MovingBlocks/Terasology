@@ -20,6 +20,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.math.Vector3i;
@@ -34,7 +35,7 @@ import java.util.Set;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 // TODO: Network
-@RegisterSystem()
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class AddMiniatureBlockAction implements ComponentSystem {
 
     @In

@@ -94,7 +94,7 @@ public class TunnelAction implements ComponentSystem {
                         continue;
 
                     if (currentBlock.isDestructible()) {
-                        worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
+                        worldProvider.setBlock(blockPos, BlockManager.getAir(), currentBlock);
 
                         EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                         blockEntity.destroy();

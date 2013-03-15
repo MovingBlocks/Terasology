@@ -15,29 +15,8 @@
  */
 package org.terasology.componentSystem;
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.nio.FloatBuffer;
-import java.util.Iterator;
-
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.BlockParticleEffectComponent;
@@ -55,6 +34,26 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.management.BlockManager;
+
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.nio.FloatBuffer;
+import java.util.Iterator;
+
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -76,11 +75,14 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     @In
     private WorldRenderer worldRenderer;
 
+    @In
+    private BlockManager blockManager;
+
     private FastRandom random = new FastRandom();
     private TObjectIntMap displayLists;
 
     public void initialise() {
-        displayLists = new TObjectIntHashMap(BlockManager.getInstance().getBlockFamilyCount());
+        displayLists = new TObjectIntHashMap(blockManager.getBlockFamilyCount());
     }
 
     @Override
@@ -206,18 +208,18 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     protected void renderParticle(Particle particle, byte blockType, float temperature, float humidity, float light) {
-        int displayList = displayLists.get(BlockManager.getInstance().getBlock(blockType).getBlockFamily());
+        int displayList = displayLists.get(blockManager.getBlock(blockType).getBlockFamily());
         if (displayList == 0) {
             displayList = glGenLists(1);
             glNewList(displayList, GL11.GL_COMPILE);
             drawParticle(blockType);
             glEndList();
-            displayLists.put(BlockManager.getInstance().getBlock(blockType).getBlockFamily(), displayList);
+            displayLists.put(blockManager.getBlock(blockType).getBlockFamily(), displayList);
         }
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
 
-        Vector4f color = BlockManager.getInstance().getBlock(blockType).calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
+        Vector4f color = blockManager.getBlock(blockType).calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
         shader.setFloat("texOffsetX", particle.texOffset.x);
         shader.setFloat("texOffsetY", particle.texOffset.y);
@@ -227,7 +229,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     private void drawParticle(byte blockType) {
-        Block b = BlockManager.getInstance().getBlock(blockType);
+        Block b = blockManager.getBlock(blockType);
 
         glBegin(GL_QUADS);
         GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y);

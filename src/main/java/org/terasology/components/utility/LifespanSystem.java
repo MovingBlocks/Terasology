@@ -19,13 +19,14 @@ package org.terasology.components.utility;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.game.CoreRegistry;
 
 /**
  * @author Immortius
  */
-@RegisterSystem
+@RegisterSystem()
 public class LifespanSystem implements UpdateSubscriberSystem {
 
     private EntityManager entityManager;

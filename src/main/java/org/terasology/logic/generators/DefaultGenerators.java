@@ -5,6 +5,8 @@ package org.terasology.logic.generators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.terasology.game.CoreRegistry;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.generator.tree.TreeGenerator;
 import org.terasology.world.generator.tree.TreeGeneratorLSystem;
@@ -19,6 +21,8 @@ public class DefaultGenerators {
 
     public DefaultGenerators(ForestGenerator mngr) {
 
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+
         Map<String, Double> probs = Maps.newHashMap();
         probs.put("A", 1.0);
         probs.put("B", 0.8);
@@ -31,13 +35,13 @@ public class DefaultGenerators {
         // Pine
         rules = ImmutableMap.<String, String>builder()
             .put("A", "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]").build();
-        TreeGenerator pineTree = new TreeGeneratorLSystem("FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("engine:DarkLeaf")).setGenerationProbability(0.05f).setBarkType(BlockManager.getInstance().getBlock("engine:PineTrunk"));
+        TreeGenerator pineTree = new TreeGeneratorLSystem("FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).setLeafType(blockManager.getBlock("engine:DarkLeaf")).setGenerationProbability(0.05f).setBarkType(blockManager.getBlock("engine:PineTrunk"));
 
         // Birk
         rules = ImmutableMap.<String, String>builder()
             .put("A", "[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]")
             .put("B", "[&FAF]////[&FAF]////[&FAF]").build();
-        TreeGenerator birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("engine:DarkLeaf")).setGenerationProbability(0.02f).setBarkType(BlockManager.getInstance().getBlock("engine:BirkTrunk"));
+        TreeGenerator birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).setLeafType(blockManager.getBlock("engine:DarkLeaf")).setGenerationProbability(0.02f).setBarkType(blockManager.getBlock("engine:BirkTrunk"));
 
         // Oak variation tree
         rules = ImmutableMap.<String, String>builder()
@@ -48,7 +52,7 @@ public class DefaultGenerators {
         // A red tree
         rules = ImmutableMap.<String, String>builder()
             .put("A", "[&FFAFF]////[&FFAFF]////[&FFAFF]").build();
-        TreeGenerator redTree = new TreeGeneratorLSystem("FFFFFAFAFAF", rules, probs, 4, 40).setLeafType(BlockManager.getInstance().getBlock("engine:RedLeaf")).setGenerationProbability(0.05f);
+        TreeGenerator redTree = new TreeGeneratorLSystem("FFFFFAFAFAF", rules, probs, 4, 40).setLeafType(blockManager.getBlock("engine:RedLeaf")).setGenerationProbability(0.05f);
 
         // Cactus
         TreeGenerator cactus = new TreeGeneratorCactus().setGenerationProbability(0.05f);

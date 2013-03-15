@@ -74,7 +74,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     }
 
     private void spawnPlayer(EntityRef clientEntity, Vector3i spawnPos) {
-        while (worldRenderer.getWorldProvider().getBlock(spawnPos) == BlockManager.getInstance().getAir() && spawnPos.y > 0) {
+        while (worldRenderer.getWorldProvider().getBlock(spawnPos) == BlockManager.getAir() && spawnPos.y > 0) {
             spawnPos.y--;
         }
 

@@ -7,6 +7,7 @@ import java.util.Map;
 import javassist.bytecode.stackmap.TypeData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.game.CoreRegistry;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.utilities.HeightmapFileReader;
 import org.terasology.world.block.Block;
@@ -24,16 +25,25 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
     private static final Logger logger = LoggerFactory.getLogger(BasicHMTerrainGenerator.class);
 
     private WorldBiomeProvider biomeProvider;
-    private Block air = BlockManager.getInstance().getAir();
-    private Block mantle = BlockManager.getInstance().getBlock(
-            "engine:MantleStone");
-    private Block water = BlockManager.getInstance().getBlock("engine:Water");
-    private Block stone = BlockManager.getInstance().getBlock("engine:Stone");
-    private Block sand = BlockManager.getInstance().getBlock("engine:Sand");
-    private Block grass = BlockManager.getInstance().getBlock("engine:Grass");
-    private Block snow = BlockManager.getInstance().getBlock("engine:Snow");
+    private Block air = BlockManager.getAir();
+    private Block mantle;
+    private Block water;
+    private Block stone;
+    private Block sand;
+    private Block grass;
+    private Block snow;
     private ClimateSimulator climate;
     float[][] heightmap;
+
+    public BasicHMTerrainGenerator() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        mantle = blockManager.getBlock("engine:MantleStone");
+        water = blockManager.getBlock("engine:Water");
+        stone = blockManager.getBlock("engine:Stone");
+        sand = blockManager.getBlock("engine:Sand");
+        grass = blockManager.getBlock("engine:Grass");
+        snow = blockManager.getBlock("engine:Snow");
+    }
 
     @Override
     public void setWorldSeed(String seed) {

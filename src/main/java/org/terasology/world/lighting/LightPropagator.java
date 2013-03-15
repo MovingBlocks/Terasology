@@ -179,7 +179,7 @@ public class LightPropagator {
         nextWave.add(new Vector3i(x, y, z));
         // First drop MAX_LIGHT until it is blocked
         if (lightLevel == Chunk.MAX_LIGHT && worldView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
-            Block lastBlock = BlockManager.getInstance().getAir();
+            Block lastBlock = BlockManager.getAir();
             for (int columnY = y - 1; columnY >= 0; columnY--) {
                 Block block = worldView.getBlock(x, columnY, z);
                 if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP) && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
@@ -373,7 +373,7 @@ public class LightPropagator {
             for (int z = 0; z < region.size().z; z++) {
                 int y = top;
                 byte aboveLight = worldView.getSunlight(x + region.min().x, y + 1, z + region.min().z);
-                Block lastBlock = BlockManager.getInstance().getAir();
+                Block lastBlock = BlockManager.getAir();
                 if (aboveLight == Chunk.MAX_LIGHT) {
                     for (; y >= 0; y--) {
                         Block block = worldView.getBlock(x + region.min().x, y, z + region.min().z);

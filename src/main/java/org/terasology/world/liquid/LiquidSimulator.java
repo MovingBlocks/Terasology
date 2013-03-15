@@ -15,20 +15,15 @@
  */
 package org.terasology.world.liquid;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.components.world.WorldComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.game.CoreRegistry;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -37,11 +32,15 @@ import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkReadyEvent;
 
-import com.google.common.collect.Queues;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Rough draft of Minecraft-like behavior of liquids. Will be replaced with some
@@ -58,7 +57,10 @@ public class LiquidSimulator implements ComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LiquidSimulator.class);
 
+    @In
     private WorldProvider world;
+    @In
+    private BlockManager blockManager;
     private Block air;
     private Block grass;
     private Block snow;
@@ -70,13 +72,12 @@ public class LiquidSimulator implements ComponentSystem {
 
     @Override
     public void initialise() {
-        world = CoreRegistry.get(WorldProvider.class);
-        air = BlockManager.getInstance().getAir();
-        grass = BlockManager.getInstance().getBlock("engine:Grass");
-        snow = BlockManager.getInstance().getBlock("engine:Snow");
-        dirt = BlockManager.getInstance().getBlock("engine:Dirt");
-        water = BlockManager.getInstance().getBlock("engine:Water");
-        lava = BlockManager.getInstance().getBlock("engine:Lava");
+        air = blockManager.getAir();
+        grass = blockManager.getBlock("engine:Grass");
+        snow = blockManager.getBlock("engine:Snow");
+        dirt = blockManager.getBlock("engine:Dirt");
+        water = blockManager.getBlock("engine:Water");
+        lava = blockManager.getBlock("engine:Lava");
 
         blockQueue = Queues.newLinkedBlockingQueue();
 
@@ -282,7 +283,7 @@ public class LiquidSimulator implements ComponentSystem {
         return !block.isPenetrable();
     }
 
-    private class SimulateBlock implements LiquidSimulationTask{
+    private class SimulateBlock implements LiquidSimulationTask {
 
         private Vector3i blockPos;
         private long waitForTime;

@@ -34,15 +34,15 @@ public class PortalBlueprint extends Blueprint {
     /**
      * Fill the blueprint with the default Portal design. This isn't the right way to do it...
      */
-    public PortalBlueprint() {
+    public PortalBlueprint(BlockManager blockManager) {
         // This becomes the portalBlocks Selection in PortalComponent
-        _blockCollection.addBlock(new BlockPosition(1, 1, 0), BlockManager.getInstance().getBlock("engine:portal"));
+        _blockCollection.addBlock(new BlockPosition(1, 1, 0), blockManager.getBlock("engine:portal"));
 
         // And these guys make up the frame
-        _blockCollection.addBlock(new BlockPosition(1, 2, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
-        _blockCollection.addBlock(new BlockPosition(0, 1, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
-        _blockCollection.addBlock(new BlockPosition(2, 1, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
-        _blockCollection.addBlock(new BlockPosition(1, 0, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(1, 2, 0), blockManager.getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(0, 1, 0), blockManager.getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(2, 1, 0), blockManager.getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(1, 0, 0), blockManager.getBlock("engine:PortalFrame"));
 
         // Set the position we'll use as the attachment point
         _blockCollection.setAttachPos(new BlockPosition(1, -1, 0));

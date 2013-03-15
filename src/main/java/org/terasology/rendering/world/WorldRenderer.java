@@ -59,6 +59,7 @@ import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.WorldTimeEvent;
 import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 
@@ -182,7 +183,8 @@ public final class WorldRenderer {
      */
     public WorldRenderer(WorldInfo worldInfo, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
         this.chunkProvider = chunkProvider;
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, this.chunkProvider));
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, this.chunkProvider, blockManager));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
         worldProvider = new WorldProviderWrapper(entityWorldProvider);

@@ -25,6 +25,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.testUtil.WorldProviderCoreStub;
@@ -52,6 +53,7 @@ public class EntityAwareWorldProviderTest {
     private PrefabManager prefabManager;
     private EntityManager entityManager;
     private static ModManager modManager;
+    private BlockManager blockManager;
 
     @BeforeClass
     public static void commonSetup() {
@@ -61,10 +63,11 @@ public class EntityAwareWorldProviderTest {
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
+        blockManager = CoreRegistry.put(BlockManager.class, new BlockManager());
 
         entityManager = builder.build(modManager);
         prefabManager = entityManager.getPrefabManager();
-        worldProvider = new EntityAwareWorldProvider(new WorldProviderCoreStub(BlockManager.getInstance().getAir()));
+        worldProvider = new EntityAwareWorldProvider(new WorldProviderCoreStub(BlockManager.getAir()));
         worldProvider.entityManager = entityManager;
     }
 
@@ -77,9 +80,9 @@ public class EntityAwareWorldProviderTest {
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
         persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
 
-        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getInstance().getAir()));
+        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
         List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
         assertEquals(1, blockEntities.size());
         assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
@@ -96,9 +99,9 @@ public class EntityAwareWorldProviderTest {
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.WHILE_PLACED);
         persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
 
-        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getInstance().getAir()));
+        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
         List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
         assertEquals(1, blockEntities.size());
         assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
@@ -115,14 +118,14 @@ public class EntityAwareWorldProviderTest {
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
         persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
 
         EntityRef entity = entityManager.create(prefab);
         StringComponent comp = entity.getComponent(StringComponent.class);
         comp.value = "hi";
         entity.saveComponent(comp);
 
-        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getInstance().getAir(), entity));
+        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir(), entity));
         List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
         assertEquals(1, blockEntities.size());
         assertEquals(blockEntities.get(0), entity);

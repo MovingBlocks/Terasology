@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -41,7 +42,9 @@ public class InternalLightGeneratorTest {
 
     @Before
     public void setup() {
-        airBlock = BlockManager.getInstance().getBlock((byte)0);
+        BlockManager blockManager = new BlockManager();
+        CoreRegistry.put(BlockManager.class, blockManager);
+        airBlock = BlockManager.getAir();
         solidBlock = new Block();
         solidBlock.setDisplayName("Stone");
         solidBlock.setUri(new BlockUri("engine:stone"));
@@ -50,7 +53,7 @@ public class InternalLightGeneratorTest {
             solidBlock.setFullSide(side, true);
         }
         solidBlock.setTranslucent(false);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock), true);
+        blockManager.addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock), true);
     }
 
     @Test

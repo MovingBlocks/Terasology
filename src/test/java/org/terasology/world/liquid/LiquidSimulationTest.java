@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldView;
@@ -40,18 +42,22 @@ public class LiquidSimulationTest {
 
     @Before
     public void setup() {
+        CoreRegistry.put(Config.class, new Config());
+
         Chunk[] chunks = new Chunk[] {new Chunk(new Vector3i(-1,0,-1)), new Chunk(new Vector3i(0,0,-1)), new Chunk(new Vector3i(1,0,-1)),
                 new Chunk(new Vector3i(-1,0,0)), new Chunk(new Vector3i(0,0,0)), new Chunk(new Vector3i(1,0,0)),
                 new Chunk(new Vector3i(-1,0,1)), new Chunk(new Vector3i(0,0,1)), new Chunk(new Vector3i(1,0,1))};
 
         view = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1,1,1));
 
-        air = BlockManager.getInstance().getBlock((byte)0);
+        BlockManager blockManager = new BlockManager();
+        CoreRegistry.put(BlockManager.class, blockManager);
+        air = BlockManager.getAir();
         dirt = new Block();
         dirt.setDisplayName("Dirt");
         dirt.setUri(new BlockUri("engine:dirt"));
         dirt.setId((byte) 1);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt));
+        blockManager.addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt));
 
         for (int x = -Chunk.SIZE_X + 1; x < 2 * Chunk.SIZE_X; ++x) {
             for (int z = -Chunk.SIZE_Z + 1; z < 2 * Chunk.SIZE_Z; ++z) {

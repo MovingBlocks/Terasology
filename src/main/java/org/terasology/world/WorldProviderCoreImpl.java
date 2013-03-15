@@ -49,12 +49,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private WorldBiomeProvider biomeProvider;
     private ChunkProvider chunkProvider;
+    private BlockManager blockManager;
 
     private long timeOffset;
 
     private List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider, BlockManager blockManager) {
         if (title == null) {
             title = seed;
         }
@@ -64,13 +65,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkGenerators = chunkGenerators;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
+        this.blockManager = blockManager;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
 
         setTime(time);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider);
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager) {
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider, blockManager);
     }
 
     @Override
@@ -90,7 +92,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             modConfig.addMod(mod.getModInfo().getId());
         }
         WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, modConfig);
-        worldInfo.setBlockIdMap(BlockManager.getInstance().getBlockIdMap());
+        worldInfo.setBlockIdMap(blockManager.getBlockIdMap());
         return worldInfo;
     }
 
@@ -210,7 +212,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public Block getBlock(int x, int y, int z) {
         if (y >= Chunk.SIZE_Y || y < 0) {
-            return BlockManager.getInstance().getAir();
+            return BlockManager.getAir();
         }
 
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
@@ -219,7 +221,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getBlock(blockPos);
         }
-        return BlockManager.getInstance().getAir();
+        return BlockManager.getAir();
     }
 
     @Override

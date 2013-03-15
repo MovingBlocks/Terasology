@@ -15,21 +15,22 @@
  */
 package org.terasology.world.generator.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.game.CoreRegistry;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Create a flat world with a specified height. It use the WorldBiomeProvider
  * but not the seed.
- * 
+ *
  * @author Mathias Kalb
  */
 public class FlatTerrainGenerator implements ChunkGenerator {
@@ -45,13 +46,15 @@ public class FlatTerrainGenerator implements ChunkGenerator {
     private WorldBiomeProvider biomeProvider;
     private int height;
 
-    private Block air = BlockManager.getInstance().getAir();
-    private Block mantle = BlockManager.getInstance().getBlock("engine:MantleStone");
-    private Block stone = BlockManager.getInstance().getBlock("engine:Stone");
-    private Block sand = BlockManager.getInstance().getBlock("engine:Sand");
-    private Block grass = BlockManager.getInstance().getBlock("engine:Grass");
-    private Block snow = BlockManager.getInstance().getBlock("engine:Snow");
-    private Block dirt = BlockManager.getInstance().getBlock("engine:Dirt");
+    BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+
+    private Block air = BlockManager.getAir();
+    private Block mantle = blockManager.getBlock("engine:MantleStone");
+    private Block stone = blockManager.getBlock("engine:Stone");
+    private Block sand = blockManager.getBlock("engine:Sand");
+    private Block grass = blockManager.getBlock("engine:Grass");
+    private Block snow = blockManager.getBlock("engine:Snow");
+    private Block dirt = blockManager.getBlock("engine:Dirt");
 
     public FlatTerrainGenerator() {
         height = FlatTerrainGenerator.DEFAULT_HEIGHT;
@@ -120,47 +123,47 @@ public class FlatTerrainGenerator implements ChunkGenerator {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
-                for (int y = Chunk.SIZE_Y-1; y >= 0; y--) {
+                for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
                     if (y == 0) {
                         // bedrock/mantle
                         chunk.setBlock(x, y, z, mantle);
                     } else if (y < height) {
                         // underground
                         switch (type) {
-                        case FOREST:
-                            chunk.setBlock(x, y, z, dirt);
-                            break;
-                        case PLAINS:
-                            chunk.setBlock(x, y, z, dirt);
-                            break;
-                        case MOUNTAINS:
-                            chunk.setBlock(x, y, z, stone);
-                            break;
-                        case SNOW:
-                            chunk.setBlock(x, y, z, snow);
-                            break;
-                        case DESERT:
-                            chunk.setBlock(x, y, z, sand);
-                            break;
+                            case FOREST:
+                                chunk.setBlock(x, y, z, dirt);
+                                break;
+                            case PLAINS:
+                                chunk.setBlock(x, y, z, dirt);
+                                break;
+                            case MOUNTAINS:
+                                chunk.setBlock(x, y, z, stone);
+                                break;
+                            case SNOW:
+                                chunk.setBlock(x, y, z, snow);
+                                break;
+                            case DESERT:
+                                chunk.setBlock(x, y, z, sand);
+                                break;
                         }
                     } else if (y == height) {
                         // surface
                         switch (type) {
-                        case FOREST:
-                            chunk.setBlock(x, y, z, dirt);
-                            break;
-                        case PLAINS:
-                            chunk.setBlock(x, y, z, grass);
-                            break;
-                        case MOUNTAINS:
-                            chunk.setBlock(x, y, z, stone);
-                            break;
-                        case SNOW:
-                            chunk.setBlock(x, y, z, snow);
-                            break;
-                        case DESERT:
-                            chunk.setBlock(x, y, z, sand);
-                            break;
+                            case FOREST:
+                                chunk.setBlock(x, y, z, dirt);
+                                break;
+                            case PLAINS:
+                                chunk.setBlock(x, y, z, grass);
+                                break;
+                            case MOUNTAINS:
+                                chunk.setBlock(x, y, z, stone);
+                                break;
+                            case SNOW:
+                                chunk.setBlock(x, y, z, snow);
+                                break;
+                            case DESERT:
+                                chunk.setBlock(x, y, z, sand);
+                                break;
                         }
                     } else {
                         // air

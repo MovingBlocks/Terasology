@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -38,12 +39,14 @@ public class WorldViewTest {
 
     @Before
     public void setup() {
-        airBlock = BlockManager.getInstance().getBlock((byte)0);
+        BlockManager blockManager = new BlockManager();
+        CoreRegistry.put(BlockManager.class, blockManager);
+        airBlock = BlockManager.getAir();
         solidBlock = new Block();
         solidBlock.setDisplayName("Stone");
         solidBlock.setUri(new BlockUri("engine:stone"));
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock));
-        solidBlock = BlockManager.getInstance().getBlock(solidBlock.getURI());
+        blockManager.addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock));
+        solidBlock = blockManager.getBlock(solidBlock.getURI());
     }
 
     @Test

@@ -95,11 +95,13 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     private void blockChanged(BlockChangeMessage blockChange) {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        logger.debug("Received block change to {}", blockManager.getBlock((byte)blockChange.getNewBlock()));
         // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         Vector3i pos = NetworkUtil.convert(blockChange.getPos());
         Block oldBlock = worldProvider.getBlock(pos);
-        Block newBlock = BlockManager.getInstance().getBlock((byte) blockChange.getNewBlock());
+        Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
         if (!worldProvider.setBlock(pos, newBlock, oldBlock)) {
             logger.error("Failed to enact block update from server - {} to {}", pos, newBlock);
         }

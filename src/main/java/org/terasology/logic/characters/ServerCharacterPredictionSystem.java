@@ -21,6 +21,7 @@ import org.terasology.game.Timer;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.utilities.collection.CircularBuffer;

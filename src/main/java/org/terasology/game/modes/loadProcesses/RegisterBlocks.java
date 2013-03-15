@@ -16,6 +16,7 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.block.management.BlockManager;
@@ -38,7 +39,9 @@ public class RegisterBlocks implements LoadProcess {
 
     @Override
     public boolean step() {
-        BlockManager.getInstance().load(worldInfo.getBlockIdMap());
+        BlockManager blockManager = new BlockManager();
+        blockManager.load(worldInfo.getBlockIdMap());
+        CoreRegistry.put(BlockManager.class, blockManager);
         return true;
     }
 

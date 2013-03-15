@@ -37,7 +37,7 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 * @author Small-Jeeper
 */
 
-@RegisterSystem()
+@RegisterSystem(whenHeadless = false)
 public class DroppedItemsRenderer implements RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
     private WorldRenderer worldRenderer;

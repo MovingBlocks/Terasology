@@ -53,8 +53,6 @@ public class BlockManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockManager.class);
 
-    /* SINGLETON */
-    private static BlockManager instance;
 
     private BlockLoader blockLoader;
 
@@ -73,14 +71,34 @@ public class BlockManager {
 
     private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
 
-    public static BlockManager getInstance() {
-        if (instance == null)
-            instance = new BlockManager();
+    private final static Block AIR;
+    private final static BlockFamily AIR_FAMILY;
 
-        return instance;
+    static {
+        AIR = new Block();
+        AIR.setTranslucent(true);
+        AIR.setInvisible(true);
+        AIR.setTargetable(false);
+        AIR.setPenetrable(true);
+        AIR.setReplacementAllowed(true);
+        AIR.setShadowCasting(false);
+        AIR.setAttachmentAllowed(false);
+        AIR.setHardness((byte) 0);
+        AIR.setId((byte) 0);
+        AIR.setDisplayName("Air");
+        AIR.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, "air"));
+        AIR_FAMILY = new SymmetricFamily(AIR.getURI(), AIR);
     }
 
-    private BlockManager() {
+    public static Block getAir() {
+        return AIR;
+    }
+
+    public static BlockFamily getAirFamily() {
+        return AIR_FAMILY;
+    }
+
+    public BlockManager() {
         blockLoader = new BlockLoader();
         reset();
     }
@@ -97,22 +115,10 @@ public class BlockManager {
         blockLoader = new BlockLoader();
         categoryLookup.clear();
 
-        Block air = new Block();
-        air.setTranslucent(true);
-        air.setInvisible(true);
-        air.setTargetable(false);
-        air.setPenetrable(true);
-        air.setReplacementAllowed(true);
-        air.setShadowCasting(false);
-        air.setAttachmentAllowed(false);
-        air.setHardness((byte) 0);
-        air.setId((byte) 0);
-        air.setDisplayName("Air");
-        air.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, "air"));
-        blocksById.put(air.getId(), air);
-        blocksByUri.put(air.getURI(), air);
-        idByUri.put(air.getURI(), air.getId());
-        familyByUri.put(air.getURI(), new SymmetricFamily(air.getURI(), air));
+        blocksById.put(AIR.getId(), AIR);
+        blocksByUri.put(AIR.getURI(), AIR);
+        idByUri.put(AIR.getURI(), AIR.getId());
+        familyByUri.put(AIR.getURI(), AIR_FAMILY);
     }
 
     public void load(Map<String, Byte> knownBlockMappings) {
@@ -248,10 +254,6 @@ public class BlockManager {
         return result;
     }
 
-    public Block getAir() {
-        return blocksById.get((byte) 0);
-    }
-
     public void addBlockFamily(BlockFamily family) {
         addBlockFamily(family, false);
     }
@@ -279,10 +281,12 @@ public class BlockManager {
         for (Block block : family.getBlocks()) {
             byte id = idByUri.get(block.getURI());
             if (id == 0) {
+                logger.info("Assigning block id");
                 id = (byte) nextId++;
                 idByUri.put(block.getURI(), id);
             }
             block.setId(id);
+            logger.info("Registering block {} to id {}", block, block.getId());
             blocksById.put(block.getId(), block);
             blocksByUri.put(block.getURI(), block);
 

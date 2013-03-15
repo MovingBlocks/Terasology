@@ -108,7 +108,7 @@ public class ExplosionAction implements ComponentSystem {
                 if (currentBlock.isDestructible()) {
                     // TODO: this should be handled centrally somewhere. Actions shouldn't be determining world behaviour
                     // like what happens when a block is destroyed.
-                    worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
+                    worldProvider.setBlock(blockPos, BlockManager.getAir(), currentBlock);
 
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();

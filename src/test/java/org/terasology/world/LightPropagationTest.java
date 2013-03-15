@@ -18,6 +18,7 @@ package org.terasology.world;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -53,8 +54,10 @@ public class LightPropagationTest {
 
         view = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         propagator = new LightPropagator(view);
+        BlockManager blockManager = new BlockManager();
+        CoreRegistry.put(BlockManager.class, blockManager);
 
-        air = BlockManager.getInstance().getBlock((byte) 0);
+        air = BlockManager.getAir();
         dirt = new Block();
         dirt.setDisplayName("Dirt");
         dirt.setUri(new BlockUri("engine:dirt"));
@@ -62,13 +65,13 @@ public class LightPropagationTest {
         for (Side side : Side.values()) {
             dirt.setFullSide(side, true);
         }
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt), true);
+        blockManager.addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt), true);
         torch = new Block();
         torch.setDisplayName("Torch");
         torch.setUri(new BlockUri("engine:torch"));
         torch.setId((byte) 2);
         torch.setLuminance(Chunk.MAX_LIGHT);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(torch.getURI(), torch), true);
+        blockManager.addBlockFamily(new SymmetricFamily(torch.getURI(), torch), true);
 
     }
 

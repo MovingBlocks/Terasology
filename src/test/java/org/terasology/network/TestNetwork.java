@@ -16,9 +16,11 @@
 
 package org.terasology.network;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
@@ -30,6 +32,11 @@ import static org.mockito.Mockito.mock;
  * @author Immortius
  */
 public class TestNetwork {
+
+    @Before
+    public void setup() {
+        CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+    }
 
     @Test
     public void testNetwork() throws InterruptedException {

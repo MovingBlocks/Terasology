@@ -16,40 +16,45 @@
 
 package org.terasology.componentSystem.worldSimulation;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.world.block.entity.BlockComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.game.CoreRegistry;
+import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
-import com.google.common.collect.Queues;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Immortius
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class GrowthSimulator implements ComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(GrowthSimulator.class);
 
+    @In
+    private BlockManager blockManager;
+
+    @In
     private WorldProvider world;
+
     private Block air;
     private Block grass;
     private Block dirt;
@@ -60,10 +65,9 @@ public class GrowthSimulator implements ComponentSystem {
 
     @Override
     public void initialise() {
-        world = CoreRegistry.get(WorldProvider.class);
-        air = BlockManager.getInstance().getAir();
-        grass = BlockManager.getInstance().getBlock("engine:grass");
-        dirt = BlockManager.getInstance().getBlock("engine:dirt");
+        air = BlockManager.getAir();
+        grass = blockManager.getBlock("engine:grass");
+        dirt = blockManager.getBlock("engine:dirt");
         blockQueue = Queues.newLinkedBlockingQueue();
         running.set(true);
 

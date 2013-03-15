@@ -35,7 +35,7 @@ public class InternalLightProcessor {
         // Tunnel light down
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
-                Block lastBlock = BlockManager.getInstance().getAir();
+                Block lastBlock = BlockManager.getAir();
                 int y = top;
                 for (; y >= 0; y--) {
                     Block block = chunk.getBlock(x,y,z);

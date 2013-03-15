@@ -83,11 +83,11 @@ public class BlockEntitySystem implements ComponentSystem {
 
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
-        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock);
+        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir(), oldBlock);
 
         Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
         if (upperBlock.isSupportRequired()) {
-            worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getInstance().getAir(), upperBlock);
+            worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getAir(), upperBlock);
         }
 
         // TODO: Configurable via block definition

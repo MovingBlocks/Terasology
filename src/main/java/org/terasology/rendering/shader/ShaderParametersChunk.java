@@ -80,9 +80,10 @@ public class ShaderParametersChunk implements IShaderParameters {
             program.setFloat("time", worldProvider.getTimeInDays());
         }
 
-        program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        program.setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("engine:grass"));
-        program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("engine:water"));
-        program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("engine:lava"));
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        program.setFloat1("wavingCoordinates", blockManager.calcCoordinatesForWavingBlocks());
+        program.setFloat2("grassCoordinate", blockManager.calcCoordinate("engine:grass"));
+        program.setFloat2("waterCoordinate", blockManager.calcCoordinate("engine:water"));
+        program.setFloat2("lavaCoordinate", blockManager.calcCoordinate("engine:lava"));
     }
 }

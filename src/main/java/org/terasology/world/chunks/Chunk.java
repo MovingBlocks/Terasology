@@ -118,6 +118,8 @@ public class Chunk implements Externalizable {
 
     private final Vector3i pos = new Vector3i();
 
+    private BlockManager blockManager;
+
     private TeraArray blockData;
     private TeraArray sunlightData;
     private TeraArray lightData;
@@ -144,6 +146,7 @@ public class Chunk implements Externalizable {
         lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
+        blockManager = CoreRegistry.get(BlockManager.class);
     }
 
     public Chunk(int x, int y, int z) {
@@ -164,6 +167,7 @@ public class Chunk implements Externalizable {
         lightData = other.lightData.copy();
         extraData = other.extraData.copy();
         chunkState = other.chunkState;
+        blockManager = other.blockManager;
         dirty = true;
     }
 
@@ -175,6 +179,7 @@ public class Chunk implements Externalizable {
         this.extraData = Preconditions.checkNotNull(liquid);
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
+        blockManager = CoreRegistry.get(BlockManager.class);
     }
 
     /**
@@ -293,11 +298,11 @@ public class Chunk implements Externalizable {
     }
 
     public Block getBlock(Vector3i pos) {
-        return BlockManager.getInstance().getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
+        return blockManager.getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
     }
 
     public Block getBlock(int x, int y, int z) {
-        return BlockManager.getInstance().getBlock((byte) blockData.get(x, y, z));
+        return blockManager.getBlock((byte) blockData.get(x, y, z));
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {

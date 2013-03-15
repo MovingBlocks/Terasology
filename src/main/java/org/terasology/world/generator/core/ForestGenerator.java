@@ -18,6 +18,7 @@ package org.terasology.world.generator.core;
 
 import java.util.Map;
 
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
@@ -45,9 +46,10 @@ public class ForestGenerator implements SecondPassChunkGenerator {
     private Block sandBlock;
 
     public ForestGenerator() {
-        grassBlock = BlockManager.getInstance().getBlock("engine:Grass");
-        snowBlock = BlockManager.getInstance().getBlock("engine:Snow");
-        sandBlock = BlockManager.getInstance().getBlock("engine:Sand");
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        grassBlock = blockManager.getBlock("engine:Grass");
+        snowBlock = blockManager.getBlock("engine:Snow");
+        sandBlock = blockManager.getBlock("engine:Sand");
     }
 
     public void addTreeGenerator(WorldBiomeProvider.Biome type, TreeGenerator gen) {

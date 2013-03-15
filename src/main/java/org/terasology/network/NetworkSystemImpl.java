@@ -51,6 +51,7 @@ import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -80,6 +81,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer eventSerializer;
     private PackedEntitySerializer entitySerializer;
+    private BlockManager blockManager;
 
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
@@ -200,9 +202,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     nextNetworkTick += NET_TICK_RATE;
                     netTick = true;
                 }
+                PerformanceMonitor.startActivity("Client update");
                 for (Client client : clientList) {
                     client.update(netTick);
                 }
+                PerformanceMonitor.endActivity();
                 if (server != null) {
                     server.update(netTick);
                 }
@@ -388,6 +392,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         this.entityManager = entityManager;
         this.entityManager.subscribe(this);
+        this.blockManager = CoreRegistry.get(BlockManager.class);
 
         CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
@@ -622,7 +627,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
             serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
         }
-        for (Map.Entry<String, Byte> blockMapping : BlockManager.getInstance().getBlockIdMap().entrySet()) {
+        for (Map.Entry<String, Byte> blockMapping : blockManager.getBlockIdMap().entrySet()) {
             serverInfoMessageBuilder.addBlockId(blockMapping.getValue());
             serverInfoMessageBuilder.addBlockName(blockMapping.getKey());
         }

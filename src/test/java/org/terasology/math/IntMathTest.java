@@ -15,59 +15,54 @@
  */
 package org.terasology.math;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.world.chunks.Chunk;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- *
  * @author Immortius
  */
-public class IntMathTest
-{
-    public IntMathTest()
-    {
+public class IntMathTest {
+    public IntMathTest() {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception
-    {
+    public static void setUpClass() throws Exception {
+        Config config = new Config();
+        CoreRegistry.put(Config.class, config);
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception
-    {
+    public static void tearDownClass() throws Exception {
     }
-    
+
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
-    
+
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
     }
 
     /**
      * Test of CeilPowerOfTwo method, of class IntMath.
      */
     @Test
-    public void testCeilPowerOfTwo()
-    {
+    public void testCeilPowerOfTwo() {
         assertEquals(8, TeraMath.ceilPowerOfTwo(8));
         assertEquals(8, TeraMath.ceilPowerOfTwo(7));
         assertEquals(0, TeraMath.ceilPowerOfTwo(-100));
     }
-    
+
     @Test
-    public void testSizeOfPower()
-    {
+    public void testSizeOfPower() {
         assertEquals(0, TeraMath.sizeOfPower(1));
         assertEquals(1, TeraMath.sizeOfPower(2));
         assertEquals(2, TeraMath.sizeOfPower(4));
@@ -75,20 +70,18 @@ public class IntMathTest
         assertEquals(4, TeraMath.sizeOfPower(16));
         assertEquals(5, TeraMath.sizeOfPower(32));
     }
-    
+
     @Test
-    public void testFloorToInt()
-    {
+    public void testFloorToInt() {
         assertEquals(0, TeraMath.floorToInt(0f));
         assertEquals(1, TeraMath.floorToInt(1f));
         assertEquals(0, TeraMath.floorToInt(0.5f));
         assertEquals(-1, TeraMath.floorToInt(-0.5f));
         assertEquals(-1, TeraMath.floorToInt(-1f));
     }
-    
+
     @Test
-    public void testCeilToInt()
-    {
+    public void testCeilToInt() {
         assertEquals(0, TeraMath.ceilToInt(0f));
         assertEquals(1, TeraMath.ceilToInt(1f));
         assertEquals(1, TeraMath.ceilToInt(0.5f));

@@ -15,18 +15,17 @@
  */
 package org.terasology.world.generator.tree;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
-
+import org.terasology.game.CoreRegistry;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Allows the generation of complex trees based on L-Systems.
@@ -61,9 +60,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
         angleInDegree = angle;
         this.iterations = iterations;
-        air = BlockManager.getInstance().getAir();
-        leafType = BlockManager.getInstance().getBlock("engine:GreenLeaf");
-        barkType = BlockManager.getInstance().getBlock("engine:OakTrunk");
+        air = BlockManager.getAir();
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        leafType = blockManager.getBlock("engine:GreenLeaf");
+        barkType = blockManager.getBlock("engine:OakTrunk");
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
