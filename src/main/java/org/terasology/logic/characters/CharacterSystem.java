@@ -16,7 +16,6 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -28,6 +27,7 @@ import org.terasology.events.DamageEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;

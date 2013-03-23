@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation for events that are broadcast to all clients (in addition to running on the server).
  * These events must originate from the server in order to be broadcast.
+ *
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)

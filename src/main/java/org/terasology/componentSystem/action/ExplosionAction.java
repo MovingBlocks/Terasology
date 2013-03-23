@@ -15,18 +15,16 @@
  */
 package org.terasology.componentSystem.action;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.components.actions.ExplosionActionComponent;
-import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
@@ -36,6 +34,8 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

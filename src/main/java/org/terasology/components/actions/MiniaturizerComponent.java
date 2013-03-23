@@ -15,12 +15,12 @@
  */
 package org.terasology.components.actions;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.BlockGrid;
 import org.terasology.world.MiniatureChunk;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

@@ -26,7 +26,7 @@ public class ServerComponentFieldCheck implements FieldSerializeCheck<Component>
                 || (field.getReplicationInfo().value() == ReplicateType.SERVER_TO_OWNER && owned)
                 || (field.getReplicationInfo().value().isReplicateFromOwner() && !owned)));
         if (result && component instanceof ReplicationCheck) {
-            return ((ReplicationCheck)component).shouldReplicate(field, initial, owned);
+            return ((ReplicationCheck) component).shouldReplicate(field, initial, owned);
         }
         return result;
     }

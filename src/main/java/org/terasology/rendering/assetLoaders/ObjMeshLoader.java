@@ -15,22 +15,11 @@
  */
 package org.terasology.rendering.assetLoaders;
 
+import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-
-import javax.vecmath.Tuple3i;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
@@ -38,7 +27,15 @@ import org.terasology.asset.AssetUri;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.primitives.Mesh;
 
-import com.google.common.collect.Lists;
+import javax.vecmath.Tuple3i;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Importer for Wavefront obj files. Supports core obj mesh data

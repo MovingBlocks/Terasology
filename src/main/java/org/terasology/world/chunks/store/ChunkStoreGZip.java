@@ -15,6 +15,14 @@
  */
 package org.terasology.world.chunks.store;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkStore;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,15 +38,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkStore;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
 
 public class ChunkStoreGZip implements ChunkStore, Serializable {
     static final long serialVersionUID = -8168985892342356264L;
@@ -96,7 +95,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
     public ChunkStoreGZip() {
         setup();
     }
-    
+
     public void setup() {
         modifiedChunks = Maps.newConcurrentMap();
         compressionQueue = Queues.newLinkedBlockingDeque();

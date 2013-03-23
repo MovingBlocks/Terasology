@@ -54,8 +54,8 @@ public class UIScreenContainer extends UIWindow {
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         maximize();
-        setCloseBinds(new String[] {"engine:frob"});
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setCloseBinds(new String[]{"engine:frob"});
+        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
 
         addVisibilityListener(new VisibilityListener() {
             @Override
@@ -141,12 +141,12 @@ public class UIScreenContainer extends UIWindow {
         getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
         layout();
 
-        playerInventory.setPosition(new Vector2f(Display.getWidth()/2 - playerInventory.getSize().x/2, Display.getHeight() + 5f));
+        playerInventory.setPosition(new Vector2f(Display.getWidth() / 2 - playerInventory.getSize().x / 2, Display.getHeight() + 5f));
         playerInventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - playerInventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
         playerInventory.getAnimation(AnimationMove.class).start();
-        leftGearWheel.addAnimation(new AnimationRotate(-120f,10f));
+        leftGearWheel.addAnimation(new AnimationRotate(-120f, 10f));
         leftGearWheel.getAnimation(AnimationRotate.class).start();
-        rightGearWheel.addAnimation(new AnimationRotate(120f,10f));
+        rightGearWheel.addAnimation(new AnimationRotate(120f, 10f));
         rightGearWheel.getAnimation(AnimationRotate.class).start();
     }
 }

@@ -16,7 +16,14 @@
 
 package org.terasology.audio.loaders;
 
-import static org.lwjgl.openal.AL10.alGenBuffers;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.openal.AL10;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.Sound;
+import org.terasology.audio.openAL.OggSound;
+import org.terasology.audio.openAL.OpenALException;
+import org.terasology.utilities.OggReader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,14 +32,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.openal.AL10;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.openAL.OggSound;
-import org.terasology.audio.openAL.OpenALException;
-import org.terasology.audio.Sound;
-import org.terasology.utilities.OggReader;
+import static org.lwjgl.openal.AL10.alGenBuffers;
 
 /**
  * @author Immortius

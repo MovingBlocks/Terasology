@@ -27,6 +27,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerAuthority;
 import org.terasology.world.chunks.Chunk;
 
 /**
@@ -39,13 +40,13 @@ public class WorldViewTest {
 
     @Before
     public void setup() {
-        BlockManager blockManager = new BlockManager();
+        BlockManagerAuthority blockManager = new BlockManagerAuthority();
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = BlockManager.getAir();
         solidBlock = new Block();
         solidBlock.setDisplayName("Stone");
         solidBlock.setUri(new BlockUri("engine:stone"));
-        blockManager.addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock), true);
         solidBlock = blockManager.getBlock(solidBlock.getURI());
     }
 

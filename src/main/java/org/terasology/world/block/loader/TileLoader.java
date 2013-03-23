@@ -16,21 +16,21 @@
 
 package org.terasology.world.block.loader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-
 /**
  * Loader for block tiles
+ *
  * @author Immortius
  */
 public class TileLoader implements AssetLoader<Tile> {

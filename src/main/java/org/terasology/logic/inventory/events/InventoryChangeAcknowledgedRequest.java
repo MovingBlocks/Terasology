@@ -29,7 +29,8 @@ import org.terasology.network.OwnerEvent;
 public class InventoryChangeAcknowledgedRequest extends NetworkEvent {
     private int changeId;
 
-    protected InventoryChangeAcknowledgedRequest() {}
+    protected InventoryChangeAcknowledgedRequest() {
+    }
 
     public InventoryChangeAcknowledgedRequest(int changeId) {
         this.changeId = changeId;

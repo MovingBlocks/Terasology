@@ -34,7 +34,10 @@ import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glScissor;
 
 /**
  * Composition of multiple display elements.
@@ -51,7 +54,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     //cropping
     private boolean cropContainer = false;
     protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    
+
     public UIDisplayContainer() {
         super();
     }
@@ -62,7 +65,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         int cropY = 0;
         int cropWidth = 0;
         int cropHeight = 0;
-        
+
         if (!isVisible())
             return;
 
@@ -75,10 +78,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             glEnable(GL_SCISSOR_TEST);
             glScissor(cropX, cropY, cropWidth, cropHeight);
         }
-        
+
         UIDisplayElement styleElement;
         for (Style style : styles) {
-            styleElement = ((UIDisplayElement)style);
+            styleElement = ((UIDisplayElement) style);
             allowsCrop = cropContainer && !styleElement.isCrop();
             if (allowsCrop) {
                 glDisable(GL_SCISSOR_TEST);
@@ -89,7 +92,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
                 glScissor(cropX, cropY, cropWidth, cropHeight);
             }
         }
-        
+
         // Render all display elements
         for (int i = 0; i < displayElements.size(); i++) {
             allowsCrop = cropContainer && !displayElements.get(i).isCrop();
@@ -112,12 +115,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void update() {
         if (!isVisible())
             return;
-        
+
         super.update();
-        
+
         //update styles
         for (Style style : styles) {
-            ((UIDisplayElement)style).update();
+            ((UIDisplayElement) style).update();
         }
 
         // Update all display elements
@@ -125,16 +128,16 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             displayElements.get(i).update();
         }
     }
-    
+
     public void layout() {
         if (!isVisible())
             return;
-        
+
         super.layout();
-        
+
         //update layout styles
         for (Style style : styles) {
-            ((UIDisplayElement)style).layout();
+            ((UIDisplayElement) style).layout();
         }
 
         // Update layout of all display elements
@@ -142,14 +145,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             displayElements.get(i).layout();
         }
     }
-    
+
     @Override
     public void processBindButton(BindButtonEvent event) {
         if (!isVisible())
             return;
-        
+
         super.processBindButton(event);
-        
+
         // Pass the bind key to all display elements
         for (int i = 0; i < displayElements.size(); i++) {
             displayElements.get(i).processBindButton(event);
@@ -173,7 +176,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
         if (!isVisible())
             return consumed;
-        
+
         //cancel mouse click event if the click is out of the cropped area
         if (cropContainer) {
             if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
@@ -185,14 +188,15 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         for (int i = displayElements.size() - 1; i >= 0; i--) {
             consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed, croped);
         }
-        
+
         consumed = super.processMouseInput(button, state, wheelMoved, consumed, croped);
-        
+
         return consumed;
     }
-    
+
     /**
      * Set whether the child elements will be cropped to the size of the display container. To exclude particular child elements from cropping, use the setCrop method.
+     *
      * @param crop True to crop all child elements.
      */
     public void setCropContainer(boolean crop) {
@@ -201,6 +205,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     /**
      * Set crop margin for this container.
+     *
      * @param margin The margin where x = top, y = right, z = bottom, w = left
      */
     public void setCropMargin(Vector4f margin) {
@@ -213,36 +218,39 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     /**
      * Add a new display element to the display container.
+     *
      * @param element The element to add.
      */
     public void addDisplayElement(UIDisplayElement element) {
         displayElements.add(element);
         element.setParent(this);
         //element.setVisible(true);
-        
+
         layout();
     }
 
     /**
      * Add a new display element to the display container at a particular position.
+     *
      * @param element The element to add.
      */
     public void addDisplayElementToPosition(int position, UIDisplayElement element) {
         displayElements.add(position, element);
         element.setParent(this);
         //element.setVisible(true);
-        
+
         layout();
     }
 
     /**
      * Remove a display element.
+     *
      * @param element The element to remove.
      */
     public void removeDisplayElement(UIDisplayElement element) {
         displayElements.remove(element);
         element.setParent(null);
-        
+
         layout();
     }
 
@@ -254,38 +262,39 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             element.setParent(null);
         }
         displayElements.clear();
-        
+
         layout();
     }
-    
+
     /**
-     * 
      * @param element
      * @param index
      */
     public void orderDisplayElement(UIDisplayElement element, int index) {
         //TODO implement
     }
-    
+
     /**
      * Change the z-order of the given display element. Move it to the top, over all other display elements.
+     *
      * @param element The element to change the z-order.
      */
     public void orderDisplayElementTop(UIDisplayElement element) {
         int pos = getDisplayElements().indexOf(element);
-        
+
         if (pos != -1) {
             Collections.rotate(getDisplayElements().subList(pos, getDisplayElements().size()), -1);
         }
     }
-    
+
     /**
      * Change the z-order of the given display element. Move it to the bottom, under all other display elements.
+     *
      * @param element The element to change the z-order.
      */
     public void orderDisplayElementBottom(UIDisplayElement element) {
         int pos = getDisplayElements().indexOf(element);
-        
+
         if (pos != -1) {
             Collections.rotate(getDisplayElements().subList(pos, getDisplayElements().size()), 1);
         }
@@ -293,14 +302,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     /**
      * Get the list of all display elements of the display container.
+     *
      * @return Returns the list of all display elements.
      */
-    public ArrayList<UIDisplayElement> getDisplayElements() {        
+    public ArrayList<UIDisplayElement> getDisplayElements() {
         return displayElements;
     }
 
     /**
-     * 
      * @param elementId
      * @return
      */
@@ -311,14 +320,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
                 ret = element;
                 break;
             }
-            
+
             if (element instanceof UIDisplayContainer) {
-                if ((ret = ((UIDisplayContainer)element).getElementById(elementId)) != null) {
+                if ((ret = ((UIDisplayContainer) element).getElementById(elementId)) != null) {
                     break;
                 }
             }
         }
-        
+
         return ret;
     }
     
@@ -326,9 +335,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
        Styling System
        Styles are just special child display elements of the container which offer a function which is commonly used, such as a background image
     */
-    
+
     /**
      * Get a style by its class.
+     *
      * @param style The style class.
      * @return Returns the style class if one was added to the display container or null if none was added.
      */
@@ -338,44 +348,47 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
                 return style.cast(s);
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Add a style.
+     *
      * @param style The style to add.
      */
-    protected void addStyle(Style style) {        
+    protected void addStyle(Style style) {
         boolean added = false;
         for (int i = 0; i < styles.size(); i++) {
             if (styles.get(i).getLayer() > style.getLayer()) {
                 styles.add(i, style);
                 added = true;
-                
+
                 break;
             }
         }
-        
+
         if (!added) {
             styles.add(style);
         }
-        
+
         ((UIDisplayElement) style).setParent(this);
-        
+
         layout();
     }
-    
+
     /**
      * Removes a style.
+     *
      * @param style The style to remove.
      */
     protected void removeStyle(Style style) {
         styles.remove(style);
     }
-    
+
     /**
      * Set the background color. The background color will fill the whole element.
+     *
      * @param r Red value. (0-255)
      * @param g Green value. (0-255)
      * @param b Blue value. (0-255)
@@ -391,22 +404,24 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setColor(color);
         }
     }
-    
+
     /**
      * Set the background color. The background color will fill the whole element.
+     *
      * @param color The hex color value. #FFFFFFFF = ARGB
      */
     public void setBackgroundColor(String color) {
         StyleBackgroundColor style = getStyle(StyleBackgroundColor.class);
         if (style == null) {
-            style = new StyleBackgroundColor(color);;
+            style = new StyleBackgroundColor(color);
+            ;
             style.setVisible(true);
             addStyle(style);
         } else {
             style.setColor(color);
         }
     }
-    
+
     /**
      * Remove the background color.
      */
@@ -416,9 +431,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             removeStyle(style);
         }
     }
-    
+
     /**
      * Set the background image. Uses the whole texture.
+     *
      * @param texture The texture to load.
      */
     public void setBackgroundImage(String texture) {
@@ -440,9 +456,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     /**
      * Set the background Image.
+     *
      * @param texture The texture to load.
-     * @param origin The origin of the texture.
-     * @param size The size of the texture.
+     * @param origin  The origin of the texture.
+     * @param size    The size of the texture.
      */
     public void setBackgroundImage(String texture, Vector2f origin, Vector2f size) {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
@@ -458,21 +475,22 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
                 style.setTexture(Assets.getTexture(texture));
             }
-            
+
             style.setTextureOrigin(origin);
             style.setTextureSize(size);
         }
     }
-    
+
     /**
      * Set the origin and size of the loaded background image texture. If no image was loaded this won't have any effect.
+     *
      * @param origin The origin of the texture.
-     * @param size The size of the texture.
+     * @param size   The size of the texture.
      */
     public void setBackgroundImage(Vector2f origin, Vector2f size) {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
 
-        if (style != null) {            
+        if (style != null) {
             style.setTextureOrigin(origin);
             style.setTextureSize(size);
         }
@@ -480,67 +498,72 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     /**
      * Set the position of the background image. On default the background will fill the whole display element.
+     *
      * @param position The position.
      */
     public void setBackgroundImagePosition(Vector2f position) {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
-        
+
         if (style != null) {
             style.setPosition(position);
         }
     }
-    
+
     /**
      * Set the position of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
+     *
      * @param x The x position to set including the unit.
      * @param y The y position to set including the unit.
      */
     public void setBackgroundImagePosition(String x, String y) {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
-        
+
         if (style != null) {
             style.setPosition(x, y);
         }
     }
-    
+
     /**
      * Set the size of the background image. On default the background will fill the whole display element.
+     *
      * @param size
      */
     public void setBackgroundImageSize(Vector2f size) {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
-        
+
         if (style != null) {
             style.setSize(size);
         }
     }
-    
+
     /**
      * Set the size of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
-     * @param width The width to set including the unit.
+     *
+     * @param width  The width to set including the unit.
      * @param height The height to set including the unit.
      */
     public void setBackgroundImageSize(String width, String height) {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
-        
+
         if (style != null) {
             style.setSize(width, height);
         }
     }
-    
+
     /**
      * Remove the background image.
-     */ 
+     */
     public void removeBackgroundImage() {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
-        
+
         if (style != null) {
             removeStyle(style);
         }
     }
-    
+
     /**
      * Set the border.
+     *
      * @param width The width of the border. x = top, y = right, z = bottom, w = left
      * @param color The color.
      */
@@ -557,9 +580,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setWidth(width);
         }
     }
-    
+
     /**
      * Set the border.
+     *
      * @param width The width of the border. x = top, y = right, z = bottom, w = left
      * @param color The hex color value. #FFFFFFFF = ARGB
      */
@@ -576,24 +600,25 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setWidth(width);
         }
     }
-    
+
     /**
      * Remove the border.
      */
     public void removeBorderSolid() {
         StyleBorderSolid style = getStyle(StyleBorderSolid.class);
-        
+
         if (style != null) {
             removeStyle(style);
         }
     }
-    
+
     /**
      * Set the border from an image.
+     *
      * @param texture The texture.
-     * @param origin The origin of the border in the texture.
-     * @param size The size of the border container in the texture.
-     * @param width The border width for each side. x = top, y = right, z = bottom, w = left
+     * @param origin  The origin of the border in the texture.
+     * @param size    The size of the border container in the texture.
+     * @param width   The border width for each side. x = top, y = right, z = bottom, w = left
      */
     public void setBorderImage(String texture, Vector2f origin, Vector2f size, Vector4f borderSize) {
         StyleBorderImage style = getStyle(StyleBorderImage.class);
@@ -618,21 +643,22 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      */
     public void removeBorderImage() {
         StyleBorderImage style = getStyle(StyleBorderImage.class);
-        
+
         if (style != null) {
             removeStyle(style);
         }
     }
-    
+
     /**
      * Set the shadow.
-     * @param width The width of the shadow for each side. x = top, y = right, z = bottom, w = left
+     *
+     * @param width     The width of the shadow for each side. x = top, y = right, z = bottom, w = left
      * @param direction The direction of the shadow. OUTSIDE draws a shadow which points away from the element. INSIDE draws a shadow which points to the center of the element.
-     * @param opacity The opacity of the shadow. 0-1
+     * @param opacity   The opacity of the shadow. 0-1
      */
     public void setShadow(Vector4f width, EShadowDirection direction, float opacity) {
         StyleShadow style = getStyle(StyleShadow.class);
-        
+
         if (style == null) {
             style = new StyleShadow(width, direction, opacity);
             style.setSize("100%", "100%");
@@ -644,13 +670,13 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setOpacity(opacity);
         }
     }
-    
+
     /**
      * Remove the shadow.
      */
     public void removeShadow() {
         StyleShadow style = getStyle(StyleShadow.class);
-        
+
         if (style != null) {
             removeStyle(style);
         }

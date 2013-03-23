@@ -15,8 +15,8 @@
  */
 package org.terasology.audio.openAL;
 
-import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -16,9 +16,9 @@
 
 package org.terasology.world.block;
 
-import java.util.EnumMap;
-
 import org.terasology.math.Side;
+
+import java.util.EnumMap;
 
 /**
  * @author Immortius
@@ -37,7 +37,8 @@ public enum BlockPart {
 
     private Side side;
 
-    private BlockPart() {}
+    private BlockPart() {
+    }
 
     private BlockPart(Side side) {
         this.side = side;
@@ -52,7 +53,7 @@ public enum BlockPart {
         sideMap.put(Side.FRONT, FRONT);
         sideMap.put(Side.TOP, TOP);
 
-        sides = new BlockPart[] {TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM};
+        sides = new BlockPart[]{TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM};
     }
 
     public static BlockPart fromSide(Side side) {

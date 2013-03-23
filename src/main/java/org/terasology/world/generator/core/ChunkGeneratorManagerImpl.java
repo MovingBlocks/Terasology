@@ -16,11 +16,7 @@
 
 package org.terasology.world.generator.core;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
@@ -31,7 +27,10 @@ import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.generator.SecondPassChunkGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 
-import com.google.common.collect.Lists;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Immortius

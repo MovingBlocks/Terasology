@@ -1,34 +1,34 @@
 package org.terasology.world.chunks.blockdata;
 
+import com.google.common.base.Preconditions;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
-import com.google.common.base.Preconditions;
-
 
 /**
  * TeraSparseArrayByte is the base class used to implement sparse arrays with elements of size 4 bit or 8 bit.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public abstract class TeraSparseArrayByte extends TeraSparseArray {
 
     protected byte[][] inflated;
     protected byte[] deflated;
     protected byte fill;
-    
+
     protected abstract TeraArray createSparse(byte fill);
-    
+
     protected abstract TeraArray createSparse(byte[][] inflated, byte[] deflated);
 
     protected abstract int rowSize();
-    
+
     @Override
-    protected void initialize() {}
-    
+    protected void initialize() {
+    }
+
     protected static abstract class SerializationHandler<T extends TeraSparseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
 
         protected abstract T createArray(int sizeX, int sizeY, int sizeZ);
@@ -36,15 +36,15 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
         @Override
         protected int internalComputeMinimumBufferSize(T array) {
             final byte[][] inf = array.inflated;
-            if (inf == null) 
+            if (inf == null)
                 return 2;
             else {
                 final int sizeY = array.getSizeY(), rowSize = array.rowSize();
                 int result = 1;
                 for (int y = 0; y < sizeY; y++)
-                    if (inf[y] == null) 
+                    if (inf[y] == null)
                         result += 2;
-                    else 
+                    else
                         result += 1 + rowSize;
                 return result;
             }
@@ -96,7 +96,7 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
             return array;
         }
     }
-    
+
     protected TeraSparseArrayByte() {
         super();
     }
@@ -112,7 +112,7 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
         Preconditions.checkArgument(inflated.length == sizeY, "The length of parameter 'inflated' has to be " + sizeY + " but is " + inflated.length);
         Preconditions.checkArgument(deflated.length == sizeY, "The length of parameter 'deflated' has to be " + sizeY + " but is " + deflated.length);
     }
-    
+
     protected TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte fill) {
         super(sizeX, sizeY, sizeZ, false);
         this.fill = fill;
@@ -132,7 +132,7 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
 
     @Override
     public final TeraArray copy() {
-        if (inflated == null) 
+        if (inflated == null)
             return createSparse(fill);
         byte[][] inf = new byte[getSizeY()][];
         byte[] def = new byte[getSizeY()];

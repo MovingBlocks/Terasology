@@ -15,19 +15,16 @@
  */
 package org.terasology.components.world;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-
-import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateType;
 import org.terasology.network.ReplicationCheck;
 
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 import java.util.Collection;
 import java.util.List;
 

@@ -17,13 +17,8 @@
 package org.terasology.network;
 
 import org.terasology.components.DisplayInformationComponent;
-import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.game.CoreRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkUnloadedEvent;
 
 /**
  * @author Immortius

@@ -23,9 +23,10 @@ import java.util.Arrays;
  * A fast 3D array wrapper.
  * </p>
  * Note: </br>
- * This class is deprecated and should not be used. 
+ * This class is deprecated and should not be used.
  * Its functionality is now covered by {@link org.terasology.world.chunks.blockdata.TeraDenseArray8Bit TeraDenseArray8Bit}.
  * </p>
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 @Deprecated

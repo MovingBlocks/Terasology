@@ -16,23 +16,41 @@
 
 package org.terasology.rendering;
 
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.lwjgl.opengl.GL11.*;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDeleteLists;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.glVertex3f;
 
 /**
  * Renderer for an AABB.
+ *
  * @author Immortius
  */
-public class AABBRenderer implements BlockOverlayRenderer
-{
+public class AABBRenderer implements BlockOverlayRenderer {
     private int displayListWire = -1;
     private int displayListSolid = -1;
     private Vector4f solidColor = new Vector4f(1f, 1f, 1f, 1f);
@@ -61,7 +79,7 @@ public class AABBRenderer implements BlockOverlayRenderer
         }
     }
 
-    public void setSolidColor(Vector4f color){
+    public void setSolidColor(Vector4f color) {
         solidColor = color;
     }
 
@@ -83,7 +101,7 @@ public class AABBRenderer implements BlockOverlayRenderer
         glPopMatrix();
     }
 
-    public void renderSolid(){
+    public void renderSolid() {
         ShaderManager.getInstance().enableDefault();
 
         glPushMatrix();
@@ -231,8 +249,8 @@ public class AABBRenderer implements BlockOverlayRenderer
         glEnd();
         glEndList();
     }
-    
-    public AABB getAABB(){
+
+    public AABB getAABB() {
         return aabb;
     }
 }

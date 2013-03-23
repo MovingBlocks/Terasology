@@ -16,9 +16,9 @@
 
 package org.terasology.asset;
 
-import java.util.Locale;
-
 import com.google.common.base.Objects;
+
+import java.util.Locale;
 
 /**
  * @author Immortius

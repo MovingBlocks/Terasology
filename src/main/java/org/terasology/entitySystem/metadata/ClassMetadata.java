@@ -39,7 +39,7 @@ public class ClassMetadata<T> {
     private String[] names;
     private TIntObjectMap<FieldMetadata> fieldsById = new TIntObjectHashMap<FieldMetadata>();
 
-    public ClassMetadata(Class<T> simpleClass, String ... names) throws NoSuchMethodException {
+    public ClassMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
         this.clazz = simpleClass;
         this.names = Arrays.copyOf(names, names.length);
         constructor = simpleClass.getDeclaredConstructor();

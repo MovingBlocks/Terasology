@@ -9,7 +9,6 @@ import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.NetworkSystemImpl;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldInfo;
 
@@ -41,7 +40,7 @@ public class JoinServer implements LoadProcess {
 
             Map<String, Byte> blockMap = Maps.newHashMap();
             for (int i = 0; i < serverInfo.getBlockIdCount(); ++i) {
-                blockMap.put(serverInfo.getBlockName(i), (byte)serverInfo.getBlockId(i));
+                blockMap.put(serverInfo.getBlockName(i), (byte) serverInfo.getBlockId(i));
             }
             worldInfo.setBlockIdMap(blockMap);
             worldInfo.setTime(networkSystem.getServer().getInfo().getTime());

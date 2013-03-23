@@ -16,6 +16,7 @@
 
 package org.terasology.world;
 
+import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.game.CoreRegistry;
@@ -27,6 +28,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerAuthority;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.lighting.LightPropagator;
 
@@ -54,7 +56,7 @@ public class LightPropagationTest {
 
         view = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         propagator = new LightPropagator(view);
-        BlockManager blockManager = new BlockManager();
+        BlockManagerAuthority blockManager = new BlockManagerAuthority(Maps.<String, Byte>newHashMap());
         CoreRegistry.put(BlockManager.class, blockManager);
 
         air = BlockManager.getAir();

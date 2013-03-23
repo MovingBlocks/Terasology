@@ -55,6 +55,7 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
@@ -740,5 +741,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     void mockHost() {
         mode = NetworkMode.SERVER;
+    }
+
+    @Override
+    public void onBlockFamilyRegistered(BlockFamily family) {
+        if (mode == NetworkMode.SERVER) {
+            for (NetClient client : netClientList) {
+                client.blockFamilyRegistered(family);
+            }
+        }
     }
 }

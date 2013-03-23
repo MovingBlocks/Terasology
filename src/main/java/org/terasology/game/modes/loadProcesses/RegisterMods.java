@@ -21,8 +21,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.network.NetworkSystem;
-import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldInfo;
 
 /**

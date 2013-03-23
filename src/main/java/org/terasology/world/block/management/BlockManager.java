@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.world.block.management;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
@@ -28,7 +29,6 @@ import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.Prefab;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -36,6 +36,7 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockLoader;
+import org.terasology.world.block.loader.FreeformFamily;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
@@ -45,34 +46,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Provides access to blocks by block id or block title.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Immortius
  */
-public class BlockManager {
+public abstract class BlockManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockManager.class);
 
-
-    private BlockLoader blockLoader;
-
-    /* BLOCKS */
-    private final Map<BlockUri, Block> blocksByUri     = Maps.newHashMapWithExpectedSize(256);
-    private final Map<String, Block> blocksByPrefabName  = Maps.newHashMapWithExpectedSize(256);
-    private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<Block>(256);
-
-    private int nextId = 1;
-    private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<BlockUri>(256);
-
-    /* Families */
-    private final Set<BlockUri> shapelessBlockDefinition = Sets.newHashSet();
-    private final Map<BlockUri, BlockFamily> partiallyRegisteredFamilies = Maps.newHashMap();
-    private final Map<BlockUri, BlockFamily> familyByUri = Maps.newHashMapWithExpectedSize(128);
-
-    private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
+    private static final int NUM_WAVING_TEXTURES = 16;
 
     private final static Block AIR;
     private final static BlockFamily AIR_FAMILY;
+
+    public static final String AIR_ID = "air";
 
     static {
         AIR = new Block();
@@ -86,7 +71,7 @@ public class BlockManager {
         AIR.setHardness((byte) 0);
         AIR.setId((byte) 0);
         AIR.setDisplayName("Air");
-        AIR.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, "air"));
+        AIR.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, AIR_ID));
         AIR_FAMILY = new SymmetricFamily(AIR.getURI(), AIR);
     }
 
@@ -98,58 +83,68 @@ public class BlockManager {
         return AIR_FAMILY;
     }
 
-    public BlockManager() {
-        blockLoader = new BlockLoader();
-        reset();
+    /* Families */
+    private final Set<BlockUri> freeformBlockUris = Sets.newHashSet();
+    private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
+    private final Map<BlockUri, BlockFamily> availableFamilies = Maps.newHashMap();
+    private final Map<BlockUri, BlockFamily> registeredFamilyByUri = Maps.newHashMapWithExpectedSize(128);
+
+    /* Blocks */
+    private final Map<BlockUri, Block> blocksByUri = Maps.newHashMapWithExpectedSize(256);
+    private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<Block>(256);
+    private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<BlockUri>(256);
+
+    private List<BlockRegistrationListener> listeners = Lists.newArrayList();
+
+    public void subscribe(BlockRegistrationListener listener) {
+        this.listeners.add(listener);
     }
 
-    public void reset() {
-        blocksById.clear();
-        blocksByPrefabName.clear();
-        blocksByUri.clear();
-        familyByUri.clear();
-        idByUri.clear();
-        partiallyRegisteredFamilies.clear();
-        shapelessBlockDefinition.clear();
-        nextId = 1;
-        blockLoader = new BlockLoader();
-        categoryLookup.clear();
-
-        blocksById.put(AIR.getId(), AIR);
-        blocksByUri.put(AIR.getURI(), AIR);
-        idByUri.put(AIR.getURI(), AIR.getId());
-        familyByUri.put(AIR.getURI(), AIR_FAMILY);
+    public void unsubscribe(BlockRegistrationListener listener) {
+        listeners.remove(listener);
     }
 
-    public void load(Map<String, Byte> knownBlockMappings) {
-        reset();
-        for (Map.Entry<String, Byte> entry : knownBlockMappings.entrySet()) {
-            idByUri.put(new BlockUri(entry.getKey()), (byte) entry.getValue());
+    /**
+     *
+     * @param family
+     * @param andRegister Immediately registers the family - it is expected that the blocks have been given ids.
+     */
+    @VisibleForTesting
+    public void addBlockFamily(BlockFamily family, boolean andRegister) {
+        for (String category : family.getCategories()) {
+            categoryLookup.put(category, family.getURI());
         }
-        nextId = idByUri.size();
-
-        BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
-        for (BlockFamily family : blockDefinitions.families) {
-            if (knownBlockMappings.containsKey(family.getURI().toString())) {
-                addBlockFamily(family, true);
-            } else {
-                addBlockFamily(family);
-            }
+        availableFamilies.put(family.getURI(), family);
+        if (andRegister) {
+            registerFamily(family);
         }
-        for (BlockLoader.ShapelessFamily shapelessFamily : blockDefinitions.shapelessDefinitions) {
-            addShapelessBlockFamily(shapelessFamily.uri, shapelessFamily.categories);
-        }
-        blockLoader.buildAtlas();
-        bindBlocks(knownBlockMappings);
     }
 
-    private void bindBlocks(Map<String, Byte> knownBlockMappings) {
-        for (String blockUri : knownBlockMappings.keySet()) {
-            Block block = getBlock(new BlockUri(blockUri));
-            if (block == null) {
-                logger.warn("Block {} no longer available", blockUri);
-            }
+    @VisibleForTesting
+    public void addFreeformBlockFamily(BlockUri family, String... categories) {
+        freeformBlockUris.add(family);
+        for (String category : categories) {
+            categoryLookup.put(category, family);
         }
+    }
+
+    @VisibleForTesting
+    protected void registerFamily(BlockFamily family) {
+        logger.info("Registered {}", family);
+        registeredFamilyByUri.put(family.getURI(), family);
+        for (Block block : family.getBlocks()) {
+            registerBlock(block);
+        }
+        for (BlockRegistrationListener listener : listeners) {
+            listener.onBlockFamilyRegistered(family);
+        }
+    }
+
+    private void registerBlock(Block block) {
+        logger.info("Registered Block {} with id {}", block, block.getId());
+        blocksById.put(block.getId(), block);
+        blocksByUri.put(block.getURI(), block);
+        idByUri.put(block.getURI(), block.getId());
     }
 
     /**
@@ -201,25 +196,7 @@ public class BlockManager {
     }
 
     public BlockFamily getBlockFamily(BlockUri uri) {
-        BlockFamily family = familyByUri.get(uri);
-        if (family == null) {
-            family = partiallyRegisteredFamilies.get(uri);
-            if (family != null) {
-                partiallyRegisteredFamilies.remove(uri);
-                registerBlockFamily(family);
-            } else {
-                BlockUri shapelessUri = new BlockUri(uri.getPackage(), uri.getFamily());
-                if (shapelessBlockDefinition.contains(shapelessUri)) {
-                    family = blockLoader.loadWithShape(uri);
-                    if (family != null) {
-                        registerBlockFamily(family);
-                    } else {
-                        logger.error("Failed to load shapeless def: {}", uri);
-                    }
-                }
-            }
-        }
-        return family;
+        return registeredFamilyByUri.get(uri);
     }
 
     public Block getBlock(String uri) {
@@ -241,11 +218,6 @@ public class BlockManager {
         return block;
     }
 
-    public Block getBlock(Prefab prefab){
-        Block result = blocksByPrefabName.get(prefab.getName());
-        return result;
-    }
-
     public Block getBlock(byte id) {
         Block result = blocksById.get(id);
         if (result == null) {
@@ -254,93 +226,47 @@ public class BlockManager {
         return result;
     }
 
-    public void addBlockFamily(BlockFamily family) {
-        addBlockFamily(family, false);
-    }
-
-    public void addBlockFamily(BlockFamily family, boolean forceRegister) {
-        for (String category : family.getCategories()) {
-            categoryLookup.put(category, family.getURI());
-        }
-        if (forceRegister) {
-            registerBlockFamily(family);
-        } else {
-            partiallyRegisteredFamilies.put(family.getURI(), family);
-        }
-    }
-
-    public void addShapelessBlockFamily(BlockUri family, String ... categories) {
-        shapelessBlockDefinition.add(family);
-        for (String category : categories) {
-            categoryLookup.put(category, family);
-        }
-    }
-
-    private void registerBlockFamily(BlockFamily family) {
-        familyByUri.put(family.getURI(), family);
-        for (Block block : family.getBlocks()) {
-            byte id = idByUri.get(block.getURI());
-            if (id == 0) {
-                logger.info("Assigning block id");
-                id = (byte) nextId++;
-                idByUri.put(block.getURI(), id);
-            }
-            block.setId(id);
-            logger.info("Registering block {} to id {}", block, block.getId());
-            blocksById.put(block.getId(), block);
-            blocksByUri.put(block.getURI(), block);
-
-            if( !block.getEntityPrefab().isEmpty() ){
-                blocksByPrefabName.put(block.getEntityPrefab(), block);
-            }
-        }
-    }
-
-    /**
-     * @return An iterator over the registered block families
-     */
     public Iterable<BlockUri> listRegisteredBlockUris() {
-        return familyByUri.keySet();
+        return registeredFamilyByUri.keySet();
     }
 
-    /**
-     * @return An iterator over the registered block families
-     */
     public Iterable<BlockFamily> listRegisteredBlockFamilies() {
-        return familyByUri.values();
+        return registeredFamilyByUri.values();
     }
 
     public int registeredBlockFamiliesCount() {
-        return familyByUri.size();
+        return registeredFamilyByUri.size();
     }
 
-    /**
-     * @return An iterator over the shapeless block types available
-     */
-    public Iterable<BlockUri> listShapelessBlockUris() {
-        return shapelessBlockDefinition;
+    public Iterable<BlockUri> listFreeformBlockUris() {
+        return freeformBlockUris;
     }
 
-    /**
-     * @return An iterator over unused but available block families
-     */
+    public boolean isFreeformFamily(BlockUri familyUri) {
+        return freeformBlockUris.contains(familyUri);
+    }
+
     public Iterable<BlockFamily> listAvailableBlockFamilies() {
-        return partiallyRegisteredFamilies.values();
+        return availableFamilies.values();
+    }
+
+    public BlockFamily getAvailableBlockFamily(BlockUri uri) {
+        return availableFamilies.get(uri);
     }
 
     public Iterable<BlockUri> listAvailableBlockUris() {
-        return partiallyRegisteredFamilies.keySet();
+        return availableFamilies.keySet();
     }
 
     public int getBlockFamilyCount() {
-        return familyByUri.size();
+        return registeredFamilyByUri.size();
     }
 
     public FloatBuffer calcCoordinatesForWavingBlocks() {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(32);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(NUM_WAVING_TEXTURES * 2);
 
         int counter = 0;
-        for (BlockFamily b : familyByUri.values()) {
+        for (BlockFamily b : registeredFamilyByUri.values()) {
             if (b.getArchetypeBlock().isWaving()) {
                 // TODO: Don't use random block part
                 Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
@@ -348,18 +274,12 @@ public class BlockManager {
                 buffer.put(pos.y);
                 counter++;
             }
-        }
-        for (BlockFamily b : partiallyRegisteredFamilies.values()) {
-            if (b.getArchetypeBlock().isWaving()) {
-                // TODO: Don't use random block part
-                Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
-                buffer.put(pos.x);
-                buffer.put(pos.y);
-                counter++;
+            if (counter >= NUM_WAVING_TEXTURES) {
+                break;
             }
         }
 
-        while (counter < 16) {
+        while (counter < NUM_WAVING_TEXTURES) {
             buffer.put(-1);
             buffer.put(-1);
             counter++;
@@ -386,6 +306,6 @@ public class BlockManager {
     }
 
     public boolean hasBlockFamily(BlockUri uri) {
-        return familyByUri.containsKey(uri) || partiallyRegisteredFamilies.containsKey(uri) || shapelessBlockDefinition.contains(uri);
+        return registeredFamilyByUri.containsKey(uri) || availableFamilies.containsKey(uri) || freeformBlockUris.contains(uri);
     }
 }

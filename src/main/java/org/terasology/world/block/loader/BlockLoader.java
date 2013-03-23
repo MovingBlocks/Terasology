@@ -34,7 +34,6 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import org.codehaus.groovy.tools.groovydoc.SimpleGroovyExecutableMemberDoc;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +77,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * Block Loader processes all the block assets, creating a set of Block Families and Freeform block uris.
+ *
  * @author Immortius
  */
 public class BlockLoader {
@@ -141,7 +142,7 @@ public class BlockLoader {
 
                     if (isShapelessBlockFamily(blockDef)) {
                         indexTile(getDefaultTile(blockDef, blockDefUri), true);
-                        result.shapelessDefinitions.add(new ShapelessFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
+                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
                     } else {
                         if (blockDef.liquid) {
                             blockDef.rotation = BlockDefinition.RotationType.NONE;
@@ -269,14 +270,14 @@ public class BlockLoader {
         return result;
     }
 
-    private List<ShapelessFamily> loadAutoBlocks() {
+    private List<FreeformFamily> loadAutoBlocks() {
         logger.debug("Loading Auto Blocks...");
-        List<ShapelessFamily> result = Lists.newArrayList();
+        List<FreeformFamily> result = Lists.newArrayList();
         for (AssetUri blockTileUri : Assets.list(AssetType.BLOCK_TILE)) {
             if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
                 logger.debug("Loading auto block {}", blockTileUri);
                 BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
-                result.add(new ShapelessFamily(uri));
+                result.add(new FreeformFamily(uri));
                 getTileIndex(blockTileUri, true);
             }
         }
@@ -757,22 +758,6 @@ public class BlockLoader {
 
     public static class LoadBlockDefinitionResults {
         public List<BlockFamily> families = Lists.newArrayList();
-        public List<ShapelessFamily> shapelessDefinitions = Lists.newArrayList();
+        public List<FreeformFamily> shapelessDefinitions = Lists.newArrayList();
     }
-
-    public static class ShapelessFamily {
-        public BlockUri uri;
-        public String[] categories = new String[0];
-
-        public ShapelessFamily(BlockUri uri) {
-            this.uri = uri;
-        }
-
-        public ShapelessFamily(BlockUri uri, String[] categories) {
-            this(uri);
-            this.categories = categories;
-        }
-
-    }
-
 }

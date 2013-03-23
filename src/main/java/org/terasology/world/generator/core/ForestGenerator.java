@@ -16,8 +16,8 @@
 
 package org.terasology.world.generator.core;
 
-import java.util.Map;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.FastRandom;
@@ -29,8 +29,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.SecondPassChunkGenerator;
 import org.terasology.world.generator.tree.TreeGenerator;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
+import java.util.Map;
 
 /**
  * @author Immortius

@@ -53,7 +53,6 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.NetworkSystemImpl;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;

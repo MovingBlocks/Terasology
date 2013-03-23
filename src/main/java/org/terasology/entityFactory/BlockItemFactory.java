@@ -15,13 +15,12 @@
  */
 package org.terasology.entityFactory;
 
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.network.NetworkComponent;
-import org.terasology.world.block.BlockEntityMode;
-import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.world.block.BlockEntityMode;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**

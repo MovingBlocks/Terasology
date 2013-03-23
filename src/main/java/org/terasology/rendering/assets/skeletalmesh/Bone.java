@@ -31,7 +31,7 @@ public class Bone {
     private String name;
     private int index;
     private Vector3f objectSpacePos = new Vector3f();
-    private Quat4f rotation = new Quat4f(0,0,0,1);
+    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
 
     private Bone parent;
     private List<Bone> children = Lists.newArrayList();

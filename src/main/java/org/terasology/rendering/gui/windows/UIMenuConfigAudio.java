@@ -17,16 +17,16 @@ package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
-import org.terasology.config.Config;
 import org.terasology.config.AudioConfig;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UILabel;
+import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -40,7 +40,7 @@ public class UIMenuConfigAudio extends UIWindow {
 
     final UIImage title;
     final UILabel version;
-    
+
     private final UISlider soundOptionSlider;
     private final UISlider musicOptionSlider;
     private final UIButton backToConfigMenuButton;
@@ -50,8 +50,8 @@ public class UIMenuConfigAudio extends UIWindow {
         setId("config:audio");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
-        setCloseBinds(new String[] {});
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setCloseBinds(new String[]{});
+        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         maximize();
 
         title = new UIImage(Assets.getTexture("engine:terasology"));
@@ -117,7 +117,7 @@ public class UIMenuConfigAudio extends UIWindow {
         addDisplayElement(soundOptionSlider);
         addDisplayElement(musicOptionSlider);
         addDisplayElement(backToConfigMenuButton);
-        
+
         setup(config);
     }
 

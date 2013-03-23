@@ -52,10 +52,10 @@ public class UIMenuPause extends UIWindow {
         setId("pause");
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
-        setCloseBinds(new String[] {"engine:pause"});
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setCloseBinds(new String[]{"engine:pause"});
+        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         maximize();
-        
+
         _title = new UIImage(Assets.getTexture("engine:terasology"));
         _title.setSize(new Vector2f(512f, 128f));
         _title.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -78,14 +78,14 @@ public class UIMenuPause extends UIWindow {
         _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         _exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
         _exitButton.setVisible(true);
-        
+
         _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnEvent());
-                
+
                 setVisible(false);
             }
         });

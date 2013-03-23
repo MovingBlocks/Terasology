@@ -28,7 +28,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface RegisterBindAxis {
     String id();
+
     String positiveButton();
+
     String negativeButton();
+
     SendEventMode eventMode() default SendEventMode.WHEN_NON_ZERO;
 }

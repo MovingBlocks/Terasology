@@ -15,13 +15,12 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-
-import com.google.common.collect.Sets;
-import com.google.common.collect.Maps;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -30,21 +29,25 @@ import java.util.Map;
 /**
  * Basic implementation of PrefabManager.
  *
- * @see PrefabManager
- *
  * @author Immortius <immortius@gmail.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @see PrefabManager
  */
 public class PojoPrefabManager implements PrefabManager {
 
-    /** Library for available components (passed in). */
+    /**
+     * Library for available components (passed in).
+     */
     private ComponentLibrary componentLibrary;
 
-    /** Map that stores the loaded Prefabs. */
+    /**
+     * Map that stores the loaded Prefabs.
+     */
     private Map<String, Prefab> prefabTable = Maps.newHashMap();
 
     /**
      * Constructor requiring a ComponentLibrary to be passed in.
+     *
      * @param library The library of Components to use
      */
     public PojoPrefabManager(ComponentLibrary library) {

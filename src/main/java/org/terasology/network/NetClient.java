@@ -36,6 +36,7 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.Chunks;
 
@@ -86,6 +87,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
+    private List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
     private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
     private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
@@ -148,6 +150,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         if (netTick) {
             NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
             message.setTime(timer.getTimeInMs());
+            sendRegisteredBlocks(message);
             sendChunkInvalidations(message);
             sendNewChunks(message);
             sendRemovedEntities(message);
@@ -157,6 +160,18 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             send(message.build());
         }
         processReceivedMessages();
+    }
+
+    private void sendRegisteredBlocks(NetData.NetMessage.Builder message) {
+        for (BlockFamily family : newlyRegisteredFamilies) {
+            NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
+            for (Block block : family.getBlocks()) {
+                blockRegMessage.addBlockUri(block.getURI().toString());
+                blockRegMessage.addBlockId(block.getId());
+            }
+            message.addBlockFamilyRegistered(blockRegMessage);
+        }
+        newlyRegisteredFamilies.clear();
     }
 
     private void sendNewChunks(NetData.NetMessage.Builder message) {
@@ -449,5 +464,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     public void setViewDistanceMode(int newViewRange) {
         this.viewDistance = newViewRange;
+    }
+
+    public void blockFamilyRegistered(BlockFamily family) {
+        newlyRegisteredFamilies.add(family);
     }
 }

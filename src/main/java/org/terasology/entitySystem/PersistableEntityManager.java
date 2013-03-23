@@ -15,7 +15,6 @@
  */
 package org.terasology.entitySystem;
 
-import gnu.trove.list.TIntList;
 import gnu.trove.set.TIntSet;
 
 /**

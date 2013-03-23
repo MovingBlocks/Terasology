@@ -15,9 +15,8 @@
  */
 package org.terasology.math;
 
-import java.util.EnumMap;
-
 import javax.vecmath.Vector3f;
+import java.util.EnumMap;
 
 /**
  * The six sides of a block and a slew of related utility

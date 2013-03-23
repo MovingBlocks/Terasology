@@ -7,11 +7,10 @@ import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
 /**
  * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.
- * 
+ *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  * @note Currently it is optimized for chunks of size 16x256x16 blocks.
  * @todo Implement deflation for sparse arrays.
- * @author Manuel Brotz <manu.brotz@gmx.ch>
- *
  */
 public class TeraStandardDeflator extends TeraVisitingDeflator {
     
@@ -48,8 +47,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
     protected final static int DEFLATE_MINIMUM_16BIT = 8;
     protected final static int DEFLATE_MINIMUM_8BIT = 16;
     protected final static int DEFLATE_MINIMUM_4BIT = 31;
-    
-    public TeraStandardDeflator() {}
+
+    public TeraStandardDeflator() {
+    }
 
     @Override
     public TeraArray deflateDenseArray16Bit(short[] data, int rowSize, int sizeX, int sizeY, int sizeZ) {
@@ -95,44 +95,44 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
 
     @Override
     public TeraArray deflateDenseArray8Bit(final byte[] data, final int rowSize, final int sizeX, final int sizeY, final int sizeZ) {
-      final byte[][] inflated = new byte[sizeY][];
-      final byte[] deflated = new byte[sizeY];
-      int packed = 0;
-      for (int y = 0; y < sizeY; y++) {
-          final int start = y * rowSize;
-          final byte first = data[start];
-          boolean packable = true;
-          for (int i = 1; i < rowSize; i++) {
-              if (data[start + i] != first) {
-                  packable = false;
-                  break;
-              }
-          }
-          if (packable) {
-              deflated[y] = first;
-              ++packed;
-          } else {
-              byte[] tmp = new byte[rowSize];
-              System.arraycopy(data, start, tmp, 0, rowSize);
-              inflated[y] = tmp;
-          }
-      }
-      if (packed == sizeY) {
-          final byte first = deflated[0];
-          boolean packable = true;
-          for (int i = 1; i < sizeY; i++) {
-              if (deflated[i] != first) {
-                  packable = false;
-                  break;
-              }
-          }
-          if (packable)
-              return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, first);
-      }
-      if (packed > DEFLATE_MINIMUM_8BIT) {
-          return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
-      }
-      return null;
+        final byte[][] inflated = new byte[sizeY][];
+        final byte[] deflated = new byte[sizeY];
+        int packed = 0;
+        for (int y = 0; y < sizeY; y++) {
+            final int start = y * rowSize;
+            final byte first = data[start];
+            boolean packable = true;
+            for (int i = 1; i < rowSize; i++) {
+                if (data[start + i] != first) {
+                    packable = false;
+                    break;
+                }
+            }
+            if (packable) {
+                deflated[y] = first;
+                ++packed;
+            } else {
+                byte[] tmp = new byte[rowSize];
+                System.arraycopy(data, start, tmp, 0, rowSize);
+                inflated[y] = tmp;
+            }
+        }
+        if (packed == sizeY) {
+            final byte first = deflated[0];
+            boolean packable = true;
+            for (int i = 1; i < sizeY; i++) {
+                if (deflated[i] != first) {
+                    packable = false;
+                    break;
+                }
+            }
+            if (packable)
+                return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, first);
+        }
+        if (packed > DEFLATE_MINIMUM_8BIT) {
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
+        }
+        return null;
     }
 
     @Override

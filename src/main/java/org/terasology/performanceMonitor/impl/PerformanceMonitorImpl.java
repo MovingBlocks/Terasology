@@ -25,12 +25,11 @@ import gnu.trove.map.hash.TObjectLongHashMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectIntProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
+import org.lwjgl.Sys;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-
-import org.lwjgl.Sys;
 
 /**
  * Active implementation of Performance Monitor

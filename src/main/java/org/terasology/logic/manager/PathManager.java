@@ -16,9 +16,9 @@
 
 package org.terasology.logic.manager;
 
-import java.io.File;
-
 import org.lwjgl.LWJGLUtil;
+
+import java.io.File;
 
 /**
  * @author Immortius

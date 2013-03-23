@@ -29,13 +29,13 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
 /**
  * Implementation of WorldSerializer for PersistableEntityManager.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class WorldSerializerImpl implements WorldSerializer {

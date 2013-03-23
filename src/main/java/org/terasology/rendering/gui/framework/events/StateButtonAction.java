@@ -18,9 +18,7 @@ package org.terasology.rendering.gui.framework.events;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public interface StateButtonAction {
     public void action(UIDisplayElement element);

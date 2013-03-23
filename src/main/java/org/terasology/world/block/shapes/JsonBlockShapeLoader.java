@@ -16,29 +16,6 @@
 
 package org.terasology.world.block.shapes;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.procedure.TIntProcedure;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.util.List;
-import java.util.Locale;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.math.Rotation;
-import org.terasology.utilities.gson.Vector2fHandler;
-import org.terasology.utilities.gson.Vector3fHandler;
-import org.terasology.world.block.BlockPart;
-
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
@@ -56,6 +33,26 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.procedure.TIntProcedure;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.math.Rotation;
+import org.terasology.utilities.gson.Vector2fHandler;
+import org.terasology.utilities.gson.Vector3fHandler;
+import org.terasology.world.block.BlockPart;
+
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Immortius
@@ -251,7 +248,8 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             public CollisionShape collisionShape;
             public boolean symmetric;
 
-            public ColliderInfo() {}
+            public ColliderInfo() {
+            }
 
             public ColliderInfo(Vector3f offset, CollisionShape shape) {
                 this.offset = offset;

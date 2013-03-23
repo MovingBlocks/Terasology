@@ -1,17 +1,16 @@
 package org.terasology.entitySystem.persistence;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.protobuf.EntityData;
 
 /**
  * Interface for providing serializers with a method to check whether a given field should be serialized.
+ *
  * @author Immortius
  */
 public interface FieldSerializeCheck<T> {
 
     /**
-     * @param field The field to check
+     * @param field  The field to check
      * @param object The object it belongs to
      * @return Whether the field should be serialized
      */

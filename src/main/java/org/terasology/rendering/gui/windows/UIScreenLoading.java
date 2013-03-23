@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-
 import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIProgressBar;
 import org.terasology.rendering.gui.widgets.UIWindow;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
@@ -37,7 +37,7 @@ public class UIScreenLoading extends UIWindow {
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
-        
+
         background = new UIImage(Assets.getTexture("engine:menuBackground"));
         background.setVisible(true);
 
@@ -53,7 +53,7 @@ public class UIScreenLoading extends UIWindow {
     }
 
     public void updateStatus(String string, float percent) {
-        _progressBar.setValue((int)percent);
+        _progressBar.setValue((int) percent);
         _progressBar.setText(string);
     }
 }

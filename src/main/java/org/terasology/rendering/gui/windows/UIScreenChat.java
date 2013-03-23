@@ -29,7 +29,6 @@ import org.terasology.logic.manager.MessageManager.MessageSubscription;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
-import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;

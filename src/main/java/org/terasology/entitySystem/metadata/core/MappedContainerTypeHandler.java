@@ -15,17 +15,15 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Maps;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>

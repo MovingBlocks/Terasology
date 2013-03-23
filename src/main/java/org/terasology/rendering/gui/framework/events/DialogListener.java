@@ -19,12 +19,10 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.widgets.UIDialog.EReturnCode;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public interface DialogListener {
-    
+
     public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue);
-    
+
 }

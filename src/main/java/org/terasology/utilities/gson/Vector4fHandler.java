@@ -26,8 +26,8 @@ import javax.vecmath.Vector4f;
 import java.lang.reflect.Type;
 
 /**
-* @author Immortius
-*/
+ * @author Immortius
+ */
 public class Vector4fHandler implements JsonDeserializer<Vector4f> {
 
     @Override

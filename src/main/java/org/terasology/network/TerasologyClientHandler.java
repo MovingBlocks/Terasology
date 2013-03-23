@@ -31,6 +31,7 @@ import org.terasology.game.Timer;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -82,40 +83,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), true);
             receivedServerInfo(message.getServerInfo());
         }
-        for (ChunksProtobuf.Chunk chunk : message.getChunkInfoList()) {
-            receivedChunk(chunk);
-        }
-        for (InvalidateChunkMessage invalidatedChunk : message.getInvalidateChunkList()) {
-            invalidateChunk(invalidatedChunk);
-        }
-        for (BlockChangeMessage blockChanged : message.getBlockChangeList()) {
-            blockChanged(blockChanged);
-        }
         server.queueMessage(message);
-    }
-
-    private void blockChanged(BlockChangeMessage blockChange) {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        logger.debug("Received block change to {}", blockManager.getBlock((byte)blockChange.getNewBlock()));
-        // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-        Vector3i pos = NetworkUtil.convert(blockChange.getPos());
-        Block oldBlock = worldProvider.getBlock(pos);
-        Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
-        if (!worldProvider.setBlock(pos, newBlock, oldBlock)) {
-            logger.error("Failed to enact block update from server - {} to {}", pos, newBlock);
-        }
-    }
-
-    // TODO: Threading (need to deal with this coming from a background thread correctly)
-    private void invalidateChunk(InvalidateChunkMessage invalidateChunk) {
-        server.invalidateChunks(NetworkUtil.convert(invalidateChunk.getPos()));
-    }
-
-    private void receivedChunk(ChunksProtobuf.Chunk chunkInfo) {
-        logger.debug("Received chunk {}, {}, {}", chunkInfo.getX(), chunkInfo.getY(), chunkInfo.getZ());
-        Chunk chunk = Chunks.getInstance().decode(chunkInfo);
-        server.receiveChunk(chunk);
     }
 
     @Override

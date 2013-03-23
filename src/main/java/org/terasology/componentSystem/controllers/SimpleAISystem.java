@@ -21,14 +21,14 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
 

@@ -6,13 +6,11 @@ package org.terasology.entitySystem.metadata;
 public interface EntitySystemLibrary {
 
     /**
-     *
      * @return The library of component metadata
      */
     ComponentLibrary getComponentLibrary();
 
     /**
-     *
      * @return The library of event metadata
      */
     EventLibrary getEventLibrary();

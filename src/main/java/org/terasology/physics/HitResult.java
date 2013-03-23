@@ -16,10 +16,10 @@
 
 package org.terasology.physics;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

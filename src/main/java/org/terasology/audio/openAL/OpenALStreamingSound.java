@@ -15,16 +15,15 @@
  */
 package org.terasology.audio.openAL;
 
-import static org.lwjgl.openal.AL10.AL_SIZE;
-import static org.lwjgl.openal.AL10.alGetBufferi;
+import org.lwjgl.openal.AL10;
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.Sound;
 
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-import org.lwjgl.openal.AL10;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
-import org.terasology.audio.openAL.OpenALException;
+import static org.lwjgl.openal.AL10.AL_SIZE;
+import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public abstract class OpenALStreamingSound implements Sound {
     private final static int BUFFER_POOL_SIZE = 3;
@@ -99,7 +98,7 @@ public abstract class OpenALStreamingSound implements Sound {
         // TODO: Fix this
         for (int i = 0; i < buffers.length; i++) {
             if (buffers[i] != 0) {
-               // AL10.alDeleteBuffers(buffers[i]);
+                // AL10.alDeleteBuffers(buffers[i]);
             }
         }
         OpenALException.checkState("Deleting buffer data");

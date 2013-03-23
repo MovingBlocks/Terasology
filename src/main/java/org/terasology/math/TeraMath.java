@@ -15,16 +15,14 @@
  */
 package org.terasology.math;
 
-import static org.lwjgl.opengl.GL11.glGetFloat;
-
-import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
+import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.nio.FloatBuffer;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-import org.lwjgl.BufferUtils;
-import org.terasology.world.chunks.Chunk;
+import static org.lwjgl.opengl.GL11.glGetFloat;
 
 /**
  * Collection of math functions.
@@ -296,7 +294,7 @@ public final class TeraMath {
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z) {
-        return calcBlockPos(x,y,z, Chunk.INNER_CHUNK_POS_FILTER);
+        return calcBlockPos(x, y, z, Chunk.INNER_CHUNK_POS_FILTER);
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {

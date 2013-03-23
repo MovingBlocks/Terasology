@@ -15,11 +15,11 @@
  */
 package org.terasology.math;
 
+import org.terasology.world.block.BlockPart;
+
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-
-import org.terasology.world.block.BlockPart;
 
 /**
  * @author Immortius <immortius@gmail.com>

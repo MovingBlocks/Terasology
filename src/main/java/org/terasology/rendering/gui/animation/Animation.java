@@ -21,60 +21,69 @@ import org.terasology.rendering.gui.framework.events.AnimationListener;
 import java.util.ArrayList;
 
 /**
- * 
  * TODO notification for repeat event
  */
 public abstract class Animation {
-    
+
     //events
-    private enum EAnimationEvents {START, STOP, REPEAT};
+    private enum EAnimationEvents {
+        START, STOP, REPEAT
+    }
+
+    ;
     private final ArrayList<AnimationListener> animationListeners = new ArrayList<AnimationListener>();
-    
+
     private boolean started = false;
-    private boolean repeat  = false;
+    private boolean repeat = false;
     protected UIDisplayElement target;
 
 
-    public void start(){
+    public void start() {
         started = true;
         notifyAnimationListeners(EAnimationEvents.START);
-    };
+    }
 
-    public void stop(){
+    ;
+
+    public void stop() {
         started = false;
         notifyAnimationListeners(EAnimationEvents.STOP);
-    };
+    }
 
-    public boolean isStarted(){
+    ;
+
+    public boolean isStarted() {
         return started;
     }
 
-    public void setTarget(UIDisplayElement target){
+    public void setTarget(UIDisplayElement target) {
         this.target = target;
-    };
+    }
 
-    public void setRepeat(boolean repeat){
+    ;
+
+    public void setRepeat(boolean repeat) {
         this.repeat = repeat;
     }
 
-    public boolean isRepeat(){
+    public boolean isRepeat() {
         return repeat;
     }
-    
+
     public abstract void renderBegin();
-    
+
     public abstract void renderEnd();
-    
+
     public abstract void update();
-    
+
     public void addAnimationListener(AnimationListener listener) {
         animationListeners.add(listener);
     }
-    
+
     public void removeAnimationListener(AnimationListener listener) {
         animationListeners.remove(listener);
     }
-    
+
     private void notifyAnimationListeners(EAnimationEvents event) {
         if (event == EAnimationEvents.START) {
             for (AnimationListener listener : animationListeners) {

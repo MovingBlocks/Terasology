@@ -20,55 +20,55 @@ import javax.vecmath.Vector2f;
 public class AnimationSize extends Animation {
     private Vector2f sizeFrom;
     private Vector2f distination;
-    private float    speed;
-    private float    dX, dY;
+    private float speed;
+    private float dX, dY;
 
-    public AnimationSize(Vector2f sizeTo, float speed){
+    public AnimationSize(Vector2f sizeTo, float speed) {
         this.distination = sizeTo;
-        this.speed       = speed;
-        this.sizeFrom    = null;
+        this.speed = speed;
+        this.sizeFrom = null;
     }
 
     @Override
     public void update() {
 
-        if(dX == 0 || dY == 0){
-            dX = target.getSize().x<distination.x?target.getSize().x/distination.x:-distination.x/target.getSize().x;
-            dY = target.getSize().y<distination.y?target.getSize().y/distination.y:-distination.y/target.getSize().y;
+        if (dX == 0 || dY == 0) {
+            dX = target.getSize().x < distination.x ? target.getSize().x / distination.x : -distination.x / target.getSize().x;
+            dY = target.getSize().y < distination.y ? target.getSize().y / distination.y : -distination.y / target.getSize().y;
         }
 
         Vector2f direction = new Vector2f(dX, dY);
         direction.normalize();
 
-        if(isRepeat() && (sizeFrom == null || sizeFrom.equals(new Vector2f(0f, 0f)))){
+        if (isRepeat() && (sizeFrom == null || sizeFrom.equals(new Vector2f(0f, 0f)))) {
             sizeFrom = new Vector2f(target.getSize());
         }
 
-        if( Math.abs( (target.getSize().x - distination.x) ) > speed || Math.abs( (target.getSize().y - distination.y) ) > speed){
+        if (Math.abs((target.getSize().x - distination.x)) > speed || Math.abs((target.getSize().y - distination.y)) > speed) {
             direction.normalize();
             direction.scale(speed);
             Vector2f newSize = new Vector2f(target.getSize());
             newSize.add(direction);
 
-            if(Math.abs( (target.getSize().x - distination.x) ) < speed){
+            if (Math.abs((target.getSize().x - distination.x)) < speed) {
                 newSize.x = target.getSize().x;
             }
 
-            if(Math.abs( (target.getSize().y - distination.y) ) < speed){
+            if (Math.abs((target.getSize().y - distination.y)) < speed) {
                 newSize.y = target.getSize().y;
             }
 
             target.setSize(newSize);
-        }else{
+        } else {
             target.setSize(distination);
 
-            if(isRepeat()){
+            if (isRepeat()) {
                 Vector2f swap = new Vector2f(distination);
                 distination = new Vector2f(sizeFrom);
                 sizeFrom = swap;
                 dX = 0;
                 dY = 0;
-            }else{
+            } else {
                 stop();
             }
         }

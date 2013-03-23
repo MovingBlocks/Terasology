@@ -16,15 +16,14 @@
 
 package org.terasology.entitySystem.metadata.extension;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.game.CoreRegistry;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius

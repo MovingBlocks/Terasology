@@ -15,13 +15,12 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>

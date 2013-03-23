@@ -40,8 +40,8 @@ import java.util.Set;
  * and unloading them.
  * The ComponentSystemManager has two states:
  * <ul>
- *     <li>Inactive: In this state the registered systems are created, but not initialised</li>
- *     <li>Active: In this state all the registered systems are initialised</li>
+ * <li>Inactive: In this state the registered systems are created, but not initialised</li>
+ * <li>Active: In this state all the registered systems are initialised</li>
  * </ul>
  * It becomes active when initialise() is called, and inactive when shutdown() is called.
  *
@@ -80,7 +80,7 @@ public class ComponentSystemManager {
                     if (share != null && share.value() != null) {
                         for (Class<?> interfaceType : share.value()) {
                             sharedSystems.add(interfaceType);
-                            CoreRegistry.put((Class<Object>)interfaceType, newSystem);
+                            CoreRegistry.put((Class<Object>) interfaceType, newSystem);
                         }
                     }
                     register(newSystem, id);

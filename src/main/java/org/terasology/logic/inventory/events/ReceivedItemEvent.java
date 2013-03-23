@@ -38,8 +38,8 @@ public class ReceivedItemEvent extends AbstractEvent {
     public EntityRef getItem() {
         return item;
     }
-    
+
     public int getSlot() {
-		return slot;
-	}
+        return slot;
+    }
 }

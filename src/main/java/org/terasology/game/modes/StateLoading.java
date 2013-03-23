@@ -84,6 +84,7 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for client of multiplayer game
+     *
      * @param netMode
      */
     public StateLoading(NetworkMode netMode) {

@@ -23,6 +23,7 @@ import org.terasology.world.chunks.Chunk;
 
 /**
  * For doing an initial lighting sweep during chunk generation - bound to the chunk and assumed blank slate
+ *
  * @author Immortius
  */
 public class InternalLightProcessor {
@@ -38,7 +39,7 @@ public class InternalLightProcessor {
                 Block lastBlock = BlockManager.getAir();
                 int y = top;
                 for (; y >= 0; y--) {
-                    Block block = chunk.getBlock(x,y,z);
+                    Block block = chunk.getBlock(x, y, z);
                     if (LightingUtil.doesSunlightRetainsFullStrengthIn(block) && LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP)) {
                         chunk.setSunlight(x, y, z, Chunk.MAX_LIGHT);
                         lastBlock = block;

@@ -16,12 +16,11 @@
 
 package org.terasology.physics;
 
-import java.util.List;
-
-import org.terasology.entitySystem.Component;
-
 import com.google.common.collect.Lists;
+import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
+
+import java.util.List;
 
 /**
  * @author Immortius

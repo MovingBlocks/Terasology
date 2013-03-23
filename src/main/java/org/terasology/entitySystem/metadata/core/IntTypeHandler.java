@@ -15,13 +15,12 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.math.TeraMath;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -40,7 +39,7 @@ public class IntTypeHandler implements TypeHandler<Integer> {
         } else if (value.getFloatCount() > 0) {
             return TeraMath.floorToInt(value.getFloat(0));
         } else if (value.getDoubleCount() > 0) {
-            return TeraMath.floorToInt((float)value.getDouble(0));
+            return TeraMath.floorToInt((float) value.getDouble(0));
         }
         return null;
     }
@@ -59,13 +58,13 @@ public class IntTypeHandler implements TypeHandler<Integer> {
         } else if (value.getLongCount() > 0) {
             List<Integer> result = Lists.newArrayListWithCapacity(value.getLongCount());
             for (int i = 0; i < value.getLongCount(); ++i) {
-                result.add((int)value.getLong(i));
+                result.add((int) value.getLong(i));
             }
             return result;
         } else if (value.getDoubleCount() > 0) {
             List<Integer> result = Lists.newArrayListWithCapacity(value.getDoubleCount());
             for (int i = 0; i < value.getDoubleCount(); ++i) {
-                result.add(TeraMath.floorToInt((float)value.getDouble(i)));
+                result.add(TeraMath.floorToInt((float) value.getDouble(i)));
             }
             return result;
         } else if (value.getFloatCount() > 0) {

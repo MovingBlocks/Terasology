@@ -15,7 +15,6 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Event;
 
 /**

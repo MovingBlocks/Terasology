@@ -16,15 +16,15 @@
 
 package org.terasology.physics.shapes;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
  */
 public class BoxShapeComponent implements Component {
     @Replicate
-    public Vector3f extents = new Vector3f(1,1,1);
+    public Vector3f extents = new Vector3f(1, 1, 1);
 }

@@ -15,11 +15,6 @@
  */
 package org.terasology.rendering.gui.widgets;
 
-import java.util.ArrayList;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
@@ -32,33 +27,40 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.layout.RowLayout;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+import java.util.ArrayList;
+
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * TODO Remove UIDialogBackground -> should use the style UIStyleBackgroundSplit
+ *         TODO Remove UIDialogBackground -> should use the style UIStyleBackgroundSplit
  */
 public class UIDialog extends UIWindow {
-    
+
     //events
     private final ArrayList<DialogListener> dialogListeners = new ArrayList<DialogListener>();
-    
+
     //drag
     private final Vector2f pressedOffset = new Vector2f(0f, 0f);
     private boolean dragged = false;
-    
+
     //others
-    public static enum EReturnCode {OK, CANCEL, YES, NO, NONE};
+    public static enum EReturnCode {
+        OK, CANCEL, YES, NO, NONE
+    }
+
+    ;
     private float titleWidth = 300f;
-    
+
     //child elements
     private UIComposite container;
     private UIComposite dialogButtons;
     private UICompositeScrollable dialogArea;
-    
+
     private UIImage overlay;
     private UIDialogBackground topBar;
     //private final UIButton closeButton;
-    
+
     @Deprecated
     private class UIDialogBackground extends UIDisplayContainer {
         private UIImage leftBackground;
@@ -68,7 +70,7 @@ public class UIDialog extends UIWindow {
 
         public UIDialogBackground(Vector2f size) {
             setSize(size);
-            
+
             text = new UILabel();
             text.setColor(Color.orange);
             text.setVisible(true);
@@ -98,11 +100,11 @@ public class UIDialog extends UIWindow {
             addDisplayElement(rightBackground);
             addDisplayElement(text);
         }
-        
+
         public String getTitle() {
             return text.getText();
         }
-        
+
         public void setTitle(String title) {
             text.setText(title);
             text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
@@ -130,7 +132,7 @@ public class UIDialog extends UIWindow {
         createButtons(dialogButtons);
         container.applyLayout();
     }
-    
+
     @Override
     public void layout() {
         super.layout();
@@ -138,37 +140,38 @@ public class UIDialog extends UIWindow {
         if (topBar != null)
             topBar.resize();
     }
-    
+
     @Override
     public void open() {
         super.open();
     }
-    
+
     @Override
     public void close() {
         super.close();
-        
+
         notifyDialogListeners(EReturnCode.NONE, null);
     }
-    
+
     /**
      * Open the dialog.
      */
     public void openDialog() {
         super.open();
     }
-    
+
     /**
      * Closes the dialog and returns a return code and a return value.
-     * @param code The code which can be <i>OK</i>, <i>CANCEL</i>, <i>YES</i>, <i>NO</i>, <i>NONE</i>.
+     *
+     * @param code        The code which can be <i>OK</i>, <i>CANCEL</i>, <i>YES</i>, <i>NO</i>, <i>NONE</i>.
      * @param returnValue The value which can be any object or null if no return value should be returned.
      */
     public void closeDialog(EReturnCode code, Object returnValue) {
         super.close();
-        
+
         notifyDialogListeners(code, returnValue);
     }
-    
+
     /**
      * Create the basic dialog elements. Override in the extended dialog class to customize the dialog.
      */
@@ -177,21 +180,21 @@ public class UIDialog extends UIWindow {
         overlay.setPositionType(EPositionType.ABSOLUTE);
         overlay.setSize("100%", "100%");
         overlay.setVisible(true);
-        
+
         topBar = new UIDialogBackground(new Vector2f(titleWidth, 19f));
-        topBar.addMouseButtonListener(new MouseButtonListener() {    
+        topBar.addMouseButtonListener(new MouseButtonListener() {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
             }
-            
+
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
                 dragged = false;
                 pressedOffset.x = 0f;
                 pressedOffset.y = 0f;
             }
-            
+
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (intersect) {
@@ -215,17 +218,17 @@ public class UIDialog extends UIWindow {
 
             @Override
             public void leave(UIDisplayElement element) {
-                
+
             }
-            
+
             @Override
             public void hover(UIDisplayElement element) {
-                
+
             }
-            
+
             @Override
             public void enter(UIDisplayElement element) {
-                
+
             }
         });
         topBar.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -251,18 +254,18 @@ public class UIDialog extends UIWindow {
         closeButton.setPosition(new Vector2f(-2, 0f));
         closeButton.setVisible(true);
         */
-        
+
         //addDisplayElement(closeButton);
-        
+
         container = new UIComposite();
         container.setSize("100%", "100%");
         container.setLayout(new GridLayout(1));
         container.setVisible(true);
-        
+
         dialogArea = new UICompositeScrollable();
         dialogArea.setSize("100%", "100%");
         dialogArea.setVisible(true);
-        
+
         dialogButtons = new UIComposite();
         RowLayout layout = new RowLayout();
         layout.setSpacingHorizontal(5);
@@ -271,47 +274,51 @@ public class UIDialog extends UIWindow {
         dialogButtons.setVerticalAlign(EVerticalAlign.BOTTOM);
         dialogButtons.setPosition(new Vector2f(0f, -10f));
         dialogButtons.setVisible(true);
-        
+
         container.addDisplayElement(dialogArea);
         dialogArea.addDisplayElement(dialogButtons);
         addDisplayElement(container);
-        
+
         addDisplayElement(topBar);
     }
-    
+
     /**
      * Creates the dialog area. Override in the extended dialog class to customize the dialog.
+     *
      * @param parent The parent where all the dialog elements should be added.
      */
     protected void createDialogArea(UIDisplayContainer parent) {
-        
+
     }
-    
+
     /**
      * Creates the buttons. Override in the extended dialog class to customize the dialog.
+     *
      * @param parent The parent where all buttons should be added.
      */
     protected void createButtons(UIDisplayContainer parent) {
-        
+
     }
-    
+
     /**
      * Reset the position of the dialog to the center of the display.
      */
     public void resetPosition() {
         setPosition(new Vector2f((Display.getWidth() / 2) - (getSize().x / 2), (Display.getHeight() / 2) - (getSize().y / 2)));
     }
-    
+
     /**
      * Get the title which will be displayed on the top center position of the dialog.
+     *
      * @return Returns the title.
      */
     public String getTitle() {
         return topBar.getTitle();
     }
-    
+
     /**
      * Set the title which will be displayed on the top center position of the dialog.
+     *
      * @param title The title.
      */
     public void setTitle(String title) {
@@ -321,13 +328,13 @@ public class UIDialog extends UIWindow {
     /*
        Event listeners
     */
-    
+
     private void notifyDialogListeners(EReturnCode returnCode, Object returnValue) {
         for (DialogListener listener : dialogListeners) {
             listener.close(this, returnCode, returnValue);
         }
     }
-    
+
     public void addDialogListener(DialogListener listener) {
         dialogListeners.add(listener);
     }

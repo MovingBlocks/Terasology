@@ -1,8 +1,5 @@
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.config.AdvancedConfig;
@@ -21,12 +18,14 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 /**
  * Exposes internal configurable details of the Terasology engine to the user.
- * 
- * @see org.terasology.config.AdvancedConfig
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @see org.terasology.config.AdvancedConfig
  */
 public class UIMenuConfigAdvanced extends UIWindow {
 
@@ -36,29 +35,29 @@ public class UIMenuConfigAdvanced extends UIWindow {
     private final UIButton backToConfigMenuButton;
 
     private final UIDisplayElement chunkConfig;
-    
-    private final AdvancedConfig config; 
-    
+
+    private final AdvancedConfig config;
+
     protected UIComposite initFactoryCombo(String title, String id, String selectedFactory, SelectionListener listener) {
         final GridLayout layout = new GridLayout(1);
         layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
-        
+
         final UIComposite comp = new UIComposite();
         comp.setLayout(layout);
         comp.setVisible(true);
         comp.setId(id);
-        
+
         UILabel label = new UILabel();
         label.setText(title);
         label.setVisible(true);
-        label.setId(id+":label");
-        
+        label.setId(id + ":label");
+
         final UIComboBox combo = new UIComboBox(new Vector2f(256f, 32f), new Vector2f(256f, 96f));
         combo.setVisible(true);
-        combo.setId(id+":combo");
+        combo.setId(id + ":combo");
         String[] factories = AdvancedConfig.getTeraArrayFactories();
         for (String factory : factories) {
-            String name = factory.substring(factory.lastIndexOf('.')+1);
+            String name = factory.substring(factory.lastIndexOf('.') + 1);
             UIListItem item = new UIListItem(name, factory);
             item.setTextColor(Color.black);
             item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
@@ -68,17 +67,17 @@ public class UIMenuConfigAdvanced extends UIWindow {
         }
         combo.addSelectionListener(listener);
 
-        
+
         comp.addDisplayElement(label);
         comp.addDisplayElement(combo);
-        
+
         return comp;
     }
-    
+
     protected UIComposite initOnOffButton(final String label, String id, boolean state, ChangedListener listener) {
         final GridLayout layout = new GridLayout(1);
         layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
-        
+
         final UIComposite comp = new UIComposite();
         comp.setLayout(layout);
         comp.setVisible(true);
@@ -86,60 +85,60 @@ public class UIMenuConfigAdvanced extends UIWindow {
 
         final UIButton button = new UIButton(new Vector2f(256f, 32f), ButtonType.TOGGLE);
         button.setVisible(true);
-        button.setId(id+":button");
+        button.setId(id + ":button");
         button.setToggleState(state);
         button.getLabel().setText(label + ": " + (state ? "On" : "Off"));
         button.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
-               UIButton b = (UIButton) element;
-               b.getLabel().setText(label + ": " + (b.getToggleState() ? "On" : "Off"));
+                UIButton b = (UIButton) element;
+                b.getLabel().setText(label + ": " + (b.getToggleState() ? "On" : "Off"));
             }
         });
         button.addChangedListener(listener);
-        
+
         comp.addDisplayElement(button);
-        
+
         return comp;
     }
-    
+
     protected UIComposite initChunkConfig(Vector2f pos) {
-        
+
         final GridLayout layout = new GridLayout(2);
         layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
-        
+
         final UIComposite comp = new UIComposite();
         comp.setPosition(pos);
         comp.setHorizontalAlign(EHorizontalAlign.CENTER);
         comp.setLayout(layout);
         comp.setVisible(true);
-        
+
         comp.addDisplayElement(initFactoryCombo("Default class for block data", "block", config.getBlocksFactoryName(), new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
-                config.setBlocksFactory((String)((UIComboBox)element).getSelection().getValue());
+                config.setBlocksFactory((String) ((UIComboBox) element).getSelection().getValue());
             }
         }));
         comp.addDisplayElement(initFactoryCombo("Default class for sunlight data", "sunlight", config.getSunlightFactoryName(), new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
-                config.setSunlightFactory((String)((UIComboBox)element).getSelection().getValue());
+                config.setSunlightFactory((String) ((UIComboBox) element).getSelection().getValue());
             }
         }));
         comp.addDisplayElement(initFactoryCombo("Default class for light data", "light", config.getLightFactoryName(), new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
-                config.setLightFactory((String)((UIComboBox)element).getSelection().getValue());
+                config.setLightFactory((String) ((UIComboBox) element).getSelection().getValue());
             }
         }));
         comp.addDisplayElement(initFactoryCombo("Default class for liquid data", "liquid", config.getExtraFactoryName(), new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
-                config.setExtraFactory((String)((UIComboBox)element).getSelection().getValue());
+                config.setExtraFactory((String) ((UIComboBox) element).getSelection().getValue());
             }
         }));
-        
-        
+
+
         comp.addDisplayElement(initOnOffButton("Runtime Chunk Compression", "chunkDeflation", config.isChunkDeflationEnabled(), new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
@@ -147,7 +146,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
                 config.setChunkDeflationEnabled(b.getToggleState());
             }
         }));
-        
+
         comp.addDisplayElement(initOnOffButton("Log Chunk Compression", "chunkDeflationLogging", config.isChunkDeflationLoggingEnabled(), new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
@@ -155,24 +154,24 @@ public class UIMenuConfigAdvanced extends UIWindow {
                 config.setChunkDeflationLoggingEnabled(b.getToggleState());
             }
         }));
-        
-        
+
+
         comp.orderDisplayElementTop(comp.getElementById("liquid"));
         comp.orderDisplayElementTop(comp.getElementById("light"));
         comp.orderDisplayElementTop(comp.getElementById("sunlight"));
         comp.orderDisplayElementTop(comp.getElementById("block"));
-        
+
         return comp;
     }
-    
+
     public UIMenuConfigAdvanced() {
         setId("config:advanced");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
-        
+
         config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
-        
+
         title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
         title.setPosition(new Vector2f(0f, 28f));
@@ -202,7 +201,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
                 getGUIManager().openWindow("config");
             }
         });
-        
+
 
         addDisplayElement(title);
         addDisplayElement(subtitle);

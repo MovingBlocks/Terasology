@@ -18,6 +18,7 @@ package org.terasology.world.liquid;
 
 /**
  * Describes the liquid state of a single block
+ *
  * @author Immortius
  */
 public class LiquidData {
@@ -38,12 +39,12 @@ public class LiquidData {
 
     public LiquidData(LiquidType type, int depth) {
         this.type = type;
-        this.depth = (byte)depth;
+        this.depth = (byte) depth;
     }
 
     public LiquidData(byte rawData) {
         this.type = LiquidType.getTypeForByte(rawData);
-        this.depth = (byte)(rawData & LIQUID_DEPTH_FILTER);
+        this.depth = (byte) (rawData & LIQUID_DEPTH_FILTER);
     }
 
     public LiquidType getType() {
@@ -62,7 +63,7 @@ public class LiquidData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof LiquidData) {
-            LiquidData other = (LiquidData)o;
+            LiquidData other = (LiquidData) o;
             if (depth == other.depth) {
                 return (depth == 0 || type == other.type);
             }

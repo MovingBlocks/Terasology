@@ -1,19 +1,17 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.util.Arrays;
-
+import com.google.common.base.Preconditions;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
-import com.google.common.base.Preconditions;
+import java.util.Arrays;
 
 
 /**
  * TeraSparseArray4Bit implements a sparse array with elements of 4 bit size.
  * Its elements are in the range 0 - 15 and it increases memory efficiency by storing two elements per byte.
  * It can further reduce memory consumption through sparse memory allocation.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
@@ -83,9 +81,9 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
             return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
         }
     }
-    
+
     public static class Factory implements TeraArray.Factory<TeraSparseArray4Bit> {
-        
+
         @Override
         public Class<TeraSparseArray4Bit> getArrayClass() {
             return TeraSparseArray4Bit.class;
@@ -95,18 +93,18 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         public SerializationHandler createSerializationHandler() {
             return new SerializationHandler();
         }
-        
+
         @Override
         public TeraSparseArray4Bit create() {
             return new TeraSparseArray4Bit();
         }
-        
+
         @Override
         public TeraSparseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
         }
     }
-    
+
     public TeraSparseArray4Bit() {
         super();
     }
@@ -138,7 +136,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     public final int get(int x, int y, int z) {
         //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         int pos = pos(x, z);
-        if (inflated == null) 
+        if (inflated == null)
             return rowGet(pos, fill);
         byte[] row = inflated[y];
         if (row != null)

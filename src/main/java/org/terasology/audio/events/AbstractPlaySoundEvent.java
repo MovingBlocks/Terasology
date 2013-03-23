@@ -1,11 +1,8 @@
 package org.terasology.audio.events;
 
 import org.terasology.audio.Sound;
-import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.NetworkEvent;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -14,7 +11,8 @@ public abstract class AbstractPlaySoundEvent extends NetworkEvent {
     private Sound sound;
     private float volume;
 
-    protected AbstractPlaySoundEvent() {}
+    protected AbstractPlaySoundEvent() {
+    }
 
     public AbstractPlaySoundEvent(Sound sound, float volume) {
         this.sound = sound;

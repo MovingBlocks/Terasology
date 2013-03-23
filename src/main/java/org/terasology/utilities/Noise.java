@@ -40,8 +40,7 @@ public interface Noise {
      * @param z Position on the z-axis
      * @return The noise value
      */
-    public double fBm(double x, double y, double z) ;
-
+    public double fBm(double x, double y, double z);
 
 
     public void setOctaves(int octaves);

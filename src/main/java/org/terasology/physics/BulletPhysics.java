@@ -15,30 +15,6 @@
  */
 package org.terasology.physics;
 
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.world.block.entity.BlockComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventReceiver;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.game.CoreRegistry;
-import org.terasology.math.AABB;
-import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.world.BlockChangedEvent;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
@@ -62,6 +38,28 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventReceiver;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.game.CoreRegistry;
+import org.terasology.math.AABB;
+import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.entity.BlockComponent;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Renders blocks using the Bullet physics library.
@@ -72,7 +70,7 @@ import com.google.common.collect.Lists;
 public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
-    
+
     private final Deque<RigidBodyRequest> _insertionQueue = new LinkedList<RigidBodyRequest>();
     private final Deque<RigidBody> _removalQueue = new LinkedList<RigidBody>();
 
@@ -107,7 +105,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         RigidBody rigidBody = new RigidBody(blockConsInf);
         rigidBody.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.getCollisionFlags());
-        _discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short)(CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
+        _discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
     }
 
     public DynamicsWorld getWorld() {
@@ -119,7 +117,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         return createCollider(pos, shape, groups, filters, 0);
     }
 
-    public static short combineGroups(CollisionGroup ... groups) {
+    public static short combineGroups(CollisionGroup... groups) {
         return combineGroups(Arrays.asList(groups));
     }
 
@@ -146,7 +144,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
     }
 
     public void addRigidBody(RigidBody body) {
-        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short)(CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.SENSOR_TRIGGER)));
+        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short) (CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.SENSOR_TRIGGER)));
     }
 
     public void addRigidBody(RigidBody body, List<CollisionGroup> groups, List<CollisionGroup> filter) {
@@ -154,7 +152,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
     }
 
     public void addRigidBody(RigidBody body, short groups, short filter) {
-        _insertionQueue.add(new RigidBodyRequest(body, groups, (short)(filter | CollisionFilterGroups.SENSOR_TRIGGER)));
+        _insertionQueue.add(new RigidBodyRequest(body, groups, (short) (filter | CollisionFilterGroups.SENSOR_TRIGGER)));
     }
 
     public void removeRigidBody(RigidBody body) {
@@ -176,7 +174,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
             CollisionObject other = scanObject.getOverlappingObject(i);
             Object userObj = other.getUserPointer();
             if (userObj instanceof EntityRef) {
-                result.add((EntityRef)userObj);
+                result.add((EntityRef) userObj);
             }
         }
         removeCollider(scanObject);
@@ -192,14 +190,14 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         closest.collisionFilterGroup = CollisionFilterGroups.SENSOR_TRIGGER;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
-            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
         } else if (closest.userData instanceof EntityRef) {
             return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
         return new HitResult();
     }
 
-    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup ... collisionGroups) {
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
         Vector3f to = new Vector3f(direction);
         to.scale(distance);
         to.add(from);
@@ -211,7 +209,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         closest.collisionFilterMask = filter;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
-            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i)closest.userData);
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
         } else if (closest.userData instanceof EntityRef) {
             return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
@@ -249,8 +247,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         }
     }
 
-    private static class RigidBodyRequest
-    {
+    private static class RigidBodyRequest {
         final RigidBody body;
         final short groups;
         final short filter;

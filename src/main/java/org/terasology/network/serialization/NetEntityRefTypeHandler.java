@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Encoding of EntityRef for network transferals. This uses with the network id of the entity from the NetworkComponent,
  * or the block position from the block component
+ *
  * @author Immortius
  */
 public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {

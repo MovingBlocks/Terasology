@@ -16,7 +16,6 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Event;
 
 /**
  * The library for metadata about components (and their fields).

@@ -12,8 +12,8 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.Share;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
@@ -21,7 +21,6 @@ import org.terasology.game.Timer;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.utilities.collection.CircularBuffer;
@@ -138,7 +137,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
                         // Haven't received input in a while, repeat last input
                         CharacterMoveInputEvent lastInput = lastInputEvent.get(entry.getKey());
                         if (lastInput != null) {
-                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, (int)(timer.getTimeInMs() - state.getTime()));
+                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, (int) (timer.getTimeInMs() - state.getTime()));
                             onPlayerInput(newInput, entry.getKey());
                         }
                         entry.getKey().send(state);

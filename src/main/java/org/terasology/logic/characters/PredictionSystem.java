@@ -10,6 +10,7 @@ import org.terasology.entitySystem.EntityRef;
 public interface PredictionSystem {
     /**
      * Rewinds time for the specified client
+     *
      * @param client The client entity to rewind for
      * @param timeMs The time to rewind to
      */

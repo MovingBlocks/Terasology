@@ -15,9 +15,9 @@
  */
 package org.terasology.components;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.Component;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

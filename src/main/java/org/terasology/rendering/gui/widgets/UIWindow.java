@@ -17,11 +17,11 @@ package org.terasology.rendering.gui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.animation.AnimationOpacity;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.KeyListener;
@@ -31,23 +31,27 @@ import java.util.ArrayList;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.
- * 
+ *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * 
- * TODO closeBinds/closeKeys needs to be handled in another way.. (its not really a close -> setVisible(false))
+ *         <p/>
+ *         TODO closeBinds/closeKeys needs to be handled in another way.. (its not really a close -> setVisible(false))
  */
 public class UIWindow extends UIDisplayContainerScrollable {
 
     private static final Logger logger = LoggerFactory.getLogger(UIWindow.class);
 
     //events
-    private static enum EWindowEvent {INITIALISE, SHUTDOWN};
+    private static enum EWindowEvent {
+        INITIALISE, SHUTDOWN
+    }
+
+    ;
     private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
-    
+
     //close buttons
     private String[] closeBinds;
     private int[] closeKeys;
-    
+
     //layout
     private boolean modal = false;
 
@@ -58,7 +62,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
                 setFocus(UIWindow.this);
             }
         });
-        
+
         addKeyListener(new KeyListener() {
             @Override
             public void key(UIDisplayElement element, KeyEvent event) {
@@ -67,14 +71,14 @@ public class UIWindow extends UIDisplayContainerScrollable {
                         if (key == event.getKey() && event.isDown()) {
                             getGUIManager().closeWindow(getId());
                             event.consume();
-                            
+
                             return;
                         }
                     }
                 }
             }
         });
-        
+
         addBindKeyListener(new BindKeyListener() {
             @Override
             public void key(UIDisplayElement element, BindButtonEvent event) {
@@ -83,7 +87,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
                         if (key.equals(event.getId()) && event.isDown()) {
                             getGUIManager().closeWindow(getId());
                             event.consume();
-                            
+
                             return;
                         }
                     }
@@ -91,7 +95,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
             }
         });
     }
-    
+
     /**
      * Maximize the window.
      */
@@ -101,6 +105,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
 
     /**
      * Check if the window is modal. A modal window will consume all input events. Input events are mouse move, mouse button, mouse wheel and keyboard input.
+     *
      * @return Returns true if the window is modal.
      */
     public boolean isModal() {
@@ -109,43 +114,46 @@ public class UIWindow extends UIDisplayContainerScrollable {
 
     /**
      * Set the windows modality. A modal window will consume all input events. Input events are mouse move, mouse button, mouse wheel and keyboard input.
+     *
      * @param modal True for modal.
      */
     public void setModal(boolean modal) {
         this.modal = modal;
     }
-    
+
     /**
      * Set the bind keys which will close the window when pressed.
+     *
      * @param binds The bind key ID. For possible bind keys see the {@link org.terasology.input.binds} package.
      */
     public void setCloseBinds(String[] binds) {
         this.closeBinds = binds;
     }
-    
+
     /**
      * Set the keys which will close the window when pressed.
+     *
      * @param keys The keys value. For possible keys see {@link org.lwjgl.input.Keyboard}.
      */
     public void setCloseKeys(int[] keys) {
         this.closeKeys = keys;
     }
-    
+
     @Override
     public void setVisible(boolean visible) {
         if (!visible && isVisible()) {
             setFocus(null);
         }
-        
+
         super.setVisible(visible);
 
         getGUIManager().checkMouseGrabbing();
     }
-    
+
     /**
      * Opens the window. This will focus the window.
      */
-    public void open() { 
+    public void open() {
         setFocus(this);
         setVisible(true);
         addAnimation(new AnimationOpacity(0f, 1f, 10f));
@@ -154,7 +162,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
         getGUIManager().openWindow(this);
         getGUIManager().checkMouseGrabbing();
     }
-    
+
     /**
      * Closes the window. This will remove the window from the GUIManager.
      */
@@ -164,18 +172,18 @@ public class UIWindow extends UIDisplayContainerScrollable {
         getGUIManager().closeWindow(this);
         getGUIManager().checkMouseGrabbing();
     }
-    
+
     /**
-     * Will be executed through the GUIManager once the window was added. All initialize tasks are executed here. 
+     * Will be executed through the GUIManager once the window was added. All initialize tasks are executed here.
      * To be notified when the window is initialized use addWindowListener.
      */
     public void initialise() {
         logger.debug("Initialise window with with ID \"{}\"", getId());
         notifyWindowListeners(EWindowEvent.INITIALISE);
     }
-    
+
     /**
-     * Will be executed through the GUIManager once the window was removed. All shutdown tasks are executed here. 
+     * Will be executed through the GUIManager once the window was removed. All shutdown tasks are executed here.
      * To be notified when the window shuts down use addWindowListener.
      */
     public void shutdown() {
@@ -186,7 +194,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
     /*
        Event listeners
     */
-    
+
     private void notifyWindowListeners(EWindowEvent event) {
         if (event == EWindowEvent.INITIALISE) {
             for (WindowListener listener : windowListeners) {
@@ -198,7 +206,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
             }
         }
     }
-    
+
     public void addWindowListener(WindowListener listener) {
         windowListeners.add(listener);
     }

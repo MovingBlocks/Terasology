@@ -12,14 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package org.terasology.entitySystem.metadata.core;
+ */
+package org.terasology.entitySystem.metadata.core;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>

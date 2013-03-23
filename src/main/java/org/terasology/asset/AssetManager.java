@@ -21,9 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.rendering.assets.Font;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.Texture;
 
 import java.io.IOException;
 import java.io.InputStream;

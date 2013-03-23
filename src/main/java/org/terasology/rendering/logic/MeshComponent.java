@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.logic;
 
-import javax.vecmath.Color4f;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
+
+import javax.vecmath.Color4f;
 
 /**
  * @author Immortius <immortius@gmail.com>

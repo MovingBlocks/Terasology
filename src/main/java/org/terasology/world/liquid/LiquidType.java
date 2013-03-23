@@ -34,7 +34,7 @@ public enum LiquidType {
     }
 
     private LiquidType(int typeVal) {
-        typeValue = (byte)typeVal;
+        typeValue = (byte) typeVal;
     }
 
     public byte getTypeValue() {
@@ -42,7 +42,7 @@ public enum LiquidType {
     }
 
     public byte convertToByte(byte depth) {
-        return (byte)((typeValue << 3) + depth);
+        return (byte) ((typeValue << 3) + depth);
     }
 
     public static LiquidType getTypeForByte(byte liquidByte) {

@@ -1,19 +1,17 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.util.Arrays;
-
+import com.google.common.base.Preconditions;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
-import com.google.common.base.Preconditions;
+import java.util.Arrays;
 
 
 /**
  * TeraSparseArray8Bit implements a sparse array with elements of 8 bit size.
  * Its elements are in the range -128 through +127 and it stores one element per byte.
  * It can reduce memory consumption through sparse memory allocation.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
@@ -46,7 +44,7 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     }
 
     public static class Factory implements TeraArray.Factory<TeraSparseArray8Bit> {
-        
+
         @Override
         public Class<TeraSparseArray8Bit> getArrayClass() {
             return TeraSparseArray8Bit.class;
@@ -56,12 +54,12 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         public SerializationHandler createSerializationHandler() {
             return new SerializationHandler();
         }
-       
+
         @Override
         public TeraSparseArray8Bit create() {
             return new TeraSparseArray8Bit();
         }
-        
+
         @Override
         public TeraSparseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
@@ -97,7 +95,7 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     @Override
     public final int get(int x, int y, int z) {
 //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-        if (inflated == null) 
+        if (inflated == null)
             return fill;
         byte[] row = inflated[y];
         if (row != null)

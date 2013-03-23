@@ -15,11 +15,10 @@
  */
 package org.terasology.math;
 
-import java.io.Serializable;
-
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+import java.io.Serializable;
 
 /**
  * Vector3i - integer vector class in the style of VecMath.

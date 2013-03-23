@@ -15,6 +15,12 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.widgets.UIWindow;
+
+import javax.vecmath.Vector2f;
+import java.util.Collections;
+
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -31,20 +37,13 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 
-import java.util.Collections;
-
-import javax.vecmath.Vector2f;
-
-import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.widgets.UIWindow;
-
 /**
  * Extends UIDisplayContainer to transparently init. OpenGL for 2D rendering.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UIDisplayRenderer extends UIDisplayContainer {
-    
+
     public UIDisplayRenderer() {
         setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
     }
@@ -85,28 +84,30 @@ public class UIDisplayRenderer extends UIDisplayContainer {
 
     /**
      * Get the focused window. The focused window is the top element within the display elements array which is visible.
+     *
      * @return The focused window.
      */
     public UIWindow getWindowFocused() {
         if (getDisplayElements().size() > 0) {
-            
+
             for (int i = getDisplayElements().size() - 1; i >= 0; i--) {
                 if (getDisplayElements().get(i).isVisible()) {
                     return (UIWindow) getDisplayElements().get(i);
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Set the given window to the top position of the display element array. Therefore the window will be focused.
+     *
      * @param window The window to focus.
      */
     public void setWindowFocus(UIWindow window) {
         int windowPosition = getDisplayElements().indexOf(window);
-        
+
         if (windowPosition != -1) {
             Collections.rotate(getDisplayElements().subList(windowPosition, getDisplayElements().size()), -1);
         }

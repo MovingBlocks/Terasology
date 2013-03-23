@@ -16,10 +16,10 @@
 
 package org.terasology.world.block.loader;
 
-import java.awt.image.BufferedImage;
-
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
+
+import java.awt.image.BufferedImage;
 
 /**
  * @author Immortius

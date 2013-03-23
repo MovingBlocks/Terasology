@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.events.RespawnEvent;
@@ -30,6 +28,8 @@ import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
@@ -48,11 +48,11 @@ public class UIScreenDeath extends UIWindow {
         setId("death");
         setBackgroundColor(new Color(70, 0, 0, 200));
         setModal(true);
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         maximize();
-        
+
         addVisibilityListener(new VisibilityListener() {
-            
+
             @Override
             public void changed(UIDisplayElement element, boolean visibility) {
                 if (!visibility) {
@@ -60,12 +60,12 @@ public class UIScreenDeath extends UIWindow {
                 }
             }
         });
-        
+
         _meassage = new UILabel("You are dead");
         _meassage.setHorizontalAlign(EHorizontalAlign.CENTER);
         _meassage.setPosition(new Vector2f(0f, 300f));
         _meassage.setVisible(true);
-        
+
         _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.addClickListener(new ClickListener() {
@@ -78,7 +78,7 @@ public class UIScreenDeath extends UIWindow {
         _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         _respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
         _respawnButton.setVisible(true);
-        
+
         _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.addClickListener(new ClickListener() {
@@ -102,13 +102,13 @@ public class UIScreenDeath extends UIWindow {
         _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         _exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
         _exitButton.setVisible(true);
-        
+
         addDisplayElement(_meassage);
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
     }
-    
+
     private void respawn() {
         CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnEvent());
     }

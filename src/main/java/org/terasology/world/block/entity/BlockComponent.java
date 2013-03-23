@@ -15,11 +15,11 @@
  */
 package org.terasology.world.block.entity;
 
-import javax.vecmath.Tuple3i;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Replicate;
+
+import javax.vecmath.Tuple3i;
 
 /**
  * Used for entities representing a block in the world

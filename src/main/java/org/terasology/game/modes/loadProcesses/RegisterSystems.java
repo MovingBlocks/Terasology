@@ -22,7 +22,6 @@ import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
 
 /**
  * @author Immortius

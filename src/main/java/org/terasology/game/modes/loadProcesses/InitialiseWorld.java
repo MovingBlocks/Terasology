@@ -18,11 +18,11 @@ package org.terasology.game.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;

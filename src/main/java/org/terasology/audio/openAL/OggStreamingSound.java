@@ -15,14 +15,14 @@
  */
 package org.terasology.audio.openAL;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.ByteBuffer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.utilities.OggReader;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
 
 public class OggStreamingSound extends OpenALStreamingSound {

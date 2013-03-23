@@ -20,7 +20,6 @@ import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
-import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
@@ -37,6 +36,7 @@ import org.terasology.input.RegisterBindButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.logic.players.LocalPlayerSystem;
 
 import java.util.Locale;
 

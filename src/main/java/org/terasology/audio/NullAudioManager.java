@@ -5,6 +5,7 @@ import javax.vecmath.Vector3f;
 
 /**
  * Null implementation of the AudioManager
+ *
  * @author Immortius
  */
 public class NullAudioManager implements AudioManager {

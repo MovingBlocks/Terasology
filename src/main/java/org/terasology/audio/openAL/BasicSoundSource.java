@@ -15,6 +15,15 @@
  */
 package org.terasology.audio.openAL;
 
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.AL11;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
+import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector3f;
+
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
 import static org.lwjgl.openal.AL10.AL_LOOPING;
@@ -32,15 +41,6 @@ import static org.lwjgl.openal.AL10.alSourceRewind;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
-
-import javax.vecmath.Vector3f;
-
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.AL11;
-import org.terasology.audio.Sound;
-import org.terasology.audio.AudioManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.rendering.world.WorldRenderer;
 
 public class BasicSoundSource implements SoundSource {
 

@@ -166,7 +166,7 @@ public class BlockCommands implements CommandProvider {
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("-----------------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<BlockUri> sortedUris = sortItems(blockManager.listShapelessBlockUris());
+        List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
         for (BlockUri uri : sortedUris) {
             stringBuilder.append(uri.toString());
             stringBuilder.append(StringConstants.NEW_LINE);
@@ -273,7 +273,6 @@ public class BlockCommands implements CommandProvider {
 
         MessageManager.getInstance().addMessage("You received " + quantity + " blocks of " + blockFamily.getDisplayName());
     }
-
 
 
     /**

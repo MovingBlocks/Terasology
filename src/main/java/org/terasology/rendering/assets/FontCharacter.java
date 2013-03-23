@@ -57,11 +57,11 @@ public class FontCharacter {
     }
 
     public float getTexWidth() {
-        return ((float)width) / page.getWidth();
+        return ((float) width) / page.getWidth();
     }
 
     public float getTexHeight() {
-        return ((float)height) / page.getHeight();
+        return ((float) height) / page.getHeight();
     }
 
     public int getxOffset() {

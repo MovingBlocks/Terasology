@@ -32,7 +32,6 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;

@@ -20,7 +20,7 @@ package org.terasology.utilities;
  *
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-public class WhiteNoise implements Noise{
+public class WhiteNoise implements Noise {
 
     private static final double LACUNARITY = 2.1379201;
     private static final double H = 0.836281;
@@ -37,13 +37,13 @@ public class WhiteNoise implements Noise{
      *
      * @param seed The seed value
      */
-    public WhiteNoise(int seed,double amplitude1) {
+    public WhiteNoise(int seed, double amplitude1) {
         rand = new FastRandom(seed);
 
-        if(amplitude>1)
-        	amplitude = 1/amplitude1;
-        if(amplitude<0)
-        	amplitude=-amplitude1;
+        if (amplitude > 1)
+            amplitude = 1 / amplitude1;
+        if (amplitude < 0)
+            amplitude = -amplitude1;
     }
 
     /**
@@ -55,7 +55,7 @@ public class WhiteNoise implements Noise{
      * @return The noise value
      */
     public double noise(double x, double y, double z) {
-    	return (rand.randomDouble()%256)*amplitude;
+        return (rand.randomDouble() % 256) * amplitude;
     }
 
     /**

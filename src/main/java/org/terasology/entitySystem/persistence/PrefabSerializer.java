@@ -19,6 +19,7 @@ import java.util.Map;
  * <p/>
  * It is also possible to set whether entity ids will be handled or ignored - if ignored then deserialized entities will
  * be given new ids.
+ *
  * @author Immortius
  */
 public class PrefabSerializer {
@@ -34,6 +35,7 @@ public class PrefabSerializer {
 
     /**
      * Sets the mapping between component classes and the ids that are used for serialization
+     *
      * @param table
      */
     public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
@@ -71,6 +73,7 @@ public class PrefabSerializer {
 
     /**
      * Deserializes a prefab, with a known uri. This uri will override any uri within the serialized prefab
+     *
      * @param prefabData
      * @param uri
      * @return The deserialized prefab

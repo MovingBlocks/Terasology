@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-final class NullMode extends MetricsMode{
+final class NullMode extends MetricsMode {
 
     public NullMode() {
         super("", false, false);

@@ -21,5 +21,6 @@ package org.terasology.world.liquid;
  */
 public interface LiquidSimulationTask {
     boolean shutdownThread();
+
     void run();
 }

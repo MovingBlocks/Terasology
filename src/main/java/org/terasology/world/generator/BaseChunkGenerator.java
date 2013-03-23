@@ -16,9 +16,9 @@
 
 package org.terasology.world.generator;
 
-import java.util.Map;
-
 import org.terasology.world.WorldBiomeProvider;
+
+import java.util.Map;
 
 /**
  * @author Immortius

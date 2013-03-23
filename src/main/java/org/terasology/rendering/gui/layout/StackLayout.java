@@ -20,19 +20,17 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.style.Style;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public class StackLayout implements Layout {
-    
+
     private UIDisplayElement top;
     private UIDisplayContainer container;
-    
+
     @Override
     public void layout(UIDisplayContainer container, boolean fitSize) {
         this.container = container;
-        
+
         for (UIDisplayElement element : container.getDisplayElements()) {
             if (!(element instanceof Style)) {
                 element.setSize("100%", "100%");
@@ -44,24 +42,24 @@ public class StackLayout implements Layout {
             }
         }
     }
-    
+
     @Override
     public void render() {
-        
+
     }
-    
+
     public void setTop(UIDisplayElement element) {
         if (container != null && container.getDisplayElements().contains(element)) {
-            
+
             for (UIDisplayElement e : container.getDisplayElements()) {
                 if (!(e instanceof Style)) {
                     e.setVisible(false);
                 }
             }
-            
+
             container.orderDisplayElementTop(element);
             element.setVisible(true);
-            
+
             top = element;
         }
     }

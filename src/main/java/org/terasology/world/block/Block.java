@@ -445,11 +445,11 @@ public class Block {
      * @return Can player craft on this block?
      */
 
-    public boolean isCraftPlace(){
+    public boolean isCraftPlace() {
         return craftPlace;
     }
 
-    public void setCraftPlace(boolean craftPlace){
+    public void setCraftPlace(boolean craftPlace) {
         this.craftPlace = craftPlace;
     }
 

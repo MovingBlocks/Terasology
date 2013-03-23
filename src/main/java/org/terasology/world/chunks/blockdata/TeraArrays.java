@@ -1,48 +1,46 @@
 package org.terasology.world.chunks.blockdata;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import com.google.protobuf.ByteString;
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.Type;
+
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.terasology.protobuf.ChunksProtobuf;
-import org.terasology.protobuf.ChunksProtobuf.Type;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
-import com.google.protobuf.ByteString;
-
 
 /**
- * TeraArrays is the central registration point for all the different TeraArray implementations. 
+ * TeraArrays is the central registration point for all the different TeraArray implementations.
  * It is threadsafe and uses a read/write lock to support concurrent read operations.
  * <p/>
  * Serialization and deserialization of TeraArrays into/from protobuf messages is supported through the methods
  * {@code TeraArrays.encode(TeraArray)} and {@code TeraArrays.decode(ChunksProtobuf.TeraArray)}.
  * <p/>
  * Alternative TeraArray implementations can be registered through the method {@code TeraArrays.register(TeraArray.Factory, ChunksProtobuf.Type)}.
- * 
+ *
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  * @todo Future optimization: Implement some caching/cycling mechanism to avoid unnecessary ByteBuffer allocations.
- *
  */
 @SuppressWarnings("rawtypes")
 public final class TeraArrays {
-    
+
     private static final TeraArrays instance = new TeraArrays();
 
     private final ReadWriteLock lock;
     private final Map<Class, Entry> arrayClasses;
     private final Map<String, Entry> arrayNames;
     private final Map<ChunksProtobuf.Type, Entry> arrayTypes;
-    
+
     private TeraArrays() {
         lock = new ReentrantReadWriteLock();
-        
+
         arrayClasses = Maps.newHashMap();
         arrayTypes = Maps.newHashMap();
         arrayNames = Maps.newHashMap();
-        
+
         lock.writeLock().lock();
         try {
             register(new TeraDenseArray4Bit.Factory(), Type.DenseArray4Bit);
@@ -55,15 +53,15 @@ public final class TeraArrays {
             lock.writeLock().unlock();
         }
     }
-    
+
     public static class Entry {
-        
+
         public final Class arrayClass;
         public final String arrayClassName;
         public final TeraArray.Factory factory;
         public final TeraArray.SerializationHandler handler;
         public final ChunksProtobuf.Type protobufType;
-        
+
         @SuppressWarnings("unchecked")
         private Entry(TeraArray.Factory factory, ChunksProtobuf.Type protobufType) {
             this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
@@ -90,7 +88,7 @@ public final class TeraArrays {
             b.setClassName(entry.arrayClassName);
         return b.build();
     }
-    
+
     public final TeraArray decode(ChunksProtobuf.TeraArray message) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
         if (!message.hasType())
@@ -103,12 +101,12 @@ public final class TeraArrays {
             entry = getEntry(message.getClassName());
             if (entry == null)
                 throw new IllegalArgumentException("Unable to decode protobuf message. No entry found for class name: " + message.getClassName());
-        } else { 
+        } else {
             entry = getEntry(type);
             if (entry == null)
                 throw new IllegalArgumentException("Unable to decode protobuf message. No entry found for type: " + type);
         }
-        if (!message.hasData()) 
+        if (!message.hasData())
             throw new IllegalArgumentException("Illformed protobuf message. Missing byte sequence.");
         final ByteString data = message.getData();
         return entry.handler.deserialize(data.asReadOnlyByteBuffer());
@@ -123,7 +121,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final Entry getEntry(ChunksProtobuf.Type protobufType) {
         Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null");
         lock.readLock().lock();
@@ -133,7 +131,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final Entry getEntry(String arrayClassName) {
         Preconditions.checkNotNull(arrayClassName, "The parameter 'arrayClassName' must not be null");
         lock.readLock().lock();
@@ -143,7 +141,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final Entry[] getCoreArrayEntries() {
         lock.readLock().lock();
         try {
@@ -152,7 +150,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final Entry[] getArrayEntries() {
         lock.readLock().lock();
         try {
@@ -161,7 +159,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final Class[] getArrayClasses() {
         lock.readLock().lock();
         try {
@@ -170,7 +168,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final String[] getArrayClassNames() {
         lock.readLock().lock();
         try {
@@ -179,7 +177,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final ChunksProtobuf.Type[] getProtobufTypes() {
         lock.readLock().lock();
         try {
@@ -188,7 +186,7 @@ public final class TeraArrays {
             lock.readLock().unlock();
         }
     }
-    
+
     public final void register(TeraArray.Factory factory, ChunksProtobuf.Type protobufType) {
         lock.writeLock().lock();
         try {
@@ -205,7 +203,7 @@ public final class TeraArrays {
             lock.writeLock().unlock();
         }
     }
-    
+
     public static final TeraArrays getInstance() {
         return instance;
     }

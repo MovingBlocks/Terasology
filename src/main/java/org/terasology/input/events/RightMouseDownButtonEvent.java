@@ -16,7 +16,6 @@
 package org.terasology.input.events;
 
 
-
 public class RightMouseDownButtonEvent extends MouseDownButtonEvent {
 
     private static RightMouseDownButtonEvent event = new RightMouseDownButtonEvent(0);

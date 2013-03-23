@@ -22,7 +22,7 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
 
     @Override
     public String[] getNamesFor(Class<? extends Event> clazz) {
-        return new String[] {clazz.getSimpleName()};
+        return new String[]{clazz.getSimpleName()};
     }
 
     @Override
@@ -41,7 +41,7 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
     }
 
     @Override
-    protected <U extends Event> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
+    protected <U extends Event> ClassMetadata<U> createMetadata(Class<U> clazz, String... names) {
         EventMetadata<U> info;
         try {
             info = new EventMetadata<U>(clazz, names[0]);

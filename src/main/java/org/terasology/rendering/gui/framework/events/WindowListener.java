@@ -18,14 +18,12 @@ package org.terasology.rendering.gui.framework.events;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public interface WindowListener {
-    
+
     public void initialise(UIDisplayElement element);
-    
+
     public void shutdown(UIDisplayElement element);
-    
+
 }

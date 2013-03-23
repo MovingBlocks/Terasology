@@ -21,5 +21,6 @@ package org.terasology.physics;
  */
 public interface CollisionGroup {
     public short getFlag();
+
     public String getName();
 }

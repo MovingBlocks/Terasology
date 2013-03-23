@@ -54,6 +54,7 @@ public interface BlockFamily {
 
     /**
      * Resolves a block within this family
+     *
      * @param blockUri
      * @return The requested block, or null
      */

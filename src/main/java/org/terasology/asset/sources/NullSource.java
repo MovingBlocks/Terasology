@@ -16,16 +16,15 @@
 
 package org.terasology.asset.sources;
 
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullIterator;
 
-import com.google.common.collect.Lists;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Immortius

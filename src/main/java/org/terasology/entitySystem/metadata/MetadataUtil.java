@@ -15,10 +15,9 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import java.util.Locale;
-
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Event;
+
+import java.util.Locale;
 
 /**
  * @author Immortius <immortius@gmail.com>

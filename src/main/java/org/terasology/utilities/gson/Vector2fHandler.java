@@ -26,8 +26,8 @@ import javax.vecmath.Vector2f;
 import java.lang.reflect.Type;
 
 /**
-* @author Immortius
-*/
+ * @author Immortius
+ */
 public class Vector2fHandler implements JsonDeserializer<Vector2f> {
     @Override
     public Vector2f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

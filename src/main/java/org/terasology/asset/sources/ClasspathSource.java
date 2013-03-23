@@ -16,14 +16,14 @@
 
 package org.terasology.asset.sources;
 
+import org.terasology.asset.AssetSource;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+
 import java.io.File;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.List;
-
-import org.terasology.asset.AssetSource;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 
 /**
  * @author Immortius

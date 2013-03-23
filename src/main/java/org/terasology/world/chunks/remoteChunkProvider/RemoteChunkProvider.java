@@ -12,7 +12,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkRegionListener;
-import org.terasology.world.chunks.ChunkRelevanceRegion;
 import org.terasology.world.chunks.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;

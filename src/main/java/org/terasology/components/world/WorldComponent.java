@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Component;
 
 /**
  * World component - indicates the world entity. Used for sending world-wide events and storing world information
+ *
  * @author Immortius
  */
 public final class WorldComponent implements Component {

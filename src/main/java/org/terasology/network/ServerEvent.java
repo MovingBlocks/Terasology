@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation for events that are consumed by the server. If the event is sent on a client, then it will be replicated
  * to the server and actioned there.
+ *
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)

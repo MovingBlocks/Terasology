@@ -18,6 +18,7 @@ package org.terasology.input;
 
 /**
  * The type of an input
+ *
  * @author Immortius
  */
 public enum InputType {

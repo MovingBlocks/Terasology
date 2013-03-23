@@ -19,9 +19,7 @@ import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public class StyleBackgroundColor extends UIImage implements Style {
 
@@ -29,7 +27,7 @@ public class StyleBackgroundColor extends UIImage implements Style {
         super(color);
         setSize("100%", "100%");
     }
-    
+
     public StyleBackgroundColor(String color) {
         super(color);
         setSize("100%", "100%");

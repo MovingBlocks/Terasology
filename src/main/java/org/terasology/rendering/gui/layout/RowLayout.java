@@ -15,39 +15,37 @@
  */
 package org.terasology.rendering.gui.layout;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.style.Style;
 
+import javax.vecmath.Vector2f;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * TODO implement wrap
+ *         TODO implement wrap
  */
 public class RowLayout implements Layout {
-    
+
     //options
     private float spacingHorizontal = 0f;
     private float spacingVertical = 0f;
     private boolean wrap = false;
     private boolean equalWidth = false;
-    
+
     @Override
     public void layout(UIDisplayContainer container, boolean fitSize) {
         List<UIDisplayElement> allElements = container.getDisplayElements();
         List<UIDisplayElement> elements = new ArrayList<UIDisplayElement>();
-        
+
         for (UIDisplayElement element : allElements) {
             if (element.isVisible() && !(element instanceof Style)) {
                 elements.add(element);
             }
         }
-        
+
         Vector2f[] cellSize = calcCellSize(elements);
         if (wrap) {
             if (container.getSize().x > 0) {
@@ -59,26 +57,26 @@ public class RowLayout implements Layout {
                     for (int j = lastWrap; j < i; j++) {
                         x += cellSize[j].x;
                     }
-                    
+
                     //calculate y position
                     float y = 0f;
                     for (int j = 0; j < rowSizeY.size(); j++) {
                         y += rowSizeY.get(j);
                     }
-                    
+
                     elements.get(i).setPosition(new Vector2f(x, y));
-                    
+
                     //check if content width is to big
                     if ((x + cellSize[i].x) > container.getSize().x) {
                         float max = 0f;
                         for (int j = lastWrap; j < i; j++) {
                             max = Math.max(max, cellSize[j].y);
                         }
-                        
+
                         rowSizeY.add(max);
-                        
+
                         lastWrap = i;
-                        
+
                         //this will recalculate the position of the last element again
                         i--;
                     }
@@ -105,42 +103,42 @@ public class RowLayout implements Layout {
                 for (int j = 0; j < i; j++) {
                     x += cellSize[j].x;
                 }
-                
+
                 elements.get(i).setPosition(new Vector2f(x, 0f));
             }
-            
+
             if (fitSize) {
                 Vector2f size = new Vector2f(0f, 0f);
                 for (int i = 0; i < cellSize.length; i++) {
                     size.x += cellSize[i].x;
                     size.y = Math.max(size.y, cellSize[i].y);
                 }
-                
+
                 size.x -= spacingHorizontal;
-                
+
                 container.setSize(size);
             }
         }
     }
-    
+
     @Override
     public void render() {
-        
+
     }
-    
+
     private Vector2f[] calcCellSize(List<UIDisplayElement> elements) {
         Vector2f[] cellSize = new Vector2f[elements.size()];
-        
+
         for (int i = 0; i < cellSize.length; i++) {
             cellSize[i] = new Vector2f(0f, 0f);
         }
-        
+
         //get width and height of each cell
         for (int i = 0; i < cellSize.length; i++) {
             cellSize[i].x = elements.get(i).getSize().x + spacingHorizontal;
             cellSize[i].y = elements.get(i).getSize().y + spacingVertical;
         }
-        
+
         //if equal width is on
         if (equalWidth) {
             //choose widest column
@@ -150,74 +148,70 @@ public class RowLayout implements Layout {
                     max = cellSize[i].x;
                 }
             }
-            
+
             //set all columns to the max width
             for (int i = 0; i < cellSize.length; i++) {
                 cellSize[i].x = max;
             }
         }
-                
+
         return cellSize;
     }
-    
+
     /**
      * Get whether the display elements will be wrapped at the width of the container. ! NOT IMPLEMENTED YET !
+     *
      * @return
      */
     public boolean isWrap() {
         return wrap;
     }
-    
+
     /**
      * Set whether the display elements will be wrapped at the width of the container.
+     *
      * @param wrap True to wrap the display elements.
      */
     public void setWrap(boolean wrap) {
         this.wrap = wrap;
     }
-    
+
     /**
-     * 
      * @return
      */
     public boolean isEqualWidth() {
         return equalWidth;
     }
-    
+
     /**
-     * 
      * @param equalWidth
      */
     public void setEqualWidth(boolean equalWidth) {
         this.equalWidth = equalWidth;
     }
-    
+
     /**
-     * 
      * @return
      */
     public float getSpacingHorizontal() {
         return spacingHorizontal;
     }
-    
+
     /**
-     * 
      * @param spacingHorizontal
      */
     public void setSpacingHorizontal(float spacingHorizontal) {
         this.spacingHorizontal = spacingHorizontal;
     }
-    
+
     /**
-     * 
      * @return
      */
     public float getSpacingVertical() {
         return spacingVertical;
     }
-    
+
     /**
-     * 
      * @param spacingVertical
      */
     public void setSpacingVertical(float spacingVertical) {

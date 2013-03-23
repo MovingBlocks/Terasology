@@ -15,17 +15,16 @@
  */
 package org.terasology.math;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import com.bulletphysics.linearmath.AabbUtil2;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.base.Objects;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-
-import com.bulletphysics.linearmath.AabbUtil2;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.base.Objects;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion
@@ -356,28 +355,28 @@ public class AABB {
         return Objects.hashCode(min, max);
     }
 
-    public boolean intersectRectangle(Vector3f from, Vector3f direction){
+    public boolean intersectRectangle(Vector3f from, Vector3f direction) {
         Vector3f dirfrac = new Vector3f();
 
         dirfrac.x = 1.0f / direction.x;
         dirfrac.y = 1.0f / direction.y;
         dirfrac.z = 1.0f / direction.z;
 
-        float t1 = (min.x - from.x)*dirfrac.x;
-        float t2 = (max.x - from.x)*dirfrac.x;
-        float t3 = (min.y - from.y)*dirfrac.y;
-        float t4 = (max.y - from.y)*dirfrac.y;
-        float t5 = (min.z - from.z)*dirfrac.z;
-        float t6 = (max.z - from.z)*dirfrac.z;
+        float t1 = (min.x - from.x) * dirfrac.x;
+        float t2 = (max.x - from.x) * dirfrac.x;
+        float t3 = (min.y - from.y) * dirfrac.y;
+        float t4 = (max.y - from.y) * dirfrac.y;
+        float t5 = (min.z - from.z) * dirfrac.z;
+        float t6 = (max.z - from.z) * dirfrac.z;
 
         float tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
         float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
 
-        if (tmax < 0){
+        if (tmax < 0) {
             return false;
         }
 
-        if (tmin > tmax){
+        if (tmin > tmax) {
             return false;
         }
 

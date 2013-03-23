@@ -15,12 +15,12 @@
  */
 package org.terasology.logic.manager;
 
-import java.util.Collection;
-
 import org.terasology.model.blueprints.Blueprint;
 import org.terasology.model.blueprints.SimpleBlueprint;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.world.WorldProvider;
+
+import java.util.Collection;
 
 /**
  * Provides the functionality to generate blueprints from a list of block positions.

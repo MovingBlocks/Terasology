@@ -26,15 +26,22 @@ import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.vecmath.Vector4f;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 public class AnimationOpacity extends Animation {
     private float toOpacity;
     private float fromOpacity;
     private float currentOpacity;
-    private int  factor;
+    private int factor;
     private float speed;
     private Mesh mesh;
 
@@ -42,15 +49,15 @@ public class AnimationOpacity extends Animation {
     private String id = null;
 
 
-    public AnimationOpacity(float fromOpacity, float toOpacity, float speed){
+    public AnimationOpacity(float fromOpacity, float toOpacity, float speed) {
         this.fromOpacity = fromOpacity;
         this.toOpacity = toOpacity;
         this.speed = speed;
         this.id = generateId();
 
-        if(fromOpacity<toOpacity){
+        if (fromOpacity < toOpacity) {
             this.factor = 1;
-        }else{
+        } else {
             this.factor = -1;
         }
 
@@ -61,10 +68,10 @@ public class AnimationOpacity extends Animation {
     }
 
     @Override
-    public void renderBegin(){
-        if(fbo == null){
+    public void renderBegin() {
+        if (fbo == null) {
             fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false);
-        }else if(fbo._height != Display.getHeight() || fbo._width != Display.getWidth()){
+        } else if (fbo._height != Display.getHeight() || fbo._width != Display.getWidth()) {
             fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false);
         }
 
@@ -74,7 +81,7 @@ public class AnimationOpacity extends Animation {
     }
 
     @Override
-    public void renderEnd(){
+    public void renderEnd() {
         PostProcessingRenderer.getInstance().getFBO(id).unbind();
         ShaderProgram program = ShaderManager.getInstance().getShaderProgram("animateOpacity");
         program.setFloat("alpha", currentOpacity);
@@ -100,24 +107,24 @@ public class AnimationOpacity extends Animation {
     }
 
     @Override
-    public void update(){
-        if((factor>0 && currentOpacity<toOpacity) || (factor<0 && currentOpacity>toOpacity)){
-            currentOpacity += factor*speed*0.01f;
+    public void update() {
+        if ((factor > 0 && currentOpacity < toOpacity) || (factor < 0 && currentOpacity > toOpacity)) {
+            currentOpacity += factor * speed * 0.01f;
 
-            if(!target.isVisible() && currentOpacity > 0.05f){
+            if (!target.isVisible() && currentOpacity > 0.05f) {
                 target.setVisible(true);
             }
 
-        }else{
-            if(!isRepeat()){
+        } else {
+            if (!isRepeat()) {
                 currentOpacity = toOpacity;
 
-                if(currentOpacity <= 0){
+                if (currentOpacity <= 0) {
                     target.setVisible(false);
                 }
 
                 this.stop();
-            }else{
+            } else {
                 float tempOpacity = toOpacity;
                 toOpacity = fromOpacity;
                 fromOpacity = tempOpacity;
@@ -128,7 +135,7 @@ public class AnimationOpacity extends Animation {
         }
     }
 
-    private String generateId(){
+    private String generateId() {
         return "opacity" + this.hashCode();
     }
 

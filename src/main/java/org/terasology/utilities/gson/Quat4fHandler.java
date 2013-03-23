@@ -23,12 +23,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector4f;
 import java.lang.reflect.Type;
 
 /**
-* @author Immortius
-*/
+ * @author Immortius
+ */
 public class Quat4fHandler implements JsonDeserializer<Quat4f> {
 
     @Override

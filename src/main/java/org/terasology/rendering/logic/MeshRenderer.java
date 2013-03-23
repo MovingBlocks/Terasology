@@ -173,14 +173,13 @@ public class MeshRenderer implements RenderSystem {
     }
 
     @ReceiveEvent(components = {MeshComponent.class})
-    public void onChangeMesh(ChangedComponentEvent event, EntityRef entity)
-    {
+    public void onChangeMesh(ChangedComponentEvent event, EntityRef entity) {
         removeMesh(entity);
         addMesh(entity);
     }
 
     private void removeMesh(EntityRef entity) {
-        if (!gelatinous.remove(entity)){
+        if (!gelatinous.remove(entity)) {
             Material mat = opaqueEntities.remove(entity);
             if (mat != null) {
                 opaqueMesh.remove(mat, entity);

@@ -24,19 +24,20 @@ public interface LoadProcess {
     public static final int UNKNOWN_STEPS = -1;
 
     /**
-     *
      * @return A message describing the state of the process
      */
     String getMessage();
 
     /**
      * Runs a single step.
+     *
      * @return Whether the overall process is finished
      */
     boolean step();
 
     /**
      * Begins the loading
+     *
      * @return The total number of expected steps for this LoadProcess, 0 if nothing to do
      */
     int begin();

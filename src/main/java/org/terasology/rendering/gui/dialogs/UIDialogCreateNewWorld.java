@@ -35,7 +35,12 @@ import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.core.*;
+import org.terasology.world.generator.core.BasicHMTerrainGenerator;
+import org.terasology.world.generator.core.FlatTerrainGenerator;
+import org.terasology.world.generator.core.FloraGenerator;
+import org.terasology.world.generator.core.ForestGenerator;
+import org.terasology.world.generator.core.MultiTerrainGenerator;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 
 import javax.vecmath.Vector2f;

@@ -15,19 +15,19 @@
  */
 package org.terasology.componentSystem.action;
 
-import org.terasology.entitySystem.In;
-import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.components.actions.AccessInventoryActionComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 

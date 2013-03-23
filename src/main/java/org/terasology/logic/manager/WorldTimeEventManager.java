@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.manager;
 
-import java.util.ArrayList;
-
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldTimeEvent;
+
+import java.util.ArrayList;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

@@ -3,8 +3,6 @@ package org.terasology.network;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
-import java.util.List;
-
 /**
  * @author Immortius
  */

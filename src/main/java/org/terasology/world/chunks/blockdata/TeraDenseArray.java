@@ -5,9 +5,8 @@ import com.google.common.base.Preconditions;
 
 /**
  * TeraDenseArray is the base class used to implement dense arrays.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public abstract class TeraDenseArray extends TeraArray {
 
@@ -18,7 +17,7 @@ public abstract class TeraDenseArray extends TeraArray {
     protected TeraDenseArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
         super(sizeX, sizeY, sizeZ, initialize);
     }
-    
+
     protected TeraDenseArray(TeraArray in) {
         super(Preconditions.checkNotNull(in).getSizeX(), in.getSizeY(), in.getSizeZ(), true);
         copyFrom(in);

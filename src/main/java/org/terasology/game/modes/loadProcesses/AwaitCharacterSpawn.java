@@ -17,11 +17,11 @@
 package org.terasology.game.modes.loadProcesses;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.WorldRenderer;
 

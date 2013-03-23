@@ -15,20 +15,6 @@
  */
 package org.terasology.rendering.gui.widgets;
 
-import static org.lwjgl.opengl.GL11.*;
-
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -47,13 +33,34 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionListener;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glVertex2f;
+
 /**
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
  * The content is scrollable and it also supports text wrapping in multi line mode. Moreover it supports the usual text editing, like selecting text and copy & paste.
+ *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * 
- * TODO remove text wrapping, the UILabel widget can do this.
- * TODO clean up
+ *         <p/>
+ *         TODO remove text wrapping, the UILabel widget can do this.
+ *         TODO clean up
  */
 public class UIText extends UIDisplayContainerScrollable {
     
@@ -83,36 +90,36 @@ public class UIText extends UIDisplayContainerScrollable {
        Note 2: There is some dividing by the factor of 2 going on when setting the position or size of the character. This needs to be done, 
                otherwise the cursor will be at the wrong position. I can't explain this behavior.
     */
-    
+
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
-    
+
     //wrapping
     private final List<Integer> wrapPosition = new ArrayList<Integer>();
-    
+
     //selection
     private int cursorPosition = -1;
     private boolean selection = false;
     private int selectionStart;
     private int selectionEnd;
-    
+
     //characters
-    private final char[] specialCharacters = new char[] {' ', '_', '.', ',', '/', '!', '-','(', ')', '"', '\'', ';', ':', '+'};
-    private final char[] multiLineSecialCharacters = new char[] {'\n'};
+    private final char[] specialCharacters = new char[]{' ', '_', '.', ',', '/', '!', '-', '(', ')', '"', '\'', ';', ':', '+'};
+    private final char[] multiLineSecialCharacters = new char[]{'\n'};
     private boolean ctrlKeyPressed = false;
-    
+
     //options
     private final Vector2f cursorSize = new Vector2f(1f, 16f);
     private int maxLength = 0;
     private boolean disabled;
     private boolean multiLine = false;
-    
+
     //child elements
     private final UILabel text;
     private final UITextCursor cursor;
     private final UISelection selectionRectangle;
-    
+
     //key listener
     private KeyListener keyListener = new KeyListener() {
         @Override
@@ -129,11 +136,11 @@ public class UIText extends UIDisplayContainerScrollable {
                         else if (cursorPosition > 0) {
                             int pos = getWrapOffset(cursorPosition);
                             replaceText(pos - 1, pos, "");
-                            
+
                             setCursorToTextPosition(cursorPosition - 1);
                         }
                     }
-                    
+
                     event.consume();
                 }
                 //delete
@@ -147,19 +154,17 @@ public class UIText extends UIDisplayContainerScrollable {
                         else if (cursorPosition < text.getText().length()) {
                             int pos = getWrapOffset(cursorPosition);
                             replaceText(pos, pos + 1, "");
-                        
+
                             setCursorToTextPosition(cursorPosition);
                         }
                     }
-                    
+
                     event.consume();
-                }
-                else if (event.getKey() == Keyboard.KEY_HOME && event.isDown()) {
+                } else if (event.getKey() == Keyboard.KEY_HOME && event.isDown()) {
                     clearSelection();
                     setCursorToTextPosition(0);
                     event.consume();
-                }
-                else if (event.getKey() == Keyboard.KEY_END && event.isDown()) {
+                } else if (event.getKey() == Keyboard.KEY_END && event.isDown()) {
                     clearSelection();
                     setCursorToTextPosition(text.getText().length());
                     event.consume();
@@ -172,7 +177,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     } else {
                         setCursorToTextPosition(cursorPosition - 1);
                     }
-                    
+
                     event.consume();
                 }
                 //move cursor right
@@ -188,11 +193,11 @@ public class UIText extends UIDisplayContainerScrollable {
                 else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
-                    
+
                     Vector2f pos = cursor.getAbsolutePosition();
                     pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y - cursorSize.y / 2);
                     setCursorToTextPosition(toTextPosition(pos));
-                    
+
                     event.consume();
                 }
                 //move cursor down
@@ -203,55 +208,55 @@ public class UIText extends UIDisplayContainerScrollable {
                     Vector2f pos = cursor.getAbsolutePosition();
                     pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y + cursorSize.y + cursorSize.y / 2);
                     setCursorToTextPosition(toTextPosition(pos));
-                    
+
                     event.consume();
                 }
                 //left/right control pressed
                 else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
                     ctrlKeyPressed = event.isDown();
-                    
+
                     event.consume();
                 }
                 //cut selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
                     cut();
-                    
+
                     event.consume();
                 }
                 //copy selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
                     copy();
-                    
+
                     event.consume();
                 }
                 //paste selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
                     paste();
-                    
+
                     event.consume();
                 }
                 //select all
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
                     setSelection(0, text.getText().length());
-                    
+
                     event.consume();
                 }
                 //add character
                 else if (event.isDown()) {
                     char c = Keyboard.getEventCharacter();
-                    
+
                     if (c == '\r') {
                         c = '\n';
                     }
-                    
+
                     if (validateChar(c)) {
                         //delete selection
                         if (selectionStart != selectionEnd) {
                             deleteSelection();
                         }
-                        
+
                         int num = insertText(getWrapOffset(cursorPosition), String.valueOf(c));
-                        
+
                         setCursorToTextPosition(cursorPosition + num);
                         event.consume();
                     }
@@ -263,12 +268,13 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * A text cursor.
+     *
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
     private class UITextCursor extends UIDisplayContainer {
         private Color color = new Color(Color.black);
 
-        public UITextCursor(Vector2f size){
+        public UITextCursor(Vector2f size) {
             setSize(size);
         }
 
@@ -276,7 +282,7 @@ public class UIText extends UIDisplayContainerScrollable {
             if (!isVisible()) {
                 return;
             }
-            
+
             glPushMatrix();
             glColor4f(color.r, color.g, color.b, color.a);
             glLineWidth(getSize().x);
@@ -286,42 +292,42 @@ public class UIText extends UIDisplayContainerScrollable {
             glEnd();
             glPopMatrix();
         }
-        
+
         public void update() {
-            
+
         }
-        
+
         public void setColor(Color color) {
             this.color = color;
         }
     }
-    
+
     /**
      * The selection rectangle.
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      *
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
     private class UISelection extends UIDisplayContainer {
         private Color color = new Color(Color.gray);
         private final List<Vector2f[]> rectangles = new ArrayList<Vector2f[]>();
         private boolean fade = false;
-        
+
         public void render() {
             if (!isVisible() || rectangles.size() == 0) {
                 return;
             }
-            
+
             glPushMatrix();
-            
+
             float alpha = color.a;
             if (fade) {
-                
-                alpha = Math.max(0, alpha - 0.5f); 
+
+                alpha = Math.max(0, alpha - 0.5f);
             }
             glColor4f(color.r, color.g, color.b, alpha);
-            
+
             glBegin(GL_QUADS);
-            
+
             for (Vector2f[] rect : rectangles) {
                 //[0] = position, [1] = size
                 glVertex2f(rect[0].x, rect[0].y);
@@ -329,7 +335,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 glVertex2f(rect[0].x + rect[1].x, rect[0].y + rect[1].y);
                 glVertex2f(rect[0].x, rect[0].y + rect[1].y);
             }
-            
+
             glEnd();
             glPopMatrix();
         }
@@ -337,7 +343,7 @@ public class UIText extends UIDisplayContainerScrollable {
         public void update() {
 
         }
-        
+
         public void updateSelection(int start, int end) {
             if (start != end) {
                 rectangles.clear();
@@ -345,48 +351,48 @@ public class UIText extends UIDisplayContainerScrollable {
                 //loop through all selected lines and add a selection rectangle for each
                 int nextLine;
                 Vector2f pos;
-                for (int i = start; i < end;) {
+                for (int i = start; i < end; ) {
                     nextLine = findNextChar(i, '\n', false);
                     pos = toDisplayPosition(i);
                     pos.x = pos.x * 2;
                     pos.y = pos.y * 2 - cursor.getSize().y;
                     Vector2f size = new Vector2f(calcTextWidth(text.getText().substring(i, Math.min(end, nextLine))), cursor.getSize().y);
-                    
-                    rectangles.add(new Vector2f[] {pos, size});
-                
+
+                    rectangles.add(new Vector2f[]{pos, size});
+
                     i = nextLine;
                 }
-                
+
                 selectionRectangle.setVisible(true);
             } else {
                 selectionRectangle.setVisible(false);
             }
         }
-        
+
         public void fadeSelection(boolean fade) {
             this.fade = fade;
         }
-        
+
         public void setColor(Color color) {
             this.color = color;
         }
-        
+
         public Color getColor() {
             return color;
         }
     }
-    
-    public UIText() {        
+
+    public UIText() {
         //key listener for processing the input
         addKeyListener(keyListener);
-        
+
         //mouse button listener to detect mouse clicks on the text and moving the cursor
         addMouseButtonListener(new MouseButtonListener() {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
-                
+
             }
-            
+
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
                 //end the selection
@@ -396,7 +402,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     setCursorToTextPosition(toTextPosition(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY())));
                 }
             }
-            
+
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 //start the selection
@@ -404,14 +410,14 @@ public class UIText extends UIDisplayContainerScrollable {
                     selection = true;
                     selectionStart = toTextPosition(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()));
                     selectionEnd = selectionStart;
-                    
+
                     selectionRectangle.updateSelection(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
                     setCursorToTextPosition(toTextPosition(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY())));
                     setFocus(UIText.this);
                 }
             }
         });
-        
+
         //mouse move listener to update position of cursor if mouse is pressed
         addMouseMoveListener(new MouseMoveListener() {
             @Override
@@ -424,20 +430,20 @@ public class UIText extends UIDisplayContainerScrollable {
 
             @Override
             public void leave(UIDisplayElement element) {
-                
+
             }
-            
+
             @Override
             public void hover(UIDisplayElement element) {
-                
+
             }
-            
+
             @Override
             public void enter(UIDisplayElement element) {
-                
+
             }
         });
-        
+
         //update of the selection rectangle
         addSelectionListener(new SelectionListener() {
             @Override
@@ -445,7 +451,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 selectionRectangle.updateSelection(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
             }
         });
-        
+
         //focus listener for hiding/displaying the cursor
         addFocusListener(new FocusListener() {
             @Override
@@ -456,26 +462,26 @@ public class UIText extends UIDisplayContainerScrollable {
                     setCursorPosition(cursorPosition);
                 }
             }
-            
+
             @Override
             public void focusOff(UIDisplayElement element) {
                 cursor.setVisible(false);
                 selectionRectangle.fadeSelection(true);
             }
         });
-        
+
         text = new UILabel();
         text.setVerticalAlign(EVerticalAlign.CENTER);
         text.setColor(Color.black);
         text.setVisible(true);
-        
+
         cursor = new UITextCursor(cursorSize);
-        selectionRectangle = new UISelection();   
-        
+        selectionRectangle = new UISelection();
+
         addDisplayElement(text);
         text.addDisplayElement(selectionRectangle);
         text.addDisplayElement(cursor);
-        
+
         setPadding(new Vector4f(0f, 5f, 0f, 5f));
         setBackgroundColor(new Color(255, 255, 255));
         setShadow(new Vector4f(0f, 4f, 4f, 0f), EShadowDirection.OUTSIDE, 1f);
@@ -485,6 +491,7 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Set the cursor position to the given position in the text.
+     *
      * @param index The text position (index) to set the cursor to.
      */
     private void setCursorToTextPosition(int index) {
@@ -493,7 +500,7 @@ public class UIText extends UIDisplayContainerScrollable {
         } else if (index > text.getText().length()) {
             index = text.getText().length();
         }
-        
+
         //calculate the display position of the cursor from text position
         if (index != cursorPosition) {
             Vector2f newPos = toDisplayPosition(index);
@@ -521,58 +528,59 @@ public class UIText extends UIDisplayContainerScrollable {
                     text.setPosition(new Vector2f(-cursor.getPosition().x * 2, 0f));
                 }
             }
-            
+
             cursorPosition = index;
-            
+
             notifySelectionListeners();
         }
     }
 
     /**
      * Get the cursor position at the given display position.
+     *
      * @return Returns the text position (index) of the cursor.
      */
     private int toTextPosition(Vector2f mousePos) {
         Vector2f textAbsPos = text.getAbsolutePosition();
         mousePos = new Vector2f(Math.max(mousePos.x, textAbsPos.x), Math.max(mousePos.y, textAbsPos.y));
         Vector2f relative = new Vector2f(mousePos.x - textAbsPos.x, mousePos.y - textAbsPos.y);
-        
+
         //multi line
         //if (isMultiLine()) {
-            //relative.x = relative.x - getPadding().y - getPadding().w;
-            //clicked bottom of text container
-            if (mousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
-                return text.getText().length();
-            }
-            //clicked top of text container
-            else if (mousePos.y <= textAbsPos.y) {
-                return 0;
-            }
-            //calculate the cursor position
-            else {
-                for (int i = 0; i < text.getText().length();) {
-                    //first calculate the height
-                    if (calcTextHeight(text.getText().substring(0, i)) >= relative.y) {
-                        //clicked left from the text box
-                        if (relative.x <= 0) {
-                            return i;
-                        }
-                        
-                        //clicked somewhere in the text or right from text
-                        for (int j = i; j < text.getText().length(); j++) {
-                            //than calculate the width
-                            if (calcTextWidth(text.getText().substring(i, j)) > relative.x || text.getText().charAt(j) == '\n') {
-                                return j;
-                            } else if (j == text.getText().length() - 1) {
-                                return j + 1;
-                            }
+        //relative.x = relative.x - getPadding().y - getPadding().w;
+        //clicked bottom of text container
+        if (mousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
+            return text.getText().length();
+        }
+        //clicked top of text container
+        else if (mousePos.y <= textAbsPos.y) {
+            return 0;
+        }
+        //calculate the cursor position
+        else {
+            for (int i = 0; i < text.getText().length(); ) {
+                //first calculate the height
+                if (calcTextHeight(text.getText().substring(0, i)) >= relative.y) {
+                    //clicked left from the text box
+                    if (relative.x <= 0) {
+                        return i;
+                    }
+
+                    //clicked somewhere in the text or right from text
+                    for (int j = i; j < text.getText().length(); j++) {
+                        //than calculate the width
+                        if (calcTextWidth(text.getText().substring(i, j)) > relative.x || text.getText().charAt(j) == '\n') {
+                            return j;
+                        } else if (j == text.getText().length() - 1) {
+                            return j + 1;
                         }
                     }
-                    
-                    i = findNextChar(i, '\n', false);
                 }
-                return text.getText().length();
+
+                i = findNextChar(i, '\n', false);
             }
+            return text.getText().length();
+        }
             /*
         }
         //single line
@@ -599,44 +607,47 @@ public class UIText extends UIDisplayContainerScrollable {
         return 0;
         */
     }
-    
+
     /**
      * Get the position on the display at the given position in the text.
+     *
      * @param index The position in the text. From 0 to the length of the text.
      * @return Returns the display position.
      */
     private Vector2f toDisplayPosition(int index) {
         Vector2f displayPos = new Vector2f();
-        
+
         String substr = text.getText().substring(0, index);
         String lastLine = substr;
-        
+
         int indexLastLine = substr.lastIndexOf('\n');
         if (indexLastLine != -1) {
             lastLine = substr.substring(indexLastLine, substr.length());
         }
-        
+
         displayPos.x = calcTextWidth(lastLine) / 2;
         displayPos.y = calcTextHeight(substr) / 2;
-        
+
         return displayPos;
     }
 
     /**
      * Calculate the width of the given text.
+     *
      * @param text The text to calculate the width.
      * @return Returns the width of the given text.
      */
-    private int calcTextWidth(String text) {        
+    private int calcTextWidth(String text) {
         return this.text.getFont().getWidth(text);
     }
-    
+
     /**
      * Calculate the height of the given text.
+     *
      * @param text The text to calculate the height.
      * @return Returns the height of the given text.
      */
-    private int calcTextHeight(String text) {        
+    private int calcTextHeight(String text) {
         //fix because the slick library is calculating the height of text wrong if the last/first character is a new line..
         if (!text.isEmpty() && (text.charAt(text.length() - 1) == '\n' || text.charAt(text.length() - 1) == ' ')) {
             text += "i";
@@ -645,16 +656,17 @@ public class UIText extends UIDisplayContainerScrollable {
         if (!text.isEmpty() && text.charAt(0) == '\n') {
             text = "i" + text;
         }
-        
+
         if (text.isEmpty()) {
             text = "i";
         }
-        
+
         return this.text.getFont().getHeight(text);
     }
-    
+
     /**
      * Remove all unsupported characters from a string.
+     *
      * @param text The string to remove all unsupported characters.
      * @return Returns the string where all unsupported characters are removed.
      */
@@ -666,21 +678,22 @@ public class UIText extends UIDisplayContainerScrollable {
                 replaced.append(original.charAt(i));
             }
         }
-        
+
         return replaced.toString();
     }
-    
+
     /**
      * Validate a character.
+     *
      * @param c The character to validate.
      * @return Returns true if the character is valid.
      */
     private boolean validateChar(char c) {
         boolean valid = false;
-        
+
         if (c >= 'a' && c < 'z' + 1) {
             valid = true;
-        } else if(c >= 'A' && c < 'Z' + 1) {
+        } else if (c >= 'A' && c < 'Z' + 1) {
             valid = true;
         } else if (c >= '0' && c < '9' + 1) {
             valid = true;
@@ -689,32 +702,33 @@ public class UIText extends UIDisplayContainerScrollable {
                 for (char ch : multiLineSecialCharacters) {
                     if (ch == c) {
                         valid = true;
-                        
+
                         break;
                     }
                 }
             }
-            
+
             for (char ch : specialCharacters) {
                 if (ch == c) {
                     valid = true;
-                    
+
                     break;
                 }
             }
         }
-             
+
         return valid;
     }
-    
+
     /**
      * Get the next or previous space in the text from the current cursor position.
+     *
      * @param reverse True to search backwards.
      * @return Returns the text position (index) where the next or previous space was found.
      */
     private int findNextChar(int index, char ch, boolean reverse) {
         StringBuilder str = new StringBuilder(text.getText());
-        
+
         //backwards search
         if (reverse) {
             for (int i = index - 1; i >= 0; i--) {
@@ -733,20 +747,22 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
             }
         }
-        
+
         return index;
     }
-    
+
     /**
      * Set the text in the clipboard.
+     *
      * @param str The text to set.
      */
     private void setClipboard(String str) {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(str), null);
     }
-    
+
     /**
      * Get the text from the clipboard.
+     *
      * @return Returns the text from the clipboard.
      */
     private String getClipboard() {
@@ -754,22 +770,21 @@ public class UIText extends UIDisplayContainerScrollable {
 
         try {
             if (t != null && t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                String text = (String)t.getTransferData(DataFlavor.stringFlavor);
+                String text = (String) t.getTransferData(DataFlavor.stringFlavor);
                 return text;
             }
-        } 
-        catch (UnsupportedFlavorException e) {
-            
-        } 
-        catch (IOException e) {
-            
+        } catch (UnsupportedFlavorException e) {
+
+        } catch (IOException e) {
+
         }
-        
+
         return "";
     }
-    
+
     /**
      * Wraps the text to the size of the container.
+     *
      * @param text The text to wrap.
      * @return Returns the wrapped text.
      */
@@ -779,12 +794,12 @@ public class UIText extends UIDisplayContainerScrollable {
             int lastSpace = 0;
             int lastWrap = 0;
             StringBuilder wrapText = new StringBuilder(text + " ");
-            
+
             wrapPosition.clear();
-            
+
             //loop through whole text
             for (int i = 0; i < wrapText.length(); i++) {
-                
+
                 //check if character is a space -> text can only be wrapped at spaces
                 if (wrapText.charAt(i) == ' ') {
                     //check if the string (from the beginning of the new line) is bigger than the container width
@@ -792,19 +807,19 @@ public class UIText extends UIDisplayContainerScrollable {
                         //than wrap the text at the previous space
                         wrapText.insert(lastSpace + 1, '\n');
                         wrapPosition.add(new Integer(lastSpace + 1));
-                        
+
                         lastWrap = lastSpace + 1;
                     }
-                    
+
                     lastSpace = i;
                 } else if (wrapText.charAt(i) == '\n') {
                     lastSpace = i;
                     lastWrap = i;
                 }
             }
-            
+
             wrapText.replace(wrapText.length() - 1, wrapText.length(), "");
-            
+
             return wrapText.toString();
         }
         //single line
@@ -812,9 +827,10 @@ public class UIText extends UIDisplayContainerScrollable {
             return text;
         }
     }
-    
+
     /**
      * Get the offset in text length which happened due to the additional new line characters at text wrapping.
+     *
      * @param index The offset will be calculated to this index.
      * @return Returns the offset in text length.
      */
@@ -826,12 +842,13 @@ public class UIText extends UIDisplayContainerScrollable {
                 return index - i - 1;
             }
         }
-        
+
         return index;
     }
-    
+
     /**
      * Get the displayed text.
+     *
      * @return Returns the text.
      */
     public String getText() {
@@ -839,17 +856,18 @@ public class UIText extends UIDisplayContainerScrollable {
         for (int i = 0; i < wrapPosition.size(); i++) {
             str.replace(wrapPosition.get(i) - i, wrapPosition.get(i) + 1 - i, "");
         }
-        
+
         return str.toString();
     }
-    
+
     /**
      * Set the text of the label.
+     *
      * @param text The text to set.
      */
     public int setText(String text) {
         boolean scrollbarVisibility = isScrollbarVisible();
-        
+
         //check the max string length
         if (maxLength > 0) {
             if (text.length() > maxLength) {
@@ -860,94 +878,96 @@ public class UIText extends UIDisplayContainerScrollable {
         this.text.setText(wrapText(text));
 
         calcContentHeight();
-        
+
         //if the visibility of the scrollbar changed, recalculate the content
         if (scrollbarVisibility != isScrollbarVisible()) {
             setText(getText());
         }
-        
+
         notifyChangedListeners();
-        
+
         return text.length();
     }
-    
+
     /**
      * Append a text to the current displayed text.
+     *
      * @param text The text to append.
      * @return Returns the number of characters which where added.
      */
     public int appendText(String text) {
         boolean scrollbarVisibility = isScrollbarVisible();
-        
+
         String str = getText();
-        
+
         //check the max string length
         if (maxLength > 0) {
             if (str.length() >= maxLength) {
                 return 0;
             }
-            
+
             if (str.length() + text.length() > maxLength) {
                 text = text.substring(0, maxLength - str.length());
             }
         }
 
         setText(str + text);
-        
+
         calcContentHeight();
-        
+
         //if the visibility of the scrollbar changed, recalculate the content
         if (scrollbarVisibility != isScrollbarVisible()) {
             setText(getText());
         }
-        
+
         return text.length();
     }
-    
+
     /**
      * Insert a text at a specific position into the current displayed text of the label.
+     *
      * @param offset The offset, where to insert the text at.
-     * @param text The text to insert.
+     * @param text   The text to insert.
      * @return Returns the number of characters which where added.
      */
-    public int insertText(int offset, String text) {        
+    public int insertText(int offset, String text) {
 
         int prevWraps = getWrapOffset(cursorPosition);
         int currentWraps;
         int diff;
-        
+
         boolean scrollbarVisibility = isScrollbarVisible();
-        
+
         StringBuilder str = new StringBuilder(getText());
-        
+
         //check the max string length
         if (maxLength > 0) {
             if (str.length() >= maxLength) {
                 return 0;
             }
-            
+
             if (str.length() + text.length() > maxLength) {
                 text = text.substring(0, maxLength - str.length());
             }
         }
-        
+
         setText(str.insert(offset, text).toString());
-        
+
         calcContentHeight();
-        
+
         //if the visibility of the scrollbar changed, recalculate the content
         if (scrollbarVisibility != isScrollbarVisible()) {
             setText(getText());
         }
-        
+
         //if text is inserted, the cursor might night a shift, because additional new lines could be inserted by wrapping the text
         currentWraps = getWrapOffset(cursorPosition);
         diff = currentWraps - prevWraps;
         cursorPosition = cursorPosition - diff;
-        
+
         return text.length();
     }
-    
+
     /**
      * Delete the whole text.
      */
@@ -956,77 +976,81 @@ public class UIText extends UIDisplayContainerScrollable {
         clearSelection();
         setCursorToTextPosition(0);
     }
-    
+
     /**
-     * Replace a string defined by its start and end index. 
+     * Replace a string defined by its start and end index.
+     *
      * @param start The start index.
-     * @param end The end index.
-     * @param text The text to replace with.
+     * @param end   The end index.
+     * @param text  The text to replace with.
      */
     public void replaceText(int start, int end, String text) {
 
         boolean scrollbarVisibility = isScrollbarVisible();
-        
+
         StringBuilder str = new StringBuilder(getText());
         setText(str.replace(start, end, text).toString());
-        
+
         calcContentHeight();
-        
+
         //if the visibility of the scrollbar changed, recalculate the content
         if (scrollbarVisibility != isScrollbarVisible()) {
             setText(getText());
         }
     }
-    
+
     public int getCursorPosition() {
         return cursorPosition;
     }
-    
+
     public void setCursorPosition(int position) {
         setCursorToTextPosition(position);
     }
-    
+
     public void setCursorStart() {
         setCursorToTextPosition(0);
     }
-    
+
     public void setCursorEnd() {
         setCursorToTextPosition(text.getText().length());
     }
-    
+
     /**
      * Sets the selection.
+     *
      * @param start The start of the selection.
      */
     public void setSelection(int start) {
         selectionStart = start;
         selectionEnd = getText().length();
-        
+
         selectionRectangle.updateSelection(start, selectionEnd);
-        
+
         setCursorToTextPosition(selectionEnd);
-        
+
         notifySelectionListeners();
     }
-    
+
     /**
      * Sets the selection to the range specified by the given start and end indices.
+     *
      * @param start The start index of the selection.
-     * @param end The end index of the selection.
+     * @param end   The end index of the selection.
      */
     public void setSelection(int start, int end) {
         selectionStart = start;
         selectionEnd = end;
-        
+
         selectionRectangle.updateSelection(start, end);
-        
+
         setCursorToTextPosition(selectionEnd);
-        
+
         notifySelectionListeners();
     }
-    
+
     /**
      * Get the selected text.
+     *
      * @return Returns the selected text. If no text is selected it will return an empty string.
      */
     public String getSelection() {
@@ -1034,22 +1058,22 @@ public class UIText extends UIDisplayContainerScrollable {
             //TODO probably not correct. need to get the original string by getText() -> havn't tested it
             return text.getText().substring(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
         }
-        
+
         return "";
     }
-    
+
     /**
      * Reset the selection.
      */
     public void clearSelection() {
         selectionStart = 0;
         selectionEnd = 0;
-        
+
         selectionRectangle.updateSelection(selectionStart, selectionEnd);
-        
+
         notifySelectionListeners();
     }
-    
+
     /**
      * Delete the selected text. This has no effect if no text is selected.
      */
@@ -1060,18 +1084,18 @@ public class UIText extends UIDisplayContainerScrollable {
             selectionEnd = selectionStart;
             selectionRectangle.updateSelection(selectionStart, selectionEnd);
             setCursorToTextPosition(cursorTo);
-            
+
             notifySelectionListeners();
         }
     }
-    
+
     /**
      * Copy the selection.
      */
     public void copy() {
         setClipboard(getSelection());
     }
-    
+
     /**
      * Cut the selection.
      */
@@ -1079,7 +1103,7 @@ public class UIText extends UIDisplayContainerScrollable {
         setClipboard(getSelection());
         deleteSelection();
     }
-    
+
     /**
      * Pastes text from clipboard.
      */
@@ -1087,24 +1111,26 @@ public class UIText extends UIDisplayContainerScrollable {
         if (selectionStart != selectionEnd) {
             deleteSelection();
         }
-        
+
         String clipboard = removeUnsupportedChars(getClipboard());
-        
+
         int num = insertText(getWrapOffset(cursorPosition), clipboard);
-        
+
         setCursorToTextPosition(cursorPosition + num);
     }
-    
+
     /**
      * Get the text color.
+     *
      * @return Returns the text color.
      */
     public Color getColor() {
         return text.getColor();
     }
-    
+
     /**
      * Set the text color.
+     *
      * @param color The color to set.
      */
     public void setColor(Color color) {
@@ -1115,6 +1141,7 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Set the text selection color.
+     *
      * @param color The text selection color to set.
      */
 
@@ -1124,6 +1151,7 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Get the text selection color.
+     *
      * @return Returns the text selection color.
      */
     public Color getSelectionColor() {
@@ -1132,6 +1160,7 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Get the shadow color.
+     *
      * @return Returns the shadow color.
      */
     public Color getShadowColor() {
@@ -1140,6 +1169,7 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Set the shadow color.
+     *
      * @param shadowColor The shadow color to set.
      */
     public void setShadowColor(Color shadowColor) {
@@ -1148,14 +1178,16 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Check whether the text has a shadow.
+     *
      * @return Returns true if the text has a shadow.
      */
     public boolean isEnableShadow() {
         return this.text.isTextShadow();
     }
-    
+
     /**
      * Set whether the text has a color.
+     *
      * @param enable True to enable the shadow of the text.
      */
     public void setEnableShadow(boolean enable) {
@@ -1164,6 +1196,7 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Get the font.
+     *
      * @return Returns the font.
      */
     public Font getFont() {
@@ -1172,22 +1205,25 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Set the font.
+     *
      * @param font The font to set.
      */
     public void setFont(Font font) {
         text.setFont(font);
     }
-    
+
     /**
      * Check whether the element is disabled. There can't be written anything in a disabled element.
+     *
      * @return Returns true if the element is disabled.
      */
     public boolean isDisabled() {
         return disabled;
     }
-    
+
     /**
      * Get the maximum of characters the text element can hold.
+     *
      * @return Returns the maximum characters.
      */
     public int getMaxLength() {
@@ -1196,14 +1232,16 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Set the maximum of characters the text element can hold.
+     *
      * @param maxLength The maximum characters.
      */
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     }
-    
+
     /**
      * Check whether the text element is a multi line text element.
+     *
      * @return Returns true if the text element is a multi line text element.
      */
     public boolean isMultiLine() {
@@ -1212,11 +1250,12 @@ public class UIText extends UIDisplayContainerScrollable {
 
     /**
      * Set whether the text element is a multi line text element.
+     *
      * @param enable True to enable multi line support.
      */
     public void setMultiLine(boolean enable) {
         this.multiLine = enable;
-                
+
         if (enable) {
             setEnableScrolling(true);
             setEnableScrollbar(true);
@@ -1231,12 +1270,13 @@ public class UIText extends UIDisplayContainerScrollable {
     }
 
     /**
-     * Set whether the element is disabled. There can't be written anything in a disabled element. 
+     * Set whether the element is disabled. There can't be written anything in a disabled element.
+     *
      * @param disabled True to disable the element.
      */
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-        
+
         if (disabled) {
             setFocus(null);
             cursor.setVisible(false);
@@ -1248,7 +1288,7 @@ public class UIText extends UIDisplayContainerScrollable {
     /*
        Event listeners
     */
-    
+
     private void notifySelectionListeners() {
         for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
@@ -1262,7 +1302,7 @@ public class UIText extends UIDisplayContainerScrollable {
     public void removeSelectionListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
-    
+
     private void notifyChangedListeners() {
         for (ChangedListener listener : changedListeners) {
             listener.changed(this);

@@ -15,8 +15,8 @@
  */
 package org.terasology.componentSystem.action;
 
-import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;

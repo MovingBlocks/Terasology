@@ -15,15 +15,14 @@
  */
 package org.terasology.entitySystem.metadata.extension;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>

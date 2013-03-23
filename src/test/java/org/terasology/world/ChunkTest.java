@@ -10,17 +10,18 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerAuthority;
 import org.terasology.world.chunks.Chunk;
 
 
 public class ChunkTest {
 
     private Chunk chunk;
-    private BlockManager blockManager;
+    private BlockManagerAuthority blockManager;
 
     @Before
     public void setup() {
-        blockManager = new BlockManager();
+        blockManager = new BlockManagerAuthority();
         CoreRegistry.put(BlockManager.class, blockManager);
         chunk = new Chunk(new Vector3i(0,0,0));
     }
@@ -28,7 +29,7 @@ public class ChunkTest {
     @Test
     public void testChangeBlock() {
 
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("some:uri"), new Block()));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("some:uri"), new Block()), false);
         Block block = blockManager.getBlock("some:uri");
         chunk.setBlock(new Vector3i(1,2,3), block);
         assertEquals(block, chunk.getBlock(new Vector3i(1, 2, 3)));

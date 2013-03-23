@@ -16,12 +16,11 @@
 
 package org.terasology.world.block;
 
-import java.util.Locale;
-
+import com.google.common.base.Objects;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
-import com.google.common.base.Objects;
+import java.util.Locale;
 
 /**
  * Identifier for both blocks and block families.
@@ -117,12 +116,25 @@ public class BlockUri implements Comparable<BlockUri> {
         return blockIdentifier;
     }
 
+    /**
+     * @return The uri of the block's family, including shape
+     */
     public BlockUri getFamilyUri() {
         if (blockIdentifier.isEmpty()) {
             return this;
         }
         if (shapePackageName != null) {
             return new BlockUri(packageName, familyName, shapePackageName, shapeName);
+        }
+        return new BlockUri(packageName, familyName);
+    }
+
+    /**
+     * @return The uri of the block's family, excluding shape
+     */
+    public BlockUri getRootFamilyUri() {
+        if (blockIdentifier.isEmpty() && shapePackageName.isEmpty() && shapeName.isEmpty()) {
+            return this;
         }
         return new BlockUri(packageName, familyName);
     }

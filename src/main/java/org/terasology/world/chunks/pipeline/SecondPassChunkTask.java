@@ -22,7 +22,6 @@ import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
 
 /**
  * @author Immortius

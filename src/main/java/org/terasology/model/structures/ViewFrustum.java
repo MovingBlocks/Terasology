@@ -15,15 +15,14 @@
  */
 package org.terasology.model.structures;
 
-import java.nio.FloatBuffer;
-
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector3f;
+import java.nio.FloatBuffer;
 
 /**
  * View frustum usable for frustum culling.

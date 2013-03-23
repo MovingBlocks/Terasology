@@ -15,17 +15,17 @@
  */
 package org.terasology.rendering.cameras;
 
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.util.glu.GLU.gluPerspective;
-
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.terasology.math.TeraMath;
+
+import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
  * Simple default camera.

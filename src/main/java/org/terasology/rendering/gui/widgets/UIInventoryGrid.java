@@ -54,12 +54,12 @@ public class UIInventoryGrid extends UIDisplayContainer {
     }
 
     public void linkToEntity(EntityRef entity) {
-        int numSlots =  inventoryManager.getNumSlots(entity);
+        int numSlots = inventoryManager.getNumSlots(entity);
         this.linkToEntity(entity, 0, numSlots);
     }
 
     public void linkToEntity(EntityRef entity, int startSlot) {
-        int numSlots =  inventoryManager.getNumSlots(entity);
+        int numSlots = inventoryManager.getNumSlots(entity);
         this.linkToEntity(entity, startSlot, Math.max(0, numSlots - startSlot));
     }
 

@@ -63,6 +63,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * An implementation of the EntitySystem.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class EventSystemImpl implements EventSystem {

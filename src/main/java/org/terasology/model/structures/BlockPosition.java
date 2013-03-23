@@ -16,10 +16,10 @@
  */
 package org.terasology.model.structures;
 
+import org.terasology.math.Vector3i;
+
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-
-import org.terasology.math.Vector3i;
 
 /**
  * Represents the position of a block. This class is used mainly in the

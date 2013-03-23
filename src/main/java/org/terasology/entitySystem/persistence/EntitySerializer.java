@@ -11,7 +11,6 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
-import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;
@@ -27,6 +26,7 @@ import java.util.Set;
  * <p/>
  * It is also possible to set whether entity ids will be handled or ignored - if ignored then deserialized entities will
  * be given new ids.
+ *
  * @author Immortius
  */
 public class EntitySerializer {
@@ -75,6 +75,7 @@ public class EntitySerializer {
      * Sets whether entity ids should be ignored during serialization and deserialization.
      * If ignored, then they will not be stored in the protobuf, and deserialized entities will be given new ids. This
      * may break entity references, depending on how they are being handled (see: EntityRefTypeHandler)
+     *
      * @param ignoringEntityId
      */
     public void setIgnoringEntityId(boolean ignoringEntityId) {
@@ -83,6 +84,7 @@ public class EntitySerializer {
 
     /**
      * Sets the mapping between component classes and the ids that are used for serialization
+     *
      * @param table
      */
     public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
@@ -160,6 +162,7 @@ public class EntitySerializer {
 
     /**
      * Creates the components for the entity being deserialized based on its prefab (if any)
+     *
      * @param entityData
      * @return The mapping of components
      */
@@ -181,6 +184,7 @@ public class EntitySerializer {
 
     /**
      * Deserializes the components from an EntityData onto a map of components
+     *
      * @param entityData
      * @param componentMap
      */
@@ -225,7 +229,7 @@ public class EntitySerializer {
         }
         if (removeMissingComponents) {
             for (Component comp : currentEntity.iterateComponents()) {
-                if (!presentComponents.contains(comp.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(comp.getClass())) ) {
+                if (!presentComponents.contains(comp.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(comp.getClass()))) {
                     currentEntity.removeComponent(comp.getClass());
                 }
             }

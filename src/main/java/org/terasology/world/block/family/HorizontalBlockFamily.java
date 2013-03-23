@@ -15,15 +15,14 @@
  */
 package org.terasology.world.block.family;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Block group for blocks that can be oriented around the vertical axis.
@@ -35,11 +34,11 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
     /**
-     * @param uri   The asset uri for the block group.
-     * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
+     * @param uri        The asset uri for the block group.
+     * @param blocks     The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      * @param categories The set of categories this block family belongs to
      */
-    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, String ... categories) {
+    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, String... categories) {
         super(uri, Arrays.asList(categories));
         for (Side side : Side.horizontalSides()) {
             Block block = blocks.get(side);

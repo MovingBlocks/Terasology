@@ -7,16 +7,18 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
 
     /**
      * Registers a class with this library
+     *
      * @param clazz
      */
     void register(Class<? extends T> clazz);
 
     /**
      * Registers a class with this library
+     *
      * @param clazz
      * @param names The names to use to find this class
      */
-    void register(Class<? extends T> clazz, String ... names);
+    void register(Class<? extends T> clazz, String... names);
 
     /**
      * @param clazz

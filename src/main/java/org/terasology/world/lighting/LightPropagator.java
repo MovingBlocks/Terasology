@@ -16,9 +16,7 @@
 
 package org.terasology.world.lighting;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Diamond3iIterator;
@@ -30,7 +28,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -164,7 +163,7 @@ public class LightPropagator {
             if (LightingUtil.canSpreadLightInto(type, side)) {
                 Vector3i adjDir = side.getVector3i();
                 Block otherType = worldView.getBlock(x + adjDir.x, y + adjDir.y, z + adjDir.z);
-                byte adjLight = (byte)(worldView.getLight(x + adjDir.x, y + adjDir.y, z + adjDir.z) - 1);
+                byte adjLight = (byte) (worldView.getLight(x + adjDir.x, y + adjDir.y, z + adjDir.z) - 1);
                 if (adjLight > newLight && LightingUtil.canSpreadLightOutOf(otherType, side.reverse())) {
                     newLight = adjLight;
                 }

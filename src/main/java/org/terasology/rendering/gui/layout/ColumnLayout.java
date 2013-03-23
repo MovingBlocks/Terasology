@@ -18,20 +18,19 @@ package org.terasology.rendering.gui.layout;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *  TODO implement
+ *         TODO implement
  */
 public class ColumnLayout implements Layout {
 
     @Override
     public void layout(UIDisplayContainer container, boolean fitSize) {
-        
+
     }
 
     @Override
     public void render() {
-        
+
     }
 
 }

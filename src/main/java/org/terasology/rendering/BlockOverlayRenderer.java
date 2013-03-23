@@ -7,5 +7,6 @@ import org.terasology.math.AABB;
  */
 public interface BlockOverlayRenderer {
     public void setAABB(AABB aabb);
+
     public void render(float lineThickness);
 }

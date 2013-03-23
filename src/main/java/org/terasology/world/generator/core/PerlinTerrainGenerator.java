@@ -16,10 +16,6 @@
 
 package org.terasology.world.generator.core;
 
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.PerlinNoise;
@@ -30,6 +26,9 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+
+import javax.vecmath.Vector2f;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -115,7 +114,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                 WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
-                for (int y = Chunk.SIZE_Y-1; y >= 0; y--) {
+                for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
 
                     if (y == 0) { // The very deepest layer of the world is an indestructible mantle
                         c.setBlock(x, y, z, mantle);
@@ -274,7 +273,9 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     private double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
-        x1 = x * 0.002;y1 = y * 0.001; z1 = z * 0.002;
+        x1 = x * 0.002;
+        y1 = y * 0.001;
+        z1 = z * 0.002;
 
         double result = pGen4.fBm(x1, y1, z1);
         return result > 0.0 ? result : 0;
@@ -282,7 +283,9 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     private double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
-        x1 = x * 0.008; y1 = y * 0.006; z1 = z * 0.008;
+        x1 = x * 0.008;
+        y1 = y * 0.006;
+        z1 = z * 0.008;
 
         double result = pGen5.fBm(x1, y1, z1) - 0.1;
         return result > 0.0 ? result : 0;

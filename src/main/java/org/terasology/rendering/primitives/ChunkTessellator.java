@@ -16,10 +16,6 @@
 package org.terasology.rendering.primitives;
 
 import gnu.trove.iterator.TIntIterator;
-
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.BufferUtils;
 import org.terasology.math.Direction;
 import org.terasology.math.Region3i;
@@ -32,6 +28,9 @@ import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.Chunk;
+
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -81,14 +80,14 @@ public final class ChunkTessellator {
         PerformanceMonitor.startActivity("GenerateMinuatureMesh");
         ChunkMesh mesh = new ChunkMesh();
 
-        MiniatureChunk[] chunks = { miniatureChunk };
+        MiniatureChunk[] chunks = {miniatureChunk};
         WorldView localWorldView = new WorldView(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
         localWorldView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
 
         for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
             for (int z = 0; z < MiniatureChunk.SIZE_Z; z++) {
                 for (int y = 0; y < MiniatureChunk.SIZE_Y; y++) {
-                    Block block = miniatureChunk.getBlock(x,y,z);
+                    Block block = miniatureChunk.getBlock(x, y, z);
 
                     if (block == null || block.isInvisible())
                         continue;
@@ -127,7 +126,7 @@ public final class ChunkTessellator {
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 float[] result = new float[3];
-                Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i+1), mesh._vertexElements[j].normals.get(i+2));
+                Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i + 1), mesh._vertexElements[j].normals.get(i + 2));
                 calcLightingValuesForVertexPos(worldView, vertexPos, result, normal);
 
                 mesh._vertexElements[j].finalVertices.putFloat(result[0]);

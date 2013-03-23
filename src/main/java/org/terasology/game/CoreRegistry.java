@@ -15,9 +15,9 @@
  */
 package org.terasology.game;
 
-import java.util.Map;
-
 import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
@@ -34,7 +34,7 @@ public class CoreRegistry {
      * @param object The system itself
      * @param <T>
      */
-    public static <T> T put(Class<T> type, T object) {
+    public static <T, U extends T> U put(Class<T> type, U object) {
         store.put(type, object);
         return object;
     }

@@ -15,74 +15,72 @@
  */
 package org.terasology.components;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.Component;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
 public final class HierarchicalAIComponent implements Component {
-	
-	//how often updates are progressed, handle whit care
-    public int updateFrequency=0;
-	public long lastProgressedUpdateAt = 0;
-	
-	public Vector3f movementTarget = new Vector3f();
-	
+
+    //how often updates are progressed, handle whit care
+    public int updateFrequency = 0;
+    public long lastProgressedUpdateAt = 0;
+
+    public Vector3f movementTarget = new Vector3f();
+
     public long lastChangeOfDirectionAt = 0;
     public long lastChangeOfMovementAt = 0;
     public long lastChangeOfidlingtAt = 0;
     public long lastChangeOfDangerAt = 0;
-        
+
     //how long ai move
-    public int moveUpdateTime=600;
+    public int moveUpdateTime = 600;
     // how long ai move to one direction
-    public int directionUpdateTime=300;
+    public int directionUpdateTime = 300;
     // how long ai idles
-    public int idlingUpdateTime=500;
+    public int idlingUpdateTime = 500;
     // how often danger direction is checked
-    public int dangerUpdateTime=100;
-    
-    public boolean dieIfPlayerFar=true;
-    public int dieDistance=2000;
+    public int dangerUpdateTime = 100;
+
+    public boolean dieIfPlayerFar = true;
+    public int dieDistance = 2000;
 
     //define type of AI 
     public boolean hunter = false;
     public boolean aggressive = false;
     public boolean wild = false;
-    public boolean flying=false;
-    
+    public boolean flying = false;
+
     //AI properties
     // if flying maximum altitude
-    public int maxAltitude=200;
+    public int maxAltitude = 200;
     //AI moves more whit higher values
-    public int hectic=2;
+    public int hectic = 2;
     //AI runs more straight lines whit higher values
-    public int straightLined=2;
+    public int straightLined = 2;
     //accurate how accurate AI kills you, values from 0 to up. Do not give negative values something will turn oposite
-    public float forgiving=5f;
+    public float forgiving = 5f;
 
     //how well this AI finds player when hunter
     public int playerSense = 30;
     //how close AI comes when hunter
     public int playerdistance = 3;
     //does damage if nearer that this when aggressive
-    public int attackDistance =1;
+    public int attackDistance = 1;
     //runs if player nearer than this when wild
-    public int runDistance=30;
+    public int runDistance = 30;
     //start attack instead running when wild
-    public int panicDistance=10;
-    
+    public int panicDistance = 10;
+
     //doing something
     public boolean inDanger = false;
-    
 
-    
+
     //TODO remove this when fight system is ready!!!
-    public int damage=50;
-    public int damageFrequency=500;
-    
-    
-    
+    public int damage = 50;
+    public int damageFrequency = 500;
+
+
 }

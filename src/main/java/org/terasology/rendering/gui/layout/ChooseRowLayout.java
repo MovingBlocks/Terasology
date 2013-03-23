@@ -7,17 +7,19 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 import javax.vecmath.Vector2f;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
-public class ChooseRowLayout implements Layout{
+public class ChooseRowLayout implements Layout {
     private Vector2f size;
     private float borderWidth;
     private Color borderColor;
     private Vector2f position;
-    
-    public ChooseRowLayout(Vector2f position, Vector2f size, Color borderColor, float borderWidth){
+
+    public ChooseRowLayout(Vector2f position, Vector2f size, Color borderColor, float borderWidth) {
         this.size = size;
         this.borderColor = borderColor;
         this.borderWidth = borderWidth;
@@ -39,17 +41,17 @@ public class ChooseRowLayout implements Layout{
         glVertex2f(position.x + size.x, position.y);
         glVertex2f(position.x + size.x, position.y + size.y);
 
-        glVertex2f(position.x,  position.y + size.y);
+        glVertex2f(position.x, position.y + size.y);
 
         glEnd();
 
     }
 
-    public void setPosition(Vector2f position){
+    public void setPosition(Vector2f position) {
         this.position = position;
     }
 
-    public Vector2f getPosition(){
+    public Vector2f getPosition() {
         return position;
     }
 }

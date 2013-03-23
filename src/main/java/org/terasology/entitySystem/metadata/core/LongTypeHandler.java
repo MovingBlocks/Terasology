@@ -15,13 +15,12 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.math.TeraMath;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -40,7 +39,7 @@ public class LongTypeHandler implements TypeHandler<Long> {
         } else if (value.getFloatCount() > 0) {
             return (long) TeraMath.floorToInt(value.getFloat(0));
         } else if (value.getDoubleCount() > 0) {
-            return (long) TeraMath.floorToInt((float)value.getDouble(0));
+            return (long) TeraMath.floorToInt((float) value.getDouble(0));
         }
         return null;
     }
@@ -59,19 +58,19 @@ public class LongTypeHandler implements TypeHandler<Long> {
         } else if (value.getIntegerCount() > 0) {
             List<Long> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
             for (int i = 0; i < value.getIntegerCount(); ++i) {
-                result.add((long)value.getInteger(i));
+                result.add((long) value.getInteger(i));
             }
             return result;
         } else if (value.getDoubleCount() > 0) {
             List<Long> result = Lists.newArrayListWithCapacity(value.getDoubleCount());
             for (int i = 0; i < value.getDoubleCount(); ++i) {
-                result.add((long)TeraMath.floorToInt((float)value.getDouble(i)));
+                result.add((long) TeraMath.floorToInt((float) value.getDouble(i)));
             }
             return result;
         } else if (value.getFloatCount() > 0) {
             List<Long> result = Lists.newArrayListWithCapacity(value.getFloatCount());
             for (int i = 0; i < value.getFloatCount(); ++i) {
-                result.add((long)TeraMath.floorToInt(value.getFloat(i)));
+                result.add((long) TeraMath.floorToInt(value.getFloat(i)));
             }
             return result;
         }

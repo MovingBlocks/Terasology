@@ -16,7 +16,6 @@
 package org.terasology.input.events;
 
 
-
 public class LeftMouseUpButtonEvent extends MouseUpButtonEvent {
 
     private static LeftMouseUpButtonEvent event = new LeftMouseUpButtonEvent(0);

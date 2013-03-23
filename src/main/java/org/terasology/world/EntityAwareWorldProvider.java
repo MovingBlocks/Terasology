@@ -35,9 +35,9 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockRegionComponent;
+import org.terasology.world.block.entity.BlockComponent;
 
 import java.util.List;
 import java.util.Map;
@@ -253,7 +253,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             if (healthComp == null || healthComp.currentHealth == healthComp.maxHealth) {
                 entity.destroy();
             } else if (networkSystem.getMode().isAuthority() && !entity.hasComponent(NetworkComponent.class)) {
-                    entity.addComponent(new NetworkComponent());
+                entity.addComponent(new NetworkComponent());
             }
         }
         tempBlocks.clear();

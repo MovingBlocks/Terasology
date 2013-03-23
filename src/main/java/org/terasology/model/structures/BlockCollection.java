@@ -39,10 +39,14 @@ public class BlockCollection {
 
     // TODO: Can this integrate better with BlockSelection, rather than need its keyset constructed into a BlockSelection for utility?
 
-    /** Map of what blocks are in which positions */
+    /**
+     * Map of what blocks are in which positions
+     */
     private final HashMap<BlockPosition, Block> _blocks = new HashMap<BlockPosition, Block>();
 
-    /** A specific position to use for attaching to a spot in the world - for a tree this could be the bottom trunk block. */
+    /**
+     * A specific position to use for attaching to a spot in the world - for a tree this could be the bottom trunk block.
+     */
     private BlockPosition _attachPos = new BlockPosition(0, 0, 0);
 
     /**
@@ -58,7 +62,6 @@ public class BlockCollection {
      * Get the Block that matches the given position
      *
      * @param pos The position we care about
-     *
      * @return The block at the position
      */
     public Block getBlock(BlockPosition pos) {
@@ -79,7 +82,6 @@ public class BlockCollection {
      *
      * @param provider The world to build the collection in
      * @param position The position to build the collection at (using the collection's attachment position)
-     *
      * @return A BlockSelection containing the final positions the blocks were built at
      */
     public BlockSelection build(WorldProvider provider, BlockPosition position) {
@@ -92,7 +94,6 @@ public class BlockCollection {
      * @param provider The world to build the collection in
      * @param position The position to build the collection at (using the collection's attachment position)
      * @param blockUri The uri of the blocks we want to filter by
-     *
      * @return The BlockSelection for the built blocks matching the filter
      */
     public BlockSelection buildWithFilter(WorldProvider provider, BlockPosition position, BlockUri blockUri) {
@@ -108,7 +109,6 @@ public class BlockCollection {
      * @param provider       The world to build the collection in
      * @param position       The position to build the collection at (using the collection's attachment position)
      * @param buildingBlocks The BlockCollection we are using to build with, which could be filtered or the main one here
-     *
      * @return A BlockSelection containing the final positions the blocks were built at
      */
     public BlockSelection build(WorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
@@ -135,7 +135,6 @@ public class BlockCollection {
      * Returns a filtered BlockCollection only including Blocks matching the supplied name
      *
      * @param blockUri The uri of the Block we're interested in
-     *
      * @return A BlockCollection only containing the interesting blocks
      */
     public BlockCollection filter(BlockUri blockUri) {
@@ -155,7 +154,6 @@ public class BlockCollection {
      * localized version of the BlockSelection in this Collection's map as per a given position
      *
      * @param localPos The local position we're going to localize against
-     *
      * @return The localized BlockSelection
      */
     public BlockSelection getLocalizedSelection(BlockPosition localPos) {

@@ -16,14 +16,12 @@
 
 package org.terasology.logic.inventory;
 
-import java.util.Map;
-
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
-
 import com.google.common.collect.Maps;
+import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicateType;
+
+import java.util.Map;
 
 /**
  * Item data is stored using this component

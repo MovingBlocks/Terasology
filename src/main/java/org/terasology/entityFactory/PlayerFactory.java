@@ -15,17 +15,17 @@
  */
 package org.terasology.entityFactory;
 
-import javax.vecmath.Vector3f;
-
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.network.NetworkComponent;
-import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.network.NetworkComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.management.BlockManager;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -70,7 +70,7 @@ public class PlayerFactory {
         inventoryManager.giveItem(chestContents, entityManager.create("core:railgunTool"));
 
         inventoryManager.giveItem(chestContents, entityManager.create("core:mrbarsack"));
-                inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Brick"), 99));
+        inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Brick"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Ice"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(blockManager.getBlockFamily("engine:Plank"), 99));
 

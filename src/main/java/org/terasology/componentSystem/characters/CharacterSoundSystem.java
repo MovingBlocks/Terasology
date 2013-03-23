@@ -15,8 +15,8 @@
  */
 package org.terasology.componentSystem.characters;
 
-import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;

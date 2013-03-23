@@ -16,13 +16,12 @@
 package org.terasology.world.chunks.store;
 
 
-import java.util.concurrent.ConcurrentMap;
-
+import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
 
-import com.google.common.collect.Maps;
+import java.util.concurrent.ConcurrentMap;
 
 public class ChunkStoreUncompressed implements ChunkStore {
     ConcurrentMap<Vector3i, Chunk> map = Maps.newConcurrentMap();

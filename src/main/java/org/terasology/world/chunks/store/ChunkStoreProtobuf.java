@@ -15,6 +15,18 @@
  */
 package org.terasology.world.chunks.store;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.math.Vector3i;
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.Chunks;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -28,25 +40,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.math.Vector3i;
-import org.terasology.protobuf.ChunksProtobuf;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.Chunks;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.protobuf.CodedInputStream;
-import com.google.protobuf.CodedOutputStream;
-
 /**
  * Implements a chunk store using protobuf internally. This is just copied and adapted from {@code ChunkStoreGZip}.
- * 
+ *
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  * @see org.terasology.world.chunks.store.ChunkStoreGZip
- *
  */
 public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     static final long serialVersionUID = -8168985892342356264L;
@@ -104,7 +102,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     public ChunkStoreProtobuf() {
         setup();
     }
-    
+
     public void setup() {
         modifiedChunks = Maps.newConcurrentMap();
         compressionQueue = Queues.newLinkedBlockingDeque();
@@ -124,7 +122,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
             final GZIPInputStream gzIn = new GZIPInputStream(baIn);
             final CodedInputStream cIn = CodedInputStream.newInstance(gzIn);
             final ChunksProtobuf.Chunk message = ChunksProtobuf.Chunk.parseFrom(cIn);
-            c = Chunks.getInstance().decode(message); 
+            c = Chunks.getInstance().decode(message);
         } catch (Exception e) {
             logger.error("Error loading chunk", e);
         }

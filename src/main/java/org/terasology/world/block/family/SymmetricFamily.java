@@ -15,11 +15,11 @@
  */
 package org.terasology.world.block.family;
 
-import java.util.Arrays;
-
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
+
+import java.util.Arrays;
 
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
@@ -30,7 +30,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     private Block block;
 
-    public SymmetricFamily(BlockUri uri, Block block, String ... categories) {
+    public SymmetricFamily(BlockUri uri, Block block, String... categories) {
         super(uri, Arrays.asList(categories));
         this.block = block;
         block.setBlockFamily(this);

@@ -15,17 +15,16 @@
  */
 package org.terasology.entitySystem.pojo;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.entitySystem.AbstractPrefab;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>

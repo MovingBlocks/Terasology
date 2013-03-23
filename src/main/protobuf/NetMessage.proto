@@ -20,6 +20,14 @@ message NetMessage {
     optional int64 time = 9;
     optional ClientConnectMessage clientConnect = 15;
     optional ServerInfoMessage serverInfo = 16;
+    repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
+
+    extensions 5000 to max;
+}
+
+message BlockFamilyRegisteredMessage {
+    repeated string blockUri = 1;
+    repeated int32 blockId = 2;
 
     extensions 5000 to max;
 }

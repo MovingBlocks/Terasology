@@ -16,8 +16,6 @@
 
 package org.terasology.network.pipelineFactory;
 
-import static org.jboss.netty.channel.Channels.pipeline;
-
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.compression.ZlibDecoder;
@@ -30,6 +28,8 @@ import org.terasology.network.MetricRecordingHandler;
 import org.terasology.network.NetworkSystemImpl;
 import org.terasology.network.TerasologyClientHandler;
 import org.terasology.protobuf.NetData;
+
+import static org.jboss.netty.channel.Channels.pipeline;
 
 /**
  * @author Immortius

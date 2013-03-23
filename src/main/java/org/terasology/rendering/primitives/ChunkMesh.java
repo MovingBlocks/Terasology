@@ -15,6 +15,20 @@
  */
 package org.terasology.rendering.primitives;
 
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
+import org.terasology.logic.manager.VertexBufferObjectManager;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
@@ -28,21 +42,6 @@ import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glNormalPointer;
 import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL15;
-import org.terasology.logic.manager.VertexBufferObjectManager;
-
-import com.bulletphysics.collision.shapes.IndexedMesh;
 
 /**
  * Chunk meshes are used to store the vertex data of tessellated chunks.

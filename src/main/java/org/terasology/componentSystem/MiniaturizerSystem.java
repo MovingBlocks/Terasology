@@ -15,13 +15,6 @@
  */
 package org.terasology.componentSystem;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -31,6 +24,13 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -54,8 +54,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
         for (EntityRef entity : entityManager.iteratorEntities(MiniaturizerComponent.class)) {
             MiniaturizerComponent min = entity.getComponent(MiniaturizerComponent.class);
 
-            if (min.chunkMesh == null && min.miniatureChunk != null)
-            {
+            if (min.chunkMesh == null && min.miniatureChunk != null) {
                 min.chunkMesh = worldRenderer.getChunkTesselator().generateMinaturizedMesh(min.miniatureChunk);
                 min.chunkMesh.generateVBOs();
                 min.chunkMesh._vertexElements = null;
@@ -80,7 +79,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
             GL11.glTranslated(min.renderPosition.x - cameraPosition.x, min.renderPosition.y - cameraPosition.y, min.renderPosition.z - cameraPosition.z);
 
             glScalef(MiniaturizerComponent.SCALE, MiniaturizerComponent.SCALE, MiniaturizerComponent.SCALE);
-            glRotatef(min.orientation, 0, 1 ,0);
+            glRotatef(min.orientation, 0, 1, 0);
 
             ShaderManager.getInstance().enableShader("chunk");
             ShaderManager.getInstance().getShaderProgram("chunk").setFloat("blockScale", MiniaturizerComponent.SCALE);

@@ -26,7 +26,8 @@ public class BlockRegionComponent implements Component {
     public Region3i region = Region3i.EMPTY;
     public boolean overrideBlockEntities = true;
 
-    public BlockRegionComponent() {}
+    public BlockRegionComponent() {
+    }
 
     public BlockRegionComponent(Region3i region) {
         this.region = region;

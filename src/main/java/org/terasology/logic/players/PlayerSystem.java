@@ -8,8 +8,8 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
@@ -22,7 +22,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkRelevanceRegion;
 
 import javax.vecmath.Vector3f;
 import java.util.Iterator;

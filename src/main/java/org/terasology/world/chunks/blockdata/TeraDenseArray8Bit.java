@@ -1,18 +1,16 @@
 package org.terasology.world.chunks.blockdata;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
-
 import com.google.common.base.Preconditions;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 
 /**
  * TeraDenseArray8Bit implements a dense array with elements of 8 bit size.
  * Its elements are in the range -128 through +127 and it stores one element per byte.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
-public final class TeraDenseArray8Bit extends TeraDenseArrayByte { 
+public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 
     @Override
     protected final TeraArray createDense(byte[] data) {
@@ -39,9 +37,9 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
                 return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ, data);
         }
     }
-    
+
     public static class Factory implements TeraArray.Factory<TeraDenseArray8Bit> {
-        
+
         @Override
         public Class<TeraDenseArray8Bit> getArrayClass() {
             return TeraDenseArray8Bit.class;
@@ -51,18 +49,18 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         public SerializationHandler createSerializationHandler() {
             return new SerializationHandler();
         }
-        
+
         @Override
         public TeraDenseArray8Bit create() {
             return new TeraDenseArray8Bit();
         }
-        
+
         @Override
         public TeraDenseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
         }
     }
-    
+
     public TeraDenseArray8Bit() {
         super();
     }
@@ -70,11 +68,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ);
     }
-    
+
     public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ, byte[] data) {
         super(sizeX, sizeY, sizeZ, data);
     }
-    
+
     public TeraDenseArray8Bit(TeraArray in) {
         super(in);
     }

@@ -15,21 +15,20 @@
  */
 package org.terasology.model.inventory;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
+
+import javax.vecmath.Vector2f;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * Icon for rendering items in inventory.
@@ -169,7 +168,7 @@ public class Icon {
         Icon minionIcon9 = new Icon();
         Icon minioncommandIcon = new Icon();
 
-        questionMarkIcon.setAtlasPosition(4,0);
+        questionMarkIcon.setAtlasPosition(4, 0);
 
         //Tool Atlas
         pickAxeIcon.setAtlasPosition(0, 0);
@@ -221,9 +220,9 @@ public class Icon {
         bannanaIcon.setAtlasPosition(6, 1);
         emptyJarIcon.setAtlasPosition(7, 0);
         waterJarIcon.setAtlasPosition(7, 1);
-        coal.setAtlasPosition(9,0);
-        stick.setAtlasPosition(9,2);
-        refinementrock.setAtlasPosition(10,0);
+        coal.setAtlasPosition(9, 0);
+        stick.setAtlasPosition(9, 2);
+        refinementrock.setAtlasPosition(10, 0);
 
         //Ingot Atlas
         ironingotIcon.setAtlasPosition(8, 0);
@@ -324,7 +323,7 @@ public class Icon {
         icons.put("minion8", minionIcon8);
         icons.put("minion9", minionIcon9);
         icons.put("minioncommand", minioncommandIcon);
-        
+
         icons.put("coal", coal);
         icons.put("stick", stick);
         icons.put("refinementrock", refinementrock);

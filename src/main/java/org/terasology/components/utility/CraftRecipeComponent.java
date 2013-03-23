@@ -2,6 +2,7 @@ package org.terasology.components.utility;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
+
 import java.util.List;
 import java.util.Map;
 

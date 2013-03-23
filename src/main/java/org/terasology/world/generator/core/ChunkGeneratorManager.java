@@ -16,13 +16,13 @@
 
 package org.terasology.world.generator.core;
 
-import java.util.List;
-
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.BaseChunkGenerator;
+
+import java.util.List;
 
 /**
  * @author Immortius

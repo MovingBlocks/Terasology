@@ -1,16 +1,14 @@
 package org.terasology.world.chunks.blockdata;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
-
 import com.google.common.base.Preconditions;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 
 /**
  * TeraDenseArray4Bit implements a dense array with elements of 4 bit size.
  * Its elements are in the range 0 - 15 and it increases memory efficiency by storing two elements per byte.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
@@ -33,15 +31,15 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
         @Override
         protected TeraDenseArray4Bit createArray(int sizeX, int sizeY, int sizeZ, byte[] data) {
-            if (data == null) 
+            if (data == null)
                 return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
             else
                 return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ, data);
         }
     }
-    
+
     public static class Factory implements TeraArray.Factory<TeraDenseArray4Bit> {
-        
+
         @Override
         public Class<TeraDenseArray4Bit> getArrayClass() {
             return TeraDenseArray4Bit.class;
@@ -51,18 +49,18 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         public SerializationHandler createSerializationHandler() {
             return new SerializationHandler();
         }
-        
+
         @Override
         public TeraDenseArray4Bit create() {
             return new TeraDenseArray4Bit();
         }
-        
+
         @Override
         public TeraDenseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
         }
     }
-    
+
     public TeraDenseArray4Bit() {
         super();
     }
@@ -83,12 +81,12 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
     public TeraArray deflate(TeraVisitingDeflator deflator) {
         return Preconditions.checkNotNull(deflator).deflateDenseArray4Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
-    
+
     @Override
     public int getElementSizeInBits() {
         return 4;
     }
-    
+
     @Override
     public final int get(int x, int y, int z) {
 //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");

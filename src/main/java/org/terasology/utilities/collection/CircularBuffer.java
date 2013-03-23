@@ -1,6 +1,5 @@
 package org.terasology.utilities.collection;
 
-import java.util.Deque;
 import java.util.Iterator;
 
 /**

@@ -27,7 +27,8 @@ public class ChangeViewRangeRequest extends AbstractEvent {
 
     private int newViewRange;
 
-    protected ChangeViewRangeRequest() {}
+    protected ChangeViewRangeRequest() {
+    }
 
     public ChangeViewRangeRequest(int newRangeMode) {
         newViewRange = newRangeMode;

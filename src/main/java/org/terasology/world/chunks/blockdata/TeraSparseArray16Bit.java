@@ -1,5 +1,8 @@
 package org.terasology.world.chunks.blockdata;
 
+import com.google.common.base.Preconditions;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -7,27 +10,23 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
-
-import com.google.common.base.Preconditions;
-
 /**
  * TeraDenseArray16Bit implements a sparse array with elements of 16 bit size.
  * Its elements are in the range -32'768 through +32'767 and it internally uses the short type to store its elements.
  * It can reduce memory consumption through sparse memory allocation.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class TeraSparseArray16Bit extends TeraSparseArray {
 
     protected short[][] inflated;
     protected short[] deflated;
     protected short fill;
-    
+
     @Override
-    protected void initialize() {}
-    
+    protected void initialize() {
+    }
+
     public static class SerializationHandler extends TeraArray.BasicSerializationHandler<TeraSparseArray16Bit> {
 
         private void putRow(final short[] row, final int length, final ByteBuffer buffer) {
@@ -35,13 +34,13 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
             sbuffer.put(row, 0, length);
             buffer.position(buffer.position() + length * 2);
         }
-        
+
         private void getRow(final short[] row, final int length, final ByteBuffer buffer) {
             final ShortBuffer sbuffer = buffer.asShortBuffer();
             sbuffer.get(row, 0, length);
             buffer.position(buffer.position() + length * 2);
         }
-        
+
         @Override
         public boolean canHandle(Class<?> clazz) {
             return TeraSparseArray16Bit.class.equals(clazz);
@@ -50,12 +49,12 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         @Override
         protected int internalComputeMinimumBufferSize(TeraSparseArray16Bit array) {
             final short[][] inf = array.inflated;
-            if (inf == null) 
+            if (inf == null)
                 return 3;
             else {
                 final int sizeY = array.getSizeY(), rowSize = array.getSizeXZ() * 2;
                 int result = 1;
-                for (int y = 0; y < sizeY; y++) 
+                for (int y = 0; y < sizeY; y++)
                     if (inf[y] == null)
                         result += 3;
                     else
@@ -112,7 +111,7 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     }
 
     public static class Factory implements TeraArray.Factory<TeraSparseArray16Bit> {
-        
+
         @Override
         public Class<TeraSparseArray16Bit> getArrayClass() {
             return TeraSparseArray16Bit.class;
@@ -122,12 +121,12 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         public SerializationHandler createSerializationHandler() {
             return new SerializationHandler();
         }
-        
+
         @Override
         public TeraSparseArray16Bit create() {
             return new TeraSparseArray16Bit();
         }
-        
+
         @Override
         public TeraSparseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
@@ -141,7 +140,7 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     public TeraSparseArray16Bit(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ, false);
     }
-    
+
     public TeraSparseArray16Bit(int sizeX, int sizeY, int sizeZ, short[][] inflated, short[] deflated) {
         super(sizeX, sizeY, sizeZ, false);
         this.inflated = Preconditions.checkNotNull(inflated);
@@ -149,15 +148,15 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         Preconditions.checkArgument(inflated.length == sizeY, "The length of parameter 'inflated' has to be " + sizeY + " but is " + inflated.length);
         Preconditions.checkArgument(deflated.length == sizeY, "The length of parameter 'deflated' has to be " + sizeY + " but is " + deflated.length);
     }
-    
+
     public TeraSparseArray16Bit(int sizeX, int sizeY, int sizeZ, short fill) {
-        super(sizeX, sizeY, sizeZ, false); 
+        super(sizeX, sizeY, sizeZ, false);
         this.fill = fill;
     }
 
     @Override
     public TeraArray copy() {
-        if (inflated == null) 
+        if (inflated == null)
             return new TeraSparseArray16Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
         short[][] inf = new short[getSizeY()][];
         short[] def = new short[getSizeY()];
@@ -195,7 +194,7 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
 
     @Override
     public int get(int x, int y, int z) {
-        if (inflated == null) 
+        if (inflated == null)
             return fill;
         short[] row = inflated[y];
         if (row != null)

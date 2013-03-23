@@ -16,17 +16,14 @@
 
 package org.terasology.logic.inventory;
 
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-
-import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateType;
 import org.terasology.network.ReplicationCheck;
+
+import java.util.List;
 
 /**
  * Allows an entity to store items

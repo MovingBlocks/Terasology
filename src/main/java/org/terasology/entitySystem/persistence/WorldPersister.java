@@ -15,6 +15,13 @@
  */
 package org.terasology.entitySystem.persistence;
 
+import com.google.protobuf.TextFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.protobuf.EntityData;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,14 +33,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.protobuf.EntityData;
-
-import com.google.protobuf.TextFormat;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -41,7 +40,7 @@ import com.google.protobuf.TextFormat;
 public class WorldPersister {
 
     public enum SaveFormat {
-        Binary (false) {
+        Binary(false) {
             @Override
             void save(OutputStream out, EntityData.World world) throws IOException {
                 world.writeTo(out);
@@ -53,7 +52,7 @@ public class WorldPersister {
                 return EntityData.World.parseFrom(in);
             }
         },
-        Text (true) {
+        Text(true) {
             @Override
             void save(OutputStream out, EntityData.World world) throws IOException {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
@@ -69,7 +68,7 @@ public class WorldPersister {
                 return builder.build();
             }
         },
-        JSON (true) {
+        JSON(true) {
             @Override
             void save(OutputStream out, EntityData.World world) throws IOException {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));

@@ -4,7 +4,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.NetworkSystemImpl;
 import org.terasology.rendering.gui.widgets.UILabel;
 
 import java.util.List;

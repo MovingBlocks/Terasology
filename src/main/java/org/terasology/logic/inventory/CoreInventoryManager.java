@@ -345,6 +345,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     /**
      * Creates or retrieves a predicted inventory component. This is used when calculated the predicted state of an inventory,
      * and any predicted changes will be made to this component (and not the real inventory)
+     *
      * @param inventoryEntity
      * @return
      */
@@ -366,7 +367,6 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
      */
 
     /**
-     *
      * @param fromEntity
      * @param fromInv
      * @param fromSlot
@@ -411,6 +411,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
 
     /**
      * Common logic for moving item amounts - for use both server and client side.
+     *
      * @param fromEntity The inventory being moved fromInv
      * @param fromInv
      * @param fromSlot
@@ -461,6 +462,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
 
     /**
      * Puts an item into a slot
+     *
      * @param inventoryEntity
      * @param inventory
      * @param slot
@@ -486,6 +488,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
 
     /**
      * Used to create a new stack when splitting out an amount. Safe for use client-side for prediction.
+     *
      * @param original
      * @param withAmount
      * @return The newly created item
@@ -505,6 +508,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
 
     /**
      * Requests an item for deletion. Client side this is ignored
+     *
      * @param item
      */
     private void destroyItem(EntityRef item, InventoryComponent inventoryComponent, int slot) {

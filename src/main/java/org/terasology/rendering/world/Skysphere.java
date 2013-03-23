@@ -15,6 +15,23 @@
  */
 package org.terasology.rendering.world;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.util.glu.Sphere;
+import org.terasology.asset.Assets;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.TeraMath;
+import org.terasology.rendering.shader.ShaderProgram;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4d;
+import javax.vecmath.Vector4f;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_LIGHT0;
@@ -25,24 +42,6 @@ import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glLight;
 import static org.lwjgl.opengl.GL11.glNewList;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4d;
-import javax.vecmath.Vector4f;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.util.glu.Sphere;
-import org.terasology.asset.Assets;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.shader.ShaderProgram;
 
 /**
  * Skysphere based on the Perez all weather luminance model.

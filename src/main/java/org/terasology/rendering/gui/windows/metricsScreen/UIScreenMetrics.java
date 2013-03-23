@@ -16,22 +16,20 @@
 package org.terasology.rendering.gui.windows.metricsScreen;
 
 import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
+
+import javax.vecmath.Vector2f;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * UI element that graphs performance metrics
  *
  * @author Immortius <immortius@gmail.com>
- * 
- * TODO create a debug window
+ *         <p/>
+ *         TODO create a debug window
  */
 public class UIScreenMetrics extends UIWindow {
 
@@ -79,7 +77,7 @@ public class UIScreenMetrics extends UIWindow {
         super.update();
 
         MetricsMode mode = modes.get(currentMode);
-        
+
         headerLine.setVisible(mode.isVisible());
         headerLine.setText(mode.getDisplayText());
         mode.updateLines(metricLines);

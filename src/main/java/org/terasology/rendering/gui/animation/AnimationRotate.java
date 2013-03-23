@@ -25,12 +25,22 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector4f;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 public class AnimationRotate extends Animation {
     private float angle;
     private float speed;
-    private int   factor;
+    private int factor;
     private float currentAngle;
     private Mesh mesh;
 
@@ -38,27 +48,27 @@ public class AnimationRotate extends Animation {
     private String id = null;
 
 
-    public AnimationRotate(float angle, float speed){
+    public AnimationRotate(float angle, float speed) {
         this.angle = angle;
         this.speed = speed;
         this.id = generateId();
 
-        if(angle<0){
+        if (angle < 0) {
             factor = -1;
-        }else{
+        } else {
             factor = 1;
         }
 
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(255f/256f, 255f/256f, 255f/256f, 1f), 1.0f, 1.0f);
+        TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(255f / 256f, 255f / 256f, 255f / 256f, 1f), 1.0f, 1.0f);
         mesh = tessellator.generateMesh();
     }
 
     @Override
-    public void renderBegin(){
-        if(fbo == null){
+    public void renderBegin() {
+        if (fbo == null) {
             fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false);
-        }else if(fbo._height != Display.getHeight() || fbo._width != Display.getWidth()){
+        } else if (fbo._height != Display.getHeight() || fbo._width != Display.getWidth()) {
             fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false);
         }
 
@@ -68,46 +78,46 @@ public class AnimationRotate extends Animation {
     }
 
     @Override
-    public void renderEnd(){
+    public void renderEnd() {
         PostProcessingRenderer.getInstance().getFBO(id).unbind();
         PostProcessingRenderer.getInstance().getFBO(id).bindTexture();
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
-            glLoadIdentity();
-            glTranslatef(0, 0.5f, 0);
-            glScalef(1f, -1f, 1f);
-            glTranslatef(target.getPosition().x / Display.getWidth(), target.getPosition().y / Display.getHeight() - 0.5f, 0f);
-            glScalef(target.getSize().x / Display.getWidth(), target.getSize().y / Display.getHeight(), 1f);
-            glMatrixMode(GL11.GL_MODELVIEW);
-            glPushMatrix();
-                glLoadIdentity();
-                glTranslatef(target.getPosition().x+target.getSize().x/2, target.getPosition().y+target.getSize().y/2, 0f);
-                glRotatef(currentAngle, 0f, 0f, 1f);
-                glTranslatef(-target.getSize().x/2, -target.getSize().y/2, 0f);
-                glScalef(target.getSize().x, target.getSize().y, 1.0f);
-                mesh.render();
-            glPopMatrix();
-            glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
+        glTranslatef(0, 0.5f, 0);
+        glScalef(1f, -1f, 1f);
+        glTranslatef(target.getPosition().x / Display.getWidth(), target.getPosition().y / Display.getHeight() - 0.5f, 0f);
+        glScalef(target.getSize().x / Display.getWidth(), target.getSize().y / Display.getHeight(), 1f);
+        glMatrixMode(GL11.GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        glTranslatef(target.getPosition().x + target.getSize().x / 2, target.getPosition().y + target.getSize().y / 2, 0f);
+        glRotatef(currentAngle, 0f, 0f, 1f);
+        glTranslatef(-target.getSize().x / 2, -target.getSize().y / 2, 0f);
+        glScalef(target.getSize().x, target.getSize().y, 1.0f);
+        mesh.render();
+        glPopMatrix();
+        glMatrixMode(GL_TEXTURE);
         glPopMatrix();
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
-    public void update(){
-        if( (factor>0 && angle>currentAngle) || (factor<0 && angle<currentAngle)){
+    public void update() {
+        if ((factor > 0 && angle > currentAngle) || (factor < 0 && angle < currentAngle)) {
             currentAngle += factor * speed/*tick*/;
-        }else{
-            if(!isRepeat()){
+        } else {
+            if (!isRepeat()) {
                 currentAngle = angle;
                 this.stop();
-            }else{
+            } else {
                 currentAngle = 0;
             }
 
         }
     }
 
-    private String generateId(){
+    private String generateId() {
         return "rotate" + this.hashCode();
     }
 

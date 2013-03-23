@@ -15,11 +15,11 @@
  */
 package org.terasology.input.events;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
+
+import javax.vecmath.Vector3f;
 
 
 public abstract class InputEvent extends AbstractEvent {

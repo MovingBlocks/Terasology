@@ -20,9 +20,6 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.nio.FloatBuffer;
-
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,8 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
+
+import java.nio.FloatBuffer;
 
 /**
  * @author Immortius

@@ -15,12 +15,11 @@
  */
 package org.terasology.rendering.primitives;
 
-import java.nio.ByteBuffer;
-
-import javax.vecmath.Vector4f;
-
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Texture;
+
+import javax.vecmath.Vector4f;
+import java.nio.ByteBuffer;
 
 public class MeshFactory {
 
@@ -61,17 +60,17 @@ public class MeshFactory {
                 if (a > alphaLimit) {
                     TessellatorHelper.addBlockMesh(tessellator, new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
 
-                    if(withContour){
+                    if (withContour) {
                         int newX = 0;
                         int newY = 0;
                         int newA = 0;
 
-                        for(int i = 0; i<4; i++){
+                        for (int i = 0; i < 4; i++) {
                             newA = alphaLimit + 1;
-                            switch(i){
+                            switch (i) {
                                 case 0:
                                     //check left
-                                    if(x > 0){
+                                    if (x > 0) {
                                         newX = x - 1;
                                         newY = y;
                                         newA = buffer.get((posY + newY) * stride + (posX + newX) * 4 + 3) & 255;
@@ -79,7 +78,7 @@ public class MeshFactory {
                                     break;
                                 case 1:
                                     //check top
-                                    if(y > 0){
+                                    if (y > 0) {
                                         newX = x;
                                         newY = y - 1;
                                         newA = buffer.get((posY + newY) * stride + (posX + newX) * 4 + 3) & 255;
@@ -87,7 +86,7 @@ public class MeshFactory {
                                     break;
                                 case 2:
                                     //check right
-                                    if(x < 16){
+                                    if (x < 16) {
                                         newX = x + 1;
                                         newY = y;
                                         newA = buffer.get((posY + newY) * stride + (posX + newX) * 4 + 3) & 255;
@@ -95,7 +94,7 @@ public class MeshFactory {
                                     break;
                                 case 3:
                                     //check bottom
-                                    if(y < 16){
+                                    if (y < 16) {
                                         newX = x;
                                         newY = y + 1;
                                         newA = buffer.get((posY + newY) * stride + (posX + newX) * 4 + 3) & 255;
@@ -103,7 +102,7 @@ public class MeshFactory {
                                     break;
                             }
 
-                            if(newA < alphaLimit){
+                            if (newA < alphaLimit) {
                                 TessellatorHelper.addBlockMesh(tessellator, new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * newX - 1f / 2f, 2f * 0.0625f * (16 - newY) - 1f, 0f);
                             }
                         }

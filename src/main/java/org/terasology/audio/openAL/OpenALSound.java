@@ -15,14 +15,14 @@
  */
 package org.terasology.audio.openAL;
 
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.Sound;
+
 import static org.lwjgl.openal.AL10.AL_BITS;
 import static org.lwjgl.openal.AL10.AL_CHANNELS;
 import static org.lwjgl.openal.AL10.AL_FREQUENCY;
 import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
-
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
 
 public abstract class OpenALSound implements Sound {
 

@@ -17,20 +17,20 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
-import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.logic.players.LocalPlayerComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.input.events.KeyDownEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.input.ButtonState;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.input.binds.PauseButton;
-import org.terasology.game.CoreRegistry;
-import org.terasology.input.ButtonState;
+import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -42,7 +42,7 @@ public class MenuControlSystem implements ComponentSystem {
     public static final String PAUSE_MENU = "pause";
     public static final String INVENTORY = "inventory";
     public static final String CHAT = "chat";
-	public static final String HUD = "hud";
+    public static final String HUD = "hud";
 
     @In
     GUIManager guiManager;
@@ -88,7 +88,7 @@ public class MenuControlSystem implements ComponentSystem {
                 break;
         }
     }
-    
+
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onDeath(NoHealthEvent event, EntityRef entity) {
         CoreRegistry.get(GUIManager.class).openWindow("death");

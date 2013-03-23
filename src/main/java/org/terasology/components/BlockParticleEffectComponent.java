@@ -15,16 +15,14 @@
  */
 package org.terasology.components;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.world.block.family.BlockFamily;
 
-import com.google.common.collect.Lists;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>

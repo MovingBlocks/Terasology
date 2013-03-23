@@ -27,6 +27,7 @@ public interface PrefabManager {
 
     /**
      * Creates a Prefab if it doesn't already exist and registers it in a prefab table, then returns it.
+     *
      * @param name The name the Prefab should be given or already exists under
      * @return The created or already existing Prefab
      */
@@ -34,6 +35,7 @@ public interface PrefabManager {
 
     /**
      * Returns the named Prefab or null if it doesn't exist.
+     *
      * @param name The name of the desired Prefab
      * @return Prefab requested or null if it doesn't exist
      */
@@ -41,6 +43,7 @@ public interface PrefabManager {
 
     /**
      * Tests whether a named Prefab exists or not.
+     *
      * @param name The name of the Prefab to look for
      * @return True if found, false if not
      */
@@ -48,6 +51,7 @@ public interface PrefabManager {
 
     /**
      * Registers a Prefab to a table by its contained name if it doesn't already exist, otherwise throws an exception.
+     *
      * @param prefab The Prefab to register (which also holds its name)
      * @return The provided Prefab
      */
@@ -55,12 +59,14 @@ public interface PrefabManager {
 
     /**
      * Returns all loaded prefabs.
+     *
      * @return Collection containing all prefabs
      */
     Collection<Prefab> listPrefabs();
 
     /**
      * Returns all loaded prefabs that include the supplied Component (which may result in an empty set).
+     *
      * @param withComponent a Component to filter by
      * @return Collection containing all prefabs that include the supplied Component
      */
@@ -68,6 +74,7 @@ public interface PrefabManager {
 
     /**
      * Removes a named Prefab from the storage table. No action if it doesn't exist.
+     *
      * @param name Name of the Prefab to remove
      */
     void removePrefab(String name);

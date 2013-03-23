@@ -24,7 +24,6 @@ import org.terasology.entitySystem.EntityRef;
 public interface InventoryManager {
 
     /**
-     *
      * @param inventoryEntity
      * @param item
      * @return Whether the given item can be added to the inventory
@@ -40,13 +39,13 @@ public interface InventoryManager {
 
     /**
      * Removes an item from the inventory (but doesn't destroy it)
+     *
      * @param inventoryEntity
      * @param item
      */
     void removeItem(EntityRef inventoryEntity, EntityRef item);
 
     /**
-     *
      * @param itemA
      * @param itemB
      * @return Whether the two items can be merged (ignoring stack size limits)
@@ -54,7 +53,6 @@ public interface InventoryManager {
     boolean canStackTogether(EntityRef itemA, EntityRef itemB);
 
     /**
-     *
      * @param item
      * @return The size of the stack of items represented by the given item. 0 if the entity is not an item.
      */

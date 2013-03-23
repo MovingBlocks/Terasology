@@ -20,12 +20,12 @@ import javax.vecmath.Vector2f;
 public class AnimationMove extends Animation {
     private Vector2f moveFrom;
     private Vector2f distination;
-    private float    speed;
+    private float speed;
 
-    public AnimationMove(Vector2f moveTo, float speed){
+    public AnimationMove(Vector2f moveTo, float speed) {
         this.distination = moveTo;
-        this.speed       = speed;
-        this.moveFrom    = null;
+        this.speed = speed;
+        this.moveFrom = null;
     }
 
     @Override
@@ -33,25 +33,25 @@ public class AnimationMove extends Animation {
         Vector2f direction = new Vector2f();
         direction.sub(distination, target.getPosition());
 
-        if(isRepeat() && (moveFrom == null || moveFrom.equals(new Vector2f(0f, 0f)))){
+        if (isRepeat() && (moveFrom == null || moveFrom.equals(new Vector2f(0f, 0f)))) {
             moveFrom = new Vector2f(target.getAbsolutePosition());
         }
 
         float distance = direction.length();
 
-        if( distance > speed ){
+        if (distance > speed) {
             direction.normalize();
             direction.scale(speed /** tick*/);
             Vector2f newPosition = target.getPosition();
             newPosition.add(direction);
-        }else{
+        } else {
             target.setPosition(distination);
 
-            if(isRepeat()){
+            if (isRepeat()) {
                 Vector2f swap = new Vector2f(distination);
                 distination = new Vector2f(moveFrom);
                 moveFrom = swap;
-            }else{
+            } else {
                 stop();
             }
         }
@@ -59,11 +59,11 @@ public class AnimationMove extends Animation {
 
     @Override
     public void renderBegin() {
-        
+
     }
 
     @Override
     public void renderEnd() {
-        
+
     }
 }

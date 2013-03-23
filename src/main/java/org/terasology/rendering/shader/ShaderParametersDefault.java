@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Block shader program.

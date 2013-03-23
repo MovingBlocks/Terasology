@@ -1,8 +1,5 @@
 package org.terasology.rendering.gui.dialogs;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.newdawn.slick.Color;
 import org.terasology.config.ServerInfo;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -14,13 +11,14 @@ import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIText;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public class UIDialogServer extends UIDialog {
-    
+
     private UIComposite containerButtons;
     private UIButton okButton;
     private UIButton cancelButton;
@@ -42,10 +40,10 @@ public class UIDialogServer extends UIDialog {
 
         setup(name, address);
     }
-    
+
     private void setup(String name, String address) {
         setModal(true);
-        
+
         //form
         containerForm = new UIComposite();
         GridLayout layout = new GridLayout(1);
@@ -54,25 +52,25 @@ public class UIDialogServer extends UIDialog {
         containerForm.setSize("100%", "100%");
         containerForm.setPosition(new Vector2f(0f, 30f));
         containerForm.setVisible(true);
-        
+
         labelName = new UILabel("Server Name:");
         labelName.setColor(Color.darkGray);
         labelName.setVisible(true);
-        
+
         inputName = new UIText();
         inputName.setText(name);
         inputName.setSize(new Vector2f(380f, 30f));
         inputName.setVisible(true);
-        
+
         labelIp = new UILabel("Address:");
         labelIp.setColor(Color.darkGray);
         labelIp.setVisible(true);
-        
+
         inputIp = new UIText();
         inputIp.setText(address);
         inputIp.setSize(new Vector2f(380f, 30f));
         inputIp.setVisible(true);
-        
+
         //buttons
         containerButtons = new UIComposite();
         layout = new GridLayout(2);
@@ -82,7 +80,7 @@ public class UIDialogServer extends UIDialog {
         containerButtons.setVerticalAlign(EVerticalAlign.BOTTOM);
         containerButtons.setPosition(new Vector2f(0f, -20f));
         containerButtons.setVisible(true);
-        
+
         okButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         okButton.getLabel().setText("Ok");
         okButton.setVisible(true);
@@ -97,7 +95,7 @@ public class UIDialogServer extends UIDialog {
                 }
             }
         });
-        
+
         cancelButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         cancelButton.getLabel().setText("Cancel");
         cancelButton.setVisible(true);
@@ -107,17 +105,17 @@ public class UIDialogServer extends UIDialog {
                 closeDialog(EReturnCode.CANCEL, null);
             }
         });
-        
+
         containerForm.addDisplayElement(labelName);
         containerForm.addDisplayElement(inputName);
         containerForm.addDisplayElement(labelIp);
         containerForm.addDisplayElement(inputIp);
-        
+
         containerButtons.addDisplayElement(okButton);
         containerButtons.addDisplayElement(cancelButton);
-        
+
         addDisplayElement(containerForm);
         addDisplayElement(containerButtons);
     }
-    
+
 }

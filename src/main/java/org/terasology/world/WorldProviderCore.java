@@ -51,7 +51,6 @@ public interface WorldProviderCore {
     public WorldBiomeProvider getBiomeProvider();
 
     /**
-     *
      * @param listener
      */
     public void registerListener(WorldChangeListener listener);

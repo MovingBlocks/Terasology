@@ -15,27 +15,25 @@
  */
 package org.terasology.logic.manager;
 
-import java.util.Map;
-
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.WorldComponent;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.ButtonState;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -60,6 +58,7 @@ import org.terasology.rendering.gui.windows.UIScreenLoading;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 
 import javax.vecmath.Vector2f;
+import java.util.Map;
 
 /**
  * The GUI manager handles all windows within the UI.
@@ -112,7 +111,7 @@ public class GUIManager implements ComponentSystem {
     /**
      * Updates all visible display elements and their child's. Will update the layout if the display was resized.
      */
-    public void update() {        
+    public void update() {
         renderer.update();
 
         if (Display.wasResized()) {
@@ -135,13 +134,14 @@ public class GUIManager implements ComponentSystem {
 
     /**
      * Add an window to the UI. Therefore it can be rendered and updated.
+     *
      * @param window The window to add.
      * @return Returns the added window.
      */
     private UIWindow addWindow(UIWindow window) {
         if (window != null) {
             logger.debug("Added window with ID \"{}\"", window.getId());
-            
+
             renderer.addDisplayElementToPosition(0, window);
             window.initialise();
             for (EntityRef worldEntity : CoreRegistry.get(EntityManager.class).iteratorEntities(WorldComponent.class)) {
@@ -151,32 +151,33 @@ public class GUIManager implements ComponentSystem {
 
         return window;
     }
-    
+
     private void removeWindow(UIWindow window) {
         if (window == null) {
             logger.warn("Can't remove null window");
         } else {
             logger.debug("Removed window by reference with ID \"{}\"");
-            
+
             renderer.removeDisplayElement(window);
             window.shutdown();
         }
     }
-    
+
     private void removeAllWindows() {
         logger.debug("Removed all windows");
-        
+
         for (UIDisplayElement window : renderer.getDisplayElements()) {
             if (window instanceof UIWindow) {
-                ((UIWindow)window).shutdown();
+                ((UIWindow) window).shutdown();
             }
         }
-        
+
         renderer.removeAllDisplayElements();
     }
 
     /**
      * Close the given window by reference and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
+     *
      * @param window The window by reference to remove.
      */
     public void closeWindow(UIWindow window) {
@@ -184,19 +185,20 @@ public class GUIManager implements ComponentSystem {
             logger.warn("Can't close null window");
         } else {
             logger.debug("Closed window by reference with ID \"{}\"", window.getId());
-            
+
             removeWindow(window);
             checkMouseGrabbing();
         }
     }
-    
+
     /**
      * Close the window by ID and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
+     *
      * @param windowId The window by ID to remove.
      */
     public void closeWindow(String windowId) {
         logger.debug("Closde window by ID \"{}\"", windowId);
-        
+
         closeWindow(getWindowById(windowId));
     }
 
@@ -205,12 +207,13 @@ public class GUIManager implements ComponentSystem {
      */
     public void closeAllWindows() {
         logger.debug("GUIManager: Closed all windows");
-        
+
         removeAllWindows();
     }
 
     /**
      * Open and focus a window by reference.
+     *
      * @param window The window to open and focus.
      * @return Returns the reference of the window which was opened and focused.
      */
@@ -221,50 +224,52 @@ public class GUIManager implements ComponentSystem {
             if (!renderer.getDisplayElements().contains(window)) {
                 addWindow(window);
             }
-            
+
             logger.debug("Open and focus window by reference with ID \"{}\"", window.getId());
-            
+
             renderer.setWindowFocus(window);
         }
-        
+
         return window;
     }
-    
+
     /**
      * Open and focus a window by ID. If the window isn't loaded, it will try to load the window.
+     *
      * @param windowId The ID of the window to open and focus.
      * @return Returns the reference of the window which was opened and focused. If a window can't be loaded a null reference will be returned.
      */
     public UIWindow openWindow(String windowId) {
         logger.debug("Open and foucs window by ID \"{}\"", windowId);
-        
+
         UIWindow window = getWindowById(windowId);
-        
+
         if (window == null) {
             window = loadWindow(windowId);
-            
+
             if (window != null) {
                 window.open();
             }
         } else {
             window.open();
         }
-        
+
         return window;
     }
 
     public void registerWindow(String windowId, Class<? extends UIWindow> windowClass) {
         registeredWindows.put(windowId, windowClass);
     }
-    
+
     /**
      * Load a window by ID and add it to the UI.
+     *
      * @param windowId The id of the window to load.
      * @return Returns the reference of the loaded window or null if the window couldn't be loaded.
      */
     public UIWindow loadWindow(String windowId) {
         UIWindow window = getWindowById(windowId);
-        
+
         if (window != null) {
             logger.warn("Window with ID \"{}\" already loaded.", windowId);
             return window;
@@ -288,30 +293,32 @@ public class GUIManager implements ComponentSystem {
 
     /**
      * Get a window reference, which was added to the GUIManager by id.
+     *
      * @param windowId The window id.
      * @return Returns the reference of the window with the given id or null if there is none with this id.
      */
-    public UIWindow getWindowById(String windowId) {        
+    public UIWindow getWindowById(String windowId) {
         for (UIDisplayElement window : renderer.getDisplayElements()) {
             if (window.getId().equals(windowId)) {
                 return (UIWindow) window;
             }
         }
-        
+
         return null;
     }
 
     /**
      * Get the focused window.
+     *
      * @return Returns the focused window.
      */
-	public UIWindow getFocusedWindow() {
-		return renderer.getWindowFocused();
-	}
+    public UIWindow getFocusedWindow() {
+        return renderer.getWindowFocused();
+    }
 
-	/**
-	 * Check whether the mouse of the current focused window is visible and can be moved on the display.
-	 */
+    /**
+     * Check whether the mouse of the current focused window is visible and can be moved on the display.
+     */
     public void checkMouseGrabbing() {
         if (isConsumingInput() || renderer.getWindowFocused() == null) {
             Mouse.setGrabbed(false);
@@ -319,9 +326,10 @@ public class GUIManager implements ComponentSystem {
             Mouse.setGrabbed(true);
         }
     }
-    
+
     /**
      * Check if the GUI will consume the input events. Input events are changes of the mouse position, mouse button, mouse wheel and keyboard input.
+     *
      * @return Returns true if the GUI will consume the input events.
      */
     public boolean isConsumingInput() {
@@ -330,8 +338,9 @@ public class GUIManager implements ComponentSystem {
 
     /**
      * Show a message dialog.
+     *
      * @param title The title of the dialog.
-     * @param text The text of the dialog.
+     * @param text  The text of the dialog.
      */
     public void showMessage(String title, String text) {
         UIWindow messageWindow = new UIMessageBox(title, text);
@@ -343,61 +352,63 @@ public class GUIManager implements ComponentSystem {
     /*
        The following methods are responsible for receiving and processing mouse and keyboard inputs.
     */
-    
+
     /**
      * Process the mouse input on the active window.
-     * @param button The button. Left = 0, Right = 1, Middle = 2.
-     * @param state The state of the button. True for pressed.
+     *
+     * @param button     The button. Left = 0, Right = 1, Middle = 2.
+     * @param state      The state of the button. True for pressed.
      * @param wheelMoved The mouse wheel movement. wheel = 0 for no movement. wheel > 0 for up. wheel < 0 for down.
-     * 
      */
     private void processMouseInput(int button, boolean state, int wheelMoved) {
         if (renderer.getWindowFocused() != null) {
-        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false, false);
+            renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false, false);
         }
     }
-    
+
     /**
      * Process the raw keyboard input.
+     *
      * @param event The event of the pressed key.
      */
     private void processKeyboardInput(KeyEvent event) {
         if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
-        	renderer.getWindowFocused().processKeyboardInput(event);
+            renderer.getWindowFocused().processKeyboardInput(event);
         }
     }
 
     /**
      * Process the bind buttons input.
+     *
      * @param event The event of the bind button.
      */
     private void processBindButton(BindButtonEvent event) {
         if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
-        	renderer.getWindowFocused().processBindButton(event);
+            renderer.getWindowFocused().processBindButton(event);
         }
     }
-    
+
     @Override
     public void initialise() {
-        
+
     }
 
     @Override
     public void shutdown() {
-        
+
     }
     
     /*
       The following events will capture the mouse and keyboard inputs. They have the highest priority so the GUI will always come first.
       If a window is "modal" it will consume all input events so no other than the GUI will handle these events.
     */
-    
+
     //mouse movement events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(-1, false, 0);
-            
+
             if (renderer.getWindowFocused() != null) {
                 if (renderer.getWindowFocused().isModal()) {
                     event.consume();
@@ -405,12 +416,12 @@ public class GUIManager implements ComponentSystem {
             }
         }
     }
-    
+
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(-1, false, 0);
-            
+
             if (renderer.getWindowFocused() != null) {
                 if (renderer.getWindowFocused().isModal()) {
                     event.consume();
@@ -418,13 +429,13 @@ public class GUIManager implements ComponentSystem {
             }
         }
     }
-    
+
     //mouse button events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(event.getButton(), event.getState() != ButtonState.UP, 0);
-            
+
             if (renderer.getWindowFocused() != null) {
                 if (renderer.getWindowFocused().isModal()) {
                     event.consume();
@@ -438,7 +449,7 @@ public class GUIManager implements ComponentSystem {
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(-1, false, event.getWheelTurns() * 120);
-            
+
             if (renderer.getWindowFocused() != null) {
                 if (renderer.getWindowFocused().isModal()) {
                     event.consume();
@@ -454,13 +465,13 @@ public class GUIManager implements ComponentSystem {
             processKeyboardInput(event);
         }
     }
-    
+
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processBindButton(event);
-            
+
             if (renderer.getWindowFocused() != null) {
                 //if modal, consume the event so it wont get caught from others
                 if (renderer.getWindowFocused().isModal()) {

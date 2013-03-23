@@ -19,9 +19,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
  */
 public interface KeyListener {
     void key(UIDisplayElement element, KeyEvent event);

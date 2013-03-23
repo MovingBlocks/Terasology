@@ -17,12 +17,15 @@
 package org.terasology.entityFactory;
 
 import com.google.common.collect.Maps;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.primitives.Mesh;
@@ -79,12 +82,12 @@ public class DroppedItemFactory {
 
             ItemComponent newItem = new ItemComponent();
 
-            newItem.stackCount    = 1;
-            newItem.name          = itemComponent.name;
-            newItem.baseDamage    = itemComponent.baseDamage;
+            newItem.stackCount = 1;
+            newItem.name = itemComponent.name;
+            newItem.baseDamage = itemComponent.baseDamage;
             newItem.consumedOnUse = itemComponent.consumedOnUse;
-            newItem.icon          = itemComponent.icon;
-            newItem.stackId       = itemComponent.stackId;
+            newItem.icon = itemComponent.icon;
+            newItem.stackId = itemComponent.stackId;
             newItem.renderWithIcon = itemComponent.renderWithIcon;
 
             droppedItem.placedEntity.saveComponent(newItem);

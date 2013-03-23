@@ -16,9 +16,8 @@
 
 package org.terasology.math;
 
-import java.util.Iterator;
-
 import javax.vecmath.Vector3f;
+import java.util.Iterator;
 
 /**
  * Describes an axis-aligned bounded space in 3D integer.

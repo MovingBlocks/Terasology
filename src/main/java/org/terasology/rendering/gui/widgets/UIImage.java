@@ -16,24 +16,6 @@
 package org.terasology.rendering.gui.widgets;
 
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.slf4j.Logger;
@@ -45,13 +27,25 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 /**
  * Provides support for rendering graphical elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * 
- * TODO rotation screws up the intersection check
+ *         <p/>
+ *         TODO rotation screws up the intersection check
  */
 public class UIImage extends UIDisplayContainer {
 
@@ -65,15 +59,15 @@ public class UIImage extends UIDisplayContainer {
 
     private float rotate = 0f;
     private Mesh mesh;
-    
+
     public UIImage() {
-        
+
     }
-    
+
     public UIImage(Color color) {
         setColor(color);
     }
-    
+
     public UIImage(String color) {
         setColor(color);
     }
@@ -81,9 +75,9 @@ public class UIImage extends UIDisplayContainer {
     public UIImage(Texture texture) {
         setTexture(texture);
     }
-    
+
     private float RGBtoColor(int v) {
-        return (float)v / 255.0f;
+        return (float) v / 255.0f;
     }
 
     @Override
@@ -104,7 +98,7 @@ public class UIImage extends UIDisplayContainer {
             glTranslatef(textureOrigin.x, textureOrigin.y, 0.0f);
             glScalef(textureSize.x, textureSize.y, 1.0f);
             glMatrixMode(GL11.GL_MODELVIEW);
-    
+
             glPushMatrix();
             if (rotate > 0f) {
                 glRotatef(rotate, 0f, 0f, 1f);
@@ -112,7 +106,7 @@ public class UIImage extends UIDisplayContainer {
             glScalef(getSize().x, getSize().y, 1.0f);
             mesh.render();
             glPopMatrix();
-    
+
             glMatrixMode(GL_TEXTURE);
             glPopMatrix();
             glMatrixMode(GL11.GL_MODELVIEW);
@@ -125,22 +119,23 @@ public class UIImage extends UIDisplayContainer {
             mesh.render();
             glPopMatrix();
         }
-        
+
         super.render();
     }
 
     /**
      * Get the texture origin.
+     *
      * @return Returns the texture origin.
-     * 
      * @deprecated Actually this method is not deprecated. But use setTextureOrigin to set the origin instead!
      */
     public Vector2f getTextureOrigin() {
         return textureOrigin;
     }
-    
+
     /**
      * Set the texture origin. You don't need to divide by the texture width/height, this will be done within this method.
+     *
      * @param origin The origin of the texture.
      */
     public void setTextureOrigin(Vector2f origin) {
@@ -148,23 +143,24 @@ public class UIImage extends UIDisplayContainer {
             if (origin == null) {
                 origin = new Vector2f(0f, 0f);
             }
-            
-            textureOrigin = new Vector2f(origin.x / (float)texture.getWidth(), origin.y / (float)texture.getHeight());
+
+            textureOrigin = new Vector2f(origin.x / (float) texture.getWidth(), origin.y / (float) texture.getHeight());
         }
     }
 
     /**
      * Get the texture size.
+     *
      * @return Returns the texture size.
-     * 
      * @deprecated Actually this method is not deprecated. But use setTextureSize to set the size instead! (deprecated tag will be removed in the future)
      */
     public Vector2f getTextureSize() {
         return textureSize;
     }
-    
+
     /**
      * Set the texture size. You don't need to divide by the texture width/height, this will be done within this method.
+     *
      * @param size The size of the texture.
      */
     public void setTextureSize(Vector2f size) {
@@ -172,69 +168,70 @@ public class UIImage extends UIDisplayContainer {
             if (size == null) {
                 size = new Vector2f(texture.getWidth(), texture.getHeight());
             }
-            
-            textureSize = new Vector2f(size.x / (float)texture.getWidth(), size.y / (float)texture.getHeight());
+
+            textureSize = new Vector2f(size.x / (float) texture.getWidth(), size.y / (float) texture.getHeight());
         }
     }
-    
+
     /**
      * Set the texture.
+     *
      * @param texture The texture.
      */
-    public void setTexture(Texture texture) {        
+    public void setTexture(Texture texture) {
         this.texture = texture;
-        
+
         if (texture != null) {
             setColor(new Color(1f, 1f, 1f, 1f));
         }
     }
-    
+
     public Texture getTexture() {
         return texture;
     }
-    
+
     public Color getColor() {
         return color;
     }
-    
+
     public void setColor(Color color) {
         generateMesh(color);
     }
-    
+
     public void setColor(String color) {
         color = color.trim().toLowerCase();
-        
+
         int r = 0;
         int g = 0;
         int b = 0;
         int a = 255;
-        
+
         if (color.matches("^#[a-f0-9]{1,8}$")) {
             color = color.replace("#", "");
-            
+
             int sum = Integer.parseInt(color, 16);
-            
+
             a = (sum & 0xFF000000) >> 24;
             r = (sum & 0x00FF0000) >> 16;
             g = (sum & 0x0000FF00) >> 8;
             b = sum & 0x000000FF;
         }
-        
+
         setColor(new Color(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), RGBtoColor(a)));
     }
-    
+
     private void generateMesh(Color color) {
         if (mesh != null) {
             mesh.dispose();
         }
-        
+
         this.color = color;
-        
+
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(color.r, color.g, color.b, color.a), 1.0f, 1.0f);
         mesh = tessellator.generateMesh();
     }
-    
+
     /*
      * Rotate graphics element
      */

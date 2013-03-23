@@ -35,6 +35,7 @@ import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerAuthority;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class EntityAwareWorldProviderTest {
     private PrefabManager prefabManager;
     private EntityManager entityManager;
     private static ModManager modManager;
-    private BlockManager blockManager;
+    private BlockManagerAuthority blockManager;
 
     @BeforeClass
     public static void commonSetup() {
@@ -63,7 +64,7 @@ public class EntityAwareWorldProviderTest {
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        blockManager = CoreRegistry.put(BlockManager.class, new BlockManager());
+        blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerAuthority());
 
         entityManager = builder.build(modManager);
         prefabManager = entityManager.getPrefabManager();
@@ -80,7 +81,7 @@ public class EntityAwareWorldProviderTest {
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
         persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
 
         assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
         List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
@@ -99,7 +100,7 @@ public class EntityAwareWorldProviderTest {
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.WHILE_PLACED);
         persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
 
         assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
         List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
@@ -118,7 +119,7 @@ public class EntityAwareWorldProviderTest {
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
         persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock));
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
 
         EntityRef entity = entityManager.create(prefab);
         StringComponent comp = entity.getComponent(StringComponent.class);

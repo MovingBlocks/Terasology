@@ -15,12 +15,11 @@
  */
 package org.terasology.entitySystem;
 
-import java.util.Map;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-
-import org.terasology.entitySystem.metadata.ComponentLibrary;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -39,7 +38,7 @@ public interface EntityManager {
     /**
      * @return A references to a new, unused entity with the desired components
      */
-    EntityRef create(Component ... components);
+    EntityRef create(Component... components);
 
     /**
      * @return A references to a new, unused entity with the desired components
@@ -75,7 +74,6 @@ public interface EntityManager {
     EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
 
     /**
-     *
      * @param id
      * @return The entity with the given id, or the null entity
      */
@@ -117,5 +115,5 @@ public interface EntityManager {
 
     int getActiveEntities();
 
-    Map<Class<? extends Component>,Component> copyComponents(EntityRef original);
+    Map<Class<? extends Component>, Component> copyComponents(EntityRef original);
 }

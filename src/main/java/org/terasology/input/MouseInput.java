@@ -38,7 +38,7 @@ public enum MouseInput {
     private MouseInput(InputType type, int id, String shortString) {
         this.type = type;
         this.id = id;
-        this.shortString =shortString;
+        this.shortString = shortString;
     }
 
     public InputType getType() {
@@ -48,6 +48,7 @@ public enum MouseInput {
     public int getId() {
         return id;
     }
+
     public Input getInput() {
         return new Input(type, id);
     }

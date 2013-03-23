@@ -129,7 +129,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
         }
 
 		/*
-		 * Trilinear interpolate the missing values.
+         * Trilinear interpolate the missing values.
 		 */
         triLerpDensityMap(densityMap);
 

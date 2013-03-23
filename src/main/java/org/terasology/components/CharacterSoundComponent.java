@@ -15,12 +15,11 @@
  */
 package org.terasology.components;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>

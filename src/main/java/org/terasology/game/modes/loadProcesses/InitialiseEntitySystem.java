@@ -17,12 +17,10 @@
 package org.terasology.game.modes.loadProcesses;
 
 import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.network.NetworkSystem;
 
 /**
  * @author Immortius

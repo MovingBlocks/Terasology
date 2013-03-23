@@ -1,7 +1,6 @@
 package org.terasology.world.block.entity;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.math.Vector3i;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 
@@ -10,7 +9,8 @@ import org.terasology.network.NetworkEvent;
  */
 @BroadcastEvent(skipInstigator = true)
 public class PlayBlockDamagedEvent extends NetworkEvent {
-    protected PlayBlockDamagedEvent() {}
+    protected PlayBlockDamagedEvent() {
+    }
 
     public PlayBlockDamagedEvent(EntityRef instigator) {
         super(instigator);

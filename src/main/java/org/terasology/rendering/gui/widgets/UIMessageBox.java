@@ -15,16 +15,15 @@
  */
 package org.terasology.rendering.gui.widgets;
 
-import javax.vecmath.Vector2f;
-
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
+import javax.vecmath.Vector2f;
+
 /**
- * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * TODO needs some work.
+ *         TODO needs some work.
  */
 public class UIMessageBox extends UIDialog {
     private UILabel infoText;

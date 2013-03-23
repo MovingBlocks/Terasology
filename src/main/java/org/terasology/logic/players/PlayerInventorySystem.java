@@ -16,7 +16,6 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
@@ -31,6 +30,7 @@ import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.rendering.world.WorldRenderer;
 

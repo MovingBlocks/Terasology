@@ -15,15 +15,14 @@
  */
 package org.terasology.world.block.family;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -33,10 +32,10 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
     private Block archetype;
 
     /**
-     * @param uri   The uri for the block group.
+     * @param uri    The uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, String ... categories) {
+    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, String... categories) {
         super(uri, Arrays.asList(categories));
         for (Side side : Side.values()) {
             Block block = blocks.get(side);

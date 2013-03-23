@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
@@ -26,6 +24,8 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Main menu screen.
@@ -49,7 +49,7 @@ public class UIMenuConfig extends UIWindow {
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
-        
+
         title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
         title.setPosition(new Vector2f(0f, 128f));
@@ -96,7 +96,7 @@ public class UIMenuConfig extends UIWindow {
                 getGUIManager().openWindow("config:controls");
             }
         });
-        
+
         advancedButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         advancedButton.getLabel().setText("Advanced");
         advancedButton.setHorizontalAlign(EHorizontalAlign.CENTER);

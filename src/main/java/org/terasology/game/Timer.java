@@ -37,6 +37,7 @@ public interface Timer {
 
     /**
      * Updates the server time. This is used to resynchronise with the server.
+     *
      * @param ms
      */
     void updateServerTime(long ms, boolean immediate);

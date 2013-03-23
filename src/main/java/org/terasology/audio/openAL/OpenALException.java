@@ -15,11 +15,11 @@
  */
 package org.terasology.audio.openAL;
 
+import org.lwjgl.openal.AL10;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.lwjgl.openal.AL10;
 
 public class OpenALException extends IllegalStateException {
 
