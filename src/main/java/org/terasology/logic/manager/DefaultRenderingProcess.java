@@ -29,7 +29,9 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -68,6 +70,9 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
 
     private Config config = CoreRegistry.get(Config.class);
+    
+	private static boolean tainted = false;
+	private static Collection<String> taintedReasons = new HashSet<String>();
 
     public enum FBOType {
         DEFAULT,
@@ -192,6 +197,29 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         readBackPBOBack.init(1,1);
 
         readBackPBOCurrent = readBackPBOFront;
+    }
+    
+    private class Tainted extends RuntimeException {
+    	public Tainted(Object object, String reason)
+    	{
+    		super(object.toString() + " tainted! (Reason: " + reason + ")");
+    	}
+    }
+    
+    private void taint(String passedReason)
+    {
+    	String reason = passedReason;
+    	tainted = true;
+    	
+    	if ( (reason == null) || (reason == "") )
+    		reason = "Tainted by " + Thread.currentThread().getStackTrace()[2].toString() + ", no reason given.";
+    	
+    	Tainted taintException = new Tainted(this, reason);
+    	
+    	logger.error(taintException.getLocalizedMessage());
+    	taintException.printStackTrace();
+    	
+    	taintedReasons.add(reason);
     }
 
 
@@ -362,6 +390,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
+                
+                /*
+                 * On some graphics cards, FBOType.NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
+                 * Attempt to continue without this FBO.
+                 */
+                if (type == FBOType.NO_COLOR) {
+                	logger.error("FrameBuffer: " + title
+                            + ", ...but the FBOType was NO_COLOR, ignoring this error and continuing without this FBO.");
+                	
+                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.NO_COLOR.");
+                	return null;
+                }
             default:
                 throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
         }

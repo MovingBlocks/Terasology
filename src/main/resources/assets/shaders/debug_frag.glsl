@@ -30,70 +30,62 @@ void main(){
     vec4 color;
 
     vec4 texColor;
-    switch (debugRenderingStage) {
-        case DEBUG_STAGE_OPAQUE_COLOR:
+    
+        if (debugRenderingStage == DEBUG_STAGE_OPAQUE_COLOR)
         {
+        
             texColor = texture2D(texSceneOpaqueColor, gl_TexCoord[0].xy);
             color = texColor;
-        }
-        break;
-        case DEBUG_STAGE_OPAQUE_NORMALS:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_OPAQUE_NORMALS) {
+        
             texColor = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
             color.xyz = texColor.xyz;
             color.a = 1.0;
-        }
-        break;
-        case DEBUG_STAGE_OPAQUE_DEPTH:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_OPAQUE_DEPTH) {
+        
             texColor = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy);
             float linDepth = linDepth(texColor.x);
             color.xyz = vec3(linDepth);
             color.a = 1.0;
-        }
-        break;
-        case DEBUG_STAGE_OPAQUE_NORMALS_ALPHA:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_OPAQUE_NORMALS_ALPHA) {
+        
             texColor = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
             color.xyz = vec3(texColor.a);
             color.a = 1.0;
-        }
-        break;
-        case DEBUG_STAGE_TRANSPARENT_COLOR:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_TRANSPARENT_COLOR) {
+        
             texColor = texture2D(texSceneTransparentColor, gl_TexCoord[0].xy);
             color = texColor;
-        }
-        break;
-        case DEBUG_STAGE_TRANSPARENT_NORMALS:
-        {
+        
+        } else if (debugRenderingStage ==  DEBUG_STAGE_TRANSPARENT_NORMALS) {
+        
             texColor = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy);
             color.xyz = texColor.xyz;
             color.a = 1.0;
-        }
-        break;
-        case DEBUG_STAGE_TRANSPARENT_DEPTH:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_TRANSPARENT_DEPTH) {
+        
             texColor = texture2D(texSceneTransparentDepth, gl_TexCoord[0].xy);
             float linDepth = linDepth(texColor.x);
             color.xyz = vec3(linDepth);
             color.a = 1.0;
-        }
-        break;
-        case DEBUG_STAGE_TRANSPARENT_NORMALS_ALPHA:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_TRANSPARENT_NORMALS_ALPHA) {
+        
             texColor = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy);
             color.xyz = vec3(texColor.a);
             color.a = 1.0;
-        }
-        break;
-        case DEBUG_STAGE_SHADOW_MAP:
-        {
+        
+        } else if (debugRenderingStage == DEBUG_STAGE_SHADOW_MAP) {
+        
             texColor = texture2D(texSceneShadowMap, gl_TexCoord[0].xy);
             color = texColor;
+        
         }
-        break;
-    }
 
     gl_FragData[0] = color;
 }
