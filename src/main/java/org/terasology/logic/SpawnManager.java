@@ -16,10 +16,12 @@
 
 package org.terasology.logic;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -29,7 +31,7 @@ import org.terasology.world.chunks.Chunk;
  * This class contains the improved spawn block algorithm. The algorithm is simple and
  * world generator neutral. See isPointAnAcceptibleSpawnPoint() for more info. 
  * 
- * @author Philip Wernersbach
+ * @author Philip Wernersbach <philip.wernersbach@gmail.com>
  */
 public class SpawnManager {
 	private WorldProvider worldProvider = null;
@@ -38,19 +40,9 @@ public class SpawnManager {
 	private Block[] acceptibleSpawnBlocks = null;
 	private Block airBlock = null;
 	
-	private static final Random numberGenerator_Static = new Random();
+	private static final FastRandom numberGenerator = new FastRandom();
 	private int airAboveSpawn = 2;
 	private boolean isWaterSpawnAcceptible = false;
-	
-	/*
-	 * For some reason, there's a corner case where a person gets a bad Random Number Generator
-	 * and the algorithm can never find a suitable block.
-	 * (This behavior is seemingly random.)
-	 * 
-	 *  We have this one as non-static so we can reset the RNG if needed.
-	 */
-	private Random numberGenerator = numberGenerator_Static;
-	
 	
 	public SpawnManager(WorldProvider provider) {
 		Block[] blocks = new Block[] { BlockManager.getInstance().getBlock("engine:Grass"), 
@@ -84,7 +76,7 @@ public class SpawnManager {
 	
 	public Vector3i getRandomPoint()
 	{
-		return new Vector3i(numberGenerator.nextInt(Chunk.SIZE_X + 1), numberGenerator.nextInt(Chunk.SIZE_Y + 1), numberGenerator.nextInt(Chunk.SIZE_Z + 1));
+		return new Vector3i(numberGenerator.randomIntAbs(Chunk.SIZE_X + 1), numberGenerator.randomIntAbs(Chunk.SIZE_Y + 1), numberGenerator.randomIntAbs(Chunk.SIZE_Z + 1));
 	}
 	
 	public Block pointToBlock(Vector3i point) {
@@ -135,26 +127,40 @@ public class SpawnManager {
 		return true;
 	}
 	
-	public Vector3i getRandomSpawnPoint() {
-		int passes = 0;
-		Vector3i point = getRandomPoint();
+	public List<Vector3i> getPointsThatAreGoodSpawnPoints() {
+		ArrayList<Vector3i> pointsThatAreAcceptible = new ArrayList<Vector3i>(700);
+		Vector3i point = null;
 		
-		while (!isPointAnAcceptibleSpawnPoint(point)) {
-			// In tests, this loop never ran for more than
-			// 1179 passes. If we get to 2000 passes, declare
-			// this a bad RNG and use a new one.
-			if (passes == 2000) {
-				LoggerFactory.getLogger(SpawnManager.class).warn("Java gave us a bad RNG, getting a new one!");
-				
-				numberGenerator = new Random();
-				passes = 0;
+		/*
+		 * I wish there was a way to query the World Provider to get a list of blocks
+		 * that are of the acceptable types. But alas there is not, so we just iterate
+		 * through every block in the world.
+		 */
+		for (int x = 0; x <= Chunk.SIZE_X; x++) {
+			for (int y = 0; y <= Chunk.SIZE_Y; y++) {
+				for (int z = 0; z <= Chunk.SIZE_Z; z++) {
+					point = new Vector3i(x, y, z);
+					
+					if(isPointAnAcceptibleSpawnPoint(point))
+						pointsThatAreAcceptible.add(point);
+				}
 			}
-			
-			passes++;
-			point = getRandomPoint();
 		}
 		
-		return point;
+		pointsThatAreAcceptible.trimToSize();
+		return pointsThatAreAcceptible;
+	}
+	
+	public Vector3i getRandomSpawnPoint() throws NoGoodSpawnPointsException {
+		List<Vector3i> pointsThatAreAcceptible = getPointsThatAreGoodSpawnPoints();
+		int numberOfPoints = pointsThatAreAcceptible.size();
+		
+		if (numberOfPoints == 0) {
+			LoggerFactory.getLogger(SpawnManager.class).warn("No good spawn points found, throwing exception!");
+			throw new NoGoodSpawnPointsException();
+		}
+			
+		return pointsThatAreAcceptible.get(numberGenerator.randomIntAbs(numberOfPoints));
 	}
 	
 	public int getRequiredAirAboveSpawn() {
@@ -165,7 +171,7 @@ public class SpawnManager {
 		Vector3i aboveBlockPoint = null;
 		for (int i = 1; i <= airAboveSpawn; i++) {
 			aboveBlockPoint = new Vector3i(spawnPoint.x, spawnPoint.y + i, spawnPoint.z);
-			worldProvider.setBlock(spawnPoint, BlockManager.getInstance().getAir(), pointToBlock(aboveBlockPoint));
+			worldProvider.setBlock(aboveBlockPoint, BlockManager.getInstance().getAir(), pointToBlock(aboveBlockPoint));
 		}
 	}
 	
@@ -173,7 +179,7 @@ public class SpawnManager {
 		(new SpawnManager(provider, point)).ensureSpawnIsClear();
 	}
 	
-	public static Vector3i getRandomSpawnPoint(WorldProvider provider) {
+	public static Vector3i getRandomSpawnPoint(WorldProvider provider) throws NoGoodSpawnPointsException {
 		return (new SpawnManager(provider)).getRandomSpawnPoint();
 	}
 }

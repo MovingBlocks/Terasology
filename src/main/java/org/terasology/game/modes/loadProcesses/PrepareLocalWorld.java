@@ -25,18 +25,20 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
+import org.terasology.game.modes.NeedToReinitStateLoading;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.NoGoodSpawnPointsException;
 import org.terasology.logic.SpawnManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * @author Immortius
@@ -58,15 +60,19 @@ public class PrepareLocalWorld implements LoadProcess {
     }
 
     @Override
-    public boolean step() {
-        while (chunkProvider.getChunk(targetPos) == null || chunkProvider.getChunk(targetPos).getChunkState() != Chunk.State.COMPLETE) {
-            return false;
-        }
-
-        if (spawningPlayer) {
-            spawnPlayer();
-        }
-        return true;
+    public boolean step() throws NeedToReinitStateLoading {
+    	try {
+	        while (chunkProvider.getChunk(targetPos) == null || chunkProvider.getChunk(targetPos).getChunkState() != Chunk.State.COMPLETE) {
+	            return false;
+	        }
+	
+	        if (spawningPlayer) {
+	            spawnPlayer();
+	        }
+	        return true;
+    	} catch (NoGoodSpawnPointsException e) {
+    		throw new NeedToReinitStateLoading();
+    	}
     }
 
     @Override
@@ -90,16 +96,10 @@ public class PrepareLocalWorld implements LoadProcess {
         return UNKNOWN_STEPS;
     }
 
-    private void spawnPlayer() {
-    	WorldProvider worldProvider = worldRenderer.getWorldProvider();
-        Vector3i spawnPoint = SpawnManager.getRandomSpawnPoint(worldProvider);
+    private void spawnPlayer() throws NoGoodSpawnPointsException {
+        Vector3i spawnPoint = SpawnManager.getRandomSpawnPoint(worldRenderer.getWorldProvider());
         
-        // Partially prevent players from bugging the spawn block by placing
-        // an indestructible block.
-        //
-        // We also need to implement something that makes sure the required number
-        // of air blocks above the spawn block is present.
-        worldProvider.setBlock(spawnPoint, BlockManager.getInstance().getBlock("engine:MantleStone"), worldProvider.getBlock(spawnPoint));
+        worldRenderer.getWorldProvider().setBlock(spawnPoint, BlockManager.getInstance().getBlock("engine:MantleStone"), worldRenderer.getWorldProvider().getBlock(spawnPoint));
         
         PlayerFactory playerFactory = new PlayerFactory(entityManager);
         CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x, spawnPoint.y + 1.5f, spawnPoint.z)));
