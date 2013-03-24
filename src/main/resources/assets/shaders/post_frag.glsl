@@ -45,7 +45,7 @@ uniform mat4 prevViewProjMatrix;
 #endif
 
 void main() {
-#if !defined (NO_BLUR) || defined (MOTION_BLUR)
+#if !defined (NO_BLUR)
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
