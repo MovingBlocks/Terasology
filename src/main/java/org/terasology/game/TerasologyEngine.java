@@ -28,7 +28,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
@@ -138,6 +138,7 @@ public class TerasologyEngine implements GameEngine {
         } else {
             config = new Config();
             config.getDefaultModSelection().addMod("core");
+            config.save();
             CoreRegistry.put(Config.class, config);
         }
     }
