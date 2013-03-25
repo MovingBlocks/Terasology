@@ -26,7 +26,7 @@ import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter;
 
 def DEFAULT_MOD_TXT_START = '{\n    "id" : "'
-def DEFAULT_MOD_TXT_END = '",\n    "displayName" : "",\n    "description" : "",\n    "dependencies" : []\n}'
+def DEFAULT_MOD_TXT_END = '",\n    "displayName" : "",\n    "author" : "",\n    "description" : "",\n    "dependencies" : []\n}'
 
 ext {
     startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
@@ -42,7 +42,7 @@ ext {
     mainClassNameEditor = 'org.terasology.editor.TeraEd'
     mainClassName = 'org.terasology.game.Terasology'
     jarFileName = 'Terasology.jar'
-    env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
+    env = System.getenv() // read environment variables, including variables passed by jenkins continuous integration server
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'

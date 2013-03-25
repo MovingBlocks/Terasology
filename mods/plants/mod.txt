@@ -1,0 +1,7 @@
+{
+    "id" : "plants",
+    "displayName" : "Metouto's Plant Pack",
+    "author" : "Metouto",
+    "description" : "Package of plants by Metouto ideal for growth stages (farming)",
+    "dependencies" : []
+}
