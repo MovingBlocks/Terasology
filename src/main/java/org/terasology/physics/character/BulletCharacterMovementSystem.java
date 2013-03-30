@@ -322,7 +322,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         moveDelta.scale(delta);
 
         // Note: No stepping underwater, no issue with slopes
-        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, 0, -1, movementComp.collider);
+        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, 0, 1, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
         distanceMoved.sub(location.getWorldPosition());
 
