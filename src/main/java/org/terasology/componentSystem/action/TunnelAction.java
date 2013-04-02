@@ -19,11 +19,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.TunnelActionComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
@@ -61,7 +57,7 @@ public class TunnelAction implements EventHandlerSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = TunnelActionComponent.class)
+    @ReceiveEvent(components = TunnelActionComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onActivate(ActivateEvent event, EntityRef entity) {
 
         Vector3f dir = new Vector3f(event.getDirection());
@@ -111,5 +107,8 @@ public class TunnelAction implements EventHandlerSystem {
                 }
             }
         }
+        //If no blocks were destroyed, cancel the event
+        if(blockCounter == MAX_DESTROYED_BLOCKS)
+            event.cancel();
     }
 }
