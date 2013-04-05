@@ -20,17 +20,15 @@ import java.io.InputStream;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Mathias Kalb
  */
-public final class TerasologyVersion {
+public final class TerasologyGameVersionInfo {
 
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyVersion.class);
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyGameVersionInfo.class);
 
-    private static TerasologyVersion instance;
+    private static TerasologyGameVersionInfo instance;
 
     private static final String VERSION_INFO_FILE = "versionInfo.properties";
 
@@ -38,9 +36,11 @@ public final class TerasologyVersion {
     private static final String BUILD_ID = "buildId";
     private static final String BUILD_TAG = "buildTag";
     private static final String BUILD_URL = "buildUrl";
+    private static final String JOB_NAME = "jobName";
     private static final String GIT_BRANCH = "gitBranch";
     private static final String GIT_COMMIT = "gitCommit";
     private static final String DATE_TIME = "dateTime";
+    private static final String DISPLAY_VERSION = "displayVersion";
 
     private static final String DEFAULT_VALUE = "";
 
@@ -48,27 +48,27 @@ public final class TerasologyVersion {
     private final String buildId;
     private final String buildTag;
     private final String buildUrl;
+    private final String jobName;
     private final String gitBranch;
     private final String gitCommit;
     private final String dateTime;
+    private final String displayVersion;
     private final String toString;
 
-    private TerasologyVersion() {
+    private TerasologyGameVersionInfo() {
         final Properties properties = new Properties();
         final InputStream inStream = this.getClass().getResourceAsStream(VERSION_INFO_FILE);
         if (inStream != null) {
             try {
                 properties.load(inStream);
             } catch (final IOException e) {
-                logger.error("Loading {} failed", VERSION_INFO_FILE, e);
+                logger.error("Loading version info failed!", e);
             } finally {
                 // JAVA7 : cleanup
                 try {
-                    if (inStream != null) {
-                        inStream.close();
-                    }
+                    inStream.close();
                 } catch (final IOException e) {
-                    logger.error("Closing {} failed", VERSION_INFO_FILE, e);
+                    logger.info("Closing InputStream failed!", e);
                 }
             }
         }
@@ -77,9 +77,11 @@ public final class TerasologyVersion {
         buildId = properties.getProperty(BUILD_ID, DEFAULT_VALUE);
         buildTag = properties.getProperty(BUILD_TAG, DEFAULT_VALUE);
         buildUrl = properties.getProperty(BUILD_URL, DEFAULT_VALUE);
+        jobName = properties.getProperty(JOB_NAME, DEFAULT_VALUE);
         gitBranch = properties.getProperty(GIT_BRANCH, DEFAULT_VALUE);
         gitCommit = properties.getProperty(GIT_COMMIT, DEFAULT_VALUE);
         dateTime = properties.getProperty(DATE_TIME, DEFAULT_VALUE);
+        displayVersion = properties.getProperty(DISPLAY_VERSION, DEFAULT_VALUE);
 
         final StringBuilder toStringBuilder = new StringBuilder();
         toStringBuilder.append("[");
@@ -99,6 +101,10 @@ public final class TerasologyVersion {
         toStringBuilder.append("=");
         toStringBuilder.append(buildUrl);
         toStringBuilder.append(", ");
+        toStringBuilder.append(JOB_NAME);
+        toStringBuilder.append("=");
+        toStringBuilder.append(jobName);
+        toStringBuilder.append(", ");
         toStringBuilder.append(GIT_BRANCH);
         toStringBuilder.append("=");
         toStringBuilder.append(gitBranch);
@@ -110,13 +116,17 @@ public final class TerasologyVersion {
         toStringBuilder.append(DATE_TIME);
         toStringBuilder.append("=");
         toStringBuilder.append(dateTime);
+        toStringBuilder.append(", ");
+        toStringBuilder.append(DISPLAY_VERSION);
+        toStringBuilder.append("=");
+        toStringBuilder.append(displayVersion);
         toStringBuilder.append("]");
         toString = toStringBuilder.toString();
     }
 
-    public static TerasologyVersion getInstance() {
+    public static TerasologyGameVersionInfo getInstance() {
         if (instance == null) {
-            instance = new TerasologyVersion();
+            instance = new TerasologyGameVersionInfo();
         }
         return instance;
     }
@@ -137,6 +147,10 @@ public final class TerasologyVersion {
         return buildUrl;
     }
 
+    public String getJobName() {
+        return jobName;
+    }
+
     public String getGitBranch() {
         return gitBranch;
     }
@@ -147,6 +161,10 @@ public final class TerasologyVersion {
 
     public String getDateTime() {
         return dateTime;
+    }
+
+    public String getDisplayVersion() {
+        return displayVersion;
     }
 
     @Override
