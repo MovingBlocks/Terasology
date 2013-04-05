@@ -305,35 +305,17 @@ public class Chunk implements Externalizable {
         return blockManager.getBlock((byte) blockData.get(x, y, z));
     }
 
-    public boolean setBlock(int x, int y, int z, Block block) {
+    public void setBlock(int x, int y, int z, Block block) {
         int oldValue = blockData.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
             if (!block.isLiquid()) {
                 setLiquid(x, y, z, new LiquidData());
             }
-            return true;
         }
-        return false;
     }
 
-    public boolean setBlock(int x, int y, int z, Block newBlock, Block oldBlock) {
-        if (newBlock != oldBlock) {
-            if (blockData.set(x, y, z, newBlock.getId(), oldBlock.getId())) {
-                if (!newBlock.isLiquid()) {
-                    setLiquid(x, y, z, new LiquidData());
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean setBlock(Vector3i pos, Block block) {
-        return setBlock(pos.x, pos.y, pos.z, block);
-    }
-
-    public boolean setBlock(Vector3i pos, Block block, Block oldBlock) {
-        return setBlock(pos.x, pos.y, pos.z, block, oldBlock);
+    public void setBlock(Vector3i pos, Block block) {
+        setBlock(pos.x, pos.y, pos.z, block);
     }
 
     public byte getSunlight(Vector3i pos) {
@@ -370,14 +352,8 @@ public class Chunk implements Externalizable {
         return lightData.set(x, y, z, amount) != amount;
     }
 
-    public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
-        return setLiquid(pos.x, pos.y, pos.z, newState, oldState);
-    }
-
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        byte expected = oldState.toByte();
-        byte newValue = newState.toByte();
-        return extraData.set(x, y, z, newValue, expected);
+    public void setLiquid(Vector3i pos, LiquidData state) {
+        setLiquid(pos.x, pos.y, pos.z, state);
     }
 
     public void setLiquid(int x, int y, int z, LiquidData newState) {

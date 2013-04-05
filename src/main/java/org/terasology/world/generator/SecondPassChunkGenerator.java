@@ -17,11 +17,11 @@
 package org.terasology.world.generator;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.WorldView;
+import org.terasology.world.ChunkView;
 
 /**
  * @author Immortius
  */
 public interface SecondPassChunkGenerator extends BaseChunkGenerator {
-    public void postProcessChunk(Vector3i chunkPos, WorldView view);
+    public void postProcessChunk(Vector3i chunkPos, ChunkView view);
 }

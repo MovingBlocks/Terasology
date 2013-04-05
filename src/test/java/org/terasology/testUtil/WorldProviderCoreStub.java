@@ -19,11 +19,11 @@ package org.terasology.testUtil;
 import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockUpdate;
+import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProviderCore;
-import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 
@@ -72,17 +72,17 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public WorldView getLocalView(Vector3i chunk) {
+    public ChunkView getLocalView(Vector3i chunkPos) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public WorldView getWorldViewAround(Vector3i chunk) {
+    public ChunkView getWorldViewAround(Vector3i chunk) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public boolean isBlockActive(int x, int y, int z) {
+    public boolean isBlockRelevant(int x, int y, int z) {
         return true;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -110,6 +110,11 @@ public class WorldProviderCoreStub implements WorldProviderCore {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void setBlockForced(int x, int y, int z, Block type) {
+        setBlock(x, y, z, type, getBlock(x, y, z));
     }
 
     @Override

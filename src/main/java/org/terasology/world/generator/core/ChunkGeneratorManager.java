@@ -17,8 +17,8 @@
 package org.terasology.world.generator.core;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.BaseChunkGenerator;
 
@@ -39,6 +39,6 @@ public interface ChunkGeneratorManager {
 
     Chunk generateChunk(Vector3i pos);
 
-    void secondPassChunk(Vector3i chunkPos, WorldView view);
+    void secondPassChunk(Vector3i chunkPos, ChunkView view);
 
 }

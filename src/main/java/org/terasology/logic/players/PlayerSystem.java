@@ -37,6 +37,7 @@ import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 
 import javax.vecmath.Vector3f;
@@ -79,7 +80,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         Iterator<SpawnCachingInfo> i = ongoingSpawns.iterator();
         while (i.hasNext()) {
             SpawnCachingInfo spawning = i.next();
-            if (chunkProvider.getChunk(Vector3i.zero()) != null && chunkProvider.getChunk(Vector3i.zero()).getChunkState() == Chunk.State.COMPLETE) {
+            if (chunkProvider.getChunk(Vector3i.zero()) != null) {
                 spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
                 chunkProvider.removeRelevanceEntity(spawning.cachingEntity);
                 spawning.cachingEntity.destroy();
@@ -103,7 +104,11 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 playerCharacter.saveComponent(netComp);
             }
             Client clientListener = networkSystem.getOwner(clientEntity);
-            worldRenderer.getChunkProvider().addRelevanceEntity(playerCharacter, clientListener.getViewDistance(), clientListener);
+            int distance = clientListener.getViewDistance();
+            if (!clientListener.isLocal()) {
+                distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
+            }
+            worldRenderer.getChunkProvider().addRelevanceEntity(playerCharacter, distance, clientListener);
 
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
@@ -113,7 +118,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onConnect(ConnectedEvent connected, EntityRef entity) {
         Vector3i pos = Vector3i.zero();
-        if (chunkProvider.getChunk(pos) != null && chunkProvider.getChunk(pos).getChunkState() == Chunk.State.COMPLETE) {
+        if (chunkProvider.getChunk(pos) != null) {
             spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
         } else {
             EntityRef spawnZoneEntity = entityManager.create();

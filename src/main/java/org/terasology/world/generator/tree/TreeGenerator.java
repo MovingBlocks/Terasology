@@ -17,7 +17,7 @@
 package org.terasology.world.generator.tree;
 
 import org.terasology.utilities.FastRandom;
-import org.terasology.world.WorldView;
+import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
 /**
@@ -37,7 +37,7 @@ public abstract class TreeGenerator {
      * @param posY Position on the y-axis
      * @param posZ Position on the z-axis
      */
-    public abstract void generate(WorldView view, FastRandom rand, int posX, int posY, int posZ);
+    public abstract void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ);
 
     public double getGenerationProbability() {
         return generationProbability;

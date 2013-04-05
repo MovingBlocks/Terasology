@@ -18,10 +18,12 @@ package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.world.WorldView;
+import org.terasology.world.ChunkView;
+import org.terasology.world.RegionalChunkView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.lighting.LightPropagator;
 
 /**
@@ -29,31 +31,31 @@ import org.terasology.world.lighting.LightPropagator;
  */
 public class PropagateLightingChunkTask extends AbstractChunkTask {
 
-    public PropagateLightingChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, ChunkProvider provider) {
+    public PropagateLightingChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
         super(pipeline, position, provider);
     }
 
     @Override
     public void enact() {
-        WorldView worldView = WorldView.createLocalView(getPosition(), getProvider());
-        if (worldView == null) {
+        ChunkView chunkView = getProvider().getViewAround(getPosition());
+        if (chunkView == null) {
             return;
         }
-        worldView.lock();
+        chunkView.lock();
         try {
-            if (!worldView.isValidView()) {
+            if (!chunkView.isValidView()) {
                 return;
             }
-            Chunk chunk = getProvider().getChunk(getPosition());
+            Chunk chunk = getProvider().getChunkForProcessing(getPosition());
             if (chunk.getChunkState() != Chunk.State.LIGHT_PROPAGATION_PENDING) {
                 return;
             }
 
-            new LightPropagator(worldView).propagateOutOfTargetChunk();
+            new LightPropagator(chunkView).propagateOutOfTargetChunk();
             chunk.setChunkState(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING);
             getPipeline().requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
         } finally {
-            worldView.unlock();
+            chunkView.unlock();
         }
     }
 }

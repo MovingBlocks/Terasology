@@ -19,19 +19,20 @@ package org.terasology.world.chunks.pipeline;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
  * @author Immortius
  */
 public class DeflateChunkTask extends AbstractChunkTask {
 
-    public DeflateChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, ChunkProvider provider) {
+    public DeflateChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
         super(pipeline, position, provider);
     }
 
     @Override
     public void enact() {
-        Chunk chunk = getProvider().getChunk(getPosition());
+        Chunk chunk = getProvider().getChunkForProcessing(getPosition());
         if (chunk != null) {
             chunk.deflate();
         }

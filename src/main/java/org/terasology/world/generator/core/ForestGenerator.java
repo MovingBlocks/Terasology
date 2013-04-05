@@ -21,8 +21,8 @@ import com.google.common.collect.ListMultimap;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.FastRandom;
+import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -56,7 +56,7 @@ public class ForestGenerator implements SecondPassChunkGenerator {
     }
 
     @Override
-    public void postProcessChunk(Vector3i pos, WorldView view) {
+    public void postProcessChunk(Vector3i pos, ChunkView view) {
         FastRandom random = new FastRandom(seed.hashCode() ^ (pos.x + 39L * (pos.y + 39L * pos.z)));
         for (int y = 32; y < Chunk.SIZE_Y; y++) {
             for (int x = 4; x < Chunk.SIZE_X; x += 4) {
@@ -100,7 +100,7 @@ public class ForestGenerator implements SecondPassChunkGenerator {
      * @param y       Position on the y-axis
      * @param z       Position on the z-axis
      */
-    private void generateTree(WorldView view, TreeGenerator treeGen, int x, int y, int z, FastRandom random) {
+    private void generateTree(ChunkView view, TreeGenerator treeGen, int x, int y, int z, FastRandom random) {
         for (int checkY = y + 1; checkY < Chunk.SIZE_Y; ++checkY) {
             if (!view.getBlock(x, checkY, z).isTranslucent()) {
                 return;

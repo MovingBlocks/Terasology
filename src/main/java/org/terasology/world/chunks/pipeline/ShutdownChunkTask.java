@@ -18,6 +18,7 @@ package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
  * @author Immortius
@@ -39,7 +40,7 @@ public final class ShutdownChunkTask implements ChunkTask {
     }
 
     @Override
-    public ChunkProvider getProvider() {
+    public GeneratingChunkProvider getProvider() {
         return null;
     }
 

@@ -33,7 +33,7 @@ import org.terasology.world.chunks.Chunk;
 /**
  * @author Immortius
  */
-public class WorldViewTest {
+public class ChunkViewTest {
 
     Block airBlock;
     Block solidBlock;
@@ -55,8 +55,8 @@ public class WorldViewTest {
         Chunk chunk = new Chunk(new Vector3i());
         chunk.setBlock(new Vector3i(0,0,0), solidBlock);
 
-        WorldView worldView = new WorldView(new Chunk[] {chunk}, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), new Vector3i());
-        assertEquals(solidBlock, worldView.getBlock(0, 0, 0));
+        ChunkView chunkView = new RegionalChunkView(new Chunk[] {chunk}, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), new Vector3i());
+        assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 
     @Test
@@ -68,8 +68,8 @@ public class WorldViewTest {
                                             new Chunk(new Vector3i(-1,0,0)), chunk, new Chunk(new Vector3i(1,0,0)),
                                             new Chunk(new Vector3i(-1,0,1)), new Chunk(new Vector3i(0,0,1)), new Chunk(new Vector3i(1,0,1))};
 
-        WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1,0,1)), new Vector3i(1,1,1));
-        assertEquals(solidBlock, worldView.getBlock(0, 0, 0));
+        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1,0,1)), new Vector3i(1,1,1));
+        assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 
     @Test
@@ -81,8 +81,8 @@ public class WorldViewTest {
                 new Chunk(new Vector3i(-1,0,0)), new Chunk(new Vector3i(0,0,0)), new Chunk(new Vector3i(1,0,0)),
                 new Chunk(new Vector3i(-1,0,1)), new Chunk(new Vector3i(0,0,1)), new Chunk(new Vector3i(1,0,1))};
 
-        WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1,0,1)), new Vector3i(1,1,1));
-        assertEquals(solidBlock, worldView.getBlock(-1, 0, -1));
+        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1,0,1)), new Vector3i(1,1,1));
+        assertEquals(solidBlock, chunkView.getBlock(-1, 0, -1));
     }
 
     @Test
@@ -94,8 +94,8 @@ public class WorldViewTest {
                 new Chunk(new Vector3i(-1,0,0)), new Chunk(new Vector3i(0,0,0)), new Chunk(new Vector3i(1,0,0)),
                 new Chunk(new Vector3i(-1,0,1)), new Chunk(new Vector3i(0,0,1)), chunk};
 
-        WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1,0,1)), new Vector3i(1,1,1));
-        assertEquals(solidBlock, worldView.getBlock(16, 0, 16));
+        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1,0,1)), new Vector3i(1,1,1));
+        assertEquals(solidBlock, chunkView.getBlock(16, 0, 16));
     }
 
     @Test
@@ -107,8 +107,8 @@ public class WorldViewTest {
                 new Chunk(new Vector3i(0,0,1)), chunk, new Chunk(new Vector3i(2,0,1)),
                 new Chunk(new Vector3i(0,0,2)), new Chunk(new Vector3i(1,0,2)), new Chunk(new Vector3i(2,0,2))};
 
-        WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1,0,1)), new Vector3i(1,1,1));
-        assertEquals(solidBlock, worldView.getBlock(0, 0, 0));
+        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1,0,1)), new Vector3i(1,1,1));
+        assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class WorldViewTest {
                 new Chunk(new Vector3i(0,0,1)), chunk, new Chunk(new Vector3i(2,0,1)),
                 new Chunk(new Vector3i(0,0,2)), new Chunk(new Vector3i(1,0,2)), new Chunk(new Vector3i(2,0,2))};
 
-        WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1,0,1)), new Vector3i(1,1,1));
-        assertEquals(new Vector3i(Chunk.SIZE_X, 0, Chunk.SIZE_Z), worldView.toWorldPos(Vector3i.zero()));
+        RegionalChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1,0,1)), new Vector3i(1,1,1));
+        assertEquals(new Vector3i(Chunk.SIZE_X, 0, Chunk.SIZE_Z), chunkView.toWorldPos(Vector3i.zero()));
     }
 }

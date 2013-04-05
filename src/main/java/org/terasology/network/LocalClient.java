@@ -72,6 +72,11 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
+    public boolean isLocal() {
+        return true;
+    }
+
+    @Override
     public void onChunkRelevant(Vector3i pos, Chunk chunk) {
     }
 

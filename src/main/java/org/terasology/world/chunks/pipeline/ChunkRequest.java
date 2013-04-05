@@ -22,10 +22,11 @@ import org.terasology.config.AdvancedConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.network.NetworkSystem;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.GeneratingChunkProvider;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
  * @author Immortius
@@ -97,7 +98,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     }
 
     private void checkState(Vector3i pos) {
-        Chunk chunk = provider.getChunk(pos);
+        Chunk chunk = provider.getChunkForProcessing(pos);
         if (chunk != null) {
             checkState(chunk);
         }
@@ -123,7 +124,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     }
 
     private void checkOrCreateChunk(Vector3i chunkPos) {
-        Chunk chunk = provider.getChunk(chunkPos);
+        Chunk chunk = provider.getChunkForProcessing(chunkPos);
         if (chunk == null) {
             provider.createOrLoadChunk(chunkPos);
         } else {
@@ -136,7 +137,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         if (chunk != null && chunk.getChunkState() == Chunk.State.ADJACENCY_GENERATION_PENDING) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                 if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunk(adjPos);
+                    Chunk adjChunk = provider.getChunkForProcessing(adjPos);
                     if (adjChunk == null) {
                         return;
                     }
@@ -150,11 +151,13 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     private void checkReadyToDoInternalLighting(Chunk chunk) {
         Vector3i pos = chunk.getPos();
         if (chunk != null && chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunk(adjPos);
-                    if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {
-                        return;
+            if (CoreRegistry.get(NetworkSystem.class).getMode().isAuthority())  {
+                for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
+                    if (!adjPos.equals(pos)) {
+                        Chunk adjChunk = provider.getChunkForProcessing(adjPos);
+                        if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {
+                            return;
+                        }
                     }
                 }
             }
@@ -168,7 +171,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         if (chunk != null && chunk.getChunkState() == Chunk.State.LIGHT_PROPAGATION_PENDING) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                 if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunk(adjPos);
+                    Chunk adjChunk = provider.getChunkForProcessing(adjPos);
                     if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.LIGHT_PROPAGATION_PENDING) < 0) {
                         return;
                     }
@@ -185,7 +188,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         if (chunk != null && chunk.getChunkState() == Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                 if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunk(adjPos);
+                    Chunk adjChunk = provider.getChunkForProcessing(adjPos);
                     if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) < 0) {
                         return;
                     }
@@ -197,9 +200,12 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
             if (config.isChunkDeflationEnabled()) {
                 pipeline.doTask(new DeflateChunkTask(pipeline, pos, provider));
             }
+            if (provider.isChunkReady(pos)) {
+                provider.onChunkIsReady(pos);
+            }
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                 if (provider.isChunkReady(adjPos)) {
-                    provider.chunkIsReady(pos);
+                    provider.onChunkIsReady(adjPos);
                 }
             }
         }

@@ -59,11 +59,11 @@ public class LiquidsGenerator implements ChunkGenerator {
         for (int y = Chunk.SIZE_Y - 1; y >= 0; y -= 2) {
             Block currentBlock = c.getBlock(8, y, 8);
             if ((grass.equals(currentBlock) || snow.equals(currentBlock)) && !grassGenerated && y >= 32 && random.randomDouble() > 0.8) {
-                c.setBlock(8, y, 8, water, currentBlock);
+                c.setBlock(8, y, 8, water);
                 c.setLiquid(8, y, 8, new LiquidData(LiquidType.WATER, 7));
                 grassGenerated = true;
             } else if ((stone.equals(currentBlock)) && !lavaGenerated && c.getBlock(8, y + 1, 8).equals(BlockManager.getAir())) {
-                c.setBlock(8, y, 8, lava, currentBlock);
+                c.setBlock(8, y, 8, lava);
                 c.setLiquid(8, y, 8, new LiquidData(LiquidType.LAVA, 7));
                 lavaGenerated = true;
             }

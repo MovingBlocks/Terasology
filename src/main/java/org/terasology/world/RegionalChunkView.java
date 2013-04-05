@@ -28,7 +28,7 @@ import org.terasology.world.liquid.LiquidData;
 /**
  * @author Immortius
  */
-public class WorldView {
+public class RegionalChunkView implements ChunkView {
 
     private Vector3i offset;
     private Region3i chunkRegion;
@@ -39,56 +39,33 @@ public class WorldView {
     private Vector3i chunkSize;
     private Vector3i chunkFilterSize;
 
-    private Block air;
+    private ThreadLocal<Boolean> locked = new ThreadLocal<Boolean>();
 
-    public static WorldView createLocalView(Vector3i pos, ChunkProvider chunkProvider) {
-        Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
-        return createWorldView(region, Vector3i.one(), chunkProvider);
-    }
-
-    public static WorldView createSubviewAroundBlock(Vector3i pos, int extent, ChunkProvider chunkProvider) {
-        Region3i region = TeraMath.getChunkRegionAroundBlockPos(pos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
-    }
-
-    public static WorldView createSubviewAroundChunk(Vector3i chunkPos, ChunkProvider chunkProvider) {
-        Region3i region = Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1));
-        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
-    }
-
-    public static WorldView createWorldView(Region3i region, Vector3i offset, ChunkProvider chunkProvider) {
-        Chunk[] chunks = new Chunk[region.size().x * region.size().z];
-        for (Vector3i chunkPos : region) {
-            Chunk chunk = chunkProvider.getChunk(chunkPos);
-            if (chunk == null) {
-                return null;
-            }
-            int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
-            chunks[index] = chunk;
-        }
-        return new WorldView(chunks, region, offset);
-    }
-
-    public WorldView(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
+    public RegionalChunkView(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
+        locked.set(false);
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
         this.offset = offset;
         setChunkSize(new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z));
     }
 
+    @Override
     public Region3i getChunkRegion() {
         return chunkRegion;
     }
 
+    @Override
     public Block getBlock(float x, float y, float z) {
         return getBlock(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
 
+    @Override
     public Block getBlock(Vector3i pos) {
         return getBlock(pos.x, pos.y, pos.z);
     }
 
     // TODO: Review
+    @Override
     public Block getBlock(int blockX, int blockY, int blockZ) {
         if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
             return BlockManager.getAir();
@@ -98,22 +75,27 @@ public class WorldView {
         return chunks[chunkIndex].getBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
+    @Override
     public byte getSunlight(float x, float y, float z) {
         return getSunlight(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
 
+    @Override
     public byte getSunlight(Vector3i pos) {
         return getSunlight(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public byte getLight(float x, float y, float z) {
         return getLight(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
 
+    @Override
     public byte getLight(Vector3i pos) {
         return getLight(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public byte getSunlight(int blockX, int blockY, int blockZ) {
         if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
             return 0;
@@ -123,6 +105,7 @@ public class WorldView {
         return chunks[chunkIndex].getSunlight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
+    @Override
     public byte getLight(int blockX, int blockY, int blockZ) {
         if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
             return 0;
@@ -132,23 +115,25 @@ public class WorldView {
         return chunks[chunkIndex].getLight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
-    public boolean setBlock(Vector3i pos, Block type, Block oldType) {
-        return setBlock(pos.x, pos.y, pos.z, type, oldType);
+    @Override
+    public void setBlock(Vector3i pos, Block type) {
+        setBlock(pos.x, pos.y, pos.z, type);
     }
 
-    public boolean setBlock(int blockX, int blockY, int blockZ, Block type, Block oldType) {
-        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
-            return false;
+    @Override
+    public void setBlock(int blockX, int blockY, int blockZ, Block type) {
+        if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            chunks[chunkIndex].setBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
         }
-
-        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].setBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type, oldType);
     }
 
+    @Override
     public LiquidData getLiquid(Vector3i pos) {
         return getLiquid(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public LiquidData getLiquid(int x, int y, int z) {
         if (!blockRegion.encompasses(x, y, z)) {
             return new LiquidData();
@@ -158,46 +143,53 @@ public class WorldView {
         return chunks[chunkIndex].getLiquid(TeraMath.calcBlockPos(x, y, z, chunkFilterSize));
     }
 
-    public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
-        return setLiquid(pos.x, pos.y, pos.z, newState, oldState);
+    @Override
+    public void setLiquid(Vector3i pos, LiquidData newState) {
+        setLiquid(pos.x, pos.y, pos.z, newState);
     }
 
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        if (blockRegion.encompasses(x, y, z)) {
+    @Override
+    public void setLiquid(int x, int y, int z, LiquidData newState) {
+        if (locked.get() && blockRegion.encompasses(x, y, z)) {
             int chunkIndex = relChunkIndex(x, y, z);
-            return chunks[chunkIndex].setLiquid(TeraMath.calcBlockPos(x, y, z, chunkFilterSize), newState, oldState);
+            chunks[chunkIndex].setLiquid(TeraMath.calcBlockPos(x, y, z, chunkFilterSize), newState);
         }
-        return false;
     }
 
+    @Override
     public void setLight(Vector3i pos, byte light) {
         setLight(pos.x, pos.y, pos.z, light);
     }
 
-    public void setSunlight(Vector3i pos, byte light) {
-        setSunlight(pos.x, pos.y, pos.z, light);
-    }
-
-    public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
-        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
-            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setSunlight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
-        }
-    }
-
+    @Override
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
-        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+        if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setLight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
         }
     }
 
+    @Override
+    public void setSunlight(Vector3i pos, byte light) {
+        setSunlight(pos.x, pos.y, pos.z, light);
+    }
+
+    @Override
+    public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
+        if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            chunks[chunkIndex].setSunlight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
+        }
+    }
+
+    @Override
     public void setDirtyAround(Vector3i blockPos) {
         for (Vector3i pos : TeraMath.getChunkRegionAroundBlockPos(blockPos, 1)) {
             chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
     }
 
+    @Override
     public void setDirtyAround(Region3i blockRegion) {
         Vector3i minPos = new Vector3i(blockRegion.min());
         minPos.sub(1, 0, 1);
@@ -212,18 +204,32 @@ public class WorldView {
         }
     }
 
+    @Override
     public void lock() {
-        for (Chunk chunk : chunks) {
-            chunk.lock();
+        if (!locked.get()) {
+            for (Chunk chunk : chunks) {
+                chunk.lock();
+            }
+            locked.set(true);
         }
     }
 
+    @Override
     public void unlock() {
-        for (Chunk chunk : chunks) {
-            chunk.unlock();
+        if (locked.get()) {
+            locked.set(false);
+            for (Chunk chunk : chunks) {
+                chunk.unlock();
+            }
         }
     }
 
+    @Override
+    public boolean isLocked() {
+        return locked.get();
+    }
+
+    @Override
     public boolean isValidView() {
         for (Chunk chunk : chunks) {
             if (chunk.isDisposed()) {
@@ -250,6 +256,7 @@ public class WorldView {
         this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);
     }
 
+    @Override
     public Vector3i toWorldPos(Vector3i localPos) {
         return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * Chunk.SIZE_X, localPos.y, localPos.z + (offset.z + chunkRegion.min().z) * Chunk.SIZE_Z);
     }

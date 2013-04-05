@@ -58,16 +58,17 @@ public interface WorldProviderCore {
     public void unregisterListener(WorldChangeListener listener);
 
     /**
-     * @param chunk
+     *
+     * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
-    public WorldView getLocalView(Vector3i chunk);
+    public ChunkView getLocalView(Vector3i chunkPos);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    public WorldView getWorldViewAround(Vector3i chunk);
+    public ChunkView getWorldViewAround(Vector3i chunk);
 
 
     /**
@@ -78,7 +79,7 @@ public interface WorldProviderCore {
      * @param z
      * @return Whether the given block is active
      */
-    public boolean isBlockActive(int x, int y, int z);
+    public boolean isBlockRelevant(int x, int y, int z);
 
     /**
      * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
@@ -100,13 +101,32 @@ public interface WorldProviderCore {
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
      *
+     * This method takes the expected value of the previous block in this position - this allows it to check the block
+     * hasn't been changed (potentially by another thread). If it has changed then no change occurs. It is recommended
+     * that this is used to ensure that the block being changed is in an acceptable state for the change.
+     *
      * @param x    The X-coordinate
      * @param y    The Y-coordinate
      * @param z    The Z-coordinate
      * @param type The type of the block to set
+     * @param oldType The expected type of the block being replaced.
      * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
      */
     public boolean setBlock(int x, int y, int z, Block type, Block oldType);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * This method forces the change regardless of the previous value. It should generally be avoided except in situations where
+     * the change must absolutely occur regardless of the type of block being changed.
+     *
+     * @param x    The X-coordinate
+     * @param y    The Y-coordinate
+     * @param z    The Z-coordinate
+     * @param type The type of the block to set
+     */
+    public void setBlockForced(int x, int y, int z, Block type);
 
     /**
      * @param x

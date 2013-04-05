@@ -19,6 +19,7 @@ package org.terasology.world.chunks.pipeline;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
  * @author Immortius
@@ -27,7 +28,7 @@ public interface ChunkTask extends Task {
 
     Vector3i getPosition();
 
-    ChunkProvider getProvider();
+    GeneratingChunkProvider getProvider();
 
     ChunkGenerationPipeline getPipeline();
 }

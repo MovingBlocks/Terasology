@@ -23,14 +23,16 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.ChunkView;
+import org.terasology.world.RegionalChunkView;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
@@ -48,7 +50,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class LiquidSimulator implements ComponentSystem {
 
     private static int NUM_THREADS = 2;
@@ -164,7 +166,7 @@ public class LiquidSimulator implements ComponentSystem {
         }
     }
 
-    public void simulate(Vector3i blockPos, WorldView view) {
+    public void simulate(Vector3i blockPos, ChunkView view) {
         Block block = view.getBlock(blockPos);
         LiquidData current = view.getLiquid(blockPos);
         LiquidData newState = calcStateFor(blockPos, view);
@@ -189,19 +191,19 @@ public class LiquidSimulator implements ComponentSystem {
         }
     }
 
-    public static LiquidData calcStateFor(Vector3i pos, WorldView worldView) {
-        Block block = worldView.getBlock(pos);
+    public static LiquidData calcStateFor(Vector3i pos, ChunkView chunkView) {
+        Block block = chunkView.getBlock(pos);
         if (isLiquidBlocking(block)) {
             return new LiquidData();
         }
 
         // Check if full/source location
-        LiquidData currentState = worldView.getLiquid(pos);
+        LiquidData currentState = chunkView.getLiquid(pos);
         if (currentState.getDepth() == MAX_LIQUID_DEPTH) {
             return currentState;
         }
 
-        LiquidData aboveState = worldView.getLiquid(pos.x, pos.y + 1, pos.z);
+        LiquidData aboveState = chunkView.getLiquid(pos.x, pos.y + 1, pos.z);
         if (aboveState.getDepth() > 0) {
             return new LiquidData(aboveState.getType(), MAX_LIQUID_DEPTH - 1);
         }
@@ -211,11 +213,11 @@ public class LiquidSimulator implements ComponentSystem {
         for (Side side : Side.horizontalSides()) {
             Vector3i adjPos = new Vector3i(side.getVector3i());
             adjPos.add(pos);
-            Block supportingBlock = worldView.getBlock(adjPos.x, adjPos.y - 1, adjPos.z);
+            Block supportingBlock = chunkView.getBlock(adjPos.x, adjPos.y - 1, adjPos.z);
 
             // TODO: Improve supporting block calculation (needs to not include grass, but include liquids)
             if (!supportingBlock.isPenetrable()) {
-                LiquidData state = getOutgoingLiquid(adjPos, worldView);
+                LiquidData state = getOutgoingLiquid(adjPos, chunkView);
                 if (state.getType() != currentState.getType() || state.getDepth() >= currentState.getDepth()) {
                     if (state.getDepth() > h1.getDepth()) {
                         h2 = h1;
@@ -257,8 +259,8 @@ public class LiquidSimulator implements ComponentSystem {
             {0, 0, 1, 1, 1, 1, 2, 2}
     };
 
-    private static LiquidData getOutgoingLiquid(Vector3i pos, WorldView worldView) {
-        LiquidData currentState = worldView.getLiquid(pos);
+    private static LiquidData getOutgoingLiquid(Vector3i pos, ChunkView chunkView) {
+        LiquidData currentState = chunkView.getLiquid(pos);
         if (currentState.getDepth() == 0) {
             return new LiquidData();
         }
@@ -267,9 +269,9 @@ public class LiquidSimulator implements ComponentSystem {
         for (Side side : Side.horizontalSides()) {
             Vector3i adjPos = new Vector3i(pos);
             adjPos.add(side.getVector3i());
-            Block block = worldView.getBlock(pos);
+            Block block = chunkView.getBlock(pos);
             if (block.isPenetrable()) {
-                LiquidData adjState = worldView.getLiquid(adjPos);
+                LiquidData adjState = chunkView.getLiquid(adjPos);
                 if (adjState.getDepth() < currentState.getDepth()) {
                     availableSpaces++;
                 }
@@ -303,7 +305,7 @@ public class LiquidSimulator implements ComponentSystem {
             if (world.getTime() < waitForTime) {
                 blockQueue.offer(this);
             } else if (world.isBlockActive(blockPos)) {
-                WorldView view = world.getWorldViewAround(TeraMath.calcChunkPos(blockPos));
+                ChunkView view = world.getWorldViewAround(TeraMath.calcChunkPos(blockPos));
                 if (view != null && view.isValidView()) {
                     simulate(blockPos, view);
                 }
@@ -325,7 +327,7 @@ public class LiquidSimulator implements ComponentSystem {
 
         @Override
         public void run() {
-            WorldView view = world.getLocalView(chunkPos);
+            ChunkView view = world.getLocalView(chunkPos);
             if (view != null) {
                 for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(Chunk.SIZE_X + 2, Chunk.SIZE_Y, Chunk.SIZE_Z + 2))) {
                     LiquidData state = view.getLiquid(pos);

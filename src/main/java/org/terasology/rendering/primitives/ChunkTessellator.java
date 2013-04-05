@@ -22,9 +22,10 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.ChunkView;
 import org.terasology.world.MiniatureChunk;
+import org.terasology.world.RegionalChunkView;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.Chunk;
@@ -47,7 +48,7 @@ public final class ChunkTessellator {
         this.biomeProvider = biomeProvider;
     }
 
-    public ChunkMesh generateMesh(WorldView worldView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
+    public ChunkMesh generateMesh(ChunkView chunkView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
 
@@ -59,17 +60,17 @@ public final class ChunkTessellator {
                 float biomeHumidity = biomeProvider.getHumidityAt(chunkOffset.x + x, chunkOffset.z + z);
 
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
-                    Block block = worldView.getBlock(x, y, z);
+                    Block block = chunkView.getBlock(x, y, z);
 
                     if (block == null || block.isInvisible())
                         continue;
 
-                    generateBlockVertices(worldView, mesh, x, y, z, biomeTemp, biomeHumidity);
+                    generateBlockVertices(chunkView, mesh, x, y, z, biomeTemp, biomeHumidity);
                 }
             }
         }
 
-        generateOptimizedBuffers(worldView, mesh);
+        generateOptimizedBuffers(chunkView, mesh);
         _statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();
@@ -81,8 +82,8 @@ public final class ChunkTessellator {
         ChunkMesh mesh = new ChunkMesh();
 
         MiniatureChunk[] chunks = {miniatureChunk};
-        WorldView localWorldView = new WorldView(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
-        localWorldView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
+        RegionalChunkView localChunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
+        localChunkView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
 
         for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
             for (int z = 0; z < MiniatureChunk.SIZE_Z; z++) {
@@ -92,19 +93,19 @@ public final class ChunkTessellator {
                     if (block == null || block.isInvisible())
                         continue;
 
-                    generateBlockVertices(localWorldView, mesh, x, y, z, 0.0f, 0.0f);
+                    generateBlockVertices(localChunkView, mesh, x, y, z, 0.0f, 0.0f);
                 }
             }
         }
 
-        generateOptimizedBuffers(localWorldView, mesh);
+        generateOptimizedBuffers(localChunkView, mesh);
         _statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();
         return mesh;
     }
 
-    private void generateOptimizedBuffers(WorldView worldView, ChunkMesh mesh) {
+    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
@@ -127,7 +128,7 @@ public final class ChunkTessellator {
 
                 float[] result = new float[3];
                 Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i + 1), mesh._vertexElements[j].normals.get(i + 2));
-                calcLightingValuesForVertexPos(worldView, vertexPos, result, normal);
+                calcLightingValuesForVertexPos(chunkView, vertexPos, result, normal);
 
                 mesh._vertexElements[j].finalVertices.putFloat(result[0]);
                 mesh._vertexElements[j].finalVertices.putFloat(result[1]);
@@ -155,7 +156,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void calcLightingValuesForVertexPos(WorldView worldView, Vector3f vertexPos, float[] output, Vector3f normal) {
+    private void calcLightingValuesForVertexPos(ChunkView chunkView, Vector3f vertexPos, float[] output, Vector3f normal) {
         PerformanceMonitor.startActivity("calcLighting");
         float[] lights = new float[8];
         float[] blockLights = new float[8];
@@ -166,44 +167,44 @@ public final class ChunkTessellator {
         switch (dir) {
             case LEFT:
             case RIGHT:
-                blocks[0] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z + 0.1f));
-                blocks[1] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z - 0.1f));
-                blocks[2] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-                blocks[3] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
+                blocks[0] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z + 0.1f));
+                blocks[1] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z - 0.1f));
+                blocks[2] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
+                blocks[3] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
                 break;
             case FORWARD:
             case BACKWARD:
-                blocks[0] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
-                blocks[1] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
-                blocks[2] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
-                blocks[3] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
+                blocks[0] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
+                blocks[1] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
+                blocks[2] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
+                blocks[3] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
                 break;
             default:
-                blocks[0] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
-                blocks[1] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
-                blocks[2] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
-                blocks[3] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
+                blocks[0] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
+                blocks[1] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
+                blocks[2] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
+                blocks[3] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
         }
 
-        lights[0] = worldView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-        lights[1] = worldView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        lights[2] = worldView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        lights[3] = worldView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
+        lights[0] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
+        lights[1] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
+        lights[2] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
+        lights[3] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
 
-        lights[4] = worldView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-        lights[5] = worldView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        lights[6] = worldView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        lights[7] = worldView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
+        lights[4] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
+        lights[5] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
+        lights[6] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
+        lights[7] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
 
-        blockLights[0] = worldView.getLight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-        blockLights[1] = worldView.getLight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        blockLights[2] = worldView.getLight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        blockLights[3] = worldView.getLight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
+        blockLights[0] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
+        blockLights[1] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
+        blockLights[2] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
+        blockLights[3] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
 
-        blockLights[4] = worldView.getLight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-        blockLights[5] = worldView.getLight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        blockLights[6] = worldView.getLight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        blockLights[7] = worldView.getLight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
+        blockLights[4] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
+        blockLights[5] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
+        blockLights[6] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
+        blockLights[7] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
         PerformanceMonitor.endActivity();
 
         float resultLight = 0;
@@ -250,7 +251,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void generateBlockVertices(WorldView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
+    private void generateBlockVertices(ChunkView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
         Block block = view.getBlock(x, y, z);
 
         /*

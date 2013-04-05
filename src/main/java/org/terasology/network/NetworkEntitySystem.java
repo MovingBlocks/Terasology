@@ -26,6 +26,7 @@ import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.chunks.ChunkConstants;
 
 /**
  * @author Immortius
@@ -76,7 +77,7 @@ public class NetworkEntitySystem implements ComponentSystem {
                 netClient.setViewDistanceMode(request.getNewViewRange());
                 ClientComponent clientComp = netClient.getEntity().getComponent(ClientComponent.class);
                 if (clientComp != null && clientComp.character.exists()) {
-                    worldRenderer.getChunkProvider().updateRelevanceEntity(clientComp.character, netClient.getViewDistance());
+                    worldRenderer.getChunkProvider().updateRelevanceEntity(clientComp.character, netClient.getViewDistance() + ChunkConstants.REMOTE_GENERATION_DISTANCE);
                 }
             }
         }

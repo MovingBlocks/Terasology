@@ -50,6 +50,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.ChunkView;
 import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldInfo;
@@ -57,7 +58,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.WorldTimeEvent;
-import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -224,7 +224,7 @@ public final class WorldRenderer {
                 for (int x = -(viewingDistance / 2); x < viewingDistance / 2; x++) {
                     for (int z = -(viewingDistance / 2); z < viewingDistance / 2; z++) {
                         Chunk c = chunkProvider.getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
-                        if (c != null && c.getChunkState() == Chunk.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                        if (c != null) {
                             chunksInProximity.add(c);
                         } else {
                             pendingChunks = true;
@@ -256,7 +256,7 @@ public final class WorldRenderer {
                     for (int x = r.minX(); x < r.maxX(); ++x) {
                         for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = chunkProvider.getChunk(x, 0, y);
-                            if (c != null && c.getChunkState() == Chunk.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                            if (c != null) {
                                 chunksInProximity.add(c);
                             } else {
                                 pendingChunks = true;
@@ -858,11 +858,11 @@ public final class WorldRenderer {
         chunkProvider.update();
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance / 2, 0, viewingDistance / 2))) {
             Chunk chunk = chunkProvider.getChunk(pos);
-            if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
+            if (chunk == null) {
                 complete = false;
                 continue;
             } else if (chunk.isDirty()) {
-                WorldView view = worldProvider.getLocalView(chunk.getPos());
+                ChunkView view = worldProvider.getLocalView(chunk.getPos());
                 if (view == null) {
                     continue;
                 }

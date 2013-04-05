@@ -19,8 +19,8 @@ package org.terasology.world.generator.core;
 import com.google.common.collect.Lists;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.BaseChunkGenerator;
 import org.terasology.world.generator.ChunkGenerator;
@@ -147,7 +147,7 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
     }
 
     @Override
-    public void secondPassChunk(final Vector3i chunkPos, final WorldView view) {
+    public void secondPassChunk(final Vector3i chunkPos, final ChunkView view) {
         for (final SecondPassChunkGenerator generator : secondPassChunkGenerators) {
             generator.postProcessChunk(chunkPos, view);
         }

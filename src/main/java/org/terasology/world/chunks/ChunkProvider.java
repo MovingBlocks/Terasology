@@ -18,6 +18,7 @@ package org.terasology.world.chunks;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkView;
 
 /**
  * @author Immortius
@@ -25,11 +26,33 @@ import org.terasology.math.Vector3i;
 public interface ChunkProvider {
 
     /**
+     * A local view pvoides a
+     * @param centerChunkPos
+     * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.
+     */
+    ChunkView getLocalView(Vector3i centerChunkPos);
+
+    /**
+     *
+     * @param blockPos
+     * @param extent
+     * @return A chunk view of the chunks around the given blockPos.
+     */
+    ChunkView getSubviewAroundBlock(Vector3i blockPos, int extent);
+
+    /**
+     *
+     * @param chunkPos
+     * @return A chunk view including the chunks around the given chunk
+     */
+    ChunkView getSubviewAroundChunk(Vector3i chunkPos);
+
+    /**
      * Sets the world entity, for the purpose of receiving chunk events.
      *
      * @param entity
      */
-    public void setWorldEntity(EntityRef entity);
+    void setWorldEntity(EntityRef entity);
 
     /**
      * Requests that a region around the given entity be maintained in near cache
@@ -37,7 +60,7 @@ public interface ChunkProvider {
      * @param entity
      * @param distance The region (in chunks) around the entity that should be near cached
      */
-    public void addRelevanceEntity(EntityRef entity, int distance);
+    void addRelevanceEntity(EntityRef entity, int distance);
 
     /**
      * Requests that a region around the given entity be maintained in near cache
@@ -46,7 +69,7 @@ public interface ChunkProvider {
      * @param distance The region (in chunks) around the entity that should be near cached
      * @param listener A listener to chunk region events
      */
-    public void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener listener);
+    void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener listener);
 
     /**
      * Retrieves the ChunkRelevanceRegion object for the given entity
@@ -54,25 +77,25 @@ public interface ChunkProvider {
      * @param entity
      * @return The chunk relevance region, or null
      */
-    public void updateRelevanceEntity(EntityRef entity, int distance);
+    void updateRelevanceEntity(EntityRef entity, int distance);
 
     /**
      * Removes an entity from producing a caching region
      *
      * @param entity
      */
-    public void removeRelevanceEntity(EntityRef entity);
+    void removeRelevanceEntity(EntityRef entity);
 
     /**
      * Updates the near cache based on the movement of the caching entities
      */
-    public void update();
+    void update();
 
     /**
      * @param pos
-     * @return Whether this chunk is readily available - does not need to be built or remotely retrieved
+     * @return Whether this chunk is available and ready for use
      */
-    public boolean isChunkAvailable(Vector3i pos);
+    boolean isChunkReady(Vector3i pos);
 
     /**
      * Returns the chunk at the given position if possible.
@@ -80,23 +103,30 @@ public interface ChunkProvider {
      * @param x The chunk position on the x-axis
      * @param y The chunk position on the y-axis
      * @param z The chunk position on the z-axis
-     * @return The chunk, or null if it cannot be obtained
+     * @return The chunk, or null if the chunk is not ready
      */
-    public Chunk getChunk(int x, int y, int z);
-
-    public Chunk getChunk(Vector3i chunkPos);
+    Chunk getChunk(int x, int y, int z);
 
     /**
-     * Disposes all chunks managed by this chunk provider.
+     * Returns the chunk at the given position if possible.
+     *
+     * @param chunkPos The position of the chunk to obtain
+     * @return The chunk, or null if the chunk is not ready
      */
-    public void dispose();
+    Chunk getChunk(Vector3i chunkPos);
+
+    /**
+     * Disposes the chunk provider, cleaning up all chunks and other assets it is using
+     */
+    void dispose();
 
     /**
      * Returns the amount of chunks managed by this chunk provider.
      *
      * @return The amount of managed chunks
      */
-    public float size();
+    float size();
 
-    boolean isChunkReady(Vector3i pos);
+
+
 }

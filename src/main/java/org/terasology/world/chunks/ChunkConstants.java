@@ -23,6 +23,12 @@ import org.terasology.math.Vector3i;
  */
 public final class ChunkConstants {
     public static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 0, 1);
+    /**
+     * How many chunks around a chunk must be relevant to guarantee it is fully generated.
+     */
+    public static final int FULL_GENERATION_DISTANCE = 4;
+
+    public static final int REMOTE_GENERATION_DISTANCE = 3;
 
     private ChunkConstants() {
     }

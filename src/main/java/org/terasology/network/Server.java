@@ -16,7 +16,9 @@
 
 package org.terasology.network;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -35,12 +37,14 @@ import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.BlockUpdate;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
@@ -49,6 +53,7 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerClient;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.Chunks;
+import org.terasology.world.chunks.remoteChunkProvider.ChunkReadyListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.util.Collections;
@@ -61,7 +66,7 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Immortius
  */
-public class Server {
+public class Server implements ChunkReadyListener {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     private NetworkSystemImpl networkSystem;
@@ -82,6 +87,7 @@ public class Server {
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
+    private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
 
     private EntityRef clientEntity = EntityRef.NULL;
 
@@ -208,6 +214,7 @@ public class Server {
 
     void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
         this.remoteWorldProvider = remoteWorldProvider;
+        remoteWorldProvider.subscribe(this);
     }
 
     private void processMessages() {
@@ -254,17 +261,20 @@ public class Server {
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetworkUtil.convert(blockChange.getPos());
-            Block oldBlock = worldProvider.getBlock(pos);
-            Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
-            if (!worldProvider.setBlock(pos, newBlock, oldBlock)) {
-                logger.error("Failed to enact block update from server - {} to {}", pos, newBlock);
+            if (worldProvider.isBlockActive(pos)) {
+                Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
+                worldProvider.setBlockForced(pos, newBlock);
+            } else {
+                awaitingChunkReadyUpdates.put(TeraMath.calcChunkPos(pos), blockChange);
             }
         }
     }
 
     private void processInvalidatedChunks(NetData.NetMessage message) {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
-            remoteWorldProvider.invalidateChunks(NetworkUtil.convert(chunk.getPos()));
+            Vector3i chunkPos = NetworkUtil.convert(chunk.getPos());
+            remoteWorldProvider.invalidateChunks(chunkPos);
+            awaitingChunkReadyUpdates.removeAll(chunkPos);
         }
     }
 
@@ -346,6 +356,18 @@ public class Server {
 
     public NetMetricSource getMetrics() {
         return metricsSource;
+    }
+
+    @Override
+    public void onChunkReady(Vector3i chunkPos) {
+        List<NetData.BlockChangeMessage> updateMessages = awaitingChunkReadyUpdates.removeAll(chunkPos);
+        for (NetData.BlockChangeMessage message : updateMessages) {
+            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+            Vector3i pos = NetworkUtil.convert(message.getPos());
+            Block newBlock = blockManager.getBlock((byte) message.getNewBlock());
+            worldProvider.setBlockForced(pos, newBlock);
+        }
     }
 }
 

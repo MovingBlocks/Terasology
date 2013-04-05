@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks;
+package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
@@ -23,6 +23,8 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkRegionListener;
 
 import javax.vecmath.Vector3f;
 import java.util.Iterator;

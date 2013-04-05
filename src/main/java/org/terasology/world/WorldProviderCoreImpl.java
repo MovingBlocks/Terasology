@@ -53,7 +53,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private long timeOffset;
 
-    private List<WorldChangeListener> listeners = Lists.newArrayList();
+    private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider, BlockManager blockManager) {
         if (title == null) {
@@ -116,18 +116,18 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public WorldView getLocalView(Vector3i chunk) {
-        return WorldView.createLocalView(chunk, chunkProvider);
+    public ChunkView getLocalView(Vector3i chunkPos) {
+        return chunkProvider.getLocalView(chunkPos);
     }
 
     @Override
-    public WorldView getWorldViewAround(Vector3i chunk) {
-        return WorldView.createSubviewAroundChunk(chunk, chunkProvider);
+    public ChunkView getWorldViewAround(Vector3i chunk) {
+        return chunkProvider.getSubviewAroundChunk(chunk);
     }
 
     @Override
-    public boolean isBlockActive(int x, int y, int z) {
-        return chunkProvider.isChunkAvailable(TeraMath.calcChunkPos(x, y, z));
+    public boolean isBlockRelevant(int x, int y, int z) {
+        return chunkProvider.isChunkReady(TeraMath.calcChunkPos(x, y, z));
     }
 
     @Override
@@ -143,35 +143,65 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
         Vector3i blockPos = new Vector3i(x, y, z);
-        WorldView worldView;
+        ChunkView chunkView;
+
+        if (oldType == type) {
+            return true;
+        }
 
         if (LightingUtil.compareLightingPropagation(type, oldType) != PropagationComparison.IDENTICAL || type.getLuminance() != oldType.getLuminance()) {
-            worldView = WorldView.createSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1, chunkProvider);
+            chunkView = chunkProvider.getSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1);
         } else {
-            worldView = WorldView.createSubviewAroundBlock(blockPos, 1, chunkProvider);
+            chunkView = chunkProvider.getSubviewAroundBlock(blockPos, 1);
         }
-        if (worldView != null) {
-            worldView.lock();
+        if (chunkView != null) {
+            chunkView.lock();
             try {
-                if (!worldView.setBlock(x, y, z, type, oldType)) {
+                Block current = chunkView.getBlock(x, y, z);
+                if (current != oldType) {
                     return false;
                 }
+                chunkView.setBlock(x, y, z, type);
 
-                Region3i affected = new LightPropagator(worldView).update(x, y, z, type, oldType);
+                Region3i affected = new LightPropagator(chunkView).update(x, y, z, type, oldType);
                 if (affected.isEmpty()) {
-                    worldView.setDirtyAround(blockPos);
+                    chunkView.setDirtyAround(blockPos);
                 } else {
-                    worldView.setDirtyAround(affected);
+                    chunkView.setDirtyAround(affected);
                 }
 
                 notifyBlockChanged(x, y, z, type, oldType);
 
                 return true;
             } finally {
-                worldView.unlock();
+                chunkView.unlock();
             }
         }
         return false;
+    }
+
+    @Override
+    public void setBlockForced(int x, int y, int z, Block type) {
+        Vector3i blockPos = new Vector3i(x, y, z);
+        ChunkView chunkView = chunkProvider.getSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1);
+        if (chunkView != null) {
+            chunkView.lock();
+            try {
+                Block current = chunkView.getBlock(x, y, z);
+                chunkView.setBlock(x, y, z, type);
+
+                Region3i affected = new LightPropagator(chunkView).update(x, y, z, type, current);
+                if (affected.isEmpty()) {
+                    chunkView.setDirtyAround(blockPos);
+                } else {
+                    chunkView.setDirtyAround(affected);
+                }
+
+                notifyBlockChanged(x, y, z, type, current);
+            } finally {
+                chunkView.unlock();
+            }
+        }
     }
 
     private void notifyBlockChanged(int x, int y, int z, Block type, Block oldType) {
@@ -186,12 +216,20 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        // TODO: Locking, light changes
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
-            return chunk.setLiquid(blockPos, newState, oldState);
+            chunk.lock();
+            try {
+                Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+                LiquidData liquidState = chunk.getLiquid(blockPos);
+                if (liquidState.equals(oldState)) {
+                    chunk.setLiquid(blockPos, newState);
+                    return true;
+                }
+            } finally {
+                chunk.unlock();
+            }
         }
         return false;
     }

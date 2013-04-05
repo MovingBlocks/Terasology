@@ -23,7 +23,7 @@ import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.world.WorldView;
+import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -37,10 +37,10 @@ import java.util.List;
 public class LightPropagator {
     private static final Logger logger = LoggerFactory.getLogger(LightPropagator.class);
 
-    private WorldView worldView;
+    private ChunkView chunkView;
 
-    public LightPropagator(WorldView worldView) {
-        this.worldView = worldView;
+    public LightPropagator(ChunkView chunkView) {
+        this.chunkView = chunkView;
     }
 
     /**
@@ -99,7 +99,7 @@ public class LightPropagator {
         switch (changeType) {
             case MORE_PERMISSIVE:
                 byte light = pullSunlight(x, y, z, type);
-                worldView.setSunlight(x, y, z, light);
+                chunkView.setSunlight(x, y, z, light);
                 if (light > 1) {
                     return pushSunlight(x, y, z, light);
                 }
@@ -113,7 +113,7 @@ public class LightPropagator {
     }
 
     private Region3i updateLight(int x, int y, int z, Block type, Block oldType) {
-        byte currentLight = worldView.getLight(x, y, z);
+        byte currentLight = chunkView.getLight(x, y, z);
         byte lum = type.getLuminance();
 
         PropagationComparison changeType = LightingUtil.compareLightingPropagation(type, oldType);
@@ -124,11 +124,11 @@ public class LightPropagator {
         } else if (changeType == PropagationComparison.MORE_PERMISSIVE) {
             // Light level can only increase, pull in light and push it out
             byte newLight = pullLight(x, y, z, lum, type);
-            worldView.setLight(x, y, z, newLight);
+            chunkView.setLight(x, y, z, newLight);
             return pushLight(x, y, z, newLight);
         } else if (lum > currentLight) {
             // Light level has increased, push out
-            worldView.setLight(x, y, z, lum);
+            chunkView.setLight(x, y, z, lum);
             return pushLight(x, y, z, lum);
         }
 
@@ -144,11 +144,11 @@ public class LightPropagator {
         } else {
             for (Side side : Side.values()) {
                 if (LightingUtil.canSpreadLightInto(type, side)) {
-                    byte adjLight = worldView.getSunlight(x + side.getVector3i().x, y + side.getVector3i().y, z + side.getVector3i().z);
+                    byte adjLight = chunkView.getSunlight(x + side.getVector3i().x, y + side.getVector3i().y, z + side.getVector3i().z);
                     if (side != Side.TOP) {
                         adjLight -= 1;
                     }
-                    Block otherType = worldView.getBlock(x + side.getVector3i().x, y + side.getVector3i().y, z + side.getVector3i().z);
+                    Block otherType = chunkView.getBlock(x + side.getVector3i().x, y + side.getVector3i().y, z + side.getVector3i().z);
                     if (adjLight > light && LightingUtil.canSpreadLightOutOf(otherType, side.reverse())) {
                         light = adjLight;
                     }
@@ -162,8 +162,8 @@ public class LightPropagator {
         for (Side side : Side.values()) {
             if (LightingUtil.canSpreadLightInto(type, side)) {
                 Vector3i adjDir = side.getVector3i();
-                Block otherType = worldView.getBlock(x + adjDir.x, y + adjDir.y, z + adjDir.z);
-                byte adjLight = (byte) (worldView.getLight(x + adjDir.x, y + adjDir.y, z + adjDir.z) - 1);
+                Block otherType = chunkView.getBlock(x + adjDir.x, y + adjDir.y, z + adjDir.z);
+                byte adjLight = (byte) (chunkView.getLight(x + adjDir.x, y + adjDir.y, z + adjDir.z) - 1);
                 if (adjLight > newLight && LightingUtil.canSpreadLightOutOf(otherType, side.reverse())) {
                     newLight = adjLight;
                 }
@@ -177,12 +177,12 @@ public class LightPropagator {
         Collection<Vector3i> nextWave = Lists.newArrayList();
         nextWave.add(new Vector3i(x, y, z));
         // First drop MAX_LIGHT until it is blocked
-        if (lightLevel == Chunk.MAX_LIGHT && worldView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
+        if (lightLevel == Chunk.MAX_LIGHT && chunkView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
             Block lastBlock = BlockManager.getAir();
             for (int columnY = y - 1; columnY >= 0; columnY--) {
-                Block block = worldView.getBlock(x, columnY, z);
+                Block block = chunkView.getBlock(x, columnY, z);
                 if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP) && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
-                    worldView.setSunlight(x, columnY, z, lightLevel);
+                    chunkView.setSunlight(x, columnY, z, lightLevel);
                     lastBlock = block;
                     nextWave.add(new Vector3i(x, columnY, z));
                 } else {
@@ -205,12 +205,12 @@ public class LightPropagator {
                     // Move sunlight up
                     if (pos.y < Chunk.SIZE_Y - 2) {
                         Vector3i adjPos = new Vector3i(pos.x, pos.y + 1, pos.z);
-                        Block block = worldView.getBlock(pos);
-                        Block adjBlock = worldView.getBlock(adjPos);
+                        Block block = chunkView.getBlock(pos);
+                        Block adjBlock = chunkView.getBlock(adjPos);
                         if (LightingUtil.canSpreadLightOutOf(block, Side.TOP) && LightingUtil.canSpreadLightInto(adjBlock, Side.BOTTOM)) {
-                            byte adjLight = worldView.getSunlight(adjPos);
+                            byte adjLight = chunkView.getSunlight(adjPos);
                             if (adjLight < lightLevel - 1) {
-                                worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
+                                chunkView.setSunlight(adjPos, (byte) (lightLevel - 1));
                                 nextWave.add(adjPos);
                                 affectedRegion = affectedRegion.expandToContain(adjPos);
                             }
@@ -222,12 +222,12 @@ public class LightPropagator {
                 // Move sunlight down
                 if (pos.y > 0) {
                     Vector3i adjPos = new Vector3i(pos.x, pos.y - 1, pos.z);
-                    Block block = worldView.getBlock(pos);
-                    Block adjBlock = worldView.getBlock(adjPos);
+                    Block block = chunkView.getBlock(pos);
+                    Block adjBlock = chunkView.getBlock(adjPos);
                     if (LightingUtil.canSpreadLightOutOf(block, Side.BOTTOM) && LightingUtil.canSpreadLightInto(adjBlock, Side.TOP)) {
-                        byte adjLight = worldView.getSunlight(adjPos);
+                        byte adjLight = chunkView.getSunlight(adjPos);
                         if (adjLight < lightLevel - 1) {
-                            worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
+                            chunkView.setSunlight(adjPos, (byte) (lightLevel - 1));
                             nextWave.add(adjPos);
                             affectedRegion = affectedRegion.expandToContain(adjPos);
                         }
@@ -241,19 +241,19 @@ public class LightPropagator {
                     adjPos.add(side.getVector3i());
 
                     try {
-                        Block block = worldView.getBlock(pos);
-                        Block adjBlock = worldView.getBlock(adjPos);
+                        Block block = chunkView.getBlock(pos);
+                        Block adjBlock = chunkView.getBlock(adjPos);
 
                         if (LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
-                            byte adjLight = worldView.getSunlight(adjPos);
+                            byte adjLight = chunkView.getSunlight(adjPos);
                             if (adjLight < lightLevel - 1) {
-                                worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
+                                chunkView.setSunlight(adjPos, (byte) (lightLevel - 1));
                                 nextWave.add(adjPos);
                                 affectedRegion = affectedRegion.expandToContain(adjPos);
                             }
                         }
                     } catch (ArrayIndexOutOfBoundsException e) {
-                        logger.error("Pushing Light {} {} {} failed", new Vector3i(x, y, z), lightLevel, worldView.getChunkRegion(), e);
+                        logger.error("Pushing Light {} {} {} failed", new Vector3i(x, y, z), lightLevel, chunkView.getChunkRegion(), e);
                     }
                 }
             }
@@ -283,12 +283,12 @@ public class LightPropagator {
                         continue;
                     }
 
-                    Block block = worldView.getBlock(pos);
-                    Block adjBlock = worldView.getBlock(adjPos);
+                    Block block = chunkView.getBlock(pos);
+                    Block adjBlock = chunkView.getBlock(adjPos);
                     if (LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
-                        byte adjLight = worldView.getLight(adjPos);
+                        byte adjLight = chunkView.getLight(adjPos);
                         if (adjLight < lightLevel - 1) {
-                            worldView.setLight(adjPos, (byte) (lightLevel - 1));
+                            chunkView.setLight(adjPos, (byte) (lightLevel - 1));
                             nextWave.add(adjPos);
                             affectedRegion = affectedRegion.expandToContain(adjPos);
                         }
@@ -301,16 +301,16 @@ public class LightPropagator {
     }
 
     private Region3i clearSunlight(int x, int y, int z) {
-        byte oldSunlight = worldView.getSunlight(x, y, z);
+        byte oldSunlight = chunkView.getSunlight(x, y, z);
         if (oldSunlight == Chunk.MAX_LIGHT) {
-            worldView.setSunlight(x, y, z, (byte) 0);
+            chunkView.setSunlight(x, y, z, (byte) 0);
             fullRecalculateSunlightAround(x, y, z);
             return Region3i.createFromMinAndSize(new Vector3i(x - Chunk.MAX_LIGHT + 1, 0, z - Chunk.MAX_LIGHT + 1), new Vector3i(2 * Chunk.MAX_LIGHT - 1, Chunk.SIZE_Y, 2 * Chunk.MAX_LIGHT - 1));
         } else if (oldSunlight > 1) {
             localRecalculateSunlightAround(x, y, z, oldSunlight);
             return Region3i.createFromCenterExtents(new Vector3i(x, y, z), oldSunlight - 1);
         } else if (oldSunlight > 0) {
-            worldView.setSunlight(x, y, z, (byte) 0);
+            chunkView.setSunlight(x, y, z, (byte) 0);
             return Region3i.createFromCenterExtents(new Vector3i(x, y, z), 0);
         }
         return Region3i.EMPTY;
@@ -323,22 +323,22 @@ public class LightPropagator {
 
         // Clear old light, recording light sources
         for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(x, y, z), checkExtent + 1)) {
-            byte lum = worldView.getBlock(pos).getLuminance();
-            worldView.setLight(pos, lum);
+            byte lum = chunkView.getBlock(pos).getLuminance();
+            chunkView.setLight(pos, lum);
             if (lum > 1) {
                 lightSources.add(pos);
             }
         }
         // Apply light sources
         for (Vector3i pos : lightSources) {
-            byte lightLevel = worldView.getLight(pos);
+            byte lightLevel = chunkView.getLight(pos);
             if (lightLevel > 1) {
                 region = Region3i.createEncompassing(region, pushLight(pos.x, pos.y, pos.z, lightLevel));
             }
         }
         // Draw in light from surrounding area
         for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(x, y, z), checkExtent + 1)) {
-            byte lightLevel = worldView.getLight(pos);
+            byte lightLevel = chunkView.getLight(pos);
             lightLevel = pullLight(pos.x, pos.y, pos.z, lightLevel, type);
             if (lightLevel > 1) {
                 pushLight(pos.x, pos.y, pos.z, lightLevel);
@@ -350,12 +350,12 @@ public class LightPropagator {
     private void localRecalculateSunlightAround(int x, int y, int z, int oldLightLevel) {
         // Clear old light, recording light sources
         for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(x, y, z), oldLightLevel)) {
-            worldView.setSunlight(pos, (byte) 0);
+            chunkView.setSunlight(pos, (byte) 0);
 
         }
         // Draw in light from surrounding area
         for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(x, y, z), oldLightLevel + 1)) {
-            byte lightLevel = worldView.getSunlight(pos);
+            byte lightLevel = chunkView.getSunlight(pos);
             if (lightLevel > 1) {
                 pushSunlight(pos.x, pos.y, pos.z, lightLevel);
             }
@@ -371,13 +371,13 @@ public class LightPropagator {
         for (int x = 0; x < region.size().x; x++) {
             for (int z = 0; z < region.size().z; z++) {
                 int y = top;
-                byte aboveLight = worldView.getSunlight(x + region.min().x, y + 1, z + region.min().z);
+                byte aboveLight = chunkView.getSunlight(x + region.min().x, y + 1, z + region.min().z);
                 Block lastBlock = BlockManager.getAir();
                 if (aboveLight == Chunk.MAX_LIGHT) {
                     for (; y >= 0; y--) {
-                        Block block = worldView.getBlock(x + region.min().x, y, z + region.min().z);
+                        Block block = chunkView.getBlock(x + region.min().x, y, z + region.min().z);
                         if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP) && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
-                            worldView.setSunlight(x + region.min().x, y, z + region.min().z, Chunk.MAX_LIGHT);
+                            chunkView.setSunlight(x + region.min().x, y, z + region.min().z, Chunk.MAX_LIGHT);
                             lastBlock = block;
                         } else {
                             break;
@@ -387,7 +387,7 @@ public class LightPropagator {
 
                 tops[x + region.size().x * z] = (short) y;
                 for (; y >= 0; y--) {
-                    worldView.setSunlight(x + region.min().x, y, z + region.min().z, (byte) 0);
+                    chunkView.setSunlight(x + region.min().x, y, z + region.min().z, (byte) 0);
                 }
 
             }
@@ -419,25 +419,25 @@ public class LightPropagator {
     }
 
     private void propagateSunlightFrom(int blockX, int blockY, int blockZ, Side side) {
-        byte lightLevel = worldView.getSunlight(blockX, blockY, blockZ);
+        byte lightLevel = chunkView.getSunlight(blockX, blockY, blockZ);
         Vector3i adjSide = new Vector3i(blockX, blockY, blockZ);
         adjSide.add(side.getVector3i());
-        Block block = worldView.getBlock(blockX, blockY, blockZ);
-        Block adjBlock = worldView.getBlock(adjSide);
-        if (lightLevel > 1 && worldView.getSunlight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
-            worldView.setSunlight(adjSide, (byte) (lightLevel - 1));
+        Block block = chunkView.getBlock(blockX, blockY, blockZ);
+        Block adjBlock = chunkView.getBlock(adjSide);
+        if (lightLevel > 1 && chunkView.getSunlight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
+            chunkView.setSunlight(adjSide, (byte) (lightLevel - 1));
             pushSunlight(adjSide.x, adjSide.y, adjSide.z, (byte) (lightLevel - 1));
         }
     }
 
     private void propagateLightFrom(int blockX, int blockY, int blockZ, Side side) {
-        byte lightLevel = worldView.getLight(blockX, blockY, blockZ);
+        byte lightLevel = chunkView.getLight(blockX, blockY, blockZ);
         Vector3i adjSide = new Vector3i(blockX, blockY, blockZ);
         adjSide.add(side.getVector3i());
-        Block block = worldView.getBlock(blockX, blockY, blockZ);
-        Block adjBlock = worldView.getBlock(adjSide);
-        if (lightLevel > 1 && worldView.getLight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
-            worldView.setLight(adjSide, (byte) (lightLevel - 1));
+        Block block = chunkView.getBlock(blockX, blockY, blockZ);
+        Block adjBlock = chunkView.getBlock(adjSide);
+        if (lightLevel > 1 && chunkView.getLight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
+            chunkView.setLight(adjSide, (byte) (lightLevel - 1));
             pushLight(adjSide.x, adjSide.y, adjSide.z, (byte) (lightLevel - 1));
         }
     }

@@ -38,4 +38,6 @@ public interface Client extends ChunkRegionListener {
 
     int getViewDistance();
 
+    boolean isLocal();
+
 }

@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks;
+package org.terasology.world.chunks.remoteChunkProvider;
 
 import org.terasology.math.Vector3i;
 
 /**
- * Internal interface used within the chunk generation system, allows a chunk provider to manage "generation" (including
- * reloading) of a chunk.
- *
  * @author Immortius
  */
-public interface GeneratingChunkProvider extends ChunkProvider {
-
-    void createOrLoadChunk(Vector3i position);
-
-    void chunkIsReady(Vector3i position);
+public interface ChunkReadyListener {
+    void onChunkReady(Vector3i pos);
 }

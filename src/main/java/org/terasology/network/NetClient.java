@@ -211,7 +211,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 }
                 Chunk chunk = readyChunks.remove(pos);
                 relevantChunks.add(pos);
-                logger.debug("Sending chunk: {}", pos);
                 message.addChunkInfo(Chunks.getInstance().encode(chunk, true)).build();
             }
         } else {
@@ -319,6 +318,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             default:
                 return config.getRendering().getViewDistanceNear();
         }
+    }
+
+    @Override
+    public boolean isLocal() {
+        return false;
     }
 
     void send(NetData.NetMessage data) {

@@ -42,7 +42,7 @@ public class LightPropagationTest {
     private static final Vector3i WORLD_MIN = new Vector3i(-Chunk.SIZE_X, 0, -Chunk.SIZE_Z);
     private static final Vector3i WORLD_MAX = new Vector3i(2 * Chunk.SIZE_X - 1, Chunk.SIZE_Y - 1, 2 * Chunk.SIZE_Z - 1);
 
-    WorldView view;
+    ChunkView view;
     LightPropagator propagator;
     Block air;
     Block dirt;
@@ -54,7 +54,7 @@ public class LightPropagationTest {
                 new Chunk(new Vector3i(-1, 0, 0)), new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)),
                 new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), new Chunk(new Vector3i(1, 0, 1))};
 
-        view = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         propagator = new LightPropagator(view);
         BlockManagerAuthority blockManager = new BlockManagerAuthority(Maps.<String, Byte>newHashMap());
         CoreRegistry.put(BlockManager.class, blockManager);
@@ -91,7 +91,7 @@ public class LightPropagationTest {
 
     @Test
     public void newUnblockedLightPropagation() {
-        view.setBlock(5, 32, 5, torch, air);
+        view.setBlock(5, 32, 5, torch);
         propagator.update(5, 32, 5, torch, air);
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, WORLD_MAX)) {
             byte expected = (byte) Math.max(0, Chunk.MAX_LIGHT - TeraMath.fastAbs(5 - pos.x) - TeraMath.fastAbs(32 - pos.y) - TeraMath.fastAbs(5 - pos.z));
@@ -102,10 +102,10 @@ public class LightPropagationTest {
     @Test
     public void newBlockedLightPropagation() {
         for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(5, WORLD_MIN.y, WORLD_MIN.z), new Vector3i(5, WORLD_MAX.y, WORLD_MAX.z))) {
-            view.setBlock(pos, dirt, air);
+            view.setBlock(pos, dirt);
         }
         Vector3i lightPos = new Vector3i(4, 32, 5);
-        view.setBlock(lightPos, torch, air);
+        view.setBlock(lightPos, torch);
         propagator.update(lightPos, torch, air);
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(4, WORLD_MAX.y, WORLD_MAX.z))) {
             byte expected = (byte) Math.max(0, Chunk.MAX_LIGHT - lightPos.gridDistance(pos));
@@ -119,13 +119,13 @@ public class LightPropagationTest {
     @Test
     public void pullLightThroughHolePropagation() {
         for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(5, WORLD_MIN.y, WORLD_MIN.z), new Vector3i(5, WORLD_MAX.y, WORLD_MAX.z))) {
-            view.setBlock(pos, dirt, air);
+            view.setBlock(pos, dirt);
         }
         Vector3i lightPos = new Vector3i(4, 32, 5);
-        view.setBlock(lightPos, torch, air);
+        view.setBlock(lightPos, torch);
         propagator.update(lightPos, torch, air);
         Vector3i holePos = new Vector3i(5, 32, 5);
-        view.setBlock(holePos, air, dirt);
+        view.setBlock(holePos, air);
         propagator.update(holePos, air, dirt);
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(4, WORLD_MAX.y, WORLD_MAX.z))) {
             byte expected = (byte) Math.max(0, Chunk.MAX_LIGHT - lightPos.gridDistance(pos));
@@ -145,9 +145,9 @@ public class LightPropagationTest {
 
     @Test
     public void simpleClearLightPropagation() {
-        view.setBlock(5, 32, 5, torch, air);
+        view.setBlock(5, 32, 5, torch);
         propagator.update(5, 32, 5, torch, air);
-        view.setBlock(5, 32, 5, air, torch);
+        view.setBlock(5, 32, 5, air);
         propagator.update(5, 32, 5, air, torch);
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, WORLD_MAX)) {
             assertEquals(pos.toString(), 0, view.getLight(pos));
@@ -157,9 +157,9 @@ public class LightPropagationTest {
     @Test
     public void pushSunlight() {
         for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(WORLD_MIN.x, Chunk.SIZE_Y - 1, WORLD_MIN.z), new Vector3i(WORLD_MAX.x, Chunk.SIZE_Y - 1, WORLD_MAX.z))) {
-            view.setBlock(pos, dirt, air);
+            view.setBlock(pos, dirt);
         }
-        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air, dirt);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air);
         assertEquals(Region3i.createFromMinAndSize(new Vector3i(8 - 14, 0, 8 - 14), new Vector3i(29, Chunk.SIZE_Y, 29)), propagator.update(8, Chunk.SIZE_Y - 1, 8, air, dirt));
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(WORLD_MAX.x, WORLD_MAX.y - 1, WORLD_MAX.z))) {
             int expected = Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 8) - TeraMath.fastAbs(pos.z - 8), 0);
@@ -170,11 +170,11 @@ public class LightPropagationTest {
     @Test
     public void pushSunlightOverlapping() {
         for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(WORLD_MIN.x, Chunk.SIZE_Y - 1, WORLD_MIN.z), new Vector3i(WORLD_MAX.x, Chunk.SIZE_Y - 1, WORLD_MAX.z))) {
-            view.setBlock(pos, dirt, air);
+            view.setBlock(pos, dirt);
         }
-        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air, dirt);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air);
         assertEquals(Region3i.createFromMinAndSize(new Vector3i(8 - 14, 0, 8 - 14), new Vector3i(29, Chunk.SIZE_Y, 29)), propagator.update(8, Chunk.SIZE_Y - 1, 8, air, dirt));
-        view.setBlock(new Vector3i(14, Chunk.SIZE_Y - 1, 8), air, dirt);
+        view.setBlock(new Vector3i(14, Chunk.SIZE_Y - 1, 8), air);
         assertEquals(Region3i.createFromMinAndSize(new Vector3i(12, 0, -6), new Vector3i(17, Chunk.SIZE_Y, 29)), propagator.update(14, Chunk.SIZE_Y - 1, 8, air, dirt));
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(WORLD_MAX.x, WORLD_MAX.y - 1, WORLD_MAX.z))) {
             int expected = Math.max(Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 8) - TeraMath.fastAbs(pos.z - 8), 0), Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 14) - TeraMath.fastAbs(pos.z - 8), 0));
@@ -185,11 +185,11 @@ public class LightPropagationTest {
     @Test
     public void simpleBlockSunlight() {
         for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(WORLD_MIN.x, Chunk.SIZE_Y - 1, WORLD_MIN.z), new Vector3i(WORLD_MAX.x, Chunk.SIZE_Y - 1, WORLD_MAX.z))) {
-            view.setBlock(pos, dirt, air);
+            view.setBlock(pos, dirt);
         }
-        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air, dirt);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air);
         propagator.update(8, Chunk.SIZE_Y - 1, 8, air, dirt);
-        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), dirt, air);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), dirt);
         propagator.update(8, Chunk.SIZE_Y - 1, 8, dirt, air);
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, WORLD_MAX)) {
             assertEquals(pos.toString(), 0, view.getSunlight(pos));
@@ -199,13 +199,13 @@ public class LightPropagationTest {
     @Test
     public void blockSomeSunlight() {
         for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(WORLD_MIN.x, Chunk.SIZE_Y - 1, WORLD_MIN.z), new Vector3i(WORLD_MAX.x, Chunk.SIZE_Y - 1, WORLD_MAX.z))) {
-            view.setBlock(pos, dirt, air);
+            view.setBlock(pos, dirt);
         }
-        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air, dirt);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air);
         propagator.update(8, Chunk.SIZE_Y - 1, 8, air, dirt);
-        view.setBlock(new Vector3i(14, Chunk.SIZE_Y - 1, 8), air, dirt);
+        view.setBlock(new Vector3i(14, Chunk.SIZE_Y - 1, 8), air);
         propagator.update(14, Chunk.SIZE_Y - 1, 8, air, dirt);
-        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), dirt, air);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), dirt);
         propagator.update(8, Chunk.SIZE_Y - 1, 8, dirt, air);
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(WORLD_MAX.x, WORLD_MAX.y - 1, WORLD_MAX.z))) {
             int expected = Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 14) - TeraMath.fastAbs(pos.z - 8), 0);

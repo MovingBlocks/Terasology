@@ -62,18 +62,18 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public WorldView getLocalView(Vector3i chunk) {
-        return base.getLocalView(chunk);
+    public ChunkView getLocalView(Vector3i chunkPos) {
+        return base.getLocalView(chunkPos);
     }
 
     @Override
-    public WorldView getWorldViewAround(Vector3i chunk) {
+    public ChunkView getWorldViewAround(Vector3i chunk) {
         return base.getWorldViewAround(chunk);
     }
 
     @Override
-    public boolean isBlockActive(int x, int y, int z) {
-        return base.isBlockActive(x, y, z);
+    public boolean isBlockRelevant(int x, int y, int z) {
+        return base.isBlockRelevant(x, y, z);
     }
 
     @Override
@@ -89,6 +89,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
         return base.setBlock(x, y, z, type, oldType);
+    }
+
+    @Override
+    public void setBlockForced(int x, int y, int z, Block type) {
+        base.setBlockForced(x, y, z, type);
     }
 
     @Override

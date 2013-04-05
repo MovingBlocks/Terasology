@@ -35,7 +35,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public boolean isBlockActive(Vector3i pos) {
-        return core.isBlockActive(pos.x, pos.y, pos.z);
+        return core.isBlockRelevant(pos.x, pos.y, pos.z);
     }
 
     @Override
@@ -46,6 +46,11 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     @Override
     public boolean setBlock(Vector3i pos, Block type, Block oldType) {
         return core.setBlock(pos.x, pos.y, pos.z, type, oldType);
+    }
+
+    @Override
+    public void setBlockForced(Vector3i pos, Block type) {
+        core.setBlockForced(pos.x, pos.y, pos.z, type);
     }
 
     @Override
@@ -108,4 +113,5 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     public void unregisterListener(WorldChangeListener listener) {
         core.unregisterListener(listener);
     }
+
 }

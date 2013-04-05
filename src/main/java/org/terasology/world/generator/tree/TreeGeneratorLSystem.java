@@ -17,7 +17,7 @@ package org.terasology.world.generator.tree;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.utilities.FastRandom;
-import org.terasology.world.WorldView;
+import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 
@@ -71,7 +71,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     }
 
     @Override
-    public void generate(WorldView view, FastRandom rand, int posX, int posY, int posZ) {
+    public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
 
         String axiom = initialAxiom;
 
@@ -114,10 +114,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    view.setBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType, view.getBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z));
-                    view.setBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType, view.getBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z));
-                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType, view.getBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1));
-                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType, view.getBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1));
+                    view.setBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType);
+                    view.setBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType);
+                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType);
+                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
                     if (_stackOrientation.size() > 1) {
@@ -129,10 +129,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                     if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
                                         continue;
 
-                                    view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType, air);
-                                    view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType, air);
-                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType, air);
-                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType, air);
+                                    view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
+                                    view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
+                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType);
+                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType);
                                 }
                             }
                         }
