@@ -25,8 +25,8 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.terasology.network.MetricRecordingHandler;
-import org.terasology.network.NetworkSystemImpl;
-import org.terasology.network.TerasologyServerHandler;
+import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.network.internal.TerasologyServerHandler;
 import org.terasology.protobuf.NetData;
 
 import static org.jboss.netty.channel.Channels.pipeline;

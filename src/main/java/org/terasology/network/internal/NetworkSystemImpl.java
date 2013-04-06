@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
@@ -37,6 +37,8 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.config.NetworkConfig;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityRef;
@@ -61,6 +63,10 @@ import org.terasology.game.Timer;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.Client;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
@@ -93,6 +99,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private static final int NULL_NET_ID = 0;
 
     // Shared
+    private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private PersistableEntityManager entityManager;
     private EntitySystemLibrary entitySystemLibrary;
@@ -122,6 +129,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     public NetworkSystemImpl(Timer timer) {
         this.timer = timer;
+        this.config = CoreRegistry.get(Config.class).getNetwork();
     }
 
     @Override
@@ -278,6 +286,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             return (NetClient) owner;
         }
         return null;
+    }
+
+    public int getBandwidthPerClient() {
+        if (netClientList.size() > 0) {
+            return config.getUpstreamBandwidth() / netClientList.size();
+        }
+        return config.getUpstreamBandwidth();
     }
 
     @Override

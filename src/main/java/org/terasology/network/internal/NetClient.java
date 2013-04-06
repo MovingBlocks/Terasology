@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -45,6 +45,12 @@ import org.terasology.game.Timer;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.MetricRecordingHandler;
+import org.terasology.network.NetMetricSource;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkUtil;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
@@ -98,7 +104,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private int viewDistance = 0;
     private float chunkSendCounter = 1.0f;
 
-    private float chunkSendRate = 7f;
+    private float chunkSendRate = 0.05469f;
 
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
@@ -192,7 +198,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void sendNewChunks(NetData.NetMessage.Builder message) {
         if (!readyChunks.isEmpty()) {
-            chunkSendCounter += chunkSendRate * NET_TICK_RATE;
+            chunkSendCounter += chunkSendRate * NET_TICK_RATE * networkSystem.getBandwidthPerClient();
             if (chunkSendCounter > 1.0f) {
                 chunkSendCounter -= 1.0f;
                 Vector3i center = new Vector3i();

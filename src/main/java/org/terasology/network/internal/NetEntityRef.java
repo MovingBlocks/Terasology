@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;

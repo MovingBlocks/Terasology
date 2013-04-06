@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -39,12 +39,15 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.network.MetricRecordingHandler;
+import org.terasology.network.NetMetricSource;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkUtil;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.BlockUpdate;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;

@@ -19,7 +19,6 @@ package org.terasology.world;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.world.liquid.LiquidData;
 
 /**
@@ -223,12 +222,13 @@ public interface ChunkView {
 
     /**
      * @return Whether the chunk view is still valid - will be false if a chunk has been unloaded since the chunk
-     * view was created. Should be checked within a lock.
+     *         view was created. Should be checked within a lock.
      */
     boolean isValidView();
 
     /**
      * Converts a coordinate from view-space to world space.
+     *
      * @param localPos
      * @return The equivalent world-space coordinate for the given view coord.
      */

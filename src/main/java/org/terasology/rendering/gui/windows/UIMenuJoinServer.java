@@ -96,7 +96,7 @@ public class UIMenuJoinServer extends UIWindow {
                     public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue) {
                         if (returnCode == EReturnCode.OK && returnValue != null) {
                             add((ServerInfo) returnValue);
-                            CoreRegistry.get(Config.class).getServer().add((ServerInfo) returnValue);
+                            CoreRegistry.get(Config.class).getNetwork().add((ServerInfo) returnValue);
                         }
                     }
                 });
@@ -139,7 +139,7 @@ public class UIMenuJoinServer extends UIWindow {
             public void click(UIDisplayElement element, int button) {
                 if (list.getSelection() != null) {
                     ServerInfo info = (ServerInfo) list.getSelection().getValue();
-                    CoreRegistry.get(Config.class).getServer().remove(info);
+                    CoreRegistry.get(Config.class).getNetwork().remove(info);
                     list.removeItem(list.getSelectionIndex());
                 }
             }
@@ -218,7 +218,7 @@ public class UIMenuJoinServer extends UIWindow {
     private void loadServerList() {
         list.removeAll();
         Config config = CoreRegistry.get(Config.class);
-        for (ServerInfo serverInfo : config.getServer()) {
+        for (ServerInfo serverInfo : config.getNetwork()) {
             add(serverInfo);
         }
     }

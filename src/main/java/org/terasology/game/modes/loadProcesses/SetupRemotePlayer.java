@@ -20,9 +20,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetEntityRef;
+import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.NetworkSystemImpl;
+import org.terasology.network.internal.NetworkSystemImpl;
 
 /**
  * @author Immortius

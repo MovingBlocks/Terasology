@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -27,6 +27,9 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.internal.NetClient;
+import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerAuthority;

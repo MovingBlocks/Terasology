@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import org.terasology.components.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
 
 /**
  * @author Immortius

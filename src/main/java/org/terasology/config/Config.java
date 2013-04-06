@@ -59,7 +59,7 @@ public final class Config {
     private RenderingConfig rendering = new RenderingConfig();
     private ModConfig defaultModSelection = new ModConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
-    private ServerConfig server = new ServerConfig();
+    private NetworkConfig network = new NetworkConfig();
     private AdvancedConfig advanced = AdvancedConfig.createDefault();
 
     /**
@@ -79,8 +79,8 @@ public final class Config {
         return defaultModSelection;
     }
 
-    public ServerConfig getServer() {
-        return server;
+    public NetworkConfig getNetwork() {
+        return network;
     }
 
     public PlayerConfig getPlayer() {

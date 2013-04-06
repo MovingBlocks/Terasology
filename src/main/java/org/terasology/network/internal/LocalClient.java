@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
 
 import org.terasology.components.DisplayInformationComponent;
 import org.terasology.config.Config;
@@ -23,6 +23,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
+import org.terasology.network.ClientComponent;
 import org.terasology.world.chunks.Chunk;
 
 /**

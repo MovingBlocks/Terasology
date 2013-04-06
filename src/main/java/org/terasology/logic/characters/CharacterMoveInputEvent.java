@@ -35,6 +35,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     private boolean jumpRequested;
     private Vector3f movementDirection = new Vector3f();
     private int sequenceNumber = 0;
+    private boolean firstRun = true;
 
     protected CharacterMoveInputEvent() {
     }
@@ -90,5 +91,13 @@ public class CharacterMoveInputEvent extends NetworkEvent {
 
     public int getSequenceNumber() {
         return sequenceNumber;
+    }
+
+    public boolean isFirstRun() {
+        return firstRun;
+    }
+
+    public void runComplete() {
+        firstRun = false;
     }
 }

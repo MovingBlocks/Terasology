@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.internal;
+
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -23,58 +24,68 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.Timer;
+import org.terasology.game.modes.StateMainMenu;
 
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.NetMessage;
+import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
 /**
  * @author Immortius
  */
-public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyServerHandler.class);
+public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyClientHandler.class);
 
     private NetworkSystemImpl networkSystem;
-    private NetClient client;
+    private Server server;
+    private boolean awaitingServerInfo = true;
 
-    public TerasologyServerHandler(NetworkSystemImpl networkSystem) {
+    public TerasologyClientHandler(NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) {
-        networkSystem.registerChannel(e.getChannel());
-    }
-
-    @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        client = new NetClient(e.getChannel(), networkSystem);
+        this.server = new Server(networkSystem, e.getChannel());
+        networkSystem.setServer(server);
+        Config config = CoreRegistry.get(Config.class);
+        e.getChannel().write(NetMessage.newBuilder()
+                .setClientConnect(ClientConnectMessage.newBuilder()
+                        .setName(config.getPlayer().getName())
+                        .setViewDistanceLevel(config.getRendering().getActiveViewDistanceMode())
+                ).build());
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        networkSystem.removeClient(client);
+        CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Disconnected From Server"));
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
-        if (message.hasClientConnect()) {
-            receivedConnect(message.getClientConnect());
+        if (message.hasServerInfo()) {
+            CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), true);
+            receivedServerInfo(message.getServerInfo());
         }
-        client.messageReceived(message);
-    }
-
-    private void receivedConnect(ClientConnectMessage message) {
-        if (client.isAwaitingConnectMessage()) {
-            client.setName(message.getName());
-            client.setViewDistanceMode(message.getViewDistanceLevel());
-            networkSystem.addClient(client);
-        }
+        server.queueMessage(message);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
         logger.warn("Unexpected exception from client", e.getCause());
         e.getChannel().close();
+    }
+
+    private void receivedServerInfo(ServerInfoMessage message) {
+        if (awaitingServerInfo) {
+            awaitingServerInfo = false;
+            server.setServerInfo(message);
+        }
     }
 }

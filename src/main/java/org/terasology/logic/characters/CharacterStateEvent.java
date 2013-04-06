@@ -40,6 +40,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private Vector3f velocity = new Vector3f();
     private float yaw = 0;
     private float pitch = 0;
+    private float footstepDelta = 0;
 
     protected CharacterStateEvent() {
     }
@@ -54,6 +55,7 @@ public class CharacterStateEvent extends NetworkEvent {
         this.sequenceNumber = previous.sequenceNumber + 1;
         this.pitch = previous.pitch;
         this.yaw = previous.yaw;
+        this.footstepDelta = previous.footstepDelta;
     }
 
     public CharacterStateEvent(long time, int sequenceNumber, Vector3f position, Quat4f rotation, Vector3f velocity, float yaw, float pitch, MovementMode mode, boolean grounded) {
@@ -128,6 +130,14 @@ public class CharacterStateEvent extends NetworkEvent {
         this.yaw = yaw;
     }
 
+    public float getFootstepDelta() {
+        return footstepDelta;
+    }
+
+    public void setFootstepDelta(float delta) {
+        this.footstepDelta = delta;
+    }
+
     public static void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(state.getPosition());
@@ -137,6 +147,7 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComp.mode = state.getMode();
         movementComp.setVelocity(state.getVelocity());
         movementComp.grounded = state.isGrounded();
+        movementComp.footstepDelta = state.getFootstepDelta();
         entity.saveComponent(movementComp);
         CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
         characterComponent.pitch = state.pitch;
@@ -161,6 +172,14 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComponent.mode = a.getMode();
         movementComponent.setVelocity(a.getVelocity());
         movementComponent.grounded = a.isGrounded();
+        if (b.getFootstepDelta() < a.getFootstepDelta()) {
+            movementComponent.footstepDelta = t * (movementComponent.distanceBetweenFootsteps + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
+            if (movementComponent.footstepDelta > movementComponent.distanceBetweenFootsteps) {
+                movementComponent.footstepDelta -= movementComponent.distanceBetweenFootsteps;
+            }
+        } else {
+            movementComponent.footstepDelta = t * (b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
+        }
         entity.saveComponent(movementComponent);
 
         CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);

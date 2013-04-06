@@ -24,11 +24,21 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ServerConfig implements Iterable<ServerInfo> {
+public class NetworkConfig implements Iterable<ServerInfo> {
     private List<ServerInfo> servers = Lists.newArrayList();
+    // Available upstream bandwidth in kilobits per second
+    private int upstreamBandwidth = 1024;
 
     public void clear() {
         servers.clear();
+    }
+
+    public int getUpstreamBandwidth() {
+        return upstreamBandwidth;
+    }
+
+    public void setUpstreamBandwidth(int upstreamBandwidth) {
+        this.upstreamBandwidth = upstreamBandwidth;
     }
 
     @Override
