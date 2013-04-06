@@ -99,15 +99,7 @@ public class DebugControlSystem implements EventHandlerSystem {
                 case Keyboard.KEY_K:
                     entity.send(new DamageEvent(9999, null));
                     break;
-                case Keyboard.KEY_H:
-                    for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                        element.setVisible(!element.isVisible());
-                    }
 
-                    config.getSystem().setDebugFirstPersonElementsHidden(!config.getSystem().isDebugFirstPersonElementsHidden());
-
-                    event.consume();
-                    break;
                 case Keyboard.KEY_F6:
                     config.getSystem().setDebugRenderingEnabled(!config.getSystem().isDebugRenderingEnabled());
                     event.consume();
@@ -124,6 +116,15 @@ public class DebugControlSystem implements EventHandlerSystem {
         }
 
         switch (event.getKey()) {
+            case Keyboard.KEY_H:
+                for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+                    element.setVisible(!element.isVisible());
+                }
+
+                config.getSystem().setDebugFirstPersonElementsHidden(!config.getSystem().isDebugFirstPersonElementsHidden());
+
+                event.consume();
+                break;
             case Keyboard.KEY_F:
                 toggleViewingDistance();
                 event.consume();
