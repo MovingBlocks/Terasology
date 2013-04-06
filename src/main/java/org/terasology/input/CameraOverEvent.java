@@ -23,7 +23,6 @@ import org.terasology.entitySystem.AbstractEvent;
  */
 public class CameraOverEvent extends AbstractEvent {
 
-    public CameraOverEvent() {
-    }
+    public CameraOverEvent() {}
 
 }
