@@ -72,6 +72,12 @@ public class UILabel extends UIDisplayContainer {
         setText(text);
     }
 
+    public UILabel(String text, Color shadowColor) {
+        setText(text);
+        this.enableShadow = true;
+        this.shadowColor = shadowColor;
+    }
+
     public void render() {
         super.render();
 
