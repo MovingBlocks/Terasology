@@ -166,7 +166,7 @@ public final class UIMenuConfigControls extends UIWindow {
         title.setPosition(new Vector2f(0f, 28f));
         title.setVisible(true);
 
-        subtitle = new UILabel("Control Settings");
+        subtitle = new UILabel("Control Settings", Color.black);
         subtitle.setHorizontalAlign(EHorizontalAlign.CENTER);
         subtitle.setPosition(new Vector2f(0f, 128f));
         subtitle.setVisible(true);
@@ -228,7 +228,7 @@ public final class UIMenuConfigControls extends UIWindow {
         defaultButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().getBinds().setInputs(BindsConfig.createDefault());
+                CoreRegistry.get(Config.class).getInputConfig().getBinds().setInputs(BindsConfig.createDefault());
                 config.getInput().setMouseSensitivity(0.075f);
 
                 setup();
@@ -261,13 +261,13 @@ public final class UIMenuConfigControls extends UIWindow {
 
     private void changeButton(UIButton button, Input input) {
         String bindId = button.getUserData().toString();
-        CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().getBinds().setInputs(bindId, input);
+        CoreRegistry.get(Config.class).getInputConfig().getBinds().setInputs(bindId, input);
 
         editButton.getLabel().setText(input.toShortString());
     }
 
     public void setup() {
-        BindsConfig bindsConfig = CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().getBinds();
+        BindsConfig bindsConfig = CoreRegistry.get(Config.class).getInputConfig().getBinds();
         for (UIButton button : inputButtons) {
             String bindId = button.getUserData().toString();
             Collection<Input> inputs = bindsConfig.getInputs(bindId);
