@@ -50,7 +50,9 @@ import java.util.Queue;
 public class StateLoading implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
-
+    
+    private GameEngine gameEngine;
+    
     private WorldInfo worldInfo;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
@@ -68,6 +70,8 @@ public class StateLoading implements GameState {
 
     @Override
     public void init(GameEngine engine) {
+    	gameEngine = engine;
+    	
         loadProcesses.add(new RegisterMods(worldInfo));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlocks(worldInfo));
@@ -112,26 +116,36 @@ public class StateLoading implements GameState {
 
     @Override
     public void update(float delta) {
-        long startTime = 1000 * Sys.getTime() / Sys.getTimerResolution();
-
-        while (current != null && 1000 * Sys.getTime() / Sys.getTimerResolution() - startTime < 20) {
-            if (current.step()) {
-                popStep();
-            } else {
-                completedSteps++;
-            }
-        }
-        if (current == null) {
-            CoreRegistry.get(GUIManager.class).closeAllWindows();
-            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer());
-        } else {
-            if (currentExpectedSteps > 0) {
-                loadingScreen.updateStatus(current.getMessage(), 100f * completedSteps / currentExpectedSteps);
-            } else {
-                loadingScreen.updateStatus(current.getMessage(), 0);
-            }
-            guiManager.update();
-        }
+    	try {
+	    	long startTime = 1000 * Sys.getTime() / Sys.getTimerResolution();
+	
+	        while (current != null && 1000 * Sys.getTime() / Sys.getTimerResolution() - startTime < 20) {
+	            if (current.step()) {
+	                popStep();
+	            } else {
+	                completedSteps++;
+	            }
+	        }
+	        if (current == null) {
+	            CoreRegistry.get(GUIManager.class).closeAllWindows();
+	            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer());
+	        } else {
+	            if (currentExpectedSteps > 0) {
+	                loadingScreen.updateStatus(current.getMessage(), 100f * completedSteps / currentExpectedSteps);
+	            } else {
+	                loadingScreen.updateStatus(current.getMessage(), 0);
+	            }
+	            guiManager.update();
+	        }
+    	} catch (NeedToReinitStateLoading e) {
+    		loadProcesses = Queues.newArrayDeque();
+    		currentExpectedSteps = 0;
+    	    completedSteps = 0;
+    	    
+    	    worldInfo.setSeed("");
+    		
+    		this.init(gameEngine);
+    	}
     }
 
     @Override

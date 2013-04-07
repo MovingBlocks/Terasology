@@ -57,6 +57,7 @@ import org.terasology.input.binds.VerticalMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.SpawnManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
@@ -290,6 +291,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
         if (playerComponent != null && locationComponent != null) {
+        	SpawnManager.ensureSpawnIsClear(worldProvider, new Vector3i(playerComponent.spawnPosition.x, playerComponent.spawnPosition.y - 1, playerComponent.spawnPosition.z));
+        	
             locationComponent.setWorldPosition(playerComponent.spawnPosition);
             entity.saveComponent(locationComponent);
         }

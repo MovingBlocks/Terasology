@@ -33,7 +33,7 @@ public interface LoadProcess {
      * Runs a single step.
      * @return Whether the overall step is finished
      */
-    boolean step();
+    boolean step() throws NeedToReinitStateLoading;
 
     /**
      * Begins the loading
