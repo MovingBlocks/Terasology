@@ -166,7 +166,7 @@ public final class UIMenuConfigControls extends UIWindow {
         title.setPosition(new Vector2f(0f, 28f));
         title.setVisible(true);
 
-        subtitle = new UILabel("Control Settings");
+        subtitle = new UILabel("Control Settings", Color.black);
         subtitle.setHorizontalAlign(EHorizontalAlign.CENTER);
         subtitle.setPosition(new Vector2f(0f, 128f));
         subtitle.setVisible(true);
