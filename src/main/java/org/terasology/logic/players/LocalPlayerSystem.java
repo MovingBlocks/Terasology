@@ -18,7 +18,7 @@ package org.terasology.logic.players;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entityFactory.DroppedBlockFactory;

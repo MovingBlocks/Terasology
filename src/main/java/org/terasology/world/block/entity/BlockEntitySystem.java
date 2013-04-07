@@ -19,7 +19,7 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.components.BlockParticleEffectComponent;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.ComponentSystem;

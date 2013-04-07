@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

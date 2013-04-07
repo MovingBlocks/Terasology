@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.common;
+package org.terasology.logic.health;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

@@ -20,7 +20,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;

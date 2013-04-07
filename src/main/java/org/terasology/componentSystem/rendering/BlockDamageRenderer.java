@@ -18,7 +18,7 @@ package org.terasology.componentSystem.rendering;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;

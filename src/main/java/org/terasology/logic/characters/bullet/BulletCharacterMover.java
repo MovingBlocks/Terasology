@@ -264,11 +264,12 @@ public class BulletCharacterMover implements CharacterMover {
 
         velocityDiff.scale(Math.min(movementComp.groundFriction * input.getDelta(), 1.0f));
 
-        state.getVelocity().x += velocityDiff.x;
-        state.getVelocity().z += velocityDiff.z;
-        state.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (state.getVelocity().y - GRAVITY * input.getDelta()));
+        Vector3f endVelocity = new Vector3f(state.getVelocity());
+        endVelocity.x += velocityDiff.x;
+        endVelocity.z += velocityDiff.z;
+        endVelocity.y = Math.max(-TERMINAL_VELOCITY, (state.getVelocity().y - GRAVITY * input.getDelta()));
 
-        Vector3f moveDelta = new Vector3f(state.getVelocity());
+        Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
 
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
@@ -285,23 +286,27 @@ public class BulletCharacterMover implements CharacterMover {
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 if (input.isFirstRun()) {
-                    entity.send(new VerticalCollisionEvent(state.getVelocity(), state.getPosition()));
+                    Vector3f landVelocity = new Vector3f(state.getVelocity());
+                    landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
+                    logger.debug("Landed at " + landVelocity);
+                    entity.send(new VerticalCollisionEvent(landVelocity, state.getPosition()));
                 }
                 state.setGrounded(true);
             }
-            state.getVelocity().y = 0;
+            endVelocity.y = 0;
             // Jumping is only possible, if the entity is standing on ground
             if (input.isJumpRequested()) {
                 state.setGrounded(false);
-                state.getVelocity().y += movementComp.jumpSpeed;
+                endVelocity.y += movementComp.jumpSpeed;
                 entity.send(new JumpEvent());
             }
         } else {
-            if (moveResult.isTopHit() && state.getVelocity().y > 0) {
-                state.getVelocity().y = -0.5f * state.getVelocity().y;
+            if (moveResult.isTopHit() && endVelocity.y > 0) {
+                endVelocity.y = -0.5f * endVelocity.y;
             }
             state.setGrounded(false);
         }
+        state.getVelocity().set(endVelocity);
 
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
             entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));

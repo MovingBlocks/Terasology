@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
-import org.terasology.components.HealthComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
@@ -53,7 +53,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
-    private final UIImage[] _hearts;
+    private final UIImage[] hearts;
     private final UIImage crosshair;
     private final UILabel debugLine1;
     private final UILabel debugLine2;
@@ -67,26 +67,28 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
     private final Config config = CoreRegistry.get(Config.class);
 
+    private LocalPlayer localPlayer;
+
     /**
      * Init. the HUD.
      */
     public UIScreenHUD() {
         setId("hud");
         maximize();
-        _hearts = new UIImage[10];
+        hearts = new UIImage[10];
 
         // Create hearts
         for (int i = 0; i < 10; i++) {
-            _hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
-            _hearts[i].setVisible(true);
-            _hearts[i].setTextureSize(new Vector2f(9f, 9f));
-            _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
-            _hearts[i].setSize(new Vector2f(18f, 18f));
-            _hearts[i].setVerticalAlign(EVerticalAlign.BOTTOM);
-            _hearts[i].setHorizontalAlign(EHorizontalAlign.CENTER);
-            _hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
+            hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
+            hearts[i].setVisible(true);
+            hearts[i].setTextureSize(new Vector2f(9f, 9f));
+            hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
+            hearts[i].setSize(new Vector2f(18f, 18f));
+            hearts[i].setVerticalAlign(EVerticalAlign.BOTTOM);
+            hearts[i].setHorizontalAlign(EHorizontalAlign.CENTER);
+            hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
 
-            addDisplayElement(_hearts[i]);
+            addDisplayElement(hearts[i]);
         }
 
         crosshair = new UIImage(Assets.getTexture("engine:gui"));
@@ -160,7 +162,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
         addDisplayElement(toolbar);
 
-        CoreRegistry.get(EventSystem.class).registerEventHandler(this);
+        localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         update();
         layout();
@@ -169,6 +171,10 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     @Override
     public void update() {
         super.update();
+
+
+
+        updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
 
         boolean enableDebug = config.getSystem().isDebugEnabled();
         debugLine1.setVisible(enableDebug);
@@ -189,16 +195,19 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         }
     }
 
-    private void updateHealthBar(int currentHealth, int maxHealth) {
-        float healthRatio = (float) currentHealth / maxHealth;
+    private void updateHealthBar(HealthComponent health) {
+        float healthRatio = 0;
+        if (health != null) {
+           healthRatio = (float) health.currentHealth / health.maxHealth;
+        }
 
         // Show/Hide hearts relatively to the available health points of the player
         for (int i = 0; i < 10; i++) {
 
             if (i < healthRatio * 10f)
-                _hearts[i].setVisible(true);
+                hearts[i].setVisible(true);
             else
-                _hearts[i].setVisible(false);
+                hearts[i].setVisible(false);
 
             // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
             //Show Poisoned Status with Green Hearts:
@@ -206,9 +215,9 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             entityManager = CoreRegistry.get(EntityManager.class);
             for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
                 if (poisoned.poisonDuration >= 1)
-                    _hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
                 else
-                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }
             
             for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
@@ -216,9 +225,9 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
                 CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CuredComponent.class);
                 entityManager = CoreRegistry.get(EntityManager.class);
                 if (cured.cureDuration >= 1)
-                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
                 else
-                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }*/
         }
     }
@@ -233,13 +242,4 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
-    public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {
-        toolbar.setSelected(CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool);
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
-    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {
-        updateHealthBar(event.getCurrentHealth(), event.getMaxHealth());
-    }
 }
