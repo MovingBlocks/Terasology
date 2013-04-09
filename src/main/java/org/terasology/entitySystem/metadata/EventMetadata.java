@@ -30,6 +30,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
     private String uri;
     private boolean lagCompensated = false;
     private boolean skipInstigator = false;
+    private boolean isRunLocally = true;
 
     public EventMetadata(Class<T> simpleClass, String uri) throws NoSuchMethodException {
         super(simpleClass, uri);
@@ -37,6 +38,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
             lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();
+            isRunLocally =  simpleClass.getAnnotation(ServerEvent.class).runLocally();
         } else if (simpleClass.getAnnotation(OwnerEvent.class) != null) {
             networkEventType = NetworkEventType.OWNER;
         } else if (simpleClass.getAnnotation(BroadcastEvent.class) != null) {
@@ -59,6 +61,10 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
 
     public NetworkEventType getNetworkEventType() {
         return networkEventType;
+    }
+
+    public boolean isRunLocally() {
+        return isRunLocally;
     }
 
     public String getId() {

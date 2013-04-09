@@ -218,9 +218,9 @@ public class EventSystemImpl implements EventSystem {
             for (EventHandlerInfo handler : selectedHandlers) {
                 // Check isValid at each stage in case components were removed.
                 if (handler.isValidFor(entity)) {
-                    handler.invoke(entity, event);
                     if (event.isCancelled())
                         return;
+                    handler.invoke(entity, event);
                 }
             }
         }
@@ -239,6 +239,8 @@ public class EventSystemImpl implements EventSystem {
                     break;
                 case SERVER:
                     sendEventToServer(entity, event);
+                    if(!metadata.isRunLocally() && networkSystem.getMode() == NetworkMode.CLIENT)
+                        event.cancel();
                     break;
 
             }

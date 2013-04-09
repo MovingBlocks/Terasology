@@ -24,11 +24,11 @@ import org.terasology.network.ServerEvent;
 import javax.vecmath.Vector3f;
 
 /**
- * A request for a player to drop an item
+ * A request for a player to drop an item. Is not run locally. Gets sent to server only.
  *
  * @author Sdab
  */
-@ServerEvent(lagCompensate = true)
+@ServerEvent(lagCompensate = true, runLocally = false)
 public class DropItemRequest extends NetworkEvent {
 
     private EntityRef item = EntityRef.NULL;
