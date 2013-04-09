@@ -348,101 +348,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onDropItem(DropItemButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
-        BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
-
-        if (selectedItemEntity.equals(EntityRef.NULL)) {
-            return;
-        }
-
-        if (event.getState() == ButtonState.DOWN && lastTimeThrowInteraction == 0) {
-            lastTimeThrowInteraction = timer.getTimeInMs();
-            return;
-        }
-
-        if (localPlayerComp.isDead) return;
-
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
-
-        crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
-
-        float dropPower = getDropPower();
-
-        crossHair.getTextureOrigin().set(new Vector2f((46f + 22f * dropPower) / 256f, 23f / 256f));
-
-        if (event.getState() == ButtonState.UP) {
-            dropPower *= 25f;
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-
-            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x * 1.5f,
-                    playerCamera.getPosition().y + playerCamera.getViewingDirection().y * 1.5f,
-                    playerCamera.getPosition().z + playerCamera.getViewingDirection().z * 1.5f
-            );
-
-            boolean changed = false;
-            if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
-                DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
-                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
-
-                if (!droppedItem.equals(EntityRef.NULL)) {
-                    droppedItem.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x * dropPower, playerCamera.getViewingDirection().y * dropPower, playerCamera.getViewingDirection().z * dropPower)));
-                    changed = true;
-                }
-            } else {
-                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
-                if (!droppedBlock.equals(EntityRef.NULL)) {
-                    droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x * dropPower, playerCamera.getViewingDirection().y * dropPower, playerCamera.getViewingDirection().z * dropPower)));
-                    changed = true;
-                }
-            }
-
-
-            if (changed) {
-                item.stackCount--;
-
-                if (item.stackCount <= 0) {
-                    selectedItemEntity.destroy();
-                }
-
-                localPlayerComp.handAnimation = 0.5f;
-            }
-            resetDropMark();
-        }
-
-        entity.saveComponent(localPlayerComp);
-        event.consume();
-    }
-
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
         return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
     }
 
-    public void resetDropMark() {
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
-        lastTimeThrowInteraction = 0;
-        crossHair.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
-        crossHair.getTextureOrigin().set(new Vector2f(24f / 256f, 24f / 256f));
-    }
-
-    private float getDropPower() {
-        if (lastTimeThrowInteraction == 0) {
-            return 0;
-        }
-        float dropPower = (float) Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction) / 200);
-
-        if (dropPower > 6) {
-            dropPower = 6;
-        }
-
-        return dropPower;
-    }
-
-    @Override
+   @Override
     public void renderOpaque() {
 
     }

@@ -21,24 +21,36 @@ import org.terasology.network.NetworkEvent;
 import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
+import javax.vecmath.Vector3f;
+
 /**
- * A request for a player to use an item
+ * A request for a player to drop an item
  *
- * @author Immortius
+ * @author Sdab
  */
 @ServerEvent(lagCompensate = true)
-public class UseItemRequest extends NetworkEvent {
+public class DropItemRequest extends NetworkEvent {
 
     private EntityRef item = EntityRef.NULL;
+    private Vector3f impulse, newPosition;
 
-    protected UseItemRequest() {
+    protected DropItemRequest() {
     }
 
-    public UseItemRequest(EntityRef usedItem) {
+    public DropItemRequest(EntityRef usedItem, Vector3f impulse, Vector3f newPosition) {
         this.item = usedItem;
+        this.impulse = impulse;
+        this.newPosition = newPosition;
     }
 
     public EntityRef getItem() {
         return item;
+    }
+
+    public Vector3f getNewPosition() {
+        return newPosition;
+    }
+    public Vector3f getImpulse() {
+        return impulse;
     }
 }
