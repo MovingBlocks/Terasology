@@ -16,18 +16,13 @@
 package org.terasology.logic.health;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.DamageEvent;
-import org.terasology.events.FullHealthEvent;
-import org.terasology.events.HealthChangedEvent;
-import org.terasology.events.NoHealthEvent;
-import org.terasology.events.VerticalCollisionEvent;
+import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 
 /**

@@ -20,11 +20,6 @@ import org.terasology.logic.health.HealthComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.events.HealthChangedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
@@ -172,9 +167,8 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     public void update() {
         super.update();
 
-
-
         updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
+        toolbar.setSelected(localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool);
 
         boolean enableDebug = config.getSystem().isDebugEnabled();
         debugLine1.setVisible(enableDebug);

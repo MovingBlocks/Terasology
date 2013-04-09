@@ -13,15 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.AbstractEvent;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-public class NoHealthEvent extends HealthChangedEvent {
-    public NoHealthEvent(EntityRef instigator, int maximumHealth) {
-        super(instigator, 0, maximumHealth);
+public class HorizontalCollisionEvent extends AbstractEvent {
+    private Vector3f velocity;
+    private Vector3f location;
+
+    public HorizontalCollisionEvent(Vector3f velocity, Vector3f location) {
+        this.velocity = new Vector3f(velocity);
+        this.location = new Vector3f(location);
+    }
+
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+
+    public Vector3f getLocation() {
+        return location;
     }
 }

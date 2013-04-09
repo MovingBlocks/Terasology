@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.AbstractEvent;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class JumpEvent extends AbstractEvent {
+public class FootstepEvent extends AbstractEvent {
+
 }

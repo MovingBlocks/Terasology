@@ -26,9 +26,9 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.FootstepEvent;
-import org.terasology.events.JumpEvent;
-import org.terasology.events.VerticalCollisionEvent;
+import org.terasology.logic.characters.events.FootstepEvent;
+import org.terasology.logic.characters.events.JumpEvent;
+import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.utilities.FastRandom;
 
 /**

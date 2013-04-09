@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.AbstractEvent;
 
@@ -21,13 +21,12 @@ import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
- * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-public class HorizontalCollisionEvent extends AbstractEvent {
+public class VerticalCollisionEvent extends AbstractEvent {
     private Vector3f velocity;
     private Vector3f location;
 
-    public HorizontalCollisionEvent(Vector3f velocity, Vector3f location) {
+    public VerticalCollisionEvent(Vector3f velocity, Vector3f location) {
         this.velocity = new Vector3f(velocity);
         this.location = new Vector3f(location);
     }

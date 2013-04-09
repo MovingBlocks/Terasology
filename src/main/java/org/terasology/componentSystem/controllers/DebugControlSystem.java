@@ -23,7 +23,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.DamageEvent;
+import org.terasology.logic.health.DamageEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
