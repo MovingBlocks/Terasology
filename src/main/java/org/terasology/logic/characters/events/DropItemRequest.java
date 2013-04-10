@@ -30,14 +30,15 @@ import javax.vecmath.Vector3f;
 @ServerEvent(lagCompensate = true)
 public class DropItemRequest extends AbstractEvent {
 
-    private EntityRef item = EntityRef.NULL;
+    private EntityRef item = EntityRef.NULL, inventory = EntityRef.NULL;
     private Vector3f impulse, newPosition;
 
     protected DropItemRequest() {
     }
 
-    public DropItemRequest(EntityRef usedItem, Vector3f impulse, Vector3f newPosition) {
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition) {
         this.item = usedItem;
+        this.inventory = inventoryEntity;
         this.impulse = impulse;
         this.newPosition = newPosition;
     }
@@ -45,7 +46,9 @@ public class DropItemRequest extends AbstractEvent {
     public EntityRef getItem() {
         return item;
     }
-
+    public EntityRef getInventoryEntity() {
+        return inventory;
+    }
     public Vector3f getNewPosition() {
         return newPosition;
     }

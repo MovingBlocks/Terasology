@@ -142,6 +142,17 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     }
 
     @Override
+    public void destroyItem(EntityRef inventoryEntity, EntityRef item) {
+        InventoryComponent inventoryComponent = inventoryEntity.getComponent(InventoryComponent.class);
+        if (inventoryComponent != null) {
+            int slot = inventoryComponent.itemSlots.indexOf(item);
+            if (slot > -1) {
+                destroyItem(item, inventoryComponent, slot);
+            }
+        }
+    }
+
+    @Override
     public void moveItemAmount(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount) {
         if (networkSystem.getMode().isAuthority()) {
             InventoryComponent from = fromInventory.getComponent(InventoryComponent.class);
@@ -220,7 +231,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     @Override
     public void setStackSize(EntityRef item, int newStackSize) {
         setStackSize(item, item.getComponent(ItemComponent.class), newStackSize);
-    }
+     }
 
     @Override
     public boolean canTakeItem(EntityRef inventoryEntity, EntityRef item) {

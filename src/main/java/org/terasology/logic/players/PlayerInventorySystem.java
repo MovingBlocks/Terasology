@@ -176,7 +176,7 @@ public class PlayerInventorySystem implements ComponentSystem {
             //send DropItemRequest
             Vector3f impulseVector = new Vector3f(playerCamera.getViewingDirection());
             impulseVector.scale(dropPower);
-            entity.send(new DropItemRequest(selectedItemEntity,
+            entity.send(new DropItemRequest(selectedItemEntity, entity,
                     impulseVector,
                     newPosition));
 

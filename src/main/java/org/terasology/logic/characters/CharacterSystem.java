@@ -27,6 +27,8 @@ import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.inventory.CoreInventoryManager;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
@@ -139,9 +141,7 @@ public class CharacterSystem implements ComponentSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {
-        //ignore client side
-        if (!networkSystem.getMode().isAuthority())
-            return;
+
         //make sure we own the item and it exists
         if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
             return;
@@ -154,33 +154,36 @@ public class CharacterSystem implements ComponentSystem {
         Vector3f newPosition = event.getNewPosition();
         ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
 
+        //don't perform actual drop on client side
+        if (networkSystem.getMode().isAuthority()){
 
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
+                DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
+                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
 
-        if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
-            DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
-            EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
-
-            if (!droppedItem.equals(EntityRef.NULL)) {
-                droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
+                if (!droppedItem.equals(EntityRef.NULL)) {
+                    droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
+                }
+            } else {
+                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+                BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
+                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
+                if (!droppedBlock.equals(EntityRef.NULL)) {
+                    droppedBlock.send(new ImpulseEvent(new Vector3f(impulse)));
+                }
             }
-        } else {
-            DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-            BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
-            EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
-            if (!droppedBlock.equals(EntityRef.NULL)) {
-                droppedBlock.send(new ImpulseEvent(new Vector3f(impulse)));
-            }
-        }
 
-        //decrease the item stack
-        item.stackCount--;
-        event.getItem().saveComponent(item);
-        //remove the item from our inventory (serves as our local prediction when running as a client)
-        if (item.stackCount <= 0) {
-            event.getItem().destroy();
         }
+        //decrease item stack
+        //XXX note this occurs on both the client and server side
+        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+        int newStackSize = inventoryManager.getStackSize(selectedItemEntity)  -1;
+        inventoryManager.setStackSize(selectedItemEntity, newStackSize);
+        if(newStackSize <=0 )
+            inventoryManager.destroyItem(event.getInventoryEntity(), selectedItemEntity);
+
     }
 
 }
