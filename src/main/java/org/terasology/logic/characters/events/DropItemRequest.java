@@ -16,9 +16,8 @@
 
 package org.terasology.logic.characters.events;
 
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.network.NetworkEvent;
-import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
 import javax.vecmath.Vector3f;
@@ -29,7 +28,7 @@ import javax.vecmath.Vector3f;
  * @author Sdab
  */
 @ServerEvent(lagCompensate = true, runLocally = false)
-public class DropItemRequest extends NetworkEvent {
+public class DropItemRequest extends AbstractEvent {
 
     private EntityRef item = EntityRef.NULL;
     private Vector3f impulse, newPosition;
