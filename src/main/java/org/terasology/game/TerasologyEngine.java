@@ -41,7 +41,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
-import org.terasology.version.TerasologyVersion;
+import org.terasology.version.TerasologyGameVersionInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -99,7 +99,7 @@ public class TerasologyEngine implements GameEngine {
         initLogger();
 
         logger.info("Initializing Terasology...");
-        logger.info(TerasologyVersion.getInstance().toString());
+        logger.info(TerasologyGameVersionInfo.getInstance().toString());
 
         initConfig();
 
