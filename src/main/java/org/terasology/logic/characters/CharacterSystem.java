@@ -27,7 +27,6 @@ import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.health.DamageEvent;
-import org.terasology.logic.inventory.CoreInventoryManager;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.network.NetworkComponent;
@@ -181,8 +180,9 @@ public class CharacterSystem implements ComponentSystem {
         InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
         int newStackSize = inventoryManager.getStackSize(selectedItemEntity)  -1;
         inventoryManager.setStackSize(selectedItemEntity, newStackSize);
-        if(newStackSize <=0 )
+        if(newStackSize <=0 ) {
             inventoryManager.destroyItem(event.getInventoryEntity(), selectedItemEntity);
+        }
 
     }
 

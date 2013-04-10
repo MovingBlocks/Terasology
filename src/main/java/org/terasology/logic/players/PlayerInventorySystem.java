@@ -149,7 +149,9 @@ public class PlayerInventorySystem implements ComponentSystem {
             return;
         }
 
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) {
+            return;
+        }
         //resize the crosshair
         UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
 

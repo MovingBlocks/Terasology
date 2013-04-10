@@ -134,7 +134,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
             if (inventoryComponent != null && itemComponent != null) {
                 int slot = inventoryComponent.itemSlots.indexOf(item);
                 if (slot > -1) {
-                    putItemInSlot(inventoryEntity, inventoryComponent, slot, item);
+                    putItemInSlot(inventoryEntity, inventoryComponent, slot, EntityRef.NULL);
                     inventoryEntity.saveComponent(inventoryComponent);
                 }
             }
@@ -231,7 +231,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     @Override
     public void setStackSize(EntityRef item, int newStackSize) {
         setStackSize(item, item.getComponent(ItemComponent.class), newStackSize);
-     }
+    }
 
     @Override
     public boolean canTakeItem(EntityRef inventoryEntity, EntityRef item) {
