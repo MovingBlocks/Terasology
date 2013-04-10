@@ -31,7 +31,4 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface ServerEvent {
     boolean lagCompensate() default false;
-    // If true, the event gets replicated on the client and server. If false, the even goes to the server, but
-    // does not occur on the client.
-    boolean runLocally() default true;
 }

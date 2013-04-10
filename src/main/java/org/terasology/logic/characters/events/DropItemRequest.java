@@ -27,7 +27,7 @@ import javax.vecmath.Vector3f;
  *
  * @author Sdab
  */
-@ServerEvent(lagCompensate = true, runLocally = false)
+@ServerEvent(lagCompensate = true)
 public class DropItemRequest extends AbstractEvent {
 
     private EntityRef item = EntityRef.NULL;

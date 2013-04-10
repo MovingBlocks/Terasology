@@ -139,6 +139,9 @@ public class CharacterSystem implements ComponentSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {
+        //ignore client side
+        if (!networkSystem.getMode().isAuthority())
+            return;
         //make sure we own the item and it exists
         if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
             return;
