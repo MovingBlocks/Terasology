@@ -180,13 +180,6 @@ public class PlayerInventorySystem implements ComponentSystem {
                     impulseVector,
                     newPosition));
 
-            //remove the item from our inventory (serves as our local prediction when running as a client)
-            item.stackCount--;
-
-            if (item.stackCount <= 0) {
-                selectedItemEntity.destroy();
-            }
-
             localPlayerComp.handAnimation = 0.5f;
 
             resetDropMark();
@@ -217,5 +210,6 @@ public class PlayerInventorySystem implements ComponentSystem {
 
         return dropPower;
     }
+
 
 }

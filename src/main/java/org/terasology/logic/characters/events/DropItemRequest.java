@@ -24,7 +24,7 @@ import org.terasology.network.ServerEvent;
 import javax.vecmath.Vector3f;
 
 /**
- * A request for a player to drop an item. Is not run locally. Gets sent to server only.
+ * A request for a player to drop an item. Is replicated onto the server
  *
  * @author Sdab
  */

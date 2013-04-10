@@ -23,10 +23,7 @@ import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.characters.events.AttackRequest;
-import org.terasology.logic.characters.events.DropItemRequest;
-import org.terasology.logic.characters.events.FrobRequest;
-import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.characters.events.*;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
@@ -144,15 +141,19 @@ public class CharacterSystem implements ComponentSystem {
             return;
         }
 
+
+        //drop the item
         EntityRef selectedItemEntity = event.getItem();
         Vector3f impulse = event.getImpulse();
         Vector3f newPosition = event.getNewPosition();
+        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+
+
 
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 
         if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
             DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
-            ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
             EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
 
             if (!droppedItem.equals(EntityRef.NULL)) {
@@ -167,6 +168,13 @@ public class CharacterSystem implements ComponentSystem {
             }
         }
 
-
+        //decrease the item stack
+        item.stackCount--;
+        event.getItem().saveComponent(item);
+        //remove the item from our inventory (serves as our local prediction when running as a client)
+        if (item.stackCount <= 0) {
+            event.getItem().destroy();
+        }
     }
+
 }
