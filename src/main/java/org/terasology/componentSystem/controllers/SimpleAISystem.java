@@ -23,7 +23,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.CharacterMoveInputEvent;

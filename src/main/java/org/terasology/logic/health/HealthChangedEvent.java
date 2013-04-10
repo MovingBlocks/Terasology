@@ -13,33 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+
+package org.terasology.logic.health;
 
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class DamageEvent extends AbstractEvent {
-    private int amount;
+public class HealthChangedEvent extends AbstractEvent {
     private EntityRef instigator;
+    private int currentHealth;
+    private int maxHealth;
 
-    public DamageEvent(int amount) {
-        this.amount = amount;
-        instigator = EntityRef.NULL;
-    }
-
-    public DamageEvent(int amount, EntityRef instigator) {
-        this.amount = amount;
+    public HealthChangedEvent(EntityRef instigator, int currentHealth, int maxHealth) {
         this.instigator = instigator;
-    }
-
-    public int getAmount() {
-        return amount;
+        this.currentHealth = currentHealth;
+        this.maxHealth = maxHealth;
     }
 
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public int getCurrentHealth() {
+        return currentHealth;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 }

@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+package org.terasology.logic.health;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.OwnerEvent;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class FootstepEvent extends AbstractEvent {
-
+public class NoHealthEvent extends HealthChangedEvent {
+    public NoHealthEvent(EntityRef instigator, int maximumHealth) {
+        super(instigator, 0, maximumHealth);
+    }
 }
