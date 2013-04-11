@@ -17,26 +17,25 @@
 package org.terasology.logic.characters;
 
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.entityFactory.DroppedItemFactory;
+import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
-import org.terasology.logic.health.DamageEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.characters.events.AttackRequest;
+import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.*;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -138,4 +137,50 @@ public class CharacterSystem implements ComponentSystem {
             result.getEntity().send(new ActivateEvent(character, character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
         }
     }
+
+    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
+    public void onDropItemRequest(DropItemRequest event, EntityRef character) {
+
+        //make sure we own the item and it exists
+        if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
+            return;
+        }
+
+
+        //drop the item
+        EntityRef selectedItemEntity = event.getItem();
+        Vector3f impulse = event.getImpulse();
+        Vector3f newPosition = event.getNewPosition();
+        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+
+        //don't perform actual drop on client side
+        if (networkSystem.getMode().isAuthority()){
+
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+
+            if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
+                DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
+                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
+
+                if (!droppedItem.equals(EntityRef.NULL)) {
+                    droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
+                }
+            } else {
+                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+                BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
+                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
+                if (!droppedBlock.equals(EntityRef.NULL)) {
+                    droppedBlock.send(new ImpulseEvent(new Vector3f(impulse)));
+                }
+            }
+
+        }
+        //decrease item stack
+        //XXX note this occurs on both the client and server side
+        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+        int newStackSize = inventoryManager.getStackSize(selectedItemEntity)  -1;
+        inventoryManager.setStackSize(selectedItemEntity, event.getInventoryEntity(), newStackSize);
+
+    }
+
 }
