@@ -16,29 +16,43 @@
 
 package org.terasology.logic.characters.events;
 
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.network.NetworkEvent;
-import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
+import javax.vecmath.Vector3f;
+
 /**
- * A request for a player to use an item
+ * A request for a player to drop an item. Is replicated onto the server
  *
- * @author Immortius
+ * @author Sdab
  */
 @ServerEvent(lagCompensate = true)
-public class UseItemRequest extends NetworkEvent {
+public class DropItemRequest extends AbstractEvent {
 
-    private EntityRef item = EntityRef.NULL;
+    private EntityRef item = EntityRef.NULL, inventory = EntityRef.NULL;
+    private Vector3f impulse, newPosition;
 
-    protected UseItemRequest() {
+    protected DropItemRequest() {
     }
 
-    public UseItemRequest(EntityRef usedItem) {
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition) {
         this.item = usedItem;
+        this.inventory = inventoryEntity;
+        this.impulse = impulse;
+        this.newPosition = newPosition;
     }
 
     public EntityRef getItem() {
         return item;
+    }
+    public EntityRef getInventoryEntity() {
+        return inventory;
+    }
+    public Vector3f getNewPosition() {
+        return newPosition;
+    }
+    public Vector3f getImpulse() {
+        return impulse;
     }
 }
