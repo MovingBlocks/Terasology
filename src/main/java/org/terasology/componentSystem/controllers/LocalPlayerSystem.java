@@ -61,7 +61,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.ImpulseEvent;
+import org.terasology.physics.*;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -110,6 +110,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private int verticalStep = 0;
     private final int maxVerticalStep = 2;
 
+    private float eyeFocusDistance;
+    private CollisionGroup[] eyeFocusFilter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -130,6 +133,22 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void update(float delta) {
         if (!localPlayer.isValid())
             return;
+
+        // Used for adjusting the focus of the depth of field effect
+        BulletPhysics physicsRenderer = CoreRegistry.get(BulletPhysics.class);
+        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(playerCamera.getPosition()), new Vector3f(localPlayer.getViewDirection()), 500.0f, eyeFocusFilter);
+        if (hitInfo.isHit()) {
+            Vector3f playerToTargetRay = new Vector3f();
+            playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getPosition());
+
+            if (eyeFocusDistance == Float.MAX_VALUE) {
+                eyeFocusDistance = playerToTargetRay.length();
+            } else {
+                eyeFocusDistance = TeraMath.lerpf(eyeFocusDistance, playerToTargetRay.length(), 0.1f);
+            }
+        } else {
+            eyeFocusDistance = Float.MAX_VALUE;
+        }
 
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
@@ -566,6 +585,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
 
         return dropPower;
+    }
+
+    public float getEyeFocusDistance() {
+        return eyeFocusDistance;
     }
 
     @Override

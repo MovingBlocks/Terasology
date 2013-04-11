@@ -15,8 +15,14 @@
  */
 package org.terasology.audio;
 
+import org.terasology.asset.AssetUri;
+
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -64,4 +70,19 @@ public interface AudioManager {
     void dispose();
 
     void stopAllSounds();
+
+    /**
+     * For internal use, loads a streaming sound
+     * @param uri
+     * @param urls
+     * @return
+     */
+    Sound loadStreamingSound(AssetUri uri, List<URL> urls);
+
+    /**
+     * For internal use, loads a sound
+     * @param uri
+     * @param stream
+     */
+    Sound loadSound(AssetUri uri, InputStream stream) throws IOException;
 }

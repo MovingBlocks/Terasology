@@ -28,7 +28,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
@@ -41,7 +41,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
-import org.terasology.version.TerasologyVersion;
+import org.terasology.version.TerasologyGameVersionInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -99,7 +99,7 @@ public class TerasologyEngine implements GameEngine {
         initLogger();
 
         logger.info("Initializing Terasology...");
-        logger.info(TerasologyVersion.getInstance().toString());
+        logger.info(TerasologyGameVersionInfo.getInstance().toString());
 
         initConfig();
 
@@ -138,6 +138,7 @@ public class TerasologyEngine implements GameEngine {
         } else {
             config = new Config();
             config.getDefaultModSelection().addMod("core");
+            config.save();
             CoreRegistry.put(Config.class, config);
         }
     }

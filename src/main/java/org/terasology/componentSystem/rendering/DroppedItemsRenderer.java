@@ -1,20 +1,11 @@
 package org.terasology.componentSystem.rendering;
 
 import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -24,14 +15,10 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
-import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.logic.MeshRenderer;
-import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 

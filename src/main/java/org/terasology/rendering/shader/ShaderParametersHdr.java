@@ -16,7 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.editor.properties.Property;
 
 import java.util.List;
@@ -35,10 +35,10 @@ public class ShaderParametersHdr extends ShaderParametersBase {
         super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        PostProcessingRenderer.getInstance().getFBO("scenePrePost").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("scenePrePost").bindTexture();
 
         program.setInt("texScene", 0);
-        program.setFloat("exposure", PostProcessingRenderer.getInstance().getExposure() * (Float) exposureBias.getValue());
+        program.setFloat("exposure", DefaultRenderingProcess.getInstance().getExposure() * (Float) exposureBias.getValue());
         program.setFloat("whitePoint", (Float) whitePoint.getValue());
     }
 

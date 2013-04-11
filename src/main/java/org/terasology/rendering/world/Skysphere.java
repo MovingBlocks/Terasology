@@ -55,56 +55,18 @@ public class Skysphere implements IPropertyProvider {
 
     private static int displayListSphere = -1;
 
-    private Texture skyTexture90 = null;
-    private Texture skyTexture180 = null;
-
     private final WorldRenderer _parent;
 
     public Skysphere(WorldRenderer parent) {
         _parent = parent;
-
-        initTextures();
     }
-
-    private void initTextures() {
-        skyTexture180 = Assets.getTexture("engine:sky180");
-        skyTexture90 = Assets.getTexture("engine:sky90");
-    }
-
-//    private void loadCubeMap(int textureId, String name, int size) {
-//        int internalFormat = GL11.GL_RGBA8, format = GL12.GL_BGRA;
-//
-//        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId);
-//
-//        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-//        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL12.GL_TEXTURE_WRAP_R, GL12.GL_CLAMP_TO_EDGE);
-//        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-//        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-//        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-//
-//        for (int i = 0; i < 6; i++) {
-//
-//            ByteBuffer data = Assets.getTexture("engine:" + name + (i + 1)).getImageData(0);
-//
-//            GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, size, size,
-//                    0, format, GL11.GL_UNSIGNED_BYTE, data);
-//        }
-//    }
 
     public void render() {
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, skyTexture90.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, skyTexture180.getId());
-
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("sky");
         shader.enable();
-
-        shader.setInt("texSky90", 0);
-        shader.setInt("texSky180", 1);
 
         // Draw the skysphere
         drawSphere();

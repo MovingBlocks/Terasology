@@ -19,9 +19,11 @@ uniform sampler2D texDepth;
 #ifdef BLOOM
 uniform sampler2D texBloom;
 #endif
-#if !defined (NO_BLUR) || defined (MOTION_BLUR)
+#if !defined (NO_BLUR)
 uniform sampler2D texBlur;
-uniform float maxBlurSky;
+uniform float blurFocusDistance;
+uniform float blurStart;
+uniform float blurLength;
 #endif
 #ifdef VIGNETTE
 uniform sampler2D texVignette;
@@ -43,22 +45,19 @@ uniform mat4 prevViewProjMatrix;
 #endif
 
 void main() {
-#if !defined (NO_BLUR) || defined (MOTION_BLUR)
+#if !defined (NO_BLUR)
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
 
 #ifndef NO_BLUR
-    float depthLin = linDepth(currentDepth);
+    float depthLin = linDepthVDist(currentDepth);
     float blur = 0.0;
 
-    if (depthLin > BLUR_START && !swimming) {
-       blur = clamp((depthLin - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
-
-       if (currentDepth > 0.9999999) {
-           blur = min(blur, maxBlurSky);
-       }
+    float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;
+    if (depthLin > finalBlurStart && !swimming) {
+       blur = clamp((depthLin - finalBlurStart) / blurLength, 0.0, 1.0);
     } else if (swimming) {
        blur = 1.0;
     }
@@ -85,14 +84,20 @@ void main() {
     for(int i = 1; i < MOTION_BLUR_SAMPLES; ++i, blurTexCoord += velocity)
     {
       vec4 currentColor = texture2D(texScene, blurTexCoord);
+# ifndef NO_BLUR
       vec4 currentColorBlur = texture2D(texBlur, blurTexCoord);
+# endif
 
       color += currentColor;
+# ifndef NO_BLUR
       colorBlur += currentColorBlur;
+# endif
     }
 
     color /= MOTION_BLUR_SAMPLES;
+# ifndef NO_BLUR
     colorBlur /= MOTION_BLUR_SAMPLES;
+# endif
 #endif
 
 #ifndef NO_BLUR

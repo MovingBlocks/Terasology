@@ -49,6 +49,13 @@ import org.terasology.world.WorldProvider;
 public class CharacterSoundSystem implements EventHandlerSystem {
 
     final private long MIN_TIME = 10;
+    final private long MIN_TIME_CRASH = 100;
+    final private long MIN_TIME_SWIMMING = 1000;
+
+    // TODO: Moved this here from the CharacterSoundComponent  caused
+    // sounds from being played completely.
+    private long lastSound = 0;
+
     private FastRandom random = new FastRandom();
     private Timer timer;
 
@@ -75,8 +82,8 @@ public class CharacterSoundSystem implements EventHandlerSystem {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-            if (timer.getTimeInMs() - characterSounds.lastSound < MIN_TIME) return;
-            characterSounds.lastSound = timer.getTimeInMs();
+            if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+            lastSound = timer.getTimeInMs();
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
                 audioManager.playSound(sound, location.getWorldPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
@@ -91,8 +98,8 @@ public class CharacterSoundSystem implements EventHandlerSystem {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-            if (timer.getTimeInMs() - characterSounds.lastSound < MIN_TIME) return;
-            characterSounds.lastSound = timer.getTimeInMs();
+            if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+            lastSound = timer.getTimeInMs();
             if (characterSounds.jumpSounds.size() > 0) {
                 Sound sound = characterSounds.jumpSounds.get(random.randomIntAbs(characterSounds.jumpSounds.size()));
                 audioManager.playSound(sound, location.getWorldPosition(), characterSounds.landingVolume, AudioManager.PRIORITY_NORMAL);
@@ -111,11 +118,11 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
         //-11 is velocity of full jump
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-        if (timer.getTimeInMs() - characterSounds.lastSound < MIN_TIME) return;
-        characterSounds.lastSound = timer.getTimeInMs();
+        if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+        lastSound = timer.getTimeInMs();
         if (characterSounds.landingSounds.size() > 0 && event.getVelocity().y < -14f) {
             Sound sound = characterSounds.landingSounds.get(random.randomIntAbs(characterSounds.landingSounds.size()));
-            audioManager.playSound(sound, event.getLocation(), 1.0f, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(sound, event.getLocation(), characterSounds.landingVolume, AudioManager.PRIORITY_NORMAL);
         } else if (characterSounds.footstepSounds.size() > 0) {
             Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
             audioManager.playSound(sound, event.getLocation(), characterSounds.landingVolume, AudioManager.PRIORITY_NORMAL);
@@ -131,8 +138,8 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
         //-5 strongest normal bump
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-        if (timer.getTimeInMs() - characterSounds.lastSound < 500) return;
-        characterSounds.lastSound = timer.getTimeInMs();
+        if (timer.getTimeInMs() - lastSound < MIN_TIME_CRASH) return;
+        lastSound = timer.getTimeInMs();
         if (characterSounds.landingSounds.size() > 0) {
             Sound sound = characterSounds.landingSounds.get(random.randomIntAbs(characterSounds.landingSounds.size()));
             audioManager.playSound(sound, event.getLocation(), characterSounds.landingVolume, AudioManager.PRIORITY_NORMAL);
@@ -146,8 +153,8 @@ public class CharacterSoundSystem implements EventHandlerSystem {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-            if (timer.getTimeInMs() - characterSounds.lastSound < 10) return;
-            characterSounds.lastSound = timer.getTimeInMs();
+            if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+            lastSound = timer.getTimeInMs();
             if (characterSounds.damageSounds.size() > 0) {
                 Sound sound = characterSounds.damageSounds.get(random.randomIntAbs(characterSounds.damageSounds.size()));
                 audioManager.playSound(sound, location.getWorldPosition(), characterSounds.damageVolume, AudioManager.PRIORITY_LOW);
@@ -188,12 +195,12 @@ public class CharacterSoundSystem implements EventHandlerSystem {
         //System.out.print("swinmming\n");
 
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-        if (timer.getTimeInMs() - characterSounds.lastSound < 1000) return;
-        characterSounds.lastSound = timer.getTimeInMs();
+        if (timer.getTimeInMs() - lastSound < MIN_TIME_SWIMMING) return;
+        lastSound = timer.getTimeInMs();
         if (event.getLiquid().getDisplayName().compareTo("Water") == 0) {
-            audioManager.playSound(Assets.getSound("engine:Slime4"), event.getPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(Assets.getSound("engine:Slime4"), event.getPosition(), characterSounds.swimmingVolume, AudioManager.PRIORITY_NORMAL);
         } else if (event.getLiquid().getDisplayName().compareTo("Lava") == 0) {
-            audioManager.playSound(Assets.getSound("engine:FootGrass2"), event.getPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(Assets.getSound("engine:FootGrass2"), event.getPosition(), characterSounds.swimmingVolume, AudioManager.PRIORITY_NORMAL);
         }
 
     }
@@ -202,12 +209,12 @@ public class CharacterSoundSystem implements EventHandlerSystem {
     public void onIntoLiquid(IntoLiquidEvent event, EntityRef entity) {
         //System.out.print("in liquid\n");
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-        if (timer.getTimeInMs() - characterSounds.lastSound < MIN_TIME) return;
-        characterSounds.lastSound = timer.getTimeInMs();
+        if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+        lastSound = timer.getTimeInMs();
         if (event.getLiquid().getDisplayName().compareTo("Water") == 0) {
-            audioManager.playSound(Assets.getSound("engine:Slime1"), event.getPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(Assets.getSound("engine:Slime1"), event.getPosition(), characterSounds.diveVolume, AudioManager.PRIORITY_NORMAL);
         } else if (event.getLiquid().getDisplayName().compareTo("Lava") == 0) {
-            audioManager.playSound(Assets.getSound("engine:FootGrass3"), event.getPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(Assets.getSound("engine:FootGrass3"), event.getPosition(), characterSounds.diveVolume, AudioManager.PRIORITY_NORMAL);
         }
     }
 
@@ -215,12 +222,12 @@ public class CharacterSoundSystem implements EventHandlerSystem {
     public void onFromLiquid(FromLiquidEvent event, EntityRef entity) {
         //System.out.print("out liquid\n");
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-        if (timer.getTimeInMs() - characterSounds.lastSound < MIN_TIME) return;
-        characterSounds.lastSound = timer.getTimeInMs();
+        if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+        lastSound = timer.getTimeInMs();
         if (event.getLiquid().getDisplayName().compareTo("Water") == 0) {
-            audioManager.playSound(Assets.getSound("engine:Slime3"), event.getPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(Assets.getSound("engine:Slime3"), event.getPosition(), characterSounds.diveVolume, AudioManager.PRIORITY_NORMAL);
         } else if (event.getLiquid().getDisplayName().compareTo("Lava") == 0) {
-            audioManager.playSound(Assets.getSound("engine:FootGrass4"), event.getPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(Assets.getSound("engine:FootGrass4"), event.getPosition(), characterSounds.diveVolume, AudioManager.PRIORITY_NORMAL);
         }
     }
 

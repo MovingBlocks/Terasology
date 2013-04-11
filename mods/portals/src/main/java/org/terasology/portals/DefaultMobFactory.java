@@ -20,11 +20,14 @@ import javax.vecmath.Vector3f;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.components.SimpleAIComponent;
 import org.terasology.entitySystem.Prefab;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.utilities.FastRandom;
 
 /**
@@ -48,19 +51,21 @@ public class DefaultMobFactory {
      * @return A reference to the entity created
      */
     public EntityRef generate(Vector3f position, Prefab prefab) {
-    	// Create new prefab
-        EntityRef entity = entityManager.create(prefab.getName());
-        // For changing location
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
-            loc.setWorldPosition(position);
-            loc.setLocalScale((random.randomFloat() + 1.0f) * 0.4f + 0.2f);
-            entity.saveComponent(loc);
-        }
+        // Create new prefab
+        EntityRef entity = entityManager.create(prefab.getName(), position);
 
-        // Set mesh
+        // Set mesh - this is currently probably specific to GelCubes that use a Mesh rather than a SkeletalMesh ...
         MeshComponent mesh = entity.getComponent(MeshComponent.class);
         if (mesh != null) {
+            logger.info("Spawning a prefab with a normal mesh: {}", prefab);
+            // For changing location (and size?) - needs to be changed around sometime
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            if (loc != null) {
+                loc.setWorldPosition(position);
+                loc.setLocalScale((random.randomFloat() + 1.0f) * 0.4f + 0.2f);
+                entity.saveComponent(loc);
+            }
+
             logger.info("Creating a {} with color {} - if default/black then will overwrite with a random color", prefab.getName(), mesh.color);
             // For uninitialized (technically black) GelCubes we just come up with a random color. Well, small list. For now.
             if (mesh.color.equals(new Color4f(0, 0, 0, 1))) {
@@ -68,6 +73,17 @@ public class DefaultMobFactory {
                 mesh.color.set(COLORS[colorId].x, COLORS[colorId].y, COLORS[colorId].z, 1.0f);
                 entity.saveComponent(mesh);
             }
+        // Theory is that anything else is a SkeletalMesh, or at least Oreons are ...
+        } else if (entity.getComponent(SkeletalMeshComponent.class) != null) {
+            logger.info("Spawning a prefab with a SKELETAL mesh: {}", prefab);
+            CharacterMovementComponent movecomp = entity.getComponent(CharacterMovementComponent.class);
+            movecomp.height = 0.31f;
+            entity.saveComponent(movecomp);
+
+            // Temp hack - make portal spawned fancy mobs bounce around like idiots too just so they do something
+            entity.addComponent((new SimpleAIComponent()));
+        } else {
+            logger.info("Was given a prefab with no mesh, can't spawn :-( {}", prefab);
         }
 
         return entity;

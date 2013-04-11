@@ -29,7 +29,9 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -41,11 +43,11 @@ import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PostProcessingRenderer implements IPropertyProvider {
+public class DefaultRenderingProcess implements IPropertyProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRenderingProcess.class);
 
-    private static PostProcessingRenderer _instance = null;
+    private static DefaultRenderingProcess _instance = null;
 
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
@@ -68,6 +70,9 @@ public class PostProcessingRenderer implements IPropertyProvider {
     private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
 
     private Config config = CoreRegistry.get(Config.class);
+    
+	private static boolean tainted = false;
+	private static Collection<String> taintedReasons = new HashSet<String>();
 
     public enum FBOType {
         DEFAULT,
@@ -165,15 +170,15 @@ public class PostProcessingRenderer implements IPropertyProvider {
      *
      * @return The instance
      */
-    public static PostProcessingRenderer getInstance() {
+    public static DefaultRenderingProcess getInstance() {
         if (_instance == null) {
-            _instance = new PostProcessingRenderer();
+            _instance = new DefaultRenderingProcess();
         }
 
         return _instance;
     }
 
-    public PostProcessingRenderer() {
+    public DefaultRenderingProcess() {
         initialize();
     }
 
@@ -192,6 +197,29 @@ public class PostProcessingRenderer implements IPropertyProvider {
         readBackPBOBack.init(1,1);
 
         readBackPBOCurrent = readBackPBOFront;
+    }
+    
+    private class Tainted extends RuntimeException {
+    	public Tainted(Object object, String reason)
+    	{
+    		super(object.toString() + " tainted! (Reason: " + reason + ")");
+    	}
+    }
+    
+    private void taint(String passedReason)
+    {
+    	String reason = passedReason;
+    	tainted = true;
+    	
+    	if ( (reason == null) || (reason == "") )
+    		reason = "Tainted by " + Thread.currentThread().getStackTrace()[2].toString() + ", no reason given.";
+    	
+    	Tainted taintException = new Tainted(this, reason);
+    	
+    	logger.error(taintException.getLocalizedMessage());
+    	taintException.printStackTrace();
+    	
+    	taintedReasons.add(reason);
     }
 
 
@@ -215,7 +243,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
         createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
-        createFBO("sceneShadowMap", 4096, 4096, FBOType.NO_COLOR, true, false);
+        createFBO("sceneShadowMap", 1024, 1024, FBOType.NO_COLOR, true, false);
 
         createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
@@ -283,8 +311,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
             fbo.depthTextureId = GL11.glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthTextureId);
 
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
@@ -362,6 +390,18 @@ public class PostProcessingRenderer implements IPropertyProvider {
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
+                
+                /*
+                 * On some graphics cards, FBOType.NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
+                 * Attempt to continue without this FBO.
+                 */
+                if (type == FBOType.NO_COLOR) {
+                	logger.error("FrameBuffer: " + title
+                            + ", ...but the FBOType was NO_COLOR, ignoring this error and continuing without this FBO.");
+                	
+                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.NO_COLOR.");
+                	return null;
+                }
             default:
                 throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
         }
@@ -374,7 +414,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     private void updateExposure() {
         if (config.getRendering().isEyeAdaptation()) {
-            FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
+            FBO scene = DefaultRenderingProcess.getInstance().getFBO("scene1");
 
             readBackPBOCurrent.copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
@@ -518,39 +558,45 @@ public class PostProcessingRenderer implements IPropertyProvider {
     }
 
     private void renderFinalScene() {
-        ShaderProgram shaderPost = ShaderManager.getInstance().getShaderProgram("post");
-        shaderPost.enable();
+        ShaderProgram shader;
 
+        if (config.getSystem().isDebugRenderingEnabled()) {
+            shader = ShaderManager.getInstance().getShaderProgram("debug");
+        } else {
+            shader = ShaderManager.getInstance().getShaderProgram("post");
+        }
+
+        shader.enable();
         renderFullQuad();
     }
 
     private void generateCombinedScene() {
         ShaderManager.getInstance().enableShader("combine");
 
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneCombined").bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneCombined").unbind();
     }
 
 
     private void generateToneMappedScene() {
         ShaderManager.getInstance().enableShader("hdr");
 
-        PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").unbind();
     }
 
     private void generateLightShafts() {
         ShaderManager.getInstance().enableShader("lightshaft");
 
-        FBO lightshaft = PostProcessingRenderer.getInstance().getFBO("lightShafts");
+        FBO lightshaft = DefaultRenderingProcess.getInstance().getFBO("lightShafts");
         lightshaft.bind();
 
         glViewport(0, 0, lightshaft.width, lightshaft.height);
@@ -558,14 +604,14 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("lightShafts").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("lightShafts").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void generateSSAO() {
         ShaderManager.getInstance().enableShader("ssao");
 
-        FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssao");
+        FBO ssao = DefaultRenderingProcess.getInstance().getFBO("ssao");
         ssao.bind();
 
         glViewport(0, 0, ssao.width, ssao.height);
@@ -573,14 +619,14 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("ssao").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("ssao").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void generateSobel() {
         ShaderManager.getInstance().enableShader("sobel");
 
-        FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
+        FBO sobel = DefaultRenderingProcess.getInstance().getFBO("sobel");
         sobel.bind();
 
         glViewport(0, 0, sobel.width, sobel.height);
@@ -588,7 +634,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sobel").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("sobel").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
@@ -598,7 +644,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         shader.enable();
         shader.setFloat("radius", (Float) ssaoBlurRadius.getValue());
 
-        FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id);
+        FBO ssao = DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + id);
         ssao.bind();
 
         glViewport(0, 0, ssao.width, ssao.height);
@@ -606,14 +652,14 @@ public class PostProcessingRenderer implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            PostProcessingRenderer.getInstance().getFBO("ssao").bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("ssao").bindTexture();
         } else {
-            PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + (id - 1)).bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + (id - 1)).bindTexture();
         }
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id).unbind();
+        DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + id).unbind();
 
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
@@ -621,13 +667,13 @@ public class PostProcessingRenderer implements IPropertyProvider {
     private void generatePrePost() {
         ShaderManager.getInstance().enableShader("prePost");
 
-        PostProcessingRenderer.getInstance().getFBO("scenePrePost").bind();
+        DefaultRenderingProcess.getInstance().getFBO("scenePrePost").bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("scenePrePost").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("scenePrePost").unbind();
     }
 
     private void generateHighPass() {
@@ -635,17 +681,17 @@ public class PostProcessingRenderer implements IPropertyProvider {
         program.setFloat("highPassThreshold", (Float) bloomHighPassThreshold.getValue());
         program.enable();
 
-        FBO highPass = PostProcessingRenderer.getInstance().getFBO("sceneHighPass");
+        FBO highPass = DefaultRenderingProcess.getInstance().getFBO("sceneHighPass");
         highPass.bind();
 
         glViewport(0, 0, highPass.width, highPass.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneHighPass").unbind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneHighPass").unbind();
 
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
@@ -657,7 +703,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         shader.setFloat("radius", (Float) overallBlurFactor.getValue() * config.getRendering().getBlurRadius());
 
-        FBO blur = PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id);
+        FBO blur = DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + id);
         blur.bind();
 
         glViewport(0, 0, blur.width, blur.height);
@@ -665,14 +711,14 @@ public class PostProcessingRenderer implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
         } else {
-            PostProcessingRenderer.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
         }
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).unbind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + id).unbind();
 
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
@@ -683,7 +729,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         shader.enable();
         shader.setFloat("radius", 32.0f);
 
-        FBO bloom = PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id);
+        FBO bloom = DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + id);
         bloom.bind();
 
         glViewport(0, 0, bloom.width, bloom.height);
@@ -691,14 +737,14 @@ public class PostProcessingRenderer implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            PostProcessingRenderer.getInstance().getFBO("sceneHighPass").bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneHighPass").bindTexture();
         } else {
-            PostProcessingRenderer.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
         }
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).unbind();
+        DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + id).unbind();
 
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
@@ -713,20 +759,20 @@ public class PostProcessingRenderer implements IPropertyProvider {
             int size = (int) java.lang.Math.pow(2, i);
             shader.setFloat("size", size);
 
-            PostProcessingRenderer.getInstance().getFBO("scene" + size).bind();
+            DefaultRenderingProcess.getInstance().getFBO("scene" + size).bind();
             glViewport(0, 0, size, size);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (i == 4) {
-                PostProcessingRenderer.getInstance().getFBO("scenePrePost").bindTexture();
+                DefaultRenderingProcess.getInstance().getFBO("scenePrePost").bindTexture();
             } else {
-                PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();
+                DefaultRenderingProcess.getInstance().getFBO("scene" + sizePrev).bindTexture();
             }
 
             renderFullQuad();
 
-            PostProcessingRenderer.getInstance().getFBO("scene" + size).unbind();
+            DefaultRenderingProcess.getInstance().getFBO("scene" + size).unbind();
 
         }
 

@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-#define BLOCK_HINT_WATER            1
-#define BLOCK_HINT_LAVA             2
-#define BLOCK_HINT_WAVING           4
-#define BLOCK_HINT_WAVING_BLOCK     5
-
 #if defined (DYNAMIC_SHADOWS)
 uniform vec3 chunkPositionRelToLightCamera;
 uniform mat4 lightViewProjMatrix;

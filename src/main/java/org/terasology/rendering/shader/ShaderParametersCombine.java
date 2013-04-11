@@ -19,27 +19,27 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 
 import java.util.List;
 
 /**
- * Shader parameters for the Post-processing shader program.
+ * Shader parameters for the Combine shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersCombine extends ShaderParametersBase {
 
-    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.1f);
+    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.01f, 0.001f, 0.1f);
     private Property outlineThickness = new Property("outlineThickness", 1.0f);
     private Property shoreStart = new Property("shoreStart",0.0001f, 0.0f, 0.01f);
-    private Property shoreEnd = new Property("shoreEnd",0.0002f, 0.0f, 0.01f);
+    private Property shoreEnd = new Property("shoreEnd",0.0012f, 0.0f, 0.01f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO sceneOpaque = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
+        DefaultRenderingProcess.FBO sceneOpaque = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -54,7 +54,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         sceneOpaque.bindNormalsTexture();
         program.setInt("texSceneOpaqueNormals", texId++);
 
-        PostProcessingRenderer.FBO sceneTransparent = PostProcessingRenderer.getInstance().getFBO("sceneTransparent");
+        DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         sceneTransparent.bindTexture();
@@ -69,14 +69,14 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         program.setInt("texSceneTransparentNormals", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
-            PostProcessingRenderer.FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred1");
+            DefaultRenderingProcess.FBO ssao = DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred1");
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             ssao.bindTexture();
             program.setInt("texSsao", texId++);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
-            PostProcessingRenderer.FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
+            DefaultRenderingProcess.FBO sobel = DefaultRenderingProcess.getInstance().getFBO("sobel");
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sobel.bindTexture();
             program.setInt("texEdges", texId++);

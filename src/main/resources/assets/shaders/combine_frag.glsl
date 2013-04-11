@@ -26,12 +26,12 @@ uniform sampler2D texSsao;
 #ifdef OUTLINE
 uniform sampler2D texEdges;
 
-uniform float shoreStart;
-uniform float shoreEnd;
-
 uniform float outlineDepthThreshold;
 uniform float outlineThickness;
 #endif
+
+uniform float shoreStart;
+uniform float shoreEnd;
 
 #define OUTLINE_COLOR 0.0, 0.0, 0.0
 

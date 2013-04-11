@@ -19,10 +19,11 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -46,29 +47,37 @@ public class ShaderParametersPost extends ShaderParametersBase {
     Texture noiseTexture = Assets.getTexture("engine:noise");
 
     Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
-    Property maxBlurSky = new Property("maxBlurSky", 1.0f, 0.0f, 1.0f);
+    Property blurStart = new Property("blurStart", 0.1f, 0.0f, 1.0f);
+    Property blurLength = new Property("blurLength", 0.1f, 0.0f, 1.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO sceneCombined = PostProcessingRenderer.getInstance().getFBO("sceneCombined");
+        LocalPlayerSystem localPlayerSystem = CoreRegistry.get(LocalPlayerSystem.class);
+
+        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
         program.setInt("texScene", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneBloom1").bindTexture();
         program.setInt("texBloom", texId++);
 
-        if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0 || CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
+        if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++);
 
-            program.setFloat("maxBlurSky", (Float) maxBlurSky.getValue());
+            if (localPlayerSystem != null) {
+                program.setFloat("blurFocusDistance", localPlayerSystem.getEyeFocusDistance());
+            }
+
+            program.setFloat("blurStart", (Float) blurStart.getValue());
+            program.setFloat("blurLength", (Float) blurLength.getValue());
         }
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -103,6 +112,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(filmGrainIntensity);
-        properties.add(maxBlurSky);
+        properties.add(blurStart);
+        properties.add(blurLength);
     }
 }

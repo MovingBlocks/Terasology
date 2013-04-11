@@ -21,7 +21,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -46,7 +46,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     private Texture effects = Assets.getTexture("engine:effects");
 
     Property skyInscatteringLength = new Property("skyInscatteringLength", 1.0f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.35f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.075f, 0.0f, 1.0f);
+    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.60f, 0.0f, 1.0f);
 
     Property waveIntens = new Property("waveIntens", 1.0f, 0.0f, 2.0f);
     Property waveIntensFalloff = new Property("waveIntensFalloff", 0.88f, 0.0f, 2.0f);
@@ -70,7 +71,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property torchSpecExp = new Property("torchSpecExp", 32.0f, 0.0f, 64.0f);
 
     Property shadowIntens = new Property("shadowIntens", 0.5f, 0.0f, 1.0f);
-    Property shadowMapBias = new Property("shadowMapBias", 0.00001f, 0.0f, 0.0001f);
+    Property shadowMapBias = new Property("shadowMapBias", 0.01f, 0.0f, 0.1f);
 
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
@@ -97,15 +98,15 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         program.setInt("textureEffects", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneReflected").bindTexture();
         program.setInt("textureWaterReflection", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneOpaque").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindTexture();
         program.setInt("texSceneOpaque", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            PostProcessingRenderer.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
             program.setInt("texSceneShadowMap", texId++);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();
@@ -139,6 +140,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             skyInscatteringSettingsFrag.x = (Float) worldRenderer.getSkysphere().getColorExp().getValue();
             skyInscatteringSettingsFrag.y = (Float) skyInscatteringStrength.getValue();
             skyInscatteringSettingsFrag.z = (Float) skyInscatteringLength.getValue();
+            skyInscatteringSettingsFrag.w = (Float) skyInscatteringThreshold.getValue();
             program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag);
         }
 
@@ -171,6 +173,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     public void addPropertiesToList(List<Property> properties) {
         properties.add(skyInscatteringLength);
         properties.add(skyInscatteringStrength);
+        properties.add(skyInscatteringThreshold);
         properties.add(waveIntens);
         properties.add(waveIntensFalloff);
         properties.add(waveSize);

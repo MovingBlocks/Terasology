@@ -25,12 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
-import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ParamType;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;
-import org.terasology.world.block.Block;
+import org.terasology.rendering.shader.ShaderProgram;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +42,6 @@ import java.util.Map;
  * @author Immortius
  */
 public class MaterialShader implements Asset {
-    private static final String PreProcessorPreamble = "#version 120\n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + ";\n";
     private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
 
     private static final Logger logger = LoggerFactory.getLogger(MaterialShader.class);
@@ -156,8 +153,8 @@ public class MaterialShader implements Asset {
     }
 
     private void compileShaderProgram() {
-        String finalVert = createShaderBuilder().append(IncludedFunctionsVertex).append('\n').append(vertShader).toString();
-        String finalFrag = createShaderBuilder().append(IncludedFunctionsFragment).append('\n').append(fragShader).toString();
+        String finalVert = ShaderProgram.createShaderBuilder().append(IncludedFunctionsVertex).append('\n').append(vertShader).toString();
+        String finalFrag = ShaderProgram.createShaderBuilder().append(IncludedFunctionsFragment).append('\n').append(fragShader).toString();
 
         valid = true;
         compileShader(GL20.GL_FRAGMENT_SHADER, finalFrag);
@@ -202,37 +199,6 @@ public class MaterialShader implements Asset {
         infoBuffer.get(infoBytes);
 
         logger.debug("{}", new String(infoBytes));
-    }
-
-    public static StringBuilder createShaderBuilder() {
-        Config config = CoreRegistry.get(Config.class);
-        StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
-        if (config.getRendering().isAnimateGrass())
-            builder.append("#define ANIMATED_GRASS \n");
-        if (config.getRendering().isAnimateWater()) {
-            builder.append("#define ANIMATED_WATER \n");
-        }
-        if (config.getRendering().getBlurIntensity() == 0)
-            builder.append("#define NO_BLUR \n");
-        if (config.getRendering().isFlickeringLight())
-            builder.append("#define FLICKERING_LIGHT \n");
-        if (config.getRendering().isVignette())
-            builder.append("#define VIGNETTE \n");
-        if (config.getRendering().isBloom())
-            builder.append("#define BLOOM \n");
-        if (config.getRendering().isMotionBlur())
-            builder.append("#define MOTION_BLUR \n");
-        if (config.getRendering().isSsao())
-            builder.append("#define SSAO \n");
-        if (config.getRendering().isFilmGrain())
-            builder.append("#define FILM_GRAIN \n");
-        if (config.getRendering().isOutline())
-            builder.append("#define OUTLINE \n");
-        if (config.getRendering().isLightShafts())
-            builder.append("#define LIGHT_SHAFTS \n");
-        if (config.getRendering().isDynamicShadows())
-            builder.append("#define DYNAMIC_SHADOWS \n");
-        return builder;
     }
 
     public static String getIncludedFunctionsVertex() {

@@ -15,24 +15,6 @@
  */
 package org.terasology.audio.openAL;
 
-import static org.lwjgl.openal.AL10.AL_FALSE;
-import static org.lwjgl.openal.AL10.AL_GAIN;
-import static org.lwjgl.openal.AL10.AL_LOOPING;
-import static org.lwjgl.openal.AL10.AL_MAX_DISTANCE;
-import static org.lwjgl.openal.AL10.AL_PLAYING;
-import static org.lwjgl.openal.AL10.AL_REFERENCE_DISTANCE;
-import static org.lwjgl.openal.AL10.AL_ROLLOFF_FACTOR;
-import static org.lwjgl.openal.AL10.AL_SOURCE_RELATIVE;
-import static org.lwjgl.openal.AL10.AL_SOURCE_STATE;
-import static org.lwjgl.openal.AL10.AL_TRUE;
-import static org.lwjgl.openal.AL10.alGenSources;
-import static org.lwjgl.openal.AL10.alGetSourcei;
-import static org.lwjgl.openal.AL10.alSource3f;
-import static org.lwjgl.openal.AL10.alSourceRewind;
-import static org.lwjgl.openal.AL10.alSourceStop;
-import static org.lwjgl.openal.AL10.alSourcef;
-import static org.lwjgl.openal.AL10.alSourcei;
-
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.openal.AL10;
@@ -41,6 +23,8 @@ import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.openal.AL10.*;
 
 public class BasicSoundSource implements SoundSource {
 
@@ -143,7 +127,7 @@ public class BasicSoundSource implements SoundSource {
         alSourcef(getSourceId(), AL_MAX_DISTANCE, AudioManager.MAX_DISTANCE);
         alSourcef(getSourceId(), AL_REFERENCE_DISTANCE, 1f);
         AL10.alSourcei(getSourceId(), AL_SOURCE_RELATIVE, AL_FALSE);
-        AL10.alSourcef(getSourceId(), AL_ROLLOFF_FACTOR, 0.25f);
+        AL10.alSourcef(getSourceId(), AL_ROLLOFF_FACTOR, 1.0f);
 
         fade = false;
         srcGain = 1.0f;

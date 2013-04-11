@@ -44,6 +44,22 @@ public final class ChunkTessellator {
 
     private WorldBiomeProvider biomeProvider;
 
+    public enum ChunkVertexFlags {
+        BLOCK_HINT_WATER(1),
+        BLOCK_HINT_LAVA(2),
+        BLOCK_HINT_GRASS(3),
+        BLOCK_HINT_WAVING(4),
+        BLOCK_HINT_WAVING_BLOCK(5);
+
+        private int value;
+        private ChunkVertexFlags(int value) {
+            this.value = value;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
+
     public ChunkTessellator(WorldBiomeProvider biomeProvider) {
         this.biomeProvider = biomeProvider;
     }
@@ -259,13 +275,13 @@ public final class ChunkTessellator {
 
         // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios
         if (block.getURI().toString().equals("engine:water")) {
-            vertexFlags = 1;
+            vertexFlags = ChunkVertexFlags.BLOCK_HINT_WATER.getValue();
         } else if (block.getURI().toString().equals("engine:lava")) {
-            vertexFlags = 2;
+            vertexFlags = ChunkVertexFlags.BLOCK_HINT_LAVA.getValue();
         } else if (block.isWaving() && block.isDoubleSided()) {
-            vertexFlags = 4;
+            vertexFlags = ChunkVertexFlags.BLOCK_HINT_WAVING.getValue();
         } else if (block.isWaving() && !block.isDoubleSided()) {
-            vertexFlags = 5;
+            vertexFlags = ChunkVertexFlags.BLOCK_HINT_WAVING_BLOCK.getValue();
         }
 
         /*
@@ -332,8 +348,9 @@ public final class ChunkTessellator {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
 
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios
+                // Don't mask grass on the top or bottom side...
                 if (block.getURI().toString().equals("engine:grass")) {
-                    vertexFlags = (dir != Side.TOP && dir != Side.BOTTOM) ? 3 : 0;
+                    vertexFlags = (dir != Side.TOP && dir != Side.BOTTOM) ? ChunkVertexFlags.BLOCK_HINT_GRASS.getValue() : 0;
                 }
 
                 block.getMeshPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlags);

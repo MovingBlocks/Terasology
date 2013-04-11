@@ -16,7 +16,7 @@
 package org.terasology.editor.properties;
 
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -33,7 +33,7 @@ public class SceneProperties implements IPropertyProvider {
         if (skysphere != null) {
             skysphere.addPropertiesToList(properties);
         }
-        PostProcessingRenderer postRenderer = PostProcessingRenderer.getInstance();
+        DefaultRenderingProcess postRenderer = DefaultRenderingProcess.getInstance();
         if (postRenderer != null) {
             postRenderer.addPropertiesToList(properties);
         }

@@ -99,7 +99,7 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setBloom(false);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
-                        config.getRendering().setFilmGrain(false);
+                        config.getRendering().setFilmGrain(true);
                         config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);

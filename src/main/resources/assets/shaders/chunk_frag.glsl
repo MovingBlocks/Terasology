@@ -14,13 +14,9 @@
  * limitations under the License.
 */
 
-#define BLOCK_HINT_WATER     1
-#define BLOCK_HINT_LAVA      2
-#define BLOCK_HINT_GRASS     3
-
-#define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
-#define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
-#define NIGHT_BRIGHTNESS 0.05
+#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
+#define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
+#define NIGHT_BRIGHTNESS 0.1
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
 
@@ -73,6 +69,7 @@ uniform vec4 skyInscatteringSettingsFrag;
 #define skyInscatteringExponent skyInscatteringSettingsFrag.x
 #define skyInscatteringStrength skyInscatteringSettingsFrag.y
 #define skyInscatteringLength skyInscatteringSettingsFrag.z
+#define skyInscatteringThreshold skyInscatteringSettingsFrag.w
 
 #ifdef FEATURE_TRANSPARENT_PASS
 uniform vec4 waterSettingsFrag;
@@ -175,9 +172,11 @@ void main(){
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
 
+#if defined FEATURE_ALPHA_REJECT
         if (color.a < 0.5) {
             discard;
         }
+#endif
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
@@ -219,10 +218,9 @@ void main(){
         diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
     }
 
+#if defined (DYNAMIC_SHADOWS)
     float shadowTerm = 1.0;
 
-#if defined (DYNAMIC_SHADOWS)
-    /* DYNAMIC SHADOWS */
     vec3 vertexLightPosClipSpace = vertexLightProjPos.xyz / vertexLightProjPos.w;
     vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5, 0.5) + vec2(0.5);
     float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
@@ -257,11 +255,9 @@ void main(){
     } else
 #endif
     {
-        /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
     }
 
-    /* SUNLIGHT BECOMES MOONLIGHT */
     vec3 ambientTint = mix(vec3(MOONLIGHT_AMBIENT_COLOR), vec3(DAYLIGHT_AMBIENT_COLOR), daylight);
     daylightColorValue.xyz *= ambientTint;
 
@@ -286,8 +282,9 @@ void main(){
     color.xyz *= shadowTerm;
 #endif
 
+    float finalFogStart = skyInscatteringThreshold * viewingDistance;
+    float fogValue = clamp((distance - finalFogStart) / (skyInscatteringLength * viewingDistance + finalFogStart), 0.0, skyInscatteringStrength);
     vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
-    float fogValue = skyInscatteringStrength - clamp((viewingDistance - distance) / (viewingDistance - (1.0 - skyInscatteringLength) * viewingDistance), 0.0, skyInscatteringStrength);
     color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
     gl_FragData[0].rgba = color;

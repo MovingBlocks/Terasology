@@ -93,29 +93,49 @@ public class DebugControlSystem implements EventHandlerSystem {
         if (debugEnabled) {
             switch (event.getKey()) {
                 case Keyboard.KEY_R:
-                    worldRenderer.setWireframe(!worldRenderer.isWireframe());
+                    config.getSystem().setDebugRenderWireframe(!config.getSystem().isDebugRenderWireframe());
                     event.consume();
                     break;
                 case Keyboard.KEY_K:
                     entity.send(new DamageEvent(9999, null));
                     break;
-                case Keyboard.KEY_H:
-                    for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                        element.setVisible(!element.isVisible());
-                    }
 
+                case Keyboard.KEY_F6:
+                    config.getSystem().setDebugRenderingEnabled(!config.getSystem().isDebugRenderingEnabled());
+                    event.consume();
+                    break;
+                case Keyboard.KEY_F7:
+                    config.getSystem().cycleDebugRenderingStage();
+                    event.consume();
+                    break;
+                case Keyboard.KEY_F8:
+                    config.getSystem().setDebugRenderChunkBoundingBoxes(!config.getSystem().isDebugRenderChunkBoundingBoxes());
                     event.consume();
                     break;
             }
         }
 
         switch (event.getKey()) {
-            case Keyboard.KEY_F3:
-                config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
+            case Keyboard.KEY_H:
+                for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+                    element.setVisible(!element.isVisible());
+                }
+
+                config.getSystem().setDebugFirstPersonElementsHidden(!config.getSystem().isDebugFirstPersonElementsHidden());
+
                 event.consume();
                 break;
             case Keyboard.KEY_F:
                 toggleViewingDistance();
+                event.consume();
+                break;
+            case Keyboard.KEY_F1:
+                TerasologyEngine.setEditorInFocus(!TerasologyEngine.isEditorInFocus());
+                Mouse.setGrabbed(!TerasologyEngine.isEditorInFocus());
+                event.consume();
+                break;
+            case Keyboard.KEY_F3:
+                config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
             case Keyboard.KEY_F4:
@@ -125,11 +145,6 @@ public class DebugControlSystem implements EventHandlerSystem {
                 break;
             case Keyboard.KEY_F5:
                 CoreRegistry.get(GUIManager.class).openWindow("itemList");
-                event.consume();
-                break;
-            case Keyboard.KEY_F1:
-                TerasologyEngine.setEditorInFocus(!TerasologyEngine.isEditorInFocus());
-                Mouse.setGrabbed(!TerasologyEngine.isEditorInFocus());
                 event.consume();
                 break;
         }

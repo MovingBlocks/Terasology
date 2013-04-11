@@ -18,7 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -42,7 +42,7 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("sceneCombined");
+        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindTexture();
         program.setInt("texScene", 0);

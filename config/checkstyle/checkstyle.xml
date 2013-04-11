@@ -8,23 +8,29 @@
         <property name="file" value="${samedir}/suppressions.xml"/>
     </module>
 
-    <!-- Checks whether files end with a new line.                        -->
+    <!-- Checks whether files end with a new line. -->
     <!-- See http://checkstyle.sourceforge.net/config_misc.html#NewlineAtEndOfFile -->
-    <module name="NewlineAtEndOfFile"/>
+    <module name="NewlineAtEndOfFile">
+        <property name="fileExtensions" value="java"/> 
+    </module>
 
     <!-- Checks that there are no tab characters ('\t') in the source code. -->
     <!-- See http://checkstyle.sourceforge.net/config_whitespace.html#FileTabCharacter -->
-    <module name="FileTabCharacter"/>
+    <module name="FileTabCharacter">
+        <property name="fileExtensions" value="java"/> 
+    </module>
 
     <module name="TreeWalker">
         <!-- Checks for Naming Conventions -->
         <!-- See http://checkstyle.sourceforge.net/config_naming.html -->
         <!-- ***************************** -->
+        <!-- class type parameters : ^[A-Z]$ -->
+        <module name="ClassTypeParameterName"/>
         <!-- constants (static, final fields) : ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
-		<!-- Unfortunately this modules is too inclusive - static final fields are not necessarily constants! -->
+        <!-- Unfortunately this modules is too inclusive - static final fields are not necessarily constants! -->
         <module name="ConstantName">
-			<property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|logger)$"/> 
-		</module>
+            <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|logger)$"/> 
+        </module>
         <!-- local, final variables, including catch parameters : ^[a-z][a-zA-Z0-9]*$ -->
         <module name="LocalFinalVariableName"/>
         <!-- local, non-final variables, including catch parameters : ^[a-z][a-zA-Z0-9]*$ -->
@@ -33,8 +39,12 @@
         <module name="MemberName"/>
         <!-- methods : ^[a-z][a-zA-Z0-9]*$ -->
         <module name="MethodName"/>
+        <!-- method type parameters : ^[A-Z]$ -->
+        <module name="MethodTypeParameterName"/>
         <!-- packages : ^[a-z]+(\.[a-zA-Z_][a-zA-Z0-9_]*)*$ -->
-        <module name="PackageName"/>
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+        </module>
         <!-- parameters : ^[a-z][a-zA-Z0-9]*$ -->
         <module name="ParameterName"/>
         <!-- static, non-final fields : ^[a-z][a-zA-Z0-9]*$ -->
@@ -43,73 +53,93 @@
         <module name="TypeName"/>
 
         <!-- Checks for imports -->
-        <!-- ****************** -->
+        <!-- See http://checkstyle.sourceforge.net/config_imports.html -->
+        <!-- *******************-->
         <!-- Checks that there are no import statements that use the * notation. -->
-        <!-- See http://checkstyle.sourceforge.net/config_imports.html#AvoidStarImport -->
         <module name="AvoidStarImport">
             <property name="severity" value="warning"/>
-            <property name="allowStaticMemberImports" value="true"/> <!-- allow starred static member imports -->
+            <!-- allow starred static member imports -->
+            <property name="allowStaticMemberImports" value="true"/>
         </module>
         <!-- Checks for redundant import statements. -->
-        <!-- See http://checkstyle.sourceforge.net/config_imports.html#RedundantImport -->
         <module name="RedundantImport">
             <property name="severity" value="warning"/>
         </module>
         <!-- Checks for unused import statements. -->
-        <!-- See http://checkstyle.sourceforge.net/config_imports.html#UnusedImports -->
         <module name="UnusedImports">
             <property name="severity" value="warning"/>
         </module>
 
+        <!-- Checks for Size Violations -->
+        <!-- See http://checkstyle.sourceforge.net/config_sizes.html -->
+        <!-- ************************** -->
+        <module name="LineLength">
+            <property name="severity" value="warning"/>
+            <property name="max" value="120"/>
+        </module>
+        <!-- Checks for the number of types declared at the outer (or root) level in a file. -->
+        <module name="OuterTypeNumber"/>
+
+        <!-- Checks for whitespaces -->
+        <!-- See http://checkstyle.sourceforge.net/config_whitespace.html -->
+        <!-- ********************** -->
+
         <!-- Modifier Checks -->
+        <!-- See http://checkstyle.sourceforge.net/config_modifier.html -->
         <!-- *************** -->
         <!-- Checks that the order of modifiers conforms to the suggestions in the Java Language specification -->
-        <!-- See http://checkstyle.sourceforge.net/config_modifier.html#ModifierOrder -->
         <module name="ModifierOrder"/>
         <!-- Checks for redundant modifiers -->
-        <!-- See http://checkstyle.sourceforge.net/config_modifier.html#RedundantModifier -->
         <module name="RedundantModifier">
             <property name="severity" value="warning"/>
         </module>
 
-        <!-- Checks for blocks. You know, those {}'s -->
-        <!-- *************************************** -->
+        <!-- Checks for blocks -->
+        <!-- See http://checkstyle.sourceforge.net/config_blocks.html -->
+        <!-- ***************** -->
         <!-- Finds nested blocks, i.e. blocks that are used freely in the code. -->
-        <!-- See http://checkstyle.sourceforge.net/config_blocks.html#AvoidNestedBlocks -->
-        <module name="AvoidNestedBlocks"/>
+        <module name="AvoidNestedBlocks">
+            <property name="severity" value="warning"/>
+        </module>
         <!-- Checks for empty blocks. -->
-        <!-- See http://checkstyle.sourceforge.net/config_blocks.html#EmptyBlock -->
         <module name="EmptyBlock">
             <property name="severity" value="warning"/>
         </module>
         <!-- Checks for the placement of left curly braces ('{') for code blocks. Default: eol -->
-        <!-- See http://checkstyle.sourceforge.net/config_blocks.html#LeftCurly -->
-        <module name="LeftCurly"/>
+        <module name="LeftCurly">
+            <property name="maxLineLength" value="120"/>
+        </module>
         <!-- Checks for braces around code blocks. -->
-        <!-- See http://checkstyle.sourceforge.net/config_blocks.html#NeedBraces -->
         <module name="NeedBraces"/>
         <!-- Checks the placement of right curly braces ('}') for else, try, and catch tokens. Default: same -->
-        <!-- See http://checkstyle.sourceforge.net/config_blocks.html#RightCurly -->
         <module name="RightCurly"/>
 
-        <!-- Miscellaneous other checks. -->
-        <!-- *************************** -->
+        <!-- Checks for common coding problems -->
+        <!-- See http://checkstyle.sourceforge.net/config_coding.html -->
+        <!-- ********************************* -->
+
+        <!-- Checks for class design -->
+        <!-- See http://checkstyle.sourceforge.net/config_design.html -->
+        <!-- *********************** -->
+
+        <!-- Miscellaneous other checks -->
+        <!-- See http://checkstyle.sourceforge.net/config_misc.html -->
+        <!-- ************************** -->
         <!-- Checks the style of array type definitions. -->
-        <!-- See http://checkstyle.sourceforge.net/config_misc.html#ArrayTypeStyle -->
         <module name="ArrayTypeStyle">
             <property name="severity" value="warning"/>
         </module>
         <!-- Checks correct indentation of Java Code. -->
-        <!-- See http://checkstyle.sourceforge.net/config_misc.html#Indentation -->
         <module name="Indentation">
             <property name="severity" value="warning"/>
         </module>
         <!-- Checks that long constants are defined with an upper ell. That is ' L' and not 'l'. -->
-        <!-- See http://checkstyle.sourceforge.net/config_misc.html#UpperEll -->
         <module name="UpperEll"/>
         <!-- Checks that the outer type name and the file name match. -->
-        <!-- See http://checkstyle.sourceforge.net/config_misc.html#OuterTypeFilename -->
         <module name="OuterTypeFilename"/>
 
+        <!-- Checks for annotations -->
+        <!-- See http://checkstyle.sourceforge.net/config_annotation.html -->
+        <!-- ********************** -->
     </module>
 </module>

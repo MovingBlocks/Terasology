@@ -27,13 +27,13 @@ public class RenderingConfig {
     private boolean renderPlacingBox = true;
     private int blurIntensity = 3;
     private boolean reflectiveWater = false;
-    private boolean vignette = false;
+    private boolean vignette = true;
     private boolean motionBlur = false;
     private boolean ssao = false;
-    private boolean filmGrain = false;
+    private boolean filmGrain = true;
     private boolean outline = true;
     private boolean lightShafts = false;
-    private boolean eyeAdapting = false;
+    private boolean eyeAdaptation = true;
     private boolean bloom = false;
     private boolean dynamicShadows = false;
 
@@ -254,11 +254,11 @@ public class RenderingConfig {
     }
 
     public boolean isEyeAdaptation() {
-        return eyeAdapting;
+        return eyeAdaptation;
     }
 
     public void setEyeAdaptation(boolean eyeAdapting) {
-        this.eyeAdapting = eyeAdapting;
+        this.eyeAdaptation = eyeAdapting;
     }
 
     public boolean isBloom() {

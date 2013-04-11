@@ -16,11 +16,13 @@
 {
     "Portal" : {
     },
+    "Holding" : {
+    },
     "Spawner" : {
         // Want to be able to spawn multiple things (or one thing in different ways)
         // Ex 1: Spawn a gelcube in the immediate vicinity
         // Ex 2: Spawn a gelcube in the "wild" (within a certain distance / within a zone)
-        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube", "herobrine"]
+        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube", "oreon"]
     },
     "PlaySoundAction" : {
         sounds = "portals:spawn"

@@ -17,7 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.properties.Property;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 
 import java.util.List;
 
@@ -28,16 +28,14 @@ import java.util.List;
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
 
-    Property pixelOffsetX = new Property("pixelOffsetX", 1.25f, 0.0f, 16.0f);
-    Property pixelOffsetY = new Property("pixelOffsetY", 1.25f, 0.0f, 16.0f);
-
-    Property threshold = new Property("threshold", 16.0f, 0.0f, 16.0f);
+    Property pixelOffsetX = new Property("pixelOffsetX", 1.0f, 0.0f, 16.0f);
+    Property pixelOffsetY = new Property("pixelOffsetY", 1.0f, 0.0f, 16.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
+        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindDepthTexture();
         program.setInt("texDepth", 0);
@@ -47,14 +45,11 @@ public class ShaderParametersSobel extends ShaderParametersBase {
 
         program.setFloat("pixelOffsetX", (Float) pixelOffsetX.getValue());
         program.setFloat("pixelOffsetY", (Float) pixelOffsetY.getValue());
-
-        program.setFloat("threshold", (Float) threshold.getValue());
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(pixelOffsetX);
         properties.add(pixelOffsetY);
-        properties.add(threshold);
     }
 }

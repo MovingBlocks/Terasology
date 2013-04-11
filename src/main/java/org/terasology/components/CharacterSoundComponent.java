@@ -26,9 +26,6 @@ import com.google.common.collect.Lists;
  * @author Immortius <immortius@gmail.com>
  */
 public final class CharacterSoundComponent implements Component {
-
-	public long lastSound=0;
-	
 	//TODO all of these could be just one string variable
     public List<Sound> footstepSounds = Lists.newArrayList();
     public List<Sound> damageSounds = Lists.newArrayList();
@@ -42,4 +39,7 @@ public final class CharacterSoundComponent implements Component {
     public float landingVolume = 1.0f;
     public float deathVolume = 1.0f;
     public float respawnVolume = 1.0f;
+    public float swimmingVolume = 1.0f;
+    public float diveVolume = 1.0f;
+
 }

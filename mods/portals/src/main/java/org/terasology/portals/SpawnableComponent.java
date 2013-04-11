@@ -16,9 +16,10 @@
 package org.terasology.portals;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
 
 /**
- * Component that enables an entity to be spawned by something
+ * Component that enables an entity to be spawned by something.
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
@@ -29,6 +30,9 @@ public class SpawnableComponent implements Component {
     
     /** Weight for how common the spawnable is, from 0-255 with 0 meaning unspawnable and 255 being the most common */
     public short probability = 1;
+
+    /** What made this Spawnable? */
+    public EntityRef parent = null;
     
     //TODO add darkness level and biome when map generation has reached better level
 }
