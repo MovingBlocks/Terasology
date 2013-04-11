@@ -230,7 +230,11 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
 
     @Override
     public void setStackSize(EntityRef item, int newStackSize) {
-        setStackSize(item, item.getComponent(ItemComponent.class), newStackSize);
+        setStackSize(item, EntityRef.NULL, newStackSize);
+    }
+    @Override
+    public void setStackSize(EntityRef item, EntityRef inventoryEntity, int newStackSize) {
+         setStackSize(item,item.getComponent(ItemComponent.class) , newStackSize, inventoryEntity);
     }
 
     @Override
@@ -541,12 +545,22 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     }
 
     private void setStackSize(EntityRef item, ItemComponent component, int newStackSize) {
+        setStackSize(item,component,newStackSize, EntityRef.NULL);
+    }
+
+    private void setStackSize(EntityRef item, ItemComponent component, int newStackSize, EntityRef inventoryEntity) {
         if (!networkSystem.getMode().isAuthority()) {
             predictedStackCounts.put(item, newStackSize);
         } else {
             component.stackCount = (byte) newStackSize;
             item.saveComponent(component);
         }
+
+        //destroy item if new stack size is 0
+        if(newStackSize <=0 && inventoryEntity != EntityRef.NULL) {
+            destroyItem(inventoryEntity,item);
+        }
+
     }
 
     private InventoryComponent getInventoryComponent(EntityRef entity) {

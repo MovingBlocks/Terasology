@@ -179,10 +179,7 @@ public class CharacterSystem implements ComponentSystem {
         //XXX note this occurs on both the client and server side
         InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
         int newStackSize = inventoryManager.getStackSize(selectedItemEntity)  -1;
-        inventoryManager.setStackSize(selectedItemEntity, newStackSize);
-        if(newStackSize <=0 ) {
-            inventoryManager.destroyItem(event.getInventoryEntity(), selectedItemEntity);
-        }
+        inventoryManager.setStackSize(selectedItemEntity, event.getInventoryEntity(), newStackSize);
 
     }
 
