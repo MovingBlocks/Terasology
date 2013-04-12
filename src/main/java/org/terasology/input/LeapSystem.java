@@ -349,7 +349,7 @@ public class LeapSystem implements EventHandlerSystem {
 
                     break;
                 default:
-                    System.out.println("Unknown gesture type.");
+                    System.out.println("Unknown / unhandled gesture type.");
                     break;
             }
         }
