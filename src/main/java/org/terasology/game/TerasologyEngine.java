@@ -39,6 +39,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.monitoring.gui.TerasologyMonitor;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyGameVersionInfo;
@@ -102,6 +103,8 @@ public class TerasologyEngine implements GameEngine {
         logger.info(TerasologyGameVersionInfo.getInstance().toString());
 
         initConfig();
+        
+        TerasologyMonitor.setMonitorVisible(true);
 
         initNativeLibs();
         initDisplay();
