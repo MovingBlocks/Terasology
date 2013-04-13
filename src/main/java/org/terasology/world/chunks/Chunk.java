@@ -25,6 +25,8 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.monitoring.impl.ChunkEvent;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
@@ -102,6 +104,7 @@ public class Chunk {
         this.lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.dirty = true;
+        ChunkMonitor.registerChunk(this);
     }
 
     public Chunk(Vector3i pos) {
@@ -116,6 +119,7 @@ public class Chunk {
         extraData = other.extraData.copy();
         chunkState = other.chunkState;
         dirty = true;
+        ChunkMonitor.registerChunk(this);
     }
 
     public Chunk(Vector3i pos, ChunkState chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
@@ -126,6 +130,7 @@ public class Chunk {
         this.extraData = Preconditions.checkNotNull(liquid);
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
+        ChunkMonitor.registerChunk(this);
     }
 
     /**
@@ -208,7 +213,11 @@ public class Chunk {
 
     public void setChunkState(ChunkState chunkState) {
         Preconditions.checkNotNull(chunkState);
-        this.chunkState = chunkState;
+        if (this.chunkState != chunkState) {
+            final ChunkState old = this.chunkState;
+            this.chunkState = chunkState;
+            ChunkMonitor.fireStateChanged(this, old);
+        }
     }
 
     public boolean isDirty() {
@@ -406,18 +415,24 @@ public class Chunk {
                 double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
 
+                ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
                 logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
             } else {
+                final int oldSize = getEstimatedMemoryConsumptionInBytes();
+                
                 blockData = def.deflate(blockData);
                 sunlightData = def.deflate(sunlightData);
                 lightData = def.deflate(lightData);
                 extraData = def.deflate(extraData);
+                
+                ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
             }
         } finally {
             unlock();
         }
     }
 
+    @Deprecated
     public void inflate() {
         lock();
         try {
@@ -493,6 +508,7 @@ public class Chunk {
             }
             mesh = null;
         }
+        ChunkMonitor.fireChunkDisposed(this);
     }
 
     public boolean isDisposed() {

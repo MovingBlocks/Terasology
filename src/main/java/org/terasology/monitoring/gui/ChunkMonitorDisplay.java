@@ -44,7 +44,7 @@ import com.google.common.eventbus.Subscribe;
 @SuppressWarnings("serial")
 public class ChunkMonitorDisplay extends JPanel {
 
-    public static final int PURGE_DEAD_CHUNKS_INTERVAL = 30000;
+    public static final int PURGE_DEAD_CHUNKS_INTERVAL = 10000;
     
     public static final Color ColorComplete = new Color(0, 38, 28);
     public static final Color ColorFullLightConnectivityPending = new Color(69, 191, 85);
