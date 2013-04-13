@@ -1205,9 +1205,9 @@ public final class ChunksProtobuf {
     boolean hasZ();
     int getZ();
     
-    // optional .State state = 4;
+    // optional uint32 state = 4;
     boolean hasState();
-    org.terasology.protobuf.ChunksProtobuf.State getState();
+    int getState();
     
     // optional .TeraArray block_data = 5;
     boolean hasBlockData();
@@ -1298,13 +1298,13 @@ public final class ChunksProtobuf {
       return z_;
     }
     
-    // optional .State state = 4;
+    // optional uint32 state = 4;
     public static final int STATE_FIELD_NUMBER = 4;
-    private org.terasology.protobuf.ChunksProtobuf.State state_;
+    private int state_;
     public boolean hasState() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
-    public org.terasology.protobuf.ChunksProtobuf.State getState() {
+    public int getState() {
       return state_;
     }
     
@@ -1385,7 +1385,7 @@ public final class ChunksProtobuf {
       x_ = 0;
       y_ = 0;
       z_ = 0;
-      state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+      state_ = 0;
       blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       sunlightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       lightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
@@ -1421,7 +1421,7 @@ public final class ChunksProtobuf {
         output.writeSInt32(3, z_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeEnum(4, state_.getNumber());
+        output.writeUInt32(4, state_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeMessage(5, blockData_);
@@ -1462,7 +1462,7 @@ public final class ChunksProtobuf {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(4, state_.getNumber());
+          .computeUInt32Size(4, state_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1620,7 +1620,7 @@ public final class ChunksProtobuf {
         bitField0_ = (bitField0_ & ~0x00000002);
         z_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+        state_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
         if (blockDataBuilder_ == null) {
           blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
@@ -1865,14 +1865,8 @@ public final class ChunksProtobuf {
               break;
             }
             case 32: {
-              int rawValue = input.readEnum();
-              org.terasology.protobuf.ChunksProtobuf.State value = org.terasology.protobuf.ChunksProtobuf.State.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(4, rawValue);
-              } else {
-                bitField0_ |= 0x00000008;
-                state_ = value;
-              }
+              bitField0_ |= 0x00000008;
+              state_ = input.readUInt32();
               break;
             }
             case 42: {
@@ -1986,18 +1980,15 @@ public final class ChunksProtobuf {
         return this;
       }
       
-      // optional .State state = 4;
-      private org.terasology.protobuf.ChunksProtobuf.State state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+      // optional uint32 state = 4;
+      private int state_ ;
       public boolean hasState() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
-      public org.terasology.protobuf.ChunksProtobuf.State getState() {
+      public int getState() {
         return state_;
       }
-      public Builder setState(org.terasology.protobuf.ChunksProtobuf.State value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
+      public Builder setState(int value) {
         bitField0_ |= 0x00000008;
         state_ = value;
         onChanged();
@@ -2005,7 +1996,7 @@ public final class ChunksProtobuf {
       }
       public Builder clearState() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+        state_ = 0;
         onChanged();
         return this;
       }
@@ -2594,21 +2585,21 @@ public final class ChunksProtobuf {
       "\n\014Chunks.proto\"B\n\tTeraArray\022\023\n\004type\030\001 \001(" +
       "\0162\005.Type\022\022\n\nclass_name\030\002 \001(\t\022\014\n\004data\030\003 \001" +
       "(\014\"/\n\007ModData\022\n\n\002id\030\001 \001(\t\022\030\n\004data\030\002 \001(\0132" +
-      "\n.TeraArray\"\345\001\n\005Chunk\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 " +
-      "\001(\021\022\t\n\001z\030\003 \001(\021\022\025\n\005state\030\004 \001(\0162\006.State\022\036\n" +
-      "\nblock_data\030\005 \001(\0132\n.TeraArray\022!\n\rsunligh" +
-      "t_data\030\006 \001(\0132\n.TeraArray\022\036\n\nlight_data\030\007" +
-      " \001(\0132\n.TeraArray\022\036\n\nextra_data\030\010 \001(\0132\n.T" +
-      "eraArray\022\032\n\010mod_data\030\t \003(\0132\010.ModData*\005\010d" +
-      "\020\351\007*\220\001\n\004Type\022\013\n\007Unknown\020\000\022\022\n\016DenseArray4",
-      "Bit\020\001\022\022\n\016DenseArray8Bit\020\002\022\023\n\017DenseArray1" +
-      "6Bit\020\003\022\023\n\017SparseArray4Bit\020\004\022\023\n\017SparseArr" +
-      "ay8Bit\020\005\022\024\n\020SparseArray16Bit\020\006*\242\001\n\005State" +
-      "\022 \n\034ADJACENCY_GENERATION_PENDING\020\000\022%\n!IN" +
-      "TERNAL_LIGHT_GENERATION_PENDING\020\001\022\035\n\031LIG" +
-      "HT_PROPAGATION_PENDING\020\002\022#\n\037FULL_LIGHT_C" +
-      "ONNECTIVITY_PENDING\020\003\022\014\n\010COMPLETE\020\004B+\n\027o" +
-      "rg.terasology.protobufB\016ChunksProtobufH\001"
+      "\n.TeraArray\"\335\001\n\005Chunk\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 " +
+      "\001(\021\022\t\n\001z\030\003 \001(\021\022\r\n\005state\030\004 \001(\r\022\036\n\nblock_d" +
+      "ata\030\005 \001(\0132\n.TeraArray\022!\n\rsunlight_data\030\006" +
+      " \001(\0132\n.TeraArray\022\036\n\nlight_data\030\007 \001(\0132\n.T" +
+      "eraArray\022\036\n\nextra_data\030\010 \001(\0132\n.TeraArray" +
+      "\022\032\n\010mod_data\030\t \003(\0132\010.ModData*\005\010d\020\351\007*\220\001\n\004" +
+      "Type\022\013\n\007Unknown\020\000\022\022\n\016DenseArray4Bit\020\001\022\022\n",
+      "\016DenseArray8Bit\020\002\022\023\n\017DenseArray16Bit\020\003\022\023" +
+      "\n\017SparseArray4Bit\020\004\022\023\n\017SparseArray8Bit\020\005" +
+      "\022\024\n\020SparseArray16Bit\020\006*\242\001\n\005State\022 \n\034ADJA" +
+      "CENCY_GENERATION_PENDING\020\000\022%\n!INTERNAL_L" +
+      "IGHT_GENERATION_PENDING\020\001\022\035\n\031LIGHT_PROPA" +
+      "GATION_PENDING\020\002\022#\n\037FULL_LIGHT_CONNECTIV" +
+      "ITY_PENDING\020\003\022\014\n\010COMPLETE\020\004B+\n\027org.teras" +
+      "ology.protobufB\016ChunksProtobufH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
