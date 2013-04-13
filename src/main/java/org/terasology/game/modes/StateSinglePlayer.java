@@ -30,7 +30,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
-import org.terasology.input.LeapSystem;
+import org.terasology.input.TeraLeapSystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -63,7 +63,7 @@ public class StateSinglePlayer implements GameState {
     private EntityManager entityManager;
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
-    private LeapSystem leapSystem;
+    private TeraLeapSystem teraLeapSystem;
 
     /* GAME LOOP */
     private boolean pauseGame = false;
@@ -81,11 +81,9 @@ public class StateSinglePlayer implements GameState {
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
 
-        CoreRegistry.put(Controller.class, new Controller());
-        leapSystem = new LeapSystem();
-        leapSystem.initialise();
-        CoreRegistry.put(LeapSystem.class, leapSystem);
-        componentSystemManager.register(leapSystem, "engine:LeapSystem");
+        //TODO: Put this somewhere better?
+        teraLeapSystem = new TeraLeapSystem();
+        teraLeapSystem.initialise();
 
         guiManager.openWindow(MenuControlSystem.HUD);
     }
@@ -132,7 +130,7 @@ public class StateSinglePlayer implements GameState {
     public void handleInput(float delta) {
         cameraTargetSystem.update();
         inputSystem.update(delta);
-        leapSystem.update(delta);
+        teraLeapSystem.update(delta); //TODO: Any way to get update() invoked without this? Module style
     }
 
     private boolean shouldUpdateWorld() {
