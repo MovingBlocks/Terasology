@@ -6,8 +6,6 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.input.jitter.BufferedJitterSystem;
 import org.terasology.input.jitter.JitterSystem;
 
-import java.util.Set;
-
 /**
  * Yay.
  */
@@ -24,6 +22,8 @@ public class TeraLeapSystem implements EventHandlerSystem {
         jitter = new JitterSystem(jitterBuffer);
 
         jitter.enableGesture(Gesture.Type.TYPE_CIRCLE);
+        //jitter.enableCircleGestures(true, 1) //"true" enables consuming gestures, 1 is minimal progress before reporting, could also include radius?)
+
         System.out.println("Jitter says hi");
     }
 
