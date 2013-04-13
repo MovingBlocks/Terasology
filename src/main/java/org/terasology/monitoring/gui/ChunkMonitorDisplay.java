@@ -29,15 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.monitoring.SingleThreadMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.WeakChunk;
 import org.terasology.monitoring.impl.ChunkEvent;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.provider.ChunkProvider;
 
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.Subscribe;
@@ -392,9 +391,7 @@ public class ChunkMonitorDisplay extends JPanel {
     protected Vector3i calcPlayerChunkPos() {
         final LocalPlayer p = CoreRegistry.get(LocalPlayer.class);
         if (p != null) {
-            final WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
-            if (renderer != null)
-                return renderer.getChunkProvider().getChunkType().calcChunkPos(new Vector3i(p.getPosition()));
+            return TeraMath.calcChunkPos(new Vector3i(p.getPosition()));
         }
         return null;
     }
