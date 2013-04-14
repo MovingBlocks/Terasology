@@ -39,6 +39,8 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.monitoring.SingleThreadMonitor;
+import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.gui.TerasologyMonitor;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
@@ -73,6 +75,8 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
+    private final SingleThreadMonitor monitor = ThreadMonitor.create("Engine", "Frames");
+    
     private GameState currentState;
     private boolean initialised;
     private boolean running;
@@ -415,54 +419,64 @@ public class TerasologyEngine implements GameEngine {
 
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
-        // MAIN GAME LOOP
-        while (running && !Display.isCloseRequested()) {
+        
+        try { 
+            // MAIN GAME LOOP
+            while (running && !Display.isCloseRequested()) {
 
-            // Only process rendering and updating once a second
-            if (!Display.isActive() && !TerasologyEngine.isEditorAttached()) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    logger.warn("Display inactivity sleep interrupted", e);
+                monitor.increment(0);
+                
+                // Only process rendering and updating once a second
+                if (!Display.isActive() && !TerasologyEngine.isEditorAttached()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        logger.warn("Display inactivity sleep interrupted", e);
+                    }
+                }
+
+                processStateChanges();
+
+                if (currentState == null) {
+                    shutdown();
+                    break;
+                }
+
+                timer.tick();
+
+                PerformanceMonitor.startActivity("Main Update");
+                currentState.update(timer.getDelta());
+                PerformanceMonitor.endActivity();
+
+                PerformanceMonitor.startActivity("Render");
+                currentState.render();
+                Display.update();
+                Display.sync(60);
+                PerformanceMonitor.endActivity();
+
+                PerformanceMonitor.startActivity("Input");
+                currentState.handleInput(timer.getDelta());
+                PerformanceMonitor.endActivity();
+
+                PerformanceMonitor.startActivity("Audio");
+                audioManager.update(timer.getDelta());
+                PerformanceMonitor.endActivity();
+
+                PerformanceMonitor.rollCycle();
+                PerformanceMonitor.startActivity("Other");
+
+                if (Display.wasResized()) {
+                    resizeViewport();
                 }
             }
-
-            processStateChanges();
-
-            if (currentState == null) {
-                shutdown();
-                break;
-            }
-
-            timer.tick();
-
-            PerformanceMonitor.startActivity("Main Update");
-            currentState.update(timer.getDelta());
+        } catch (Exception e) {
+            monitor.addError(e);
+            logger.error("Unhandled exception in main loop!", e);
+        } finally {
             PerformanceMonitor.endActivity();
-
-            PerformanceMonitor.startActivity("Render");
-            currentState.render();
-            Display.update();
-            Display.sync(60);
-            PerformanceMonitor.endActivity();
-
-            PerformanceMonitor.startActivity("Input");
-            currentState.handleInput(timer.getDelta());
-            PerformanceMonitor.endActivity();
-
-            PerformanceMonitor.startActivity("Audio");
-            audioManager.update(timer.getDelta());
-            PerformanceMonitor.endActivity();
-
-            PerformanceMonitor.rollCycle();
-            PerformanceMonitor.startActivity("Other");
-
-            if (Display.wasResized()) {
-                resizeViewport();
-            }
+            monitor.setActive(false);
+            running = false;
         }
-        PerformanceMonitor.endActivity();
-        running = false;
     }
 
     private void processStateChanges() {
