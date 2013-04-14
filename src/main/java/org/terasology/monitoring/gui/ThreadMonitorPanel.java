@@ -60,6 +60,9 @@ public class ThreadMonitorPanel extends JPanel {
             private final JLabel lId = new JLabel();
             private final JLabel lCounters = new JLabel();
             private final JLabel lActive = new JLabel();
+            private final JPanel pError = new JPanel();
+            private final JLabel lErrorSpacer = new JLabel();
+            private final JLabel lError = new JLabel();
             
             private Dimension dId = new Dimension(0, 0), dName = new Dimension(0, 0);
             
@@ -70,6 +73,7 @@ public class ThreadMonitorPanel extends JPanel {
                 pHead.setLayout(new BorderLayout());
                 pHead.add(pList, BorderLayout.LINE_START);
                 pHead.add(lActive, BorderLayout.LINE_END);
+                pHead.add(pError, BorderLayout.PAGE_END);
                 
                 lId.setHorizontalAlignment(SwingConstants.RIGHT);
                 lName.setForeground(Color.blue);
@@ -80,6 +84,13 @@ public class ThreadMonitorPanel extends JPanel {
                 pList.add(lName);
                 pList.add(lCounters);
                 
+                pError.setVisible(false);
+                pError.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+                pError.add(lErrorSpacer);
+                pError.add(lError);
+                
+                lError.setForeground(Color.red);
+
                 add(pHead, BorderLayout.PAGE_START);
             }
             
@@ -120,6 +131,12 @@ public class ThreadMonitorPanel extends JPanel {
                     } else {
                         lActive.setForeground(Color.red);
                         lActive.setText("Disposed");
+                    }
+                    
+                    pError.setVisible(monitor.hasErrors());
+                    if (monitor.hasErrors()) {
+                        lErrorSpacer.setPreferredSize(dId);
+                        lError.setText(monitor.getNumErrors() + " Error(s), [" + monitor.getLastError().getClass().getSimpleName() + "] " + monitor.getLastError().getMessage());
                     }
                 } else {
                     lName.setText("");
