@@ -119,7 +119,8 @@ public class TerasologyEngine implements GameEngine {
 
         initConfig();
         
-        TerasologyMonitor.setMonitorVisible(true);
+        if (config.getAdvanced().isAdvancedMonitoringEnabled() && config.getAdvanced().isAdvancedMonitorVisibleAtStartup())
+            TerasologyMonitor.setMonitorVisible(true);
 
         initNativeLibs();
         initDisplay();

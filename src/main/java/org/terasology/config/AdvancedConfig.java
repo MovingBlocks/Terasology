@@ -31,6 +31,7 @@ public final class AdvancedConfig {
 
     private String blocksFactory, sunlightFactory, lightFactory, extraFactory;
     private boolean chunkDeflationEnabled, chunkDeflationLoggingEnabled;
+    private boolean advancedMonitoringEnabled, advancedMonitorVisibleAtStartup;
     
     private AdvancedConfig() {}
     
@@ -144,6 +145,25 @@ public final class AdvancedConfig {
         return this;
     }
     
+
+    public boolean isAdvancedMonitoringEnabled() {
+        return advancedMonitoringEnabled;
+    }
+
+    public AdvancedConfig setAdvancedMonitoringEnabled(boolean enabled) {
+        advancedMonitoringEnabled = enabled;
+        return this;
+    }
+
+    public boolean isAdvancedMonitorVisibleAtStartup() {
+        return advancedMonitorVisibleAtStartup;
+    }
+
+    public AdvancedConfig setAdvancedMonitorVisibleAtStartup(boolean visible) {
+        advancedMonitorVisibleAtStartup = visible;
+        return this;
+    }
+
     public static AdvancedConfig createDefault() {
         return new AdvancedConfig()
         .setBlocksFactory(TeraDenseArray8Bit.class.getName())
@@ -151,7 +171,9 @@ public final class AdvancedConfig {
         .setLightFactory(TeraDenseArray8Bit.class.getName())
         .setExtraFactory(TeraDenseArray8Bit.class.getName())
         .setChunkDeflationEnabled(true)
-        .setChunkDeflationLoggingEnabled(false);
+        .setChunkDeflationLoggingEnabled(false)
+        .setAdvancedMonitoringEnabled(true)
+        .setAdvancedMonitorVisibleAtStartup(false);
     }
 
     public static class Handler implements JsonSerializer<AdvancedConfig>, JsonDeserializer<AdvancedConfig> {
@@ -172,6 +194,10 @@ public final class AdvancedConfig {
                 config.setChunkDeflationEnabled(input.get("chunkDeflationEnabled").getAsBoolean());
             if (input.has("chunkDeflationLoggingEnabled")) 
                 config.setChunkDeflationLoggingEnabled(input.get("chunkDeflationLoggingEnabled").getAsBoolean());
+            if (input.has("advancedMonitoringEnabled"))
+                config.setAdvancedMonitoringEnabled(input.get("advancedMonitoringEnabled").getAsBoolean());
+            if (input.has("advancedMonitorVisibleAtStartup"))
+                config.setAdvancedMonitorVisibleAtStartup(input.get("advancedMonitorVisibleAtStartup").getAsBoolean());
             return config;
         }
 
@@ -184,6 +210,8 @@ public final class AdvancedConfig {
             result.addProperty("extraFactory", src.extraFactory);
             result.addProperty("chunkDeflationEnabled", src.chunkDeflationEnabled);
             result.addProperty("chunkDeflationLoggingEnabled", src.chunkDeflationLoggingEnabled);
+            result.addProperty("advancedMonitoringEnabled", src.advancedMonitoringEnabled);
+            result.addProperty("advancedMonitorVisibleAtStartup", src.advancedMonitorVisibleAtStartup);
             return result;
         }
         
