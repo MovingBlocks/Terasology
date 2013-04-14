@@ -75,7 +75,7 @@ public class ThreadMonitorPanel extends JPanel {
                 lName.setForeground(Color.blue);
                 lCounters.setForeground(Color.gray);
 
-                pList.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
+                pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 pList.add(lId);
                 pList.add(lName);
                 pList.add(lCounters);

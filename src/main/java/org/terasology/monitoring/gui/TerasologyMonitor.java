@@ -14,6 +14,7 @@ public class TerasologyMonitor extends JFrame {
     
     private final ThreadMonitorPanel threadMonitor;
     private final ChunkMonitorPanel chunkMonitor;
+    private final PerformanceMonitorPanel perfMonitor;
     
     public TerasologyMonitor() {
         this("Terasology Monitor", 10, 10, 800, 600);
@@ -32,8 +33,12 @@ public class TerasologyMonitor extends JFrame {
         chunkMonitor = new ChunkMonitorPanel();
         chunkMonitor.setVisible(true);
         
-        tabs.add("Thread Monitor", threadMonitor);
-        tabs.add("Chunk Monitor", chunkMonitor);
+        perfMonitor = new PerformanceMonitorPanel();
+        perfMonitor.setVisible(true);
+        
+        tabs.add("Threads", threadMonitor);
+        tabs.add("Chunks", chunkMonitor);
+        tabs.add("Performance", perfMonitor);
 
         add(tabs, BorderLayout.CENTER);
     }
