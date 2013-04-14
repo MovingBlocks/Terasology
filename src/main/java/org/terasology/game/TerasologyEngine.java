@@ -109,9 +109,8 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void init() {
-        if (initialised) {
+        if (initialised)
             return;
-        }
         initLogger();
 
         logger.info("Initializing Terasology...");
@@ -119,10 +118,8 @@ public class TerasologyEngine implements GameEngine {
 
         initConfig();
         
-        if (config.getAdvanced().isAdvancedMonitoringEnabled() && config.getAdvanced().isAdvancedMonitorVisibleAtStartup())
-            TerasologyMonitor.setMonitorVisible(true);
-
         initNativeLibs();
+        initMonitorDisplay(); // Has to be called before initDisplay(), otherwise the display loses focus
         initDisplay();
         initOpenGL();
         initOpenAL();
@@ -131,6 +128,7 @@ public class TerasologyEngine implements GameEngine {
         updateInputConfig();
         initTimer(); // Dependent on LWJGL
         initSecurity();
+        
         initialised = true;
     }
 
@@ -335,6 +333,11 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(AudioManager.class, audioManager);
     }
 
+    private void initMonitorDisplay() {
+        if (config.getAdvanced().isAdvancedMonitoringEnabled() && config.getAdvanced().isAdvancedMonitorVisibleAtStartup())
+            TerasologyMonitor.setMonitorVisible(true);
+    }
+    
     private void initDisplay() {
         try {
             setDisplayMode();
