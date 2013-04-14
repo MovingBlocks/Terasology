@@ -14,11 +14,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractListModel;
 import javax.swing.JLabel;
@@ -44,12 +41,6 @@ public class PerformanceMonitorPanel extends JPanel {
         add(list, BorderLayout.CENTER);
     }
 
-    protected abstract static class Task {
-        
-        public abstract void execute();
-        
-    }
-    
     protected static class Entry implements Comparable<Entry> {
         
         public final String name;
@@ -137,7 +128,6 @@ public class PerformanceMonitorPanel extends JPanel {
         private final List<Entry> list = new ArrayList<Entry>();
         private final Map<String, Entry> map = new HashMap<String, Entry>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
-        private final BlockingQueue<Task> queue = new LinkedBlockingQueue<Task>();
         
         protected void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
@@ -209,17 +199,12 @@ public class PerformanceMonitorPanel extends JPanel {
                 @Override
                 public void run() {
                     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    final SingleThreadMonitor monitor = ThreadMonitor.create("Monitoring.Performance", "Tasks", "Polls");
+                    final SingleThreadMonitor monitor = ThreadMonitor.create("Monitoring.Performance", "Polls");
                     try {
                         while (true) {
-                            final Task task = queue.poll(1000, TimeUnit.MILLISECONDS);
-                            if (task != null) {
-                                task.execute();
-                                monitor.increment(0);
-                            } else {
-                                updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
-                                monitor.increment(1);
-                            }
+                            Thread.sleep(1000);
+                            updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
+                            monitor.increment(0);
                         }
                     } catch (Exception e) {
                         monitor.addError(e);
