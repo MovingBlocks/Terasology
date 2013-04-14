@@ -195,15 +195,17 @@ public class ThreadMonitorPanel extends JPanel {
                 @Override
                 public void run() {
                     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    final SingleThreadMonitor monitor = ThreadMonitor.create("Monitoring.Threads");
+                    final SingleThreadMonitor monitor = ThreadMonitor.create("Monitoring.Threads", "Tasks", "Polls");
                     try {
                         while (true) {
                             final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
                             if (task != null) {
                                 task.execute();
+                                monitor.increment(0);
                             } else {
                                 Collections.sort(monitors);
                                 invokeContentsChanged(0, monitors.size()-1);
+                                monitor.increment(1);
                             }
                         }
                     } catch (Exception e) {
