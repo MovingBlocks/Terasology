@@ -3,6 +3,7 @@ package org.terasology.monitoring.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -169,8 +170,15 @@ public class ChunkMonitorDisplay extends JPanel {
     
     protected class MouseInputListener implements MouseWheelListener, MouseMotionListener, MouseListener {
 
+        private Point leftPressed = null;
+        private int offsetX, offsetY;
+        
         @Override
         public void mouseDragged(MouseEvent e) {
+            if (leftPressed != null) {
+                final int dx = e.getPoint().x - leftPressed.x, dy = e.getPoint().y - leftPressed.y;
+                setOffset(offsetX + dx, offsetY + dy);
+            }
         }
 
         @Override
@@ -193,12 +201,17 @@ public class ChunkMonitorDisplay extends JPanel {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                leftPressed = e.getPoint();
+                offsetX = getOffsetX();
+                offsetY = getOffsetY();
+            }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            
+            if (e.getButton() == MouseEvent.BUTTON1)
+                leftPressed = null;
         }
 
         @Override
