@@ -39,10 +39,10 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.monitoring.Monitoring;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.SingleThreadMonitor;
 import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.gui.TerasologyMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyGameVersionInfo;
 
@@ -119,7 +119,7 @@ public class TerasologyEngine implements GameEngine {
         initConfig();
         
         initNativeLibs();
-        initMonitorDisplay(); // Has to be called before initDisplay(), otherwise the display loses focus
+        initMonitorDisplay(); // Dependent on initConfig. Has to be called before initDisplay(), otherwise the display loses focus
         initDisplay();
         initOpenGL();
         initOpenAL();
@@ -334,8 +334,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initMonitorDisplay() {
-        if (config.getAdvanced().isAdvancedMonitoringEnabled() && config.getAdvanced().isAdvancedMonitorVisibleAtStartup())
-            TerasologyMonitor.setMonitorVisible(true);
+        Monitoring.createAndShowAtStartup();
     }
     
     private void initDisplay() {
