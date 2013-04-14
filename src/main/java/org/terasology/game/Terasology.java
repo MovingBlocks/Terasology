@@ -22,7 +22,7 @@ import org.terasology.logic.manager.PathManager;
 /**
  * The heart and soul of Terasology.
  * <p/>
- * TODO: Create a function returns the number of generated worlds
+ * TODO: Create a function returns the number of generated worlds / Create a function to count the Folders created in SAVED_WORLDS
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Kireev   Anton   <adeon.k87@gmail.com>
