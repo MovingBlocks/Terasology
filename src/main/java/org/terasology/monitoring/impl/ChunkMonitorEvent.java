@@ -1,16 +1,15 @@
 package org.terasology.monitoring.impl;
 
-import org.terasology.monitoring.WeakChunk;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkState;
 
 import com.google.common.base.Preconditions;
 
-public abstract class ChunkEvent {
+public abstract class ChunkMonitorEvent {
 
     public abstract Chunk getChunk();
     
-    protected static class BasicChunkEvent extends ChunkEvent {
+    protected static class BasicChunkEvent extends ChunkMonitorEvent {
         
         protected final Chunk chunk;
         
@@ -24,7 +23,7 @@ public abstract class ChunkEvent {
         }
     }
     
-    public static class Created extends ChunkEvent {
+    public static class Created extends ChunkMonitorEvent {
         
         protected final WeakChunk weakChunk;
         

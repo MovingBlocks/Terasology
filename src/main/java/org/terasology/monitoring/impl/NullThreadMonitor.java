@@ -2,7 +2,6 @@ package org.terasology.monitoring.impl;
 
 import java.util.LinkedList;
 
-import org.terasology.monitoring.SingleThreadMonitor;
 
 public class NullThreadMonitor implements SingleThreadMonitor {
 

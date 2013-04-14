@@ -172,7 +172,7 @@ public final class AdvancedConfig {
         .setExtraFactory(TeraDenseArray8Bit.class.getName())
         .setChunkDeflationEnabled(true)
         .setChunkDeflationLoggingEnabled(false)
-        .setAdvancedMonitoringEnabled(true)
+        .setAdvancedMonitoringEnabled(false)
         .setAdvancedMonitorVisibleAtStartup(false);
     }
 

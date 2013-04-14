@@ -23,7 +23,7 @@ public class Monitoring {
         if (config == null) {
             logger.error("Cannot obtain global configuration object");
             initialized = false;
-            return;
+            throw new RuntimeException("Cannot obtain global configuration object");
         }
         final AdvancedConfig aconfig = config.getAdvanced();
         advancedMonitoringEnabled = aconfig.isAdvancedMonitoringEnabled();

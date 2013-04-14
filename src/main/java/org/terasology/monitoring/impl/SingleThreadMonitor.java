@@ -1,4 +1,4 @@
-package org.terasology.monitoring;
+package org.terasology.monitoring.impl;
 
 import java.util.LinkedList;
 

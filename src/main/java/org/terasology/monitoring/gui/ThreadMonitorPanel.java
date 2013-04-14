@@ -23,9 +23,9 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.monitoring.SingleThreadMonitor;
 import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.ThreadMonitor.ThreadMonitorEvent;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
+import org.terasology.monitoring.impl.ThreadMonitorEvent;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -197,7 +197,7 @@ public class ThreadMonitorPanel extends JPanel {
         }
         
         protected ThreadListModel() {
-            ThreadMonitor.getEventBus().register(this);
+            ThreadMonitor.registerForEvents(this);
             queue.add(new Task() {
                 @Override
                 public void execute() {

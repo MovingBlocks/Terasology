@@ -33,10 +33,10 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
-import org.terasology.monitoring.SingleThreadMonitor;
 import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.WeakChunk;
-import org.terasology.monitoring.impl.ChunkEvent;
+import org.terasology.monitoring.impl.ChunkMonitorEvent;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
+import org.terasology.monitoring.impl.WeakChunk;
 import org.terasology.world.chunks.Chunk;
 
 import com.google.common.base.Preconditions;
@@ -128,9 +128,9 @@ public class ChunkMonitorDisplay extends JPanel {
     
     protected class ChunkRequest implements Request {
         
-        public final ChunkEvent event;
+        public final ChunkMonitorEvent event;
         
-        public ChunkRequest(ChunkEvent event) {
+        public ChunkRequest(ChunkMonitorEvent event) {
             Preconditions.checkNotNull(event, "The parameter 'event' must not be null");
             this.event = event;
         }
@@ -140,8 +140,8 @@ public class ChunkMonitorDisplay extends JPanel {
         
         @Override
         public void execute() {
-            if (event instanceof ChunkEvent.Created) {
-                final ChunkEvent.Created e = (ChunkEvent.Created) event;
+            if (event instanceof ChunkMonitorEvent.Created) {
+                final ChunkMonitorEvent.Created e = (ChunkMonitorEvent.Created) event;
                 final WeakChunk w = e.getWeakChunk();
                 final Vector3i pos = w.getPos();
                 if (pos.y < minRenderY)
@@ -421,7 +421,7 @@ public class ChunkMonitorDisplay extends JPanel {
         this.chunkSize = chunkSize;
         this.executor = Executors.newSingleThreadExecutor();
         this.renderTask = new RenderTask();
-        ChunkMonitor.getEventBus().register(this);
+        ChunkMonitor.registerForEvents(this);
         queue.offer(new InitialRequest());
         executor.execute(renderTask);
     }
@@ -505,7 +505,7 @@ public class ChunkMonitorDisplay extends JPanel {
     }
     
     @Subscribe
-    public void recieveChunkEvent(ChunkEvent event) {
+    public void recieveChunkEvent(ChunkMonitorEvent event) {
         if (event != null) {
             queue.offer(new ChunkRequest(event));
         }

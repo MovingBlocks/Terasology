@@ -41,8 +41,8 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.monitoring.Monitoring;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.SingleThreadMonitor;
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyGameVersionInfo;
 
@@ -75,8 +75,7 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
-    private final SingleThreadMonitor loopMonitor = ThreadMonitor.create("Engine.MainLoop", "Frames");
-    private final SingleThreadMonitor taskMonitor = ThreadMonitor.create("Engine.Tasks", "Tasks", "Errors");
+    private SingleThreadMonitor loopMonitor, taskMonitor;
     
     private GameState currentState;
     private boolean initialised;
@@ -118,8 +117,9 @@ public class TerasologyEngine implements GameEngine {
 
         initConfig();
         
+        initThreadMonitors(); // Dependent on initConfig()
         initNativeLibs();
-        initMonitorDisplay(); // Dependent on initConfig. Has to be called before initDisplay(), otherwise the display loses focus
+        initMonitorDisplay(); // Dependent on initConfig(), has to be called before initDisplay(), otherwise the display loses focus
         initDisplay();
         initOpenGL();
         initOpenAL();
@@ -158,6 +158,11 @@ public class TerasologyEngine implements GameEngine {
             config.save();
             CoreRegistry.put(Config.class, config);
         }
+    }
+    
+    private void initThreadMonitors() {
+        loopMonitor = ThreadMonitor.create("Engine.MainLoop", "Frames");
+        taskMonitor = ThreadMonitor.create("Engine.Tasks", "Tasks", "Errors");
     }
 
     private void updateInputConfig() {

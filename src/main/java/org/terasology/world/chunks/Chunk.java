@@ -26,7 +26,7 @@ import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
-import org.terasology.monitoring.impl.ChunkEvent;
+import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;

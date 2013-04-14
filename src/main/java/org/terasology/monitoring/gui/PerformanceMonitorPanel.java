@@ -25,8 +25,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.SingleThreadMonitor;
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
 
 @SuppressWarnings("serial")
 public class PerformanceMonitorPanel extends JPanel {
