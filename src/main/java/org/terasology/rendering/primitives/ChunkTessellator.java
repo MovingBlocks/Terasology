@@ -25,7 +25,7 @@ import org.terasology.math.Direction;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
