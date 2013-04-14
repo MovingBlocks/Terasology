@@ -75,7 +75,8 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
-    private final SingleThreadMonitor monitor = ThreadMonitor.create("Engine", "Frames");
+    private final SingleThreadMonitor loopMonitor = ThreadMonitor.create("Engine.MainLoop", "Frames");
+    private final SingleThreadMonitor taskMonitor = ThreadMonitor.create("Engine.Tasks", "Tasks", "Errors");
     
     private GameState currentState;
     private boolean initialised;
@@ -92,6 +93,16 @@ public class TerasologyEngine implements GameEngine {
     private Canvas customViewPort = null;
     private static boolean editorInFocus = false;
     private static boolean editorAttached = false;
+    
+    private synchronized void incrementTasks() {
+        taskMonitor.increment(0);
+    }
+    
+    private synchronized void incrementTaskErrors(Exception e) {
+        taskMonitor.increment(1);
+        if (e != null)
+            taskMonitor.addError(e);
+    }
 
     public TerasologyEngine() {
     }
@@ -234,14 +245,21 @@ public class TerasologyEngine implements GameEngine {
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                PerformanceMonitor.startThread(name);
                 try {
-                    task.run();
-                } catch (RejectedExecutionException e) {
-                    logger.error("Thread submitted after shutdown requested: {}", name);
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                    PerformanceMonitor.startThread(name);
+                    try {
+                        task.run();
+                    } catch (RejectedExecutionException e) {
+                        logger.error("Thread submitted after shutdown requested: {}", name);
+                    } finally {
+                        PerformanceMonitor.endThread(name);
+                    }
+                } catch (Exception e) {
+                    logger.error("Error in task", e);
+                    incrementTaskErrors(e);
                 } finally {
-                    PerformanceMonitor.endThread(name);
+                    incrementTasks();
                 }
             }
         });
@@ -424,7 +442,7 @@ public class TerasologyEngine implements GameEngine {
             // MAIN GAME LOOP
             while (running && !Display.isCloseRequested()) {
 
-                monitor.increment(0);
+                loopMonitor.increment(0);
                 
                 // Only process rendering and updating once a second
                 if (!Display.isActive() && !TerasologyEngine.isEditorAttached()) {
@@ -470,11 +488,11 @@ public class TerasologyEngine implements GameEngine {
                 }
             }
         } catch (Exception e) {
-            monitor.addError(e);
+            loopMonitor.addError(e);
             logger.error("Unhandled exception in main loop!", e);
         } finally {
             PerformanceMonitor.endActivity();
-            monitor.setActive(false);
+            loopMonitor.setActive(false);
             running = false;
         }
     }
