@@ -47,8 +47,6 @@ import org.terasology.world.WorldProvider;
 public class DebugControlSystem implements EventHandlerSystem {
 
     private UIScreenMetrics metrics;
-    private Timer timer;
-    private long lastTimeSpacePressed;
 
     @In
     private WorldProvider world;
