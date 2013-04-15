@@ -50,16 +50,9 @@ Debug Features
 Only works when the F3 debug mode is enabled (and may come and go)
 
 * [Arrow up/down] - Adjust the current time in small steps
-* [Arrow left/right] - Adjust the current time in larger steps
-* [R] - Debug render wire-frame
 * [P] - Activate first-person player camera
 * [O] - Activate animated spawning point camera
 * [K] - Don't try this :-)
-* [Double Space] - God mode (fly / no-clip)
-* [F4] - Different debug metrics
-* [F6] - Debug rendering enabled
-* [F7] - Cycle debug rendering stage
-* [F8] - Debug render chunk bounding boxes
 
 Tools
 --------

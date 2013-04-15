@@ -28,9 +28,12 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.TerasologyEngine;
+import org.terasology.game.Timer;
+import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
@@ -92,7 +95,6 @@ public class DebugControlSystem implements EventHandlerSystem {
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey()) {
-
                 case Keyboard.KEY_R:
                     config.getSystem().setDebugRenderWireframe(!config.getSystem().isDebugRenderWireframe());
                     event.consume();
@@ -125,7 +127,9 @@ public class DebugControlSystem implements EventHandlerSystem {
                 for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
                     element.setVisible(!element.isVisible());
                 }
+
                 config.getSystem().setDebugFirstPersonElementsHidden(!config.getSystem().isDebugFirstPersonElementsHidden());
+
                 event.consume();
                 break;
             case Keyboard.KEY_F:
