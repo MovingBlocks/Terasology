@@ -22,25 +22,51 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 
+import com.google.common.base.Preconditions;
+
 @SuppressWarnings("serial")
 public class PerformanceMonitorPanel extends JPanel {
 
+    private final HeaderPanel header;
     private final JList list;
     
     public PerformanceMonitorPanel() {
         setLayout(new BorderLayout());
+        header = new HeaderPanel();
         list = new JList(new PerformanceListModel());
-        list.setCellRenderer(new PerformanceListRenderer());
+        list.setCellRenderer(new PerformanceListRenderer(header));
         list.setVisible(true);
+        add(header, BorderLayout.PAGE_START);
         add(list, BorderLayout.CENTER);
     }
 
+    protected static class HeaderPanel extends JPanel {
+        
+        private final JLabel lName = new JLabel("Title");
+        private final JLabel lMean = new JLabel("Running Means");
+        private final JLabel lSpike = new JLabel("Decaying Spikes");
+        
+        public HeaderPanel() {
+           setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+
+           add(lName);
+           add(lMean);
+           add(lSpike);
+        }
+        
+        public void setNameSize(Dimension d) {
+            lName.setPreferredSize(d);
+            doLayout();
+        }
+    }
+    
     protected static class Entry implements Comparable<Entry> {
         
         public final String name;
@@ -65,19 +91,27 @@ public class PerformanceMonitorPanel extends JPanel {
 
         protected static class MyRenderer extends JPanel {
             
+            private final HeaderPanel header;
             private final DecimalFormat format = new DecimalFormat ("#####0.00");
             private final JLabel lName = new JLabel();
             private final JLabel lMean = new JLabel();
             private final JLabel lSpike = new JLabel();
             
-            private Dimension dName = new Dimension(0, 0), dMean = new Dimension(0, 0);
+            private Dimension dName = new Dimension(0, 0);
             
-            public MyRenderer() {
+            public MyRenderer(HeaderPanel header) {
+                this.header = Preconditions.checkNotNull(header, "The parameter 'header' must not be null");
+                
                 setBackground(Color.white);
                 setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 
+                lMean.setHorizontalAlignment(SwingConstants.RIGHT);
                 lMean.setForeground(Color.gray);
+                lMean.setPreferredSize(header.lMean.getPreferredSize());
+
+                lSpike.setHorizontalAlignment(SwingConstants.RIGHT);
                 lSpike.setForeground(Color.gray);
+                lSpike.setPreferredSize(header.lSpike.getPreferredSize());
              
                 add(lName);
                 add(lMean);
@@ -92,26 +126,25 @@ public class PerformanceMonitorPanel extends JPanel {
                     Dimension tmp = lName.getPreferredSize();
                     if (tmp.width > dName.width || tmp.height > dName.height) {
                         dName = tmp;
+                        header.setNameSize(dName);
                     }
                     lName.setPreferredSize(dName);
                     
-                    lMean.setPreferredSize(null);
-                    lMean.setText("Running Mean: " + format.format(entry.mean));
-                    tmp = lMean.getPreferredSize();
-                    if (tmp.width > dMean.width || tmp.height > dMean.height) {
-                        dMean = tmp;
-                    }
-                    lMean.setPreferredSize(dMean);
-                    
-                    lSpike.setText("Decaying Spike: " + format.format(entry.spike));
+                    lMean.setText("  " + format.format(entry.mean) + " ms");
+                    lSpike.setText("  " + format.format(entry.spike) + " ms");
                 } else {
                     lName.setText("");
                     lMean.setText("");
+                    lSpike.setText("");
                 }
             }
         }
         
-        protected final MyRenderer renderer = new MyRenderer();
+        protected final MyRenderer renderer;
+        
+        public PerformanceListRenderer(HeaderPanel header) {
+            renderer = new MyRenderer(header);
+        }
         
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
