@@ -1,6 +1,12 @@
+//TODO: Add license header when properly externalized as a library - already discussed with Marcel
+
 package org.terasology.input.jitter;
 
-import com.leapmotion.leap.*;
+import com.leapmotion.leap.Gesture;
+import com.leapmotion.leap.CircleGesture;
+import com.leapmotion.leap.SwipeGesture;
+import com.leapmotion.leap.KeyTapGesture;
+import com.leapmotion.leap.ScreenTapGesture;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,22 +14,29 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
- * This system listens to the JitterListener wrapper around the Leap then buffers the data for consumption.
+ * Second layer to Jitter providing higher level functionality based on receiving processed input from JitterListener.
+ * Buffers the input read at "Leap FPS" for easy consumption at a lower "Application FPS" without missing frames.
+ * Application-specific implementations can simply request batched data through very exact method calls.
+ * Some methods additionally support filtering the batched data further.
+ *
+ * General design notes:
+ * Leap gestures come in three stages - started, updated, stopped. Discrete gestures only have the stopped state.
+ * - Started: first frame making up a continuous gesture. Add it to the buffer since we know it is brand new.
+ * - Updated: later frame in a continuous gesture. Replace any existing buffer entry with the latest frame.
+ *      If a gesture can be "consumed" by use in an implementation then it gets removed and is ignored if seen again.
+ * - Stopped: final/only gesture frame. Unless already consumed add/overwrite in buffer and remove from "consumed" list.
+ *
+ * Buffers are filled by calls coming from JitterListener and are consumed by calls to the batch return methods.
+ * Those methods may be picky and not accept all buffered gestures and should remove "stopped" gestures from the buffer.
+ *
+ * To hide more technical Leap details this class could offer "user friendly" gesture enabling methods that include
+ * details on the minimum sensitivity of gestures as well as whether said gestures are "consumed" when returned.
+ *
+ * Based on gesture_recognition.pde by Marcel Schwittlick for LeapMotionP5 - https://github.com/mrzl/LeapMotionP5
+ *
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class BufferedJitterSystem implements JitterListener {
-
-    // RECOGNIZED:
-    // If START state then simply add the gesture to the buffer (we know it is brand new)
-    // If UPDATE then check the ID against the consumed list, if not found then replace existing gesture
-        // Even if concurrent processing of the SAME id is active, next pass will have item with correct consumed state
-    // If STOP then check the consumed list, if there then remove from consumed list (should already be out of buffer)
-        // If NOT consumed then add it - processing will remove it next pass (consumed never gets set)
-
-    // PROCESSED:
-    // Check EACH in buffer against threshold (progress, consumed, etc) - if not then ignore and continue
-    // If passed then return the object for processing and mark it consumed if that's enabled
-        // If processing a START or UPDATE item then take no additional action
-        // If processing a STOP item then remove the object from the buffer
 
     /** Buffer for CircleGestures with their IDs as keys */
     private ConcurrentSkipListMap<Integer, CircleGesture> circleGestures = new ConcurrentSkipListMap<Integer, CircleGesture>();
@@ -31,6 +44,12 @@ public class BufferedJitterSystem implements JitterListener {
     /** List of consumed IDs for circleGestures (gestures that have been marked as "spent") */
     private ConcurrentSkipListSet<Integer> consumedCircles = new ConcurrentSkipListSet<Integer>();
 
+    /**
+     * Accepts input via JitterListener and adds to a local buffer when appropriate.
+     *
+     * @param gesture the CircleGesture detected
+     */
+    @Override
     public void circleGestureRecognized(CircleGesture gesture) {
         if (gesture.state() == Gesture.State.STATE_STOP) {
             // A gesture in STOP state may have previously existed, we effectively treat it as an update
@@ -67,10 +86,11 @@ public class BufferedJitterSystem implements JitterListener {
             if (!consumedCircles.contains(gesture.id())) {
                 circleGestures.put(gesture.id(), gesture);
             }
-
         }
     }
 
+    //TODO: Refactor to follow a similar approach as circle gestures
+    @Override
     public void swipeGestureRecognized(SwipeGesture gesture) {
         if (gesture.state() == Gesture.State.STATE_STOP) {
             System.out.println("//////////////////////////////////////");
@@ -88,6 +108,8 @@ public class BufferedJitterSystem implements JitterListener {
         }
     }
 
+    //TODO: Refactor to follow a similar approach as circle gestures
+    @Override
     public void screenTapGestureRecognized(ScreenTapGesture gesture) {
         if (gesture.state() == Gesture.State.STATE_STOP) {
             System.out.println("//////////////////////////////////////");
@@ -104,6 +126,8 @@ public class BufferedJitterSystem implements JitterListener {
         }
     }
 
+    //TODO: Refactor to follow a similar approach as circle gestures
+    @Override
     public void keyTapGestureRecognized(KeyTapGesture gesture) {
         if (gesture.state() == Gesture.State.STATE_STOP) {
             System.out.println("//////////////////////////////////////");
@@ -123,7 +147,7 @@ public class BufferedJitterSystem implements JitterListener {
     // CIRCLE NOTE: on enabling circle gestures should indicate whether they should be "consumed" on use
     // Usage of *more than one* variant of nextWhateverBatch at the same time may be bad and cause unexpected results
 
-    //TODO: Move up, make user set it somewhere
+    //TODO: Make implementer set it instead. Enable gestures through here (through JitterSystem) including consumption?
     boolean consumptionEnabled = true;
 
     //TODO: Support filtering gestures by hand? But it would have to be a persistent hand ID or we'd lose buffers ...
@@ -163,7 +187,6 @@ public class BufferedJitterSystem implements JitterListener {
         //System.out.println("nextCircleBatch started with " + circleGestures.size() + " entries in the buffer");
 
         for (CircleGesture circleGesture : circleGestures.values()) {
-
 
             // Test against constraints here and add only if the gesture passes muster
             if (circleGesture.progress() >= progress) {
@@ -205,9 +228,9 @@ public class BufferedJitterSystem implements JitterListener {
                 // Consume (if that's enabled)
                 consumeCircle(circleGesture);
 
-            } else {
-                System.out.println("Circle gesture hasn't progressed enough to be considered yet");
-            }
+            }// else {
+                //System.out.println("Circle gesture hasn't progressed enough to be considered yet");
+            //}
 
             // Remove stopped circles (won't be seen again). With constraints some circles may never have been used
             removeStoppedCircles(circleGesture);
@@ -223,6 +246,7 @@ public class BufferedJitterSystem implements JitterListener {
     private void consumeCircle(CircleGesture circleGesture) {
         // If gestures of this type are considered consumed when returned for processing then flag & remove
         if (consumptionEnabled) {
+            System.out.println("Consuming circle gesture with id: " + circleGesture.id());
             consumedCircles.add(circleGesture.id());    // Mark circle as consumed so it won't get re-added
             circleGestures.remove(circleGesture.id());  // Remove it from the buffer so it won't be tested again
         } // Else then the gesture stays in the buffer till the STOP state 'if' later removes it
@@ -236,13 +260,12 @@ public class BufferedJitterSystem implements JitterListener {
     private void removeStoppedCircles(CircleGesture circleGesture) {
         if (circleGesture.state() == Gesture.State.STATE_STOP) {
 
-            System.out.println("Why does execution disregard the above if and instead jumps straight to inside the next if?");
             circleGestures.remove(circleGesture.id());
 
             // Additionally clear out the consumption status if enabled - even if we *just* consumed the gesture ;-)
             if (consumptionEnabled) {
                 consumedCircles.remove(circleGesture.id());
-                System.out.println("Just removed the gesture with id " + circleGesture.id() + " from the 'consumed' list");
+                System.out.println("Just removed gesture with id " + circleGesture.id() + " from the 'consumed' list");
             }
         }
     }

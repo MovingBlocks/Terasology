@@ -1,3 +1,5 @@
+//TODO: Add license header when properly externalized as a library - already discussed with Marcel
+
 package org.terasology.input.jitter;
 
 import com.leapmotion.leap.CircleGesture;
@@ -6,7 +8,12 @@ import com.leapmotion.leap.ScreenTapGesture;
 import com.leapmotion.leap.SwipeGesture;
 
 /**
- * Yay.
+ * "External" listener for Leap Motion Controller input provided by the Leap software.
+ * Used by Jitter to forward gesture calls from to an internal listener to an implementer.
+ *
+ * Based on gesture_recognition.pde by Marcel Schwittlick for LeapMotionP5 - https://github.com/mrzl/LeapMotionP5
+ *
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public interface JitterListener {
 

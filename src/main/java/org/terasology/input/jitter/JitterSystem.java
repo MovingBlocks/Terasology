@@ -1,28 +1,6 @@
-package org.terasology.input.jitter;
+//TODO: Add license header when properly externalized as a library - already discussed with Marcel
 
-/**
- * JitterSystem
- *
- * JitterSystem library for Processing. Copyright (c) 2012-2013 held jointly by the individual
- * authors.
- *
- * JitterSystem library for Processing is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * JitterSystem for Processing is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with JitterSystem library
- * for Processing. If not, see http://www.gnu.org/licenses/.
- *
- * Leap Developer SDK. Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.
- *
- * NOTICE: This developer release of Leap Motion, Inc. software is confidential and intended for
- * very limited distribution. Parties using this software must accept the SDK Agreement prior to
- * obtaining this software and related tools. This software is subject to copyright.
- */
+package org.terasology.input.jitter;
 
 import com.leapmotion.leap.*;
 import com.leapmotion.leap.Gesture.Type;
@@ -35,9 +13,16 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * JitterSystem.java
+ * This class is the heart of Jitter and orchestrates mostly everything. It sets up an internal listener to
+ * fetch input from the Leap Motion Controller device then keeps track of all the data and provides utility.
+ * One provided extension option is including a JitterListener to forward higher level calls to.
+ *
+ * TODO: Make the JitterListener optional? Or does that even make sense?
+ *
+ * Based on LeapMotionP5.java by Marcel Schwittlick for LeapMotionP5 - https://github.com/mrzl/LeapMotionP5
  *
  * @author Marcel Schwittlick
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class JitterSystem {
     private static final float LEAP_WIDTH = 200.0f; // in mm
@@ -145,6 +130,7 @@ public class JitterSystem {
         return getAcceleration(velocityOffsetTestFinger);
     }
 
+    //TODO: Change to (or offer additional?) more specific methods per-gesture that include sensitivity config settings?
     public void enableGesture(Type gestureName) {
         controller.enableGesture(gestureName);
     }

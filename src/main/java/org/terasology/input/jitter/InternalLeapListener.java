@@ -1,28 +1,6 @@
-package org.terasology.input.jitter;
+//TODO: Add license header when properly externalized as a library - already discussed with Marcel
 
-/**
- * JitterSystem
- *
- * Jitter library for Leap Motion. Copyright (c) 2012-2013 held jointly by the individual
- * authors.
- *
- * JitterSystem library for Processing is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * JitterSystem for Processing is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with JitterSystem library
- * for Processing. If not, see http://www.gnu.org/licenses/.
- *
- * Leap Developer SDK. Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.
- *
- * NOTICE: This developer release of Leap Motion, Inc. software is confidential and intended for
- * very limited distribution. Parties using this software must accept the SDK Agreement prior to
- * obtaining this software and related tools. This software is subject to copyright.
- */
+package org.terasology.input.jitter;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -42,10 +20,12 @@ import com.leapmotion.leap.SwipeGesture;
 
 /**
  * InternalLeapListener is a wrapped Leap Listener used by Jitter. It captures and stores Leap data in the JitterSystem.
- * Gestures are detected locally here and callbacks issued to the JitterListener provided by the user
+ * Gestures are detected locally here and callbacks issued to the JitterListener supplied on instantiation
+ *
+ * Based on LeapMotionListener.java by Marcel Schwittlick for LeapMotionP5 - https://github.com/mrzl/LeapMotionP5
  *
  * @author Marcel Schwittlick
- * @author Rasmus 'Cervator' Praestholm
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 class InternalLeapListener extends Listener {
     protected int maxFramesToRecord = 1000;
