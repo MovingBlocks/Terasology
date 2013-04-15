@@ -15,7 +15,7 @@ public class AdvancedMonitor extends JFrame {
     private final PerformanceMonitorPanel perfMonitor;
     
     public AdvancedMonitor() {
-        this("Terasology Monitor", 10, 10, 800, 600);
+        this("Advanced Monitoring Tool", 10, 10, 800, 600);
     }
     
     public AdvancedMonitor(String title, int x, int y, int width, int height) {
