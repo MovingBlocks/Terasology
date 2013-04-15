@@ -32,6 +32,8 @@ import com.google.common.eventbus.Subscribe;
 @SuppressWarnings("serial")
 public class ThreadMonitorPanel extends JPanel {
 
+    protected static final Color background = Color.white;
+    
     protected static final Logger logger = LoggerFactory.getLogger(ThreadMonitorPanel.class);
 
     private final JList list;
@@ -67,10 +69,11 @@ public class ThreadMonitorPanel extends JPanel {
             private Dimension dId = new Dimension(0, 0), dName = new Dimension(0, 0);
             
             public MyRenderer() {
-                setBackground(Color.white);
+                setBackground(background);
                 setLayout(new BorderLayout());
                 
                 pHead.setLayout(new BorderLayout());
+                pHead.setBackground(background);
                 pHead.add(pList, BorderLayout.LINE_START);
                 pHead.add(lActive, BorderLayout.LINE_END);
                 pHead.add(pError, BorderLayout.PAGE_END);
@@ -80,12 +83,14 @@ public class ThreadMonitorPanel extends JPanel {
                 lCounters.setForeground(Color.gray);
 
                 pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+                pList.setBackground(background);
                 pList.add(lId);
                 pList.add(lName);
                 pList.add(lCounters);
                 
                 pError.setVisible(false);
                 pError.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+                pError.setBackground(background);
                 pError.add(lErrorSpacer);
                 pError.add(lError);
                 
