@@ -28,9 +28,12 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.TerasologyEngine;
+import org.terasology.game.Timer;
+import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
@@ -44,6 +47,8 @@ import org.terasology.world.WorldProvider;
 public class DebugControlSystem implements EventHandlerSystem {
 
     private UIScreenMetrics metrics;
+    private Timer timer;
+    private long lastTimeSpacePressed;
 
     @In
     private WorldProvider world;
@@ -99,7 +104,11 @@ public class DebugControlSystem implements EventHandlerSystem {
                 case Keyboard.KEY_K:
                     entity.send(new DamageEvent(9999, null));
                     break;
-
+                case Keyboard.KEY_F4:
+                    metrics = (UIScreenMetrics) CoreRegistry.get(GUIManager.class).openWindow("metrics");
+                    metrics.toggleMode();
+                    event.consume();
+                    break;
                 case Keyboard.KEY_F6:
                     config.getSystem().setDebugRenderingEnabled(!config.getSystem().isDebugRenderingEnabled());
                     event.consume();
@@ -136,11 +145,6 @@ public class DebugControlSystem implements EventHandlerSystem {
                 break;
             case Keyboard.KEY_F3:
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
-                event.consume();
-                break;
-            case Keyboard.KEY_F4:
-                metrics = (UIScreenMetrics) CoreRegistry.get(GUIManager.class).openWindow("metrics");
-                metrics.toggleMode();
                 event.consume();
                 break;
             case Keyboard.KEY_F5:
