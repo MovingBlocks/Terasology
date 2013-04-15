@@ -12,7 +12,7 @@ public class Monitoring {
     private static final Logger logger = LoggerFactory.getLogger(Monitoring.class);
     
     private static boolean initialized = false;
-    private static boolean advancedMonitoringEnabled, advancedMonitorVisibleAtStartup;
+    private static boolean advancedMonitoringEnabled = false, advancedMonitorVisibleAtStartup = false;
     
     private static AdvancedMonitor instance;
     
@@ -21,9 +21,9 @@ public class Monitoring {
         initialized = true;
         final Config config = CoreRegistry.get(Config.class);
         if (config == null) {
-            logger.error("Cannot obtain global configuration object");
-            initialized = false;
-            throw new RuntimeException("Cannot obtain global configuration object");
+            logger.error("Cannot obtain global configuration object, advanced monitoring will be disabled");
+            initialized = true;
+            return;
         }
         final AdvancedConfig aconfig = config.getAdvanced();
         advancedMonitoringEnabled = aconfig.isAdvancedMonitoringEnabled();
