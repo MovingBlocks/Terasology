@@ -26,7 +26,6 @@ import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
-import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
@@ -104,7 +103,7 @@ public class Chunk {
         this.lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.dirty = true;
-        ChunkMonitor.registerChunk(this);
+        ChunkMonitor.fireChunkCreated(this);
     }
 
     public Chunk(Vector3i pos) {
@@ -119,7 +118,7 @@ public class Chunk {
         extraData = other.extraData.copy();
         chunkState = other.chunkState;
         dirty = true;
-        ChunkMonitor.registerChunk(this);
+        ChunkMonitor.fireChunkCreated(this);
     }
 
     public Chunk(Vector3i pos, ChunkState chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
@@ -130,7 +129,7 @@ public class Chunk {
         this.extraData = Preconditions.checkNotNull(liquid);
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
-        ChunkMonitor.registerChunk(this);
+        ChunkMonitor.fireChunkCreated(this);
     }
 
     /**

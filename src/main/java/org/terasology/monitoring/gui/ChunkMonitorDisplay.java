@@ -13,7 +13,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -35,8 +34,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
+import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
-import org.terasology.monitoring.impl.WeakChunk;
 import org.terasology.world.chunks.Chunk;
 
 import com.google.common.base.Preconditions;
@@ -57,7 +56,7 @@ public class ChunkMonitorDisplay extends JPanel {
     
     protected static final Logger logger = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
 
-    protected final List<WeakChunk> chunks = new LinkedList<WeakChunk>();
+    protected final List<ChunkMonitorEntry> chunks = new LinkedList<ChunkMonitorEntry>();
     
     protected AtomicReference<BufferedImage> imageRef = new AtomicReference<BufferedImage>();
     protected int refreshInterval, centerOffsetX = 0, centerOffsetY = 0, offsetX, offsetY, chunkSize;
@@ -91,9 +90,9 @@ public class ChunkMonitorDisplay extends JPanel {
 
         @Override
         public void execute() {
-            ChunkMonitor.getWeakChunks(chunks);
-            for (WeakChunk w : chunks) {
-                final Vector3i pos = w.getPos();
+            ChunkMonitor.getChunks(chunks);
+            for (ChunkMonitorEntry chunk : chunks) {
+                final Vector3i pos = chunk.getPosition();
                 if (pos.y < minRenderY)
                     minRenderY = pos.y;
                 if (pos.y > maxRenderY)
@@ -142,13 +141,13 @@ public class ChunkMonitorDisplay extends JPanel {
         public void execute() {
             if (event instanceof ChunkMonitorEvent.Created) {
                 final ChunkMonitorEvent.Created e = (ChunkMonitorEvent.Created) event;
-                final WeakChunk w = e.getWeakChunk();
-                final Vector3i pos = w.getPos();
+                final ChunkMonitorEntry chunk = e.getEntry();
+                final Vector3i pos = e.getPosition();
                 if (pos.y < minRenderY)
                     minRenderY = pos.y;
                 if (pos.y > maxRenderY)
                     maxRenderY = pos.y;
-                chunks.add(w);
+                chunks.add(chunk);
             }
         }
     }
@@ -229,13 +228,13 @@ public class ChunkMonitorDisplay extends JPanel {
 
         protected RenderTask() {}
         
-        protected Rectangle calcBox(List<WeakChunk> chunks) {
+        protected Rectangle calcBox(List<ChunkMonitorEntry> chunks) {
             if (chunks.isEmpty()) 
                 return new Rectangle(0, 0, 0, 0);
             int xmin = Integer.MAX_VALUE, xmax = Integer.MIN_VALUE;
             int ymin = Integer.MAX_VALUE, ymax = Integer.MIN_VALUE;
-            for (WeakChunk w : chunks) {
-                final Vector3i pos = w.getPos();
+            for (ChunkMonitorEntry entry : chunks) {
+                final Vector3i pos = entry.getPosition();
                 if (pos.y != renderY) continue;
                 if (pos.x < xmin) xmin = pos.x;
                 if (pos.x > xmax) xmax = pos.x;
@@ -245,7 +244,8 @@ public class ChunkMonitorDisplay extends JPanel {
             return new Rectangle(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
         }
 
-        protected Color calcChunkColor(Chunk chunk) {
+        protected Color calcChunkColor(ChunkMonitorEntry entry) {
+            final Chunk chunk = entry.getChunk();
             if (chunk == null)
                 return ColorDead;
             
@@ -275,19 +275,19 @@ public class ChunkMonitorDisplay extends JPanel {
             g.fillRect(0, 0, width, height);
         }
 
-        protected void renderChunks(Graphics2D g, int offsetx, int offsety, List<WeakChunk> chunks) {
-            for (WeakChunk w : chunks) {
-                if (w.getPos().y == renderY) 
-                    renderChunk(g, offsetx, offsety, w.getPos(), w.getChunk());
+        protected void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunks) {
+            for (ChunkMonitorEntry entry : chunks) {
+                if (entry.getPosition().y == renderY) 
+                    renderChunk(g, offsetx, offsety, entry.getPosition(), entry);
             }
         }
 
-        protected void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, Chunk chunk) {
-            g.setColor(calcChunkColor(chunk));
+        protected void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
+            g.setColor(calcChunkColor(entry));
             g.fillRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
         }
         
-        protected void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<WeakChunk> chunks) {
+        protected void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunks) {
             final Rectangle box = calcBox(chunks);
             renderBackground(g, width, height);
             renderChunks(g, offsetx, offsety, chunks);
@@ -323,21 +323,10 @@ public class ChunkMonitorDisplay extends JPanel {
             return (System.currentTimeMillis() - time);
         }
         
-        protected void purgeDeadChunks() {
-            ChunkMonitor.purgeDeadChunks();
-            final Iterator<WeakChunk> it = chunks.iterator();
-            while (it.hasNext()) {
-                final WeakChunk w = it.next();
-                if (w.getChunk() == null) {
-                    it.remove();
-                }
-            }
-        }
-        
         protected void recomputeRenderY() {
             int min = 0, max = 0, y = renderY;
-            for (WeakChunk w : chunks) {
-                final Vector3i pos = w.getPos();
+            for (ChunkMonitorEntry chunk : chunks) {
+                final Vector3i pos = chunk.getPosition();
                 if (pos.y < min) min = pos.y;
                 if (pos.y > max) max = pos.y;
             }
@@ -363,11 +352,9 @@ public class ChunkMonitorDisplay extends JPanel {
             final LinkedList<Request> requests = new LinkedList<Request>();
             final SingleThreadMonitor monitor = ThreadMonitor.create("Monitoring.Chunks", "Requests", "Events");
             
-            long lastPurgeTime = System.currentTimeMillis();
-            
             try {
                 while (true) {
-                    long slept = poll(requests);
+                    final long slept = poll(requests);
                     for (Request r : requests) 
                         try {
                             r.execute();
@@ -384,11 +371,6 @@ public class ChunkMonitorDisplay extends JPanel {
                     if (followPlayer)
                         doFollowPlayer();
                     render();
-                    if (System.currentTimeMillis() - lastPurgeTime >= 30000) {
-                        purgeDeadChunks();
-                        recomputeRenderY();
-                        lastPurgeTime = System.currentTimeMillis();
-                    }
                     if (slept <= 400)
                         Thread.sleep(500 - slept);
                 }

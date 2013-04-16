@@ -1,27 +1,45 @@
 package org.terasology.monitoring;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.terasology.math.Vector3i;
+import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
-import org.terasology.monitoring.impl.WeakChunk;
 import org.terasology.world.MiniatureChunk;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkState;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 
 public class ChunkMonitor {
 
     private static final EventBus eventbus = new EventBus("ChunkMonitor");
-    private static final LinkedList<WeakChunk> chunks = new LinkedList<WeakChunk>();
+    private static final Map<Vector3i, ChunkMonitorEntry> chunks = Maps.newConcurrentMap();
     
     private static void post(Object event) {
         if (!Monitoring.isAdvancedMonitoringEnabled())
             return;
         eventbus.post(event);
+    }
+    
+    private static synchronized ChunkMonitorEntry registerChunk(Chunk chunk) {
+        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+        if (!Monitoring.isAdvancedMonitoringEnabled())
+            return null;
+        if (chunk instanceof MiniatureChunk)
+            return null;
+        final Vector3i pos = chunk.getPos();
+        ChunkMonitorEntry entry = chunks.get(pos);
+        if (entry == null) {
+            entry = new ChunkMonitorEntry(pos);
+            chunks.put(pos, entry);
+        }
+        entry.setChunk(chunk);
+        return entry;
     }
     
     private ChunkMonitor() {}
@@ -31,62 +49,38 @@ public class ChunkMonitor {
         eventbus.register(object);
     }
     
-    public static synchronized void registerChunk(Chunk chunk) {
+    public static void fireChunkCreated(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        if (!Monitoring.isAdvancedMonitoringEnabled())
-            return;
-        if (chunk instanceof MiniatureChunk)
-            return;
-        final WeakChunk w = new WeakChunk(chunk);
-        chunks.add(w);
-        post(new ChunkMonitorEvent.Created(w));
+        final ChunkMonitorEntry entry = registerChunk(chunk);
+        if (entry != null)
+            post(new ChunkMonitorEvent.Created(entry)); 
     }
     
-    public static synchronized void getChunks(List<Chunk> output) {
-        final Iterator<WeakChunk> it = chunks.iterator();
-        while (it.hasNext()) {
-            final WeakChunk e = it.next();
-            final Chunk c = e.getChunk();
-            if (c != null) {
-                output.add(c);
-            }
-        }
-    }
-    
-    public static synchronized void getWeakChunks(List<WeakChunk> output) {
-        final Iterator<WeakChunk> it = chunks.iterator();
-        while (it.hasNext()) {
-            final WeakChunk e = it.next();
-            final Chunk c = e.getChunk();
-            if (c != null) {
-                output.add(e);
-            }
-        }
-    }
-    
-    public static synchronized int purgeDeadChunks() {
-        int result = 0;
-        final Iterator<WeakChunk> it = chunks.iterator();
-        while (it.hasNext()) {
-            final WeakChunk e = it.next();
-            final Chunk c = e.getChunk();
-            if (c == null) {
-                it.remove();
-                ++result;
-            }
-        }
-        return result;
+    public static void fireChunkRevived(Chunk chunk) {
+        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+        post(new ChunkMonitorEvent.Revived(chunk.getPos()));
     }
     
     public static void fireStateChanged(Chunk chunk, ChunkState oldState) {
-        post(new ChunkMonitorEvent.StateChanged(chunk, oldState));
+        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+        post(new ChunkMonitorEvent.StateChanged(chunk.getPos(), oldState, chunk.getChunkState()));
     }
     
     public static void fireChunkDeflated(Chunk chunk, int oldSize, int newSize) {
-        post(new ChunkMonitorEvent.Deflated(chunk, oldSize, newSize));
+        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+        post(new ChunkMonitorEvent.Deflated(chunk.getPos(), oldSize, newSize));
     }
     
     public static void fireChunkDisposed(Chunk chunk) {
-        post(new ChunkMonitorEvent.Disposed(chunk));
+        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+        post(new ChunkMonitorEvent.Disposed(chunk.getPos()));
+    }
+
+    public static synchronized void getChunks(List<ChunkMonitorEntry> output) {
+        final Iterator<ChunkMonitorEntry> it = chunks.values().iterator();
+        while (it.hasNext()) {
+            final ChunkMonitorEntry e = it.next();
+            output.add(e);
+        }
     }
 }

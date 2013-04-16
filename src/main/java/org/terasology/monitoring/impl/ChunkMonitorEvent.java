@@ -1,48 +1,51 @@
 package org.terasology.monitoring.impl;
 
-import org.terasology.world.chunks.Chunk;
+import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.ChunkState;
 
 import com.google.common.base.Preconditions;
 
 public abstract class ChunkMonitorEvent {
 
-    public abstract Chunk getChunk();
+    public abstract Vector3i getPosition();
     
     protected static class BasicChunkEvent extends ChunkMonitorEvent {
         
-        protected final Chunk chunk;
+        protected final Vector3i position;
         
-        public BasicChunkEvent(Chunk chunk) {
-            Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-            this.chunk = chunk;
+        public BasicChunkEvent(Vector3i position) {
+            Preconditions.checkNotNull(position, "The parameter 'chunk' must not be null");
+            this.position = position;
         }
         
-        public final Chunk getChunk() {
-            return chunk;
+        public final Vector3i getPosition() {
+            return position;
         }
     }
     
-    public static class Created extends ChunkMonitorEvent {
+    public static class Created extends BasicChunkEvent {
         
-        protected final WeakChunk weakChunk;
+        protected final ChunkMonitorEntry entry;
         
-        public Created(WeakChunk chunk) {
-            this.weakChunk = chunk;
+        public Created(ChunkMonitorEntry chunk) {
+            super(Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null").getPosition());
+            this.entry = chunk;
         }
         
-        public final WeakChunk getWeakChunk() {
-            return weakChunk;
+        public final ChunkMonitorEntry getEntry() {
+            return entry;
         }
-        
-        public final Chunk getChunk() {
-            return weakChunk.getChunk();
+    }
+    
+    public static class Revived extends BasicChunkEvent {
+        public Revived(Vector3i position) {
+            super(position);
         }
     }
     
     public static class Disposed extends BasicChunkEvent {
-        public Disposed(Chunk chunk) {
-            super(chunk);
+        public Disposed(Vector3i position) {
+            super(position);
         }
     }
     
@@ -50,10 +53,10 @@ public abstract class ChunkMonitorEvent {
         
         public final ChunkState oldState, newState;
         
-        public StateChanged(Chunk chunk, ChunkState oldState) {
-            super(chunk);
+        public StateChanged(Vector3i position, ChunkState oldState, ChunkState newState) {
+            super(position);
             this.oldState = oldState;
-            this.newState = chunk.getChunkState();
+            this.newState = newState;
         }
     }
     
@@ -61,8 +64,8 @@ public abstract class ChunkMonitorEvent {
         
         public final int oldSize, newSize;
         
-        public Deflated(Chunk chunk, int oldSize, int newSize) {
-            super(chunk);
+        public Deflated(Vector3i position, int oldSize, int newSize) {
+            super(position);
             this.oldSize = oldSize;
             this.newSize = newSize;
         }
