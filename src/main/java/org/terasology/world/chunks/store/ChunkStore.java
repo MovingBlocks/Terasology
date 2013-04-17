@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks;
+package org.terasology.world.chunks.store;
 
 import java.util.List;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius

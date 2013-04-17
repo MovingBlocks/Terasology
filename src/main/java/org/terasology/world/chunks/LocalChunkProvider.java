@@ -44,6 +44,7 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.WorldView;
+import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.localChunkProvider.AbstractChunkTask;
 import org.terasology.world.localChunkProvider.ChunkRequest;

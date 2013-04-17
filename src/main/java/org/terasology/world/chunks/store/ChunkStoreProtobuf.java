@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.Chunks;
 
 import com.google.common.base.Preconditions;
