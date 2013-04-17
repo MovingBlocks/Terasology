@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks;
+package org.terasology.world.chunks.provider;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -44,6 +44,9 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.WorldView;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkReadyEvent;
+import org.terasology.world.chunks.ChunkState;
 import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.localChunkProvider.AbstractChunkTask;
