@@ -155,16 +155,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
 
-        if (localPlayerComponent.isDead) {
-            return;
-        }
-
         updateMovement(localPlayerComponent, characterMovementComponent, location);
 
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
         QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
-        updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation);
+        updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation, entity);
 
         // Hand animation update
         localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
@@ -332,8 +328,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         characterMovementComponent.setDrive(relMove);
     }
 
-    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
-        // The camera position is the player's position plus the eye offset
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation, EntityRef entity) {        // The camera position is the player's position plus the eye offset
         Vector3d cameraPosition = new Vector3d();
         // TODO: don't hardset eye position
         cameraPosition.add(new Vector3d(position), new Vector3d(0, 0.6f, 0));
@@ -347,7 +344,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
 
-        if (playerCamera.getClass() == PerspectiveCamera.class) {
+        LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
+        if ((playerCamera.getClass() == PerspectiveCamera.class)&& !(localPlayerComponent.isDead)) {
             if (config.getRendering().isCameraBobbing()) {
                 ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
                 ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
