@@ -64,7 +64,6 @@ import org.terasology.world.chunks.ChunkState;
 import org.terasology.world.chunks.provider.ChunkProvider;
 import org.terasology.world.chunks.provider.LocalChunkProvider;
 import org.terasology.world.chunks.store.ChunkStore;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
@@ -186,10 +185,7 @@ public final class WorldRenderer {
             in = new ObjectInputStream(fileIn);
 
             ChunkStore cache = (ChunkStore) in.readObject();
-            if (cache instanceof ChunkStoreGZip) {
-                ((ChunkStoreGZip) cache).setup();
-                logger.info("Using old chunk store implementation without protobuf support for compatibility.");
-            } else if (cache instanceof ChunkStoreProtobuf)
+            if (cache instanceof ChunkStoreProtobuf)
                 ((ChunkStoreProtobuf) cache).setup();
             else
                 logger.warn("Chunk store might not have been initialized: {}", cache.getClass().getName());
