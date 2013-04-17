@@ -16,17 +16,22 @@
 
 package org.terasology.world.chunks;
 
+import java.util.List;
+
 import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
 public interface ChunkStore {
+    
     public Chunk get(Vector3i position);
 
     public void put(Chunk c);
 
     public boolean contains(Vector3i position);
+    
+    public int list(List<Vector3i> output);
 
     public float size();
 

@@ -18,6 +18,7 @@ package org.terasology.world.chunks.store;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +37,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.Chunks;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.protobuf.CodedInputStream;
@@ -141,6 +143,14 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     @Override
     public boolean contains(Vector3i position) {
         return modifiedChunks.containsKey(position) || serializedChunks.containsKey(position);
+    }
+    
+    @Override
+    public int list(List<Vector3i> output) {
+        Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
+        final int size = output.size();
+        output.addAll(serializedChunks.keySet());
+        return output.size() - size;
     }
 
     public float size() {
