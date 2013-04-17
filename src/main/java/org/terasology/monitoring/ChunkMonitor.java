@@ -105,6 +105,7 @@ public class ChunkMonitor {
     }
 
     public static synchronized void getChunks(List<ChunkMonitorEntry> output) {
+        Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
         final Iterator<ChunkMonitorEntry> it = chunks.values().iterator();
         while (it.hasNext()) {
             final ChunkMonitorEntry e = it.next();
