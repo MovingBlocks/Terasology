@@ -39,6 +39,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
@@ -70,7 +71,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
 
-    private ChunkStore farStore;
+    private final ChunkStore farStore;
 
     private BlockingQueue<ChunkTask> chunkTasksQueue;
     private BlockingQueue<ChunkRequest> reviewChunkQueue;
@@ -90,6 +91,8 @@ public class LocalChunkProvider implements ChunkProvider {
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
         this.generator = generator;
+        
+        ChunkMonitor.fireChunkProviderInitialized(this, farStore);
         
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
 
@@ -292,6 +295,7 @@ public class LocalChunkProvider implements ChunkProvider {
             chunk.dispose();
         }
         nearCache.clear();
+        ChunkMonitor.fireChunkProviderDisposed(this);
     }
 
     @Override

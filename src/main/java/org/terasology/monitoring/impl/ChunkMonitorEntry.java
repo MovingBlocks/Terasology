@@ -30,7 +30,9 @@ public class ChunkMonitorEntry {
     
     public void setChunk(Chunk value) {
         Preconditions.checkNotNull(value, "The parameter 'value' must not be null");
-        if (chunk == null || chunk.getChunk() == null)
+        if (value == null)
+            this.chunk = null;
+        else if (chunk == null || chunk.getChunk() == null)
             chunk = new WeakChunk(value);
         else
             logger.error("A chunk is already registered for position {}", pos);

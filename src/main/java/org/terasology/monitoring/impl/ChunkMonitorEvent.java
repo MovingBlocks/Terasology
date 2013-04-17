@@ -2,13 +2,36 @@ package org.terasology.monitoring.impl;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.ChunkState;
+import org.terasology.world.chunks.provider.ChunkProvider;
+import org.terasology.world.chunks.store.ChunkStore;
 
 import com.google.common.base.Preconditions;
 
 public abstract class ChunkMonitorEvent {
-
-    public abstract Vector3i getPosition();
     
+    public static class ChunkProviderInitialized extends ChunkMonitorEvent {
+        
+        public final ChunkProvider provider;
+        public final ChunkStore farStore;
+        
+        public ChunkProviderInitialized(ChunkProvider provider, ChunkStore farStore) {
+            Preconditions.checkNotNull(provider, "The parameter 'provider' must not be null");
+            Preconditions.checkNotNull(farStore, "The parameter 'farStore' must not be null");
+            this.provider = provider;
+            this.farStore = farStore;
+        }
+    }
+    
+    public static class ChunkProviderDisposed extends ChunkMonitorEvent {
+        
+        public final ChunkProvider provider;
+        
+        public ChunkProviderDisposed(ChunkProvider provider) {
+            Preconditions.checkNotNull(provider, "The parameter 'provider' must not be null");
+            this.provider = provider;
+        }
+    }
+
     protected static class BasicChunkEvent extends ChunkMonitorEvent {
         
         protected final Vector3i position;

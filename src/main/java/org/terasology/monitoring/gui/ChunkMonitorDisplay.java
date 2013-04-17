@@ -66,6 +66,20 @@ public class ChunkMonitorDisplay extends JPanel {
     protected final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
     protected final ExecutorService executor;
     protected final Runnable renderTask;
+    
+    protected void recomputeRenderY() {
+        int min = 0, max = 0, y = renderY;
+        for (ChunkMonitorEntry chunk : chunks) {
+            final Vector3i pos = chunk.getPosition();
+            if (pos.y < min) min = pos.y;
+            if (pos.y > max) max = pos.y;
+        }
+        if (y < min) y = min;
+        if (y > max) y = max;
+        minRenderY = min;
+        maxRenderY = max;
+        renderY = y;
+    }
         
     protected interface Request {
         
@@ -91,13 +105,7 @@ public class ChunkMonitorDisplay extends JPanel {
         @Override
         public void execute() {
             ChunkMonitor.getChunks(chunks);
-            for (ChunkMonitorEntry chunk : chunks) {
-                final Vector3i pos = chunk.getPosition();
-                if (pos.y < minRenderY)
-                    minRenderY = pos.y;
-                if (pos.y > maxRenderY)
-                    maxRenderY = pos.y;
-            }
+            recomputeRenderY();
         }
     }
     
@@ -139,7 +147,16 @@ public class ChunkMonitorDisplay extends JPanel {
         
         @Override
         public void execute() {
-            if (event instanceof ChunkMonitorEvent.Created) {
+            if (event instanceof ChunkMonitorEvent.ChunkProviderInitialized) {
+                chunks.clear();
+                ChunkMonitor.getChunks(chunks);
+                recomputeRenderY();
+            }
+            else if (event instanceof ChunkMonitorEvent.ChunkProviderDisposed) {
+                chunks.clear();
+                recomputeRenderY();
+            }
+            else if (event instanceof ChunkMonitorEvent.Created) {
                 final ChunkMonitorEvent.Created e = (ChunkMonitorEvent.Created) event;
                 final ChunkMonitorEntry chunk = e.getEntry();
                 final Vector3i pos = e.getPosition();
@@ -321,20 +338,6 @@ public class ChunkMonitorDisplay extends JPanel {
                 queue.drainTo(output);
             }
             return (System.currentTimeMillis() - time);
-        }
-        
-        protected void recomputeRenderY() {
-            int min = 0, max = 0, y = renderY;
-            for (ChunkMonitorEntry chunk : chunks) {
-                final Vector3i pos = chunk.getPosition();
-                if (pos.y < min) min = pos.y;
-                if (pos.y > max) max = pos.y;
-            }
-            if (y < min) y = min;
-            if (y > max) y = max;
-            minRenderY = min;
-            maxRenderY = max;
-            renderY = y;
         }
         
         protected void doFollowPlayer() {
