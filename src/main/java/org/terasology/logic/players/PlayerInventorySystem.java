@@ -16,24 +16,30 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entitySystem.*;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.binds.AttackButton;
+import org.terasology.input.binds.DropItemButton;
 import org.terasology.input.binds.ToolbarNextButton;
 import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.AttackRequest;
+import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -56,7 +62,7 @@ public class PlayerInventorySystem implements ComponentSystem {
     @In
     private SlotBasedInventoryManager inventoryManager;
 
-    private long lastInteraction;
+    private long lastInteraction, lastTimeThrowInteraction;
 
     @Override
     public void initialise() {
@@ -126,5 +132,82 @@ public class PlayerInventorySystem implements ComponentSystem {
         entity.saveComponent(character);
         event.consume();
     }
+
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
+    public void onDropItemRequest(DropItemButton event, EntityRef entity) {
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedTool);
+
+        if (selectedItemEntity.equals(EntityRef.NULL)) {
+            return;
+        }
+        //if this is our first time throwing, set the timer to something sensible, we can return since
+        // this is a repeating event.
+        if (event.isDown() && lastTimeThrowInteraction == 0) {
+            lastTimeThrowInteraction = timer.getTimeInMs();
+            return;
+        }
+
+        //resize the crosshair
+        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+
+        crossHair.setTextureSize(new Vector2f(22f / 256f, 22f / 256f));
+        // compute drop power
+        float dropPower = getDropPower();
+        //update crosshair to show progress/power
+        crossHair.setTextureOrigin(new Vector2f((46f + 22f * dropPower) / 256f, 23f / 256f));
+
+        //handle when we finally let go
+        if (!event.isDown()) {
+            // Compute new position
+            dropPower *= 25f;
+            ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+
+            // TODO: This will change when camera are handled better (via a component)
+            Camera playerCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+
+            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x * 1.5f,
+                    playerCamera.getPosition().y + playerCamera.getViewingDirection().y * 1.5f,
+                    playerCamera.getPosition().z + playerCamera.getViewingDirection().z * 1.5f
+            );
+
+            //send DropItemRequest
+            Vector3f impulseVector = new Vector3f(playerCamera.getViewingDirection());
+            impulseVector.scale(dropPower);
+            entity.send(new DropItemRequest(selectedItemEntity, entity,
+                    impulseVector,
+                    newPosition));
+
+            character.handAnimation = 0.5f;
+
+            resetDropMark();
+        }
+
+        entity.saveComponent(character);
+        event.consume();
+
+
+    }
+
+    public void resetDropMark() {
+        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+        lastTimeThrowInteraction = 0;
+        crossHair.setTextureSize(new Vector2f(20f / 256f, 20f / 256f));
+        crossHair.setTextureOrigin(new Vector2f(24f / 256f, 24f / 256f));
+    }
+
+    private float getDropPower() {
+        if (lastTimeThrowInteraction == 0) {
+            return 0;
+        }
+        float dropPower = (float) Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction) / 200);
+
+        if (dropPower > 6) {
+            dropPower = 6;
+        }
+
+        return dropPower;
+    }
+
 
 }
