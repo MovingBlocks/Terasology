@@ -31,6 +31,24 @@ public interface EntityManager {
     // Entity Management
 
     /**
+     * Creates an EntityBuilder.
+     * @return A new entity builder
+     */
+    EntityBuilder newBuilder();
+
+    /**
+     * Creates an EntityBuilder, from a prefab
+     * @return A new entity builder
+     */
+    EntityBuilder newBuilder(String prefabName);
+
+    /**
+     * Creates an EntityBuilder, from a prefab
+     * @return A new entity builder
+     */
+    EntityBuilder newBuilder(Prefab prefab);
+
+    /**
      * @return A references to a new, unused entity
      */
     EntityRef create();

@@ -114,6 +114,8 @@ public class Server implements ChunkReadyListener {
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
         this.serverInfo = serverInfo;
         clientEntity = new NetEntityRef(serverInfo.getClientId(), networkSystem);
+
+
     }
 
     public EntityRef getEntity() {

@@ -79,7 +79,7 @@ public class PojoPrefabManagerTest {
     @Test
     public void addAndRetrieveComponent() {
         Prefab prefab = prefabManager.createPrefab(PrefabName);
-        StringComponent comp = prefab.setComponent(new StringComponent());
+        StringComponent comp = prefab.addComponent(new StringComponent());
         assertNotNull(comp);
 
         assertEquals(comp, prefab.getComponent(StringComponent.class));
@@ -91,7 +91,7 @@ public class PojoPrefabManagerTest {
         Prefab parentPrefab = prefabManager.createPrefab("parentPrefab");
 
         LocationComponent testComponent = new LocationComponent();
-        parentPrefab.setComponent(testComponent);
+        parentPrefab.addComponent(testComponent);
 
 
         Prefab prefab = prefabManager.createPrefab(PrefabName);
@@ -108,15 +108,15 @@ public class PojoPrefabManagerTest {
     @Test
     public void testListPrefabs() {
         Prefab prefab = prefabManager.createPrefab(PrefabName + "1");
-        prefab.setComponent(new StringComponent());
+        prefab.addComponent(new StringComponent());
         Prefab prefab2 = prefabManager.createPrefab(PrefabName + "2");
-        prefab2.setComponent(new StringComponent());
+        prefab2.addComponent(new StringComponent());
         Prefab prefab3 = prefabManager.createPrefab(PrefabName + "3");
-        prefab3.setComponent(new StringComponent());
+        prefab3.addComponent(new StringComponent());
         Prefab prefab4 = prefabManager.createPrefab(PrefabName + "4");
-        prefab4.setComponent(new LocationComponent());
+        prefab4.addComponent(new LocationComponent());
         Prefab prefab5 = prefabManager.createPrefab(PrefabName + "5");
-        prefab5.setComponent(new LocationComponent());
+        prefab5.addComponent(new LocationComponent());
 
         long i = 0;
         Iterator it = prefabManager.listPrefabs().iterator();

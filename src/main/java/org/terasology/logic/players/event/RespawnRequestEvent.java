@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.players;
 
-import org.terasology.entitySystem.Component;
+package org.terasology.logic.players.event;
+
+import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.network.ServerEvent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public final class LocalPlayerComponent implements Component {
-    // Should this be in another component? Player probably.
-    public boolean isDead = false;
-    public float respawnWait = 0;
-
-    // Should be here I think (only the local player needs to know the slot),
-    // but equipped item will need to be reflected elsewhere so it can
-    // be replicated to all players
-    public int selectedTool = 0;
-    public float handAnimation = 0;
+@ServerEvent
+public class RespawnRequestEvent extends AbstractEvent {
 }

@@ -265,7 +265,7 @@ public class PojoEntityManagerTest {
     public void prefabCopiedCorrectly() {
         PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
         Prefab prefab = manager.createPrefab("myprefab");
-        prefab.setComponent(new StringComponent("Test"));
+        prefab.addComponent(new StringComponent("Test"));
         EntityRef entity1 = entityManager.create(prefab);
         StringComponent comp = entity1.getComponent(StringComponent.class);
         assertEquals("Test", comp.value);
@@ -283,7 +283,7 @@ public class PojoEntityManagerTest {
         PrefabManager prefabManager = entityManager.getPrefabManager();
         Prefab prefab = prefabManager.createPrefab("myprefab");
         StringComponent testComponent = new StringComponent();
-        prefab.setComponent(testComponent);
+        prefab.addComponent(testComponent);
         EntityRef test1 = entityManager.create("myprefab");
         EntityRef test2 = entityManager.create("myprefab");
         //This returns true because the Objectids are Identical.
@@ -295,7 +295,7 @@ public class PojoEntityManagerTest {
         PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
         Prefab prefab = manager.createPrefab("myprefab");
         prefab.setPersisted(false);
-        prefab.setComponent(new StringComponent("Test"));
+        prefab.addComponent(new StringComponent("Test"));
         EntityRef entity1 = entityManager.create(prefab);
         assertFalse(entity1.isPersisted());
     }

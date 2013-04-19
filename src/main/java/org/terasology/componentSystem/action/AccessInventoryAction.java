@@ -25,9 +25,10 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 
@@ -61,9 +62,10 @@ public class AccessInventoryAction implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
-        if (event.getContainer().hasComponent(InventoryComponent.class)) {
+        ClientComponent controller = entity.getComponent(CharacterComponent.class).controller.getComponent(ClientComponent.class);
+        if (controller.local && event.getContainer().hasComponent(InventoryComponent.class)) {
             UIScreenContainer containerScreen = (UIScreenContainer) CoreRegistry.get(GUIManager.class).openWindow("container");
             containerScreen.openContainer(event.getContainer(), entity);
         }

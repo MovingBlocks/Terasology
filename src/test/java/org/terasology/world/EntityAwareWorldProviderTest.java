@@ -76,7 +76,7 @@ public class EntityAwareWorldProviderTest {
     public void testAddBlockWithPersistentEntity() {
 
         Prefab prefab = prefabManager.createPrefab(PREFAB_URI);
-        prefab.setComponent(new StringComponent());
+        prefab.addComponent(new StringComponent());
 
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
@@ -95,7 +95,7 @@ public class EntityAwareWorldProviderTest {
     public void testAddBlockWithPlacedEntity() {
 
         Prefab prefab = prefabManager.createPrefab(PREFAB_URI);
-        prefab.setComponent(new StringComponent());
+        prefab.addComponent(new StringComponent());
 
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.WHILE_PLACED);
@@ -114,7 +114,7 @@ public class EntityAwareWorldProviderTest {
     public void testAddBlockWithExistingEntity() {
 
         Prefab prefab = prefabManager.createPrefab(PREFAB_URI);
-        prefab.setComponent(new StringComponent());
+        prefab.addComponent(new StringComponent());
 
         Block persistentEntityBlock = new Block();
         persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);

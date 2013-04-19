@@ -18,7 +18,6 @@ package org.terasology.logic.players;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entityFactory.DroppedBlockFactory;
@@ -28,9 +27,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.logic.health.HealthChangedEvent;
 import org.terasology.logic.health.NoHealthEvent;
-import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
@@ -56,6 +53,7 @@ import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.network.ClientComponent;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -127,24 +125,21 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
 
     @Override
     public void update(float delta) {
-        if (!localPlayer.isValid())
+        if (!localPlayer.isValid()) {
             return;
+        }
 
         EntityRef entity = localPlayer.getCharacterEntity();
-        LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         CharacterComponent characterComp = entity.getComponent(CharacterComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
 
-        if (localPlayerComponent.isDead) {
-            return;
-        }
 
         processInput(entity, characterComp, characterMovementComponent);
         updateCamera(characterComp, characterMovementComponent, characterComp, location);
 
         // Hand animation update
-        localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
+        characterComp.handAnimation = Math.max(0, characterComp.handAnimation - 2.5f * delta);
 
         entity.saveComponent(characterComp);
     }
@@ -176,21 +171,21 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
         CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
         lookYaw = (characterComponent.yaw - event.getValue()) % 360;
         event.consume();
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         lookPitch = TeraMath.clamp(character.pitch - event.getValue(), -89, 89);
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class})
     public void onJump(JumpButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             jump = true;
@@ -204,25 +199,25 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
         relativeMovement.x = event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
         relativeMovement.y = event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onRun(RunButton event, EntityRef entity) {
         run = event.isDown();
         event.consume();
@@ -266,42 +261,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         return aabbRenderer;
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onDeath(NoHealthEvent event, EntityRef entity) {
-        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
-        localPlayer.isDead = true;
-        entity.saveComponent(localPlayer);
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onRespawn(RespawnEvent event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComponent.isDead) {
-            localPlayerComponent.isDead = false;
-            entity.saveComponent(localPlayerComponent);
-        }
-
-        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-        CharacterComponent playerComponent = entity.getComponent(CharacterComponent.class);
-        if (playerComponent != null && locationComponent != null) {
-            locationComponent.setWorldPosition(playerComponent.spawnPosition);
-            entity.saveComponent(locationComponent);
-        }
-
-        HealthComponent healthComponent = entity.getComponent(HealthComponent.class);
-        if (healthComponent != null) {
-            healthComponent.currentHealth = healthComponent.maxHealth;
-            entity.send(new HealthChangedEvent(entity, healthComponent.currentHealth, healthComponent.maxHealth));
-            entity.saveComponent(healthComponent);
-        }
-
-        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
-        if (characterMovementComponent != null) {
-            // TODO: Fix
-            characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
-            entity.saveComponent(characterMovementComponent);
-        }
-    }
 
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         // The camera position is the player's position plus the eye offset
@@ -333,14 +292,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onFrobRequest(FrobButton event, EntityRef entity) {
         if (event.getState() != ButtonState.DOWN) {
-            return;
-        }
-
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp.isDead) {
             return;
         }
 
@@ -348,10 +302,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onDropItem(DropItemButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedTool);
         BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
 
         if (selectedItemEntity.equals(EntityRef.NULL)) {
@@ -362,8 +316,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
             lastTimeThrowInteraction = timer.getTimeInMs();
             return;
         }
-
-        if (localPlayerComp.isDead) return;
 
         UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
 
@@ -409,12 +361,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
                     selectedItemEntity.destroy();
                 }
 
-                localPlayerComp.handAnimation = 0.5f;
+                character.handAnimation = 0.5f;
             }
             resetDropMark();
         }
 
-        entity.saveComponent(localPlayerComp);
+        entity.saveComponent(character);
         event.consume();
     }
 

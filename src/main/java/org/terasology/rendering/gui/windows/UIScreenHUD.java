@@ -16,7 +16,6 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
@@ -25,8 +24,8 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.gui.widgets.UILabel;
@@ -115,7 +114,10 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
         toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
-        toolbar.setSelected(CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool);
+        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
+        if (character != null) {
+            toolbar.setSelected(character.selectedTool);
+        }
 
         leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
 
@@ -168,7 +170,17 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         super.update();
 
         updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
-        toolbar.setSelected(localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool);
+        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
+        if (character == null) {
+            toolbar.setVisible(false);
+            leftGearWheel.setVisible(false);
+            rightGearWheel.setVisible(false);
+        } else {
+            toolbar.setVisible(true);
+            toolbar.setSelected(character.selectedTool);
+            leftGearWheel.setVisible(true);
+            rightGearWheel.setVisible(true);
+        }
 
         boolean enableDebug = config.getSystem().isDebugEnabled();
         debugLine1.setVisible(enableDebug);
@@ -184,7 +196,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             if (entityManager != null) {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntities(), cameraTarget.toString()));
             }
-            debugLine3.setText(String.format("%s, %.2f", CoreRegistry.get(LocalPlayer.class).getPosition(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).yaw));
+            debugLine3.setText(String.format("%s, %.2f", CoreRegistry.get(LocalPlayer.class).getPosition(), (character != null) ? character.yaw : 0));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
     }
@@ -192,7 +204,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     private void updateHealthBar(HealthComponent health) {
         float healthRatio = 0;
         if (health != null) {
-           healthRatio = (float) health.currentHealth / health.maxHealth;
+            healthRatio = (float) health.currentHealth / health.maxHealth;
         }
 
         // Show/Hide hearts relatively to the available health points of the player

@@ -294,9 +294,4 @@ public class HierarchicalAISystem implements ComponentSystem,
         }
     }
 
-    //Destroy AI on death
-    //@ReceiveEvent(components = {LocalPlayerComponent.class})
-    //public void onDeath(NoHealthEvent event, EntityRef entity) {
-    //	entity.destroy();
-    //}
 }

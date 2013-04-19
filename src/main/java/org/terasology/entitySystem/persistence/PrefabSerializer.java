@@ -116,7 +116,7 @@ public class PrefabSerializer {
         for (EntityData.Component componentData : prefabData.getComponentList()) {
             Component component = componentSerializer.deserialize(componentData);
             if (component != null) {
-                prefab.setComponent(component);
+                prefab.addComponent(component);
             }
         }
 
@@ -144,7 +144,7 @@ public class PrefabSerializer {
         for (EntityData.Component componentData : prefabData.getComponentList()) {
             Component component = componentSerializer.deserialize(componentData);
             if (component != null) {
-                prefab.setComponent(component);
+                prefab.addComponent(component);
             }
         }
         return prefab;

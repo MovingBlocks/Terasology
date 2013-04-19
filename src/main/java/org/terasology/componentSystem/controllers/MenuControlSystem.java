@@ -22,15 +22,15 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.input.binds.PauseButton;
 import org.terasology.input.events.KeyDownEvent;
+import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -56,7 +56,7 @@ public class MenuControlSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             guiManager.openWindow(CHAT);
@@ -64,7 +64,7 @@ public class MenuControlSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             guiManager.openWindow(INVENTORY);
@@ -72,7 +72,7 @@ public class MenuControlSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onTogglePause(PauseButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             CoreRegistry.get(GUIManager.class).openWindow(PAUSE_MENU);
@@ -80,7 +80,7 @@ public class MenuControlSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey()) {
             case Keyboard.KEY_F12:
@@ -89,9 +89,11 @@ public class MenuControlSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onDeath(NoHealthEvent event, EntityRef entity) {
-        CoreRegistry.get(GUIManager.class).openWindow("death");
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void onDeath(DeathEvent event, EntityRef entity) {
+        if (entity.getComponent(ClientComponent.class).local) {
+            CoreRegistry.get(GUIManager.class).openWindow("death");
+        }
     }
 
 }

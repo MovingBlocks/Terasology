@@ -62,6 +62,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.Chunks;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -423,8 +424,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void sendInitialEntities(NetData.NetMessage.Builder message) {
         TIntIterator initialIterator = netInitial.iterator();
-        while (initialIterator.hasNext()) {
-            int netId = initialIterator.next();
+        int[] initial = netInitial.toArray();
+        netInitial.clear();
+        Arrays.sort(initial);
+        for (int netId : initial) {
             netRelevant.add(netId);
             EntityRef entity = networkSystem.getEntity(netId);
             if (!entity.hasComponent(NetworkComponent.class)) {
@@ -441,7 +444,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             }
             message.addCreateEntity(createMessage);
         }
-        netInitial.clear();
+
     }
 
     private void processEvents(NetData.NetMessage message) {

@@ -26,6 +26,8 @@ import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.ComponentContainer;
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.Prefab;
@@ -200,11 +202,11 @@ public class PackedEntitySerializer {
         }
     }
 
-    public void deserializeOnto(EntityRef entity, EntityData.PackedEntity entityData) {
+    public void deserializeOnto(ComponentContainer entity, EntityData.PackedEntity entityData) {
         deserializeOnto(entity, entityData, FieldSerializeCheck.NullCheck.<Component>newInstance());
     }
 
-    public void deserializeOnto(EntityRef entity, EntityData.PackedEntity entityData, FieldSerializeCheck<Component> fieldCheck) {
+    public void deserializeOnto(ComponentContainer entity, EntityData.PackedEntity entityData, FieldSerializeCheck<Component> fieldCheck) {
         int fieldPos = 0;
         for (int componentIndex = 0; componentIndex < entityData.getComponentIdCount(); ++componentIndex) {
             Class<? extends Component> componentClass = idTable.inverse().get((Integer) entityData.getComponentId(componentIndex));
@@ -252,14 +254,14 @@ public class PackedEntitySerializer {
     }
 
     public EntityRef deserialize(EntityData.PackedEntity entityData) {
-        EntityRef target;
+        EntityBuilder target;
         if (entityData.hasParentPrefabUri()) {
-            target = entityManager.create(entityData.getParentPrefabUri());
+            target = entityManager.newBuilder(entityData.getParentPrefabUri());
         } else {
-            target = entityManager.create();
+            target = entityManager.newBuilder();
         }
         deserializeOnto(target, entityData);
-        return target;
+        return target.build();
     }
 
 

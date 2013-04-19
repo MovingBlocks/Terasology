@@ -140,6 +140,9 @@ public class CharacterStateEvent extends NetworkEvent {
 
     public static void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
+        if (location == null) {
+            return;
+        }
         location.setWorldPosition(state.getPosition());
         location.setWorldRotation(state.getRotation());
         entity.saveComponent(location);

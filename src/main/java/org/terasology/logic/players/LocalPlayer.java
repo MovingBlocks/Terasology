@@ -50,7 +50,7 @@ public class LocalPlayer {
     }
 
     public boolean isValid() {
-        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class) && getCharacterEntity().hasComponent(LocalPlayerComponent.class) && getCharacterEntity().hasComponent(CharacterComponent.class);
+        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class) && getCharacterEntity().hasComponent(CharacterComponent.class);
     }
 
     public Vector3f getPosition() {
@@ -70,11 +70,11 @@ public class LocalPlayer {
     }
 
     public boolean isCarryingTorch() {
-        LocalPlayerComponent localPlayer = getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        if (localPlayer == null)
+        CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
+        if (character == null)
             return false;
 
-        return CoreRegistry.get(SlotBasedInventoryManager.class).getItemInSlot(getCharacterEntity(), localPlayer.selectedTool).hasComponent(LightComponent.class);
+        return CoreRegistry.get(SlotBasedInventoryManager.class).getItemInSlot(getCharacterEntity(), character.selectedTool).hasComponent(LightComponent.class);
     }
 
     public EntityRef getCharacterEntity() {

@@ -15,10 +15,15 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
@@ -29,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -74,6 +80,10 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     private EntitySystemLibrary entitySystemLibrary;
     private ComponentLibrary componentLibrary;
 
+    private Set<EntityRef> newlyCreated = Sets.newHashSet();
+    private SetMultimap<EntityRef, Class<? extends Component>> addedComponents = HashMultimap.create();
+
+
     public PojoEntityManager() {
     }
 
@@ -92,6 +102,34 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         nextEntityId = 1;
         freedIds.clear();
         entityCache.clear();
+    }
+
+    @Override
+    public EntityBuilder newBuilder() {
+        return new EntityBuilder(this);
+    }
+
+    @Override
+    public EntityBuilder newBuilder(String prefabName) {
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = prefabManager.getPrefab(prefabName);
+            if (prefab == null) {
+                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
+                return new EntityBuilder(this);
+            }
+            return newBuilder(prefab);
+        }
+        return newBuilder();
+    }
+
+    @Override
+    public EntityBuilder newBuilder(Prefab prefab) {
+        EntityBuilder builder = new EntityBuilder(this);
+        for (Component component : prefab.iterateComponents()) {
+            builder.addComponent(componentLibrary.copy(component));
+        }
+        builder.addComponent(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
+        return builder;
     }
 
     @Override

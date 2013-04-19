@@ -52,13 +52,22 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
         this.parents = parents;
     }
 
+    @Override
+    public boolean hasComponent(Class<? extends Component> component) {
+        checkComponentCache();
+
+        return componentCache.containsKey(component);
+    }
+
+    @Override
     public <T extends Component> T getComponent(Class<T> componentClass) {
         checkComponentCache();
 
         return componentClass.cast(componentCache.get(componentClass));
     }
 
-    public <T extends Component> T setComponent(T component) {
+    @Override
+    public <T extends Component> T addComponent(T component) {
         // Update data
         this.components.put(component.getClass(), component);
 
@@ -72,6 +81,11 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
     public void removeComponent(Class<? extends Component> componentClass) {
         components.remove(componentClass);
         this.invalidateComponentCache();
+    }
+
+    @Override
+    public void saveComponent(Component component) {
+        addComponent(component);
     }
 
     public Iterable<Component> iterateComponents() {

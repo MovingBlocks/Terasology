@@ -23,13 +23,13 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
@@ -112,12 +112,16 @@ public class FirstPersonRenderer implements RenderSystem {
 
     @Override
     public void renderFirstPerson() {
+        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
+        if (character == null) {
+            return;
+        }
         CharacterMovementComponent charMoveComp = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
-        float handMovementAnimationOffset = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).handAnimation;
+        float handMovementAnimationOffset = character.handAnimation;
 
         UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
-        int invSlotIndex = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool + toolbar.getStartSlot();
+        int invSlotIndex = character.selectedTool + toolbar.getStartSlot();
         EntityRef heldItem = inventoryManager.getItemInSlot(localPlayer.getCharacterEntity(), invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);

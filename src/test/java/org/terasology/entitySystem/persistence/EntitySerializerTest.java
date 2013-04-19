@@ -54,7 +54,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaNoUnchangedComponents() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
 
@@ -69,7 +69,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaAddNewComponent() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
         entity.addComponent(new IntegerComponent(1));
@@ -91,7 +91,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaRemoveComponent() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
         entity.removeComponent(StringComponent.class);
@@ -107,7 +107,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaChangedComponent() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
         StringComponent comp = entity.getComponent(StringComponent.class);
@@ -127,7 +127,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaLoadNoChange() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create("Test");
         EntityData.Entity entityData = entitySerializer.serialize(entity);
@@ -142,7 +142,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaLoadAddedComponent() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create("Test");
         entity.addComponent(new IntegerComponent(2));
@@ -160,7 +160,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaLoadRemovedComponent() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create("Test");
         entity.removeComponent(StringComponent.class);
@@ -175,7 +175,7 @@ public class EntitySerializerTest {
     @Test
     public void testDeltaLoadChangedComponent() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create("Test");
         StringComponent comp = entity.getComponent(StringComponent.class);
@@ -193,7 +193,7 @@ public class EntitySerializerTest {
     @Test
     public void testPrefabMaintainedOverSerialization() throws Exception {
         Prefab prefab = prefabManager.createPrefab("Test");
-        prefab.setComponent(new StringComponent("Value"));
+        prefab.addComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
 

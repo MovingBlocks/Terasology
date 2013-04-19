@@ -26,7 +26,9 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.input.binds.AttackButton;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -97,7 +99,8 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         if (client != null) {
             PlayerFactory playerFactory = new PlayerFactory(entityManager, inventoryManager);
-            EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z));
+            EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z), clientEntity);
+
             NetworkComponent netComp = playerCharacter.getComponent(NetworkComponent.class);
             if (netComp != null) {
                 netComp.owner = clientEntity;
@@ -109,7 +112,6 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
             }
             worldRenderer.getChunkProvider().addRelevanceEntity(playerCharacter, distance, clientListener);
-
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
         }
@@ -133,6 +135,24 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onDisconnect(DisconnectedEvent connected, EntityRef entity) {
         entity.getComponent(ClientComponent.class).character.destroy();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
+        ClientComponent client = entity.getComponent(ClientComponent.class);
+        if (!client.character.exists()) {
+            Vector3i pos = Vector3i.zero();
+            if (chunkProvider.getChunk(pos) != null) {
+                spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+            } else {
+                EntityRef spawnZoneEntity = entityManager.create();
+                spawnZoneEntity.setPersisted(false);
+                spawnZoneEntity.addComponent(new LocationComponent(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2)));
+                worldRenderer.getChunkProvider().addRelevanceEntity(spawnZoneEntity, 4);
+
+                ongoingSpawns.add(new SpawnCachingInfo(spawnZoneEntity, entity));
+            }
+        }
     }
 
     /**

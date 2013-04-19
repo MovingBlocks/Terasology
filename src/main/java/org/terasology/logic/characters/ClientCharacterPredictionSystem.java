@@ -36,7 +36,7 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.network.ClientComponent;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.utilities.collection.CircularBuffer;
@@ -98,16 +98,15 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
         playerStates.put(entity, stateBuffer);
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class, LocationComponent.class})
-    public void onLocalPlayerCreated(final AddComponentEvent event, final EntityRef entity) {
-        predictedState = createInitialState(entity);
-        authoritiveState = predictedState;
-        playerStates.remove(entity);
-    }
-
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class, LocationComponent.class})
     public void onDestroy(final RemovedComponentEvent event, final EntityRef entity) {
         CharacterMovementComponent comp = entity.getComponent(CharacterMovementComponent.class);
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        ClientComponent controller = character.controller.getComponent(ClientComponent.class);
+        if (controller != null && controller.local) {
+            predictedState = null;
+            authoritiveState = null;
+        }
         if (comp.collider != null) {
             physics.removeCollider(comp.collider);
         }
@@ -141,8 +140,14 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     }
 
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
+        if (predictedState == null) {
+            predictedState = createInitialState(entity);
+            authoritiveState = predictedState;
+            playerStates.remove(entity);
+        }
+
         inputs.add(input);
         CharacterStateEvent newState = stepState(input, predictedState, entity);
         predictedState = newState;

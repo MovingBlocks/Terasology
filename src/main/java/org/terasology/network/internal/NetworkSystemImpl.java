@@ -369,6 +369,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
             if (!Objects.equal(lastOwner, newOwner)) {
                 recursiveUpdateOwnership(entity, lastOwner, newOwner);
+                int id = netComponent.getNetworkId();
+                for (Component component : entity.iterateComponents()) {
+                    if (entitySystemLibrary.getComponentLibrary().getMetadata(component.getClass()).isReplicated()) {
+                        newOwner.setComponentDirty(id, component.getClass());
+                    }
+                }
             }
 
             if (lastOwnerEntity.exists()) {
@@ -716,6 +722,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     void setServer(Server server) {
         this.server = server;
+
     }
 
     private void generateSerializationTables() {

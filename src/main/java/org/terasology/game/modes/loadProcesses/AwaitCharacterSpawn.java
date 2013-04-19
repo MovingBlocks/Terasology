@@ -21,7 +21,6 @@ import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -46,7 +45,6 @@ public class AwaitCharacterSpawn implements LoadProcess {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         ClientComponent client = localPlayer.getClientEntity().getComponent(ClientComponent.class);
         if (client != null && client.character.exists()) {
-            client.character.addComponent(new LocalPlayerComponent());
             worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
             return true;
         }

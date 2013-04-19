@@ -28,6 +28,7 @@ import org.terasology.input.binds.ToolbarNextButton;
 import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.inventory.InventoryComponent;
@@ -65,71 +66,64 @@ public class PlayerInventorySystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onNextItem(ToolbarNextButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 10;
-        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
+        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
+        character.selectedTool = (character.selectedTool + 1) % 10;
+        localPlayer.getCharacterEntity().saveComponent(character);
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 10;
-        if (localPlayerComp.selectedTool < 0) {
-            localPlayerComp.selectedTool = 10 + localPlayerComp.selectedTool;
+        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
+        character.selectedTool = (character.selectedTool - 1) % 10;
+        if (character.selectedTool < 0) {
+            character.selectedTool = 10 + character.selectedTool;
         }
-        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
+        localPlayer.getCharacterEntity().saveComponent(character);
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = event.getSlot();
-        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        character.selectedTool = event.getSlot();
+        localPlayer.getCharacterEntity().saveComponent(character);
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
             return;
         }
 
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp.isDead) {
-            return;
-        }
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
 
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedTool);
 
         entity.send(new UseItemRequest(selectedItemEntity));
 
         lastInteraction = timer.getTimeInMs();
-        localPlayerComp.handAnimation = 0.5f;
-        entity.saveComponent(localPlayerComp);
+        character.handAnimation = 0.5f;
+        entity.saveComponent(character);
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onAttackRequest(AttackButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
             return;
         }
 
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp.isDead) {
-            return;
-        }
-
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedTool);
 
         entity.send(new AttackRequest(selectedItemEntity));
 
         lastInteraction = timer.getTimeInMs();
-        localPlayerComp.handAnimation = 0.5f;
-        entity.saveComponent(localPlayerComp);
+        character.handAnimation = 0.5f;
+        entity.saveComponent(character);
         event.consume();
     }
 

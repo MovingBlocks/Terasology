@@ -42,12 +42,14 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
+import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.assets.Material;
@@ -134,13 +136,6 @@ public class MeshRenderer implements RenderSystem {
     public void shutdown() {
     }
 
-    /*@ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onKeyDown(KeyDownEvent event, EntityRef entity) {
-        if (event.getKeyCharacter() == ';') {
-            batch = !batch;
-        }
-    }*/
-
     @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
     public void onNewMesh(AddComponentEvent event, EntityRef entity) {
         addMesh(entity);
@@ -152,9 +147,11 @@ public class MeshRenderer implements RenderSystem {
         }
         MeshComponent meshComp = entity.getComponent(MeshComponent.class);
         // Don't render if hidden from owner (need to improve for third person)
-        // TODO: This should be based on ownership, need to fix that up
-        if (meshComp.hideFromOwner && entity.hasComponent(LocalPlayerComponent.class)) {
-            return;
+        if (meshComp.hideFromOwner) {
+            ClientComponent owner = network.getOwnerEntity(entity).getComponent(ClientComponent.class);
+            if (owner != null && owner.local) {
+                return;
+            }
         }
         if (meshComp.renderType == MeshComponent.RenderType.GelatinousCube) {
             gelatinous.add(entity);
@@ -164,12 +161,10 @@ public class MeshRenderer implements RenderSystem {
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MeshComponent.class})
-    public void onLocalMesh(AddComponentEvent event, EntityRef entity) {
-        MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-        if (meshComp != null) {
-            removeMesh(entity);
-        }
+    @ReceiveEvent(components = {CharacterComponent.class, MeshComponent.class})
+    public void onLocalMesh(ChangedComponentEvent event, EntityRef entity) {
+        removeMesh(entity);
+        addMesh(entity);
     }
 
     @ReceiveEvent(components = {MeshComponent.class})

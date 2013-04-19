@@ -18,11 +18,11 @@ package org.terasology.rendering.gui.windows;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -84,7 +84,7 @@ public class UIMenuPause extends UIWindow {
         _respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnEvent());
+                CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnRequestEvent());
 
                 setVisible(false);
             }

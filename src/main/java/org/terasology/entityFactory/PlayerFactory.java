@@ -44,7 +44,7 @@ public class PlayerFactory {
         blockManager = CoreRegistry.get(BlockManager.class);
     }
 
-    public EntityRef newInstance(Vector3f spawnPosition) {
+    public EntityRef newInstance(Vector3f spawnPosition, EntityRef controller) {
         EntityRef player = entityManager.create("core:player", spawnPosition);
         EntityRef transferSlot = entityManager.create("engine:transferSlot");
         NetworkComponent netComp = transferSlot.getComponent(NetworkComponent.class);
@@ -54,6 +54,7 @@ public class PlayerFactory {
         CharacterComponent playerComponent = player.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         playerComponent.movingItem = transferSlot;
+        playerComponent.controller = controller;
         player.saveComponent(playerComponent);
 
         // Goodie chest

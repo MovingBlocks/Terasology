@@ -37,8 +37,16 @@ public final class CharacterComponent implements Component {
     public float interactionRange = 5f;
     public float pitch;
     public float yaw;
+
     @Replicate(ReplicateType.SERVER_TO_OWNER)
     public EntityRef movingItem = EntityRef.NULL;
+
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    public EntityRef controller = EntityRef.NULL;
+
+    // These are only used by the owning player at the moment
+    public int selectedTool = 0;
+    public float handAnimation = 0;
 
     public Quat4f getLookRotation() {
         Quat4f lookRotation = new Quat4f();

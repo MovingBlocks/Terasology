@@ -28,7 +28,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.network.ClientComponent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
@@ -58,7 +58,7 @@ public class DebugControlSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
@@ -84,7 +84,7 @@ public class DebugControlSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only

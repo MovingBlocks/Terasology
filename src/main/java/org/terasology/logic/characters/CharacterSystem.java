@@ -23,10 +23,12 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
+import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.health.DamageEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
@@ -63,6 +65,14 @@ public class CharacterSystem implements ComponentSystem {
 
     @Override
     public void shutdown() {
+    }
+
+    @ReceiveEvent(components = {CharacterComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        character.controller.send(new DeathEvent());
+        // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
+        entity.destroy();
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
