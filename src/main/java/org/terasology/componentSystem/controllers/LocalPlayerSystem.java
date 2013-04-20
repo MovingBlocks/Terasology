@@ -194,11 +194,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
     public void onJump(JumpButton event, EntityRef entity) {
+        boolean debugEnabled = config.getSystem().isDebugEnabled();
         if (event.getState() == ButtonState.DOWN) {
             CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
             characterMovement.jump = true;
             if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
+                if (debugEnabled) {
                 characterMovement.isGhosting = !characterMovement.isGhosting;
+                }
             }
             lastTimeSpacePressed = timer.getTimeInMs();
             event.consume();
