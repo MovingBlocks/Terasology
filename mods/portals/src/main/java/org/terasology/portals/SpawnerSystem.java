@@ -27,7 +27,7 @@ import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.utilities.EntityTools;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockComponent;

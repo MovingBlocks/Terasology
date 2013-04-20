@@ -24,7 +24,7 @@ import java.util.Queue;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.WorldProvider;
 
 /**

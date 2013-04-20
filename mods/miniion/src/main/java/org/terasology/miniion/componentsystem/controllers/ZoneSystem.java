@@ -15,58 +15,50 @@
  */
 package org.terasology.miniion.componentsystem.controllers;
 
-import javax.vecmath.Vector4f;
-
-import org.terasology.componentSystem.*;
-import org.terasology.entitySystem.*;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
-import org.terasology.miniion.components.ZoneSelectionComponent;
-import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
 
 @RegisterComponentSystem(headedOnly = true)
 public class ZoneSystem implements UpdateSubscriberSystem, RenderSystem {
 
-	private EntityManager entityManager;
+    private EntityManager entityManager;
 
-	@Override
-	public void initialise() {
-		entityManager = CoreRegistry.get(EntityManager.class);
-	}
+    @Override
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+    }
 
-	@Override
-	public void shutdown() {
-	}
+    @Override
+    public void shutdown() {
+    }
 
-	@Override
-	public void update(float delta) {
+    @Override
+    public void update(float delta) {
 
-	}
+    }
 
-	@Override
-	public void renderTransparent() {
-		if(MinionSystem.getNewZone() != null){
-			MinionSystem.getNewZone().render();
-		}
-	}
+    @Override
+    public void renderTransparent() {
+        if (MinionSystem.getNewZone() != null) {
+            MinionSystem.getNewZone().render();
+        }
+    }
 
-	@Override
-	public void renderOpaque() {
-	}
+    @Override
+    public void renderOpaque() {
+    }
 
-	@Override
-	public void renderOverlay() {
-	}
+    @Override
+    public void renderOverlay() {
+    }
 
-	@Override
-	public void renderFirstPerson() {
+    @Override
+    public void renderFirstPerson() {
 
-	}
+    }
 
     @Override
     public void renderShadows() {
