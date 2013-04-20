@@ -33,6 +33,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldView;
@@ -85,19 +87,27 @@ public class LiquidSimulator implements EventHandlerSystem {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    while (true) {
-                        try {
-                            LiquidSimulationTask task = blockQueue.take();
-                            if (task.shutdownThread()) {
-                                break;
+                    final SingleThreadMonitor monitor = ThreadMonitor.create("Terasology.Simulation.Liquid", "Processed Blocks");
+                    try {
+                        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                        while (true) {
+                            try {
+                                LiquidSimulationTask task = blockQueue.take();
+                                if (task.shutdownThread()) {
+                                    break;
+                                }
+                                task.run();
+                                monitor.increment(0);
+                            } catch (InterruptedException e) {
+                                monitor.addError(e);
+                                logger.debug("Interrupted");
+                            } catch (Exception e) {
+                                monitor.addError(e);
+                                logger.error("Error in water simulation", e);
                             }
-                            task.run();
-                        } catch (InterruptedException e) {
-                            logger.debug("Interrupted");
-                        } catch (Exception e) {
-                            logger.error("Error in water simulation", e);
                         }
+                    } finally {
+                        monitor.setActive(false);
                     }
                 }
             });

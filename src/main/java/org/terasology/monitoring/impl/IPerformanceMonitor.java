@@ -13,22 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.monitoring.impl;
 
-package org.terasology.world.chunks;
-
-import org.terasology.math.Vector3i;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.TObjectIntMap;
 
 /**
- * @author Immortius
+ * Base interface for performance monitor implementations.
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public interface ChunkStore {
-    public Chunk get(Vector3i position);
+public interface IPerformanceMonitor {
+    void rollCycle();
 
-    public void put(Chunk c);
+    void startActivity(String activity);
 
-    public boolean contains(Vector3i position);
+    void endActivity();
 
-    public float size();
+    void startThread(String name);
 
-    void dispose();
+    void endThread(String name);
+
+    TObjectIntMap<String> getRunningThreads();
+
+    TObjectDoubleMap<String> getRunningMean();
+
+    TObjectDoubleMap<String> getDecayingSpikes();
 }

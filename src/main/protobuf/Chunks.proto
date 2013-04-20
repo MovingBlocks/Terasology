@@ -42,7 +42,7 @@ message Chunk {
     optional sint32    y             = 2;
     optional sint32    z             = 3;
 
-    optional State     state         = 4;
+    optional uint32    state         = 4;
     
     optional TeraArray block_data    = 5;
     optional TeraArray sunlight_data = 6;
