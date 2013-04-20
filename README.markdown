@@ -29,7 +29,6 @@ Note that these instructions are meant for the stable release. The latest develo
 * [E] - Activate (Chest, TNT, etc)
 * [Q] - Throw held (block) item (hold down to charge for a longer throw!) OR start crafting (if placing object on ground with crafting module active)
 * [Space] - Jump
-* [Double Space] - God mode (fly / no-clip)
 * [Shift] - Hold to run
 * [Left click] - Activate left click action (default = remove block)
 * [Right click] - Activate right click action (default = place block)
@@ -41,7 +40,6 @@ Note that these instructions are meant for the stable release. The latest develo
 * [Tab] - Toggle developer console
 * [Escape] - Show/hide the game menu screen
 * [F3] - Toggle debug mode and information
-* [F4] - Different debug metrics
 * [F5] - Show block picker GUI element
 
 Debug Features
@@ -49,13 +47,13 @@ Debug Features
 
 Only works when the F3 debug mode is enabled (and may come and go)
 
+* [Double Space] - God mode (fly / no-clip)
 * [Arrow up/down] - Adjust the current time in small steps
 * [Arrow left/right] - Adjust the current time in larger steps
 * [R] - Debug render wire-frame
 * [P] - Activate first-person player camera
 * [O] - Activate animated spawning point camera
 * [K] - Don't try this :-)
-* [Double Space] - God mode (fly / no-clip)
 * [F4] - Different debug metrics
 * [F6] - Debug rendering enabled
 * [F7] - Cycle debug rendering stage
@@ -120,7 +118,7 @@ Contributors
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber, Panserbjoern
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, MiJyn, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, 3000Lane, philip-wernersbach, Xeano, Jamoozy, sdab
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, MiJyn, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, 3000Lane, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx
 * World Team: B!0HAX, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann
