@@ -31,7 +31,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkState;
+import org.terasology.world.chunks.provider.ChunkProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
@@ -57,7 +58,7 @@ public class PrepareLocalWorld implements LoadProcess {
 
     @Override
     public boolean step() {
-        while (chunkProvider.getChunk(targetPos) == null || chunkProvider.getChunk(targetPos).getChunkState() != Chunk.State.COMPLETE) {
+        while (chunkProvider.getChunk(targetPos) == null || chunkProvider.getChunk(targetPos).getChunkState() != ChunkState.COMPLETE) {
             return false;
         }
 

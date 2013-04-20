@@ -39,7 +39,7 @@ import org.terasology.math.AABB;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.Camera;
@@ -60,10 +60,10 @@ import org.terasology.world.WorldTimeEvent;
 import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.LocalChunkProvider;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
+import org.terasology.world.chunks.ChunkState;
+import org.terasology.world.chunks.provider.ChunkProvider;
+import org.terasology.world.chunks.provider.LocalChunkProvider;
+import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
@@ -185,10 +185,7 @@ public final class WorldRenderer {
             in = new ObjectInputStream(fileIn);
 
             ChunkStore cache = (ChunkStore) in.readObject();
-            if (cache instanceof ChunkStoreGZip) {
-                ((ChunkStoreGZip) cache).setup();
-                logger.info("Using old chunk store implementation without protobuf support for compatibility.");
-            } else if (cache instanceof ChunkStoreProtobuf)
+            if (cache instanceof ChunkStoreProtobuf)
                 ((ChunkStoreProtobuf) cache).setup();
             else
                 logger.warn("Chunk store might not have been initialized: {}", cache.getClass().getName());
@@ -277,7 +274,7 @@ public final class WorldRenderer {
                 for (int x = -(viewingDistance / 2); x < viewingDistance / 2; x++) {
                     for (int z = -(viewingDistance / 2); z < viewingDistance / 2; z++) {
                         Chunk c = chunkProvider.getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
-                        if (c != null && c.getChunkState() == Chunk.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                        if (c != null && c.getChunkState() == ChunkState.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
                             chunksInProximity.add(c);
                         } else {
                             pendingChunks = true;
@@ -309,7 +306,7 @@ public final class WorldRenderer {
                     for (int x = r.minX(); x < r.maxX(); ++x) {
                         for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = chunkProvider.getChunk(x, 0, y);
-                            if (c != null && c.getChunkState() == Chunk.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                            if (c != null && c.getChunkState() == ChunkState.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
                                 chunksInProximity.add(c);
                             } else {
                                 pendingChunks = true;
@@ -731,7 +728,7 @@ public final class WorldRenderer {
 
     private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera,CHUNK_RENDER_MODE mode) {
 
-        if (chunk.getChunkState() == Chunk.State.COMPLETE && chunk.getMesh() != null) {
+        if (chunk.getChunkState() == ChunkState.COMPLETE && chunk.getMesh() != null) {
 
             ShaderProgram shader = null;
 
@@ -989,7 +986,7 @@ public final class WorldRenderer {
         chunkProvider.update();
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance / 2, 0, viewingDistance / 2))) {
             Chunk chunk = chunkProvider.getChunk(pos);
-            if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
+            if (chunk == null || chunk.getChunkState() != ChunkState.COMPLETE) {
                 complete = false;
             } else if (chunk.isDirty()) {
                 WorldView view = worldProvider.getLocalView(chunk.getPos());

@@ -35,7 +35,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
     private final UILabel warning;
     private final UIButton backToConfigMenuButton;
 
-    private final UIDisplayElement chunkConfig;
+    private final UIDisplayElement mainContainer, chunkConfig, monitoringConfig;
     
     private final AdvancedConfig config; 
     
@@ -49,6 +49,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
         comp.setId(id);
         
         UILabel label = new UILabel();
+        label.setColor(Color.black);
         label.setText(title);
         label.setVisible(true);
         label.setId(id+":label");
@@ -103,13 +104,29 @@ public class UIMenuConfigAdvanced extends UIWindow {
         return comp;
     }
     
-    protected UIComposite initChunkConfig(Vector2f pos) {
+    protected UIComposite initMainContainer(Vector2f pos) {
+        
+        final GridLayout layout = new GridLayout(1);
+        layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
+        
+        final UIComposite comp = new UIComposite();
+        comp.setPosition(pos);
+        comp.setHorizontalAlign(EHorizontalAlign.CENTER);
+        comp.setLayout(layout);
+        comp.setVisible(true);
+        
+        comp.addDisplayElement(chunkConfig);
+        comp.addDisplayElement(monitoringConfig);
+        
+        return comp;
+    }
+    
+    protected UIComposite initChunkConfig() {
         
         final GridLayout layout = new GridLayout(2);
         layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
         
         final UIComposite comp = new UIComposite();
-        comp.setPosition(pos);
         comp.setHorizontalAlign(EHorizontalAlign.CENTER);
         comp.setLayout(layout);
         comp.setVisible(true);
@@ -165,6 +182,35 @@ public class UIMenuConfigAdvanced extends UIWindow {
         return comp;
     }
     
+    protected UIComposite initMonitoringConfig() {
+        
+        final GridLayout layout = new GridLayout(2);
+        layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
+        
+        final UIComposite comp = new UIComposite();
+        comp.setHorizontalAlign(EHorizontalAlign.CENTER);
+        comp.setLayout(layout);
+        comp.setVisible(true);
+        
+        comp.addDisplayElement(initOnOffButton("Enable Advanced Monitoring", "advancedMonitoring", config.isAdvancedMonitoringEnabled(), new ChangedListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                UIButton b = (UIButton) element;
+                config.setAdvancedMonitoringEnabled(b.getToggleState());
+            }
+        }));
+        
+        comp.addDisplayElement(initOnOffButton("Show Advanced Monitor @ Startup", "advancedMonitorVisible", config.isAdvancedMonitorVisibleAtStartup(), new ChangedListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                UIButton b = (UIButton) element;
+                config.setAdvancedMonitorVisibleAtStartup(b.getToggleState());
+            }
+        }));
+        
+        return comp;
+    }
+    
     public UIMenuConfigAdvanced() {
         setId("config:advanced");
         setBackgroundImage("engine:loadingbackground");
@@ -185,11 +231,14 @@ public class UIMenuConfigAdvanced extends UIWindow {
         subtitle.setVisible(true);
 
         warning = new UILabel("Warning! Only change these settings if you know what you do!");
+        warning.setColor(Color.red);
         warning.setHorizontalAlign(EHorizontalAlign.CENTER);
         warning.setPosition(new Vector2f(0f, 148f));
         warning.setVisible(true);
 
-        chunkConfig = initChunkConfig(new Vector2f(0f, 200f));
+        chunkConfig = initChunkConfig();
+        monitoringConfig = initMonitoringConfig();
+        mainContainer = initMainContainer(new Vector2f(0f, 200f));
 
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
@@ -207,7 +256,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
         addDisplayElement(title);
         addDisplayElement(subtitle);
         addDisplayElement(warning);
-        addDisplayElement(chunkConfig);
+        addDisplayElement(mainContainer);
         addDisplayElement(backToConfigMenuButton);
     }
 

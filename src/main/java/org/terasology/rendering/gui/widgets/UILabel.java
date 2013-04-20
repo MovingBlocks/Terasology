@@ -21,7 +21,7 @@ import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;

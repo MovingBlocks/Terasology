@@ -26,7 +26,7 @@ import java.util.TreeSet;
 
 import javax.vecmath.Vector2f;
 
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
