@@ -179,7 +179,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     }
     
     /**
-     * CompressedProtobufHandler implements support for encoding/decoding the entire chunk store into/from protobuf messages.
+     * ProtobufHandler implements support for encoding/decoding the entire chunk store into/from protobuf messages.
      * Chunks are compressed using GZIP.
      *
      * @author Manuel Brotz <manu.brotz@gmx.ch>
