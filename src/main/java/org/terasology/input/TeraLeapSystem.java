@@ -18,9 +18,9 @@ package org.terasology.input;
 
 import com.leapmotion.leap.CircleGesture;
 import com.leapmotion.leap.Gesture;
+import org.openleap.jitter.BufferedJitterSystem;
+import org.openleap.jitter.JitterSystem;
 import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.input.jitter.BufferedJitterSystem;
-import org.terasology.input.jitter.JitterSystem;
 
 /**
  * Terasology implementation for Leap Motion using the Jitter library.

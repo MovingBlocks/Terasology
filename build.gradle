@@ -495,4 +495,14 @@ idea {
     module.excludeDirs += file('protobuf')
     module.excludeDirs += file('SAVED_WORLDS')
     module.excludeDirs += file('screens')
+
+    project {
+        jdkName = '1.6'
+
+        ipr {
+            withXml { provider ->
+                provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
+            }
+        }
+    }
 }
