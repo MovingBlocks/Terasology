@@ -75,10 +75,10 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     private transient ConcurrentMap<Vector3i, Chunk> queuedChunks;
     private transient BlockingQueue<Chunk> compressionQueue;
     private transient ExecutorService compressionThreads;
-    private transient final AtomicInteger finishedThreads = new AtomicInteger(0);
+    private transient AtomicInteger finishedThreads;
 
     private final ConcurrentMap<Vector3i, byte[]> serializedChunks = Maps.newConcurrentMap();
-    private final AtomicInteger sizeInBytes = new AtomicInteger(0);
+    private final AtomicInteger sizeInByte = new AtomicInteger(0);
     private final AtomicBoolean running = new AtomicBoolean(true);
 
     protected Chunk decode(byte[] data) throws IOException {
@@ -108,7 +108,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
         try {
             try {
                 final byte[] data = encode(chunk);
-                sizeInBytes.addAndGet(data.length);
+                sizeInByte.addAndGet(data.length);
                 serializedChunks.put(pos, data);
             } finally {
                 queuedChunks.remove(pos, chunk);
@@ -242,7 +242,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
                 final Vector3i pos = new Vector3i(chunk.getX(), chunk.getY(), chunk.getZ());
                 final byte[] data = chunk.getData().toByteArray();
                 store.serializedChunks.put(pos, data);
-                store.sizeInBytes.addAndGet(data.length);
+                store.sizeInByte.addAndGet(data.length);
             }
         }
     }
@@ -252,6 +252,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
         initialized = true;
         queuedChunks = Maps.newConcurrentMap();
         compressionQueue = Queues.newLinkedBlockingDeque();
+        finishedThreads = new AtomicInteger(0);
         setupThreads();
     }
 
@@ -296,12 +297,12 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
 
     @Override
     public long sizeInBytes() {
-        return sizeInBytes.get();
+        return sizeInByte.get();
     }
 
     @Override
     public float size() {
-        return (float) sizeInBytes.get() / (1 << 20);
+        return (float) sizeInByte.get() / (1 << 20);
     }
 
     public void dispose() {
