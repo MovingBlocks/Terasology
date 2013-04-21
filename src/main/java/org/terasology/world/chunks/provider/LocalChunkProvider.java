@@ -280,10 +280,10 @@ public class LocalChunkProvider implements ChunkProvider {
         reviewThreads.shutdown();
         chunkProcessingThreads.shutdown();
         try {
-            if (!reviewThreads.awaitTermination(1, TimeUnit.SECONDS)) {
+            if (!reviewThreads.awaitTermination(10, TimeUnit.SECONDS)) {
                 logger.warn("Timed out awaiting chunk review thread termination");
             }
-            if (!chunkProcessingThreads.awaitTermination(1, TimeUnit.SECONDS)) {
+            if (!chunkProcessingThreads.awaitTermination(10, TimeUnit.SECONDS)) {
                 logger.warn("Timed out awaiting chunk processing thread termination");
             }
         } catch (InterruptedException e) {
@@ -296,6 +296,11 @@ public class LocalChunkProvider implements ChunkProvider {
         }
         nearCache.clear();
         ChunkMonitor.fireChunkProviderDisposed(this);
+    }
+
+    @Override
+    public long sizeInBytes() {
+        return farStore.sizeInBytes();
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package org.terasology.world.chunks.store;
 
+import java.io.File;
 import java.util.List;
 
 import org.terasology.math.Vector3i;
@@ -34,7 +35,13 @@ public interface ChunkStore {
     
     public int list(List<Vector3i> output);
 
+    public long sizeInBytes();
+    
     public float size();
 
     void dispose();
+    
+    void saveToFile(File file);
+    
+    void loadFromFile(File file);
 }

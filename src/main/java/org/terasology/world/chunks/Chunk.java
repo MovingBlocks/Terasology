@@ -184,6 +184,11 @@ public class Chunk {
             final TeraArray extraData = t.decode(message.getExtraData());
             return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
         }
+
+        @Override
+        public void decode(org.terasology.protobuf.ChunksProtobuf.Chunk message, Chunk value) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public void lock() {

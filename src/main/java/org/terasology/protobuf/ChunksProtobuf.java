@@ -2558,1081 +2558,6 @@ public final class ChunksProtobuf {
     // @@protoc_insertion_point(class_scope:Chunk)
   }
   
-  public interface CompressedChunkOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // optional sint32 x = 1;
-    boolean hasX();
-    int getX();
-    
-    // optional sint32 y = 2;
-    boolean hasY();
-    int getY();
-    
-    // optional sint32 z = 3;
-    boolean hasZ();
-    int getZ();
-    
-    // optional bytes data = 4;
-    boolean hasData();
-    com.google.protobuf.ByteString getData();
-  }
-  public static final class CompressedChunk extends
-      com.google.protobuf.GeneratedMessage
-      implements CompressedChunkOrBuilder {
-    // Use CompressedChunk.newBuilder() to construct.
-    private CompressedChunk(Builder builder) {
-      super(builder);
-    }
-    private CompressedChunk(boolean noInit) {}
-    
-    private static final CompressedChunk defaultInstance;
-    public static CompressedChunk getDefaultInstance() {
-      return defaultInstance;
-    }
-    
-    public CompressedChunk getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunk_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunk_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // optional sint32 x = 1;
-    public static final int X_FIELD_NUMBER = 1;
-    private int x_;
-    public boolean hasX() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public int getX() {
-      return x_;
-    }
-    
-    // optional sint32 y = 2;
-    public static final int Y_FIELD_NUMBER = 2;
-    private int y_;
-    public boolean hasY() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public int getY() {
-      return y_;
-    }
-    
-    // optional sint32 z = 3;
-    public static final int Z_FIELD_NUMBER = 3;
-    private int z_;
-    public boolean hasZ() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public int getZ() {
-      return z_;
-    }
-    
-    // optional bytes data = 4;
-    public static final int DATA_FIELD_NUMBER = 4;
-    private com.google.protobuf.ByteString data_;
-    public boolean hasData() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    public com.google.protobuf.ByteString getData() {
-      return data_;
-    }
-    
-    private void initFields() {
-      x_ = 0;
-      y_ = 0;
-      z_ = 0;
-      data_ = com.google.protobuf.ByteString.EMPTY;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt32(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeSInt32(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeSInt32(3, z_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, data_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(3, z_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, data_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-    
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.CompressedChunk parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.ChunksProtobuf.CompressedChunk prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunk_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunk_fieldAccessorTable;
-      }
-      
-      // Construct using org.terasology.protobuf.ChunksProtobuf.CompressedChunk.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        x_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        y_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        z_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        data_ = com.google.protobuf.ByteString.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.terasology.protobuf.ChunksProtobuf.CompressedChunk.getDescriptor();
-      }
-      
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk getDefaultInstanceForType() {
-        return org.terasology.protobuf.ChunksProtobuf.CompressedChunk.getDefaultInstance();
-      }
-      
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk build() {
-        org.terasology.protobuf.ChunksProtobuf.CompressedChunk result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private org.terasology.protobuf.ChunksProtobuf.CompressedChunk buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.terasology.protobuf.ChunksProtobuf.CompressedChunk result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk buildPartial() {
-        org.terasology.protobuf.ChunksProtobuf.CompressedChunk result = new org.terasology.protobuf.ChunksProtobuf.CompressedChunk(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.x_ = x_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.y_ = y_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.z_ = z_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.data_ = data_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.terasology.protobuf.ChunksProtobuf.CompressedChunk) {
-          return mergeFrom((org.terasology.protobuf.ChunksProtobuf.CompressedChunk)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(org.terasology.protobuf.ChunksProtobuf.CompressedChunk other) {
-        if (other == org.terasology.protobuf.ChunksProtobuf.CompressedChunk.getDefaultInstance()) return this;
-        if (other.hasX()) {
-          setX(other.getX());
-        }
-        if (other.hasY()) {
-          setY(other.getY());
-        }
-        if (other.hasZ()) {
-          setZ(other.getZ());
-        }
-        if (other.hasData()) {
-          setData(other.getData());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              x_ = input.readSInt32();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              y_ = input.readSInt32();
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              z_ = input.readSInt32();
-              break;
-            }
-            case 34: {
-              bitField0_ |= 0x00000008;
-              data_ = input.readBytes();
-              break;
-            }
-          }
-        }
-      }
-      
-      private int bitField0_;
-      
-      // optional sint32 x = 1;
-      private int x_ ;
-      public boolean hasX() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      public int getX() {
-        return x_;
-      }
-      public Builder setX(int value) {
-        bitField0_ |= 0x00000001;
-        x_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearX() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        x_ = 0;
-        onChanged();
-        return this;
-      }
-      
-      // optional sint32 y = 2;
-      private int y_ ;
-      public boolean hasY() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      public int getY() {
-        return y_;
-      }
-      public Builder setY(int value) {
-        bitField0_ |= 0x00000002;
-        y_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearY() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        y_ = 0;
-        onChanged();
-        return this;
-      }
-      
-      // optional sint32 z = 3;
-      private int z_ ;
-      public boolean hasZ() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      public int getZ() {
-        return z_;
-      }
-      public Builder setZ(int value) {
-        bitField0_ |= 0x00000004;
-        z_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearZ() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        z_ = 0;
-        onChanged();
-        return this;
-      }
-      
-      // optional bytes data = 4;
-      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
-      public boolean hasData() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
-      }
-      public com.google.protobuf.ByteString getData() {
-        return data_;
-      }
-      public Builder setData(com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000008;
-        data_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearData() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        data_ = getDefaultInstance().getData();
-        onChanged();
-        return this;
-      }
-      
-      // @@protoc_insertion_point(builder_scope:CompressedChunk)
-    }
-    
-    static {
-      defaultInstance = new CompressedChunk(true);
-      defaultInstance.initFields();
-    }
-    
-    // @@protoc_insertion_point(class_scope:CompressedChunk)
-  }
-  
-  public interface ChunksOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // repeated .Chunk chunks = 1;
-    java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> 
-        getChunksList();
-    org.terasology.protobuf.ChunksProtobuf.Chunk getChunks(int index);
-    int getChunksCount();
-    java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
-        getChunksOrBuilderList();
-    org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder getChunksOrBuilder(
-        int index);
-  }
-  public static final class Chunks extends
-      com.google.protobuf.GeneratedMessage
-      implements ChunksOrBuilder {
-    // Use Chunks.newBuilder() to construct.
-    private Chunks(Builder builder) {
-      super(builder);
-    }
-    private Chunks(boolean noInit) {}
-    
-    private static final Chunks defaultInstance;
-    public static Chunks getDefaultInstance() {
-      return defaultInstance;
-    }
-    
-    public Chunks getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.terasology.protobuf.ChunksProtobuf.internal_static_Chunks_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.terasology.protobuf.ChunksProtobuf.internal_static_Chunks_fieldAccessorTable;
-    }
-    
-    // repeated .Chunk chunks = 1;
-    public static final int CHUNKS_FIELD_NUMBER = 1;
-    private java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> chunks_;
-    public java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> getChunksList() {
-      return chunks_;
-    }
-    public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
-        getChunksOrBuilderList() {
-      return chunks_;
-    }
-    public int getChunksCount() {
-      return chunks_.size();
-    }
-    public org.terasology.protobuf.ChunksProtobuf.Chunk getChunks(int index) {
-      return chunks_.get(index);
-    }
-    public org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder getChunksOrBuilder(
-        int index) {
-      return chunks_.get(index);
-    }
-    
-    private void initFields() {
-      chunks_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      for (int i = 0; i < getChunksCount(); i++) {
-        if (!getChunks(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      for (int i = 0; i < chunks_.size(); i++) {
-        output.writeMessage(1, chunks_.get(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      for (int i = 0; i < chunks_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, chunks_.get(i));
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-    
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.terasology.protobuf.ChunksProtobuf.Chunks parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.ChunksProtobuf.Chunks prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.terasology.protobuf.ChunksProtobuf.ChunksOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.terasology.protobuf.ChunksProtobuf.internal_static_Chunks_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.terasology.protobuf.ChunksProtobuf.internal_static_Chunks_fieldAccessorTable;
-      }
-      
-      // Construct using org.terasology.protobuf.ChunksProtobuf.Chunks.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getChunksFieldBuilder();
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        if (chunksBuilder_ == null) {
-          chunks_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-        } else {
-          chunksBuilder_.clear();
-        }
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.terasology.protobuf.ChunksProtobuf.Chunks.getDescriptor();
-      }
-      
-      public org.terasology.protobuf.ChunksProtobuf.Chunks getDefaultInstanceForType() {
-        return org.terasology.protobuf.ChunksProtobuf.Chunks.getDefaultInstance();
-      }
-      
-      public org.terasology.protobuf.ChunksProtobuf.Chunks build() {
-        org.terasology.protobuf.ChunksProtobuf.Chunks result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private org.terasology.protobuf.ChunksProtobuf.Chunks buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.terasology.protobuf.ChunksProtobuf.Chunks result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public org.terasology.protobuf.ChunksProtobuf.Chunks buildPartial() {
-        org.terasology.protobuf.ChunksProtobuf.Chunks result = new org.terasology.protobuf.ChunksProtobuf.Chunks(this);
-        int from_bitField0_ = bitField0_;
-        if (chunksBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
-            chunks_ = java.util.Collections.unmodifiableList(chunks_);
-            bitField0_ = (bitField0_ & ~0x00000001);
-          }
-          result.chunks_ = chunks_;
-        } else {
-          result.chunks_ = chunksBuilder_.build();
-        }
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.terasology.protobuf.ChunksProtobuf.Chunks) {
-          return mergeFrom((org.terasology.protobuf.ChunksProtobuf.Chunks)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(org.terasology.protobuf.ChunksProtobuf.Chunks other) {
-        if (other == org.terasology.protobuf.ChunksProtobuf.Chunks.getDefaultInstance()) return this;
-        if (chunksBuilder_ == null) {
-          if (!other.chunks_.isEmpty()) {
-            if (chunks_.isEmpty()) {
-              chunks_ = other.chunks_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-            } else {
-              ensureChunksIsMutable();
-              chunks_.addAll(other.chunks_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.chunks_.isEmpty()) {
-            if (chunksBuilder_.isEmpty()) {
-              chunksBuilder_.dispose();
-              chunksBuilder_ = null;
-              chunks_ = other.chunks_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-              chunksBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getChunksFieldBuilder() : null;
-            } else {
-              chunksBuilder_.addAllMessages(other.chunks_);
-            }
-          }
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        for (int i = 0; i < getChunksCount(); i++) {
-          if (!getChunks(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              org.terasology.protobuf.ChunksProtobuf.Chunk.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.Chunk.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addChunks(subBuilder.buildPartial());
-              break;
-            }
-          }
-        }
-      }
-      
-      private int bitField0_;
-      
-      // repeated .Chunk chunks = 1;
-      private java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> chunks_ =
-        java.util.Collections.emptyList();
-      private void ensureChunksIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          chunks_ = new java.util.ArrayList<org.terasology.protobuf.ChunksProtobuf.Chunk>(chunks_);
-          bitField0_ |= 0x00000001;
-         }
-      }
-      
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.Chunk, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder, org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> chunksBuilder_;
-      
-      public java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> getChunksList() {
-        if (chunksBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(chunks_);
-        } else {
-          return chunksBuilder_.getMessageList();
-        }
-      }
-      public int getChunksCount() {
-        if (chunksBuilder_ == null) {
-          return chunks_.size();
-        } else {
-          return chunksBuilder_.getCount();
-        }
-      }
-      public org.terasology.protobuf.ChunksProtobuf.Chunk getChunks(int index) {
-        if (chunksBuilder_ == null) {
-          return chunks_.get(index);
-        } else {
-          return chunksBuilder_.getMessage(index);
-        }
-      }
-      public Builder setChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk value) {
-        if (chunksBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureChunksIsMutable();
-          chunks_.set(index, value);
-          onChanged();
-        } else {
-          chunksBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      public Builder setChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder builderForValue) {
-        if (chunksBuilder_ == null) {
-          ensureChunksIsMutable();
-          chunks_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          chunksBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addChunks(org.terasology.protobuf.ChunksProtobuf.Chunk value) {
-        if (chunksBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureChunksIsMutable();
-          chunks_.add(value);
-          onChanged();
-        } else {
-          chunksBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      public Builder addChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk value) {
-        if (chunksBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureChunksIsMutable();
-          chunks_.add(index, value);
-          onChanged();
-        } else {
-          chunksBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      public Builder addChunks(
-          org.terasology.protobuf.ChunksProtobuf.Chunk.Builder builderForValue) {
-        if (chunksBuilder_ == null) {
-          ensureChunksIsMutable();
-          chunks_.add(builderForValue.build());
-          onChanged();
-        } else {
-          chunksBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder builderForValue) {
-        if (chunksBuilder_ == null) {
-          ensureChunksIsMutable();
-          chunks_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          chunksBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addAllChunks(
-          java.lang.Iterable<? extends org.terasology.protobuf.ChunksProtobuf.Chunk> values) {
-        if (chunksBuilder_ == null) {
-          ensureChunksIsMutable();
-          super.addAll(values, chunks_);
-          onChanged();
-        } else {
-          chunksBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      public Builder clearChunks() {
-        if (chunksBuilder_ == null) {
-          chunks_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-          onChanged();
-        } else {
-          chunksBuilder_.clear();
-        }
-        return this;
-      }
-      public Builder removeChunks(int index) {
-        if (chunksBuilder_ == null) {
-          ensureChunksIsMutable();
-          chunks_.remove(index);
-          onChanged();
-        } else {
-          chunksBuilder_.remove(index);
-        }
-        return this;
-      }
-      public org.terasology.protobuf.ChunksProtobuf.Chunk.Builder getChunksBuilder(
-          int index) {
-        return getChunksFieldBuilder().getBuilder(index);
-      }
-      public org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder getChunksOrBuilder(
-          int index) {
-        if (chunksBuilder_ == null) {
-          return chunks_.get(index);  } else {
-          return chunksBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
-           getChunksOrBuilderList() {
-        if (chunksBuilder_ != null) {
-          return chunksBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(chunks_);
-        }
-      }
-      public org.terasology.protobuf.ChunksProtobuf.Chunk.Builder addChunksBuilder() {
-        return getChunksFieldBuilder().addBuilder(
-            org.terasology.protobuf.ChunksProtobuf.Chunk.getDefaultInstance());
-      }
-      public org.terasology.protobuf.ChunksProtobuf.Chunk.Builder addChunksBuilder(
-          int index) {
-        return getChunksFieldBuilder().addBuilder(
-            index, org.terasology.protobuf.ChunksProtobuf.Chunk.getDefaultInstance());
-      }
-      public java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk.Builder> 
-           getChunksBuilderList() {
-        return getChunksFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.Chunk, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder, org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
-          getChunksFieldBuilder() {
-        if (chunksBuilder_ == null) {
-          chunksBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.Chunk, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder, org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder>(
-                  chunks_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
-                  getParentForChildren(),
-                  isClean());
-          chunks_ = null;
-        }
-        return chunksBuilder_;
-      }
-      
-      // @@protoc_insertion_point(builder_scope:Chunks)
-    }
-    
-    static {
-      defaultInstance = new Chunks(true);
-      defaultInstance.initFields();
-    }
-    
-    // @@protoc_insertion_point(class_scope:Chunks)
-  }
-  
   public interface CompressedChunksOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
@@ -3640,14 +2565,14 @@ public final class ChunksProtobuf {
     boolean hasMethod();
     org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressionMethod getMethod();
     
-    // repeated .CompressedChunk chunks = 2;
-    java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunk> 
+    // repeated .CompressedChunks.CompressedChunk chunks = 2;
+    java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk> 
         getChunksList();
-    org.terasology.protobuf.ChunksProtobuf.CompressedChunk getChunks(int index);
+    org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk getChunks(int index);
     int getChunksCount();
-    java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder> 
+    java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder> 
         getChunksOrBuilderList();
-    org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder getChunksOrBuilder(
+    org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder getChunksOrBuilder(
         int index);
   }
   public static final class CompressedChunks extends
@@ -3744,6 +2669,518 @@ public final class ChunksProtobuf {
       // @@protoc_insertion_point(enum_scope:CompressedChunks.CompressionMethod)
     }
     
+    public interface CompressedChunkOrBuilder
+        extends com.google.protobuf.MessageOrBuilder {
+      
+      // optional sint32 x = 1;
+      boolean hasX();
+      int getX();
+      
+      // optional sint32 y = 2;
+      boolean hasY();
+      int getY();
+      
+      // optional sint32 z = 3;
+      boolean hasZ();
+      int getZ();
+      
+      // optional bytes data = 4;
+      boolean hasData();
+      com.google.protobuf.ByteString getData();
+    }
+    public static final class CompressedChunk extends
+        com.google.protobuf.GeneratedMessage
+        implements CompressedChunkOrBuilder {
+      // Use CompressedChunk.newBuilder() to construct.
+      private CompressedChunk(Builder builder) {
+        super(builder);
+      }
+      private CompressedChunk(boolean noInit) {}
+      
+      private static final CompressedChunk defaultInstance;
+      public static CompressedChunk getDefaultInstance() {
+        return defaultInstance;
+      }
+      
+      public CompressedChunk getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+      
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunks_CompressedChunk_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunks_CompressedChunk_fieldAccessorTable;
+      }
+      
+      private int bitField0_;
+      // optional sint32 x = 1;
+      public static final int X_FIELD_NUMBER = 1;
+      private int x_;
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public int getX() {
+        return x_;
+      }
+      
+      // optional sint32 y = 2;
+      public static final int Y_FIELD_NUMBER = 2;
+      private int y_;
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getY() {
+        return y_;
+      }
+      
+      // optional sint32 z = 3;
+      public static final int Z_FIELD_NUMBER = 3;
+      private int z_;
+      public boolean hasZ() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public int getZ() {
+        return z_;
+      }
+      
+      // optional bytes data = 4;
+      public static final int DATA_FIELD_NUMBER = 4;
+      private com.google.protobuf.ByteString data_;
+      public boolean hasData() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public com.google.protobuf.ByteString getData() {
+        return data_;
+      }
+      
+      private void initFields() {
+        x_ = 0;
+        y_ = 0;
+        z_ = 0;
+        data_ = com.google.protobuf.ByteString.EMPTY;
+      }
+      private byte memoizedIsInitialized = -1;
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized != -1) return isInitialized == 1;
+        
+        memoizedIsInitialized = 1;
+        return true;
+      }
+      
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        getSerializedSize();
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          output.writeSInt32(1, x_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          output.writeSInt32(2, y_);
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          output.writeSInt32(3, z_);
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          output.writeBytes(4, data_);
+        }
+        getUnknownFields().writeTo(output);
+      }
+      
+      private int memoizedSerializedSize = -1;
+      public int getSerializedSize() {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+      
+        size = 0;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeSInt32Size(1, x_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeSInt32Size(2, y_);
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeSInt32Size(3, z_);
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(4, data_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSerializedSize = size;
+        return size;
+      }
+      
+      private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      protected java.lang.Object writeReplace()
+          throws java.io.ObjectStreamException {
+        return super.writeReplace();
+      }
+      
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return newBuilder().mergeFrom(data).buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return newBuilder().mergeFrom(data, extensionRegistry)
+                 .buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return newBuilder().mergeFrom(data).buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return newBuilder().mergeFrom(data, extensionRegistry)
+                 .buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return newBuilder().mergeFrom(input).buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return newBuilder().mergeFrom(input, extensionRegistry)
+                 .buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        Builder builder = newBuilder();
+        if (builder.mergeDelimitedFrom(input)) {
+          return builder.buildParsed();
+        } else {
+          return null;
+        }
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        Builder builder = newBuilder();
+        if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+          return builder.buildParsed();
+        } else {
+          return null;
+        }
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return newBuilder().mergeFrom(input).buildParsed();
+      }
+      public static org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return newBuilder().mergeFrom(input, extensionRegistry)
+                 .buildParsed();
+      }
+      
+      public static Builder newBuilder() { return Builder.create(); }
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder(org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk prototype) {
+        return newBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() { return newBuilder(this); }
+      
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessage.Builder<Builder>
+         implements org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunks_CompressedChunk_descriptor;
+        }
+        
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return org.terasology.protobuf.ChunksProtobuf.internal_static_CompressedChunks_CompressedChunk_fieldAccessorTable;
+        }
+        
+        // Construct using org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.newBuilder()
+        private Builder() {
+          maybeForceBuilderInitialization();
+        }
+        
+        private Builder(BuilderParent parent) {
+          super(parent);
+          maybeForceBuilderInitialization();
+        }
+        private void maybeForceBuilderInitialization() {
+          if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          }
+        }
+        private static Builder create() {
+          return new Builder();
+        }
+        
+        public Builder clear() {
+          super.clear();
+          x_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000001);
+          y_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000002);
+          z_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000004);
+          data_ = com.google.protobuf.ByteString.EMPTY;
+          bitField0_ = (bitField0_ & ~0x00000008);
+          return this;
+        }
+        
+        public Builder clone() {
+          return create().mergeFrom(buildPartial());
+        }
+        
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.getDescriptor();
+        }
+        
+        public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk getDefaultInstanceForType() {
+          return org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.getDefaultInstance();
+        }
+        
+        public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk build() {
+          org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+        
+        private org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk buildParsed()
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(
+              result).asInvalidProtocolBufferException();
+          }
+          return result;
+        }
+        
+        public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk buildPartial() {
+          org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk result = new org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk(this);
+          int from_bitField0_ = bitField0_;
+          int to_bitField0_ = 0;
+          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+            to_bitField0_ |= 0x00000001;
+          }
+          result.x_ = x_;
+          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+            to_bitField0_ |= 0x00000002;
+          }
+          result.y_ = y_;
+          if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+            to_bitField0_ |= 0x00000004;
+          }
+          result.z_ = z_;
+          if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+            to_bitField0_ |= 0x00000008;
+          }
+          result.data_ = data_;
+          result.bitField0_ = to_bitField0_;
+          onBuilt();
+          return result;
+        }
+        
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk) {
+            return mergeFrom((org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+        
+        public Builder mergeFrom(org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk other) {
+          if (other == org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.getDefaultInstance()) return this;
+          if (other.hasX()) {
+            setX(other.getX());
+          }
+          if (other.hasY()) {
+            setY(other.getY());
+          }
+          if (other.hasZ()) {
+            setZ(other.getZ());
+          }
+          if (other.hasData()) {
+            setData(other.getData());
+          }
+          this.mergeUnknownFields(other.getUnknownFields());
+          return this;
+        }
+        
+        public final boolean isInitialized() {
+          return true;
+        }
+        
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+            com.google.protobuf.UnknownFieldSet.newBuilder(
+              this.getUnknownFields());
+          while (true) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              default: {
+                if (!parseUnknownField(input, unknownFields,
+                                       extensionRegistry, tag)) {
+                  this.setUnknownFields(unknownFields.build());
+                  onChanged();
+                  return this;
+                }
+                break;
+              }
+              case 8: {
+                bitField0_ |= 0x00000001;
+                x_ = input.readSInt32();
+                break;
+              }
+              case 16: {
+                bitField0_ |= 0x00000002;
+                y_ = input.readSInt32();
+                break;
+              }
+              case 24: {
+                bitField0_ |= 0x00000004;
+                z_ = input.readSInt32();
+                break;
+              }
+              case 34: {
+                bitField0_ |= 0x00000008;
+                data_ = input.readBytes();
+                break;
+              }
+            }
+          }
+        }
+        
+        private int bitField0_;
+        
+        // optional sint32 x = 1;
+        private int x_ ;
+        public boolean hasX() {
+          return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+        public int getX() {
+          return x_;
+        }
+        public Builder setX(int value) {
+          bitField0_ |= 0x00000001;
+          x_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearX() {
+          bitField0_ = (bitField0_ & ~0x00000001);
+          x_ = 0;
+          onChanged();
+          return this;
+        }
+        
+        // optional sint32 y = 2;
+        private int y_ ;
+        public boolean hasY() {
+          return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+        public int getY() {
+          return y_;
+        }
+        public Builder setY(int value) {
+          bitField0_ |= 0x00000002;
+          y_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearY() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          y_ = 0;
+          onChanged();
+          return this;
+        }
+        
+        // optional sint32 z = 3;
+        private int z_ ;
+        public boolean hasZ() {
+          return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
+        public int getZ() {
+          return z_;
+        }
+        public Builder setZ(int value) {
+          bitField0_ |= 0x00000004;
+          z_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearZ() {
+          bitField0_ = (bitField0_ & ~0x00000004);
+          z_ = 0;
+          onChanged();
+          return this;
+        }
+        
+        // optional bytes data = 4;
+        private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
+        public boolean hasData() {
+          return ((bitField0_ & 0x00000008) == 0x00000008);
+        }
+        public com.google.protobuf.ByteString getData() {
+          return data_;
+        }
+        public Builder setData(com.google.protobuf.ByteString value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+          data_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearData() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          data_ = getDefaultInstance().getData();
+          onChanged();
+          return this;
+        }
+        
+        // @@protoc_insertion_point(builder_scope:CompressedChunks.CompressedChunk)
+      }
+      
+      static {
+        defaultInstance = new CompressedChunk(true);
+        defaultInstance.initFields();
+      }
+      
+      // @@protoc_insertion_point(class_scope:CompressedChunks.CompressedChunk)
+    }
+    
     private int bitField0_;
     // optional .CompressedChunks.CompressionMethod method = 1 [default = GZIP];
     public static final int METHOD_FIELD_NUMBER = 1;
@@ -3755,23 +3192,23 @@ public final class ChunksProtobuf {
       return method_;
     }
     
-    // repeated .CompressedChunk chunks = 2;
+    // repeated .CompressedChunks.CompressedChunk chunks = 2;
     public static final int CHUNKS_FIELD_NUMBER = 2;
-    private java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunk> chunks_;
-    public java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunk> getChunksList() {
+    private java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk> chunks_;
+    public java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk> getChunksList() {
       return chunks_;
     }
-    public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder> 
+    public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder> 
         getChunksOrBuilderList() {
       return chunks_;
     }
     public int getChunksCount() {
       return chunks_.size();
     }
-    public org.terasology.protobuf.ChunksProtobuf.CompressedChunk getChunks(int index) {
+    public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk getChunks(int index) {
       return chunks_.get(index);
     }
-    public org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder getChunksOrBuilder(
+    public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder getChunksOrBuilder(
         int index) {
       return chunks_.get(index);
     }
@@ -4087,7 +3524,7 @@ public final class ChunksProtobuf {
               break;
             }
             case 18: {
-              org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.CompressedChunk.newBuilder();
+              org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.newBuilder();
               input.readMessage(subBuilder, extensionRegistry);
               addChunks(subBuilder.buildPartial());
               break;
@@ -4122,20 +3559,20 @@ public final class ChunksProtobuf {
         return this;
       }
       
-      // repeated .CompressedChunk chunks = 2;
-      private java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunk> chunks_ =
+      // repeated .CompressedChunks.CompressedChunk chunks = 2;
+      private java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk> chunks_ =
         java.util.Collections.emptyList();
       private void ensureChunksIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          chunks_ = new java.util.ArrayList<org.terasology.protobuf.ChunksProtobuf.CompressedChunk>(chunks_);
+          chunks_ = new java.util.ArrayList<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk>(chunks_);
           bitField0_ |= 0x00000002;
          }
       }
       
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.CompressedChunk, org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder, org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder> chunksBuilder_;
+          org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder> chunksBuilder_;
       
-      public java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunk> getChunksList() {
+      public java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk> getChunksList() {
         if (chunksBuilder_ == null) {
           return java.util.Collections.unmodifiableList(chunks_);
         } else {
@@ -4149,7 +3586,7 @@ public final class ChunksProtobuf {
           return chunksBuilder_.getCount();
         }
       }
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk getChunks(int index) {
+      public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk getChunks(int index) {
         if (chunksBuilder_ == null) {
           return chunks_.get(index);
         } else {
@@ -4157,7 +3594,7 @@ public final class ChunksProtobuf {
         }
       }
       public Builder setChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunk value) {
+          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk value) {
         if (chunksBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -4171,7 +3608,7 @@ public final class ChunksProtobuf {
         return this;
       }
       public Builder setChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder builderForValue) {
+          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder builderForValue) {
         if (chunksBuilder_ == null) {
           ensureChunksIsMutable();
           chunks_.set(index, builderForValue.build());
@@ -4181,7 +3618,7 @@ public final class ChunksProtobuf {
         }
         return this;
       }
-      public Builder addChunks(org.terasology.protobuf.ChunksProtobuf.CompressedChunk value) {
+      public Builder addChunks(org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk value) {
         if (chunksBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -4195,7 +3632,7 @@ public final class ChunksProtobuf {
         return this;
       }
       public Builder addChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunk value) {
+          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk value) {
         if (chunksBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -4209,7 +3646,7 @@ public final class ChunksProtobuf {
         return this;
       }
       public Builder addChunks(
-          org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder builderForValue) {
+          org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder builderForValue) {
         if (chunksBuilder_ == null) {
           ensureChunksIsMutable();
           chunks_.add(builderForValue.build());
@@ -4220,7 +3657,7 @@ public final class ChunksProtobuf {
         return this;
       }
       public Builder addChunks(
-          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder builderForValue) {
+          int index, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder builderForValue) {
         if (chunksBuilder_ == null) {
           ensureChunksIsMutable();
           chunks_.add(index, builderForValue.build());
@@ -4231,7 +3668,7 @@ public final class ChunksProtobuf {
         return this;
       }
       public Builder addAllChunks(
-          java.lang.Iterable<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunk> values) {
+          java.lang.Iterable<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk> values) {
         if (chunksBuilder_ == null) {
           ensureChunksIsMutable();
           super.addAll(values, chunks_);
@@ -4261,18 +3698,18 @@ public final class ChunksProtobuf {
         }
         return this;
       }
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder getChunksBuilder(
+      public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder getChunksBuilder(
           int index) {
         return getChunksFieldBuilder().getBuilder(index);
       }
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder getChunksOrBuilder(
+      public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder getChunksOrBuilder(
           int index) {
         if (chunksBuilder_ == null) {
           return chunks_.get(index);  } else {
           return chunksBuilder_.getMessageOrBuilder(index);
         }
       }
-      public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder> 
+      public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder> 
            getChunksOrBuilderList() {
         if (chunksBuilder_ != null) {
           return chunksBuilder_.getMessageOrBuilderList();
@@ -4280,25 +3717,25 @@ public final class ChunksProtobuf {
           return java.util.Collections.unmodifiableList(chunks_);
         }
       }
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder addChunksBuilder() {
+      public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder addChunksBuilder() {
         return getChunksFieldBuilder().addBuilder(
-            org.terasology.protobuf.ChunksProtobuf.CompressedChunk.getDefaultInstance());
+            org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.getDefaultInstance());
       }
-      public org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder addChunksBuilder(
+      public org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder addChunksBuilder(
           int index) {
         return getChunksFieldBuilder().addBuilder(
-            index, org.terasology.protobuf.ChunksProtobuf.CompressedChunk.getDefaultInstance());
+            index, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.getDefaultInstance());
       }
-      public java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder> 
+      public java.util.List<org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder> 
            getChunksBuilderList() {
         return getChunksFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.CompressedChunk, org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder, org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder> 
+          org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder> 
           getChunksFieldBuilder() {
         if (chunksBuilder_ == null) {
           chunksBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.CompressedChunk, org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder, org.terasology.protobuf.ChunksProtobuf.CompressedChunkOrBuilder>(
+              org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder, org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunkOrBuilder>(
                   chunks_,
                   ((bitField0_ & 0x00000002) == 0x00000002),
                   getParentForChildren(),
@@ -4335,20 +3772,15 @@ public final class ChunksProtobuf {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Chunk_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_CompressedChunk_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CompressedChunk_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_Chunks_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_Chunks_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_CompressedChunks_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_CompressedChunks_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_CompressedChunks_CompressedChunk_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CompressedChunks_CompressedChunk_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4366,22 +3798,22 @@ public final class ChunksProtobuf {
       "ata\030\005 \001(\0132\n.TeraArray\022!\n\rsunlight_data\030\006" +
       " \001(\0132\n.TeraArray\022\036\n\nlight_data\030\007 \001(\0132\n.T" +
       "eraArray\022\036\n\nextra_data\030\010 \001(\0132\n.TeraArray" +
-      "\022\032\n\010mod_data\030\t \003(\0132\010.ModData*\005\010d\020\351\007\"@\n\017C" +
-      "ompressedChunk\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 \001(\021\022\t\n\001",
-      "z\030\003 \001(\021\022\014\n\004data\030\004 \001(\014\" \n\006Chunks\022\026\n\006chunk" +
-      "s\030\001 \003(\0132\006.Chunk\"\216\001\n\020CompressedChunks\0229\n\006" +
-      "method\030\001 \001(\0162#.CompressedChunks.Compress" +
-      "ionMethod:\004GZIP\022 \n\006chunks\030\002 \003(\0132\020.Compre" +
-      "ssedChunk\"\035\n\021CompressionMethod\022\010\n\004GZIP\020\000" +
-      "*\220\001\n\004Type\022\013\n\007Unknown\020\000\022\022\n\016DenseArray4Bit" +
-      "\020\001\022\022\n\016DenseArray8Bit\020\002\022\023\n\017DenseArray16Bi" +
-      "t\020\003\022\023\n\017SparseArray4Bit\020\004\022\023\n\017SparseArray8" +
-      "Bit\020\005\022\024\n\020SparseArray16Bit\020\006*\242\001\n\005State\022 \n" +
-      "\034ADJACENCY_GENERATION_PENDING\020\000\022%\n!INTER",
-      "NAL_LIGHT_GENERATION_PENDING\020\001\022\035\n\031LIGHT_" +
-      "PROPAGATION_PENDING\020\002\022#\n\037FULL_LIGHT_CONN" +
-      "ECTIVITY_PENDING\020\003\022\014\n\010COMPLETE\020\004B+\n\027org." +
-      "terasology.protobufB\016ChunksProtobufH\001"
+      "\022\032\n\010mod_data\030\t \003(\0132\010.ModData*\005\010d\020\351\007\"\341\001\n\020" +
+      "CompressedChunks\0229\n\006method\030\001 \001(\0162#.Compr",
+      "essedChunks.CompressionMethod:\004GZIP\0221\n\006c" +
+      "hunks\030\002 \003(\0132!.CompressedChunks.Compresse" +
+      "dChunk\032@\n\017CompressedChunk\022\t\n\001x\030\001 \001(\021\022\t\n\001" +
+      "y\030\002 \001(\021\022\t\n\001z\030\003 \001(\021\022\014\n\004data\030\004 \001(\014\"\035\n\021Comp" +
+      "ressionMethod\022\010\n\004GZIP\020\000*\220\001\n\004Type\022\013\n\007Unkn" +
+      "own\020\000\022\022\n\016DenseArray4Bit\020\001\022\022\n\016DenseArray8" +
+      "Bit\020\002\022\023\n\017DenseArray16Bit\020\003\022\023\n\017SparseArra" +
+      "y4Bit\020\004\022\023\n\017SparseArray8Bit\020\005\022\024\n\020SparseAr" +
+      "ray16Bit\020\006*\242\001\n\005State\022 \n\034ADJACENCY_GENERA" +
+      "TION_PENDING\020\000\022%\n!INTERNAL_LIGHT_GENERAT",
+      "ION_PENDING\020\001\022\035\n\031LIGHT_PROPAGATION_PENDI" +
+      "NG\020\002\022#\n\037FULL_LIGHT_CONNECTIVITY_PENDING\020" +
+      "\003\022\014\n\010COMPLETE\020\004B+\n\027org.terasology.protob" +
+      "ufB\016ChunksProtobufH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -4412,30 +3844,22 @@ public final class ChunksProtobuf {
               new java.lang.String[] { "X", "Y", "Z", "State", "BlockData", "SunlightData", "LightData", "ExtraData", "ModData", },
               org.terasology.protobuf.ChunksProtobuf.Chunk.class,
               org.terasology.protobuf.ChunksProtobuf.Chunk.Builder.class);
-          internal_static_CompressedChunk_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_CompressedChunk_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_CompressedChunk_descriptor,
-              new java.lang.String[] { "X", "Y", "Z", "Data", },
-              org.terasology.protobuf.ChunksProtobuf.CompressedChunk.class,
-              org.terasology.protobuf.ChunksProtobuf.CompressedChunk.Builder.class);
-          internal_static_Chunks_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_Chunks_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Chunks_descriptor,
-              new java.lang.String[] { "Chunks", },
-              org.terasology.protobuf.ChunksProtobuf.Chunks.class,
-              org.terasology.protobuf.ChunksProtobuf.Chunks.Builder.class);
           internal_static_CompressedChunks_descriptor =
-            getDescriptor().getMessageTypes().get(5);
+            getDescriptor().getMessageTypes().get(3);
           internal_static_CompressedChunks_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_CompressedChunks_descriptor,
               new java.lang.String[] { "Method", "Chunks", },
               org.terasology.protobuf.ChunksProtobuf.CompressedChunks.class,
               org.terasology.protobuf.ChunksProtobuf.CompressedChunks.Builder.class);
+          internal_static_CompressedChunks_CompressedChunk_descriptor =
+            internal_static_CompressedChunks_descriptor.getNestedTypes().get(0);
+          internal_static_CompressedChunks_CompressedChunk_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_CompressedChunks_CompressedChunk_descriptor,
+              new java.lang.String[] { "X", "Y", "Z", "Data", },
+              org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.class,
+              org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk.Builder.class);
           return null;
         }
       };

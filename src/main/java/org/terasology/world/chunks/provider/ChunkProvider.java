@@ -74,6 +74,8 @@ public interface ChunkProvider {
      */
     public void dispose();
 
+    public long sizeInBytes();
+    
     /**
      * Returns the amount of chunks managed by this chunk provider.
      *
