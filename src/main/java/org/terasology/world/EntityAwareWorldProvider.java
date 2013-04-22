@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
@@ -176,8 +176,14 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public boolean setBlock(Vector3i pos, Block type, Block oldType, EntityRef entity) {
-        if (setBlock(pos.x, pos.y, pos.z, type, oldType)) {
-            replaceEntityAt(pos, entity, type);
+        if (super.setBlock(pos.x, pos.y, pos.z, type, oldType)) {
+            if (entity.exists()) {
+                replaceEntityAt(pos, entity, type);
+            } else if (Thread.currentThread().equals(mainThread)) {
+                getOrCreateEntityAt(pos).send(new BlockChangedEvent(pos, type, oldType));
+            } else {
+                eventQueue.add(new BlockChangedEvent(pos, type, oldType));
+            }
             return true;
         }
         return false;

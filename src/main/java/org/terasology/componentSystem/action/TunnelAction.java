@@ -28,7 +28,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

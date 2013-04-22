@@ -34,7 +34,7 @@ import org.terasology.logic.health.FullHealthEvent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.physics.ImpulseEvent;
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockEntityMode;

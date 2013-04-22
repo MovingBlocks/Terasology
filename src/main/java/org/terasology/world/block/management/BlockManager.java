@@ -104,6 +104,9 @@ public abstract class BlockManager {
         listeners.remove(listener);
     }
 
+
+    public abstract void buildAtlas();
+
     /**
      *
      * @param family

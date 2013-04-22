@@ -18,8 +18,8 @@ package org.terasology.world.generator.core;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
-import org.terasology.utilities.EPNoise;
-import org.terasology.utilities.Noise;
+import org.terasology.utilities.procedural.EPNoise;
+import org.terasology.utilities.procedural.Noise;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;

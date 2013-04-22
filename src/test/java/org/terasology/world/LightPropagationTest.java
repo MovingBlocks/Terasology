@@ -17,8 +17,10 @@
 package org.terasology.world;
 
 import com.google.common.collect.Maps;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -37,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Immortius
  */
-public class LightPropagationTest {
+public class LightPropagationTest extends TerasologyTestingEnvironment {
 
     private static final Vector3i WORLD_MIN = new Vector3i(-Chunk.SIZE_X, 0, -Chunk.SIZE_Z);
     private static final Vector3i WORLD_MAX = new Vector3i(2 * Chunk.SIZE_X - 1, Chunk.SIZE_Y - 1, 2 * Chunk.SIZE_Z - 1);
@@ -55,6 +57,7 @@ public class LightPropagationTest {
                 new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), new Chunk(new Vector3i(1, 0, 1))};
 
         view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        view.lock();
         propagator = new LightPropagator(view);
         BlockManagerAuthority blockManager = new BlockManagerAuthority(Maps.<String, Byte>newHashMap());
         CoreRegistry.put(BlockManager.class, blockManager);
@@ -74,7 +77,13 @@ public class LightPropagationTest {
         torch.setId((byte) 2);
         torch.setLuminance(Chunk.MAX_LIGHT);
         blockManager.addBlockFamily(new SymmetricFamily(torch.getURI(), torch), true);
+    }
 
+    @After
+    public void dispose() {
+        if (view != null) {
+            view.unlock();
+        }
     }
 
     @Test

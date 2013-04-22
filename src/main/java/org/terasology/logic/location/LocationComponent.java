@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components.world;
+package org.terasology.logic.location;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Lists;
@@ -44,10 +44,12 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     // Relative to
     @Replicate
-    private EntityRef parent = EntityRef.NULL;
-    private List<EntityRef> children = Lists.newArrayList();
+    EntityRef parent = EntityRef.NULL;
 
-    private boolean replicateChanges = true;
+    @Replicate
+    List<EntityRef> children = Lists.newArrayList();
+
+    public boolean replicateChanges = true;
 
     public LocationComponent() {
     }
@@ -159,20 +161,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     public Collection<EntityRef> getChildren() {
         return children;
-    }
-
-    public void addChild(EntityRef child, EntityRef self) {
-        LocationComponent childLoc = child.getComponent(LocationComponent.class);
-        if (childLoc != null && !childLoc.getParent().equals(self)) {
-            LocationComponent oldParentLoc = childLoc.getParent().getComponent(LocationComponent.class);
-            if (oldParentLoc != null) {
-                oldParentLoc.children.remove(child);
-                childLoc.getParent().saveComponent(oldParentLoc);
-            }
-            childLoc.parent = self;
-            child.saveComponent(childLoc);
-            children.add(child);
-        }
     }
 
     @Override

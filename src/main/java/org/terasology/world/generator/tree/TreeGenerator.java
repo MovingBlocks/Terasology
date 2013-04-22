@@ -16,7 +16,7 @@
 
 package org.terasology.world.generator.tree;
 
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 

@@ -18,7 +18,7 @@ package org.terasology.world.generator.core;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
-import org.terasology.utilities.PerlinNoise;
+import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;

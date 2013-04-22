@@ -18,8 +18,10 @@ package org.terasology.world.liquid;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
@@ -36,7 +38,7 @@ import org.terasology.world.chunks.Chunk;
 /**
  * @author Immortius
  */
-public class LiquidSimulationTest {
+public class LiquidSimulationTest extends TerasologyTestingEnvironment {
 
     ChunkView view;
     Block air;
@@ -44,16 +46,15 @@ public class LiquidSimulationTest {
 
     @Before
     public void setup() {
-        CoreRegistry.put(Config.class, new Config());
-
         Chunk[] chunks = new Chunk[] {new Chunk(new Vector3i(-1,0,-1)), new Chunk(new Vector3i(0,0,-1)), new Chunk(new Vector3i(1,0,-1)),
                 new Chunk(new Vector3i(-1,0,0)), new Chunk(new Vector3i(0,0,0)), new Chunk(new Vector3i(1,0,0)),
                 new Chunk(new Vector3i(-1,0,1)), new Chunk(new Vector3i(0,0,1)), new Chunk(new Vector3i(1,0,1))};
 
         view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1,1,1));
+        view.lock();
 
-        BlockManagerAuthority blockManager = new BlockManagerAuthority();
-        CoreRegistry.put(BlockManager.class, blockManager);
+
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
         dirt = new Block();
         dirt.setDisplayName("Dirt");
@@ -67,6 +68,13 @@ public class LiquidSimulationTest {
             }
         }
 
+    }
+
+    @After
+    public void dispose() {
+        if (view != null) {
+            view.unlock();
+        }
     }
 
     @Test

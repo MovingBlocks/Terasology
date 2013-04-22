@@ -26,7 +26,7 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;

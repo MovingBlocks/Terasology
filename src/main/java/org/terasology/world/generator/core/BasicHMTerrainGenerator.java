@@ -20,7 +20,7 @@ package org.terasology.world.generator.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
-import org.terasology.utilities.HeightmapFileReader;
+import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;

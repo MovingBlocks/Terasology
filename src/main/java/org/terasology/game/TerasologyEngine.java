@@ -42,6 +42,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
 
 import java.io.File;
@@ -238,10 +239,10 @@ public class TerasologyEngine implements GameEngine {
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -249,7 +250,7 @@ public class TerasologyEngine implements GameEngine {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");
@@ -263,32 +264,7 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
-    private void addLibraryPath(File libPath) {
-        try {
-            String envPath = System.getProperty("java.library.path");
-            if (envPath == null || envPath.isEmpty()) {
-                System.setProperty("java.library.path", libPath.getAbsolutePath());
-            } else {
-                System.setProperty("java.library.path", envPath + File.pathSeparator + libPath.getAbsolutePath());
-            }
 
-            final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
-            usrPathsField.setAccessible(true);
-
-            List<String> paths = new ArrayList<String>(Arrays.asList((String[]) usrPathsField.get(null)));
-
-            if (paths.contains(libPath.getAbsolutePath())) {
-                return;
-            }
-
-            paths.add(0, libPath.getAbsolutePath()); // Add to beginning, to override system libraries
-
-            usrPathsField.set(null, paths.toArray(new String[paths.size()]));
-        } catch (Exception e) {
-            logger.error("Couldn't link static libraries. ", e);
-            System.exit(1);
-        }
-    }
 
     private void initOpenAL() {
         if (config.getAudio().isDisableSound()) {

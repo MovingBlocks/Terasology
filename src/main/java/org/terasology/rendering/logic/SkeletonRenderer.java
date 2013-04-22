@@ -26,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.Location;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -90,9 +91,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
                 loc.setLocalRotation(bone.getLocalRotation());
                 EntityRef boneEntity = entityManager.create(loc);
                 EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
-                LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
-                parentLoc.addChild(boneEntity, parent);
-                parent.saveComponent(parentLoc);
+                Location.attachChild(parent, boneEntity);
                 if (bone.getParent() == null) {
                     skeleton.rootBone = boneEntity;
                 }

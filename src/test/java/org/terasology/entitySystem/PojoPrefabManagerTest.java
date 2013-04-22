@@ -5,7 +5,7 @@ import javax.vecmath.Vector3f;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;

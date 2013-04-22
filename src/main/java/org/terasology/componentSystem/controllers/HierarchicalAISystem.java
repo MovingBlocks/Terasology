@@ -17,7 +17,7 @@ package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HierarchicalAIComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -32,7 +32,7 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;

@@ -23,7 +23,7 @@ import org.terasology.audio.AudioManager;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.SimpleAIComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;

@@ -18,7 +18,7 @@ package org.terasology.audio.openAL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
-import org.terasology.utilities.OggReader;
+import org.terasology.audio.loaders.OggReader;
 
 import java.io.IOException;
 import java.net.URL;

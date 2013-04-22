@@ -22,7 +22,7 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.components.BlockParticleEffectComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;

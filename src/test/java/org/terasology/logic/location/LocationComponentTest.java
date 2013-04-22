@@ -1,10 +1,11 @@
-package org.terasology.components;
+package org.terasology.logic.location;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
 
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class LocationComponentTest {
+public class LocationComponentTest extends TerasologyTestingEnvironment {
 
     LocationComponent loc;
     EntityRef entity;
@@ -38,6 +39,9 @@ public class LocationComponentTest {
         QuaternionUtil.setEuler(yawRotation, TeraMath.DEG_TO_RAD * 90, 0, 0);
         QuaternionUtil.setEuler(pitchRotation, 0, TeraMath.DEG_TO_RAD * 45, 0);
         QuaternionUtil.setEuler(yawPitch, TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
+
+//        CoreRegistry.get(ComponentSystemManager.class).register(locationSystem, "engine:locationSystem");
+//        CoreRegistry.get(ComponentSystemManager.class).initialise();
     }
 
     @Test
@@ -170,12 +174,13 @@ public class LocationComponentTest {
         when(thirdEntity.getComponent(LocationComponent.class)).thenReturn(third);
         when(thirdEntity.exists()).thenReturn(true);
 
-        first.setLocalRotation(yawRotation);
+        Location.attachChild(firstEntity, secondEntity);
         second.setLocalPosition(new Vector3f(1, 0, 0));
-        first.addChild(secondEntity, firstEntity);
+        first.setLocalRotation(yawRotation);
         TeraAssert.assertEquals(new Vector3f(0, 0, -1), second.getWorldPosition(), 0.000001f);
+        Location.attachChild(secondEntity, thirdEntity);
         second.setLocalRotation(pitchRotation);
-        second.addChild(thirdEntity, secondEntity);
+        third.setLocalPosition(new Vector3f(0, 0, 0));
         TeraAssert.assertEquals(new Vector3f(0, 0, -1), third.getWorldPosition(), 0.000001f);
         third.setLocalPosition(new Vector3f(0, 0, 1));
         TeraAssert.assertEquals(new Vector3f(0.5f * (float) Math.sqrt(2), -0.5f * (float) Math.sqrt(2), -1), third.getWorldPosition(), 0.000001f);
@@ -222,12 +227,62 @@ public class LocationComponentTest {
         TeraAssert.assertEquals(yawPitch, loc.getWorldRotation(), 0.0000001f);
     }
 
+    @Test
+    public void positionMaintainedWhenAttachedToParent() {
+        LocationComponent parent = new LocationComponent();
+        EntityRef parentEntity = mock(EntityRef.class);
+        when(parentEntity.getComponent(LocationComponent.class)).thenReturn(parent);
+        when(parentEntity.exists()).thenReturn(true);
+        parent.setWorldPosition(new Vector3f(1, 0, 0));
+
+        loc.setWorldPosition(new Vector3f(2,0,0));
+        Location.attachChild(parentEntity, entity);
+
+        TeraAssert.assertEquals(new Vector3f(2,0,0), loc.getWorldPosition(), 0.000001f);
+    }
+
+    @Test
+    public void positionMaintainedWhenRemovedFromParent() {
+        LocationComponent parent = new LocationComponent();
+        EntityRef parentEntity = mock(EntityRef.class);
+        when(parentEntity.getComponent(LocationComponent.class)).thenReturn(parent);
+        when(parentEntity.exists()).thenReturn(true);
+        parent.setWorldPosition(new Vector3f(1, 0, 0));
+
+        loc.setWorldPosition(new Vector3f(2,0,0));
+        Location.attachChild(parentEntity, entity);
+        Location.removeChild(parentEntity, entity);
+
+        TeraAssert.assertEquals(new Vector3f(2,0,0), loc.getWorldPosition(), 0.000001f);
+    }
+
+    @Test
+    public void positionMaintainedWhenParentDestroyed() {
+        LocationComponent parent = new LocationComponent();
+        EntityRef parentEntity = mock(EntityRef.class);
+        when(parentEntity.getComponent(LocationComponent.class)).thenReturn(parent);
+        when(parentEntity.exists()).thenReturn(true);
+        parent.setWorldPosition(new Vector3f(1, 0, 0));
+
+        loc.setWorldPosition(new Vector3f(2,0,0));
+        Location.attachChild(parentEntity, entity);
+        System.out.println(entity.toFullDescription());
+        Location locationSystem = new Location();
+        locationSystem.onDestroyed(RemovedComponentEvent.newInstance(), parentEntity);
+        when(parentEntity.getComponent(LocationComponent.class)).thenReturn(null);
+        when(parentEntity.exists()).thenReturn(false);
+        System.out.println(entity.toFullDescription());
+
+        TeraAssert.assertEquals(new Vector3f(2,0,0), loc.getWorldPosition(), 0.000001f);
+    }
+
+
     private LocationComponent giveParent(LocationComponent location) {
         LocationComponent parent = new LocationComponent();
         EntityRef parentEntity = mock(EntityRef.class);
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(parent);
         when(parentEntity.exists()).thenReturn(true);
-        parent.addChild(entity, parentEntity);
+        Location.attachChild(parentEntity, entity);
         return parent;
     }
 }

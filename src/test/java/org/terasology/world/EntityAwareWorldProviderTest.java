@@ -128,6 +128,9 @@ public class EntityAwareWorldProviderTest {
 
         assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir(), entity));
         List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
+        for (EntityRef entityFound : blockEntities) {
+            System.out.println(entityFound.toFullDescription());
+        }
         assertEquals(1, blockEntities.size());
         assertEquals(blockEntities.get(0), entity);
         assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));

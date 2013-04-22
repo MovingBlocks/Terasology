@@ -78,10 +78,7 @@ public class NetworkEntitySystem implements ComponentSystem {
             NetClient netClient = networkSystem.getNetOwner(entity);
             if (netClient != null) {
                 netClient.setViewDistanceMode(request.getNewViewRange());
-                ClientComponent clientComp = netClient.getEntity().getComponent(ClientComponent.class);
-                if (clientComp != null && clientComp.character.exists()) {
-                    worldRenderer.getChunkProvider().updateRelevanceEntity(clientComp.character, netClient.getViewDistance() + ChunkConstants.REMOTE_GENERATION_DISTANCE);
-                }
+                worldRenderer.getChunkProvider().updateRelevanceEntity(netClient.getEntity(), netClient.getViewDistance() + ChunkConstants.REMOTE_GENERATION_DISTANCE);
             }
         }
     }

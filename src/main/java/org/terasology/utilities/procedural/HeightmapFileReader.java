@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.utilities;
+package org.terasology.utilities.procedural;
 
 /**
  * Reads a heightmap encoded in a textfile

@@ -19,7 +19,7 @@ package org.terasology.entityFactory;
 import com.google.common.collect.Maps;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.utility.LifespanComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;

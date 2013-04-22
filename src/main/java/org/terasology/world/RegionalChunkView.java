@@ -125,6 +125,8 @@ public class RegionalChunkView implements ChunkView {
         if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
+        } else {
+            throw new IllegalStateException("Attempted to modify block though an unlocked view");
         }
     }
 
@@ -153,6 +155,8 @@ public class RegionalChunkView implements ChunkView {
         if (locked.get() && blockRegion.encompasses(x, y, z)) {
             int chunkIndex = relChunkIndex(x, y, z);
             chunks[chunkIndex].setLiquid(TeraMath.calcBlockPos(x, y, z, chunkFilterSize), newState);
+        } else {
+            throw new IllegalStateException("Attempted to modify liquid data though an unlocked view");
         }
     }
 
@@ -166,6 +170,8 @@ public class RegionalChunkView implements ChunkView {
         if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setLight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
+        } else {
+            throw new IllegalStateException("Attempted to modify light though an unlocked view");
         }
     }
 
@@ -179,6 +185,8 @@ public class RegionalChunkView implements ChunkView {
         if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setSunlight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
+        } else {
+            throw new IllegalStateException("Attempted to modify sunlight though an unlocked view");
         }
     }
 

@@ -1,5 +1,7 @@
 {
     "persisted" : false,
+    "Location" : {
+    },
     "Client" : {},
     "Network" : {
         "replicateMode" : "OWNER"

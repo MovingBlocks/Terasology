@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
 import org.terasology.entitySystem.ComponentSystem;

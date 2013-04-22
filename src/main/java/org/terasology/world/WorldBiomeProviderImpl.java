@@ -17,7 +17,7 @@
 package org.terasology.world;
 
 import org.terasology.math.TeraMath;
-import org.terasology.utilities.PerlinNoise;
+import org.terasology.utilities.procedural.PerlinNoise;
 
 /**
  * @author Immortius

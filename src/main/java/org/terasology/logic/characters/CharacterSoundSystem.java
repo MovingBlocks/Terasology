@@ -19,7 +19,7 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.components.CharacterSoundComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
@@ -29,7 +29,7 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.JumpEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 
 /**
  * @author Immortius <immortius@gmail.com>

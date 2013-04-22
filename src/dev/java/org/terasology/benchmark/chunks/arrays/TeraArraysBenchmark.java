@@ -1,19 +1,12 @@
 package org.terasology.benchmark.chunks.arrays;
 
-import java.io.ByteArrayOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.terasology.benchmark.Benchmark;
 import org.terasology.benchmark.PrintToConsoleCallback;
 import org.terasology.benchmark.Benchmarks;
-import org.terasology.utilities.FastRandom;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
 /**
  * TeraArraysBenchmark simplifies the execution of the benchmarks for tera arrays.

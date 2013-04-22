@@ -23,7 +23,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
 import org.terasology.audio.openAL.OggSound;
 import org.terasology.audio.openAL.OpenALException;
-import org.terasology.utilities.OggReader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

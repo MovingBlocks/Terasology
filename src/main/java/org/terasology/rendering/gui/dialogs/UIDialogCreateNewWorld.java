@@ -33,7 +33,7 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
-import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.core.BasicHMTerrainGenerator;
 import org.terasology.world.generator.core.FlatTerrainGenerator;

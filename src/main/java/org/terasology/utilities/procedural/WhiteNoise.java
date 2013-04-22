@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.utilities;
+package org.terasology.utilities.procedural;
 
 /**
  * Some white noise

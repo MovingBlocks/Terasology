@@ -53,7 +53,6 @@ public class BlockManagerClient extends BlockManager {
         for (FreeformFamily freeformFamily : blockDefinitions.shapelessDefinitions) {
             addFreeformBlockFamily(freeformFamily.uri, freeformFamily.categories);
         }
-        blockLoader.buildAtlas();
 
         for (String uri : knownBlockMappings.keySet()) {
             BlockUri blockUri = new BlockUri(uri);
@@ -79,6 +78,11 @@ public class BlockManagerClient extends BlockManager {
                 logger.error("Block not available: {}", uri);
             }
         }
+    }
+
+    @Override
+    public void buildAtlas() {
+        blockLoader.buildAtlas();
     }
 
     public void receiveFamilyRegistration(BlockUri familyUri, Map<String, Integer> registration) {

@@ -18,21 +18,16 @@ package org.terasology.logic.players;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.config.Config;
-import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entityFactory.DroppedItemFactory;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.input.binds.DropItemButton;
 import org.terasology.input.binds.ForwardsMovementAxis;
 import org.terasology.input.binds.FrobButton;
 import org.terasology.input.binds.JumpButton;
@@ -46,28 +41,22 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FrobRequest;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
-import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegionComponent;
 import org.terasology.world.block.entity.BlockComponent;
-import org.terasology.world.block.entity.BlockItemComponent;
 
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
@@ -218,12 +207,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onRun(RunButton event, EntityRef entity) {
-        run = event.isDown();
-        event.consume();
-    }
+public void onRun(RunButton event, EntityRef entity) {
+    run = event.isDown();
+    event.consume();
+}
 
-    @Override
+@Override
     public void renderOverlay() {
         // TODO: Don't render if not in first person?
         // Display the block the player is aiming at

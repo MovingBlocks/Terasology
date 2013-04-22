@@ -50,6 +50,7 @@ public class RegisterBlocks implements LoadProcess {
         } else {
             blockManager = new BlockManagerClient(worldInfo.getBlockIdMap());
         }
+        blockManager.buildAtlas();
         CoreRegistry.put(BlockManager.class, blockManager);
 
         return true;

@@ -52,7 +52,6 @@ public class BlockManagerAuthority extends BlockManager {
         for (FreeformFamily freeformFamily : blockDefinitions.shapelessDefinitions) {
             addFreeformBlockFamily(freeformFamily.uri, freeformFamily.categories);
         }
-        blockLoader.buildAtlas();
         nextId = knownBlockMappings.size();
         if (nextId == 0) {
             // Account for air being registered.
@@ -83,6 +82,11 @@ public class BlockManagerAuthority extends BlockManager {
                 logger.warn("Block no longer available: {}", uri);
             }
         }
+    }
+
+    @Override
+    public void buildAtlas() {
+        blockLoader.buildAtlas();
     }
 
     @Override

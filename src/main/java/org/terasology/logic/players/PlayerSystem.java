@@ -18,7 +18,8 @@ package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.logic.location.Location;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -26,7 +27,6 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.input.binds.AttackButton;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Vector3i;
@@ -42,6 +42,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +67,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
     private ChunkProvider chunkProvider;
 
-    private List<SpawnCachingInfo> ongoingSpawns = Lists.newArrayList();
+    private List<EntityRef> clientsPreparingToSpawn = Lists.newArrayList();
 
     @Override
     public void initialise() {
@@ -79,13 +80,11 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        Iterator<SpawnCachingInfo> i = ongoingSpawns.iterator();
+        Iterator<EntityRef> i = clientsPreparingToSpawn.iterator();
         while (i.hasNext()) {
-            SpawnCachingInfo spawning = i.next();
+            EntityRef spawning = i.next();
             if (chunkProvider.getChunk(Vector3i.zero()) != null) {
-                spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
-                chunkProvider.removeRelevanceEntity(spawning.cachingEntity);
-                spawning.cachingEntity.destroy();
+                spawnPlayer(spawning, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
                 i.remove();
             }
         }
@@ -100,6 +99,11 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         if (client != null) {
             PlayerFactory playerFactory = new PlayerFactory(entityManager, inventoryManager);
             EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z), clientEntity);
+            Location.attachChild(playerCharacter, clientEntity);
+            LocationComponent clientLoc = clientEntity.getComponent(LocationComponent.class);
+            clientLoc.setLocalPosition(new Vector3f());
+            clientLoc.setLocalRotation(new Quat4f(0,0,0,1));
+            clientEntity.saveComponent(clientLoc);
 
             NetworkComponent netComp = playerCharacter.getComponent(NetworkComponent.class);
             if (netComp != null) {
@@ -111,7 +115,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             if (!clientListener.isLocal()) {
                 distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
             }
-            worldRenderer.getChunkProvider().addRelevanceEntity(playerCharacter, distance, clientListener);
+            worldRenderer.getChunkProvider().updateRelevanceEntity(playerCharacter, distance);
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
         }
@@ -120,15 +124,15 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onConnect(ConnectedEvent connected, EntityRef entity) {
         Vector3i pos = Vector3i.zero();
+        worldRenderer.getChunkProvider().addRelevanceEntity(entity, 4, networkSystem.getOwner(entity));
         if (chunkProvider.getChunk(pos) != null) {
             spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
         } else {
-            EntityRef spawnZoneEntity = entityManager.create();
-            spawnZoneEntity.setPersisted(false);
-            spawnZoneEntity.addComponent(new LocationComponent(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2)));
-            worldRenderer.getChunkProvider().addRelevanceEntity(spawnZoneEntity, 4);
+            LocationComponent location = entity.getComponent(LocationComponent.class);
+            location.setWorldPosition(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
+            entity.saveComponent(location);
 
-            ongoingSpawns.add(new SpawnCachingInfo(spawnZoneEntity, entity));
+            clientsPreparingToSpawn.add(entity);
         }
     }
 
@@ -145,26 +149,13 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             if (chunkProvider.getChunk(pos) != null) {
                 spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
             } else {
-                EntityRef spawnZoneEntity = entityManager.create();
-                spawnZoneEntity.setPersisted(false);
-                spawnZoneEntity.addComponent(new LocationComponent(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2)));
-                worldRenderer.getChunkProvider().addRelevanceEntity(spawnZoneEntity, 4);
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                loc.setWorldPosition(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
+                entity.saveComponent(loc);
+                worldRenderer.getChunkProvider().updateRelevanceEntity(entity, 4);
 
-                ongoingSpawns.add(new SpawnCachingInfo(spawnZoneEntity, entity));
+                clientsPreparingToSpawn.add(entity);
             }
-        }
-    }
-
-    /**
-     * Information on the caching of an area of the world for character spawning
-     */
-    private static class SpawnCachingInfo {
-        public EntityRef cachingEntity = EntityRef.NULL;
-        public EntityRef clientEntity = EntityRef.NULL;
-
-        public SpawnCachingInfo(EntityRef cachingEntity, EntityRef clientEntity) {
-            this.cachingEntity = cachingEntity;
-            this.clientEntity = clientEntity;
         }
     }
 }
