@@ -177,6 +177,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             rightGearWheel.setVisible(false);
         } else {
             toolbar.setVisible(true);
+            toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
             toolbar.setSelected(character.selectedTool);
             leftGearWheel.setVisible(true);
             rightGearWheel.setVisible(true);

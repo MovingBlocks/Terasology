@@ -64,11 +64,13 @@ public class UIInventoryGrid extends UIDisplayContainer {
     }
 
     public void linkToEntity(EntityRef entity, int startSlot, int numSlots) {
-        this.entity = entity;
-        this.startSlot = startSlot;
-        this.maxSlotsInGrid = numSlots;
+        if (!entity.equals(this.entity)) {
+            this.entity = entity;
+            this.startSlot = startSlot;
+            this.maxSlotsInGrid = numSlots;
 
-        fillInventoryCells();
+            fillInventoryCells();
+        }
     }
 
     @Override

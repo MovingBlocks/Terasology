@@ -19,6 +19,7 @@ package org.terasology.network;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.internal.Server;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.management.BlockRegistrationListener;
@@ -29,7 +30,7 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
  */
 public interface NetworkSystem extends BlockRegistrationListener {
 
-    void host(int port);
+    void host(int port) throws HostingFailedException;
 
     boolean join(String address, int port);
 

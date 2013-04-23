@@ -19,7 +19,9 @@ package org.terasology.game.modes.loadProcesses;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.game.modes.LoadProcess;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.exceptions.HostingFailedException;
 
 /**
  * @author Immortius
@@ -32,7 +34,11 @@ public class StartServer implements LoadProcess {
 
     @Override
     public boolean step() {
-        CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT);
+        try {
+            CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT);
+        } catch (HostingFailedException e) {
+            CoreRegistry.get(GUIManager.class).showMessage("Failed to Host", e.getMessage() + " - Reverting to single player");
+        }
         return true;
     }
 

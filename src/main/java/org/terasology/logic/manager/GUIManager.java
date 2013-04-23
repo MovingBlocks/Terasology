@@ -227,7 +227,9 @@ public class GUIManager implements ComponentSystem {
 
             logger.debug("Open and focus window by reference with ID \"{}\"", window.getId());
 
-            renderer.setWindowFocus(window);
+            if (window.isModal()) {
+                renderer.setWindowFocus(window);
+            }
         }
 
         return window;

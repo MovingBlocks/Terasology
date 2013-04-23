@@ -29,6 +29,7 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.group.ChannelGroup;
@@ -69,6 +70,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
+import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
@@ -82,6 +84,7 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
@@ -133,24 +136,33 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void host(int port) {
+    public void host(int port) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
-            mode = NetworkMode.SERVER;
-            for (EntityRef entity : entityManager.iteratorEntities(NetworkComponent.class)) {
-                registerNetworkEntity(entity);
+            try {
+                for (EntityRef entity : entityManager.iteratorEntities(NetworkComponent.class)) {
+                    registerNetworkEntity(entity);
+                }
+                generateSerializationTables();
+
+                factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+                ServerBootstrap bootstrap = new ServerBootstrap(factory);
+                bootstrap.setPipelineFactory(new TerasologyServerPipelineFactory(this));
+                bootstrap.setOption("child.tcpNoDelay", true);
+                bootstrap.setOption("child.keepAlive", true);
+                Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
+                allChannels.add(listenChannel);
+                logger.info("Started server");
+
+                nextNetworkTick = timer.getRawTimeInMs();
+                mode = NetworkMode.SERVER;
+            } catch (ChannelException e) {
+                if (e.getCause() instanceof BindException) {
+                    throw new HostingFailedException("Port already in use (are you already hosting a game?)");
+                } else {
+                    throw new HostingFailedException("Failed to host game");
+                }
+
             }
-            generateSerializationTables();
-
-            factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-            ServerBootstrap bootstrap = new ServerBootstrap(factory);
-            bootstrap.setPipelineFactory(new TerasologyServerPipelineFactory(this));
-            bootstrap.setOption("child.tcpNoDelay", true);
-            bootstrap.setOption("child.keepAlive", true);
-            Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
-            allChannels.add(listenChannel);
-            logger.info("Started server");
-
-            nextNetworkTick = timer.getRawTimeInMs();
         }
     }
 

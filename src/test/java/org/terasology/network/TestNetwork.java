@@ -40,7 +40,7 @@ public class TestNetwork {
     }
 
     @Test
-    public void testNetwork() throws InterruptedException {
+    public void testNetwork() throws Exception {
         PersistableEntityManager entityManager = new EntitySystemBuilder().build(new ModManager());
         Timer timer = mock(Timer.class);
         NetworkSystem server = new NetworkSystemImpl(timer);
