@@ -513,7 +513,7 @@ public final class WorldRenderer {
                     c.setPendingMesh(null);
                 }
 
-                if ((c.isDirty() || mesh == null) && isChunkValidForRender(c)) {
+                if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
                     statDirtyChunks++;
                     chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
                 }
