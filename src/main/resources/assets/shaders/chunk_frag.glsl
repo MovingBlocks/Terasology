@@ -152,7 +152,7 @@ void main(){
             } else {
                 texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
                 texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-                texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
+                texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
 
                 color = vec4(texture2D(textureWater, texCoord.xy).xyz, 1.0);
             }
@@ -165,7 +165,7 @@ void main(){
     if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-        texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
+        texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
 
         color = texture2D(textureLava, texCoord.xy);
     /* APPLY DEFAULT TEXTURE FROM ATLAS */
