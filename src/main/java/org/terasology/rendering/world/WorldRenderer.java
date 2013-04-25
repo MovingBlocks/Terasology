@@ -71,13 +71,10 @@ import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -220,20 +217,36 @@ public final class WorldRenderer {
      */
     public WorldRenderer(WorldInfo worldInfo, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         // TODO: Cleaner method for this? Should not be using the world title
-        File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
-        if (f.exists()) {
-            try {
-                chunkStore = loadChunkStore(f);
-            } catch (IOException e) {
-                /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
-                   (don't have the game continue or we risk overwriting their game)
-                 */
-                e.printStackTrace();
+        try {
+            final long time = System.currentTimeMillis();
+            boolean loaded = false;
+            File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".chunks");
+            if (f.exists()) {
+                final ChunkStoreProtobuf store = new ChunkStoreProtobuf(false);
+                store.loadFromFile(f);
+                store.setup();
+                chunkStore = store;
+                loaded = true;
+            } else {
+                f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
+                if (f.exists()) {
+                    chunkStore = loadChunkStore(f);
+                    logger.info("Loaded chunks in old java object serialization format");
+                    loaded = true;
+                }
             }
+            if (loaded)
+                logger.info("It took {} ms to load chunks from file {}", (System.currentTimeMillis() - time), f);
+        } catch (Exception e) {
+            /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
+               (don't have the game continue or we risk overwriting their game)
+             */
+            logger.error("Error loading chunks", e);
         }
-        if (chunkStore == null) {
+
+        if (chunkStore == null)
             chunkStore = new ChunkStoreProtobuf();
-        }
+        
         chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
@@ -958,20 +971,11 @@ public final class WorldRenderer {
         CoreRegistry.get(AudioManager.class).stopAllSounds();
 
         chunkStore.dispose();
-        // TODO: this should be elsewhere, perhaps within the chunk cache.
-        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(worldProvider.getTitle()), worldProvider.getTitle() + ".dat");
-        try {
-            FileOutputStream fileOut = new FileOutputStream(chunkFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fileOut);
-            ObjectOutputStream out = new ObjectOutputStream(bos);
-            out.writeObject(chunkStore);
-            out.close();
-            bos.flush();
-            bos.close();
-            fileOut.close();
-        } catch (IOException e) {
-            logger.error("Error saving chunks", e);
-        }
+
+        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(worldProvider.getTitle()), worldProvider.getTitle() + ".chunks");
+        final long time = System.currentTimeMillis();
+        chunkStore.saveToFile(chunkFile);
+        logger.info("It took {} ms to save chunks to file {}", (System.currentTimeMillis() - time), chunkFile);
     }
 
     /**
