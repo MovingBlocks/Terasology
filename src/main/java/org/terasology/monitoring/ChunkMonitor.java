@@ -56,7 +56,7 @@ public class ChunkMonitor {
             entry = new ChunkMonitorEntry(pos);
             chunks.put(pos, entry);
         }
-        entry.setChunk(chunk);
+        entry.addChunk(chunk);
         return entry;
     }
     

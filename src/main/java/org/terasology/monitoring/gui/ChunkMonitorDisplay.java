@@ -44,8 +44,6 @@ import com.google.common.eventbus.Subscribe;
 @SuppressWarnings("serial")
 public class ChunkMonitorDisplay extends JPanel {
 
-    public static final int PURGE_DEAD_CHUNKS_INTERVAL = 10000;
-    
     public static final Color ColorComplete = new Color(0, 38, 28);
     public static final Color ColorFullLightConnectivityPending = new Color(69, 191, 85);
     public static final Color ColorLightPropagationPending = new Color(22, 127, 57);
@@ -262,7 +260,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         protected Color calcChunkColor(ChunkMonitorEntry entry) {
-            final Chunk chunk = entry.getChunk();
+            final Chunk chunk = entry.getLatestChunk();
             if (chunk == null)
                 return ColorDead;
             
@@ -300,8 +298,15 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         protected void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
+            final Chunk chunk = entry.getLatestChunk();
+
             g.setColor(calcChunkColor(entry));
             g.fillRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
+            
+            if (chunk != null && chunk.getMesh() != null) {
+                g.setColor(Color.blue);
+                g.drawRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 3, chunkSize - 3);
+            }
         }
         
         protected void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunks) {
