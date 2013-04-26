@@ -32,6 +32,8 @@ import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.Chunks;
@@ -72,30 +74,42 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
                 compressionThreads.execute(new Runnable() {
                     @Override
                     public void run() {
-                        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                        while (running.get()) {
-                            try {
-                                Chunk chunk = compressionQueue.poll(500, TimeUnit.MILLISECONDS);
-                                if (chunk != null) {
-                                    saveChunk(chunk);
+                        final SingleThreadMonitor monitor = ThreadMonitor.create("Terasology.Chunks.Storage", "Stored Chunks");
+                        try {
+                            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                            while (running.get()) {
+                                try {
+                                    Chunk chunk = compressionQueue.poll(500, TimeUnit.MILLISECONDS);
+                                    if (chunk != null) {
+                                        saveChunk(chunk);
+                                        monitor.increment(0);
+                                    }
+                                } catch (InterruptedException e) {
+                                    monitor.addError(e);
+                                    logger.error("Thread interrupted", e);
+                                } catch (Exception e) {
+                                    monitor.addError(e);
+                                    logger.error("Error in thread", e);
                                 }
-
-                            } catch (InterruptedException e) {
-                                logger.error("Thread interrupted", e);
-                            } catch (Exception e) {
-                                logger.error("Error in thread", e);
                             }
+                            boolean remaining = true;
+                            do {
+                                Chunk chunk = compressionQueue.poll();
+                                if (chunk != null) {
+                                    try {
+                                        saveChunk(chunk);
+                                        monitor.increment(0);
+                                    } catch (Exception e) {
+                                        monitor.addError(e);
+                                        logger.error("Error in thread", e);
+                                    }
+                                } else
+                                    remaining = false;
+                            } while (remaining);
+                            logger.debug("Thread shutdown safely");
+                        } finally {
+                            monitor.setActive(false);
                         }
-                        boolean remaining = true;
-                        do {
-                            Chunk chunk = compressionQueue.poll();
-                            if (chunk != null) {
-                                saveChunk(chunk);
-                            } else {
-                                remaining = false;
-                            }
-                        } while (remaining);
-                        logger.debug("Thread shutdown safely");
                     }
                 });
             }
