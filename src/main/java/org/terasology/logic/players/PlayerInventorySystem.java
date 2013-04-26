@@ -161,7 +161,6 @@ public class PlayerInventorySystem implements ComponentSystem {
         if (!event.isDown()) {
             // Compute new position
             dropPower *= 25f;
-            ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
 
             // TODO: This will change when camera are handled better (via a component)
             Camera playerCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();

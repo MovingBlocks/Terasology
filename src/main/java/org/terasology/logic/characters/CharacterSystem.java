@@ -16,6 +16,8 @@
 
 package org.terasology.logic.characters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
@@ -43,6 +45,7 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
@@ -55,6 +58,8 @@ import javax.vecmath.Vector3f;
  */
 @RegisterSystem()
 public class CharacterSystem implements ComponentSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
 
     @In
     private BulletPhysics physics;
@@ -86,6 +91,8 @@ public class CharacterSystem implements ComponentSystem {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         character.controller.send(new DeathEvent());
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
+        //entity.removeComponent(CharacterComponent.class);
+        //entity.removeComponent(CharacterMovementComponent.class);
         entity.destroy();
     }
 
@@ -171,7 +178,6 @@ public class CharacterSystem implements ComponentSystem {
             return;
         }
 
-
         //drop the item
         EntityRef selectedItemEntity = event.getItem();
         Vector3f impulse = event.getImpulse();
@@ -183,7 +189,8 @@ public class CharacterSystem implements ComponentSystem {
 
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 
-            if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
+            BlockItemComponent blockItem = selectedItemEntity.getComponent(BlockItemComponent.class);
+            if (blockItem == null) {
                 DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
                 EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
 
@@ -192,10 +199,14 @@ public class CharacterSystem implements ComponentSystem {
                 }
             } else {
                 DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-                BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
-                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
+                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), blockItem.blockFamily, 20, blockItem.placedEntity);
                 if (!droppedBlock.equals(EntityRef.NULL)) {
                     droppedBlock.send(new ImpulseEvent(new Vector3f(impulse)));
+                    blockItem.placedEntity = EntityRef.NULL;
+                    selectedItemEntity.saveComponent(blockItem);
+                } else {
+                    // Didn't create the dropped block, so don't decrement the stack
+                    return;
                 }
             }
 

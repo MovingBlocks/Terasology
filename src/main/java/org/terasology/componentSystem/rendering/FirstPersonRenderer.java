@@ -117,6 +117,9 @@ public class FirstPersonRenderer implements RenderSystem {
             return;
         }
         CharacterMovementComponent charMoveComp = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
+        if (charMoveComp == null) {
+            return;
+        }
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
         float handMovementAnimationOffset = character.handAnimation;
 

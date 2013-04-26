@@ -140,23 +140,22 @@ public class CharacterStateEvent extends NetworkEvent {
 
     public static void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        if (location == null) {
+        CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        if (location == null || movementComp == null || characterComponent == null) {
             return;
         }
         location.setWorldPosition(state.getPosition());
         location.setWorldRotation(state.getRotation());
         entity.saveComponent(location);
-        CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
         movementComp.mode = state.getMode();
         movementComp.setVelocity(state.getVelocity());
         movementComp.grounded = state.isGrounded();
         movementComp.footstepDelta = state.getFootstepDelta();
         entity.saveComponent(movementComp);
-        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
         characterComponent.pitch = state.pitch;
         characterComponent.yaw = state.yaw;
         entity.saveComponent(characterComponent);
-
         movementComp.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), state.getPosition(), 1.0f)));
     }
 

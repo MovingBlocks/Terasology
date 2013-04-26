@@ -40,4 +40,5 @@ public interface Client extends ChunkRegionListener {
 
     boolean isLocal();
 
+    void setViewDistanceMode(int newViewRange);
 }

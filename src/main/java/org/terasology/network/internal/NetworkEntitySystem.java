@@ -24,6 +24,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
@@ -75,10 +76,10 @@ public class NetworkEntitySystem implements ComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onChangeViewRequest(ChangeViewRangeRequest request, EntityRef entity) {
         if (networkSystem.getMode().isAuthority()) {
-            NetClient netClient = networkSystem.getNetOwner(entity);
-            if (netClient != null) {
-                netClient.setViewDistanceMode(request.getNewViewRange());
-                worldRenderer.getChunkProvider().updateRelevanceEntity(netClient.getEntity(), netClient.getViewDistance() + ChunkConstants.REMOTE_GENERATION_DISTANCE);
+            Client client = networkSystem.getOwner(entity);
+            if (client != null) {
+                client.setViewDistanceMode(request.getNewViewRange());
+                worldRenderer.getChunkProvider().updateRelevanceEntity(entity, client.getViewDistance() + ChunkConstants.FULL_GENERATION_DISTANCE);
             }
         }
     }

@@ -78,6 +78,11 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
+    public void setViewDistanceMode(int newViewRange) {
+        // Handled by Configuration change
+    }
+
+    @Override
     public void onChunkRelevant(Vector3i pos, Chunk chunk) {
     }
 
