@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;

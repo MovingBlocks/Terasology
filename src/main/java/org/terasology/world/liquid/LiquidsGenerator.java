@@ -15,7 +15,7 @@
  */
 package org.terasology.world.liquid;
 
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;

@@ -22,7 +22,7 @@ import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 
 import com.google.common.collect.Lists;
 import org.terasology.logic.mod.ModManager;

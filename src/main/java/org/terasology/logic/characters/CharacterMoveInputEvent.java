@@ -16,8 +16,8 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Timer;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Timer;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 

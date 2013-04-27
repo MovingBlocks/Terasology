@@ -28,7 +28,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.lwjgl.input.Keyboard;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;

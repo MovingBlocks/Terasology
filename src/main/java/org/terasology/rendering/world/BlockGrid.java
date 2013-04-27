@@ -16,7 +16,7 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
 import org.terasology.model.structures.BlockPosition;

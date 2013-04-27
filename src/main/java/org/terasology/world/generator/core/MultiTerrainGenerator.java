@@ -16,7 +16,7 @@
 
 package org.terasology.world.generator.core;
 
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.EPNoise;
 import org.terasology.utilities.procedural.Noise;

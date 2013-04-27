@@ -16,7 +16,7 @@
 package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.model.structures.ViewFrustum;
 
 import javax.vecmath.Vector3f;

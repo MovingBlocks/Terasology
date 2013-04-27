@@ -26,7 +26,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyEvent;

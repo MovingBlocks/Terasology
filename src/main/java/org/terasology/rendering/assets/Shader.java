@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ParamType;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;

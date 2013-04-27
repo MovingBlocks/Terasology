@@ -19,7 +19,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullEntityRef;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntitySerializer;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 
 /**
  * A wrapper around an entity id providing access to common functionality

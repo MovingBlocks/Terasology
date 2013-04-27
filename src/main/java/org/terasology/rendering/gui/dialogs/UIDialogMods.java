@@ -19,7 +19,7 @@ package org.terasology.rendering.gui.dialogs;
 import com.google.common.collect.Lists;
 import org.newdawn.slick.Color;
 import org.terasology.config.ModConfig;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;

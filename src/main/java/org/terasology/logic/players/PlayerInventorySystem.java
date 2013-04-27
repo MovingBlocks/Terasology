@@ -17,8 +17,8 @@
 package org.terasology.logic.players;
 
 import org.terasology.entitySystem.*;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Timer;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.binds.AttackButton;
 import org.terasology.input.binds.DropItemButton;
@@ -31,7 +31,6 @@ import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.cameras.Camera;

@@ -18,7 +18,7 @@ package org.terasology.world.generator.core;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;

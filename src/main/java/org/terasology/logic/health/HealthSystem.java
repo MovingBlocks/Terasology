@@ -23,7 +23,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -20,10 +20,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.game.ComponentSystemManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Timer;
-import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Timer;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.internal.NetworkSystemImpl;
 

@@ -19,7 +19,7 @@ package org.terasology.world.chunks;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.blockdata.TeraArrays;
 

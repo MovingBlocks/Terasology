@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.events.KeyEvent;

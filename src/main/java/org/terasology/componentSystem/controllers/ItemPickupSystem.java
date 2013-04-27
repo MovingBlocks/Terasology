@@ -41,7 +41,11 @@ public class ItemPickupSystem implements ComponentSystem {
 
     @ReceiveEvent(components = DroppedItemTypeComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
-        if (inventoryManager.giveItem(event.getOtherEntity(), entity)) {
+        DroppedItemTypeComponent droppedItem = entity.getComponent(DroppedItemTypeComponent.class);
+        if (inventoryManager.giveItem(event.getOtherEntity(), droppedItem.placedEntity)) {
+            droppedItem.placedEntity = EntityRef.NULL;
+            entity.saveComponent(droppedItem);
+            entity.destroy();
             event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
         }
     }

@@ -16,8 +16,8 @@
 
 package org.terasology.rendering.gui.windows.metricsScreen;
 
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Timer;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Timer;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.widgets.UILabel;

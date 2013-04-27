@@ -41,7 +41,7 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
@@ -141,9 +141,6 @@ public class MeshRenderer implements RenderSystem {
     }
 
     private void addMesh(EntityRef entity) {
-        if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
-            return;
-        }
         MeshComponent meshComp = entity.getComponent(MeshComponent.class);
         // Don't render if hidden from owner (need to improve for third person)
         if (meshComp.hideFromOwner) {

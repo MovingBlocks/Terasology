@@ -21,7 +21,7 @@ package org.terasology.logic.generators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.generator.core.ForestGenerator;

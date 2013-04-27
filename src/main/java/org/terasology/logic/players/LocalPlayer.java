@@ -19,7 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.LightComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;

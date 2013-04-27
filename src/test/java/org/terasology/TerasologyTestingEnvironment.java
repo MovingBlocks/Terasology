@@ -20,15 +20,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
-import org.lwjgl.opengl.ContextAttribs;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.utilities.NativeHelper;
@@ -36,14 +32,6 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerAuthority;
 
 import java.io.File;
-
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth

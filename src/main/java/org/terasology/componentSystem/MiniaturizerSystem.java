@@ -16,11 +16,11 @@
 package org.terasology.componentSystem;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.components.actions.MiniaturizerComponent;
+import org.terasology.logic.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;

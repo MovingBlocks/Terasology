@@ -33,7 +33,7 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.Share;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.Timer;
+import org.terasology.engine.Timer;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;

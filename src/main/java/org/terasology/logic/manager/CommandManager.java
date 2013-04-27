@@ -25,7 +25,7 @@ import groovy.lang.GroovyShell;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.commands.Command;
 import org.terasology.logic.commands.CommandParam;
 import org.terasology.logic.commands.CommandProvider;

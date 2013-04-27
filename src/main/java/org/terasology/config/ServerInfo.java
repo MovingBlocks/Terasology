@@ -16,7 +16,7 @@
 
 package org.terasology.config;
 
-import org.terasology.game.TerasologyConstants;
+import org.terasology.engine.TerasologyConstants;
 
 /**
  * @author Immortius

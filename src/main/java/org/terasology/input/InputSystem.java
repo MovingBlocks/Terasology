@@ -24,7 +24,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.In;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.input.events.InputEvent;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;

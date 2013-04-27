@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.binds.InventoryButton;

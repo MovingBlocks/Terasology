@@ -25,10 +25,10 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
-import org.terasology.game.Timer;
-import org.terasology.game.modes.StateMainMenu;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.Timer;
+import org.terasology.engine.modes.StateMainMenu;
 
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.NetMessage;

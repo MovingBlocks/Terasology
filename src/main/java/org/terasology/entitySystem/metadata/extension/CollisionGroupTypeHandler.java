@@ -18,7 +18,7 @@ package org.terasology.entitySystem.metadata.extension;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.protobuf.EntityData;

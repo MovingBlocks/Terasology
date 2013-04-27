@@ -18,7 +18,7 @@ package org.terasology.input;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 

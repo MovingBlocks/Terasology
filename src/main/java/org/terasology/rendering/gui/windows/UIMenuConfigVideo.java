@@ -17,9 +17,9 @@ package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
-import org.terasology.game.TerasologyEngine;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;

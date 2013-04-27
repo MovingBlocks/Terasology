@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.physics.RigidBodyComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.block.entity.BlockPickupComponent;

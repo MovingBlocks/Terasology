@@ -13,6 +13,7 @@
         "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
     },
     "Mesh" : {
+        "material" : "engine:droppedItem"
     },
     "Lifespan" : {
         "lifespan" : 30

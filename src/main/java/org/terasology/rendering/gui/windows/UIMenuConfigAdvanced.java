@@ -19,7 +19,7 @@ package org.terasology.rendering.gui.windows;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.config.AdvancedConfig;
-import org.terasology.game.CoreRegistry;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
