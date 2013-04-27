@@ -33,7 +33,7 @@ import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.engine.modes.GameState;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
@@ -92,6 +92,8 @@ public class TerasologyEngine implements GameEngine {
 
         logger.info("Initializing Terasology...");
         logger.info(TerasologyVersion.getInstance().toString());
+        logger.info("Homne path: {}", PathManager.getInstance().getHomePath());
+        logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
 
         initConfig();
 
@@ -235,10 +237,10 @@ public class TerasologyEngine implements GameEngine {
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "linux"));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -246,7 +248,7 @@ public class TerasologyEngine implements GameEngine {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");

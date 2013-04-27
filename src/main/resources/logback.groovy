@@ -1,5 +1,5 @@
 import static ch.qos.logback.classic.Level.*
-import org.terasology.logic.manager.PathManager
+import org.terasology.engine.paths.PathManager
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.status.OnConsoleStatusListener
 import ch.qos.logback.core.FileAppender

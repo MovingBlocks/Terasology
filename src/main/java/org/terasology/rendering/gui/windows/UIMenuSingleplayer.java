@@ -21,7 +21,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 
 import java.io.File;
 import java.io.FileFilter;

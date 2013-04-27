@@ -41,7 +41,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -218,7 +218,7 @@ public class BlockLoader {
             BufferedImage image = generateAtlas(i);
             if (i == 0) {
                 try {
-                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreensPath(), "tiles.png"));
+                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles.png"));
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
                 }

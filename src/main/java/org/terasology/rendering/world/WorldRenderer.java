@@ -30,7 +30,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Timer;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.WorldTimeEventManager;
@@ -908,7 +908,7 @@ public final class WorldRenderer {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
 
-                File file = new File(PathManager.getInstance().getScreensPath(), sdf.format(cal.getTime()) + ".png");
+                File file = new File(PathManager.getInstance().getScreenshotPath(), sdf.format(cal.getTime()) + ".png");
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
                 for (int x = 0; x < width; x++)

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.management.BlockManager;
@@ -59,13 +59,13 @@ public abstract class TerasologyTestingEnvironment {
     }
 
     public static void bindLwjgl() throws LWJGLException {
-        PathManager.getInstance().determineRootPath(true);
+        PathManager.getInstance().useOverrideHomePath(new File("unittesthome"));
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "linux"));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -73,7 +73,7 @@ public abstract class TerasologyTestingEnvironment {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
+                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");

@@ -42,7 +42,7 @@ import org.terasology.logic.console.SimpleMessageEvent;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.MessageManager;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Direction;
 import org.terasology.rendering.cameras.Camera;
@@ -264,7 +264,7 @@ public class Commands implements CommandProvider {
             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
         WorldPersister worldPersister = new WorldPersister(CoreRegistry.get(EntityManager.class));
-        worldPersister.save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
+        worldPersister.save(new File(PathManager.getInstance().getHomePath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
     }
 
     @Command(shortDescription = "Maps a key to a function")
