@@ -1,6 +1,9 @@
 package org.terasology.monitoring.impl;
 
+import java.util.Date;
+
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.chunks.ChunkState;
 import org.terasology.world.chunks.provider.ChunkProvider;
 import org.terasology.world.chunks.store.ChunkStore;
@@ -8,6 +11,8 @@ import org.terasology.world.chunks.store.ChunkStore;
 import com.google.common.base.Preconditions;
 
 public abstract class ChunkMonitorEvent {
+    
+    public final Date date = new Date();
     
     public static class ChunkProviderInitialized extends ChunkMonitorEvent {
         
@@ -30,9 +35,9 @@ public abstract class ChunkMonitorEvent {
             Preconditions.checkNotNull(provider, "The parameter 'provider' must not be null");
             this.provider = provider;
         }
-    }
+    } 
 
-    protected static class BasicChunkEvent extends ChunkMonitorEvent {
+    public static class BasicChunkEvent extends ChunkMonitorEvent {
         
         protected final Vector3i position;
         
@@ -91,6 +96,16 @@ public abstract class ChunkMonitorEvent {
             super(position);
             this.oldSize = oldSize;
             this.newSize = newSize;
+        }
+    }
+    
+    public static class Tessellated extends BasicChunkEvent {
+
+        public final ChunkMeshInfo meshInfo;
+        
+        public Tessellated(Vector3i position, ChunkMesh[] mesh) {
+            super(position);
+            this.meshInfo = new ChunkMeshInfo(mesh);
         }
     }
 }

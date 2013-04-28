@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
@@ -85,9 +86,8 @@ public final class ChunkUpdateManager {
                     for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
                         newMeshes[seg] = tessellator.generateMesh(worldView, c.getPos(), Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
                     }
-
                     c.setPendingMesh(newMeshes);
-
+                    ChunkMonitor.fireChunkTessellated(c.getPos(), newMeshes);
                 }
                 currentlyProcessedChunks.remove(c);
             }

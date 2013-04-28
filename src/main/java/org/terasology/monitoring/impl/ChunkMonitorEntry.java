@@ -17,6 +17,7 @@ public class ChunkMonitorEntry {
     
     protected final Vector3i pos;
     protected LinkedList<WeakReference<Chunk>> chunks = new LinkedList<WeakReference<Chunk>>();
+    protected LinkedList<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<ChunkMonitorEvent.BasicChunkEvent>();
     
     protected final void purge() {
         if (chunks.size() == 0) return;
@@ -49,6 +50,12 @@ public class ChunkMonitorEntry {
         purge();
         chunks.add(new WeakReference<Chunk>(value));
         if (chunks.size() > 1)
-            logger.error("Multiple chunks for position {} are registered ({})", pos, chunks.size());
+            logger.warn("Multiple chunks for position {} are registered ({})", pos, chunks.size());
+    }
+    
+    public void addEvent(ChunkMonitorEvent.BasicChunkEvent event) {
+        Preconditions.checkNotNull(event, "The parameter 'event' must not be null");
+        Preconditions.checkArgument(pos.equals(event.position), "Expected event for position {} but got position {} instead", pos, event.position);
+        events.add(event);
     }
 }
