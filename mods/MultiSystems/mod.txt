@@ -1,0 +1,6 @@
+{
+    "id" : "multisystems",
+    "displayName" : "NowNewStart's Multiplayer Systems",
+    "author" : "NowNewStart",
+    "description" : "This mod add Systems for Multiplayer, like Permissions etc."
+}

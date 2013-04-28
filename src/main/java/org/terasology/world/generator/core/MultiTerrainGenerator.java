@@ -16,14 +16,9 @@
 
 package org.terasology.world.generator.core;
 
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.EPNoise;
 import org.terasology.utilities.Noise;
-import org.terasology.utilities.WhiteNoise;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -31,6 +26,9 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+
+import javax.vecmath.Vector2f;
+import java.util.Map;
 
 /**
  * Uses multiple different methods to generate world
@@ -41,7 +39,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 	private static final int SAMPLE_RATE_3D_HOR = 4;
 	private static final int SAMPLE_RATE_3D_VERT = 4;
 
-	private Noise pGen1, pGen2, pGen3, pGen4, pGen5, pGen8;
+    private Noise pGen1, pGen2, pGen3, pGen4, pGen5, pGen8;
 	private WorldBiomeProvider biomeProvider;
 
 	private Block air = BlockManager.getInstance().getAir();
@@ -198,8 +196,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 
 	private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight,
 			Chunk c, WorldBiomeProvider.Biome type) {
-		// TODO Add more complicated layers
-		// And we need more biomes
+		// TODO Add more complicated layers and we need more biomes
 		int depth = (firstBlockHeight - y);
 
 		switch (type) {
@@ -239,7 +236,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 			break;
 
 		case DESERT:
-			if (depth > 8) {
+		if (depth > 8) {
 				// Stone
 				c.setBlock(x, y, z, stone);
 			} else {
@@ -247,8 +244,56 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 			}
 
 			break;
-		}
-	}
+            case HEIGHTLANDS:
+                if (y >= 28 && y <= 34) {
+                    c.setBlock(x, y, z, sand);
+                } else if (depth == 0 && y > 32 && y < 128) {
+                    // Grass on top
+                    c.setBlock(x, y, z, grass);
+                } else if (depth > 32) {
+                    // Stone
+                    c.setBlock(x, y, z, stone);
+                } else {
+                    if(depth <= 0 && y >= 64)
+                    {
+                    c.setBlock(x,y,z, grass);
+                    }
+                    else
+                    {
+                        if(depth <= 0 && y < 32)
+                        {
+                        //Random
+                            c.setBlock(x,y,z, stone);
+                        }
+                        else
+                        {
+                                                    // Dirt
+                            c.setBlock(x,y,z, dirt);
+                        }
+                    }
+
+                }
+         break;
+            case NEWBIOME:
+                if(y >= 28 && y <= 34) {
+                c.setBlock(x,y,z, sand);
+            } else if(depth == 0 && y > 32 && y < 128) {
+                c.setBlock(x,y,z, grass);
+            } else if(depth > 32 && depth < 64) {
+                c.setBlock(x,y,z, stone);
+            } else if(depth <= 0 & y >= 64) {
+              c.setBlock(x,y,z, grass);
+            } else if(depth >= 0 && y < 32) {
+                    c.setBlock(x,y,z, dirt);
+            } else if(depth <= 0 && y < 32) {
+                    c.setBlock(x,y,z, stone);
+                } else {
+                    c.setBlock(x,y,z, dirt);
+                }
+           break;
+        }
+        }
+
 
 	private void triLerpDensityMap(double[][][] densityMap) {
 		for (int x = 0; x < Chunk.SIZE_X; x++) {
