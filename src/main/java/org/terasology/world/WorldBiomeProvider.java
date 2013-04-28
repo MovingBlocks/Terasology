@@ -22,7 +22,7 @@ package org.terasology.world;
 public interface WorldBiomeProvider {
 
     public enum Biome {
-        MOUNTAINS(true), SNOW(false), DESERT(true), FOREST(true), PLAINS(true);
+        MOUNTAINS(true), SNOW(false), DESERT(true), FOREST(true), PLAINS(true), HEIGHTLANDS(true), NEWBIOME(true);
 
         private boolean vegetationFriendly;
 

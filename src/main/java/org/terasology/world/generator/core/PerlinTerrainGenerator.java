@@ -16,10 +16,6 @@
 
 package org.terasology.world.generator.core;
 
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
@@ -29,6 +25,9 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+
+import javax.vecmath.Vector2f;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -207,6 +206,44 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                     c.setBlock(x, y, z, sand);
                 }
 
+                break;
+            case HEIGHTLANDS:
+                if (y >= 28 && y <= 34) {
+                    c.setBlock(x, y, z, sand);
+                } else if (depth == 0 && y > 32 && y < 128) {
+                    // Grass on top
+                    c.setBlock(x, y, z, grass);
+                } else if (depth > 32) {
+                    // Stone
+                    c.setBlock(x, y, z, stone);
+                } else {
+                    if(depth <= 0 && y >= 64)
+                    {
+                        c.setBlock(x,y,z, grass);
+                    }
+                    else
+                    {
+                        // Dirt
+                        c.setBlock(x, y, z, dirt);
+                    }
+                }
+                break;
+            case NEWBIOME:
+                if(y >= 28 && y <= 34) {
+                    c.setBlock(x,y,z, sand);
+                } else if(depth == 0 && y > 32 && y < 128) {
+                    c.setBlock(x,y,z, grass);
+                } else if(depth > 32 && depth < 64) {
+                    c.setBlock(x,y,z, stone);
+                } else if(depth <= 0 & y >= 64) {
+                    c.setBlock(x,y,z, grass);
+                } else if(depth >= 0 && y < 32) {
+                    c.setBlock(x,y,z, dirt);
+                } else if(depth <= 0 && y < 32) {
+                    c.setBlock(x,y,z, stone);
+                } else {
+                    c.setBlock(x,y,z, dirt);
+                }
                 break;
         }
     }

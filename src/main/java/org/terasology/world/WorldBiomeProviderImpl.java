@@ -63,9 +63,14 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
             return Biome.SNOW;
         } else if (humidity >= 0.2 && humidity <= 0.6 && temp < 0.5) {
             return Biome.MOUNTAINS;
-        }
+        } else if(temp >= 0 && humidity <= 0.5) {
+            return Biome.HEIGHTLANDS;
+        } else if(temp >= 0 && humidity <= 0.8) {
+            return Biome.NEWBIOME;
+        } else {
 
         return Biome.FOREST;
+    }
     }
 
     @Override
