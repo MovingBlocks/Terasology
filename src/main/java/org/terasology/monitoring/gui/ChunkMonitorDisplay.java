@@ -56,6 +56,8 @@ public class ChunkMonitorDisplay extends JPanel {
     
     public static final Color ColorHighlightTessellation = Color.blue.brighter().brighter();
     
+    public static final Color ColorSelectedChunk = new Color(255, 102, 0);
+    
     public static final Color ColorDead = Color.lightGray;
     public static final Color ColorInvalid = Color.red;
     
@@ -452,6 +454,14 @@ public class ChunkMonitorDisplay extends JPanel {
             
             return ColorInvalid;
         }
+        
+        protected void renderSelectedChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos) {
+            if (pos != null) {
+                g.setColor(ColorSelectedChunk);
+                g.drawRect(pos.x * chunkSize + offsetx, pos.z * chunkSize + offsety, chunkSize - 1, chunkSize - 1);
+                g.drawRect(pos.x * chunkSize + offsetx - 1, pos.z * chunkSize + offsety - 1, chunkSize + 1, chunkSize + 1);
+            }
+        }
 
         protected void renderBox(Graphics2D g, int offsetx, int offsety, Rectangle box) {
             g.setColor(Color.white);
@@ -473,10 +483,6 @@ public class ChunkMonitorDisplay extends JPanel {
         protected void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
             g.setColor(calcChunkColor(entry));
             g.fillRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
-            if (selectedChunk != null && selectedChunk.equals(pos)) {
-                g.setColor(Color.white);
-                g.drawRect(pos.x * chunkSize + offsetx, pos.z * chunkSize + offsety, chunkSize - 1, chunkSize - 1);
-            }
         }
         
         protected void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunks) {
@@ -484,6 +490,7 @@ public class ChunkMonitorDisplay extends JPanel {
             renderBackground(g, width, height);
             renderChunks(g, offsetx, offsety, chunks);
             renderBox(g, offsetx, offsety, box);
+            renderSelectedChunk(g, offsetx, offsety, selectedChunk);
         }
         
         protected void render() {
@@ -535,6 +542,8 @@ public class ChunkMonitorDisplay extends JPanel {
                     
                     final long slept = poll(requests);
                     boolean needsRendering = false, fastResume = false;
+                    
+                    monitor.increment(2);
                     
                     for (Request r : requests) 
                         try {
