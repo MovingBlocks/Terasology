@@ -16,11 +16,14 @@
 
 package org.terasology.engine.paths;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.lwjgl.LWJGLUtil;
 import org.terasology.engine.paths.windows.SavedGamesPathFinder;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -37,7 +40,10 @@ public final class PathManager {
     private File homePath;
     private File worldPath;
     private File logPath;
-    private File modPath;
+    private File homeModPath;
+    private File installModPath;
+
+    private ImmutableList<File> modPaths = ImmutableList.of();
     private File screenshotPath;
     private File nativesPath;
 
@@ -106,8 +112,8 @@ public final class PathManager {
         return logPath;
     }
 
-    public File getModPath() {
-        return modPath;
+    public List<File> getModPaths() {
+        return modPaths;
     }
 
     public File getScreenshotPath() {
@@ -124,10 +130,21 @@ public final class PathManager {
         worldPath.mkdirs();
         logPath = new File(homePath, LOG_DIR);
         logPath.mkdirs();
-        modPath = new File(homePath, MOD_DIR);
-        modPath.mkdirs();
+        homeModPath = new File(homePath, MOD_DIR);
+        homeModPath.mkdirs();
+        installModPath = new File(installPath, MOD_DIR);
+        installModPath.mkdirs();
+        if (homeModPath.equals(installModPath)) {
+            modPaths = ImmutableList.of(homeModPath);
+        } else {
+            modPaths = ImmutableList.of(homeModPath, installModPath);
+        }
         screenshotPath = new File(homePath, SCREENSHOT_DIR);
         screenshotPath.mkdirs();
         nativesPath = new File(installPath, NATIVES_DIR);
+    }
+
+    public File getHomeModPath() {
+        return modPaths.get(0);
     }
 }
