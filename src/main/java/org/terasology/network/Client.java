@@ -28,6 +28,8 @@ public interface Client extends ChunkRegionListener {
 
     String getName();
 
+    String getId();
+
     void disconnect();
 
     void update(boolean netTick);

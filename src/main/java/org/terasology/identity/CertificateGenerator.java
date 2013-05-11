@@ -1,0 +1,93 @@
+package org.terasology.identity;
+
+import java.math.BigInteger;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
+import java.util.UUID;
+
+/**
+ *
+ */
+public class CertificateGenerator {
+    private static final int KEY_SIZE = 2048;
+    private KeyPairGenerator keyPairGenerator;
+    private KeyFactory keyFactory;
+    private Signature signer;
+
+    public CertificateGenerator() {
+        try {
+            keyPairGenerator = KeyPairGenerator.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
+            keyFactory = KeyFactory.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
+            signer = Signature.getInstance(IdentityConstants.SIGNATURE_ALGORITHM);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+        }
+    }
+
+    public CertificatePair generateSelfSigned() {
+        keyPairGenerator.initialize(KEY_SIZE);
+        KeyPair kp = keyPairGenerator.genKeyPair();
+
+        try {
+            RSAPublicKeySpec pub = keyFactory.getKeySpec(kp.getPublic(), RSAPublicKeySpec.class);
+            RSAPrivateKeySpec priv = keyFactory.getKeySpec(kp.getPrivate(), RSAPrivateKeySpec.class);
+            String uuid = UUID.randomUUID().toString();
+            signer.initSign(kp.getPrivate(), new SecureRandom());
+            signer.update(uuid.getBytes());
+            signer.update(pub.getModulus().toByteArray());
+            signer.update(pub.getPublicExponent().toByteArray());
+            byte[] rawSig = signer.sign();
+            BigInteger signature = new BigInteger(rawSig);
+
+            PublicIdentityCertificate publicCert = new PublicIdentityCertificate(uuid, pub.getModulus(), pub.getPublicExponent(), signature);
+            PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(priv.getModulus(), priv.getPrivateExponent());
+            return new CertificatePair(publicCert, privateCert);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException("Unexpected exception generating certificate", e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException("Unexpected exception generating certificate", e);
+        } catch (SignatureException e) {
+            throw new RuntimeException("Unexpected exception generating certificate", e);
+        }
+    }
+
+    /**
+     * Generates a certificate signed by the given signer
+     * @param signingCertificate
+     * @return
+     */
+    public CertificatePair generate(PrivateIdentityCertificate signingCertificate) {
+        keyPairGenerator.initialize(KEY_SIZE);
+        KeyPair kp = keyPairGenerator.genKeyPair();
+
+        RSAPrivateKeySpec signingRSAKey = new RSAPrivateKeySpec(signingCertificate.getModulus(), signingCertificate.getExponent());
+
+        try {
+            PrivateKey signingKey = keyFactory.generatePrivate(signingRSAKey);
+
+            RSAPublicKeySpec pub = keyFactory.getKeySpec(kp.getPublic(), RSAPublicKeySpec.class);
+            RSAPrivateKeySpec priv = keyFactory.getKeySpec(kp.getPrivate(), RSAPrivateKeySpec.class);
+
+            String uuid = UUID.randomUUID().toString();
+            signer.initSign(signingKey, new SecureRandom());
+            signer.update(uuid.getBytes());
+            signer.update(pub.getModulus().toByteArray());
+            signer.update(pub.getPublicExponent().toByteArray());
+            byte[] rawSig = signer.sign();
+            BigInteger signature = new BigInteger(rawSig);
+
+            PublicIdentityCertificate publicCert = new PublicIdentityCertificate(uuid, pub.getModulus(), pub.getPublicExponent(), signature);
+            PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(priv.getModulus(), priv.getPrivateExponent());
+            return new CertificatePair(publicCert, privateCert);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException("Unexpected exception generating certificate", e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException("Unexpected exception generating certificate", e);
+        } catch (SignatureException e) {
+            throw new RuntimeException("Unexpected exception generating certificate", e);
+        }
+    }
+}

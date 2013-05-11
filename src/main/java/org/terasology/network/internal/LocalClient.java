@@ -55,6 +55,11 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
+    public String getId() {
+        return "local";
+    }
+
+    @Override
     public void disconnect() {
 
     }

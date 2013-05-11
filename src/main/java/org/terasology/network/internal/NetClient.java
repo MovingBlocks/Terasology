@@ -47,7 +47,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.MetricRecordingHandler;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkUtil;
@@ -107,6 +106,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private float chunkSendRate = 0.05469f;
 
+    private String id;
+
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
@@ -148,6 +149,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             }
         }
         return name;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public void setName(String name) {

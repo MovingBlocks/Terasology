@@ -22,6 +22,53 @@ message NetMessage {
     optional ServerInfoMessage serverInfo = 16;
     repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
 
+    optional HandshakeHello handshakeHello = 100;
+    optional NewIdentityRequest newIdentityRequest = 101;
+    optional ProvisionIdentity provisionIdentity = 102;
+    optional HandshakeVerification handshakeVerification = 103;
+
+    extensions 5000 to max;
+}
+
+message HandshakeHello {
+    optional bytes random = 1;
+    optional Certificate certificate = 2;
+
+    extensions 5000 to max;
+}
+
+message NewIdentityRequest {
+    optional bytes preMasterSecret = 1;
+    optional bytes random = 2;
+
+    extensions 5000 to max;
+}
+
+message ProvisionIdentity {
+    optional bytes encryptedCertificates = 1;
+
+    extensions 5000 to max;
+}
+
+message CertificateSet {
+    optional Certificate publicCertificate = 1;
+    optional bytes privateExponent = 2;
+
+    extensions 5000 to max;
+}
+
+message HandshakeVerification {
+    optional bytes encryptedVerificationSignature = 1;
+
+    extensions 5000 to max;
+}
+
+message Certificate {
+    optional string id = 1;
+    optional bytes modulus = 2;
+    optional bytes exponent = 3;
+    optional bytes signature = 4;
+
     extensions 5000 to max;
 }
 

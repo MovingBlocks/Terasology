@@ -116,14 +116,10 @@ public class EventSerializer {
         ByteString.Output fieldIds = ByteString.newOutput();
         for (FieldMetadata field : eventMetadata.iterateFields()) {
             if (field.isReplicated()) {
-                try {
-                    EntityData.Value serializedValue = field.serialize(event);
-                    if (serializedValue != null) {
-                        eventData.addFieldValue(serializedValue);
-                        fieldIds.write(field.getId());
-                    }
-                } catch (IOException e) {
-                    logger.error("Exception during serializing of {}", event.getClass(), e);
+                EntityData.Value serializedValue = field.serialize(event);
+                if (serializedValue != null) {
+                    eventData.addFieldValue(serializedValue);
+                    fieldIds.write(field.getId());
                 }
             }
         }

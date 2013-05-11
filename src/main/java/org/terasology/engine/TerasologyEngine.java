@@ -32,8 +32,10 @@ import org.terasology.audio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.engine.modes.GameState;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.identity.CertificateGenerator;
+import org.terasology.identity.CertificatePair;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
@@ -53,13 +55,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Immortius
@@ -92,7 +88,7 @@ public class TerasologyEngine implements GameEngine {
 
         logger.info("Initializing Terasology...");
         logger.info(TerasologyVersion.getInstance().toString());
-        logger.info("Homne path: {}", PathManager.getInstance().getHomePath());
+        logger.info("Home path: {}", PathManager.getInstance().getHomePath());
         logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
 
         initConfig();
@@ -130,6 +126,11 @@ public class TerasologyEngine implements GameEngine {
             config = new Config();
         }
         config.getDefaultModSelection().addMod("core");
+        if (config.getSecurity().getServerPrivateCertificate() == null) {
+            CertificateGenerator generator = new CertificateGenerator();
+            CertificatePair serverIdentity = generator.generateSelfSigned();
+            config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
+        }
         CoreRegistry.put(Config.class, config);
     }
 

@@ -60,7 +60,9 @@ public final class Config {
     private ModConfig defaultModSelection = new ModConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
     private NetworkConfig network = new NetworkConfig();
+    private SecurityConfig security = new SecurityConfig();
     private AdvancedConfig advanced = AdvancedConfig.createDefault();
+
 
     /**
      * Create a new, empty config
@@ -107,6 +109,10 @@ public final class Config {
         return worldGeneration;
     }
 
+    public SecurityConfig getSecurity() {
+        return security;
+    }
+
     /**
      * Saves this config to the default configuration file
      */
@@ -135,13 +141,7 @@ public final class Config {
     public static void save(File toFile, Config config) throws IOException {
         FileWriter writer = new FileWriter(toFile);
         try {
-            new GsonBuilder()
-                    .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
-                    .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
-                    .registerTypeAdapter(Input.class, new InputHandler())
-                    .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
-                    .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
-                    .setPrettyPrinting().create().toJson(config, writer);
+            createGson().toJson(config, writer);
         } finally {
             // JAVA7: better closing support
             writer.close();
@@ -158,13 +158,7 @@ public final class Config {
     public static Config load(File fromFile) throws IOException {
         FileReader reader = new FileReader(fromFile);
         try {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
-                    .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
-                    .registerTypeAdapter(Input.class, new InputHandler())
-                    .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
-                    .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
-                    .create();
+            Gson gson = createGson();
             JsonElement baseConfig = gson.toJsonTree(new Config());
             JsonParser parser = new JsonParser();
             JsonElement config = parser.parse(reader);
@@ -177,6 +171,17 @@ public final class Config {
         } finally {
             reader.close();
         }
+    }
+
+    private static Gson createGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
+                .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
+                .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
+                .registerTypeAdapter(Input.class, new InputHandler())
+                .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
+                .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
+                .setPrettyPrinting().create();
     }
 
     private static void merge(JsonObject target, JsonObject from) {

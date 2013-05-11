@@ -39,7 +39,6 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Timer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.network.MetricRecordingHandler;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkUtil;

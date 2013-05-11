@@ -23,6 +23,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.identity.PublicIdentityCertificate;
 
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.NetMessage;
@@ -46,13 +47,14 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        client = new NetClient(e.getChannel(), networkSystem);
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        if (client != null) {
+            networkSystem.removeClient(client);
+        }
     }
 
-    @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        networkSystem.removeClient(client);
+    public void channelAuthenticated(PublicIdentityCertificate identity, ChannelHandlerContext ctx) {
+        client = new NetClient(ctx.getChannel(), networkSystem);
     }
 
     @Override

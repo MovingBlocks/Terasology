@@ -110,12 +110,12 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
     compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2.2'
-    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.4.1'
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
     compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
     compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.9.0'
     compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.9.0'
-    compile group: 'io.netty', name: 'netty', version: '3.5.11.Final'
+    compile group: 'io.netty', name: 'netty', version: '3.6.5.Final'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.8'
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
 	compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
@@ -474,7 +474,7 @@ idea {
     module.excludeDirs += file('logs') 
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
-    module.excludeDirs += file('SAVED_WORLDS')
-    module.excludeDirs += file('screens')
+    module.excludeDirs += file('worlds')
+    module.excludeDirs += file('screenshots')
 }
     

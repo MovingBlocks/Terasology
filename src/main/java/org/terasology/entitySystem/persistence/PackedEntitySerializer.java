@@ -144,31 +144,27 @@ public class PackedEntitySerializer {
             return;
         }
 
-        try {
-            byte fieldCount = 0;
-            for (FieldMetadata field : componentMetadata.iterateFields()) {
-                if (fieldCheck.shouldSerializeField(field, newComponent)) {
-                    Object oldValue = field.getValue(oldComponent);
-                    Object newValue = field.getValue(newComponent);
-                    if (!Objects.equal(oldValue, newValue)) {
-                        EntityData.Value fieldValue = field.serializeValue(newValue);
-                        if (fieldValue != null) {
-                            entityFieldIds.write(field.getId());
-                            entityData.addFieldValue(fieldValue);
-                            fieldCount++;
-                        } else {
-                            logger.error("Exception serializing component type: {}, field: {} - returned null", componentMetadata, field);
-                        }
+        byte fieldCount = 0;
+        for (FieldMetadata field : componentMetadata.iterateFields()) {
+            if (fieldCheck.shouldSerializeField(field, newComponent)) {
+                Object oldValue = field.getValue(oldComponent);
+                Object newValue = field.getValue(newComponent);
+                if (!Objects.equal(oldValue, newValue)) {
+                    EntityData.Value fieldValue = field.serializeValue(newValue);
+                    if (fieldValue != null) {
+                        entityFieldIds.write(field.getId());
+                        entityData.addFieldValue(fieldValue);
+                        fieldCount++;
+                    } else {
+                        logger.error("Exception serializing component type: {}, field: {} - returned null", componentMetadata, field);
                     }
                 }
             }
+        }
 
-            if (fieldCount > 0) {
-                entityData.addComponentId(idTable.get(newComponent.getClass()));
-                componentFieldCounts.write(fieldCount);
-            }
-        } catch (IOException e) {
-            logger.error("Failed to serialize component {}", componentMetadata, e);
+        if (fieldCount > 0) {
+            entityData.addComponentId(idTable.get(newComponent.getClass()));
+            componentFieldCounts.write(fieldCount);
         }
     }
 
@@ -178,27 +174,23 @@ public class PackedEntitySerializer {
             logger.error("Unregistered component type: {}", component.getClass());
         }
 
-        try {
-            byte fieldCount = 0;
-            for (FieldMetadata field : componentMetadata.iterateFields()) {
-                if (fieldCheck.shouldSerializeField(field, component)) {
-                    EntityData.Value fieldValue = field.serialize(component);
-                    if (fieldValue != null) {
+        byte fieldCount = 0;
+        for (FieldMetadata field : componentMetadata.iterateFields()) {
+            if (fieldCheck.shouldSerializeField(field, component)) {
+                EntityData.Value fieldValue = field.serialize(component);
+                if (fieldValue != null) {
 
-                        entityFieldIds.write(field.getId());
+                    entityFieldIds.write(field.getId());
 
-                        entityData.addFieldValue(fieldValue);
-                        fieldCount++;
-                    }
+                    entityData.addFieldValue(fieldValue);
+                    fieldCount++;
                 }
             }
+        }
 
-            if (fieldCount != 0 || !ignoreIfNoFields) {
-                entityData.addComponentId(idTable.get(component.getClass()));
-                componentFieldCounts.write(fieldCount);
-            }
-        } catch (IOException e) {
-            logger.error("Failed to serialize component {}", componentMetadata, e);
+        if (fieldCount != 0 || !ignoreIfNoFields) {
+            entityData.addComponentId(idTable.get(component.getClass()));
+            componentFieldCounts.write(fieldCount);
         }
     }
 

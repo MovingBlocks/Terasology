@@ -22,9 +22,7 @@ import org.terasology.engine.paths.PathManager;
 import java.io.File;
 
 /**
- * The heart and soul of Terasology.
- * <p/>
- * TODO: Create a function returns the number of generated worlds
+ * Main method for launching Terasology
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Kireev   Anton   <adeon.k87@gmail.com>

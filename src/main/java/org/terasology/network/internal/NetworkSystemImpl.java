@@ -697,13 +697,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     .setId(eventMapping.getValue())
                     .setName(metadata.getName());
             for (FieldMetadata field : metadata.iterateFields()) {
-                try {
-                    fieldIds.write(field.getId());
-                    info.addFieldName(field.getName());
-                } catch (IOException e) {
-                    // TODO: Disconnect client and fail more gracefully
-                    throw new RuntimeException("Failed writing field id " + field.getId() + " for field " + field.getName());
-                }
+                fieldIds.write(field.getId());
+                info.addFieldName(field.getName());
             }
             info.setFieldIds(fieldIds.toByteString());
             serverInfoMessageBuilder.addEvent(info);
@@ -719,13 +714,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     .setId(componentIdMapping.getValue())
                     .setName(metadata.getName());
             for (FieldMetadata field : metadata.iterateFields()) {
-                try {
-                    fieldIds.write(field.getId());
-                    info.addFieldName(field.getName());
-                } catch (IOException e) {
-                    // TODO: Disconnect client and fail more gracefully
-                    throw new RuntimeException("Failed writing field id " + field.getId() + " for field " + field.getName());
-                }
+                fieldIds.write(field.getId());
+                info.addFieldName(field.getName());
             }
             info.setFieldIds(fieldIds.toByteString());
             serverInfoMessageBuilder.addComponent(info);

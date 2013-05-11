@@ -50,7 +50,7 @@ public class JoinServer implements LoadProcess {
 
     @Override
     public boolean step() {
-        if (networkSystem.getServer().getInfo() != null) {
+        if (networkSystem.getServer() != null && networkSystem.getServer().getInfo() != null) {
             NetData.ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             worldInfo.setTitle(serverInfo.getWorldName());
 

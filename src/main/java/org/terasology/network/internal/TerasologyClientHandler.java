@@ -50,18 +50,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        this.server = new Server(networkSystem, e.getChannel());
-        networkSystem.setServer(server);
-        Config config = CoreRegistry.get(Config.class);
-        e.getChannel().write(NetMessage.newBuilder()
-                .setClientConnect(ClientConnectMessage.newBuilder()
-                        .setName(config.getPlayer().getName())
-                        .setViewDistanceLevel(config.getRendering().getActiveViewDistanceMode())
-                ).build());
-    }
-
-    @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Disconnected From Server"));
     }
@@ -87,5 +75,16 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             awaitingServerInfo = false;
             server.setServerInfo(message);
         }
+    }
+
+    public void channelAuthenticated(ChannelHandlerContext ctx) {
+        this.server = new Server(networkSystem, ctx.getChannel());
+        networkSystem.setServer(server);
+        Config config = CoreRegistry.get(Config.class);
+        ctx.getChannel().write(NetMessage.newBuilder()
+                .setClientConnect(ClientConnectMessage.newBuilder()
+                        .setName(config.getPlayer().getName())
+                        .setViewDistanceLevel(config.getRendering().getActiveViewDistanceMode())
+                ).build());
     }
 }
