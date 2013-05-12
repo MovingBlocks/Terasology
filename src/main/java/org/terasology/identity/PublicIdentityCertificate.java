@@ -133,4 +133,31 @@ public class PublicIdentityCertificate {
             return false;
         }
     }
+
+    /**
+     * Verifies that the signature was created by this certificate's corresponding private certificate, over the
+     * given data.
+     * @param data
+     * @param signature
+     * @return
+     */
+    public boolean verify(byte[] data, byte[] signature) {
+        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, exponent);
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
+            PublicKey key = keyFactory.generatePublic(keySpec);
+            Signature signatureVerifier = Signature.getInstance(IdentityConstants.SIGNATURE_ALGORITHM);
+            signatureVerifier.initVerify(key);
+            signatureVerifier.update(data);
+            return signatureVerifier.verify(signature);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+        } catch (InvalidKeySpecException e) {
+            return false;
+        } catch (SignatureException e) {
+            return false;
+        } catch (InvalidKeyException e) {
+            return false;
+        }
+    }
 }

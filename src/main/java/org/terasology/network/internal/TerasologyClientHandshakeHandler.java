@@ -39,7 +39,9 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
     private byte[] serverRandom;
     private byte[] clientRandom;
     private byte[] masterSecret;
-    private boolean receivedServerHello = false;
+    private NetData.HandshakeHello serverHello;
+    private NetData.HandshakeHello clientHello;
+
     private boolean requestedCertificate = false;
     private ClientIdentity identity = null;
     private PublicIdentityCertificate serverCertificate = null;
@@ -54,20 +56,35 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
         if (message.hasHandshakeHello()) {
-            processServerHello(message.getHandshakeHello(), e.getChannel());
+            processServerHello(message.getHandshakeHello(), ctx);
         } else if (message.hasProvisionIdentity()) {
             processNewIdentity(message.getProvisionIdentity(), ctx);
+        } else if (message.hasHandshakeVerification()) {
+            processHandshakeVerification(message.getHandshakeVerification(), ctx);
         }
     }
 
-    private void processNewIdentity(NetData.ProvisionIdentity provisionIdentity, ChannelHandlerContext ctx) {
-        logger.info("Received identity from server");
-        if (!receivedServerHello) {
-            logger.error("Received identity without receiving server hello: cancelling authentication");
+    private void processHandshakeVerification(NetData.HandshakeVerification handshakeVerification, ChannelHandlerContext ctx) {
+        logger.info("Received server verification");
+        if (serverHello == null || clientHello == null) {
+            logger.error("Received server verification without requesting it: cancelling authentication");
             ctx.getChannel().close();
             return;
         }
 
+        if (!serverCertificate.verify(Bytes.concat(serverHello.toByteArray(), clientHello.toByteArray()), handshakeVerification.getSignature().toByteArray())) {
+            logger.error("Server failed verification: cancelling authentication");
+            ctx.getChannel().close();
+            return;
+        }
+
+        // And we're authenticated.
+        ctx.getPipeline().remove(this);
+        clientHandler.channelAuthenticated(ctx);
+    }
+
+    private void processNewIdentity(NetData.ProvisionIdentity provisionIdentity, ChannelHandlerContext ctx) {
+        logger.info("Received identity from server");
         if (!requestedCertificate) {
             logger.error("Received identity without requesting it: cancelling authentication");
             ctx.getChannel().close();
@@ -90,11 +107,7 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
             NetData.CertificateSet certificateSet = NetData.CertificateSet.parseFrom(decryptedCert);
             NetData.Certificate publicCertData = certificateSet.getPublicCertificate();
 
-            PublicIdentityCertificate publicCert = new PublicIdentityCertificate(
-                    publicCertData.getId(),
-                    new BigInteger(publicCertData.getModulus().toByteArray()),
-                    new BigInteger(publicCertData.getExponent().toByteArray()),
-                    new BigInteger(publicCertData.getSignature().toByteArray()));
+            PublicIdentityCertificate publicCert = NetMessageUtil.convert(publicCertData);
 
             if (!publicCert.verifySignedBy(serverCertificate)) {
                 logger.error("Received invalid certificate, not signed by server: cancelling authentication");
@@ -119,49 +132,72 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
         }
     }
 
-    private void processServerHello(NetData.HandshakeHello helloMessage, Channel channel) {
-        if (!receivedServerHello) {
+    private void processServerHello(NetData.HandshakeHello helloMessage, ChannelHandlerContext ctx) {
+        if (serverHello == null) {
             logger.info("Received Server Hello");
-            receivedServerHello = true;
+            serverHello = helloMessage;
             serverRandom = helloMessage.getRandom().toByteArray();
             NetData.Certificate cert = helloMessage.getCertificate();
-            serverCertificate = new PublicIdentityCertificate(
-                    cert.getId(),
-                    new BigInteger(cert.getModulus().toByteArray()),
-                    new BigInteger(cert.getExponent().toByteArray()),
-                    new BigInteger(cert.getSignature().toByteArray()));
+            serverCertificate = NetMessageUtil.convert(cert);
 
             if (!serverCertificate.verifySelfSigned()) {
                 logger.error("Received invalid server certificate: cancelling authentication");
-                channel.close();
+                ctx.getChannel().close();
                 return;
             }
 
+            clientRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
+
             identity = config.getSecurity().getIdentity(serverCertificate);
             if (identity == null) {
-
-                logger.info("No existing identity, requesting one");
-
-                byte[] preMasterSecret = new byte[IdentityConstants.PREMASTER_SECRET_LENGTH];
-                new SecureRandom().nextBytes(preMasterSecret);
-                byte[] encryptedPreMasterSecret = serverCertificate.encrypt(preMasterSecret);
-                clientRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
-                masterSecret = SecretGenerator.generate(preMasterSecret, SecretGenerator.MASTER_SECRET_LABEL, Bytes.concat(clientRandom, serverRandom), SecretGenerator.MASTER_SECRET_LENGTH);
-
-                channel.write(NetData.NetMessage.newBuilder()
-                        .setNewIdentityRequest(NetData.NewIdentityRequest.newBuilder()
-                                .setPreMasterSecret(ByteString.copyFrom(encryptedPreMasterSecret))
-                                .setRandom(ByteString.copyFrom(clientRandom))
-                        ).build());
-                requestedCertificate = true;
+                requestIdentity(ctx);
+            } else {
+                sendCertificate(helloMessage, ctx);
             }
 
         } else {
             logger.error("Received multiple hello messages from server: cancelling authentication");
-            channel.close();
+            ctx.getChannel().close();
             // TODO: Ensure authentication failed error is displayed to client
         }
 
+    }
+
+    private void sendCertificate(NetData.HandshakeHello helloMessage, ChannelHandlerContext ctx) {
+        logger.info("Sending client certificate");
+        PublicIdentityCertificate pubClientCert = identity.getPlayerPublicCertificate();
+
+        clientHello = NetData.HandshakeHello.newBuilder()
+                .setRandom(ByteString.copyFrom(clientRandom))
+                .setCertificate(NetMessageUtil.convert(pubClientCert))
+                .setTimestamp(System.currentTimeMillis())
+                .build();
+
+        byte[] dataToSign = Bytes.concat(helloMessage.toByteArray(), clientHello.toByteArray());
+        byte[] signature = identity.getPlayerPrivateCertificate().sign(dataToSign);
+
+        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+                .setHandshakeHello(clientHello)
+                .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
+                        .setSignature(ByteString.copyFrom(signature)))
+                .build());
+    }
+
+    private void requestIdentity(ChannelHandlerContext ctx) {
+        logger.info("No existing identity, requesting one");
+
+        byte[] preMasterSecret = new byte[IdentityConstants.PREMASTER_SECRET_LENGTH];
+        new SecureRandom().nextBytes(preMasterSecret);
+        byte[] encryptedPreMasterSecret = serverCertificate.encrypt(preMasterSecret);
+
+        masterSecret = SecretGenerator.generate(preMasterSecret, SecretGenerator.MASTER_SECRET_LABEL, Bytes.concat(clientRandom, serverRandom), SecretGenerator.MASTER_SECRET_LENGTH);
+
+        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+                .setNewIdentityRequest(NetData.NewIdentityRequest.newBuilder()
+                        .setPreMasterSecret(ByteString.copyFrom(encryptedPreMasterSecret))
+                        .setRandom(ByteString.copyFrom(clientRandom))
+                ).build());
+        requestedCertificate = true;
     }
 
 

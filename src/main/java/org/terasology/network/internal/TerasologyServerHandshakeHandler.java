@@ -31,9 +31,10 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
     private Config config = CoreRegistry.get(Config.class);
     private TerasologyServerHandler serverHandler;
     private byte[] serverRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
+    private NetData.HandshakeHello serverHello;
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception{
+    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
         serverHandler = ctx.getPipeline().get(TerasologyServerHandler.class);
     }
@@ -45,15 +46,14 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
         PublicIdentityCertificate serverPublicCert = config.getSecurity().getServerPublicCertificate();
         new SecureRandom().nextBytes(serverRandom);
 
+        serverHello = NetData.HandshakeHello.newBuilder()
+                .setRandom(ByteString.copyFrom(serverRandom))
+                .setCertificate(NetMessageUtil.convert(serverPublicCert))
+                .setTimestamp(System.currentTimeMillis())
+                .build();
+
         e.getChannel().write(NetData.NetMessage.newBuilder()
-                .setHandshakeHello(NetData.HandshakeHello.newBuilder()
-                        .setRandom(ByteString.copyFrom(serverRandom))
-                        .setCertificate(NetData.Certificate.newBuilder()
-                                .setId(serverPublicCert.getId())
-                                .setModulus(ByteString.copyFrom(serverPublicCert.getModulus().toByteArray()))
-                                .setExponent(ByteString.copyFrom(serverPublicCert.getExponent().toByteArray()))
-                                .setSignature(ByteString.copyFrom(serverPublicCert.getSignature().toByteArray()))
-                        ))
+                .setHandshakeHello(serverHello)
                 .build());
     }
 
@@ -62,7 +62,38 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
         if (message.hasNewIdentityRequest()) {
             processNewIdentityRequest(message.getNewIdentityRequest(), ctx);
+        } else if (message.hasHandshakeHello() && message.hasHandshakeVerification()) {
+            processClientHandshake(message.getHandshakeHello(), message.getHandshakeVerification(), ctx);
         }
+    }
+
+    private void processClientHandshake(NetData.HandshakeHello clientHello, NetData.HandshakeVerification handshakeVerification, ChannelHandlerContext ctx) {
+        logger.info("Received client certificate");
+        PublicIdentityCertificate clientCert = NetMessageUtil.convert(clientHello.getCertificate());
+
+        if (!clientCert.verifySignedBy(config.getSecurity().getServerPublicCertificate())) {
+            logger.error("Received invalid client certificate, ending connection attempt");
+            ctx.getChannel().close();
+            return;
+        }
+
+        byte[] clientSignature = handshakeVerification.getSignature().toByteArray();
+        if (!clientCert.verify(Bytes.concat(serverHello.toByteArray(), clientHello.toByteArray()), clientSignature)) {
+            logger.error("Received invalid verification signature, ending connection attempt");
+            ctx.getChannel().close();
+            return;
+        }
+
+        logger.info("Sending server verification");
+        byte[] dataToSign = Bytes.concat(serverHello.toByteArray(), clientHello.toByteArray());
+        byte[] serverSignature = config.getSecurity().getServerPrivateCertificate().sign(dataToSign);
+        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+            .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
+                .setSignature(ByteString.copyFrom(serverSignature))).build());
+
+        // Identity has been established, inform the server handler and withdraw from the pipeline
+        ctx.getPipeline().remove(this);
+        serverHandler.channelAuthenticated(clientCert, ctx);
     }
 
     private void processNewIdentityRequest(NetData.NewIdentityRequest newIdentityRequest, ChannelHandlerContext ctx) {
@@ -75,18 +106,12 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
             CertificatePair clientCertificates = new CertificateGenerator().generate(config.getSecurity().getServerPrivateCertificate());
 
             NetData.CertificateSet certificateData = NetData.CertificateSet.newBuilder()
-                    .setPublicCertificate(NetData.Certificate.newBuilder()
-                            .setId(clientCertificates.getPublicCert().getId())
-                            .setModulus(ByteString.copyFrom(clientCertificates.getPublicCert().getModulus().toByteArray()))
-                            .setExponent(ByteString.copyFrom(clientCertificates.getPublicCert().getExponent().toByteArray()))
-                            .setSignature(ByteString.copyFrom(clientCertificates.getPublicCert().getSignature().toByteArray())))
+                    .setPublicCertificate(NetMessageUtil.convert(clientCertificates.getPublicCert()))
                     .setPrivateExponent(ByteString.copyFrom(clientCertificates.getPrivateCert().getExponent().toByteArray()))
                     .build();
 
             byte[] encryptedCert = null;
             try {
-
-
                 SecretKeySpec key = new SecretKeySpec(SecretGenerator.generate(masterSecret, SecretGenerator.KEY_EXPANSION, Bytes.concat(newIdentityRequest.getRandom().toByteArray(), serverRandom), IdentityConstants.SYMMETRIC_ENCRYPTION_KEY_LENGTH), IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
                 Cipher cipher = Cipher.getInstance(IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
                 cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -109,7 +134,5 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
             logger.error("Received invalid encrypted pre-master secret, ending connection attempt");
             ctx.getChannel().close();
         }
-
-
     }
 }

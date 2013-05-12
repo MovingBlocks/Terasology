@@ -33,6 +33,7 @@ message NetMessage {
 message HandshakeHello {
     optional bytes random = 1;
     optional Certificate certificate = 2;
+    optional sint64 timestamp = 3;
 
     extensions 5000 to max;
 }
@@ -58,7 +59,7 @@ message CertificateSet {
 }
 
 message HandshakeVerification {
-    optional bytes encryptedVerificationSignature = 1;
+    optional bytes signature = 1;
 
     extensions 5000 to max;
 }

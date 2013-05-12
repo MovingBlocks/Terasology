@@ -45,11 +45,7 @@ import org.terasology.engine.Timer;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.NetMetricSource;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkUtil;
+import org.terasology.network.*;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
@@ -237,7 +233,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             Vector3i pos = i.next();
             i.remove();
             relevantChunks.remove(pos);
-            message.addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().setPos(NetworkUtil.convert(pos)));
+            message.addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().setPos(NetMessageUtil.convert(pos)));
         }
         invalidatedChunks.clear();
     }
@@ -304,7 +300,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         if (blockComp != null) {
             if (relevantChunks.contains(TeraMath.calcChunkPos(blockComp.getPosition()))) {
                 queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setTargetBlockPos(NetworkUtil.convert(blockComp.getPosition()))
+                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
                         .setEvent(eventSerializer.serialize(event)).build());
             }
         } else {
@@ -362,7 +358,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         Vector3i chunkPos = TeraMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
-                    .setPos(NetworkUtil.convert(pos))
+                    .setPos(NetMessageUtil.convert(pos))
                     .setNewBlock(newBlock.getId())
                     .build());
         }
@@ -446,7 +442,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {
-                createMessage.setBlockPos(NetworkUtil.convert(blockComponent.getPosition()));
+                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
             }
             message.addCreateEntity(createMessage);
         }

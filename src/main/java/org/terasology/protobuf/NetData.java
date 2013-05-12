@@ -4662,6 +4662,16 @@ public final class NetData {
      * <code>optional .Certificate certificate = 2;</code>
      */
     org.terasology.protobuf.NetData.CertificateOrBuilder getCertificateOrBuilder();
+
+    // optional sint64 timestamp = 3;
+    /**
+     * <code>optional sint64 timestamp = 3;</code>
+     */
+    boolean hasTimestamp();
+    /**
+     * <code>optional sint64 timestamp = 3;</code>
+     */
+    long getTimestamp();
   }
   /**
    * Protobuf type {@code HandshakeHello}
@@ -4730,6 +4740,11 @@ public final class NetData {
                 certificate_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000002;
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              timestamp_ = input.readSInt64();
               break;
             }
           }
@@ -4810,9 +4825,26 @@ public final class NetData {
       return certificate_;
     }
 
+    // optional sint64 timestamp = 3;
+    public static final int TIMESTAMP_FIELD_NUMBER = 3;
+    private long timestamp_;
+    /**
+     * <code>optional sint64 timestamp = 3;</code>
+     */
+    public boolean hasTimestamp() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional sint64 timestamp = 3;</code>
+     */
+    public long getTimestamp() {
+      return timestamp_;
+    }
+
     private void initFields() {
       random_ = com.google.protobuf.ByteString.EMPTY;
       certificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
+      timestamp_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4845,6 +4877,9 @@ public final class NetData {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeMessage(2, certificate_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeSInt64(3, timestamp_);
+      }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
@@ -4862,6 +4897,10 @@ public final class NetData {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, certificate_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt64Size(3, timestamp_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -4989,6 +5028,8 @@ public final class NetData {
           certificateBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
+        timestamp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -5029,6 +5070,10 @@ public final class NetData {
         } else {
           result.certificate_ = certificateBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.timestamp_ = timestamp_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -5050,6 +5095,9 @@ public final class NetData {
         }
         if (other.hasCertificate()) {
           mergeCertificate(other.getCertificate());
+        }
+        if (other.hasTimestamp()) {
+          setTimestamp(other.getTimestamp());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -5240,6 +5288,39 @@ public final class NetData {
           certificate_ = null;
         }
         return certificateBuilder_;
+      }
+
+      // optional sint64 timestamp = 3;
+      private long timestamp_ ;
+      /**
+       * <code>optional sint64 timestamp = 3;</code>
+       */
+      public boolean hasTimestamp() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional sint64 timestamp = 3;</code>
+       */
+      public long getTimestamp() {
+        return timestamp_;
+      }
+      /**
+       * <code>optional sint64 timestamp = 3;</code>
+       */
+      public Builder setTimestamp(long value) {
+        bitField0_ |= 0x00000004;
+        timestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint64 timestamp = 3;</code>
+       */
+      public Builder clearTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        timestamp_ = 0L;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:HandshakeHello)
@@ -6787,15 +6868,15 @@ public final class NetData {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<HandshakeVerification> {
 
-    // optional bytes encryptedVerificationSignature = 1;
+    // optional bytes signature = 1;
     /**
-     * <code>optional bytes encryptedVerificationSignature = 1;</code>
+     * <code>optional bytes signature = 1;</code>
      */
-    boolean hasEncryptedVerificationSignature();
+    boolean hasSignature();
     /**
-     * <code>optional bytes encryptedVerificationSignature = 1;</code>
+     * <code>optional bytes signature = 1;</code>
      */
-    com.google.protobuf.ByteString getEncryptedVerificationSignature();
+    com.google.protobuf.ByteString getSignature();
   }
   /**
    * Protobuf type {@code HandshakeVerification}
@@ -6850,7 +6931,7 @@ public final class NetData {
             }
             case 10: {
               bitField0_ |= 0x00000001;
-              encryptedVerificationSignature_ = input.readBytes();
+              signature_ = input.readBytes();
               break;
             }
           }
@@ -6893,24 +6974,24 @@ public final class NetData {
     }
 
     private int bitField0_;
-    // optional bytes encryptedVerificationSignature = 1;
-    public static final int ENCRYPTEDVERIFICATIONSIGNATURE_FIELD_NUMBER = 1;
-    private com.google.protobuf.ByteString encryptedVerificationSignature_;
+    // optional bytes signature = 1;
+    public static final int SIGNATURE_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString signature_;
     /**
-     * <code>optional bytes encryptedVerificationSignature = 1;</code>
+     * <code>optional bytes signature = 1;</code>
      */
-    public boolean hasEncryptedVerificationSignature() {
+    public boolean hasSignature() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional bytes encryptedVerificationSignature = 1;</code>
+     * <code>optional bytes signature = 1;</code>
      */
-    public com.google.protobuf.ByteString getEncryptedVerificationSignature() {
-      return encryptedVerificationSignature_;
+    public com.google.protobuf.ByteString getSignature() {
+      return signature_;
     }
 
     private void initFields() {
-      encryptedVerificationSignature_ = com.google.protobuf.ByteString.EMPTY;
+      signature_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -6932,7 +7013,7 @@ public final class NetData {
         .ExtendableMessage<org.terasology.protobuf.NetData.HandshakeVerification>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, encryptedVerificationSignature_);
+        output.writeBytes(1, signature_);
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -6946,7 +7027,7 @@ public final class NetData {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, encryptedVerificationSignature_);
+          .computeBytesSize(1, signature_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -7065,7 +7146,7 @@ public final class NetData {
 
       public Builder clear() {
         super.clear();
-        encryptedVerificationSignature_ = com.google.protobuf.ByteString.EMPTY;
+        signature_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
@@ -7098,7 +7179,7 @@ public final class NetData {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.encryptedVerificationSignature_ = encryptedVerificationSignature_;
+        result.signature_ = signature_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -7115,8 +7196,8 @@ public final class NetData {
 
       public Builder mergeFrom(org.terasology.protobuf.NetData.HandshakeVerification other) {
         if (other == org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance()) return this;
-        if (other.hasEncryptedVerificationSignature()) {
-          setEncryptedVerificationSignature(other.getEncryptedVerificationSignature());
+        if (other.hasSignature()) {
+          setSignature(other.getSignature());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -7150,38 +7231,38 @@ public final class NetData {
       }
       private int bitField0_;
 
-      // optional bytes encryptedVerificationSignature = 1;
-      private com.google.protobuf.ByteString encryptedVerificationSignature_ = com.google.protobuf.ByteString.EMPTY;
+      // optional bytes signature = 1;
+      private com.google.protobuf.ByteString signature_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>optional bytes encryptedVerificationSignature = 1;</code>
+       * <code>optional bytes signature = 1;</code>
        */
-      public boolean hasEncryptedVerificationSignature() {
+      public boolean hasSignature() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional bytes encryptedVerificationSignature = 1;</code>
+       * <code>optional bytes signature = 1;</code>
        */
-      public com.google.protobuf.ByteString getEncryptedVerificationSignature() {
-        return encryptedVerificationSignature_;
+      public com.google.protobuf.ByteString getSignature() {
+        return signature_;
       }
       /**
-       * <code>optional bytes encryptedVerificationSignature = 1;</code>
+       * <code>optional bytes signature = 1;</code>
        */
-      public Builder setEncryptedVerificationSignature(com.google.protobuf.ByteString value) {
+      public Builder setSignature(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        encryptedVerificationSignature_ = value;
+        signature_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bytes encryptedVerificationSignature = 1;</code>
+       * <code>optional bytes signature = 1;</code>
        */
-      public Builder clearEncryptedVerificationSignature() {
+      public Builder clearSignature() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        encryptedVerificationSignature_ = getDefaultInstance().getEncryptedVerificationSignature();
+        signature_ = getDefaultInstance().getSignature();
         onChanged();
         return this;
       }
@@ -17642,48 +17723,48 @@ public final class NetData {
       "tityRequest\030e \001(\0132\023.NewIdentityRequest\022-" +
       "\n\021provisionIdentity\030f \001(\0132\022.ProvisionIde" +
       "ntity\0225\n\025handshakeVerification\030g \001(\0132\026.H" +
-      "andshakeVerification*\t\010\210\'\020\200\200\200\200\002\"N\n\016Hands" +
+      "andshakeVerification*\t\010\210\'\020\200\200\200\200\002\"a\n\016Hands" +
       "hakeHello\022\016\n\006random\030\001 \001(\014\022!\n\013certificate" +
-      "\030\002 \001(\0132\014.Certificate*\t\010\210\'\020\200\200\200\200\002\"H\n\022NewId",
-      "entityRequest\022\027\n\017preMasterSecret\030\001 \001(\014\022\016" +
-      "\n\006random\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"=\n\021ProvisionId" +
-      "entity\022\035\n\025encryptedCertificates\030\001 \001(\014*\t\010" +
-      "\210\'\020\200\200\200\200\002\"]\n\016CertificateSet\022\'\n\021publicCert" +
-      "ificate\030\001 \001(\0132\014.Certificate\022\027\n\017privateEx" +
-      "ponent\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"J\n\025HandshakeVeri" +
-      "fication\022&\n\036encryptedVerificationSignatu" +
-      "re\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"Z\n\013Certificate\022\n\n\002id" +
-      "\030\001 \001(\t\022\017\n\007modulus\030\002 \001(\014\022\020\n\010exponent\030\003 \001(" +
-      "\014\022\021\n\tsignature\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"L\n\034Block",
-      "FamilyRegisteredMessage\022\020\n\010blockUri\030\001 \003(" +
-      "\t\022\017\n\007blockId\030\002 \003(\005*\t\010\210\'\020\200\200\200\200\002\"?\n\026Invalid" +
-      "ateChunkMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iD" +
-      "ata*\t\010\210\'\020\200\200\200\200\002\"M\n\022BlockChangeMessage\022\032\n\003" +
-      "pos\030\001 \001(\0132\r.Vector3iData\022\020\n\010newBlock\030\002 \001" +
-      "(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005" +
-      "\022\t\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(\005\"[\n\024ClientConnectM" +
-      "essage\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\031\n" +
-      "\021viewDistanceLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\232\002\n\021" +
-      "ServerInfoMessage\022\033\n\006module\030\001 \003(\0132\013.Modu",
-      "leInfo\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName" +
-      "\030\003 \003(\t\022%\n\tcomponent\030\004 \003(\0132\022.Serializatio" +
-      "nInfo\022!\n\005event\030\005 \003(\0132\022.SerializationInfo" +
-      "\022\024\n\010assetIds\030\006 \003(\005B\002\020\001\022\021\n\tassetUris\030\007 \003(" +
-      "\t\022\017\n\007version\030\017 \001(\t\022\021\n\tworldName\030\020 \001(\t\022\020\n" +
-      "\010clientId\030\021 \001(\005\022\014\n\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002" +
-      "\"]\n\021SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002i" +
-      "d\030\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004" +
-      " \001(\014*\t\010\210\'\020\200\200\200\200\002\")\n\nModuleInfo\022\020\n\010moduleI" +
-      "d\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessag",
-      "e\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010bloc" +
-      "kPos\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023" +
-      "UpdateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.Pa" +
-      "ckedEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023" +
-      "RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020" +
-      "\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005\022" +
-      "\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockPos" +
-      "\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org." +
-      "terasology.protobufB\007NetDataH\001"
+      "\030\002 \001(\0132\014.Certificate\022\021\n\ttimestamp\030\003 \001(\022*",
+      "\t\010\210\'\020\200\200\200\200\002\"H\n\022NewIdentityRequest\022\027\n\017preM" +
+      "asterSecret\030\001 \001(\014\022\016\n\006random\030\002 \001(\014*\t\010\210\'\020\200" +
+      "\200\200\200\002\"=\n\021ProvisionIdentity\022\035\n\025encryptedCe" +
+      "rtificates\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"]\n\016Certifica" +
+      "teSet\022\'\n\021publicCertificate\030\001 \001(\0132\014.Certi" +
+      "ficate\022\027\n\017privateExponent\030\002 \001(\014*\t\010\210\'\020\200\200\200" +
+      "\200\002\"5\n\025HandshakeVerification\022\021\n\tsignature" +
+      "\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"Z\n\013Certificate\022\n\n\002id\030\001" +
+      " \001(\t\022\017\n\007modulus\030\002 \001(\014\022\020\n\010exponent\030\003 \001(\014\022" +
+      "\021\n\tsignature\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"L\n\034BlockFa",
+      "milyRegisteredMessage\022\020\n\010blockUri\030\001 \003(\t\022" +
+      "\017\n\007blockId\030\002 \003(\005*\t\010\210\'\020\200\200\200\200\002\"?\n\026Invalidat" +
+      "eChunkMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iDat" +
+      "a*\t\010\210\'\020\200\200\200\200\002\"M\n\022BlockChangeMessage\022\032\n\003po" +
+      "s\030\001 \001(\0132\r.Vector3iData\022\020\n\010newBlock\030\002 \001(\005" +
+      "*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t" +
+      "\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(\005\"[\n\024ClientConnectMes" +
+      "sage\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\031\n\021v" +
+      "iewDistanceLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\232\002\n\021Se" +
+      "rverInfoMessage\022\033\n\006module\030\001 \003(\0132\013.Module",
+      "Info\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003" +
+      " \003(\t\022%\n\tcomponent\030\004 \003(\0132\022.SerializationI" +
+      "nfo\022!\n\005event\030\005 \003(\0132\022.SerializationInfo\022\024" +
+      "\n\010assetIds\030\006 \003(\005B\002\020\001\022\021\n\tassetUris\030\007 \003(\t\022" +
+      "\017\n\007version\030\017 \001(\t\022\021\n\tworldName\030\020 \001(\t\022\020\n\010c" +
+      "lientId\030\021 \001(\005\022\014\n\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]" +
+      "\n\021SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030" +
+      "\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001" +
+      "(\014*\t\010\210\'\020\200\200\200\200\002\")\n\nModuleInfo\022\020\n\010moduleId\030" +
+      "\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022",
+      "\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010blockP" +
+      "os\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023Up" +
+      "dateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.Pack" +
+      "edEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023Re" +
+      "moveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200" +
+      "\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n" +
+      "\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockPos\030\003" +
+      " \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.te" +
+      "rasology.protobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -17701,7 +17782,7 @@ public final class NetData {
           internal_static_HandshakeHello_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_HandshakeHello_descriptor,
-              new java.lang.String[] { "Random", "Certificate", });
+              new java.lang.String[] { "Random", "Certificate", "Timestamp", });
           internal_static_NewIdentityRequest_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_NewIdentityRequest_fieldAccessorTable = new
@@ -17725,7 +17806,7 @@ public final class NetData {
           internal_static_HandshakeVerification_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_HandshakeVerification_descriptor,
-              new java.lang.String[] { "EncryptedVerificationSignature", });
+              new java.lang.String[] { "Signature", });
           internal_static_Certificate_descriptor =
             getDescriptor().getMessageTypes().get(6);
           internal_static_Certificate_fieldAccessorTable = new

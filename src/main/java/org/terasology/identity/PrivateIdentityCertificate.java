@@ -27,6 +27,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.UUID;
 
 /**
  *
@@ -46,6 +47,22 @@ public class PrivateIdentityCertificate {
 
     public BigInteger getExponent() {
         return exponent;
+    }
+
+    public byte[] sign(byte[] dataToSign) {
+        RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, exponent);
+
+        Signature signer = null;
+        try {
+            signer = Signature.getInstance(IdentityConstants.SIGNATURE_ALGORITHM);
+            KeyFactory keyFactory = KeyFactory.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
+            PrivateKey key = keyFactory.generatePrivate(keySpec);
+            signer.initSign(key, new SecureRandom());
+            signer.update(dataToSign);
+            return signer.sign();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
+            throw new RuntimeException("Unexpected exception during signing", e);
+        }
     }
 
     public byte[] decrypt(byte[] data) throws BadEncryptedDataException {
