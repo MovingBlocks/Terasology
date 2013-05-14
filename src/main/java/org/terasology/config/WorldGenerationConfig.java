@@ -16,8 +16,6 @@ public class WorldGenerationConfig {
     private float desertGrassDensity = 0.001f;
     private String defaultSeed = "Blockmaina42";
 //MPratt "Map Gen Setup" start
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
     private String BaseTerrainFACTOR="100";
     private String OceanTerrainFACTOR="100";
     private String RiverTerrainFACTOR="100";
