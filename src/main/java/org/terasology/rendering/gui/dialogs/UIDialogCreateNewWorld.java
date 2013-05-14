@@ -178,11 +178,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     UIDialogSetUpMap dialog = new UIDialogSetUpMap();
                     dialog.open();
                 }else if(chunkGenerator.getSelectionIndex() == 1){ //Flat
-//MPratt "Map Gen Setup" TODO add other menu
+//MPratt "Map Gen Setup" TODO add other menu here
                 }else if(chunkGenerator.getSelectionIndex() == 2){ //multiworld
-//MPratt "Map Gen Setup" TODO add other menu
+//MPratt "Map Gen Setup" TODO add other menu here
                 }else if(chunkGenerator.getSelectionIndex() == 3){ //heightmap
-//MPratt "Map Gen Setup" TODO add other menu
+//MPratt "Map Gen Setup" TODO add other menu here
                 }
             }
         });
