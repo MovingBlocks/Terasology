@@ -33,6 +33,8 @@ import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
+
 
 import javax.vecmath.Vector2f;
 
@@ -77,6 +79,12 @@ public class UIDialogSetUpMap extends UIDialog {
 
     private UILabel SIZE_ZFACTORLabel;
     private UIText SIZE_ZFACTOR;
+
+    private UILabel SAMPLE_RATE_3D_HORLabel;
+    private UIText SAMPLE_RATE_3D_HORFACTOR;
+
+    private UILabel SAMPLE_RATE_3D_VERTLabel;
+    private UIText SAMPLE_RATE_3D_VERTFACTOR;
 
     private static final Logger logger = LoggerFactory.getLogger(UIDialogSetUpMap.class);
 
@@ -313,10 +321,6 @@ public class UIDialogSetUpMap extends UIDialog {
         SIZE_XFACTOR.addKeyListener(new KeyListener() {
             @Override
             public void key(UIDisplayElement element, KeyEvent event) {
-                Config config = CoreRegistry.get(Config.class);
-                CoreRegistry.get(Config.class).getDefaultModSelection();
-                CoreRegistry.get(Config.class).save();
-
                 if (event.isDown()) {
                     // submit message
                     if (event.getKey() == Keyboard.KEY_RETURN) {
@@ -342,9 +346,6 @@ public class UIDialogSetUpMap extends UIDialog {
        SIZE_YFACTOR.addKeyListener(new KeyListener() {
             @Override
             public void key(UIDisplayElement element, KeyEvent event) {
-                Config config = CoreRegistry.get(Config.class);
-                CoreRegistry.get(Config.class).getDefaultModSelection();
-                CoreRegistry.get(Config.class).save();
 
                 if (event.isDown()) {
                     // submit message
@@ -372,9 +373,6 @@ public class UIDialogSetUpMap extends UIDialog {
        SIZE_ZFACTOR.addKeyListener(new KeyListener() {
             @Override
             public void key(UIDisplayElement element, KeyEvent event) {
-                Config config = CoreRegistry.get(Config.class);
-                CoreRegistry.get(Config.class).getDefaultModSelection();
-                CoreRegistry.get(Config.class).save();
 
                 if (event.isDown()) {
                     // submit message
@@ -382,6 +380,60 @@ public class UIDialogSetUpMap extends UIDialog {
                         SIZE_ZFACTOR.setText( Integer.toString(Chunk.SIZE_Z));
                         Chunk.SIZE_Z=Integer.parseInt(SIZE_ZFACTOR.getText());
                         if(troubleshoot) logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
+
+                    }  else if (event.getKey() == Keyboard.KEY_TAB) {
+//MPratt "Map Gen Setup" TODO Change focus
+                    }
+                }
+            }
+
+        });
+
+        SAMPLE_RATE_3D_HORFACTOR = new UIText();
+        SAMPLE_RATE_3D_HORFACTOR.setSize(new Vector2f(60f, 30f));
+        //BaseTerrainFACTOR.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        SAMPLE_RATE_3D_HORFACTOR.setVisible(true);
+        SAMPLE_RATE_3D_HORFACTOR.setBackgroundColor(new Color(55, 255, 255, 200));
+        SAMPLE_RATE_3D_HORFACTOR.setSelectionColor(Color.red);
+        SAMPLE_RATE_3D_HORFACTOR.setText("16");
+        SAMPLE_RATE_3D_HORFACTOR.setText( Integer.toString(PerlinTerrainGenerator.SAMPLE_RATE_3D_HOR));
+        SAMPLE_RATE_3D_HORFACTOR.addKeyListener(new KeyListener() {
+            @Override
+            public void key(UIDisplayElement element, KeyEvent event) {
+
+                if (event.isDown()) {
+                    // submit message
+                    if (event.getKey() == Keyboard.KEY_RETURN) {
+                        SAMPLE_RATE_3D_HORFACTOR.setText( Integer.toString(PerlinTerrainGenerator.SAMPLE_RATE_3D_HOR));
+                        PerlinTerrainGenerator.SAMPLE_RATE_3D_HOR=Integer.parseInt(SAMPLE_RATE_3D_HORFACTOR.getText());
+                        if(troubleshoot) logger.error("value of SAMPLE_RATE_3D_HORFACTOR GUI = " + SAMPLE_RATE_3D_HORFACTOR.getText());
+
+                    }  else if (event.getKey() == Keyboard.KEY_TAB) {
+//MPratt "Map Gen Setup" TODO Change focus
+                    }
+                }
+            }
+
+        });
+
+        SAMPLE_RATE_3D_VERTFACTOR = new UIText();
+        SAMPLE_RATE_3D_VERTFACTOR.setSize(new Vector2f(60f, 30f));
+        //BaseTerrainFACTOR.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        SAMPLE_RATE_3D_VERTFACTOR.setVisible(true);
+        SAMPLE_RATE_3D_VERTFACTOR.setBackgroundColor(new Color(55, 255, 255, 200));
+        SAMPLE_RATE_3D_VERTFACTOR.setSelectionColor(Color.red);
+        SAMPLE_RATE_3D_VERTFACTOR.setText("16");
+        SAMPLE_RATE_3D_VERTFACTOR.setText( Integer.toString(PerlinTerrainGenerator.SAMPLE_RATE_3D_VERT));
+        SAMPLE_RATE_3D_VERTFACTOR.addKeyListener(new KeyListener() {
+            @Override
+            public void key(UIDisplayElement element, KeyEvent event) {
+
+                if (event.isDown()) {
+                    // submit message
+                    if (event.getKey() == Keyboard.KEY_RETURN) {
+                        SAMPLE_RATE_3D_VERTFACTOR.setText( Integer.toString(PerlinTerrainGenerator.SAMPLE_RATE_3D_VERT));
+                        PerlinTerrainGenerator.SAMPLE_RATE_3D_VERT=Integer.parseInt(SAMPLE_RATE_3D_VERTFACTOR.getText());
+                        if(troubleshoot) logger.error("value of SAMPLE_RATE_3D_VERTFACTOR GUI = " + SAMPLE_RATE_3D_VERTFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
 //MPratt "Map Gen Setup" TODO Change focus
@@ -426,21 +478,32 @@ public class UIDialogSetUpMap extends UIDialog {
         caveDensityFACTORLabel.setSize(new Vector2f(0f, 12f));
         caveDensityFACTORLabel.setVisible(true);
 
-        SIZE_XFACTORLabel = new UILabel("Chunk Size X 0-256:");
+        SIZE_XFACTORLabel = new UILabel("Chunk Size X");
         SIZE_XFACTORLabel.setColor(Color.darkGray);
         SIZE_XFACTORLabel.setSize(new Vector2f(0f, 12f));
         SIZE_XFACTORLabel.setVisible(true);
 
-        SIZE_YFACTORLabel = new UILabel("Chunk Size Y  0-256:");
+        SIZE_YFACTORLabel = new UILabel("Chunk Size Y");
         SIZE_YFACTORLabel.setColor(Color.darkGray);
         SIZE_YFACTORLabel.setSize(new Vector2f(0f, 12f));
         SIZE_YFACTORLabel.setVisible(true);
 
-        SIZE_ZFACTORLabel = new UILabel("Chunk Size Z  0-256:");
+        SIZE_ZFACTORLabel = new UILabel("Chunk Size Z");
         SIZE_ZFACTORLabel.setColor(Color.darkGray);
         SIZE_ZFACTORLabel.setSize(new Vector2f(0f, 12f));
         SIZE_ZFACTORLabel.setVisible(true);
 
+		SAMPLE_RATE_3D_HORLabel = new UILabel("SAMPLE_RATE_3D_HOR");
+        SAMPLE_RATE_3D_HORLabel.setColor(Color.darkGray);
+        SAMPLE_RATE_3D_HORLabel.setSize(new Vector2f(0f, 12f));
+        SAMPLE_RATE_3D_HORLabel.setVisible(true);
+
+		SAMPLE_RATE_3D_VERTLabel = new UILabel("SAMPLE_RATE_3D_VERT");
+        SAMPLE_RATE_3D_VERTLabel.setColor(Color.darkGray);
+        SAMPLE_RATE_3D_VERTLabel.setSize(new Vector2f(0f, 12f));
+        SAMPLE_RATE_3D_VERTLabel.setVisible(true);
+		
+		
         BaseTerrainFACTORLabel.setPosition(new Vector2f(15f, 48f));
         BaseTerrainFACTOR.setPosition(new Vector2f(BaseTerrainFACTORLabel.getPosition().x, BaseTerrainFACTORLabel.getPosition().y + BaseTerrainFACTORLabel.getSize().y + 6f));
 
@@ -471,6 +534,13 @@ public class UIDialogSetUpMap extends UIDialog {
         SIZE_ZFACTORLabel.setPosition(new Vector2f(OceanTerrainFACTOR.getPosition().x +250f, OceanTerrainFACTOR.getPosition().y + OceanTerrainFACTOR.getSize().y + 6f));
         SIZE_ZFACTOR.setPosition(new Vector2f(RiverTerrainFACTORLabel.getPosition().x +250f, RiverTerrainFACTORLabel.getPosition().y + RiverTerrainFACTORLabel.getSize().y + 6f));
 
+		SAMPLE_RATE_3D_HORLabel.setPosition(new Vector2f(RiverTerrainFACTOR.getPosition().x +250f, RiverTerrainFACTOR.getPosition().y + RiverTerrainFACTOR.getSize().y + 6f));
+        SAMPLE_RATE_3D_HORFACTOR.setPosition(new Vector2f(MountainFACTORLabel.getPosition().x +250f, MountainFACTORLabel.getPosition().y + MountainFACTORLabel.getSize().y + 6f));
+
+        SAMPLE_RATE_3D_VERTLabel.setPosition(new Vector2f(MountainFACTOR.getPosition().x +250f, MountainFACTOR.getPosition().y + MountainFACTOR.getSize().y + 6f));
+        SAMPLE_RATE_3D_VERTFACTOR.setPosition(new Vector2f(HillDensityFACTORLabel.getPosition().x +250f, HillDensityFACTORLabel.getPosition().y + HillDensityFACTORLabel.getSize().y + 6f));
+
+		
         parent.addDisplayElement(BaseTerrainFACTORLabel);
         parent.addDisplayElement(BaseTerrainFACTOR);
 
@@ -500,6 +570,12 @@ public class UIDialogSetUpMap extends UIDialog {
 		
         parent.addDisplayElement(SIZE_ZFACTORLabel);
         parent.addDisplayElement(SIZE_ZFACTOR);
+		
+        parent.addDisplayElement(SAMPLE_RATE_3D_HORLabel);
+        parent.addDisplayElement(SAMPLE_RATE_3D_HORFACTOR);
+		
+        parent.addDisplayElement(SAMPLE_RATE_3D_VERTLabel);
+        parent.addDisplayElement(SAMPLE_RATE_3D_VERTFACTOR);
 
         parent.layout();
     }
@@ -568,7 +644,14 @@ public class UIDialogSetUpMap extends UIDialog {
                     Chunk.SIZE_Z=Integer.parseInt(SIZE_ZFACTOR.getText());
                     if(troubleshoot) logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
                 }
-
+				 if (SAMPLE_RATE_3D_HORFACTOR.getText().length() > 0) {
+                     PerlinTerrainGenerator.SAMPLE_RATE_3D_HOR=Integer.parseInt(SAMPLE_RATE_3D_HORFACTOR.getText());
+                     if(troubleshoot) logger.error("value of SAMPLE_RATE_3D_HORFACTOR GUI = " + SAMPLE_RATE_3D_HORFACTOR.getText());
+                }
+				if (SAMPLE_RATE_3D_VERTFACTOR.getText().length() > 0) {
+                    PerlinTerrainGenerator.SAMPLE_RATE_3D_VERT=Integer.parseInt(SAMPLE_RATE_3D_VERTFACTOR.getText());
+                    if(troubleshoot) logger.error("value of SAMPLE_RATE_3D_VERTFACTOR GUI = " + SAMPLE_RATE_3D_VERTFACTOR.getText());
+                }
                 close();
             }
         });
