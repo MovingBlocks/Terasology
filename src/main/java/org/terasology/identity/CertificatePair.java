@@ -1,7 +1,7 @@
 package org.terasology.identity;
 
 /**
- *
+ * Holds a public/private certificate pair
  */
 public class CertificatePair {
     private PublicIdentityCertificate publicCert;

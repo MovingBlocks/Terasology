@@ -30,7 +30,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.UUID;
 
 /**
- *
+ * A private certificate contains the key that only the certificate owner should know. Used for signing and decryption
  */
 public class PrivateIdentityCertificate {
     private BigInteger modulus;
@@ -49,6 +49,11 @@ public class PrivateIdentityCertificate {
         return exponent;
     }
 
+    /**
+     * Produces a signature for data that can be verified as by the paired public certificate.
+     * @param dataToSign
+     * @return The signature
+     */
     public byte[] sign(byte[] dataToSign) {
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, exponent);
 
@@ -65,6 +70,12 @@ public class PrivateIdentityCertificate {
         }
     }
 
+    /**
+     * Decrypts data encrypted by the paired public certificate
+     * @param data
+     * @return The decrypted data
+     * @throws BadEncryptedDataException If the data could not be decrypted due to an error with the data.
+     */
     public byte[] decrypt(byte[] data) throws BadEncryptedDataException {
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, exponent);
         try {

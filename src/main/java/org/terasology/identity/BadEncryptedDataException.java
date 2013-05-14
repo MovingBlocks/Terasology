@@ -1,7 +1,7 @@
 package org.terasology.identity;
 
 /**
- *
+ * This exception indicates an issue during decryption c
  */
 public class BadEncryptedDataException extends Exception {
 

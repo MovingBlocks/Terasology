@@ -19,19 +19,16 @@ package org.terasology.network.pipelineFactory;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.compression.ZlibDecoder;
-import org.jboss.netty.handler.codec.compression.ZlibWrapper;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.terasology.network.internal.ClientHandler;
+import org.terasology.network.internal.ClientHandshakeHandler;
 import org.terasology.network.internal.MetricRecordingHandler;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.network.internal.TerasologyClientHandler;
-import org.terasology.network.internal.TerasologyClientHandshakeHandler;
 import org.terasology.protobuf.NetData;
-
-import java.util.BitSet;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
@@ -50,14 +47,17 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = pipeline();
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
-        //p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
-        //p.addLast("inflateDecoder", new ZlibDecoder(ZlibWrapper.GZIP));
+
+        p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
+        p.addLast("inflateDecoder", new ZlibDecoder());
         p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
         p.addLast("protobufDecoder", new ProtobufDecoder(NetData.NetMessage.getDefaultInstance()));
+
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
-        p.addLast("authenticationHandler", new TerasologyClientHandshakeHandler());
-        p.addLast("handler", new TerasologyClientHandler(networkSystem));
+
+        p.addLast("authenticationHandler", new ClientHandshakeHandler());
+        p.addLast("handler", new ClientHandler(networkSystem));
         return p;
     }
 }

@@ -10,19 +10,43 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
- *
+ * Generates secrets using the TLS p_hash method. This is used in two situations:
+ * <ol>
+ * <li>To generate the master secret from the premaster secret</li>
+ * <li>To generate keys for symmetric encryption</li>
+ * </ol>
  */
 public final class SecretGenerator {
 
+    /**
+     * Label for generating master secrets
+     */
     public static final String MASTER_SECRET_LABEL = "master secret";
+
+    /**
+     * Label when generating a key from a master secret
+     */
     public static final String KEY_EXPANSION = "key expansion";
+
+    /**
+     * The standard length of a master secret
+     */
     public static final int MASTER_SECRET_LENGTH = 48;
+
     private static final String MD5_HASH_ALGORITHM = "HmacMD5";
     private static final String SHA1_HASH_ALGORITHM = "HmacSHA1";
 
     private SecretGenerator() {
     }
 
+    /**
+     * Generates a secret from another secret, a seed, and a label
+     * @param secret
+     * @param label
+     * @param seed
+     * @param targetLength The desired length of the generated secret.
+     * @return The generated secret
+     */
     public static byte[] generate(byte[] secret, String label, byte[] seed, int targetLength) {
         // Split the secret
         int partLength = TeraMath.ceilToInt(secret.length / 2.0f);

@@ -29,6 +29,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Objects;
 
+/**
+ * The public certificate, that can be freely shared to declare identity. Able to encrypt data and verify signatures.
+ */
 public class PublicIdentityCertificate {
     private String id;
     private BigInteger modulus;
@@ -80,6 +83,14 @@ public class PublicIdentityCertificate {
         return signature.hashCode();
     }
 
+    /**
+     * Encrypts data such that it can only be decrypted by the paired private certificate, which is held by the certificate owner.
+     * <p>
+     * Note that only a limited amount of data can be encrypted in this fashion - for large exchanges this should be used
+     * to establish shared symmetric key which can then be used for the main exchange.
+     * @param data
+     * @return The encrypted data
+     */
     public byte[] encrypt(byte[] data) {
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, exponent);
         try {
@@ -88,8 +99,6 @@ public class PublicIdentityCertificate {
             Cipher cipher = Cipher.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher.doFinal(data);
-
-
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
         } catch (InvalidKeySpecException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
@@ -100,7 +109,7 @@ public class PublicIdentityCertificate {
     /**
      * Verifies that the certificate is valid (self signed check)
      *
-     * @return Whether the certificate is valid
+     * @return Whether the certificate is signed by itself
      */
     public boolean verifySelfSigned() {
         return verifySignedBy(this);

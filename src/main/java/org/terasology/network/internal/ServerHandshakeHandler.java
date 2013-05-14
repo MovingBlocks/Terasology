@@ -1,6 +1,5 @@
 package org.terasology.network.internal;
 
-import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -23,20 +22,20 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- *
+ * Authentication handler for the server end of the handshake
  */
-public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandler {
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyServerHandshakeHandler.class);
+public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandshakeHandler.class);
 
     private Config config = CoreRegistry.get(Config.class);
-    private TerasologyServerHandler serverHandler;
+    private ServerHandler serverHandler;
     private byte[] serverRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
     private NetData.HandshakeHello serverHello;
 
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
-        serverHandler = ctx.getPipeline().get(TerasologyServerHandler.class);
+        serverHandler = ctx.getPipeline().get(ServerHandler.class);
     }
 
     @Override
@@ -78,18 +77,18 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
         }
 
         byte[] clientSignature = handshakeVerification.getSignature().toByteArray();
-        if (!clientCert.verify(Bytes.concat(serverHello.toByteArray(), clientHello.toByteArray()), clientSignature)) {
+        byte[] signatureData = HandshakeCommon.getSignatureData(serverHello, clientHello);
+        if (!clientCert.verify(signatureData, clientSignature)) {
             logger.error("Received invalid verification signature, ending connection attempt");
             ctx.getChannel().close();
             return;
         }
 
         logger.info("Sending server verification");
-        byte[] dataToSign = Bytes.concat(serverHello.toByteArray(), clientHello.toByteArray());
-        byte[] serverSignature = config.getSecurity().getServerPrivateCertificate().sign(dataToSign);
+        byte[] serverSignature = config.getSecurity().getServerPrivateCertificate().sign(signatureData);
         ctx.getChannel().write(NetData.NetMessage.newBuilder()
-            .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
-                .setSignature(ByteString.copyFrom(serverSignature))).build());
+                .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
+                        .setSignature(ByteString.copyFrom(serverSignature))).build());
 
         // Identity has been established, inform the server handler and withdraw from the pipeline
         ctx.getPipeline().remove(this);
@@ -100,7 +99,7 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
         logger.info("Received new identity request");
         try {
             byte[] preMasterSecret = config.getSecurity().getServerPrivateCertificate().decrypt(newIdentityRequest.getPreMasterSecret().toByteArray());
-            byte[] masterSecret = SecretGenerator.generate(preMasterSecret, SecretGenerator.MASTER_SECRET_LABEL, Bytes.concat(newIdentityRequest.getRandom().toByteArray(), serverRandom), SecretGenerator.MASTER_SECRET_LENGTH);
+            byte[] masterSecret = HandshakeCommon.generateMasterSecret(preMasterSecret, newIdentityRequest.getRandom().toByteArray(), serverRandom);
 
             // Generate a certificate pair for the client
             CertificatePair clientCertificates = new CertificateGenerator().generate(config.getSecurity().getServerPrivateCertificate());
@@ -112,7 +111,7 @@ public class TerasologyServerHandshakeHandler extends SimpleChannelUpstreamHandl
 
             byte[] encryptedCert = null;
             try {
-                SecretKeySpec key = new SecretKeySpec(SecretGenerator.generate(masterSecret, SecretGenerator.KEY_EXPANSION, Bytes.concat(newIdentityRequest.getRandom().toByteArray(), serverRandom), IdentityConstants.SYMMETRIC_ENCRYPTION_KEY_LENGTH), IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
+                SecretKeySpec key = HandshakeCommon.generateSymmetricKey(masterSecret, newIdentityRequest.getRandom().toByteArray(), serverRandom);
                 Cipher cipher = Cipher.getInstance(IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
                 cipher.init(Cipher.ENCRYPT_MODE, key);
                 encryptedCert = cipher.doFinal(certificateData.toByteArray());

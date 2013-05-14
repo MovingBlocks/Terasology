@@ -3,18 +3,18 @@ package org.terasology.network.internal;
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ClientIdentity;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.identity.IdentityConstants;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.identity.SecretGenerator;
 import org.terasology.protobuf.NetData;
 
 import javax.crypto.BadPaddingException;
@@ -28,13 +28,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- *
+ * Authentication handler for the client end of the authentication handshake.
  */
-public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandler {
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyClientHandshakeHandler.class);
+public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandshakeHandler.class);
 
     private Config config = CoreRegistry.get(Config.class);
-    private TerasologyClientHandler clientHandler;
+    private ClientHandler clientHandler;
 
     private byte[] serverRandom;
     private byte[] clientRandom;
@@ -49,7 +49,7 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
-        clientHandler = ctx.getPipeline().get(TerasologyClientHandler.class);
+        clientHandler = ctx.getPipeline().get(ClientHandler.class);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
             return;
         }
 
-        if (!serverCertificate.verify(Bytes.concat(serverHello.toByteArray(), clientHello.toByteArray()), handshakeVerification.getSignature().toByteArray())) {
+        if (!serverCertificate.verify(HandshakeCommon.getSignatureData(serverHello, clientHello), handshakeVerification.getSignature().toByteArray())) {
             logger.error("Server failed verification: cancelling authentication");
             ctx.getChannel().close();
             return;
@@ -94,7 +94,7 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
         try {
             byte[] decryptedCert = null;
             try {
-                SecretKeySpec key = new SecretKeySpec(SecretGenerator.generate(masterSecret, SecretGenerator.KEY_EXPANSION, Bytes.concat(clientRandom, serverRandom), IdentityConstants.SYMMETRIC_ENCRYPTION_KEY_LENGTH), IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
+                SecretKeySpec key = HandshakeCommon.generateSymmetricKey(masterSecret, clientRandom, serverRandom);
                 Cipher cipher = Cipher.getInstance(IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
                 cipher.init(Cipher.DECRYPT_MODE, key);
                 decryptedCert = cipher.doFinal(provisionIdentity.getEncryptedCertificates().toByteArray());
@@ -117,6 +117,7 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
 
             PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(publicCert.getModulus(), new BigInteger(certificateSet.getPrivateExponent().toByteArray()));
 
+            // Store identity for later use
             ClientIdentity identity = new ClientIdentity(publicCert, privateCert);
             config.getSecurity().addIdentity(serverCertificate, identity);
             config.save();
@@ -124,7 +125,6 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
             // And we're authenticated.
             ctx.getPipeline().remove(this);
             clientHandler.channelAuthenticated(ctx);
-
         } catch (InvalidProtocolBufferException e) {
             logger.error("Received invalid certificate data: cancelling authentication", e);
             ctx.getChannel().close();
@@ -190,7 +190,7 @@ public class TerasologyClientHandshakeHandler extends SimpleChannelUpstreamHandl
         new SecureRandom().nextBytes(preMasterSecret);
         byte[] encryptedPreMasterSecret = serverCertificate.encrypt(preMasterSecret);
 
-        masterSecret = SecretGenerator.generate(preMasterSecret, SecretGenerator.MASTER_SECRET_LABEL, Bytes.concat(clientRandom, serverRandom), SecretGenerator.MASTER_SECRET_LENGTH);
+        masterSecret = HandshakeCommon.generateMasterSecret(preMasterSecret, clientRandom, serverRandom);
 
         ctx.getChannel().write(NetData.NetMessage.newBuilder()
                 .setNewIdentityRequest(NetData.NewIdentityRequest.newBuilder()

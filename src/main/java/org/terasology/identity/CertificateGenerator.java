@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 /**
- *
+ * A generator for identity certificates.
  */
 public class CertificateGenerator {
     private static final int KEY_SIZE = 2048;
@@ -27,6 +27,10 @@ public class CertificateGenerator {
         }
     }
 
+    /**
+     * Generates a self-signed certificate. These are used to identify servers.
+     * @return A matched pair of public and private certificates.
+     */
     public CertificatePair generateSelfSigned() {
         keyPairGenerator.initialize(KEY_SIZE);
         KeyPair kp = keyPairGenerator.genKeyPair();
@@ -55,9 +59,10 @@ public class CertificateGenerator {
     }
 
     /**
-     * Generates a certificate signed by the given signer
+     * Generates a certificate signed by the given signer - a server will typically generate client identity certificates
+     * signed by its certificate.
      * @param signingCertificate
-     * @return
+     * @return A matched pair of public and private certificates.
      */
     public CertificatePair generate(PrivateIdentityCertificate signingCertificate) {
         keyPairGenerator.initialize(KEY_SIZE);
