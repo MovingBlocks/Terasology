@@ -19,11 +19,11 @@ import org.newdawn.slick.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-//Matthew Pratt start
+//MPratt "Map Gen Setup" start
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.lwjgl.input.Keyboard;
-//Matthew Pratt end
+//MPratt "Map Gen Setup" end
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -40,7 +40,7 @@ import javax.vecmath.Vector2f;
 /*
  * Dialog for map setup
  *
- * @author Matthew Pratt <marsmod@hotmail.com>
+ * @author MPratt "Map Gen Setup" <marsmod@hotmail.com>
  * @version 0.1
  */
 
@@ -56,9 +56,6 @@ public class UIDialogSetUpMap extends UIDialog {
 
     private UILabel RiverTerrainFACTORLabel;
     private UIText RiverTerrainFACTOR;
-
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
 
     private UILabel MountainFACTORLabel;
     private UIText MountainFACTOR;
@@ -83,6 +80,7 @@ public class UIDialogSetUpMap extends UIDialog {
 
     private static final Logger logger = LoggerFactory.getLogger(UIDialogSetUpMap.class);
 
+	private boolean troubleshoot= false;
 
     public UIDialogSetUpMap() {
 
@@ -96,8 +94,6 @@ public class UIDialogSetUpMap extends UIDialog {
         Config config = CoreRegistry.get(Config.class);
         CoreRegistry.get(Config.class).getDefaultModSelection();
         CoreRegistry.get(Config.class).save();
-
-//validation of the input
 
         BaseTerrainFACTOR = new UIText();
         BaseTerrainFACTOR.setSize(new Vector2f(60f, 30f));
@@ -119,10 +115,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setBaseTerrainFACTOR(BaseTerrainFACTOR.getText());
                         BaseTerrainFACTOR.setText(config.getWorldGeneration().getBaseTerrainFACTOR());
-                        logger.error("value of BaseTerrainFACTOR GUI = " + BaseTerrainFACTOR.getText());
+                        if(troubleshoot) logger.error("value of BaseTerrainFACTOR GUI = " + BaseTerrainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -149,10 +145,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setBaseTerrainFACTOR(OceanTerrainFACTOR.getText());
                         OceanTerrainFACTOR.setText(config.getWorldGeneration().getOceanTerrainFACTOR());
-                        logger.error("value of OceanTerrainFACTOR GUI = " + OceanTerrainFACTOR.getText());
+                        if(troubleshoot) logger.error("value of OceanTerrainFACTOR GUI = " + OceanTerrainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -178,17 +174,15 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setRiverTerrainFACTOR(RiverTerrainFACTOR.getText());
                         RiverTerrainFACTOR.setText(config.getWorldGeneration().getRiverTerrainFACTOR());
-                        logger.error("value of RiverTerrainFACTOR GUI = " + RiverTerrainFACTOR.getText());
+                        if(troubleshoot) logger.error("value of RiverTerrainFACTOR GUI = " + RiverTerrainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
 
         });
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
 
         MountainFACTOR = new UIText();
         MountainFACTOR.setSize(new Vector2f(60f, 30f));
@@ -210,10 +204,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setMountainFACTOR(MountainFACTOR.getText());
                         MountainFACTOR.setText(config.getWorldGeneration().getMountainFACTOR());
-                        logger.error("value of MountainFACTOR GUI = " + MountainFACTOR.getText());
+                        if(troubleshoot) logger.error("value of MountainFACTOR GUI = " + MountainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -239,10 +233,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setHillDensityFACTOR(HillDensityFACTOR.getText());
                         HillDensityFACTOR.setText(config.getWorldGeneration().getHillDensityFACTOR());
-                        logger.error("value of HillDensityFACTOR GUI = " + HillDensityFACTOR.getText());
+                        if(troubleshoot) logger.error("value of HillDensityFACTOR GUI = " + HillDensityFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -268,10 +262,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setBaseTerrainFACTOR(plateauAreaFACTOR.getText());
                         plateauAreaFACTOR.setText(config.getWorldGeneration().getBaseTerrainFACTOR());
-                        logger.error("value of plateauAreaFACTOR GUI = " + plateauAreaFACTOR.getText());
+                        if(troubleshoot) logger.error("value of plateauAreaFACTOR GUI = " + plateauAreaFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -298,10 +292,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         config.getWorldGeneration().setcaveDensityFACTOR(caveDensityFACTOR.getText());
                         caveDensityFACTOR.setText(config.getWorldGeneration().getcaveDensityFACTOR());
-                        logger.error("value of caveDensityFACTOR GUI = " + caveDensityFACTOR.getText());
+                        if(troubleshoot) logger.error("value of caveDensityFACTOR GUI = " + caveDensityFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -328,17 +322,16 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         SIZE_XFACTOR.setText( Integer.toString(Chunk.SIZE_X));
                         Chunk.SIZE_X=Integer.parseInt(SIZE_XFACTOR.getText());
-                        logger.error("value of SIZE_XFACTOR GUI = " + SIZE_XFACTOR.getText());
+                        if(troubleshoot) logger.error("value of SIZE_XFACTOR GUI = " + SIZE_XFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
 
         });
-		
-		
+
        SIZE_YFACTOR = new UIText();
        SIZE_YFACTOR.setSize(new Vector2f(60f, 30f));
         //BaseTerrainFACTOR.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
@@ -358,10 +351,10 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         SIZE_YFACTOR.setText( Integer.toString(Chunk.SIZE_Y));
                         Chunk.SIZE_Y=Integer.parseInt(SIZE_YFACTOR.getText());
-                        logger.error("value of SIZE_YFACTOR GUI = " + SIZE_YFACTOR.getText());
+                        if(troubleshoot) logger.error("value of SIZE_YFACTOR GUI = " + SIZE_YFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
@@ -388,68 +381,62 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         SIZE_ZFACTOR.setText( Integer.toString(Chunk.SIZE_Z));
                         Chunk.SIZE_Z=Integer.parseInt(SIZE_ZFACTOR.getText());
-                        logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
+                        if(troubleshoot) logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//Matthew Pratt Nicety Change focus here
+//MPratt "Map Gen Setup" TODO Change focus here
                     }
                 }
             }
 
         });
 
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
-
-        BaseTerrainFACTORLabel = new UILabel("BaseTerrainFACTOR 0-100:");
+        BaseTerrainFACTORLabel = new UILabel("Base Terrain 0-100:");
         BaseTerrainFACTORLabel.setColor(Color.darkGray);
         BaseTerrainFACTORLabel.setSize(new Vector2f(0f, 12f));
         BaseTerrainFACTORLabel.setVisible(true);
 
-        OceanTerrainFACTORLabel = new UILabel("OceanTerrainFACTOR 0-100:");
+        OceanTerrainFACTORLabel = new UILabel("Ocean Terrain 0-100:");
         OceanTerrainFACTORLabel.setColor(Color.darkGray);
         OceanTerrainFACTORLabel.setSize(new Vector2f(0f, 12f));
         OceanTerrainFACTORLabel.setVisible(true);
 
-        RiverTerrainFACTORLabel = new UILabel("RiverTerrainFACTOR 0-100:");
+        RiverTerrainFACTORLabel = new UILabel("River Terrain 0-100:");
         RiverTerrainFACTORLabel.setColor(Color.darkGray);
         RiverTerrainFACTORLabel.setSize(new Vector2f(0f, 12f));
         RiverTerrainFACTORLabel.setVisible(true);
 
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
-
-        MountainFACTORLabel = new UILabel("MountainFACTOR 0-100:");
+        MountainFACTORLabel = new UILabel("Mountain 0-100:");
         MountainFACTORLabel.setColor(Color.darkGray);
         MountainFACTORLabel.setSize(new Vector2f(0f, 12f));
         MountainFACTORLabel.setVisible(true);
 
-        HillDensityFACTORLabel = new UILabel("HillDensityFACTOR 0-100:");
+        HillDensityFACTORLabel = new UILabel("Hill Density 0-100:");
         HillDensityFACTORLabel.setColor(Color.darkGray);
         HillDensityFACTORLabel.setSize(new Vector2f(0f, 12f));
         HillDensityFACTORLabel.setVisible(true);
 
-        plateauAreaFACTORLabel = new UILabel("plateauAreaFACTOR 0-100:");
+        plateauAreaFACTORLabel = new UILabel("Plateau Area 0-100:");
         plateauAreaFACTORLabel.setColor(Color.darkGray);
         plateauAreaFACTORLabel.setSize(new Vector2f(0f, 12f));
         plateauAreaFACTORLabel.setVisible(true);
 
-        caveDensityFACTORLabel = new UILabel("caveDensityFACTOR 0-100:");
+        caveDensityFACTORLabel = new UILabel("Cave Density 0-100:");
         caveDensityFACTORLabel.setColor(Color.darkGray);
         caveDensityFACTORLabel.setSize(new Vector2f(0f, 12f));
         caveDensityFACTORLabel.setVisible(true);
 
-        SIZE_XFACTORLabel = new UILabel("CHUNK SIZE X 0-256:");
+        SIZE_XFACTORLabel = new UILabel("Chunk Size X 0-256:");
         SIZE_XFACTORLabel.setColor(Color.darkGray);
         SIZE_XFACTORLabel.setSize(new Vector2f(0f, 12f));
         SIZE_XFACTORLabel.setVisible(true);
 
-        SIZE_YFACTORLabel = new UILabel("CHUNK SIZE Y  0-256:");
+        SIZE_YFACTORLabel = new UILabel("Chunk Size Y  0-256:");
         SIZE_YFACTORLabel.setColor(Color.darkGray);
         SIZE_YFACTORLabel.setSize(new Vector2f(0f, 12f));
         SIZE_YFACTORLabel.setVisible(true);
 
-        SIZE_ZFACTORLabel = new UILabel("CHUNK SIZE Z  0-256:");
+        SIZE_ZFACTORLabel = new UILabel("Chunk Size Z  0-256:");
         SIZE_ZFACTORLabel.setColor(Color.darkGray);
         SIZE_ZFACTORLabel.setSize(new Vector2f(0f, 12f));
         SIZE_ZFACTORLabel.setVisible(true);
@@ -465,9 +452,6 @@ public class UIDialogSetUpMap extends UIDialog {
 
         MountainFACTORLabel.setPosition(new Vector2f(RiverTerrainFACTOR.getPosition().x, RiverTerrainFACTOR.getPosition().y + RiverTerrainFACTOR.getSize().y + 6f));
         MountainFACTOR.setPosition(new Vector2f(MountainFACTORLabel.getPosition().x, MountainFACTORLabel.getPosition().y + MountainFACTORLabel.getSize().y + 6f));
-
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
 
         HillDensityFACTORLabel.setPosition(new Vector2f(MountainFACTOR.getPosition().x, MountainFACTOR.getPosition().y + MountainFACTOR.getSize().y + 6f));
         HillDensityFACTOR.setPosition(new Vector2f(HillDensityFACTORLabel.getPosition().x, HillDensityFACTORLabel.getPosition().y + HillDensityFACTORLabel.getSize().y + 6f));
@@ -496,9 +480,6 @@ public class UIDialogSetUpMap extends UIDialog {
         parent.addDisplayElement(RiverTerrainFACTORLabel);
         parent.addDisplayElement(RiverTerrainFACTOR);
 
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
-
         parent.addDisplayElement(MountainFACTORLabel);
         parent.addDisplayElement(MountainFACTOR);
 
@@ -517,16 +498,13 @@ public class UIDialogSetUpMap extends UIDialog {
         parent.addDisplayElement(SIZE_YFACTORLabel);
         parent.addDisplayElement(SIZE_YFACTOR);
 		
-		
         parent.addDisplayElement(SIZE_ZFACTORLabel);
         parent.addDisplayElement(SIZE_ZFACTOR);
 
         parent.layout();
     }
 
-
         protected void createButtons(UIDisplayContainer parent) {
-
 
         OKButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         OKButton.setPosition(new Vector2f(caveDensityFACTOR.getPosition().x + caveDensityFACTOR.getSize().x + 16f, caveDensityFACTOR.getPosition().y));
@@ -541,61 +519,55 @@ public class UIDialogSetUpMap extends UIDialog {
                 CoreRegistry.get(Config.class).getDefaultModSelection();
                 CoreRegistry.get(Config.class).save();
 
-//save and validate the input
-//Matthew Pratt TODO actually validate
+//MPratt "Map Gen Setup" TODO actually validate
 
                 if (BaseTerrainFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setBaseTerrainFACTOR(BaseTerrainFACTOR.getText());
                     BaseTerrainFACTOR.setText(config.getWorldGeneration().getBaseTerrainFACTOR());
-                    logger.error("clicked OK  BaseTerrainFACTOR");
+                    if(troubleshoot) logger.error("clicked OK  BaseTerrainFACTOR");
                 }
                 if (OceanTerrainFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setOceanTerrainFACTOR(OceanTerrainFACTOR.getText());
                     OceanTerrainFACTOR.setText(config.getWorldGeneration().getOceanTerrainFACTOR());
-                    logger.error("clicked OK OceanTerrainFACTOR");
+                    if(troubleshoot) logger.error("clicked OK OceanTerrainFACTOR");
                 }
                 if (RiverTerrainFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setRiverTerrainFACTOR(RiverTerrainFACTOR.getText());
                     RiverTerrainFACTOR.setText(config.getWorldGeneration().getRiverTerrainFACTOR());
-                    logger.error("clicked OK RiverTerrainFACTOR");
+                    if(troubleshoot) logger.error("clicked OK RiverTerrainFACTOR");
                 }
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
                 if (MountainFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setMountainFACTOR(MountainFACTOR.getText());
                     MountainFACTOR.setText(config.getWorldGeneration().getMountainFACTOR());
-                    logger.error("clicked OK MountainFACTOR");
+                    if(troubleshoot) logger.error("clicked OK MountainFACTOR");
                 }
                 if (HillDensityFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setHillDensityFACTOR(HillDensityFACTOR.getText());
                     HillDensityFACTOR.setText(config.getWorldGeneration().getHillDensityFACTOR());
-                    logger.error("clicked OK HillDensityFACTOR");
+                    if(troubleshoot) logger.error("clicked OK HillDensityFACTOR");
                 }
                 if (plateauAreaFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setplateauAreaFACTOR(plateauAreaFACTOR.getText());
                     plateauAreaFACTOR.setText(config.getWorldGeneration().getplateauAreaFACTOR());
-                    logger.error("clicked OK plateauAreaFACTOR");
+                    if(troubleshoot) logger.error("clicked OK plateauAreaFACTOR");
                 }
                 if (caveDensityFACTOR.getText().length() > 0) {
                     config.getWorldGeneration().setcaveDensityFACTOR(caveDensityFACTOR.getText());
                     caveDensityFACTOR.setText(config.getWorldGeneration().getcaveDensityFACTOR());
-                    logger.error("clicked OK caveDensityFACTOR");
+                    if(troubleshoot) logger.error("clicked OK caveDensityFACTOR");
                 }
                 if (SIZE_XFACTOR.getText().length() > 0) {
                     Chunk.SIZE_X=Integer.parseInt(SIZE_XFACTOR.getText());
-                    logger.error("value of SIZE_XFACTOR GUI = " + SIZE_XFACTOR.getText());
+                    if(troubleshoot) logger.error("value of SIZE_XFACTOR GUI = " + SIZE_XFACTOR.getText());
                 }
 				 if (SIZE_YFACTOR.getText().length() > 0) {
                      Chunk.SIZE_Y=Integer.parseInt(SIZE_YFACTOR.getText());
-                     logger.error("value of SIZE_YFACTOR GUI = " + SIZE_YFACTOR.getText());
+                     if(troubleshoot) logger.error("value of SIZE_YFACTOR GUI = " + SIZE_YFACTOR.getText());
                 }
 				if (SIZE_ZFACTOR.getText().length() > 0) {
                     Chunk.SIZE_Z=Integer.parseInt(SIZE_ZFACTOR.getText());
-                    logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
+                    if(troubleshoot) logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
                 }
-
-//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
-// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
 
                 close();
             }
