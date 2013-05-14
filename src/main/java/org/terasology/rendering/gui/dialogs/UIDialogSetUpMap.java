@@ -653,6 +653,7 @@ public class UIDialogSetUpMap extends UIDialog {
                     if(troubleshoot) logger.error("value of SAMPLE_RATE_3D_VERTFACTOR GUI = " + SAMPLE_RATE_3D_VERTFACTOR.getText());
                 }
                 close();
+
             }
         });
 
