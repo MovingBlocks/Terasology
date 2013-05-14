@@ -42,8 +42,8 @@ import org.terasology.config.Config;
 public class PerlinTerrainGenerator implements ChunkGenerator {
 //Start MPratt "Map Gen Setup"
 //MPratt TODO add rate var to Map Gen Menu
-    private static int SAMPLE_RATE_3D_HOR = 4;
-    private static int SAMPLE_RATE_3D_VERT = 4;
+    public static int SAMPLE_RATE_3D_HOR = 4;
+    public static int SAMPLE_RATE_3D_VERT = 4;
     private double calcBaseTerrainFACTOR, calcOceanTerrainFACTOR, calcRiverTerrainFACTOR, calcMountainFACTOR, calcHillDensityFACTOR, plateauAreaFACTOR, caveDensityFACTOR;
     private static final Logger logger = LoggerFactory.getLogger(PerlinTerrainGenerator.class);
 //End MPratt
