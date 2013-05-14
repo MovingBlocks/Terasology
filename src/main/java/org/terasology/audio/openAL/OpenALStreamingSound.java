@@ -27,11 +27,9 @@ import org.terasology.audio.Sound;
 //import org.terasology.audio.openAL.OpenALException;
 
 public abstract class OpenALStreamingSound implements Sound {
-//MatthewPratt start
-    //private final static int BUFFER_POOL_SIZE = 3;
-    //prevents buffering
-    private final static int BUFFER_POOL_SIZE = 30;
-//MatthewPratt end
+//MPratt "prevent stuttering" increase buffering 
+    private final static int BUFFER_POOL_SIZE = 30; //3
+//MPratt end
 
     private final AssetUri uri;
     protected final URL audioSource;
