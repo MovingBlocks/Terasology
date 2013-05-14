@@ -59,9 +59,12 @@ public class Chunk {
     public static final long serialVersionUID = 79881925217704826L;
 
     /* PUBLIC CONSTANT VALUES */
-    public static final int SIZE_X = 16;
-    public static final int SIZE_Y = 256;
-    public static final int SIZE_Z = 16;
+//MPratt "Map Gen Setup" start
+    //note: cant be final variable if you can change them via menu
+    public static int SIZE_X = 16;
+    public static int SIZE_Y = 256;
+    public static int SIZE_Z = 16;
+//MPratt "Map Gen Setup" end
     public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
