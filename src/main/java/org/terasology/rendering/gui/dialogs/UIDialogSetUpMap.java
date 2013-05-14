@@ -118,7 +118,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of BaseTerrainFACTOR GUI = " + BaseTerrainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -148,7 +148,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of OceanTerrainFACTOR GUI = " + OceanTerrainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -177,7 +177,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of RiverTerrainFACTOR GUI = " + RiverTerrainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -207,7 +207,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of MountainFACTOR GUI = " + MountainFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -236,7 +236,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of HillDensityFACTOR GUI = " + HillDensityFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -265,7 +265,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of plateauAreaFACTOR GUI = " + plateauAreaFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -295,7 +295,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of caveDensityFACTOR GUI = " + caveDensityFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -325,7 +325,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of SIZE_XFACTOR GUI = " + SIZE_XFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -354,7 +354,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of SIZE_YFACTOR GUI = " + SIZE_YFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
@@ -384,7 +384,7 @@ public class UIDialogSetUpMap extends UIDialog {
                         if(troubleshoot) logger.error("value of SIZE_ZFACTOR GUI = " + SIZE_ZFACTOR.getText());
 
                     }  else if (event.getKey() == Keyboard.KEY_TAB) {
-//MPratt "Map Gen Setup" TODO Change focus here
+//MPratt "Map Gen Setup" TODO Change focus
                     }
                 }
             }
