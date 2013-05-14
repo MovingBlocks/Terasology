@@ -60,7 +60,7 @@ public class Chunk {
 
     /* PUBLIC CONSTANT VALUES */
 //MPratt "Map Gen Setup" start
-    //note: cant be final variable if you can change them via menu
+    //note: cant be final variable if you cant change them via menu
     public static int SIZE_X = 16;
     public static int SIZE_Y = 256;
     public static int SIZE_Z = 16;
