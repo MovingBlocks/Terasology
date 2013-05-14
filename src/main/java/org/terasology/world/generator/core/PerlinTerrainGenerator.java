@@ -44,6 +44,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 //MPratt TODO add rate var to Map Gen Menu
     public static int SAMPLE_RATE_3D_HOR = 4;
     public static int SAMPLE_RATE_3D_VERT = 4;
+
     private double calcBaseTerrainFACTOR, calcOceanTerrainFACTOR, calcRiverTerrainFACTOR, calcMountainFACTOR, calcHillDensityFACTOR, plateauAreaFACTOR, caveDensityFACTOR;
     private static final Logger logger = LoggerFactory.getLogger(PerlinTerrainGenerator.class);
 //End MPratt
