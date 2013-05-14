@@ -443,37 +443,37 @@ public class UIDialogSetUpMap extends UIDialog {
 
         });
 
-        BaseTerrainFACTORLabel = new UILabel("Base Terrain 0-100:");
+        BaseTerrainFACTORLabel = new UILabel("Base Terrain %:");
         BaseTerrainFACTORLabel.setColor(Color.darkGray);
         BaseTerrainFACTORLabel.setSize(new Vector2f(0f, 12f));
         BaseTerrainFACTORLabel.setVisible(true);
 
-        OceanTerrainFACTORLabel = new UILabel("Ocean Terrain 0-100:");
+        OceanTerrainFACTORLabel = new UILabel("Ocean Terrain %:");
         OceanTerrainFACTORLabel.setColor(Color.darkGray);
         OceanTerrainFACTORLabel.setSize(new Vector2f(0f, 12f));
         OceanTerrainFACTORLabel.setVisible(true);
 
-        RiverTerrainFACTORLabel = new UILabel("River Terrain 0-100:");
+        RiverTerrainFACTORLabel = new UILabel("River Terrain %:");
         RiverTerrainFACTORLabel.setColor(Color.darkGray);
         RiverTerrainFACTORLabel.setSize(new Vector2f(0f, 12f));
         RiverTerrainFACTORLabel.setVisible(true);
 
-        MountainFACTORLabel = new UILabel("Mountain 0-100:");
+        MountainFACTORLabel = new UILabel("Mountain %:");
         MountainFACTORLabel.setColor(Color.darkGray);
         MountainFACTORLabel.setSize(new Vector2f(0f, 12f));
         MountainFACTORLabel.setVisible(true);
 
-        HillDensityFACTORLabel = new UILabel("Hill Density 0-100:");
+        HillDensityFACTORLabel = new UILabel("Hill Density %:");
         HillDensityFACTORLabel.setColor(Color.darkGray);
         HillDensityFACTORLabel.setSize(new Vector2f(0f, 12f));
         HillDensityFACTORLabel.setVisible(true);
 
-        plateauAreaFACTORLabel = new UILabel("Plateau Area 0-100:");
+        plateauAreaFACTORLabel = new UILabel("Plateau Area %:");
         plateauAreaFACTORLabel.setColor(Color.darkGray);
         plateauAreaFACTORLabel.setSize(new Vector2f(0f, 12f));
         plateauAreaFACTORLabel.setVisible(true);
 
-        caveDensityFACTORLabel = new UILabel("Cave Density 0-100:");
+        caveDensityFACTORLabel = new UILabel("Cave Density %:");
         caveDensityFACTORLabel.setColor(Color.darkGray);
         caveDensityFACTORLabel.setSize(new Vector2f(0f, 12f));
         caveDensityFACTORLabel.setVisible(true);
