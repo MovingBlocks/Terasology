@@ -29,13 +29,25 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+//MPratt start
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.game.CoreRegistry;
+import org.terasology.config.Config;
+//MPratt end
 
 /**
  * @author Immortius
  */
 public class PerlinTerrainGenerator implements ChunkGenerator {
-    private static final int SAMPLE_RATE_3D_HOR = 4;
-    private static final int SAMPLE_RATE_3D_VERT = 4;
+//Start MPratt "Map Gen Setup"
+//MPratt TODO add rate var to Map Gen Menu
+    public static int SAMPLE_RATE_3D_HOR = 4;
+    public static int SAMPLE_RATE_3D_VERT = 4;
+
+    private double calcBaseTerrainFACTOR, calcOceanTerrainFACTOR, calcRiverTerrainFACTOR, calcMountainFACTOR, calcHillDensityFACTOR, plateauAreaFACTOR, caveDensityFACTOR;
+    private static final Logger logger = LoggerFactory.getLogger(PerlinTerrainGenerator.class);
+//End MPratt
 
     private PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen8;
     private WorldBiomeProvider biomeProvider;
@@ -65,6 +77,20 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
             _pGen4 = new PerlinNoise(seed.hashCode() + 3);
             _pGen5 = new PerlinNoise(seed.hashCode() + 4);
             _pGen8 = new PerlinNoise(seed.hashCode() + 7);
+
+//Start MPratt "Map Gen Setup"
+            Config config = CoreRegistry.get(Config.class);
+            CoreRegistry.get(Config.class).getDefaultModSelection();
+            CoreRegistry.get(Config.class).save();
+//variables
+            calcBaseTerrainFACTOR = Double.parseDouble(config.getWorldGeneration().getBaseTerrainFACTOR())/100;
+            calcOceanTerrainFACTOR = Double.parseDouble(config.getWorldGeneration().getOceanTerrainFACTOR())/100;
+            calcRiverTerrainFACTOR = Double.parseDouble(config.getWorldGeneration().getRiverTerrainFACTOR())/100;
+            calcMountainFACTOR = Double.parseDouble(config.getWorldGeneration().getMountainFACTOR())/100;
+            calcHillDensityFACTOR = Double.parseDouble(config.getWorldGeneration().getHillDensityFACTOR())/100;
+            plateauAreaFACTOR = Double.parseDouble(config.getWorldGeneration().getplateauAreaFACTOR())/1000;
+            caveDensityFACTOR = Double.parseDouble(config.getWorldGeneration().getcaveDensityFACTOR())/100;
+//End MPratt "Map Gen Setup"
         }
     }
 
@@ -241,41 +267,46 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
         double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
         int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
-        double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
+//MPratt "Map Gen Setup" variable
+        double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea * plateauAreaFACTOR);
 
         return -y + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0) * flatten;
     }
 
     private double calcBaseTerrain(double x, double z) {
-        return TeraMath.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
+//MPratt "Map Gen Setup" variable
+        return TeraMath.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0 * calcBaseTerrainFACTOR);
     }
 
     private double calcOceanTerrain(double x, double z) {
-        return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
+//MPratt "Map Gen Setup" variable
+        return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0 * calcOceanTerrainFACTOR);
     }
 
     private double calcRiverTerrain(double x, double z) {
-        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
+//MPratt "Map Gen Setup" variable
+        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0 * calcRiverTerrainFACTOR);
     }
 
     private double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
         x1 = x * 0.002;y1 = y * 0.001; z1 = z * 0.002;
-
-        double result = _pGen4.fBm(x1, y1, z1);
+//MPratt "Map Gen Setup" variable
+        double result = _pGen4.fBm(x1, y1, z1)  * calcMountainFACTOR;
         return result > 0.0 ? result : 0;
     }
 
     private double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
         x1 = x * 0.008; y1 = y * 0.006; z1 = z * 0.008;
-
-        double result = _pGen5.fBm(x1, y1, z1) - 0.1;
+//MPratt "Map Gen Setup" variable
+        double result = _pGen5.fBm(x1 , y1, z1)* calcHillDensityFACTOR - 0.1 ;
         return result > 0.0 ? result : 0;
     }
 
     private double calcCaveDensity(double x, double y, double z) {
-        return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
+//MPratt "Map Gen Setup" variable
+        return _pGen8.fBm(x * 0.02 , y * 0.02 , z * 0.02) * caveDensityFACTOR;
     }
 
     @Override

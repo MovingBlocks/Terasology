@@ -18,6 +18,10 @@ package org.terasology.rendering.gui.dialogs;
 import org.newdawn.slick.Color;
 import org.terasology.config.Config;
 import org.terasology.config.ModConfig;
+//MPratt "Map Gen Setup" start
+import org.terasology.config.MapSetupConfig;
+import org.terasology.rendering.gui.dialogs.UIDialogSetUpMap;
+//MPratt "Map Gen Setup" end
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
@@ -122,7 +126,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         typeOfGame.select(0);
         typeOfGame.setVisible(true);
 
-        chunkGeneratorLabel = new UILabel("Choose Chunk Generator:");
+        chunkGeneratorLabel = new UILabel("Choose Map Generator:");
         chunkGeneratorLabel.setColor(Color.darkGray);
         chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         chunkGeneratorLabel.setVisible(true);
@@ -159,11 +163,37 @@ public class UIDialogCreateNewWorld extends UIDialog {
         chunkGeneratorLabel.setPosition(new Vector2f(typeOfGame.getPosition().x, typeOfGame.getPosition().y + typeOfGame.getSize().y + 16f));
         chunkGenerator.setPosition(new Vector2f(chunkGeneratorLabel.getPosition().x, chunkGeneratorLabel.getPosition().y + chunkGeneratorLabel.getSize().y + 8f));
 
+//MPratt "Map Gen Setup" start
+        UIButton MapSetupButton = new UIButton(new Vector2f(90, 30), UIButton.ButtonType.NORMAL);
+        MapSetupButton.setPosition(new Vector2f(chunkGeneratorLabel.getPosition().x + 200f, chunkGeneratorLabel.getPosition().y - 0f + chunkGeneratorLabel.getSize().y));
+        MapSetupButton.setVisible(true);
 
-        UIButton modButton = new UIButton(new Vector2f(80, 30), UIButton.ButtonType.NORMAL);
+        MapSetupButton.getLabel().setText("Setup...");
+        MapSetupButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+
+
+                if(chunkGenerator.getSelectionIndex() == 0){  //Perlin
+                    UIDialogSetUpMap dialog = new UIDialogSetUpMap();
+                    dialog.open();
+                }else if(chunkGenerator.getSelectionIndex() == 1){ //Flat
+//MPratt "Map Gen Setup" TODO add other menu here
+                }else if(chunkGenerator.getSelectionIndex() == 2){ //multiworld
+//MPratt "Map Gen Setup" TODO add other menu here
+                }else if(chunkGenerator.getSelectionIndex() == 3){ //heightmap
+//MPratt "Map Gen Setup" TODO add other menu here
+                }
+            }
+        });
+
+
+//MPratt "Map Gen Setup" end
+
+        UIButton modButton = new UIButton(new Vector2f(90, 30), UIButton.ButtonType.NORMAL);
         modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 58f));
         modButton.setVisible(true);
-        modButton.getLabel().setText("Mods...");
+        modButton.getLabel().setText("  Mods...  ");
         modButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
@@ -180,6 +210,9 @@ public class UIDialogCreateNewWorld extends UIDialog {
         parent.addDisplayElement(typeOfGame);
         parent.addDisplayElement(typeOfGameLabel);
         parent.addDisplayElement(modButton);
+//MPratt "Map Gen Setup"
+        parent.addDisplayElement(MapSetupButton);
+//MPratt "Map Gen Setup"
         parent.layout();
     }
 

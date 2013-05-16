@@ -15,6 +15,15 @@ public class WorldGenerationConfig {
     private float mountainGrassDensity = 0.2f;
     private float desertGrassDensity = 0.001f;
     private String defaultSeed = "Blockmaina42";
+//MPratt "Map Gen Setup" start
+    private String BaseTerrainFACTOR="100";
+    private String OceanTerrainFACTOR="100";
+    private String RiverTerrainFACTOR="100";
+    private String MountainFACTOR="100";
+    private String HillDensityFACTOR="100";
+    private String plateauAreaFACTOR="100";
+    private String caveDensityFACTOR="100";
+//MPratt "Map Gen Setup" end
 
     public String getWorldTitle() {
         return worldTitle;
@@ -71,4 +80,63 @@ public class WorldGenerationConfig {
     public void setDefaultSeed(String defaultSeed) {
         this.defaultSeed = defaultSeed;
     }
+
+//MPratt "Map Gen Setup" start
+//1. BaseTerrainFACTOR, 2. OceanTerrainFACTOR, 3. RiverTerrainFACTOR, 4. MountainFACTOR,
+// 5. HillDensityFACTOR, 6. plateauAreaFACTOR, 7. caveDensityFACTOR;
+    public String getBaseTerrainFACTOR() {
+    return BaseTerrainFACTOR;
+    }
+
+    public void setBaseTerrainFACTOR(String BaseTerrainFACTOR) {
+        this.BaseTerrainFACTOR = BaseTerrainFACTOR;}
+
+    public String getOceanTerrainFACTOR() {
+        return OceanTerrainFACTOR;
+    }
+
+    public void setOceanTerrainFACTOR(String OceanTerrainFACTOR) {
+        this.OceanTerrainFACTOR = OceanTerrainFACTOR;
+    }
+
+    public String getRiverTerrainFACTOR() {
+        return RiverTerrainFACTOR;
+    }
+
+    public void setRiverTerrainFACTOR(String RiverTerrainFACTOR) {
+        this.RiverTerrainFACTOR = RiverTerrainFACTOR;}
+
+    public String getMountainFACTOR() {
+        return MountainFACTOR;
+    }
+
+    public void setMountainFACTOR(String MountainFACTOR) {
+        this.MountainFACTOR = MountainFACTOR;
+    }
+
+    public String getHillDensityFACTOR() {
+        return HillDensityFACTOR;
+    }
+
+    public void setHillDensityFACTOR(String HillDensityFACTOR) {
+        this.HillDensityFACTOR = HillDensityFACTOR;
+    }
+
+    public String getplateauAreaFACTOR() {
+        return plateauAreaFACTOR;
+    }
+
+    public void setplateauAreaFACTOR(String plateauAreaFACTOR) {
+        this.plateauAreaFACTOR = plateauAreaFACTOR;
+    }
+
+    public String getcaveDensityFACTOR() {
+        return caveDensityFACTOR;
+    }
+
+    public void setcaveDensityFACTOR(String caveDensityFACTOR) {
+        this.caveDensityFACTOR = caveDensityFACTOR;
+    }
+
+//MPratt "Map Gen Setup" end
 }

@@ -24,10 +24,12 @@ import java.nio.ByteBuffer;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
-import org.terasology.audio.openAL.OpenALException;
+//import org.terasology.audio.openAL.OpenALException;
 
 public abstract class OpenALStreamingSound implements Sound {
-    private final static int BUFFER_POOL_SIZE = 3;
+//MPratt increase buffering "prevent stuttering"
+    private final static int BUFFER_POOL_SIZE = 30; //3
+//MPratt end
 
     private final AssetUri uri;
     protected final URL audioSource;
