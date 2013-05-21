@@ -24,7 +24,7 @@ import org.terasology.game.modes.StateLoading;
 import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;

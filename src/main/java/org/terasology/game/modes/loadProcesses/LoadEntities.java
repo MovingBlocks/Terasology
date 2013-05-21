@@ -23,7 +23,7 @@ import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.world.WorldInfo;
 
 import java.io.File;
