@@ -22,6 +22,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.paths.PathManager;
@@ -301,7 +302,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
         farStore.dispose();
         String title = CoreRegistry.get(WorldProvider.class).getTitle();
-        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(title), title + ".dat");
+        File chunkFile = new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.WORLD_DATA_FILE);
         try {
             FileOutputStream fileOut = new FileOutputStream(chunkFile);
             BufferedOutputStream bos = new BufferedOutputStream(fileOut);

@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem;
+
+package org.terasology.entitySystem.lifecycleEvents;
+
+import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
- * Marker interface for classes that can be sent to entities as events
- *
- * @author Immortius <immortius@gmail.com>
+ * This event is sent when a component is removed from an entity, or an entity is destroyed.
  */
-public interface Event {
-    public void cancel();
+public class OnRemovedEvent extends AbstractEvent {
+    private static OnRemovedEvent instance = new OnRemovedEvent();
 
-    public boolean isCancelled();
+    public static OnRemovedEvent newInstance() {
+        return instance;
+    }
+
+    private OnRemovedEvent() {
+    }
 }

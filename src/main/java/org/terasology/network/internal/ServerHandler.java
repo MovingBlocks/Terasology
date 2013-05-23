@@ -54,7 +54,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler {
     }
 
     public void channelAuthenticated(PublicIdentityCertificate identity, ChannelHandlerContext ctx) {
-        client = new NetClient(ctx.getChannel(), networkSystem);
+        client = new NetClient(ctx.getChannel(), networkSystem, identity);
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package org.terasology.network.events;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.network.ServerEvent;
 
 /**

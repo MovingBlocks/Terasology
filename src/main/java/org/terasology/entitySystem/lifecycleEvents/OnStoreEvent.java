@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem;
+package org.terasology.entitySystem.lifecycleEvents;
+
+import org.terasology.entitySystem.EntityStore;
+import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
- * Interface for a single event receiver
  *
- * @author Immortius
  */
-public interface EventReceiver<T extends Event> {
-    public void onEvent(T event, EntityRef entity);
+public class OnStoreEvent extends AbstractEvent {
+
+    private EntityStore entityStore;
+
+    public OnStoreEvent(EntityStore store) {
+        this.entityStore = store;
+    }
+
+    public EntityStore getStore() {
+        return entityStore;
+    }
 }

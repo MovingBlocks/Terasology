@@ -22,6 +22,7 @@ package org.terasology.engine;
 public final class TerasologyConstants {
     public static final String ENTITY_DATA_FILE = "entity.dat";
     public static final int DEFAULT_PORT = 25777;
+    public static final String WORLD_DATA_FILE = "world.dat";
 
     private TerasologyConstants() {
     }

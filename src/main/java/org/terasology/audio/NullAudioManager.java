@@ -16,8 +16,15 @@
 
 package org.terasology.audio;
 
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.nullAudio.NullSound;
+
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Null implementation of the AudioManager
@@ -76,5 +83,15 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void stopAllSounds() {
+    }
+
+    @Override
+    public Sound loadStreamingSound(AssetUri uri, List<URL> urls) {
+        return new NullSound(uri);
+    }
+
+    @Override
+    public Sound loadSound(AssetUri uri, InputStream stream) throws IOException {
+        return new NullSound(uri);
     }
 }

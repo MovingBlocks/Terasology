@@ -16,8 +16,8 @@
 package org.terasology.entitySystem.metadata.extension;
 
 import com.google.common.collect.Lists;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
@@ -28,10 +28,10 @@ import java.util.List;
  */
 public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
 
-    public EntityRefTypeHandler(PersistableEntityManager persistableEntityManager) {
-        this.entityManager = persistableEntityManager;
+    public EntityRefTypeHandler(EngineEntityManager engineEntityManager) {
+        this.entityManager = engineEntityManager;
     }
 
     public EntityData.Value serialize(EntityRef value) {

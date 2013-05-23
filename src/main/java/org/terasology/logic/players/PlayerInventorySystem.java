@@ -19,6 +19,7 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.*;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Timer;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.binds.AttackButton;
 import org.terasology.input.binds.DropItemButton;
@@ -141,7 +142,7 @@ public class PlayerInventorySystem implements ComponentSystem {
             return;
         }
         //if this is our first time throwing, set the timer to something sensible, we can return since
-        // this is a repeating event.
+        // this is a repeating lifecycleEvents.
         if (event.isDown() && lastTimeThrowInteraction == 0) {
             lastTimeThrowInteraction = timer.getTimeInMs();
             return;

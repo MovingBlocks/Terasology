@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.pojo;
+package org.terasology.entitySystem.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
@@ -29,15 +29,15 @@ import com.google.common.collect.Sets;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.EventReceiver;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.EventReceiver;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.network.BroadcastEvent;
@@ -117,10 +117,10 @@ public class EventSystemImpl implements EventSystem {
     }
 
     /**
-     * Events are added to the event library if they have a network annotation
+     * Events are added to the lifecycleEvents library if they have a network annotation
      *
      * @param eventType
-     * @return Whether the event should be added to the event library
+     * @return Whether the lifecycleEvents should be added to the lifecycleEvents library
      */
     private boolean shouldAddToLibrary(Class<? extends Event> eventType) {
         return eventType.getAnnotation(ServerEvent.class) != null

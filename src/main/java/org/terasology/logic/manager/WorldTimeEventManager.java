@@ -33,25 +33,25 @@ public class WorldTimeEventManager {
     }
 
     /**
-     * Adds a time event to the list.
+     * Adds a time lifecycleEvents to the list.
      *
-     * @param e The time event
+     * @param e The time lifecycleEvents
      */
     public void addWorldTimeEvent(WorldTimeEvent e) {
         _worldTimeEvents.add(e);
     }
 
     /**
-     * Removes a time event from the list.
+     * Removes a time lifecycleEvents from the list.
      *
-     * @param e The time event
+     * @param e The time lifecycleEvents
      */
     public void removeWorldTimeEvent(WorldTimeEvent e) {
         _worldTimeEvents.remove(e);
     }
 
     /**
-     * Executes all time events which event times equal a specified delta value.
+     * Executes all time events which lifecycleEvents times equal a specified delta value.
      */
     public void fireWorldTimeEvents() {
         for (int i = _worldTimeEvents.size() - 1; i >= 0; i--) {

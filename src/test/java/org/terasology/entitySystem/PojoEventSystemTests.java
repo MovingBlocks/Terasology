@@ -8,11 +8,14 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.pojo.EventSystemImpl;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
-import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.entitySystem.internal.EventSystemImpl;
+import org.terasology.entitySystem.internal.PojoEntityManager;
+import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.network.NetworkSystem;
 
 import java.util.List;

@@ -22,7 +22,7 @@ import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.input.events.InputEvent;

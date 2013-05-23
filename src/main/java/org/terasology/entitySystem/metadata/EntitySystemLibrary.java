@@ -27,7 +27,7 @@ public interface EntitySystemLibrary {
     ComponentLibrary getComponentLibrary();
 
     /**
-     * @return The library of event metadata
+     * @return The library of lifecycleEvents metadata
      */
     EventLibrary getEventLibrary();
 

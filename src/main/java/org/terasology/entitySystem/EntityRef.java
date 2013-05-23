@@ -20,6 +20,8 @@ import org.terasology.entitySystem.common.NullEntityRef;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -41,7 +43,7 @@ public abstract class EntityRef implements ComponentContainer {
     public abstract void destroy();
 
     /**
-     * Transmits an event to this entity
+     * Transmits an lifecycleEvents to this entity
      *
      * @param event
      */
@@ -62,7 +64,7 @@ public abstract class EntityRef implements ComponentContainer {
     public abstract AssetUri getPrefabURI();
 
     public String toFullDescription() {
-        EntitySerializer serializer = new EntitySerializer((PersistableEntityManager) CoreRegistry.get(EntityManager.class));
+        EntitySerializer serializer = new EntitySerializer((EngineEntityManager) CoreRegistry.get(EntityManager.class));
         serializer.setUsingFieldIds(false);
         return EntityDataJSONFormat.write(serializer.serialize(this));
     }

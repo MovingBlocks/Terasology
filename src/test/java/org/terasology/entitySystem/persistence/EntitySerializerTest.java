@@ -6,9 +6,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class EntitySerializerTest {
 
     private ComponentLibrary componentLibrary;
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
     private EntitySerializer entitySerializer;
     private PrefabManager prefabManager;
     private static ModManager modManager;

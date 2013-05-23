@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.entitySystem.event;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.network.NoReplicate;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public class AddComponentEvent extends AbstractEvent {
+public abstract class AbstractEvent implements Event {
+    @NoReplicate
+    protected boolean cancelled;
 
-    private static AddComponentEvent instance = new AddComponentEvent();
-
-    public static AddComponentEvent newInstance() {
-        return instance;
+    @Override
+    public void cancel() {
+        cancelled = true;
     }
 
-    private AddComponentEvent() {
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 }

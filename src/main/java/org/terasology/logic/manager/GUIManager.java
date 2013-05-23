@@ -24,8 +24,8 @@ import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
@@ -144,7 +144,7 @@ public class GUIManager implements ComponentSystem {
 
             renderer.addDisplayElementToPosition(0, window);
             window.initialise();
-            for (EntityRef worldEntity : CoreRegistry.get(EntityManager.class).iteratorEntities(WorldComponent.class)) {
+            for (EntityRef worldEntity : CoreRegistry.get(EntityManager.class).listEntitiesWith(WorldComponent.class)) {
                 worldEntity.send(new UIWindowOpenedEvent(window));
             }
         }
@@ -371,7 +371,7 @@ public class GUIManager implements ComponentSystem {
     /**
      * Process the raw keyboard input.
      *
-     * @param event The event of the pressed key.
+     * @param event The lifecycleEvents of the pressed key.
      */
     private void processKeyboardInput(KeyEvent event) {
         if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
@@ -382,7 +382,7 @@ public class GUIManager implements ComponentSystem {
     /**
      * Process the bind buttons input.
      *
-     * @param event The event of the bind button.
+     * @param event The lifecycleEvents of the bind button.
      */
     private void processBindButton(BindButtonEvent event) {
         if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
@@ -468,14 +468,14 @@ public class GUIManager implements ComponentSystem {
         }
     }
 
-    //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
+    //bind input events (will be send after raw input events, if a bind button was pressed and the raw input lifecycleEvents hasn't consumed the lifecycleEvents)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processBindButton(event);
 
             if (renderer.getWindowFocused() != null) {
-                //if modal, consume the event so it wont get caught from others
+                //if modal, consume the lifecycleEvents so it wont get caught from others
                 if (renderer.getWindowFocused().isModal()) {
                     event.consume();
                 }

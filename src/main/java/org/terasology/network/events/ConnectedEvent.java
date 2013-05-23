@@ -16,11 +16,26 @@
 
 package org.terasology.network.events;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EntityStore;
+import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.persistence.PlayerEntityStore;
+
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class ConnectedEvent extends AbstractEvent {
+
+    private PlayerEntityStore entityStore;
+
+    public ConnectedEvent(PlayerEntityStore store) {
+        this.entityStore = store;
+    }
+
+    public PlayerEntityStore getEntityStore() {
+        return entityStore;
+    }
 
 }

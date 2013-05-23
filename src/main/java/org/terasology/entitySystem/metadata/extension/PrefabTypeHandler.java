@@ -16,8 +16,8 @@
 
 package org.terasology.entitySystem.metadata.extension;
 
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.protobuf.EntityData;

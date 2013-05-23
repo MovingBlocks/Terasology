@@ -16,6 +16,8 @@
 
 package org.terasology.world;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -29,6 +31,8 @@ import org.terasology.world.liquid.LiquidData;
  * @author Immortius
  */
 public class RegionalChunkView implements ChunkView {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegionalChunkView.class);
 
     private Vector3i offset;
     private Region3i chunkRegion;
@@ -170,8 +174,10 @@ public class RegionalChunkView implements ChunkView {
         if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setLight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
-        } else {
+        } else if (!locked.get()) {
             throw new IllegalStateException("Attempted to modify light though an unlocked view");
+        } else {
+            logger.warn("Attempted to set light at a position not encompassed by the view");
         }
     }
 

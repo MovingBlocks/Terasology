@@ -20,7 +20,7 @@ import org.terasology.components.DisplayInformationComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;

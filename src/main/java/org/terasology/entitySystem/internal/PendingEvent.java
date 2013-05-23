@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.pojo;
+package org.terasology.entitySystem.internal;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Immortius

@@ -17,9 +17,9 @@ package org.terasology.engine.modes;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
@@ -50,7 +50,7 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 public class StateMainMenu implements GameState {
     private GameEngine _gameInstance = null;
 
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private InputSystem inputSystem;
     private ComponentSystemManager componentSystemManager;
@@ -71,7 +71,7 @@ public class StateMainMenu implements GameState {
     public void init(GameEngine gameEngine) {
         _gameInstance = gameEngine;
 
-        //lets get the entity event system running
+        //lets get the entity lifecycleEvents system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
 

@@ -20,7 +20,7 @@ import org.terasology.components.SimpleAIComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
@@ -59,7 +59,7 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 

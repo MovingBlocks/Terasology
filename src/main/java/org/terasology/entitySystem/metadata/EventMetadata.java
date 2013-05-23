@@ -16,7 +16,7 @@
 
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;

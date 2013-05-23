@@ -42,6 +42,7 @@ public final class PathManager {
     private File logPath;
     private File homeModPath;
     private File installModPath;
+    private File currentWorldPath;
 
     private ImmutableList<File> modPaths = ImmutableList.of();
     private File screenshotPath;
@@ -89,11 +90,13 @@ public final class PathManager {
         updateDirs();
     }
 
-    public File getWorldSavePath(String worldTitle) {
-        // TODO: remove special characters from world title?
-        File result = new File(worldPath, worldTitle);
-        result.mkdirs();
-        return result;
+    public File getCurrentWorldPath() {
+        return currentWorldPath;
+    }
+
+    public void setCurrentWorldTitle(String worldTitle) {
+        currentWorldPath = getWorldSavePath(worldTitle);
+        currentWorldPath.mkdirs();
     }
 
     public File getHomePath() {
@@ -142,9 +145,16 @@ public final class PathManager {
         screenshotPath = new File(homePath, SCREENSHOT_DIR);
         screenshotPath.mkdirs();
         nativesPath = new File(installPath, NATIVES_DIR);
+        if (currentWorldPath == null) {
+            currentWorldPath = homePath;
+        }
     }
 
     public File getHomeModPath() {
         return modPaths.get(0);
+    }
+
+    public File getWorldSavePath(String title) {
+        return new File(worldPath, title.replaceAll("[^A-Za-z0-9-_ ]", ""));
     }
 }

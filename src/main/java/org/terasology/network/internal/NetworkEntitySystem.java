@@ -20,10 +20,10 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
@@ -51,25 +51,25 @@ public class NetworkEntitySystem implements ComponentSystem {
 
     @Override
     public void initialise() {
-        for (EntityRef entity : entityManager.iteratorEntities(NetworkComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(NetworkComponent.class)) {
             networkSystem.registerNetworkEntity(entity);
         }
     }
 
     @ReceiveEvent(components = NetworkComponent.class)
-    public void onAddNetworkComponent(AddComponentEvent event, EntityRef entity) {
+    public void onAddNetworkComponent(OnActivatedEvent event, EntityRef entity) {
         if (networkSystem.getMode() == NetworkMode.SERVER) {
             networkSystem.registerNetworkEntity(entity);
         }
     }
 
     @ReceiveEvent(components = NetworkComponent.class)
-    public void onNetworkComponentChanged(ChangedComponentEvent event, EntityRef entity) {
+    public void onNetworkComponentChanged(OnChangedEvent event, EntityRef entity) {
         networkSystem.updateNetworkEntity(entity);
     }
 
     @ReceiveEvent(components = NetworkComponent.class)
-    public void onRemoveNetworkComponent(RemovedComponentEvent event, EntityRef entity) {
+    public void onRemoveNetworkComponent(OnDeactivatedEvent event, EntityRef entity) {
         networkSystem.unregisterNetworkEntity(entity);
     }
 

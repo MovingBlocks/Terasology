@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 public class NetworkOwnershipTest extends TerasologyTestingEnvironment
 {
 
-    private static PersistableEntityManager entityManager;
+    private static EngineEntityManager entityManager;
     private NetworkSystemImpl networkSystem;
     private Timer mockTimer;
     private NetClient client;

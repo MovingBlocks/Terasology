@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
  * @author Immortius <immortius@gmail.com>

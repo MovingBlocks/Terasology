@@ -18,9 +18,9 @@ package org.terasology.logic.location;
 
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
@@ -72,7 +72,7 @@ public class Location implements ComponentSystem {
     }
 
     @ReceiveEvent(components = LocationComponent.class)
-    public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroyed(OnDeactivatedEvent event, EntityRef entity) {
         LocationComponent parentLoc = entity.getComponent(LocationComponent.class);
         if (parentLoc == null)
         if (parentLoc.parent != null) {

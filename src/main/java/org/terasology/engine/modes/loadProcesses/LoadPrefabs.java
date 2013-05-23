@@ -23,7 +23,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.PrefabSerializer;
@@ -53,22 +53,25 @@ public class LoadPrefabs implements LoadProcess {
 
     @Override
     public boolean step() {
-        AssetUri prefabURI = prefabs.next();
-        logger.debug("Loading prefab " + prefabURI);
-        try {
-            InputStream stream = AssetManager.assetStream(prefabURI);
-            if (stream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
-                stream.close();
-                if (prefabData != null) {
-                    prefabSerializer.deserialize(prefabData, prefabURI);
+        if (prefabs.hasNext()) {
+            AssetUri prefabURI = prefabs.next();
+            logger.debug("Loading prefab " + prefabURI);
+            // TODO: This should go into some other class?
+            try {
+                InputStream stream = AssetManager.assetStream(prefabURI);
+                if (stream != null) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                    EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
+                    stream.close();
+                    if (prefabData != null) {
+                        prefabSerializer.deserialize(prefabData, prefabURI);
+                    }
+                } else {
+                    logger.warn("Failed to load prefab '{}'", prefabURI);
                 }
-            } else {
-                logger.warn("Failed to load prefab '{}'", prefabURI);
+            } catch (IOException e) {
+                logger.error("Failed to load prefab '{}'", prefabURI, e);
             }
-        } catch (IOException e) {
-            logger.error("Failed to load prefab '{}'", prefabURI, e);
         }
         return !prefabs.hasNext();
     }

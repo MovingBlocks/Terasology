@@ -18,7 +18,7 @@ package org.terasology.network;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
@@ -41,7 +41,7 @@ public class TestNetwork {
 
     @Test
     public void testNetwork() throws Exception {
-        PersistableEntityManager entityManager = new EntitySystemBuilder().build(new ModManager());
+        EngineEntityManager entityManager = new EntitySystemBuilder().build(new ModManager());
         Timer timer = mock(Timer.class);
         NetworkSystem server = new NetworkSystemImpl(timer);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);

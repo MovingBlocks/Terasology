@@ -125,11 +125,14 @@ public class TerasologyEngine implements GameEngine {
         } else {
             config = new Config();
         }
-        config.getDefaultModSelection().addMod("core");
+        if (!config.getDefaultModSelection().hasMod("core")) {
+            config.getDefaultModSelection().addMod("core");
+        }
         if (config.getSecurity().getServerPrivateCertificate() == null) {
             CertificateGenerator generator = new CertificateGenerator();
             CertificatePair serverIdentity = generator.generateSelfSigned();
             config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
+            config.save();
         }
         CoreRegistry.put(Config.class, config);
     }

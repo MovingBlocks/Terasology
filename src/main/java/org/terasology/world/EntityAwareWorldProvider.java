@@ -20,15 +20,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
@@ -72,12 +72,12 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void initialise() {
-        for (EntityRef blockComp : entityManager.iteratorEntities(BlockComponent.class)) {
+        for (EntityRef blockComp : entityManager.listEntitiesWith(BlockComponent.class)) {
             BlockComponent comp = blockComp.getComponent(BlockComponent.class);
             blockComponentLookup.put(new Vector3i(comp.getPosition()), blockComp);
         }
 
-        for (EntityRef entity : entityManager.iteratorEntities(BlockComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(BlockComponent.class)) {
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             if (blockComp.temporary) {
                 HealthComponent health = entity.getComponent(HealthComponent.class);
@@ -190,19 +190,19 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onCreate(AddComponentEvent event, EntityRef entity) {
+    public void onCreate(OnActivatedEvent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         blockComponentLookup.put(new Vector3i(block.getPosition()), entity);
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onDestroy(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroy(OnDeactivatedEvent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         blockComponentLookup.remove(new Vector3i(block.getPosition()));
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onNewBlockRegion(AddComponentEvent event, EntityRef entity) {
+    public void onNewBlockRegion(OnActivatedEvent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
         for (Vector3i pos : regionComp.region) {
@@ -211,7 +211,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionChanged(ChangedComponentEvent event, EntityRef entity) {
+    public void onBlockRegionChanged(OnChangedEvent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
         for (Vector3i pos : oldRegion) {
             blockRegionLookup.remove(pos);
@@ -224,7 +224,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionRemoved(RemovedComponentEvent event, EntityRef entity) {
+    public void onBlockRegionRemoved(OnDeactivatedEvent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
         for (Vector3i pos : oldRegion) {
             blockRegionLookup.remove(pos);

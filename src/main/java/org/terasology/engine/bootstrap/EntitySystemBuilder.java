@@ -22,11 +22,11 @@ import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
@@ -44,9 +44,9 @@ import org.terasology.entitySystem.metadata.extension.Vector2fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.pojo.EventSystemImpl;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
-import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.entitySystem.internal.EventSystemImpl;
+import org.terasology.entitySystem.internal.PojoEntityManager;
+import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
@@ -71,7 +71,7 @@ import java.util.Set;
  */
 public class EntitySystemBuilder {
 
-    public PersistableEntityManager build(ModManager modManager) {
+    public EngineEntityManager build(ModManager modManager) {
         PojoEntityManager entityManager = new PojoEntityManager();
         TypeHandlerLibrary typeHandlerLibrary = buildTypeLibrary(entityManager);
         EntitySystemLibrary library = new EntitySystemLibraryImpl(typeHandlerLibrary);

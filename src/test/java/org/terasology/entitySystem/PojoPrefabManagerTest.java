@@ -5,6 +5,7 @@ import javax.vecmath.Vector3f;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -13,7 +14,7 @@ import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 
 import java.util.Iterator;

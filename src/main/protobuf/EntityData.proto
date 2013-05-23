@@ -82,6 +82,24 @@ message Event {
     extensions 5000 to max;
 }
 
+message PlayerEntityStore {
+    optional EntityStore store = 1;
+    optional float characterPosX = 15;
+    optional float characterPosY = 16;
+    optional float characterPosZ = 17;
+    optional bool hasCharacter = 18;
+
+    extensions 5000 to max;
+}
+
+message EntityStore {
+    repeated Entity entity = 1;
+    repeated string entityName = 2;
+    repeated string component_class = 3;
+
+    extensions 5000 to max;
+}
+
 message World {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;

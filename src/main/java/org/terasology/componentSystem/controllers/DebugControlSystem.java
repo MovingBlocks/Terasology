@@ -21,7 +21,7 @@ import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.health.DamageEvent;
 import org.terasology.engine.CoreRegistry;

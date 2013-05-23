@@ -22,9 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for events that are run on the owning client of the entity the event is sent to.
+ * Annotation for events that are run on the owning client of the entity the lifecycleEvents is sent to.
  * <p/>
- * If the net owner is null, or a local player the event is run on the server.
+ * If the net owner is null, or a local player the lifecycleEvents is run on the server.
  *
  * @author Immortius
  */

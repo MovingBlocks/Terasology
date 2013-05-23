@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.engine.CoreRegistry;
@@ -78,7 +78,7 @@ public class Server implements ChunkReadyListener {
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private NetData.ServerInfoMessage serverInfo;
 
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
     private PackedEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private BlockManagerClient blockManagerClient;
@@ -101,7 +101,7 @@ public class Server implements ChunkReadyListener {
         this.timer = CoreRegistry.get(Timer.class);
     }
 
-    void connectToEntitySystem(PersistableEntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
+    void connectToEntitySystem(EngineEntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
         this.entityManager = entityManager;
         this.eventSerializer = eventSerializer;
         this.entitySerializer = entitySerializer;

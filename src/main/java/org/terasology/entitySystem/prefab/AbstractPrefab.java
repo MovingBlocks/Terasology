@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem;
+package org.terasology.entitySystem.prefab;
 
 import com.google.common.base.Objects;
 

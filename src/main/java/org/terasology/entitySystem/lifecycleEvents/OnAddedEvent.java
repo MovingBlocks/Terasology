@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem;
 
-import gnu.trove.set.TIntSet;
+package org.terasology.entitySystem.lifecycleEvents;
+
+import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * This event is sent when an entity is created or a component added to an existing entity.
  */
-public interface PersistableEntityManager extends EntityManager {
+public class OnAddedEvent extends AbstractEvent {
+    private static OnAddedEvent instance = new OnAddedEvent();
 
-    EntityRef createEntityWithId(int id, Iterable<Component> components);
+    public static OnAddedEvent newInstance() {
+        return instance;
+    }
 
-    EntityRef createEntityRefWithId(int id);
-
-    int getNextId();
-
-    void setNextId(int id);
-
-    TIntSet getFreedIds();
+    private OnAddedEvent() {
+    }
 }

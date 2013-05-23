@@ -19,11 +19,11 @@ package org.terasology.entitySystem.persistence;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
@@ -46,7 +46,7 @@ import java.util.Set;
  * @author Immortius
  */
 public class EntitySerializer {
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
     private ComponentSerializer componentSerializer;
@@ -57,11 +57,11 @@ public class EntitySerializer {
     /**
      * @param entityManager The entityManager that deserialized entities will be placed in.
      */
-    public EntitySerializer(PersistableEntityManager entityManager) {
+    public EntitySerializer(EngineEntityManager entityManager) {
         this(entityManager, entityManager.getComponentLibrary());
     }
 
-    public EntitySerializer(PersistableEntityManager entityManager, ComponentLibrary componentLibrary) {
+    public EntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();

@@ -17,12 +17,7 @@
 package org.terasology.network.internal;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -40,27 +35,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityChangeSubscriber;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.metadata.ClassLibrary;
-import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.TypeHandler;
-import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.persistence.EventSerializer;
-import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Timer;
+import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.metadata.*;
+import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
+import org.terasology.entitySystem.persistence.EventSerializer;
+import org.terasology.entitySystem.persistence.PackedEntitySerializer;
+import org.terasology.entitySystem.persistence.PlayerEntityStore;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
@@ -104,7 +88,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     // Shared
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer eventSerializer;
     private PackedEntitySerializer entitySerializer;
@@ -139,7 +123,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void host(int port) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
             try {
-                for (EntityRef entity : entityManager.iteratorEntities(NetworkComponent.class)) {
+                for (EntityRef entity : entityManager.listEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
                 }
                 generateSerializationTables();
@@ -223,7 +207,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         Client localClient = new LocalClient(name, entityManager);
         clientList.add(localClient);
         clientPlayerLookup.put(localClient.getEntity(), localClient);
-        localClient.getEntity().send(new ConnectedEvent());
+        connectClient(localClient);
         return localClient;
     }
 
@@ -376,7 +360,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
 
         if (!Objects.equal(lastOwnerEntity, netComponent.owner)) {
-            NetClient lastOwner = (lastOwnerEntity == null) ? null : getNetOwner(lastOwnerEntity);
+            NetClient lastOwner = getNetOwner(lastOwnerEntity);
             NetClient newOwner = getNetOwner(netComponent.owner);
 
             if (!Objects.equal(lastOwner, newOwner)) {
@@ -436,7 +420,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
+    public void connectToEntitySystem(EngineEntityManager entityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
@@ -637,7 +621,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientList.remove(client);
         logger.info("Client disconnected: " + client.getName());
         MessageManager.getInstance().addMessage("Client disconnected: " + client.getName());
-        client.getEntity().send(new DisconnectedEvent());
+        PlayerEntityStore playerStore = new PlayerEntityStore(client.getId(), entityManager);
+        playerStore.beginStore();
+        client.getEntity().send(new DisconnectedEvent(playerStore));
+        try {
+            playerStore.endStore();
+        } catch (IOException e) {
+            logger.error("Failed to store player data for '{}'", client.getId(), e);
+        }
         client.disconnect();
     }
 
@@ -649,9 +640,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientPlayerLookup.put(client.getEntity(), client);
         sendServerInfo(client);
 
-        client.getEntity().send(new ConnectedEvent());
+        connectClient(client);
+
         logger.info("New client entity: {}", client.getEntity());
-        for (EntityRef netEntity : entityManager.iteratorEntities(NetworkComponent.class)) {
+        for (EntityRef netEntity : entityManager.listEntitiesWith(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
             switch (netComp.replicateMode) {
                 case OWNER:
@@ -665,6 +657,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     break;
             }
         }
+    }
+
+    private void connectClient(Client client) {
+        PlayerEntityStore entityStore = new PlayerEntityStore(client.getId(), entityManager);
+        try {
+            entityStore.beginRestore();
+        } catch (IOException ioe) {
+            logger.error("Failed to read player store for: '{}'", client.getId(), ioe);
+        }
+        client.getEntity().send(new ConnectedEvent(entityStore));
     }
 
     private void sendServerInfo(NetClient client) {

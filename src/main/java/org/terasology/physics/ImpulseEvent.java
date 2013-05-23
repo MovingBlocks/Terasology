@@ -16,7 +16,7 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.network.BroadcastEvent;
 
 import javax.vecmath.Vector3f;

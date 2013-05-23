@@ -45,7 +45,7 @@ public class PlayerFactory {
     }
 
     public EntityRef newInstance(Vector3f spawnPosition, EntityRef controller) {
-        EntityRef player = entityManager.create("core:player", spawnPosition);
+        EntityRef player = entityManager.create("engine:player", spawnPosition);
         EntityRef transferSlot = entityManager.create("engine:transferSlot");
         NetworkComponent netComp = transferSlot.getComponent(NetworkComponent.class);
         netComp.owner = player;

@@ -16,7 +16,7 @@
 
 package org.terasology.logic.console;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
  * @author Immortius

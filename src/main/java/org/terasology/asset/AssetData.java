@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.event;
 
-import org.terasology.entitySystem.AbstractEvent;
+package org.terasology.asset;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * Interface for AssetData.
+ *
+ * AssetData is information used to create and reload assets
  */
-public class RemovedComponentEvent extends AbstractEvent {
-
-    private static RemovedComponentEvent instance = new RemovedComponentEvent();
-
-    public static RemovedComponentEvent newInstance() {
-        return instance;
-    }
-
-    private RemovedComponentEvent() {
-    }
+public interface AssetData {
 }

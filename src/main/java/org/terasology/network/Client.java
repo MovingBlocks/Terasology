@@ -17,7 +17,7 @@
 package org.terasology.network;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.world.chunks.ChunkRegionListener;
 
 /**

@@ -15,7 +15,7 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * The library for metadata about events (and their fields).

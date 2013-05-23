@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem;
+package org.terasology.entitySystem.event;
 
 /**
  * @author Immortius

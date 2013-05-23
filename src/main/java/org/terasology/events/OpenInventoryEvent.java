@@ -15,7 +15,7 @@
  */
 package org.terasology.events;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.OwnerEvent;
 

@@ -19,7 +19,7 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
@@ -42,7 +42,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth <= 0) continue;
 

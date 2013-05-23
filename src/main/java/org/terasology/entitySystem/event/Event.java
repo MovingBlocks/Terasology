@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.entitySystem;
-
-import org.terasology.network.NoReplicate;
+package org.terasology.entitySystem.event;
 
 /**
- * @author Immortius
+ * Marker interface for classes that can be sent to entities as events
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public abstract class AbstractEvent implements Event {
-    @NoReplicate
-    protected boolean cancelled;
+public interface Event {
+    public void cancel();
 
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
+    public boolean isCancelled();
 }

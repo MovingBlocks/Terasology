@@ -26,13 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -77,7 +77,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {SkeletalMeshComponent.class, LocationComponent.class})
-    public void newSkeleton(AddComponentEvent event, EntityRef entity) {
+    public void newSkeleton(OnActivatedEvent event, EntityRef entity) {
         SkeletalMeshComponent skeleton = entity.getComponent(SkeletalMeshComponent.class);
         if (skeleton.mesh == null) {
             return;
@@ -104,7 +104,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
             if (skeletalMeshComp.animation != null && skeletalMeshComp.animation.getFrameCount() > 0) {
                 skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
@@ -174,7 +174,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
         glPushMatrix();
         glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
-        for (EntityRef entity : entityManager.iteratorEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             if (skeletalMesh.mesh == null || skeletalMesh.material == null) {
                 continue;
@@ -244,12 +244,12 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
         glDisable(GL11.GL_TEXTURE_2D);
         glLineWidth(2);
         glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        for (EntityRef entity : entityManager.iteratorEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.listEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             renderBone(skeletalMesh.rootBone);
         }
         glColor4f(1.0f, 0.0f, 1.0f, 1.0f);
-        for (EntityRef entity : entityManager.iteratorEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.listEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             renderBoneOrientation(skeletalMesh.rootBone);
         }

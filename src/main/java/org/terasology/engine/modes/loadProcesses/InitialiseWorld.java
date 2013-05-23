@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.players.LocalPlayer;
@@ -116,7 +117,8 @@ public class InitialiseWorld implements LoadProcess {
         chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
 
         ChunkStore chunkStore = null;
-        File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
+        PathManager.getInstance().setCurrentWorldTitle(worldInfo.getTitle());
+        File f = new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.WORLD_DATA_FILE);
         if (f.exists()) {
             try {
                 chunkStore = loadChunkStore(f);

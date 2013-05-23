@@ -32,7 +32,7 @@ public class LifespanSystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(LifespanComponent.class)) {
+        for (EntityRef entity : entityManager.listEntitiesWith(LifespanComponent.class)) {
             LifespanComponent lifespan = entity.getComponent(LifespanComponent.class);
             lifespan.lifespan -= delta;
             if (lifespan.lifespan < 0) {

@@ -29,11 +29,11 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.Share;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
 import org.terasology.logic.inventory.events.MoveItemAmountRequest;
@@ -232,6 +232,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     public void setStackSize(EntityRef item, int newStackSize) {
         setStackSize(item, EntityRef.NULL, newStackSize);
     }
+
     @Override
     public void setStackSize(EntityRef item, EntityRef inventoryEntity, int newStackSize) {
          setStackSize(item,item.getComponent(ItemComponent.class) , newStackSize, inventoryEntity);
@@ -294,7 +295,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
      */
 
     @ReceiveEvent(components = InventoryComponent.class)
-    public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroyed(OnDeactivatedEvent event, EntityRef entity) {
         if (networkSystem.getMode().isAuthority()) {
             InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
             for (EntityRef content : inventory.itemSlots) {

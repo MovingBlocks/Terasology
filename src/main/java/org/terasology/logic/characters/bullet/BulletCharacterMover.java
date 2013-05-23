@@ -92,15 +92,18 @@ public class BulletCharacterMover implements CharacterMover {
 
     @Override
     public CharacterStateEvent step(CharacterStateEvent initial, CharacterMoveInputEvent input, EntityRef entity) {
+
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
 
         CharacterStateEvent result = new CharacterStateEvent(initial);
         result.setSequenceNumber(input.getSequenceNumber());
-        updatePosition(characterMovementComponent, result, input, entity);
-        result.setTime(initial.getTime() + input.getDeltaMs());
-        if (result.getMode() != MovementMode.GHOSTING) {
-            checkSwimming(characterMovementComponent, result);
+        if (worldProvider.isBlockActive(initial.getPosition())) {
+            updatePosition(characterMovementComponent, result, input, entity);
+            if (result.getMode() != MovementMode.GHOSTING) {
+                checkSwimming(characterMovementComponent, result);
+            }
         }
+        result.setTime(initial.getTime() + input.getDeltaMs());
         updateRotation(characterMovementComponent, result, input);
         result.setPitch(input.getPitch());
         result.setYaw(input.getYaw());

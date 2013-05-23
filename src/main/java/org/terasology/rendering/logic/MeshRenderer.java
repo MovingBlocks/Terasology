@@ -33,14 +33,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.utility.DroppedItemTypeComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.ShaderManager;
@@ -136,7 +136,7 @@ public class MeshRenderer implements RenderSystem {
     }
 
     @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
-    public void onNewMesh(AddComponentEvent event, EntityRef entity) {
+    public void onNewMesh(OnActivatedEvent event, EntityRef entity) {
         addMesh(entity);
     }
 
@@ -158,13 +158,13 @@ public class MeshRenderer implements RenderSystem {
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, MeshComponent.class})
-    public void onLocalMesh(ChangedComponentEvent event, EntityRef entity) {
+    public void onLocalMesh(OnChangedEvent event, EntityRef entity) {
         removeMesh(entity);
         addMesh(entity);
     }
 
     @ReceiveEvent(components = {MeshComponent.class})
-    public void onChangeMesh(ChangedComponentEvent event, EntityRef entity) {
+    public void onChangeMesh(OnChangedEvent event, EntityRef entity) {
         removeMesh(entity);
         addMesh(entity);
     }
@@ -184,7 +184,7 @@ public class MeshRenderer implements RenderSystem {
     }
 
     @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
-    public void onDestroyMesh(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroyMesh(OnDeactivatedEvent event, EntityRef entity) {
         if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
             return;
         }
@@ -334,7 +334,7 @@ public class MeshRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        /*for (EntityRef entity : manager.iteratorEntities(MeshComponent.class)) {
+        /*for (EntityRef entity : manager.listEntities(MeshComponent.class)) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             if (meshComp.renderType != MeshComponent.RenderType.Normal || meshComp.mesh == null) continue;
 

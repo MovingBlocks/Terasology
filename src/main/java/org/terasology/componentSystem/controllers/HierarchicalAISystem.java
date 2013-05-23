@@ -21,7 +21,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.health.DamageEvent;
@@ -68,7 +68,7 @@ public class HierarchicalAISystem implements ComponentSystem,
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(
+        for (EntityRef entity : entityManager.listEntitiesWith(
                 HierarchicalAIComponent.class, CharacterMovementComponent.class,
                 LocationComponent.class)) {
             LocationComponent location = entity

@@ -18,8 +18,7 @@ package org.terasology.entitySystem.persistence;
 import com.google.protobuf.TextFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedReader;
@@ -99,12 +98,12 @@ public class WorldPersister {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(WorldPersister.class);
-    private EntityManager entityManager;
+    private EngineEntityManager entityManager;
     private WorldSerializer persisterHelper;
 
-    public WorldPersister(EntityManager entityManager) {
+    public WorldPersister(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
-        this.persisterHelper = new WorldSerializerImpl((PersistableEntityManager) entityManager);
+        this.persisterHelper = new WorldSerializerImpl(entityManager);
     }
 
     public void save(File file, SaveFormat format) throws IOException {
@@ -116,34 +115,18 @@ public class WorldPersister {
                 logger.error("Failed to create world save directory {}", parentFile);
             }
         }
-        FileOutputStream out = new FileOutputStream(file);
 
-        try {
+        try (FileOutputStream out = new FileOutputStream(file)) {
             format.save(out, world);
-        } finally {
-            // JAVA7 : Replace with improved resource handling
-            try {
-                out.close();
-            } catch (IOException e) {
-                logger.error("Failed to close file", e);
-            }
         }
     }
 
     public void load(File file, SaveFormat format) throws IOException {
         entityManager.clear();
 
-        FileInputStream in = new FileInputStream(file);
         EntityData.World world = null;
-        try {
+        try (FileInputStream in = new FileInputStream(file)) {
             world = format.load(in);
-        } finally {
-            // JAVA7: Replace with improved resource handling
-            try {
-                in.close();
-            } catch (IOException e) {
-                logger.error("Failed to close file", e);
-            }
         }
 
         if (world != null) {

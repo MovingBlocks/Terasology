@@ -15,16 +15,19 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
+import org.terasology.entitySystem.internal.PojoPrefabManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 
 import com.google.common.collect.Lists;
+import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.logic.mod.ModManager;
 
 /**
@@ -32,7 +35,7 @@ import org.terasology.logic.mod.ModManager;
  */
 public class PojoEntityManagerTest {
 
-    PersistableEntityManager entityManager;
+    EngineEntityManager entityManager;
 
     private static ModManager modManager;
 
@@ -118,7 +121,7 @@ public class PojoEntityManagerTest {
         StringComponent comp = new StringComponent();
         entity.addComponent(comp);
 
-        for (Map.Entry<EntityRef, StringComponent> item : entityManager.iterateComponents(StringComponent.class)) {
+        for (Map.Entry<EntityRef, StringComponent> item : entityManager.listComponents(StringComponent.class)) {
             assertEquals(entity, item.getKey());
             assertEquals(comp, item.getValue());
         }
@@ -131,7 +134,7 @@ public class PojoEntityManagerTest {
         EntityRef entity2 = entityManager.create();
         entity2.addComponent(new StringComponent());
         
-        Iterator<Map.Entry<EntityRef, StringComponent>> iterator = entityManager.iterateComponents(StringComponent.class).iterator();
+        Iterator<Map.Entry<EntityRef, StringComponent>> iterator = entityManager.listComponents(StringComponent.class).iterator();
         iterator.next();
 
         entity2.removeComponent(StringComponent.class);
@@ -145,7 +148,7 @@ public class PojoEntityManagerTest {
         EntityRef entity1 = entityManager.create();
         StringComponent comp = entity1.addComponent(new StringComponent());
 
-        verify(eventSystem).send(entity1, AddComponentEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnActivatedEvent.newInstance(), comp);
     }
 
     @Test
@@ -157,7 +160,7 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         entity1.removeComponent(StringComponent.class);
 
-        verify(eventSystem).send(entity1, RemovedComponentEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnDeactivatedEvent.newInstance(), comp);
     }
 
     @Test
@@ -169,7 +172,7 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         entity1.saveComponent(comp);
 
-        verify(eventSystem).send(entity1, ChangedComponentEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnChangedEvent.newInstance(), comp);
     }
 
     @Test
@@ -181,7 +184,7 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         StringComponent comp2 = entity1.addComponent(new StringComponent());
 
-        verify(eventSystem).send(entity1, ChangedComponentEvent.newInstance(), comp2);
+        verify(eventSystem).send(entity1, OnChangedEvent.newInstance(), comp2);
     }
     
     @Test
@@ -193,7 +196,7 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         entity1.destroy();
         
-        verify(eventSystem).send(entity1, RemovedComponentEvent.newInstance());
+        verify(eventSystem).send(entity1, OnDeactivatedEvent.newInstance());
     }
     
     @Test
@@ -201,7 +204,7 @@ public class PojoEntityManagerTest {
         EntityRef entity1 = entityManager.create();
         StringComponent comp1 = entity1.addComponent(new StringComponent());
         
-        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class));
         assertEquals(Lists.newArrayList(entity1), results);
     }
 
@@ -210,7 +213,7 @@ public class PojoEntityManagerTest {
         EntityRef entity1 = entityManager.create();
         StringComponent comp1 = entity1.addComponent(new StringComponent());
 
-        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class, IntegerComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class, IntegerComponent.class));
         assertEquals(Lists.newArrayList(), results);
     }
 
@@ -220,13 +223,13 @@ public class PojoEntityManagerTest {
         StringComponent comp1 = entity1.addComponent(new StringComponent());
         IntegerComponent comp2 = entity1.addComponent(new IntegerComponent());
 
-        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class, IntegerComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class, IntegerComponent.class));
         assertEquals(Lists.newArrayList(entity1), results);
     }
 
     @Test
     public void iterateWithNoComponents() {
-        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class));
         assertEquals(Lists.newArrayList(), results);
     }
     
@@ -249,10 +252,10 @@ public class PojoEntityManagerTest {
 
         EntityRef reference = entityManager.create();
         EntityRefComponent refComp = reference.addComponent(new EntityRefComponent());
-        refComp.entityRef = entityManager.iteratorEntities(StringComponent.class).iterator().next();
+        refComp.entityRef = entityManager.listEntitiesWith(StringComponent.class).iterator().next();
 
         assertTrue(main.exists());
-        entityManager.iteratorEntities(StringComponent.class).iterator().next().destroy();
+        entityManager.listEntitiesWith(StringComponent.class).iterator().next().destroy();
 
         assertFalse(main.exists());
         assertFalse(refComp.entityRef.exists());

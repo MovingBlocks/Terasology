@@ -22,7 +22,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.messaging.ChatMessageEvent;
 import org.terasology.events.messaging.SendChatMessage;
@@ -56,7 +56,7 @@ public class MessagingSystem implements ComponentSystem {
     public void onReceiveMessage(SendChatMessage event, EntityRef entity) {
         if (networkSystem.getMode().isAuthority()) {
             logger.info("Received message from {} : '{}'", entity, event.getMessage());
-            for (EntityRef client : entityManager.iteratorEntities(ClientComponent.class)) {
+            for (EntityRef client : entityManager.listEntitiesWith(ClientComponent.class)) {
                 client.send(new ChatMessageEvent(event.getMessage(), entity.getComponent(ClientComponent.class).clientInfo));
             }
         }

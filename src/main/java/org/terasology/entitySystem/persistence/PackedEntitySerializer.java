@@ -25,19 +25,15 @@ import com.google.common.primitives.UnsignedBytes;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.ComponentContainer;
-import org.terasology.entitySystem.EntityBuilder;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,12 +43,12 @@ import java.util.Set;
 public class PackedEntitySerializer {
     private static final Logger logger = LoggerFactory.getLogger(PackedEntitySerializer.class);
 
-    private ComponentSerializeCheck componentSerializeCheck;
-    private PersistableEntityManager entityManager;
+    private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
+    private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
 
-    public PackedEntitySerializer(PersistableEntityManager entityManager, ComponentLibrary componentLibrary) {
+    public PackedEntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary) {
         this.entityManager = entityManager;
         this.componentLibrary = componentLibrary;
     }
@@ -77,7 +73,7 @@ public class PackedEntitySerializer {
         this.idTable = ImmutableBiMap.copyOf(componentIdMapping);
     }
 
-    public EntityData.PackedEntity serialize(EntityRef entity, boolean deltaAgainstPrefab, FieldSerializeCheck<Component> fieldCheck) {
+    public EntityData.PackedEntity.Builder serialize(EntityRef entity, boolean deltaAgainstPrefab, FieldSerializeCheck<Component> fieldCheck) {
         Prefab prefab = entity.getParentPrefab();
         if (prefab != null && deltaAgainstPrefab) {
             return serializeEntityDelta(entity, prefab, fieldCheck);
@@ -86,7 +82,7 @@ public class PackedEntitySerializer {
         }
     }
 
-    private EntityData.PackedEntity serializeEntityFull(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
+    private EntityData.PackedEntity.Builder serializeEntityFull(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.PackedEntity.Builder entity = EntityData.PackedEntity.newBuilder();
 
         ByteString.Output fieldIds = ByteString.newOutput();
@@ -101,10 +97,10 @@ public class PackedEntitySerializer {
         entity.setFieldIds(fieldIds.toByteString());
         entity.setComponentFieldCounts(componentFieldCounts.toByteString());
 
-        return entity.build();
+        return entity;
     }
 
-    private EntityData.PackedEntity serializeEntityDelta(EntityRef entityRef, Prefab prefab, FieldSerializeCheck<Component> fieldCheck) {
+    private EntityData.PackedEntity.Builder serializeEntityDelta(EntityRef entityRef, Prefab prefab, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.PackedEntity.Builder entity = EntityData.PackedEntity.newBuilder();
         entity.setParentPrefabUri(prefab.getName());
         Set<Class<? extends Component>> presentClasses = Sets.newHashSet();
@@ -134,7 +130,7 @@ public class PackedEntitySerializer {
                 entity.addRemovedComponent(idTable.get(prefabComponent.getClass()));
             }
         }
-        return entity.build();
+        return entity;
     }
 
     private void serializeComponentDelta(Component oldComponent, Component newComponent, FieldSerializeCheck<Component> fieldCheck, EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
@@ -253,7 +249,11 @@ public class PackedEntitySerializer {
             target = entityManager.newBuilder();
         }
         deserializeOnto(target, entityData);
-        return target.build();
+        if (entityData.hasId()) {
+            return entityManager.createEntityWithId(entityData.getId(), target.iterateComponents());
+        } else {
+            return target.build();
+        }
     }
 
 

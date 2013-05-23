@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.entitySystem.event;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * Interface for a single lifecycleEvents receiver
+ *
+ * @author Immortius
  */
-public class ChangedComponentEvent extends AbstractEvent {
-
-    private static ChangedComponentEvent instance = new ChangedComponentEvent();
-
-    public static ChangedComponentEvent newInstance() {
-        return instance;
-    }
-
-    private ChangedComponentEvent() {
-    }
+public interface EventReceiver<T extends Event> {
+    public void onEvent(T event, EntityRef entity);
 }

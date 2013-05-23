@@ -20,13 +20,25 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.NullAudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Terasology;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerAuthority;
@@ -41,20 +53,49 @@ import java.io.File;
 public abstract class TerasologyTestingEnvironment {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
+    private static boolean setup = false;
+
+    private EngineEntityManager engineEntityManager;
+
     @BeforeClass
     public static void setupEnvironment() throws Exception {
-        bindLwjgl();
-        CoreRegistry.put(BlockManager.class, new BlockManagerAuthority());
+        if (!setup) {
+            setup = true;
+            bindLwjgl();
+            CoreRegistry.put(BlockManager.class, new BlockManagerAuthority());
+
+            setupConfig();
+
+            CoreRegistry.put(AudioManager.class, new NullAudioManager());
+
+            Display.setDisplayMode(new DisplayMode(0,0));
+            Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
+
+            CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
+            ModManager modManager = new ModManager();
+            modManager.applyActiveMods();
+            CoreRegistry.put(ModManager.class, modManager);
+            AssetType.registerAssetTypes();
+            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+        }
     }
 
     @Before
     public void setup() throws Exception {
-        setupConfig();
-        new EntitySystemBuilder().build(new ModManager());
+
+        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class));
+        LoadPrefabs prefabLoadStep = new LoadPrefabs();
+        prefabLoadStep.begin();
+        while (!prefabLoadStep.step());
+    }
+
+    public EngineEntityManager getEntityManager() {
+        return engineEntityManager;
     }
 
     public static void setupConfig() {
         Config config = new Config();
+        config.getAudio().setDisableSound(true);
         CoreRegistry.put(Config.class, config);
     }
 

@@ -18,8 +18,10 @@ package org.terasology.audio.loaders;
 
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.openAL.OggStreamingSound;
+import org.terasology.engine.CoreRegistry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +34,8 @@ import java.util.List;
 public class OggStreamingSoundLoader implements AssetLoader<Sound> {
     @Override
     public Sound load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
-        return new OggStreamingSound(uri, urls.get(0));
+        // TODO: Use a different sound loader rather than hacking in a check here
+        AudioManager audioManager = CoreRegistry.get(AudioManager.class);
+        return audioManager.loadStreamingSound(uri, urls);
     }
 }

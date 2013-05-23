@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
@@ -34,7 +34,7 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 
 /**
- * Implementation of WorldSerializer for PersistableEntityManager.
+ * Implementation of WorldSerializer for EngineEntityManager.
  *
  * @author Immortius <immortius@gmail.com>
  */
@@ -43,11 +43,11 @@ public class WorldSerializerImpl implements WorldSerializer {
 
     private ComponentLibrary componentLibrary;
     private PrefabManager prefabManager;
-    private PersistableEntityManager entityManager;
+    private EngineEntityManager entityManager;
     private EntitySerializer entitySerializer;
     private PrefabSerializer prefabSerializer;
 
-    public WorldSerializerImpl(PersistableEntityManager entityManager) {
+    public WorldSerializerImpl(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
@@ -68,7 +68,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         }
 
         TIntList nonPersistedIds = new TIntArrayList();
-        for (EntityRef entity : entityManager.iteratorEntities()) {
+        for (EntityRef entity : entityManager.listEntities()) {
             if (verbose || entity.isPersisted()) {
                 world.addEntity(entitySerializer.serialize(entity));
             } else {

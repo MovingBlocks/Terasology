@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.engine.CoreRegistry;
@@ -49,10 +50,10 @@ public class LoadEntities implements LoadProcess {
 
     @Override
     public boolean step() {
-        CoreRegistry.put(WorldPersister.class, new WorldPersister(CoreRegistry.get(EntityManager.class)));
+        CoreRegistry.put(WorldPersister.class, new WorldPersister((EngineEntityManager)CoreRegistry.get(EntityManager.class)));
 
         // TODO: Should probably not use the world title as a path?
-        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), TerasologyConstants.ENTITY_DATA_FILE);
+        File entityDataFile = new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.ENTITY_DATA_FILE);
         if (entityDataFile.exists()) {
             try {
                 CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);

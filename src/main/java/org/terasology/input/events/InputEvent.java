@@ -15,7 +15,7 @@
  */
 package org.terasology.input.events;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
 

@@ -21,7 +21,7 @@ import org.terasology.rendering.gui.framework.events.AnimationListener;
 import java.util.ArrayList;
 
 /**
- * TODO notification for repeat event
+ * TODO notification for repeat lifecycleEvents
  */
 public abstract class Animation {
 

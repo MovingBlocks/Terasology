@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem;
+package org.terasology.entitySystem.event;
+
+import org.terasology.entitySystem.Component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,7 +26,7 @@ import java.lang.annotation.Target;
  * This annotation is used to mark up methods that can be registered to receive events through the EventSystem
  * <p/>
  * These methods should have the form
- * <code>public void handlerMethod(EventType event, EntityRef entity)</code>
+ * <code>public void handlerMethod(EventType lifecycleEvents, EntityRef entity)</code>
  *
  * @author Immortius <immortius@gmail.com>
  */

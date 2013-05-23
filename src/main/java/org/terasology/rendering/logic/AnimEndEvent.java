@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.logic;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 
 /**

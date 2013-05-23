@@ -21,7 +21,7 @@ package org.terasology.input;
  */
 public enum SendEventMode {
     /**
-     * Send an event every update/frame with the current axis value
+     * Send an lifecycleEvents every update/frame with the current axis value
      */
     ALWAYS {
         @Override
@@ -30,7 +30,7 @@ public enum SendEventMode {
         }
     },
     /**
-     * Sends an event every frame in which the current axis value is not zero
+     * Sends an lifecycleEvents every frame in which the current axis value is not zero
      */
     WHEN_NON_ZERO {
         @Override
@@ -39,7 +39,7 @@ public enum SendEventMode {
         }
     },
     /**
-     * Only sends an event when the value of the axis changes
+     * Only sends an lifecycleEvents when the value of the axis changes
      */
     WHEN_CHANGED {
         @Override

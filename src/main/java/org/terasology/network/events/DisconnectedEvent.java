@@ -16,10 +16,21 @@
 
 package org.terasology.network.events;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityStore;
+import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.persistence.PlayerEntityStore;
 
 /**
  * @author Immortius
  */
 public class DisconnectedEvent extends AbstractEvent {
+    private PlayerEntityStore entityStore;
+
+    public DisconnectedEvent(PlayerEntityStore entityStore) {
+        this.entityStore = entityStore;
+    }
+
+    public PlayerEntityStore getEntityStore() {
+        return entityStore;
+    }
 }

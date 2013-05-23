@@ -19,8 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.MenuControlSystem;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
@@ -59,7 +60,7 @@ public class StateIngame implements GameState {
     private EventSystem eventSystem;
     private GUIManager guiManager;
     private WorldRenderer worldRenderer;
-    private EntityManager entityManager;
+    private EngineEntityManager entityManager;
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
     private NetworkSystem networkSystem;
@@ -77,7 +78,7 @@ public class StateIngame implements GameState {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         eventSystem = CoreRegistry.get(EventSystem.class);
         componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        entityManager = CoreRegistry.get(EntityManager.class);
+        entityManager = (EngineEntityManager)CoreRegistry.get(EntityManager.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
@@ -95,7 +96,7 @@ public class StateIngame implements GameState {
         guiManager.closeAllWindows();
         if (saveWorld) {
             try {
-                CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+                CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {
                 logger.error("Failed to save entities", e);
             }

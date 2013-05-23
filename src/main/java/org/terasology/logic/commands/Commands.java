@@ -20,14 +20,15 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.logic.health.FullHealthEvent;
 import org.terasology.logic.health.HealthChangedEvent;
@@ -263,7 +264,7 @@ public class Commands implements CommandProvider {
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
-        WorldPersister worldPersister = new WorldPersister(CoreRegistry.get(EntityManager.class));
+        WorldPersister worldPersister = new WorldPersister((EngineEntityManager)CoreRegistry.get(EntityManager.class));
         worldPersister.save(new File(PathManager.getInstance().getHomePath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
     }
 
@@ -326,13 +327,13 @@ public class Commands implements CommandProvider {
     public void destroyAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         int i = 0;
-        for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
+        for (EntityRef ref : entityManager.listEntitiesWith(SimpleAIComponent.class)) {
             ref.destroy();
             i++;
         }
         MessageManager.getInstance().addMessage("Simple AIs (" + i + ") Destroyed ");
         i = 0;
-        for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
+        for (EntityRef ref : entityManager.listEntitiesWith(HierarchicalAIComponent.class)) {
             ref.destroy();
             i++;
         }
@@ -343,12 +344,12 @@ public class Commands implements CommandProvider {
     public void countAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         int i = 0;
-        for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
+        for (EntityRef ref : entityManager.listEntitiesWith(SimpleAIComponent.class)) {
             i++;
         }
         MessageManager.getInstance().addMessage("Simple AIs: " + i);
         i = 0;
-        for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
+        for (EntityRef ref : entityManager.listEntitiesWith(HierarchicalAIComponent.class)) {
             i++;
         }
         MessageManager.getInstance().addMessage("Hierarchical AIs: " + i);

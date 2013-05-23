@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.FieldMetadata;
@@ -38,7 +38,7 @@ public class ComponentSerializerTest {
     public void setup() {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        PersistableEntityManager entityManager = builder.build(modManager);
+        EngineEntityManager entityManager = builder.build(modManager);
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);

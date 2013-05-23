@@ -29,12 +29,13 @@ import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.DisplayInformationComponent;
+import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
@@ -102,7 +103,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private float chunkSendRate = 0.05469f;
 
-    private String id;
+    private PublicIdentityCertificate identity;
 
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
@@ -122,7 +123,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private AtomicInteger sentMessages = new AtomicInteger();
     private AtomicInteger sentBytes = new AtomicInteger();
 
-    public NetClient(Channel channel, NetworkSystemImpl networkSystem) {
+    public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity) {
         this.channel = channel;
         metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
@@ -149,7 +150,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public String getId() {
-        return id;
+        return identity.getId();
     }
 
     public void setName(String name) {
@@ -438,7 +439,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             }
             // Note: Send owner->server fields on initial create
             Client owner = networkSystem.getOwner(entity);
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true, new ServerComponentFieldCheck(owner == this, true));
+            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true, new ServerComponentFieldCheck(owner == this, true)).build();
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {

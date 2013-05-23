@@ -16,19 +16,19 @@
 package org.terasology.entitySystem;
 
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.Collection;
 import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public interface EntityManager {
-
-    void clear();
-
-    // Entity Management
 
     /**
      * Creates an EntityBuilder.
@@ -103,9 +103,12 @@ public interface EntityManager {
      */
     EntityRef copy(EntityRef other);
 
-    void subscribe(EntityChangeSubscriber subscriber);
-
-    void unsubscribe(EntityChangeSubscriber subscriber);
+    /**
+     * Creates a copy of the components of an entity.
+     * @param original
+     * @return A map of components types to components copied from the target entity.
+     */
+    Map<Class<? extends Component>, Component> copyComponents(EntityRef original);
 
     /**
      * @param componentClass
@@ -113,11 +116,18 @@ public interface EntityManager {
      */
     int getComponentCount(Class<? extends Component> componentClass);
 
-    Iterable<EntityRef> iteratorEntities();
+    /**
+     * @return An iterable over all entities
+     */
+    Iterable<EntityRef> listEntities();
 
-    Iterable<EntityRef> iteratorEntities(Class<? extends Component>... componentClasses);
+    /**
+     * @param componentClasses
+     * @return An iterable over all entities with the provided component types.
+     */
+    Iterable<EntityRef> listEntitiesWith(Class<? extends Component>... componentClasses);
 
-    <T extends Component> Iterable<Map.Entry<EntityRef, T>> iterateComponents(Class<T> componentClass);
+    <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass);
 
 
     /**
@@ -125,13 +135,9 @@ public interface EntityManager {
      */
     EventSystem getEventSystem();
 
-    void setEventSystem(EventSystem system);
-
     PrefabManager getPrefabManager();
 
     ComponentLibrary getComponentLibrary();
 
     int getActiveEntities();
-
-    Map<Class<? extends Component>, Component> copyComponents(EntityRef original);
 }

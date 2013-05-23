@@ -22,8 +22,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -84,7 +84,7 @@ public class EntityAwareWorldProviderTest {
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
 
         assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
-        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
+        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.listEntitiesWith(BlockComponent.class));
         assertEquals(1, blockEntities.size());
         assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
         assertNotNull(blockEntities.get(0).getComponent(BlockComponent.class));
@@ -103,7 +103,7 @@ public class EntityAwareWorldProviderTest {
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
 
         assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
-        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
+        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.listEntitiesWith(BlockComponent.class));
         assertEquals(1, blockEntities.size());
         assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
         assertNotNull(blockEntities.get(0).getComponent(BlockComponent.class));
@@ -127,7 +127,7 @@ public class EntityAwareWorldProviderTest {
         entity.saveComponent(comp);
 
         assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir(), entity));
-        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.iteratorEntities(BlockComponent.class));
+        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.listEntitiesWith(BlockComponent.class));
         for (EntityRef entityFound : blockEntities) {
             System.out.println(entityFound.toFullDescription());
         }

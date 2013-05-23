@@ -16,7 +16,7 @@
 
 package org.terasology.logic.health;
 
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
 /**

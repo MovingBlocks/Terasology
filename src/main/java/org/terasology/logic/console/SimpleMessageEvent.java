@@ -19,7 +19,7 @@ package org.terasology.logic.console;
 import org.terasology.network.OwnerEvent;
 
 /**
- * Simple message event. Not ideal in general, but useful for quickly getting things working.
+ * Simple message lifecycleEvents. Not ideal in general, but useful for quickly getting things working.
  *
  * @author Immortius
  */

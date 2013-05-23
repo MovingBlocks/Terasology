@@ -220,14 +220,14 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             //Show Poisoned Status with Green Hearts:
             /*PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PoisonedComponent.class);
             entityManager = CoreRegistry.get(EntityManager.class);
-            for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
+            for (EntityRef entity : entityManager.listEntities(PoisonedComponent.class)) {
                 if (poisoned.poisonDuration >= 1)
                     hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
                 else
                     hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }
             
-            for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
+            for (EntityRef entity : entityManager.listEntities(CuredComponent.class)) {
                 //For fixing the Green > Red hearts when cured:
                 CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CuredComponent.class);
                 entityManager = CoreRegistry.get(EntityManager.class);

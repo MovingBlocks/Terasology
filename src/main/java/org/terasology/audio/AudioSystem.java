@@ -22,7 +22,7 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;

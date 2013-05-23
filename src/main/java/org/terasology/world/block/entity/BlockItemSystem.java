@@ -23,10 +23,10 @@ import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.inventory.ItemComponent;
@@ -70,7 +70,7 @@ public class BlockItemSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = BlockItemComponent.class)
-    public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroyed(OnDeactivatedEvent event, EntityRef entity) {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 

@@ -18,9 +18,9 @@ package org.terasology.entitySystem.common;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.internal.PojoEntityManager;
 
 /**
  * Null entity implementation - acts the same as an empty entity, except you cannot add anything to it.

@@ -838,7 +838,7 @@ public final class WorldRenderer {
         worldProvider.dispose();
         WorldInfo worldInfo = worldProvider.getWorldInfo();
         try {
-            WorldInfo.save(new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
+            WorldInfo.save(new File(PathManager.getInstance().getCurrentWorldPath(), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
         } catch (IOException e) {
             logger.error("Failed to save world manifest", e);
         }
