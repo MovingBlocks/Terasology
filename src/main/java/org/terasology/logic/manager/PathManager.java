@@ -70,7 +70,30 @@ public final class PathManager {
     }
 
     public File getWorldSavePath(String worldTitle) {
-        // TODO: remove special characters from world title?
+        worldTitle = worldTitle.replaceAll("|","");
+        worldTitle = worldTitle.replaceAll("!","");
+        worldTitle = worldTitle.replaceAll("@","");
+        worldTitle = worldTitle.replaceAll("§","");
+        worldTitle = worldTitle.replaceAll("$","");
+        worldTitle = worldTitle.replaceAll("%","");
+        worldTitle = worldTitle.replaceAll("&","");
+        worldTitle = worldTitle.replaceAll("/","");
+        worldTitle = worldTitle.replaceAll(",","");
+        worldTitle = worldTitle.replaceAll(".","");
+        worldTitle = worldTitle.replaceAll(";","");
+        worldTitle = worldTitle.replaceAll(":","");
+        worldTitle = worldTitle.replaceAll("<","");
+        worldTitle = worldTitle.replaceAll(">","");
+        worldTitle = worldTitle.replaceAll("]","");
+        worldTitle = worldTitle.replaceAll("}","");
+         /* TODO: Fix not working Special Characters
+        worldTitle = worldTitle.replaceAll("(","");
+        worldTitle = worldTitle.replaceAll(")","");
+        worldTitle = worldTitle.replaceAll("*","");
+        worldTitle = worldTitle.replaceAll("{","");
+        worldTitle = worldTitle.replaceAll("[","");
+        */
+
         File result = new File(worldPath, worldTitle);
         result.mkdirs();
         return result;
