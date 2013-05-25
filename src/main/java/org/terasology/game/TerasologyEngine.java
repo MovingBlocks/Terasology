@@ -34,7 +34,7 @@ import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
@@ -114,6 +114,8 @@ public class TerasologyEngine implements GameEngine {
 
         logger.info("Initializing Terasology...");
         logger.info(TerasologyGameVersionInfo.getInstance().toString());
+        logger.info("Home path: {}", PathManager.getInstance().getHomePath());
+        logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
 
         initConfig();
         
@@ -277,10 +279,10 @@ public class TerasologyEngine implements GameEngine {
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
+                addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
+                addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "linux"));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -288,7 +290,7 @@ public class TerasologyEngine implements GameEngine {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
+                addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");
