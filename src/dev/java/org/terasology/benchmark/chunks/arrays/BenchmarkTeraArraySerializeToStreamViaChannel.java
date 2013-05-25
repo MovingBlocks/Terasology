@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
-import org.terasology.benchmark.BenchmarkResult;
 import org.terasology.world.chunks.blockdata.TeraArray;
 
 public class BenchmarkTeraArraySerializeToStreamViaChannel extends BenchmarkTeraArraySerialization {
@@ -33,29 +32,24 @@ public class BenchmarkTeraArraySerializeToStreamViaChannel extends BenchmarkTera
     }
 
     @Override
-    public void prerun(int index) {}
+    public void prerun() {}
 
     @SuppressWarnings("unchecked")
     @Override
-    public int run(int index, int repetitions, BenchmarkResult result) {
+    public void run() {
         try {
-            int bogus = 0;
-            for (int i = 0; i < repetitions; i++) {
-                handler.serialize(array, buffer);
-                bogus += buffer.position();
-                buffer.rewind();
-                channel.write(buffer);
-                buffer.rewind();
-                out.reset();
-            }
-            return bogus;
+            handler.serialize(array, buffer);
+            buffer.rewind();
+            channel.write(buffer);
+            buffer.rewind();
+            out.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void postrun(int index, BenchmarkResult result) {}
+    public void postrun() {}
 
     @Override
     public void finish(boolean aborted) {}

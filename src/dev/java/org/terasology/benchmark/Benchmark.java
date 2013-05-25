@@ -6,25 +6,21 @@ package org.terasology.benchmark;
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
  */
-public abstract class Benchmark {
+public interface Benchmark {
 
-    public Benchmark() {}
+    String getTitle();
+    
+    int getWarmupRepetitions();
+    
+    int[] getRepetitions();
 
-    public abstract String getTitle();
+    void setup();
     
-    public abstract int getWarmupRepetitions();
+    void prerun();
     
-    public abstract int[] getRepetitions();
+    void run();
     
-    public abstract BenchmarkResult createResult();
+    void postrun();
     
-    public abstract void setup();
-    
-    public abstract void prerun(int index);
-    
-    public abstract int run(int index, int repetitions, BenchmarkResult result);
-    
-    public abstract void postrun(int index, BenchmarkResult result);
-    
-    public abstract void finish(boolean aborted);
+    void finish(boolean aborted);
 }

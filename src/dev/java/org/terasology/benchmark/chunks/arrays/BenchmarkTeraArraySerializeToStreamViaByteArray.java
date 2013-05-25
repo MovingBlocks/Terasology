@@ -3,7 +3,6 @@ package org.terasology.benchmark.chunks.arrays;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
-import org.terasology.benchmark.BenchmarkResult;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArray.SerializationHandler;
 
@@ -31,27 +30,24 @@ public class BenchmarkTeraArraySerializeToStreamViaByteArray extends BenchmarkTe
     }
 
     @Override
-    public void prerun(int index) {}
+    public void prerun() {}
 
     @SuppressWarnings("unchecked")
     @Override
-    public int run(int index, int repetitions, BenchmarkResult result) {
+    public void run() {
         int bogus = 0;
-        for (int i = 0; i < repetitions; i++) {
-            handler.serialize(array, buffer);
-            final int length = buffer.position();
-            buffer.rewind();
-            buffer.get(via, 0, length);
-            buffer.rewind();
-            out.write(via, 0, length);
-            out.reset();
-            bogus += length;
-        }
-        return bogus;
+        handler.serialize(array, buffer);
+        final int length = buffer.position();
+        buffer.rewind();
+        buffer.get(via, 0, length);
+        buffer.rewind();
+        out.write(via, 0, length);
+        out.reset();
+        bogus += length;
     }
 
     @Override
-    public void postrun(int index, BenchmarkResult result) {}
+    public void postrun() {}
 
     @Override
     public void finish(boolean aborted) {}

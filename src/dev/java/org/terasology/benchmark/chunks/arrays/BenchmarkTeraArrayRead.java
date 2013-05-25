@@ -1,6 +1,5 @@
 package org.terasology.benchmark.chunks.arrays;
 
-import org.terasology.benchmark.BenchmarkResult;
 import org.terasology.world.chunks.blockdata.TeraArray;
 
 /**
@@ -21,19 +20,16 @@ public class BenchmarkTeraArrayRead extends BenchmarkTeraArray {
     }
 
     @Override
-    public int run(final int index, final int repetitions, final BenchmarkResult result) {
+    public void run() {
         int tmp = 0;
-        for (int i = 0; i < repetitions; i++) {
-            for (int y = 0; y < array.getSizeY(); y++) {
-                for (int z = 0; z < array.getSizeZ(); z++) {
-                    for (int x = 0; x < array.getSizeX(); x++) {
-                        tmp += array.get(x, y, z);
-                        array.get(x, y, z);
-                    }
+        for (int y = 0; y < array.getSizeY(); y++) {
+            for (int z = 0; z < array.getSizeZ(); z++) {
+                for (int x = 0; x < array.getSizeX(); x++) {
+                    tmp += array.get(x, y, z);
+                    array.get(x, y, z);
                 }
             }
         }
-        return tmp;
     }
 
 }

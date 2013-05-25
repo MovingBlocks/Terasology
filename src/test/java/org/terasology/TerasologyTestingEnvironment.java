@@ -36,7 +36,6 @@ import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
@@ -56,51 +55,61 @@ public abstract class TerasologyTestingEnvironment {
     private static boolean setup = false;
 
     private EngineEntityManager engineEntityManager;
+    private static BlockManager blockManager;
+    private static Config config;
+    private static AudioManager audioManager;
+    private static CollisionGroupManager collisionGroupManager;
+    private static ModManager modManager;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
+        PathManager.getInstance().useOverrideHomePath(new File("unittesthome"));
         if (!setup) {
             setup = true;
             bindLwjgl();
-            CoreRegistry.put(BlockManager.class, new BlockManagerAuthority());
+            blockManager = new BlockManagerAuthority();
+            CoreRegistry.put(BlockManager.class, blockManager);
 
-            setupConfig();
+            config = new Config();
+            CoreRegistry.put(Config.class, config);
 
-            CoreRegistry.put(AudioManager.class, new NullAudioManager());
+            audioManager = new NullAudioManager();
 
-            Display.setDisplayMode(new DisplayMode(0,0));
+            CoreRegistry.put(AudioManager.class, audioManager);
+
+            Display.setDisplayMode(new DisplayMode(0, 0));
             Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
 
-            CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
-            ModManager modManager = new ModManager();
+            collisionGroupManager = new CollisionGroupManager();
+            CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
+            modManager = new ModManager();
             modManager.applyActiveMods();
             CoreRegistry.put(ModManager.class, modManager);
             AssetType.registerAssetTypes();
             AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+        } else {
+            CoreRegistry.put(BlockManager.class, blockManager);
+            CoreRegistry.put(Config.class, config);
+            CoreRegistry.put(AudioManager.class, audioManager);
+            CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
+            CoreRegistry.put(ModManager.class, modManager);
         }
+        PathManager.getInstance().setCurrentWorldTitle("world1");
     }
 
     @Before
     public void setup() throws Exception {
-
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class));
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
         prefabLoadStep.begin();
-        while (!prefabLoadStep.step());
+        while (!prefabLoadStep.step()) ;
     }
 
     public EngineEntityManager getEntityManager() {
         return engineEntityManager;
     }
 
-    public static void setupConfig() {
-        Config config = new Config();
-        config.getAudio().setDisableSound(true);
-        CoreRegistry.put(Config.class, config);
-    }
-
     public static void bindLwjgl() throws LWJGLException {
-        PathManager.getInstance().useOverrideHomePath(new File("unittesthome"));
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
                 NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));

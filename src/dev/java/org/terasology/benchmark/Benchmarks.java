@@ -21,10 +21,11 @@ public final class Benchmarks {
     
     public static BenchmarkResult execute(Benchmark benchmark, int benchmarkIndex, int benchmarkCount, BenchmarkCallback callback) {
         
-        if (callback != null)
+        if (callback != null) {
             callback.begin(benchmark, benchmarkIndex, benchmarkCount);
+        }
 
-        final BenchmarkResult result = Preconditions.checkNotNull(benchmark.createResult(), "Benchmark::createResult() must not return null");
+        final BenchmarkResult result = new BasicBenchmarkResult(benchmark);
         final int[] repetitions = Preconditions.checkNotNull(benchmark.getRepetitions(), "Benchmark::getRepetitions() must not return null");
         Preconditions.checkState(repetitions.length > 0, "Benchmark::getRepetitions() must return an array of size greater than zero");
         
@@ -38,7 +39,9 @@ public final class Benchmarks {
         
         try {
             if (callback != null) callback.warmup(benchmark, false);
-            benchmark.run(-1, benchmark.getWarmupRepetitions(), result);
+            for (int i = 0; i < benchmark.getWarmupRepetitions(); ++i) {
+                benchmark.run();
+            }
             if (callback != null) callback.warmup(benchmark, true);
         } catch (Exception e) {
             result.addError(BenchmarkError.Type.Warmup, e);
@@ -57,7 +60,7 @@ public final class Benchmarks {
         for (int reps : repetitions) {
             
             try {
-                benchmark.prerun(repIndex);
+                benchmark.prerun();
             } catch (Exception e) {
                 aborted = true;
                 result.addError(BenchmarkError.Type.PreRun, e);
@@ -69,19 +72,21 @@ public final class Benchmarks {
             try {
                 result.setStartTime(repIndex, TimeUnit.MILLISECONDS.convert(start, TimeUnit.NANOSECONDS));
                 while (reps > repsPart) {
-                    benchmark.run(repIndex, repsPart, result);
+                    for (int i = 0; i < repsPart; ++i) {
+                        benchmark.run();
+                    }
                     reps -= repsPart;
                     repsSoFar += repsPart;
                     if (callback != null) callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
-                    elapsed += elapsed(start, TimeUnit.NANOSECONDS);
-                    start = time();
                 }
                 if (reps <= repsPart) {
-                    benchmark.run(repIndex, reps, result);
+                    for (int i = 0; i < reps; ++i) {
+                        benchmark.run();
+                    }
                     repsSoFar += reps;
                     if (callback != null) callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
-                    elapsed += elapsed(start, TimeUnit.NANOSECONDS);
                 }
+                elapsed = elapsed(start, TimeUnit.NANOSECONDS);
                 result.setRunTime(repIndex, TimeUnit.MILLISECONDS.convert(elapsed, TimeUnit.NANOSECONDS));
             } catch (Exception e) {
                 aborted = true;
@@ -91,7 +96,7 @@ public final class Benchmarks {
             }
                         
             try {
-                benchmark.postrun(repIndex, result);
+                benchmark.postrun();
             } catch (Exception e) {
                 aborted = true;
                 result.addError(BenchmarkError.Type.PostRun, e);
@@ -197,7 +202,7 @@ public final class Benchmarks {
     private static long time() {
         return System.nanoTime();
     }
-    
+
     private static long elapsed(long time, TimeUnit unit) {
         Preconditions.checkNotNull(unit);
         long result = time() - time;

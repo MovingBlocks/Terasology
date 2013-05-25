@@ -2,7 +2,6 @@ package org.terasology.benchmark.chunks.arrays;
 
 import java.nio.ByteBuffer;
 
-import org.terasology.benchmark.BenchmarkResult;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArray.SerializationHandler;
 
@@ -29,19 +28,16 @@ public class BenchmarkTeraArrayDeserializeFromBuffer extends BenchmarkTeraArrayS
     }
 
     @Override
-    public void prerun(int index) {}
+    public void prerun() {}
 
     @Override
-    public int run(int index, int repetitions, BenchmarkResult result) {
-        for (int i = 0; i < repetitions; i++) {
-            handler.deserialize(buffer);
-            buffer.rewind();
-        }
-        return 0;
+    public void run() {
+        handler.deserialize(buffer);
+        buffer.rewind();
     }
 
     @Override
-    public void postrun(int index, BenchmarkResult result) {}
+    public void postrun() {}
 
     @Override
     public void finish(boolean aborted) {}

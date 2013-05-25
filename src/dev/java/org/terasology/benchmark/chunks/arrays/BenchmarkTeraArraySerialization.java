@@ -8,7 +8,7 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 import com.google.common.base.Preconditions;
 
 @SuppressWarnings("rawtypes")
-public abstract class BenchmarkTeraArraySerialization extends Benchmark {
+public abstract class BenchmarkTeraArraySerialization implements Benchmark {
 
     public static final int BUFFER_SIZE = 1024 * 1024;
     
@@ -30,11 +30,6 @@ public abstract class BenchmarkTeraArraySerialization extends Benchmark {
     @Override
     public int[] getRepetitions() {
         return new int[] {1000, 5000, 10000};
-    }
-
-    @Override
-    public BenchmarkResult createResult() {
-        return new BasicBenchmarkResult(this);
     }
 
 }

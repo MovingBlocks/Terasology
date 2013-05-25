@@ -1,9 +1,8 @@
 package org.terasology.benchmark.chunks.cache;
 
 import org.terasology.benchmark.Benchmark;
-import org.terasology.benchmark.BenchmarkResult;
 
-public class BenchmarkChunkCache extends Benchmark {
+public class BenchmarkChunkCache implements Benchmark {
 
     public BenchmarkChunkCache() {
     }
@@ -24,27 +23,21 @@ public class BenchmarkChunkCache extends Benchmark {
     }
 
     @Override
-    public BenchmarkResult createResult() {
-        return null;
-    }
-
-    @Override
     public void setup() {
 
     }
 
     @Override
-    public void prerun(int index) {
+    public void prerun() {
 
     }
 
     @Override
-    public int run(int index, int repetitions, BenchmarkResult result) {
-        return 0;
+    public void run() {
     }
 
     @Override
-    public void postrun(int index, BenchmarkResult result) {
+    public void postrun() {
 
     }
 

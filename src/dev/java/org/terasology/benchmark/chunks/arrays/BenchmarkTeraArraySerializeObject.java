@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import org.terasology.benchmark.BenchmarkResult;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArray.SerializationHandler;
 
@@ -28,25 +27,20 @@ public class BenchmarkTeraArraySerializeObject extends BenchmarkTeraArraySeriali
     }
 
     @Override
-    public void prerun(int index) {}
+    public void prerun() {}
 
     @Override
-    public int run(int index, int repetitions, BenchmarkResult result) {
+    public void run() {
         try {
-            int bogus = 0;
-            for (int i = 0; i < repetitions; i++) {
-                (new ObjectOutputStream(out)).writeObject(array);
-                bogus += out.size();
-                out.reset();
-            }
-            return bogus;
+            (new ObjectOutputStream(out)).writeObject(array);
+            out.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void postrun(int index, BenchmarkResult result) {}
+    public void postrun() {}
 
     @Override
     public void finish(boolean aborted) {}

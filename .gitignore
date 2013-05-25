@@ -18,6 +18,7 @@
 /.checkstyle
 /.gradle
 /bin
+/unittesthome
 /data/console/consolelog.json
 /mods/*/classes
 /mods/*/testClasses

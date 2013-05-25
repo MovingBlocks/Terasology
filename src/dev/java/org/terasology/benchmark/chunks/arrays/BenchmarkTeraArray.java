@@ -1,8 +1,6 @@
 package org.terasology.benchmark.chunks.arrays;
 
-import org.terasology.benchmark.BasicBenchmarkResult;
 import org.terasology.benchmark.Benchmark;
-import org.terasology.benchmark.BenchmarkResult;
 import org.terasology.world.chunks.blockdata.TeraArray;
 
 import com.google.common.base.Preconditions;
@@ -13,7 +11,7 @@ import com.google.common.base.Preconditions;
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
  */
-public abstract class BenchmarkTeraArray extends Benchmark {
+public abstract class BenchmarkTeraArray implements Benchmark {
 
     protected TeraArray array;
     
@@ -32,18 +30,13 @@ public abstract class BenchmarkTeraArray extends Benchmark {
     }
 
     @Override
-    public BenchmarkResult createResult() {
-        return new BasicBenchmarkResult(this);
-    }
-
-    @Override
     public void setup() {}
 
     @Override
-    public void prerun(int index) {}
+    public void prerun() {}
 
     @Override
-    public void postrun(int index, BenchmarkResult result) {}
+    public void postrun() {}
 
     @Override
     public void finish(boolean aborted) {}
