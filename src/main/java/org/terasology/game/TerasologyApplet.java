@@ -28,7 +28,7 @@ import java.nio.channels.ReadableByteChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -56,7 +56,7 @@ public final class TerasologyApplet extends Applet {
             try {
                 URL url = new URL(modsPath + mod);
                 ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-                FileOutputStream fos = new FileOutputStream(new File(PathManager.getInstance().getModPath(), mod));
+                FileOutputStream fos = new FileOutputStream(new File(PathManager.getInstance().getHomeModPath(), mod));
                 long readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
                 while (readBytes == 1 << 24) {
                     readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
@@ -77,6 +77,7 @@ public final class TerasologyApplet extends Applet {
             @Override
             public void run() {
                 try {
+                    PathManager.getInstance().useDefaultHomePath();
                     engine = new TerasologyEngine();
                     engine.run(new StateMainMenu());
                     engine.dispose();

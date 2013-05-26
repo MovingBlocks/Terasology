@@ -17,12 +17,12 @@ package org.terasology.editor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.editor.properties.SceneProperties;
+import org.terasology.editor.ui.MainWindow;
 import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.PathManager;
-import org.terasology.editor.properties.SceneProperties;
-import org.terasology.editor.ui.MainWindow;
+import org.terasology.game.paths.PathManager;
 
 import javax.swing.*;
 
@@ -58,7 +58,7 @@ public final class TeraEd extends JWindow {
         mainWindow = new MainWindow();
 
         try {
-            PathManager.getInstance().determineRootPath(true);
+            PathManager.getInstance().useDefaultHomePath();
 
             TerasologyEngine.setEditorAttached(true);
             engine.setCustomViewPort(mainWindow.getViewPort());

@@ -32,7 +32,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.Input;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.MultimapHandler;
 
@@ -116,7 +116,7 @@ public final class Config {
      * @return The default configuration file location
      */
     public static File getConfigFile() {
-        return new File(PathManager.getInstance().getDataPath(), "config.cfg");
+        return new File(PathManager.getInstance().getHomePath(), "config.cfg");
     }
 
     /**

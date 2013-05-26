@@ -125,6 +125,8 @@ dependencies {
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
     compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
     compile group: 'org.newdawn.slick', name: 'slick', version: '236'
+	compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
+	compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
     // Would have liked to have left this runtime, but needed to "compile" the groovy config in IntelliJ
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
     compile fileTree(dir: 'libs', include: '*.jar')
