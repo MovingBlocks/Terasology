@@ -67,6 +67,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * A remote client.
  * @author Immortius
  */
 public class NetClient extends AbstractClient implements WorldChangeListener {

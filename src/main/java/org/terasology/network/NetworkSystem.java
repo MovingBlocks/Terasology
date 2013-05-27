@@ -26,8 +26,10 @@ import org.terasology.world.block.management.BlockRegistrationListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
+ * Interface for the network system
  * @author Immortius
  */
+// TODO: Refactor the core gameplay components like the list of players into a separate system.
 public interface NetworkSystem extends BlockRegistrationListener {
 
     void host(int port) throws HostingFailedException;

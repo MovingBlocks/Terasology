@@ -30,5 +30,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface ServerEvent {
+    /**
+     * @return Whether the event should be compensated for lag - if true then the location and rotation of all characters
+     * is rewound to simulate the condition on the client before processing the event.
+     */
     boolean lagCompensate() default false;
 }

@@ -8,7 +8,7 @@ import org.terasology.protobuf.NetData;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- *
+ * Common methods for both server and client ends of the authentication handshake
  */
 public final class HandshakeCommon {
 

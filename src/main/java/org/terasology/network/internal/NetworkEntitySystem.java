@@ -33,6 +33,11 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
+ * This system handles a number of events relevant to the Network System:
+ * <ul>
+ *     <li>Notifies the network system when network entities are created, destroyed or updated</li>
+ *     <li>Notifies the network system when a client requests a change of view range</li>
+ * </ul>
  * @author Immortius
  */
 public class NetworkEntitySystem implements ComponentSystem {

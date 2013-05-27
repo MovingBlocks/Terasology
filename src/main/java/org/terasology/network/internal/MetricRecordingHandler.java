@@ -25,6 +25,7 @@ import org.terasology.network.NetMetricSource;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * A generic Netty handler for recording metrics on sent and received bytes and messages.
  * @author Immortius
  */
 public class MetricRecordingHandler extends SimpleChannelHandler implements NetMetricSource {

@@ -21,6 +21,7 @@ import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.persistence.PlayerEntityStore;
 
 /**
+ * Event notifying of a client disconnecting.
  * @author Immortius
  */
 public class DisconnectedEvent extends AbstractEvent {
@@ -30,6 +31,9 @@ public class DisconnectedEvent extends AbstractEvent {
         this.entityStore = entityStore;
     }
 
+    /**
+     * @return The Player's entity store. It is ready to store any entities that need to be stored.
+     */
     public PlayerEntityStore getEntityStore() {
         return entityStore;
     }

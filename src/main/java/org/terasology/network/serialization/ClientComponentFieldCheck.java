@@ -21,17 +21,21 @@ import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 
 /**
+ * Determines which fields should be serialized and deserialized by the client.
  * @author Immortius
  */
 public class ClientComponentFieldCheck implements FieldSerializeCheck<Component> {
 
+
     @Override
     public boolean shouldSerializeField(FieldMetadata field, Component component) {
+        // Clients only send fields that are replicated from the owner
         return field.isReplicated() && field.getReplicationInfo().value().isReplicateFromOwner();
     }
 
     @Override
     public boolean shouldDeserializeField(FieldMetadata fieldInfo) {
+        // Clients should use all replicated fields
         return true;
     }
 }

@@ -29,7 +29,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Replicate {
-    public ReplicateType value() default ReplicateType.SERVER_TO_CLIENT;
+    /**
+     * @return Under what condition the field should be replicated
+     */
+    public FieldReplicateType value() default FieldReplicateType.SERVER_TO_CLIENT;
 
+    /**
+     * @return Whether the field should only be replicated when the entity initially becomes relevant to a client
+     */
     public boolean initialOnly() default false;
 }

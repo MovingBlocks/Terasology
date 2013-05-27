@@ -18,8 +18,8 @@ package org.terasology.logic.inventory;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
+import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateType;
 
 import java.util.Map;
 
@@ -32,31 +32,31 @@ public final class ItemComponent implements Component {
     /**
      * The display name of this item
      */
-    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String name = "";
 
     /**
      * Should this item be rendered? Some items have an inventory icon but no "held" representation
      */
-    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public boolean renderWithIcon = false;
 
     /**
      * Name of the icon this item should be rendered with
      */
-    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String icon = "";
 
     /**
      * If this item is stackable, it should have a unique ID (so alike stacks can be merged)
      */
-    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String stackId = "";
 
     /**
      * How many of said item are there in this stack
      */
-    @Replicate(ReplicateType.SERVER_TO_CLIENT)
+    @Replicate(FieldReplicateType.SERVER_TO_CLIENT)
     public byte stackCount = 1;
 
     /**
@@ -73,7 +73,7 @@ public final class ItemComponent implements Component {
     /**
      * Usage setting for this item
      */
-    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public UsageType usage = UsageType.NONE;
 
     /**

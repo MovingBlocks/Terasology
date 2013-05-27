@@ -17,11 +17,23 @@
 package org.terasology.network;
 
 /**
+ * The current multiplayer mode of the game.
  * @author Immortius
  */
 public enum NetworkMode {
+    /**
+     * The game is running in single-player mode.
+     */
     NONE(true),
+
+    /**
+     * The game is hosting a server
+     */
     SERVER(true),
+
+    /**
+     * The game is a remote client connected to a server
+     */
     CLIENT(false);
 
     private boolean authority;
@@ -30,6 +42,9 @@ public enum NetworkMode {
         this.authority = authority;
     }
 
+    /**
+     * @return Whether the game is the authority on what is happening in the world
+     */
     public boolean isAuthority() {
         return authority;
     }

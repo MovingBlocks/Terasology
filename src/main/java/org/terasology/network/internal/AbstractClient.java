@@ -23,6 +23,7 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 
 /**
+ * The common behaviour of all clients - whether local or remote
  * @author Immortius
  */
 public abstract class AbstractClient implements Client {

@@ -24,6 +24,7 @@ import org.terasology.entitySystem.persistence.PlayerEntityStore;
 import java.util.Map;
 
 /**
+ * Event notifying that a new client has connected - sent against the client by the network system.
  * @author Immortius
  */
 public class ConnectedEvent extends AbstractEvent {
@@ -34,6 +35,9 @@ public class ConnectedEvent extends AbstractEvent {
         this.entityStore = store;
     }
 
+    /**
+     * @return The PlayerEntityStore for the connecting player. It is ready to restore any stored entities.
+     */
     public PlayerEntityStore getEntityStore() {
         return entityStore;
     }

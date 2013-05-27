@@ -22,6 +22,7 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.persistence.ComponentSerializeCheck;
 
 /**
+ * Determines which components should be serialized over the network - only replicated components.
  * @author Immortius
  */
 public class NetComponentSerializeCheck implements ComponentSerializeCheck {

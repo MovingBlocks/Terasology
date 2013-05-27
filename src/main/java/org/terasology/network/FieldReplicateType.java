@@ -19,16 +19,15 @@ package org.terasology.network;
 /**
  * @author Immortius
  */
-public enum ReplicateType {
+public enum FieldReplicateType {
     SERVER_TO_CLIENT(false),
     SERVER_TO_OWNER(false),
     OWNER_TO_SERVER(true),
-    OWNER_TO_SERVER_TO_CLIENT(true),
-    INITIAL(false);
+    OWNER_TO_SERVER_TO_CLIENT(true);
 
     private boolean replicateFromOwner;
 
-    private ReplicateType(boolean fromOwner) {
+    private FieldReplicateType(boolean fromOwner) {
         this.replicateFromOwner = fromOwner;
     }
 

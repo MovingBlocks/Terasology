@@ -23,6 +23,10 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
+ * An implementation of EntityRef that deals with entities propagated to a client. These entities may enter and
+ * leave relevance over time, and may have a different Entity id each time. NetEntityRef links to them via their
+ * network id, and survives them dropping in and out of relevance.
+ *
  * @author Immortius
  */
 public class NetEntityRef extends EntityRef {

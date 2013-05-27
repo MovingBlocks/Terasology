@@ -30,8 +30,8 @@ import org.terasology.world.block.entity.BlockComponent;
 import java.util.List;
 
 /**
- * Encoding of EntityRef for network transferals. This uses with the network id of the entity from the NetworkComponent,
- * or the block position from the block component
+ * This type handler encodes EntityRef for network transferals. For normal entities, the Network Id of the entity is used.
+ * For block entities the block position is used instead (this allows overriding simulated block entities).
  *
  * @author Immortius
  */

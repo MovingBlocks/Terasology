@@ -55,8 +55,8 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
-import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
-import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
+import org.terasology.network.internal.pipelineFactory.TerasologyClientPipelineFactory;
+import org.terasology.network.internal.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -77,6 +77,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 
 /**
+ * Implementation of the Network System using Netty and TCP/IP
  * @author Immortius
  */
 public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem {

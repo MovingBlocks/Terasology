@@ -20,6 +20,7 @@ import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
 /**
+ * Optional parent for events that are replicated over the network. Inherit this to make use of advanced features
  * @author Immortius
  */
 public class NetworkEvent extends AbstractEvent {
@@ -29,6 +30,11 @@ public class NetworkEvent extends AbstractEvent {
     protected NetworkEvent() {
     }
 
+    /**
+     * @param instigator The instigator of this event. Can be used with BroadcastEvent's skipInstigator option
+     *                   to avoid sending the event to the client that caused the event (who will have simulated it
+     *                   client-side).
+     */
     protected NetworkEvent(EntityRef instigator) {
         this.instigator = instigator;
     }

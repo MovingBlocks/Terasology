@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network.pipelineFactory;
+package org.terasology.network.internal.pipelineFactory;
 
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -33,6 +33,7 @@ import org.terasology.protobuf.NetData;
 import static org.jboss.netty.channel.Channels.pipeline;
 
 /**
+ * Netty pipeline for Clients
  * @author Immortius
  */
 public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {

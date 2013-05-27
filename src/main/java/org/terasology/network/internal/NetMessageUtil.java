@@ -24,6 +24,7 @@ import org.terasology.protobuf.NetData;
 import java.math.BigInteger;
 
 /**
+ * Utility class for converting types between network representation and usable objects
  * @author Immortius
  */
 public final class NetMessageUtil {

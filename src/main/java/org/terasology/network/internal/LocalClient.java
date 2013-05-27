@@ -27,6 +27,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.world.chunks.Chunk;
 
 /**
+ * A local client.
  * @author Immortius
  */
 public class LocalClient extends AbstractClient {
