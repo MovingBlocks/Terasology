@@ -17,6 +17,7 @@ package org.terasology.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.MappedContainer;
 import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
@@ -48,23 +49,23 @@ public final class BlockParticleEffectComponent implements Component {
 
     public List<Particle> particles = Lists.newArrayList();
 
-    public static class Particle implements Serializable, Cloneable {
+    @MappedContainer
+    public static class Particle {
         public Vector3f velocity = new Vector3f();
         public Vector3f position = new Vector3f();
         public float size = 1.0f;
         public float lifeRemaining = 1.0f;
         public Vector2f texOffset = new Vector2f(0, 0);
-        //public Vector2f texSize = new Vector2f(1,1);
 
-        public Particle clone() {
-            Particle particle = new Particle();
-            particle.velocity.set(velocity);
-            particle.position.set(position);
-            particle.size = size;
-            particle.lifeRemaining = lifeRemaining;
-            particle.texOffset.set(texOffset);
-            //particle.texSize.set(texSize);
-            return particle;
+        public Particle() {
+        }
+
+        public Particle(Particle other) {
+            this.velocity.set(other.velocity);
+            this.position.set(other.position);
+            this.size = other.size;
+            this.lifeRemaining = other.lifeRemaining;
+            this.texOffset.set(other.texOffset);
         }
     }
 }

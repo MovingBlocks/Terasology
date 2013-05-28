@@ -15,9 +15,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.*;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -148,6 +146,7 @@ public class PojoEntityManagerTest {
         EntityRef entity1 = entityManager.create();
         StringComponent comp = entity1.addComponent(new StringComponent());
 
+        verify(eventSystem).send(entity1, OnAddedEvent.newInstance(), comp);
         verify(eventSystem).send(entity1, OnActivatedEvent.newInstance(), comp);
     }
 
@@ -161,6 +160,7 @@ public class PojoEntityManagerTest {
         entity1.removeComponent(StringComponent.class);
 
         verify(eventSystem).send(entity1, OnDeactivatedEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnRemovedEvent.newInstance(), comp);
     }
 
     @Test
@@ -197,6 +197,7 @@ public class PojoEntityManagerTest {
         entity1.destroy();
         
         verify(eventSystem).send(entity1, OnDeactivatedEvent.newInstance());
+        verify(eventSystem).send(entity1, OnRemovedEvent.newInstance());
     }
     
     @Test

@@ -25,7 +25,8 @@ import javax.vecmath.Vector3f;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class MiniaturizerComponent implements Component {
+// TODO: This component is not valid: Some of the fields are not serializable
+/*public class MiniaturizerComponent implements Component {
 
     public static final float SCALE = 1f / 32f;
 
@@ -46,4 +47,4 @@ public class MiniaturizerComponent implements Component {
         miniatureChunk = null;
     }
 
-}
+}  */

@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHandler<?>>> {
     private static final Logger logger = LoggerFactory.getLogger(TypeHandlerLibrary.class);
-    private static final int MAX_SERIALIZATION_DEPTH = 1;
+    private static final int MAX_SERIALIZATION_DEPTH = 10;
 
     private Map<Class<?>, TypeHandler<?>> typeHandlers;
 
@@ -146,8 +146,12 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
         else if (typeHandlers.containsKey(typeClass)) {
             return typeHandlers.get(typeClass);
         }
-        // For unknown types of a limited depth, assume they are data holders and use them
+        // For unknown types annotated by MappedContainer annotation, map them
         else if (depth <= MAX_SERIALIZATION_DEPTH && !Modifier.isAbstract(typeClass.getModifiers()) && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
+            if (typeClass.getAnnotation(MappedContainer.class) == null) {
+                logger.error("Unable to register field of type {}: not a supported type or MappedContainer", typeClass.getSimpleName());
+                return null;
+            }
             try {
                 // Check if constructor exists
                 typeClass.getConstructor();
@@ -156,7 +160,6 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 return null;
             }
 
-            logger.warn("Handling serialization of type {} via MappedContainer", typeClass);
             MappedContainerTypeHandler mappedHandler = new MappedContainerTypeHandler(typeClass);
             for (Field field : typeClass.getDeclaredFields()) {
                 if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))

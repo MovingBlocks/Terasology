@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
 
@@ -268,7 +269,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         Location.attachChild(parentEntity, entity);
         System.out.println(entity.toFullDescription());
         Location locationSystem = new Location();
-        locationSystem.onDestroyed(OnDeactivatedEvent.newInstance(), parentEntity);
+        locationSystem.onDestroyed(OnRemovedEvent.newInstance(), parentEntity);
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(null);
         when(parentEntity.exists()).thenReturn(false);
         System.out.println(entity.toFullDescription());

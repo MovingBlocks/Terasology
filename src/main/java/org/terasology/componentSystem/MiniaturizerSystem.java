@@ -16,7 +16,6 @@
 package org.terasology.componentSystem;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterSystem;
@@ -35,6 +34,8 @@ import static org.lwjgl.opengl.GL11.glScalef;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+// Fix up once MiniaturizerComponent is fixed
+/*
 @RegisterSystem(whenHeadless = false)
 public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem {
 
@@ -102,4 +103,4 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
     public void renderFirstPerson() {
 
     }
-}
+}       */

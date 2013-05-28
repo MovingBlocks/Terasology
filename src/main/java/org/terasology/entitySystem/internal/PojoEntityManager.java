@@ -29,9 +29,7 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.*;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityBuilder;
@@ -153,6 +151,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             store.put(entity.getId(), c);
         }
         if (eventSystem != null) {
+            eventSystem.send(entity, OnAddedEvent.newInstance());
             eventSystem.send(entity, OnActivatedEvent.newInstance());
         }
         return entity;
@@ -361,6 +360,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         EntityRef ref = createEntityRef(entityId);
         if (eventSystem != null) {
             eventSystem.send(ref, OnDeactivatedEvent.newInstance());
+            eventSystem.send(ref, OnRemovedEvent.newInstance());
         }
         entityCache.remove(entityId);
         freedIds.add(entityId);
@@ -392,10 +392,12 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
         }
         if (eventSystem != null) {
+            EntityRef entityRef = createEntityRef(entityId);
             if (oldComponent == null) {
-                eventSystem.send(createEntityRef(entityId), OnActivatedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnAddedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnActivatedEvent.newInstance(), component);
             } else {
-                eventSystem.send(createEntityRef(entityId), OnChangedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnChangedEvent.newInstance(), component);
             }
         }
         if (oldComponent == null) {
@@ -410,7 +412,9 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         Component component = store.get(entityId, componentClass);
         if (component != null) {
             if (eventSystem != null) {
-                eventSystem.send(createEntityRef(entityId), OnDeactivatedEvent.newInstance(), component);
+                EntityRef entityRef = createEntityRef(entityId);
+                eventSystem.send(entityRef, OnDeactivatedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnRemovedEvent.newInstance(), component);
             }
             store.remove(entityId, componentClass);
             notifyComponentRemoved(getEntity(entityId), componentClass);
@@ -423,10 +427,12 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId);
         }
         if (eventSystem != null) {
+            EntityRef entityRef = createEntityRef(entityId);
             if (oldComponent == null) {
-                eventSystem.send(createEntityRef(entityId), OnActivatedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnAddedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnActivatedEvent.newInstance(), component);
             } else {
-                eventSystem.send(createEntityRef(entityId), OnChangedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnChangedEvent.newInstance(), component);
             }
         }
         if (oldComponent == null) {

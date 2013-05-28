@@ -34,7 +34,8 @@ import java.util.Set;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 // TODO: Network
-@RegisterSystem(RegisterMode.AUTHORITY)
+// TODO: Fix
+/*@RegisterSystem(RegisterMode.AUTHORITY)
 public class AddMiniatureBlockAction implements ComponentSystem {
 
     @In
@@ -96,4 +97,4 @@ public class AddMiniatureBlockAction implements ComponentSystem {
         }
 
     }
-}
+}     */
