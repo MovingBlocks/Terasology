@@ -25,6 +25,7 @@ import org.terasology.entitySystem.EntityStore;
 import org.terasology.entitySystem.lifecycleEvents.OnStoreEvent;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
 import java.io.*;
@@ -39,7 +40,7 @@ public class PlayerEntityStore implements EntityStore {
     private EngineEntityManager entityManager;
     private File playerDataFile;
     private EntitySerializer serializer;
-    private Vector3f relevanceLocation = new Vector3f();
+    private Vector3f relevanceLocation = new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2);
     private boolean hasCharacter = false;
 
     private EntityData.EntityStore.Builder entityStoreBuilder;

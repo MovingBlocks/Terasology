@@ -128,11 +128,11 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onConnect(ConnectedEvent connected, EntityRef entity) {
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        loc.setWorldPosition(connected.getEntityStore().getRelevanceLocation());
+        entity.saveComponent(loc);
         worldRenderer.getChunkProvider().addRelevanceEntity(entity, 4, networkSystem.getOwner(entity));
         if (connected.getEntityStore().hasCharacter()) {
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            location.setWorldPosition(connected.getEntityStore().getRelevanceLocation());
-            entity.saveComponent(location);
             if (worldRenderer.getWorldProvider().isBlockActive(connected.getEntityStore().getRelevanceLocation())) {
                 restoreCharacter(entity, connected.getEntityStore());
             } else {
@@ -144,12 +144,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             if (chunkProvider.getChunk(pos) != null) {
                 spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
             } else {
-                LocationComponent location = entity.getComponent(LocationComponent.class);
-                location.setWorldPosition(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
-                entity.saveComponent(location);
-
                 SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
-
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         }
@@ -176,6 +171,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             ClientComponent client = entity.getComponent(ClientComponent.class);
             client.character = character;
             entity.saveComponent(client);
+            Location.attachChild(character, entity);
         }
     }
 
