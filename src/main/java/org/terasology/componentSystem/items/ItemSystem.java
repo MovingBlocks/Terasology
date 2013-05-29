@@ -49,7 +49,6 @@ import org.terasology.world.block.management.BlockManager;
  */
 @RegisterComponentSystem
 public class ItemSystem implements EventHandlerSystem {
-    private EntityManager entityManager;
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
 
@@ -58,7 +57,6 @@ public class ItemSystem implements EventHandlerSystem {
 
     @Override
     public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
@@ -128,46 +126,44 @@ public class ItemSystem implements EventHandlerSystem {
             return true;
 
         Vector3i placementPos = new Vector3i(targetBlock);
-        if (!worldProvider.getBlock(targetBlock).isReplacementAllowed())
+        Block blockAtTarget = worldProvider.getBlock(targetBlock);
+        if (!blockAtTarget.isReplacementAllowed())
             placementPos.add(surfaceDirection.getVector3i());
 
-        Block block = null;
+        Block blockToPlace;
 
         if( type instanceof ConnectToAdjacentBlockFamily){
-            block = ( (ConnectToAdjacentBlockFamily) type ).getBlockFor(placementPos, worldProvider);
+            blockToPlace = ( (ConnectToAdjacentBlockFamily) type ).getBlockFor(placementPos, worldProvider);
         }else{
-            block = type.getBlockFor(surfaceDirection, secondaryDirection);
+            blockToPlace = type.getBlockFor(surfaceDirection, secondaryDirection);
         }
 
-        if (block == null)
+        if (blockToPlace == null)
             return false;
 
-        if (canPlaceBlock(block, targetBlock, placementPos)) {
-            Block oldBlockType = BlockManager.getInstance().getBlock(worldProvider.getBlock(placementPos).getURI());
-            if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
+        Block blockAtPlacement = worldProvider.getBlock(placementPos);
+        if (canPlaceBlock(blockToPlace, blockAtTarget, blockAtPlacement, placementPos)) {
+            if (blockEntityRegistry.setBlock(placementPos, blockToPlace, blockAtPlacement, blockItem.placedEntity)) {
                 audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
                 if (blockItem.placedEntity.exists()) {
                     blockItem.placedEntity = EntityRef.NULL;
                 }
 
                 item.saveComponent(new BlockComponent());
-                item.send( new BlockChangedEvent( placementPos, block, oldBlockType) );
+                item.send( new BlockChangedEvent( placementPos, blockToPlace, blockAtPlacement) );
                 return true;
             }
         }
         return false;
     }
 
-    private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
-        Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
-
-        if (!centerBlock.isReplacementAllowed()) {
-            if (!centerBlock.isAttachmentAllowed()) {
+    private boolean canPlaceBlock(Block block, Block blockAtTarget, Block blockAtPlacement, Vector3i blockPos) {
+        if (!blockAtTarget.isReplacementAllowed()) {
+            if (!blockAtTarget.isAttachmentAllowed()) {
                 return false;
             }
 
-            Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-            if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
+            if (!blockAtPlacement.isReplacementAllowed() || blockAtPlacement.isTargetable()) {
                 return false;
             }
         }
