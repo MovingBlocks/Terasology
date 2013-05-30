@@ -1,6 +1,7 @@
 package org.terasology.blockNetwork;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.terasology.math.Direction;
 
 import java.util.Collection;
@@ -28,6 +29,16 @@ public class DirectionsUtil {
 
     public static byte getDirection(Direction direction) {
         return directionBits.get(direction);
+    }
+
+    public static Collection<Direction> getDirections(byte directionBit) {
+        Set<Direction> result = Sets.newHashSet();
+        for (Map.Entry<Direction, Byte> aDirectionBit : directionBits.entrySet()) {
+            if ((aDirectionBit.getValue() & directionBit) > 0)
+                result.add(aDirectionBit.getKey());
+        }
+
+        return result;
     }
 
     public static boolean hasDirection(byte directionBit, Direction direction) {

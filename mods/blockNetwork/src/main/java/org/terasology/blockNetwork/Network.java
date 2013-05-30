@@ -2,7 +2,6 @@ package org.terasology.blockNetwork;
 
 import org.terasology.math.Direction;
 
-import javax.vecmath.Vector3f;
 import java.util.*;
 
 import com.google.common.collect.Maps;
@@ -88,38 +87,70 @@ public class Network {
         return networkingBlocks.isEmpty() && leafPossibleConnections.isEmpty();
     }
 
+    public int getNetworkSize() {
+        Set<Vector3i> countedNodes = new HashSet<Vector3i>();
+        countedNodes.addAll(networkingBlocks.keySet());
+        countedNodes.addAll(leafPossibleConnections.keySet());
+        return countedNodes.size();
+    }
+
     /**
      * Remove block from the network. If this removal splits the network, the returned Set will contain all the
-     * Networks this Network should be replaced with.
+     * Networks this Network should be replaced with. If it does not split it, this method will return <code>null</code>.
      *
      * @param location Location of the removed block.
      * @return
      */
     public Set<Network> removeNetworkingBlock(Vector3i location) {
-        // TODO Review and finish
-        // Removal of a block splits the network, if it is connected to a block on at least two sides, and there is no
+        // Removal of a block can split the network if it is connected to a block on at least two sides, and there is no
         // other connection between the neighbouring blocks
-//        Set<Direction> directions = networkingBlocks.remove(location);
-//        int connectedOnSidesCount = 0;
-//        for (Direction direction : directions) {
-//            final List<Direction> directionList = Arrays.asList(direction);
-//            if (canAddBlock(location, directionList))
-//                connectedOnSidesCount++;
-////            else if (canConnectToLeafBlocks(location, directionList))
-//        }
-//        if (connectedOnSidesCount < 2)
-//            return Collections.emptySet();
-//
-//        List<Vector3i> nodesBeingDisconnected = new ArrayList<Vector3i>();
-//        for (Direction direction : directions) {
-//            final Vector3i connectedBlockLocation = new Vector3i(location);
-//            connectedBlockLocation.add(direction.getVector3i());
-//            if (networkingBlocks.containsKey(connectedBlockLocation))
-//                nodesBeingDisconnected.add(connectedBlockLocation);
-//        }
+        Byte directions = networkingBlocks.remove(location);
+        if (directions == null)
+            throw new IllegalStateException("Tried to remove a block that is not in the network");
 
-        // Naive implementation depth-first search with a set of visited blocks
-        return null;
+        // TODO Do something smarter, at least check if the removed block is connected to at least two other nodes
+        // For now, just naively rebuild the whole network after removal
+        Set<Network> resultNetworks = Sets.newHashSet();
+        resultNetworks.add(new Network());
+
+        for (Map.Entry<Vector3i, Byte> networkingBlock : networkingBlocks.entrySet()) {
+            Network networkAddedTo = null;
+
+            final Vector3i networkingBlockLocation = networkingBlock.getKey();
+            final byte networkingBlockConnectingSides = networkingBlock.getValue();
+            final Collection<Direction> networkingBlockDirections = DirectionsUtil.getDirections(networkingBlockConnectingSides);
+            for (Network resultNetwork : resultNetworks) {
+                if (resultNetwork.canAddBlock(networkingBlockLocation, networkingBlockDirections)) {
+                    if (networkAddedTo == null) {
+                        resultNetwork.addNetworkingBlock(networkingBlockLocation, networkingBlockDirections);
+                        networkAddedTo = resultNetwork;
+                    } else {
+                        networkAddedTo.mergeInNetwork(resultNetwork);
+                    }
+                }
+            }
+
+            if (networkAddedTo == null) {
+                Network newNetwork = new Network();
+                newNetwork.addNetworkingBlock(networkingBlockLocation, networkingBlockDirections);
+                resultNetworks.add(newNetwork);
+            }
+        }
+
+        // We have all connections for the resulting networks, now add leaves
+        for (Network resultNetwork : resultNetworks) {
+            for (Map.Entry<Vector3i, Byte> leafBlock : leafPossibleConnections.entrySet()){
+                final Vector3i leafBlockLocation = leafBlock.getKey();
+                final Collection<Direction> leafBlockDirections = DirectionsUtil.getDirections(leafBlock.getValue());
+                if (resultNetwork.canAddBlock(leafBlockLocation, leafBlockDirections))
+                    resultNetwork.addLeafBlock(leafBlockLocation, leafBlockDirections);
+            }
+        }
+
+        if (resultNetworks.size() == 1)
+            return null;
+
+        return resultNetworks;
     }
 
     /**
@@ -127,10 +158,16 @@ public class Network {
      *
      * @param network
      */
-    public void mergeWithNetwork(Network network) {
+    public void mergeInNetwork(Network network) {
         networkingBlocks.putAll(network.networkingBlocks);
-        leafPossibleConnections.putAll(network.leafPossibleConnections);
-        // TODO merge possible connections
+        // Naive implementation - add all connecting blocks and rebuild all the leaves
+        final Map<Vector3i, Byte> oldThisNetworkLeaves = leafPossibleConnections;
+        leafPossibleConnections = Maps.newHashMap();
+        leafActualConnections = Maps.newHashMap();
+        for (Map.Entry<Vector3i, Byte> oldNetworkLeaves : oldThisNetworkLeaves.entrySet())
+            addLeafBlock(oldNetworkLeaves.getKey(), DirectionsUtil.getDirections(oldNetworkLeaves.getValue()));
+        for (Map.Entry<Vector3i, Byte> otherNetworkLeaves : network.leafPossibleConnections.entrySet())
+            addLeafBlock(otherNetworkLeaves.getKey(), DirectionsUtil.getDirections(otherNetworkLeaves.getValue()));
     }
 
 //    /**
@@ -160,7 +197,7 @@ public class Network {
                 final Vector3i possibleBlockLocation = new Vector3i(location);
                 possibleBlockLocation.add(connectingOnSide.getVector3i());
                 final Byte directionsForBlockOnThatSide = leafPossibleConnections.get(possibleBlockLocation);
-                if (directionsForBlockOnThatSide!= null && DirectionsUtil.hasDirection(directionsForBlockOnThatSide, connectingOnSide.reverse()))
+                if (directionsForBlockOnThatSide != null && DirectionsUtil.hasDirection(directionsForBlockOnThatSide, connectingOnSide.reverse()))
                     return true;
             }
         } else {
@@ -168,8 +205,8 @@ public class Network {
                 final Vector3i possibleBlockLocation = new Vector3i(location);
                 possibleBlockLocation.add(connectingOnSide.getVector3i());
                 final Byte directionsForBlockOnThatSide = networkingBlocks.get(possibleBlockLocation);
-                if (directionsForBlockOnThatSide!= null && DirectionsUtil.hasDirection(directionsForBlockOnThatSide, connectingOnSide.reverse()))
-                        return true;
+                if (directionsForBlockOnThatSide != null && DirectionsUtil.hasDirection(directionsForBlockOnThatSide, connectingOnSide.reverse()))
+                    return true;
             }
         }
         return false;
