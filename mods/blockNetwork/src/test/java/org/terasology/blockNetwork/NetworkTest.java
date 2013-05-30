@@ -38,11 +38,10 @@ public class NetworkTest {
         assertEquals(1, network.getNetworkSize());
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void addLeafNodeToEmptyNetwork() {
         assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
         network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
-        assertEquals(1, network.getNetworkSize());
     }
 
     @Test
@@ -55,26 +54,14 @@ public class NetworkTest {
     }
 
     @Test
-    public void addingLeafNodeToLeafNode() {
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
-
-        assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
-        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+    public void creatingDegenerateNetwork() {
+        network = Network.createDegenerateNetwork(new Vector3i(0, 0, 1), allDirections, new Vector3i(0, 0, 0), allDirections);
         assertEquals(2, network.getNetworkSize());
     }
 
     @Test
     public void addingNetworkingNodeToNetworkingNode() {
         network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
-
-        assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
-        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
-        assertEquals(2, network.getNetworkSize());
-    }
-
-    @Test
-    public void addingNetworkingNodeToLeafNode() {
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
 
         assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
         network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
@@ -89,13 +76,6 @@ public class NetworkTest {
     }
 
     @Test
-    public void cantAddNodeToLeafNodeTooFar() {
-        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
-
-        assertFalse(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
-    }
-
-    @Test
     public void cantAddNodeToNetworkingNodeWrongDirection() {
         network.addNetworkingBlock(new Vector3i(0, 0, 1), upOnly);
 
@@ -103,24 +83,17 @@ public class NetworkTest {
     }
 
     @Test
-    public void cantAddNodeToLeafNodeWrongDirection() {
-        network.addLeafBlock(new Vector3i(0, 0, 1), upOnly);
-
-        assertFalse(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
-    }
-
-    @Test
     public void cantAddNodeToNetworkOnTheSideOfConnectedLeaf() {
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 2), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
 
         assertFalse(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
     public void canAddLeafNodeOnTheSideOfConnectedNetworkingNode() {
-        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
 
         assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
         network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
@@ -128,8 +101,8 @@ public class NetworkTest {
 
     @Test
     public void canAddNetworkingNodeOnTheSideOfConnectedNetworkingNode() {
-        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
 
         assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
         network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
@@ -138,19 +111,19 @@ public class NetworkTest {
 
     @Test
     public void cantAddNodeToNetworkWithTwoLeafNodes() {
-        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+        network = Network.createDegenerateNetwork(new Vector3i(0, 0, 2), allDirections, new Vector3i(0, 0, 1), allDirections);
 
         assertFalse(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
     public void removeNetworkingNodeFromConnectedNetworkWithLeaf() {
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
 
-        assertNull(network.removeNetworkingBlock(new Vector3i(0, 0, 0)));
-        assertEquals(1, network.getNetworkSize());
+        final Collection<Network> resultNetworks = network.removeNetworkingBlock(new Vector3i(0, 0, 0));
+        assertNotNull(resultNetworks);
+        assertEquals(0, resultNetworks.size());
     }
 
     @Test
@@ -164,8 +137,8 @@ public class NetworkTest {
 
     @Test
     public void removeLeafNodeFromConnectedNetworkWithNetworkingNode() {
-        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
 
         network.removeLeafBlock(new Vector3i(0, 0, 0));
         assertEquals(1, network.getNetworkSize());
@@ -173,18 +146,29 @@ public class NetworkTest {
 
     @Test
     public void removeLeafNodeFromConnectedNetworkWithOnlyLeafNodes() {
-        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+        network = Network.createDegenerateNetwork(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections);
 
         network.removeLeafBlock(new Vector3i(0, 0, 0));
         assertEquals(1, network.getNetworkSize());
+        assertTrue(network.isDegeneratedNetwork());
+    }
+
+    @Test
+    public void removingNetworkingNodeRemovesNetworkWithLeavesOnly() {
+        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, -1), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+
+        final Collection<Network> resultNetworks = network.removeNetworkingBlock(new Vector3i(0, 0, 0));
+        assertNotNull(resultNetworks);
+        assertEquals(0, resultNetworks.size());
     }
 
     @Test
     public void removingNetworkingNodeSplitsNetwork() {
-        network.addLeafBlock(new Vector3i(0, 0, -1), allDirections);
+        network.addNetworkingBlock(new Vector3i(0, 0, -1), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
-        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+        network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
 
         final Collection<Network> resultNetworks = network.removeNetworkingBlock(new Vector3i(0, 0, 0));
         assertEquals(2, resultNetworks.size());
@@ -212,8 +196,30 @@ public class NetworkTest {
     }
 
     @Test
-    public void removeTheOnlyLeafNode() {
+    public void networkingAndLeafNodeWithNetworkingNodeStopsBeingNetworking() {
+        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
         network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
-        assertTrue(network.removeLeafBlock(new Vector3i(0, 0, 0)));
+
+        assertEquals(2, network.getNetworkSize());
+        assertFalse(network.isDegeneratedNetwork());
+
+        assertNull(network.removeNetworkingBlock(new Vector3i(0, 0, 0)));
+        assertEquals(2, network.getNetworkSize());
+        assertFalse(network.isDegeneratedNetwork());
+    }
+
+    @Test
+    public void networkingAndLeafNodeWithLeafNodeStopsBeingNetworking() {
+        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+
+        assertEquals(2, network.getNetworkSize());
+        assertFalse(network.isDegeneratedNetwork());
+
+        assertNull(network.removeNetworkingBlock(new Vector3i(0, 0, 0)));
+        assertEquals(2, network.getNetworkSize());
+        assertFalse(network.isDegeneratedNetwork());
     }
 }
