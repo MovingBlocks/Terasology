@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Marcin Sciesinski <marcins78@gmail.com>
+ */
 public class DirectionsUtil {
     private static Map<Direction, Byte> directionBits = Maps.newHashMap();
 

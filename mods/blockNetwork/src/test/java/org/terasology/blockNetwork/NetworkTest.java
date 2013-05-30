@@ -8,6 +8,7 @@ import org.terasology.math.Vector3i;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -124,7 +125,7 @@ public class NetworkTest {
         assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
         network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
     }
-    
+
     @Test
     public void canAddNetworkingNodeOnTheSideOfConnectedNetworkingNode() {
         network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
@@ -133,6 +134,14 @@ public class NetworkTest {
         assertTrue(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
         network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(3, network.getNetworkSize());
+    }
+
+    @Test
+    public void cantAddNodeToNetworkWithTwoLeafNodes() {
+        network.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+
+        assertFalse(network.canAddBlock(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
@@ -148,5 +157,63 @@ public class NetworkTest {
     public void removeNetworkingNodeFromConnectedNetworkWithNetworkingNode() {
         network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
         network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+
+        assertNull(network.removeNetworkingBlock(new Vector3i(0, 0, 0)));
+        assertEquals(1, network.getNetworkSize());
+    }
+
+    @Test
+    public void removeLeafNodeFromConnectedNetworkWithNetworkingNode() {
+        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+
+        network.removeLeafBlock(new Vector3i(0, 0, 0));
+        assertEquals(1, network.getNetworkSize());
+    }
+
+    @Test
+    public void removeLeafNodeFromConnectedNetworkWithOnlyLeafNodes() {
+        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+
+        network.removeLeafBlock(new Vector3i(0, 0, 0));
+        assertEquals(1, network.getNetworkSize());
+    }
+
+    @Test
+    public void removingNetworkingNodeSplitsNetwork() {
+        network.addLeafBlock(new Vector3i(0, 0, -1), allDirections);
+        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+
+        final Collection<Network> resultNetworks = network.removeNetworkingBlock(new Vector3i(0, 0, 0));
+        assertEquals(2, resultNetworks.size());
+        for (Network resultNetwork : resultNetworks)
+            assertEquals(1, resultNetwork.getNetworkSize());
+    }
+
+    @Test
+    public void removingNetworkingNodeDoesNotSplitNetworkIfThereIsAlternativePath() {
+        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        network.addNetworkingBlock(new Vector3i(1, 0, 0), allDirections);
+        network.addNetworkingBlock(new Vector3i(1, 0, 1), allDirections);
+        network.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+
+        assertNull(network.removeNetworkingBlock(new Vector3i(0, 0, 0)));
+        assertEquals(3, network.getNetworkSize());
+    }
+
+    @Test
+    public void removeTheOnlyNetworkingNode() {
+        network.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        final Collection<Network> resultNetworks = network.removeNetworkingBlock(new Vector3i(0, 0, 0));
+        assertNotNull(resultNetworks);
+        assertEquals(0, resultNetworks.size());
+    }
+
+    @Test
+    public void removeTheOnlyLeafNode() {
+        network.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+        assertTrue(network.removeLeafBlock(new Vector3i(0, 0, 0)));
     }
 }
