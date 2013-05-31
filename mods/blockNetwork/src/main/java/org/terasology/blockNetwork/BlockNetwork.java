@@ -10,31 +10,36 @@ import java.util.*;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class BlockNetwork {
-    private Set<Network> networks = Sets.newHashSet();
+    private Set<SimpleNetwork> networks = Sets.newHashSet();
     private Map<Vector3i, Byte> leafNodes = Maps.newHashMap();
     private Set<Vector3i> networkingNodes = Sets.newHashSet();
 
-    private Map<Network, Collection<Network>> networkSplits = Maps.newHashMap();
-    private Map<Network, Collection<Network>> networkMerges = Maps.newHashMap();
-    private Set<Network> networkDeletes = Sets.newHashSet();
-    private Set<Network> networkAdds = Sets.newHashSet();
-    private Set<Network> networkUpdates = Sets.newHashSet();
+    private Set<BlockNetworkTopologyListener> listeners = new HashSet<BlockNetworkTopologyListener>();
+
+    public void addTopologyListener(BlockNetworkTopologyListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeTopologyListener(BlockNetworkTopologyListener listener) {
+        listeners.remove(listener);
+    }
 
     public void addNetworkingBlock(Vector3i location, byte connectingOnSides) {
         networkingNodes.add(location);
-        Network addedToNetwork = null;
+        SimpleNetwork addedToNetwork = null;
 
         // Try adding to existing networks
-        final Iterator<Network> networkIterator = networks.iterator();
+        final Iterator<SimpleNetwork> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
-            final Network network = networkIterator.next();
+            final SimpleNetwork network = networkIterator.next();
             if (network.canAddNode(location, connectingOnSides)) {
                 if (addedToNetwork == null) {
                     network.addNetworkingNode(location, connectingOnSides);
-                    networkUpdates.add(network);
+                    notifyUpdate(network);
                     addedToNetwork = network;
                 } else {
-                    mergeNetwork(addedToNetwork, network);
+                    addedToNetwork.mergeInNetwork(network);
+                    notifyMerge(addedToNetwork, network);
                     networkIterator.remove();
                 }
             }
@@ -42,10 +47,10 @@ public class BlockNetwork {
 
         // If it's not in any networks, create a new one
         if (addedToNetwork == null) {
-            Network newNetwork = new Network();
+            SimpleNetwork newNetwork = new SimpleNetwork();
             newNetwork.addNetworkingNode(location, connectingOnSides);
             networks.add(newNetwork);
-            networkAdds.add(newNetwork);
+            notifyAdd(newNetwork);
             addedToNetwork = newNetwork;
         }
 
@@ -58,21 +63,36 @@ public class BlockNetwork {
         }
     }
 
-    private void mergeNetwork(Network mainNetwork, Network mergedNetwork) {
-        mainNetwork.mergeInNetwork(mergedNetwork);
-        Collection<Network> mainNetworkMerges = networkMerges.get(mainNetwork);
-        if (mainNetworkMerges == null) {
-            mainNetworkMerges = Sets.newHashSet();
-            networkMerges.put(mainNetwork, mainNetworkMerges);
-        }
-        mainNetworkMerges.add(mergedNetwork);
+    private void notifyAdd(SimpleNetwork network) {
+        for (BlockNetworkTopologyListener listener : listeners)
+            listener.networkAdded(network);
+    }
+
+    private void notifyUpdate(SimpleNetwork network) {
+        for (BlockNetworkTopologyListener listener : listeners)
+            listener.networkUpdated(network);
+    }
+
+    private void notifyRemove(SimpleNetwork network) {
+        for (BlockNetworkTopologyListener listener : listeners)
+            listener.networkRemoved(network);
+    }
+
+    private void notifyMerge(SimpleNetwork mainNetwork, SimpleNetwork mergedNetwork) {
+        for (BlockNetworkTopologyListener listener : listeners)
+            listener.networksMerged(mainNetwork, mergedNetwork);
+    }
+
+    private void notifySplit(SimpleNetwork mainNetwork, Collection<SimpleNetwork> resultNetworks) {
+        for (BlockNetworkTopologyListener listener : listeners)
+            listener.networkSplit(mainNetwork, resultNetworks);
     }
 
     public void addLeafBlock(Vector3i location, byte connectingOnSides) {
-        for (Network network : networks) {
+        for (SimpleNetwork network : networks) {
             if (network.canAddNode(location, connectingOnSides)) {
                 network.addLeafNode(location, connectingOnSides);
-                networkUpdates.add(network);
+                notifyUpdate(network);
             }
         }
 
@@ -80,10 +100,10 @@ public class BlockNetwork {
         for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entrySet()) {
             final Vector3i leafLocation = leafNode.getKey();
             final byte leafConnectingOnSides = leafNode.getValue();
-            if (Network.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
-                Network degenerateNetwork = Network.createDegenerateNetwork(location, connectingOnSides, leafLocation, leafConnectingOnSides);
+            if (SimpleNetwork.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
+                SimpleNetwork degenerateNetwork = SimpleNetwork.createDegenerateNetwork(location, connectingOnSides, leafLocation, leafConnectingOnSides);
                 networks.add(degenerateNetwork);
-                networkAdds.add(degenerateNetwork);
+                notifyAdd(degenerateNetwork);
             }
         }
 
@@ -102,68 +122,46 @@ public class BlockNetwork {
 
     public void removeNetworkingBlock(Vector3i location) {
         networkingNodes.remove(location);
-        Network networkWithBlock = findNetworkWithNetworkingBlock(location);
+        SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(location);
 
         if (networkWithBlock == null)
             throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
 
-        final Collection<Network> resultNetworks = networkWithBlock.removeNetworkingNode(location);
+        final Collection<SimpleNetwork> resultNetworks = networkWithBlock.removeNetworkingNode(location);
         if (resultNetworks != null) {
             if (resultNetworks.size() > 0)
                 splitNetwork(networkWithBlock, resultNetworks);
             else {
                 networks.remove(networkWithBlock);
-                networkDeletes.add(networkWithBlock);
+                notifyRemove(networkWithBlock);
             }
         }
     }
 
-    private void splitNetwork(Network splitNetwork, Collection<Network> splitResult) {
+    private void splitNetwork(SimpleNetwork splitNetwork, Collection<SimpleNetwork> splitResult) {
         networks.remove(splitNetwork);
         networks.addAll(splitResult);
-        Collection<Network> networkSplitNetworks = networkSplits.get(splitNetwork);
-        if (networkSplitNetworks == null) {
-            networkSplitNetworks = Sets.newHashSet();
-            networkSplits.put(splitNetwork, networkSplitNetworks);
-        }
-        networkSplitNetworks.addAll(splitResult);
+        notifySplit(splitNetwork, splitResult);
     }
 
     public void removeLeafBlock(Vector3i location) {
         leafNodes.remove(location);
-        final Iterator<Network> networkIterator = networks.iterator();
+        final Iterator<SimpleNetwork> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
-            final Network network = networkIterator.next();
+            final SimpleNetwork network = networkIterator.next();
             if (network.hasLeafNode(location) && network.removeLeafNode(location)) {
                 networkIterator.remove();
-                networkDeletes.add(network);
+                notifyRemove(network);
             }
         }
     }
 
-    public Collection<Network> getNetworks() {
+    public Collection<? extends Network> getNetworks() {
         return Collections.unmodifiableCollection(networks);
     }
 
-    public BlockNetworkTopologyChanges consumeNetworksTopologyChanges() {
-        if (networkAdds.isEmpty() && networkUpdates.isEmpty() && networkDeletes.isEmpty()
-                && networkSplits.isEmpty() && networkMerges.isEmpty())
-            return null;
-
-        BlockNetworkTopologyChanges changes = new BlockNetworkTopologyChanges(networkAdds, networkUpdates, networkDeletes,
-                networkMerges, networkSplits);
-
-        networkAdds = Sets.newHashSet();
-        networkUpdates = Sets.newHashSet();
-        networkDeletes = Sets.newHashSet();
-        networkMerges = Maps.newHashMap();
-        networkSplits = Maps.newHashMap();
-
-        return changes;
-    }
-
-    private Network findNetworkWithNetworkingBlock(Vector3i location) {
-        for (Network network : networks) {
+    private SimpleNetwork findNetworkWithNetworkingBlock(Vector3i location) {
+        for (SimpleNetwork network : networks) {
             if (network.hasNetworkingNode(location))
                 return network;
         }

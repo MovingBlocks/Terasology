@@ -6,18 +6,17 @@ import org.terasology.math.Direction;
 import org.terasology.math.Vector3i;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
 public class NetworkTest {
-    private Network network;
+    private SimpleNetwork network;
     private byte allDirections;
     private byte upOnly;
 
     @Before
     public void setup() {
-        network = new Network();
+        network = new SimpleNetwork();
         allDirections = DirectionsUtil.addDirection((byte) 0, Direction.UP, Direction.LEFT, Direction.FORWARD, Direction.DOWN, Direction.RIGHT, Direction.BACKWARD);
         upOnly = DirectionsUtil.addDirection((byte) 0, Direction.UP);
     }
@@ -46,7 +45,7 @@ public class NetworkTest {
 
     @Test
     public void creatingDegenerateNetwork() {
-        network = Network.createDegenerateNetwork(new Vector3i(0, 0, 1), allDirections, new Vector3i(0, 0, 0), allDirections);
+        network = SimpleNetwork.createDegenerateNetwork(new Vector3i(0, 0, 1), allDirections, new Vector3i(0, 0, 0), allDirections);
         assertEquals(2, network.getNetworkSize());
     }
 
@@ -102,7 +101,7 @@ public class NetworkTest {
 
     @Test
     public void cantAddNodeToNetworkWithTwoLeafNodes() {
-        network = Network.createDegenerateNetwork(new Vector3i(0, 0, 2), allDirections, new Vector3i(0, 0, 1), allDirections);
+        network = SimpleNetwork.createDegenerateNetwork(new Vector3i(0, 0, 2), allDirections, new Vector3i(0, 0, 1), allDirections);
 
         assertFalse(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
     }
@@ -112,7 +111,7 @@ public class NetworkTest {
         network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 1), allDirections);
 
-        final Collection<Network> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
+        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
         assertNotNull(resultNetworks);
         assertEquals(0, resultNetworks.size());
     }
@@ -137,7 +136,7 @@ public class NetworkTest {
 
     @Test
     public void removeLeafNodeFromConnectedNetworkWithOnlyLeafNodes() {
-        network = Network.createDegenerateNetwork(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections);
+        network = SimpleNetwork.createDegenerateNetwork(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections);
 
         assertTrue(network.removeLeafNode(new Vector3i(0, 0, 0)));
         assertEquals(1, network.getNetworkSize());
@@ -149,7 +148,7 @@ public class NetworkTest {
         network.addLeafNode(new Vector3i(0, 0, -1), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 1), allDirections);
 
-        final Collection<Network> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
+        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
         assertNotNull(resultNetworks);
         assertEquals(0, resultNetworks.size());
     }
@@ -160,9 +159,9 @@ public class NetworkTest {
         network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
 
-        final Collection<Network> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
+        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
         assertEquals(2, resultNetworks.size());
-        for (Network resultNetwork : resultNetworks)
+        for (SimpleNetwork resultNetwork : resultNetworks)
             assertEquals(1, resultNetwork.getNetworkSize());
     }
 
@@ -180,7 +179,7 @@ public class NetworkTest {
     @Test
     public void removeTheOnlyNetworkingNode() {
         network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
-        final Collection<Network> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
+        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
         assertNotNull(resultNetworks);
         assertEquals(0, resultNetworks.size());
     }
