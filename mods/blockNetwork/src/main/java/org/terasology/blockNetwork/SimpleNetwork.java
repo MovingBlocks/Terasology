@@ -1,5 +1,7 @@
 package org.terasology.blockNetwork;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.terasology.math.Direction;
 
 import java.util.*;
@@ -27,7 +29,7 @@ import org.terasology.math.Vector3i;
 public class SimpleNetwork implements Network {
     private static final boolean SANITY_CHECK = true;
     private Map<Vector3i, Byte> networkingNodes = Maps.newHashMap();
-    private Map<Vector3i, Byte> leafNodes = Maps.newHashMap();
+    private Multimap<Vector3i, Byte> leafNodes = HashMultimap.create();
 
     public static SimpleNetwork createDegenerateNetwork(
             Vector3i location1, byte connectingOnSides1,
@@ -45,7 +47,7 @@ public class SimpleNetwork implements Network {
      * @param connectingOnSides Sides on which it can connect nodes.
      */
     public void addNetworkingNode(Vector3i location, byte connectingOnSides) {
-        if (SANITY_CHECK && !canAddNode(location, connectingOnSides))
+        if (SANITY_CHECK && !canAddNetworkingNode(location, connectingOnSides))
             throw new IllegalStateException("Unable to add this node to network");
         networkingNodes.put(new Vector3i(location), connectingOnSides);
     }
@@ -57,14 +59,14 @@ public class SimpleNetwork implements Network {
      * @param connectingOnSides Sides on which it can connect nodes.
      */
     public void addLeafNode(Vector3i location, byte connectingOnSides) {
-        if (SANITY_CHECK && (!canAddNode(location, connectingOnSides) || isEmptyNetwork()))
+        if (SANITY_CHECK && (!canAddLeafNode(location, connectingOnSides) || isEmptyNetwork()))
             throw new IllegalStateException("Unable to add this node to network");
         leafNodes.put(new Vector3i(location), connectingOnSides);
     }
 
     /**
-     * Returns the network size - a number of nodes it spans.
-     * it is counted once only.
+     * Returns the network size - a number of nodes it spans. If the same leaf node is added twice with different
+     * connecting sides, it is counted twice.
      *
      * @return
      */
@@ -79,12 +81,12 @@ public class SimpleNetwork implements Network {
      *
      * @param location
      */
-    public boolean removeLeafNode(Vector3i location) {
+    public boolean removeLeafNode(Vector3i location, byte connectingOnSides) {
         // Removal of a leaf node cannot split the network, so it's just safe to remove it
         // We just need to check, if after removal of the node, network becomes degenerated, if so - we need
         // to signal that the network is no longer valid and should be removed.
-        final Byte removedDirections = leafNodes.remove(location);
-        if (removedDirections == null)
+        final boolean changed = leafNodes.remove(location, connectingOnSides);
+        if (!changed)
             throw new IllegalStateException("Tried to remove a node that is not in the network");
 
         if (isDegeneratedNetwork())
@@ -121,7 +123,7 @@ public class SimpleNetwork implements Network {
             final Iterator<SimpleNetwork> resultNetworksIterator = resultNetworks.iterator();
             while (resultNetworksIterator.hasNext()) {
                 final SimpleNetwork resultNetwork = resultNetworksIterator.next();
-                if (resultNetwork.canAddNode(networkingNodeLocation, networkingNodeConnectingSides)) {
+                if (resultNetwork.canAddNetworkingNode(networkingNodeLocation, networkingNodeConnectingSides)) {
                     if (networkAddedTo == null) {
                         resultNetwork.addNetworkingNode(networkingNodeLocation, networkingNodeConnectingSides);
                         networkAddedTo = resultNetwork;
@@ -140,12 +142,12 @@ public class SimpleNetwork implements Network {
         }
 
         // We have all connections for the resulting networks, now add leaves
-        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entrySet()) {
+        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entries()) {
             final Vector3i leafNodeLocation = leafNode.getKey();
             final byte leafNodeConnectingSides = leafNode.getValue();
 
             for (SimpleNetwork resultNetwork : resultNetworks) {
-                if (resultNetwork.canAddNode(leafNodeLocation, leafNodeConnectingSides))
+                if (resultNetwork.canAddLeafNode(leafNodeLocation, leafNodeConnectingSides))
                     resultNetwork.addLeafNode(leafNodeLocation, leafNodeConnectingSides);
             }
         }
@@ -183,11 +185,27 @@ public class SimpleNetwork implements Network {
      * @param connectingOnSides
      * @return
      */
-    public boolean canAddNode(Vector3i location, byte connectingOnSides) {
+    public boolean canAddNetworkingNode(Vector3i location, byte connectingOnSides) {
         if (isEmptyNetwork())
             return true;
-        if (networkingNodes.containsKey(location))
+        if (networkingNodes.containsKey(location) || leafNodes.containsKey(location))
             return false;
+        for (Direction connectingOnSide : DirectionsUtil.getDirections(connectingOnSides)) {
+            final Vector3i possibleNodeLocation = new Vector3i(location);
+            possibleNodeLocation.add(connectingOnSide.getVector3i());
+            final Byte directionsForNodeOnThatSide = networkingNodes.get(possibleNodeLocation);
+            if (directionsForNodeOnThatSide != null && DirectionsUtil.hasDirection(directionsForNodeOnThatSide, connectingOnSide.reverse()))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean canAddLeafNode(Vector3i location, byte connectingOnSides) {
+        if (isEmptyNetwork())
+            return false;
+        if (networkingNodes.containsKey(location) || leafNodes.containsEntry(location, connectingOnSides))
+            return false;
+        
         for (Direction connectingOnSide : DirectionsUtil.getDirections(connectingOnSides)) {
             final Vector3i possibleNodeLocation = new Vector3i(location);
             possibleNodeLocation.add(connectingOnSide.getVector3i());
@@ -204,6 +222,10 @@ public class SimpleNetwork implements Network {
     }
 
     @Override
+    public boolean hasLeafNode(Vector3i location, byte connectingOnSides) {
+        return leafNodes.containsEntry(location, connectingOnSides);
+    }
+
     public boolean hasLeafNode(Vector3i location) {
         return leafNodes.containsKey(location);
     }

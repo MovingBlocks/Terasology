@@ -1,6 +1,8 @@
 package org.terasology.blockNetwork;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.terasology.math.Vector3i;
 
@@ -11,7 +13,7 @@ import java.util.*;
  */
 public class BlockNetwork {
     private Set<SimpleNetwork> networks = Sets.newHashSet();
-    private Map<Vector3i, Byte> leafNodes = Maps.newHashMap();
+    private Multimap<Vector3i, Byte> leafNodes = HashMultimap.create();
     private Set<Vector3i> networkingNodes = Sets.newHashSet();
 
     private Set<BlockNetworkTopologyListener> listeners = new HashSet<BlockNetworkTopologyListener>();
@@ -32,7 +34,7 @@ public class BlockNetwork {
         final Iterator<SimpleNetwork> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
             final SimpleNetwork network = networkIterator.next();
-            if (network.canAddNode(location, connectingOnSides)) {
+            if (network.canAddNetworkingNode(location, connectingOnSides)) {
                 if (addedToNetwork == null) {
                     network.addNetworkingNode(location, connectingOnSides);
                     notifyUpdate(network);
@@ -55,10 +57,10 @@ public class BlockNetwork {
         }
 
         // Find all leaf nodes that it joins to its network
-        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entrySet()) {
+        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entries()) {
             final Vector3i leafNodeLocation = leafNode.getKey();
             final byte leafNodeConnectingOnSides = leafNode.getValue();
-            if (addedToNetwork.canAddNode(leafNodeLocation, leafNodeConnectingOnSides))
+            if (addedToNetwork.canAddLeafNode(leafNodeLocation, leafNodeConnectingOnSides))
                 addedToNetwork.addLeafNode(leafNodeLocation, leafNodeConnectingOnSides);
         }
     }
@@ -90,14 +92,14 @@ public class BlockNetwork {
 
     public void addLeafBlock(Vector3i location, byte connectingOnSides) {
         for (SimpleNetwork network : networks) {
-            if (network.canAddNode(location, connectingOnSides)) {
+            if (network.canAddLeafNode(location, connectingOnSides)) {
                 network.addLeafNode(location, connectingOnSides);
                 notifyUpdate(network);
             }
         }
 
         // Check for new degenerated networks
-        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entrySet()) {
+        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entries()) {
             final Vector3i leafLocation = leafNode.getKey();
             final byte leafConnectingOnSides = leafNode.getValue();
             if (SimpleNetwork.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
@@ -116,7 +118,7 @@ public class BlockNetwork {
     }
 
     public void updateLeafBlock(Vector3i location, byte connectingOnSides) {
-        removeLeafBlock(location);
+        removeLeafBlock(location, connectingOnSides);
         addLeafBlock(location, connectingOnSides);
     }
 
@@ -144,12 +146,12 @@ public class BlockNetwork {
         notifySplit(splitNetwork, splitResult);
     }
 
-    public void removeLeafBlock(Vector3i location) {
-        leafNodes.remove(location);
+    public void removeLeafBlock(Vector3i location, byte connectingOnSides) {
+        leafNodes.remove(location, connectingOnSides);
         final Iterator<SimpleNetwork> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
             final SimpleNetwork network = networkIterator.next();
-            if (network.hasLeafNode(location) && network.removeLeafNode(location)) {
+            if (network.hasLeafNode(location, connectingOnSides) && network.removeLeafNode(location, connectingOnSides)) {
                 networkIterator.remove();
                 notifyRemove(network);
             }

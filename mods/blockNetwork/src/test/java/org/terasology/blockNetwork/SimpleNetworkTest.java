@@ -23,22 +23,21 @@ public class SimpleNetworkTest {
 
     @Test
     public void addNetworkingNodeToEmptyNetwork() {
-        assertTrue(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertTrue(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
         network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
         assertEquals(1, network.getNetworkSize());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void addLeafNodeToEmptyNetwork() {
-        assertTrue(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
-        network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
+    @Test
+    public void cantAddLeafNodeToEmptyNetwork() {
+        assertFalse(network.canAddLeafNode(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
     public void addingLeafNodeToNetworkingNode() {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
 
-        assertTrue(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertTrue(network.canAddLeafNode(new Vector3i(0, 0, 0), allDirections));
         network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
         assertEquals(2, network.getNetworkSize());
     }
@@ -53,7 +52,7 @@ public class SimpleNetworkTest {
     public void addingNetworkingNodeToNetworkingNode() {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
 
-        assertTrue(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertTrue(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
         network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
         assertEquals(2, network.getNetworkSize());
     }
@@ -62,14 +61,14 @@ public class SimpleNetworkTest {
     public void cantAddNodeToNetworkingNodeTooFar() {
         network.addNetworkingNode(new Vector3i(0, 0, 2), allDirections);
 
-        assertFalse(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertFalse(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
     public void cantAddNodeToNetworkingNodeWrongDirection() {
         network.addNetworkingNode(new Vector3i(0, 0, 1), upOnly);
 
-        assertFalse(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertFalse(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class SimpleNetworkTest {
         network.addNetworkingNode(new Vector3i(0, 0, 2), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 1), allDirections);
 
-        assertFalse(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertFalse(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
@@ -85,7 +84,7 @@ public class SimpleNetworkTest {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 2), allDirections);
 
-        assertTrue(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertTrue(network.canAddLeafNode(new Vector3i(0, 0, 0), allDirections));
         network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
     }
 
@@ -94,7 +93,7 @@ public class SimpleNetworkTest {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 2), allDirections);
 
-        assertTrue(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertTrue(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
         network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
         assertEquals(3, network.getNetworkSize());
     }
@@ -103,7 +102,7 @@ public class SimpleNetworkTest {
     public void cantAddNodeToNetworkWithTwoLeafNodes() {
         network = SimpleNetwork.createDegenerateNetwork(new Vector3i(0, 0, 2), allDirections, new Vector3i(0, 0, 1), allDirections);
 
-        assertFalse(network.canAddNode(new Vector3i(0, 0, 0), allDirections));
+        assertFalse(network.canAddNetworkingNode(new Vector3i(0, 0, 0), allDirections));
     }
 
     @Test
@@ -130,7 +129,7 @@ public class SimpleNetworkTest {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
 
-        network.removeLeafNode(new Vector3i(0, 0, 0));
+        network.removeLeafNode(new Vector3i(0, 0, 0), allDirections);
         assertEquals(1, network.getNetworkSize());
     }
 
@@ -138,7 +137,7 @@ public class SimpleNetworkTest {
     public void removeLeafNodeFromConnectedNetworkWithOnlyLeafNodes() {
         network = SimpleNetwork.createDegenerateNetwork(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections);
 
-        assertTrue(network.removeLeafNode(new Vector3i(0, 0, 0)));
+        assertTrue(network.removeLeafNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(1, network.getNetworkSize());
     }
 
