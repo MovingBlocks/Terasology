@@ -142,8 +142,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setDynamicShadows(true);
                         break;
                 }
-
-                ShaderManager.getInstance().recompileAllShaders();
             }
         };
         graphicsQualityButton.addState("Graphics Quality: Nice", graphicsQualityStateAction);
@@ -206,8 +204,6 @@ public class UIMenuConfigVideo extends UIWindow {
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton) element;
                 config.getRendering().setAnimateGrass(button.getState() != 0);
-
-                ShaderManager.getInstance().recompileAllShaders();
             }
         };
         animateGrassButton.addState("Animate Grass: Off", animateGrassStateAction);
@@ -223,8 +219,6 @@ public class UIMenuConfigVideo extends UIWindow {
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton) element;
                 config.getRendering().setReflectiveWater(button.getState() != 0);
-
-                ShaderManager.getInstance().recompileAllShaders();
             }
         };
         reflectiveWaterButton.addState("Water World Reflection: Off", reflectiveWaterStateAction);
@@ -240,7 +234,6 @@ public class UIMenuConfigVideo extends UIWindow {
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton) element;
                 config.getRendering().setBlurIntensity(button.getState());
-                ShaderManager.getInstance().recompileAllShaders();
             }
         };
         blurIntensityButton.addState("Blur Intensity: Off", blurIntensityStateAction);
@@ -278,8 +271,6 @@ public class UIMenuConfigVideo extends UIWindow {
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton) element;
                 config.getRendering().setOutline(button.getState()!=0);
-
-                ShaderManager.getInstance().recompileAllShaders();
             }
         };
         outlineButton.addState("Outline: Off", outlineStateAction);
@@ -297,6 +288,8 @@ public class UIMenuConfigVideo extends UIWindow {
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
+                ShaderManager.getInstance().recompileAllShaders();
+
                 getGUIManager().openWindow("config");
             }
         });
