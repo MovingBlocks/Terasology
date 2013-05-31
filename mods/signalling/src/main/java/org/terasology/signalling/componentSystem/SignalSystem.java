@@ -1,7 +1,10 @@
 package org.terasology.signalling.componentSystem;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.terasology.blockNetwork.BlockNetwork;
+import org.terasology.blockNetwork.Network;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
@@ -19,19 +22,21 @@ import org.terasology.signalling.components.SignalConsumerComponent;
 import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.block.BlockComponent;
 
+import java.util.Map;
 import java.util.Set;
 
 @RegisterComponentSystem
 public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem {
     private BlockNetwork signalNetwork;
-    private Set<Vector3i> signalProducers;
-    private Set<Vector3i> signalConsumers;
+
+    private Map<Vector3i, Byte> signalProducers;
+    private Map<Vector3i, Byte> signalConsumers;
 
     @Override
     public void initialise() {
         signalNetwork = new BlockNetwork();
-        signalProducers = Sets.newHashSet();
-        signalConsumers = Sets.newHashSet();
+        signalProducers = Maps.newHashMap();
+        signalConsumers = Maps.newHashMap();
     }
 
     @Override
@@ -49,16 +54,18 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     public void conductorAdded(AddComponentEvent event, EntityRef block) {
         final LocationComponent location = block.getComponent(LocationComponent.class);
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
-        
+
         signalNetwork.addNetworkingBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalConductorComponent.class})
+    @ReceiveEvent(components = {SignalConductorComponent.class})
     public void conductorUpdated(ChangedComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
-        byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
+        if (block.hasComponent(BlockComponent.class) && block.hasComponent(LocationComponent.class)) {
+            final LocationComponent location = block.getComponent(LocationComponent.class);
+            byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
 
-        signalNetwork.updateNetworkingBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+            signalNetwork.updateNetworkingBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+        }
     }
 
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalConductorComponent.class})
@@ -70,49 +77,49 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem 
 
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalProducerComponent.class})
     public void producerAdded(AddComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
+        Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
 
-        signalNetwork.addLeafBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+        signalProducers.put(location, connectingOnSides);
+        signalNetwork.addLeafBlock(location, connectingOnSides);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalProducerComponent.class})
+    @ReceiveEvent(components = {SignalProducerComponent.class})
     public void producerUpdated(ChangedComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
-        byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
+        if (block.hasComponent(BlockComponent.class) && block.hasComponent(LocationComponent.class)) {
+            Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
+            byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
 
-        signalNetwork.updateLeafBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+            final Byte oldConnectingOnSides = signalProducers.get(location);
+            signalProducers.put(location, connectingOnSides);
+            signalNetwork.updateLeafBlock(location, oldConnectingOnSides, connectingOnSides);
+        }
     }
 
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalProducerComponent.class})
     public void producerRemoved(RemovedComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
+        Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
 
-        signalNetwork.removeLeafBlock(new Vector3i(location.getLocalPosition()));
+        signalProducers.remove(location);
+        signalNetwork.removeLeafBlock(location, connectingOnSides);
     }
 
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalConsumerComponent.class})
     public void consumerAdded(AddComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
+        Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
 
-        signalNetwork.addLeafBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
-    }
-
-    @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalConsumerComponent.class})
-    public void consumerUpdated(ChangedComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
-        byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
-
-        signalNetwork.updateLeafBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+        signalConsumers.put(location, connectingOnSides);
+        signalNetwork.addLeafBlock(location, connectingOnSides);
     }
 
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, SignalConsumerComponent.class})
     public void consumerRemoved(RemovedComponentEvent event, EntityRef block) {
-        final LocationComponent location = block.getComponent(LocationComponent.class);
+        Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectingOnSides;
 
-        signalNetwork.removeLeafBlock(new Vector3i(location.getLocalPosition()));
+        signalConsumers.remove(location);
+        signalNetwork.removeLeafBlock(location, connectingOnSides);
     }
 }
