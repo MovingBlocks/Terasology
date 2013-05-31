@@ -17,12 +17,16 @@ package org.terasology.entitySystem.metadata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
+import org.terasology.network.NoReplicate;
 import org.terasology.network.Replicate;
 import org.terasology.protobuf.EntityData;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Locale;
 
 /**
@@ -38,14 +42,26 @@ public final class FieldMetadata {
     private TypeHandler serializationHandler;
     private boolean replicated;
     private Replicate replicationInfo;
+    private boolean ownedReference;
 
-    public FieldMetadata(Field field, Class type, TypeHandler handler, boolean replicated) {
+    public FieldMetadata(Field field, Class type, TypeHandler handler, boolean replicatedByDefault) {
         this.field = field;
         this.serializationHandler = handler;
-        this.replicated = replicated;
+        this.replicated = replicatedByDefault;
+        if (field.getAnnotation(NoReplicate.class) != null) {
+            replicated = false;
+        }
+        if (field.getAnnotation(Replicate.class) != null) {
+            replicated = true;
+        }
         this.replicationInfo = field.getAnnotation(Replicate.class);
+        ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType()) || isCollectionOf(EntityRef.class, field.getType()));
         getter = findGetter(type, field);
         setter = findSetter(type, field);
+    }
+
+    private boolean isCollectionOf(Class<?> targetType, Field field) {
+        if (Collection.class.isAssignableFrom(field.getType()) && )
     }
 
     public Object deserialize(EntityData.Value value) {

@@ -79,14 +79,8 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             if (typeHandler == null) {
                 logger.error("Unsupported field type in component type {}, {} : {}", forClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
-                boolean replicate = replicateFieldsByDefault;
-                if (field.getAnnotation(NoReplicate.class) != null) {
-                    replicate = false;
-                }
-                if (field.getAnnotation(Replicate.class) != null) {
-                    replicate = true;
-                }
-                info.addField(new FieldMetadata(field, forClass, typeHandler, replicate));
+
+                info.addField(new FieldMetadata(field, forClass, typeHandler, replicateFieldsByDefault));
             }
         }
     }
@@ -170,25 +164,13 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 if (handler == null) {
                     logger.error("Unsupported field type in component type {}, {} : {}", typeClass.getSimpleName(), field.getName(), field.getGenericType());
                 } else {
-                    mappedHandler.addField(new FieldMetadata(field, typeClass, handler, true));
+                    mappedHandler.addField(new FieldMetadata(field, typeClass, handler, false));
                 }
             }
             return mappedHandler;
         }
 
         return null;
-    }
-
-    // TODO - Improve parameter lookup to go up the inheritance tree more
-    private Type getTypeParameter(Type type, int parameter) {
-        if (!(type instanceof ParameterizedType)) {
-            return null;
-        }
-        ParameterizedType parameterizedType = (ParameterizedType) type;
-        if (parameterizedType.getActualTypeArguments().length < parameter + 1) {
-            return null;
-        }
-        return parameterizedType.getActualTypeArguments()[parameter];
     }
 
     @Override
