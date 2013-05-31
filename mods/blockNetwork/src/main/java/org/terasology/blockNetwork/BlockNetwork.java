@@ -162,6 +162,10 @@ public class BlockNetwork {
         return Collections.unmodifiableCollection(networks);
     }
 
+    public boolean isNetworkActive(Network network) {
+        return networks.contains(network);
+    }
+
     private SimpleNetwork findNetworkWithNetworkingBlock(Vector3i location) {
         for (SimpleNetwork network : networks) {
             if (network.hasNetworkingNode(location))
