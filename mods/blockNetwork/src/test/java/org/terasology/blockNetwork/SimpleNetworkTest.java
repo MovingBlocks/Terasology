@@ -9,7 +9,7 @@ import java.util.Collection;
 
 import static org.junit.Assert.*;
 
-public class NetworkTest {
+public class SimpleNetworkTest {
     private SimpleNetwork network;
     private byte allDirections;
     private byte upOnly;
