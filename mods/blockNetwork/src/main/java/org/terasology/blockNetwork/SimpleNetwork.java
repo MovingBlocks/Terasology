@@ -80,6 +80,7 @@ public class SimpleNetwork implements Network {
      * to signify that this network is now empty.
      *
      * @param location
+     * @param connectingOnSides
      */
     public boolean removeLeafNode(Vector3i location, byte connectingOnSides) {
         // Removal of a leaf node cannot split the network, so it's just safe to remove it
@@ -224,10 +225,6 @@ public class SimpleNetwork implements Network {
     @Override
     public boolean hasLeafNode(Vector3i location, byte connectingOnSides) {
         return leafNodes.containsEntry(location, connectingOnSides);
-    }
-
-    public boolean hasLeafNode(Vector3i location) {
-        return leafNodes.containsKey(location);
     }
 
     private boolean isDegeneratedNetwork() {

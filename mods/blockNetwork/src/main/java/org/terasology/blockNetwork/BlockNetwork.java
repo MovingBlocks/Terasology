@@ -117,9 +117,9 @@ public class BlockNetwork {
         addNetworkingBlock(location, connectingOnSides);
     }
 
-    public void updateLeafBlock(Vector3i location, byte connectingOnSides) {
-        removeLeafBlock(location, connectingOnSides);
-        addLeafBlock(location, connectingOnSides);
+    public void updateLeafBlock(Vector3i location, byte oldConnectingOnSides, byte newConnectingOnSides) {
+        removeLeafBlock(location, oldConnectingOnSides);
+        addLeafBlock(location, newConnectingOnSides);
     }
 
     public void removeNetworkingBlock(Vector3i location) {
