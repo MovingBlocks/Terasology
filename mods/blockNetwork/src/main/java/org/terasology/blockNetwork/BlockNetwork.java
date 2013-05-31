@@ -12,10 +12,10 @@ import java.util.*;
  */
 public class BlockNetwork {
     private Set<Network> networks = Sets.newHashSet();
-    private Map<Vector3i, Collection<Direction>> leafNodes = Maps.newHashMap();
+    private Map<Vector3i, Byte> leafNodes = Maps.newHashMap();
     private Set<Vector3i> networkingNodes = Sets.newHashSet();
 
-    public void addNetworkingBlock(Vector3i location, Collection<Direction> connectingOnSides) {
+    public void addNetworkingBlock(Vector3i location, byte connectingOnSides) {
         networkingNodes.add(location);
         Network addedToNetwork = null;
 
@@ -43,24 +43,24 @@ public class BlockNetwork {
         }
 
         // Find all leaf nodes that it joins to its network
-        for (Map.Entry<Vector3i, Collection<Direction>> leafNode: leafNodes.entrySet()){
+        for (Map.Entry<Vector3i, Byte> leafNode: leafNodes.entrySet()){
             final Vector3i leafNodeLocation = leafNode.getKey();
-            final Collection<Direction> leafNodeConnectingOnSides = leafNode.getValue();
+            final byte leafNodeConnectingOnSides = leafNode.getValue();
             if (addedToNetwork.canAddNode(leafNodeLocation, leafNodeConnectingOnSides))
                 addedToNetwork.addLeafNode(leafNodeLocation, leafNodeConnectingOnSides);
         }
     }
 
-    public void addLeafBlock(Vector3i location, Collection<Direction> connectingOnSides) {
+    public void addLeafBlock(Vector3i location, byte connectingOnSides) {
         for (Network network : networks) {
             if (network.canAddNode(location, connectingOnSides))
                 network.addLeafNode(location, connectingOnSides);
         }
 
         // Check for new degenerated networks
-        for (Map.Entry<Vector3i, Collection<Direction>> leafNode : leafNodes.entrySet()){
+        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entrySet()){
             final Vector3i leafLocation = leafNode.getKey();
-            final Collection<Direction> leafConnectingOnSides = leafNode.getValue();
+            final byte leafConnectingOnSides = leafNode.getValue();
             if (Network.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
                 Network degenerateNetwork = Network.createDegenerateNetwork(location, connectingOnSides, leafLocation, leafConnectingOnSides);
                 networks.add(degenerateNetwork);
@@ -70,12 +70,12 @@ public class BlockNetwork {
         leafNodes.put(location, connectingOnSides);
     }
 
-    public void updateNetworkingBlock(Vector3i location, Collection<Direction> connectingOnSides) {
+    public void updateNetworkingBlock(Vector3i location, byte connectingOnSides) {
         removeNetworkingBlock(location);
         addNetworkingBlock(location, connectingOnSides);
     }
 
-    public void updateLeafBlock(Vector3i location, Collection<Direction> connectingOnSides) {
+    public void updateLeafBlock(Vector3i location, byte connectingOnSides) {
         removeLeafBlock(location);
         addLeafBlock(location, connectingOnSides);
     }

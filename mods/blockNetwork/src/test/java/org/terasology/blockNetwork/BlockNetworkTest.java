@@ -14,18 +14,12 @@ import static org.junit.Assert.assertTrue;
 
 public class BlockNetworkTest {
     private BlockNetwork blockNetwork;
-    private Collection<Direction> allDirections;
+    private byte allDirections;
 
     @Before
     public void setup() {
         blockNetwork = new BlockNetwork();
-        allDirections = new HashSet<Direction>();
-        allDirections.add(Direction.UP);
-        allDirections.add(Direction.LEFT);
-        allDirections.add(Direction.FORWARD);
-        allDirections.add(Direction.DOWN);
-        allDirections.add(Direction.RIGHT);
-        allDirections.add(Direction.BACKWARD);
+        allDirections = DirectionsUtil.addDirection((byte) 0, Direction.UP, Direction.LEFT, Direction.FORWARD, Direction.DOWN, Direction.RIGHT, Direction.BACKWARD);
     }
 
     @Test

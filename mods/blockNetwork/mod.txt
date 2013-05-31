@@ -1,7 +1,7 @@
 {
     "id" : "blockNetwork",
-    "displayName" : "",
-    "author" : "",
-    "description" : "",
+    "displayName" : "Block Networks",
+    "author" : "MarcinSc marcins78@gmail.com",
+    "description" : "Library mod that adds functionality of grouping blocks into networks",
     "dependencies" : []
 }

@@ -12,21 +12,14 @@ import static org.junit.Assert.*;
 
 public class NetworkTest {
     private Network network;
-    private Collection<Direction> allDirections;
-    private Collection<Direction> upOnly;
+    private byte allDirections;
+    private byte upOnly;
 
     @Before
     public void setup() {
         network = new Network();
-        allDirections = new HashSet<Direction>();
-        allDirections.add(Direction.UP);
-        allDirections.add(Direction.LEFT);
-        allDirections.add(Direction.FORWARD);
-        allDirections.add(Direction.DOWN);
-        allDirections.add(Direction.RIGHT);
-        allDirections.add(Direction.BACKWARD);
-        upOnly = new HashSet<Direction>();
-        upOnly.add(Direction.UP);
+        allDirections = DirectionsUtil.addDirection((byte) 0, Direction.UP, Direction.LEFT, Direction.FORWARD, Direction.DOWN, Direction.RIGHT, Direction.BACKWARD);
+        upOnly = DirectionsUtil.addDirection((byte) 0, Direction.UP);
     }
 
     @Test

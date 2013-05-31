@@ -48,7 +48,11 @@ public class DirectionsUtil {
         return (directionBit & directionBits.get(direction)) > 0;
     }
 
-    public static byte addDirection(byte directionBit, Direction direction) {
-        return (byte) (directionBit | directionBits.get(direction));
+    public static byte addDirection(byte directionBit, Direction ... direction) {
+        for (Direction oneDirection : direction) {
+            directionBit |= directionBits.get(oneDirection);
+        }
+
+        return directionBit;
     }
 }

@@ -30,11 +30,11 @@ public class Network {
     private Map<Vector3i, Byte> leafNodes = Maps.newHashMap();
 
     public static Network createDegenerateNetwork(
-            Vector3i location1, Collection<Direction> connectingOnSides1,
-            Vector3i location2, Collection<Direction> connectingOnSides2) {
+            Vector3i location1, byte connectingOnSides1,
+            Vector3i location2, byte connectingOnSides2) {
         Network network = new Network();
-        network.leafNodes.put(location1, DirectionsUtil.getDirections(connectingOnSides1));
-        network.leafNodes.put(location2, DirectionsUtil.getDirections(connectingOnSides2));
+        network.leafNodes.put(location1, connectingOnSides1);
+        network.leafNodes.put(location2, connectingOnSides2);
         return network;
     }
 
@@ -44,10 +44,10 @@ public class Network {
      * @param location          The location of the new node.
      * @param connectingOnSides Sides on which it can connect nodes.
      */
-    public void addNetworkingNode(Vector3i location, Collection<Direction> connectingOnSides) {
+    public void addNetworkingNode(Vector3i location, byte connectingOnSides) {
         if (SANITY_CHECK && !canAddNode(location, connectingOnSides))
             throw new IllegalStateException("Unable to add this node to network");
-        networkingNodes.put(new Vector3i(location), DirectionsUtil.getDirections(connectingOnSides));
+        networkingNodes.put(new Vector3i(location), connectingOnSides);
     }
 
     /**
@@ -56,10 +56,10 @@ public class Network {
      * @param location          The location of the new node.
      * @param connectingOnSides Sides on which it can connect nodes.
      */
-    public void addLeafNode(Vector3i location, Collection<Direction> connectingOnSides) {
+    public void addLeafNode(Vector3i location, byte connectingOnSides) {
         if (SANITY_CHECK && (!canAddNode(location, connectingOnSides) || isEmptyNetwork()))
             throw new IllegalStateException("Unable to add this node to network");
-        leafNodes.put(new Vector3i(location), DirectionsUtil.getDirections(connectingOnSides));
+        leafNodes.put(new Vector3i(location), connectingOnSides);
     }
 
     /**
@@ -117,13 +117,12 @@ public class Network {
 
             final Vector3i networkingNodeLocation = networkingNode.getKey();
             final byte networkingNodeConnectingSides = networkingNode.getValue();
-            final Collection<Direction> networkingNodeDirections = DirectionsUtil.getDirections(networkingNodeConnectingSides);
             final Iterator<Network> resultNetworksIterator = resultNetworks.iterator();
             while (resultNetworksIterator.hasNext()) {
                 final Network resultNetwork = resultNetworksIterator.next();
-                if (resultNetwork.canAddNode(networkingNodeLocation, networkingNodeDirections)) {
+                if (resultNetwork.canAddNode(networkingNodeLocation, networkingNodeConnectingSides)) {
                     if (networkAddedTo == null) {
-                        resultNetwork.addNetworkingNode(networkingNodeLocation, networkingNodeDirections);
+                        resultNetwork.addNetworkingNode(networkingNodeLocation, networkingNodeConnectingSides);
                         networkAddedTo = resultNetwork;
                     } else {
                         networkAddedTo.mergeInNetwork(resultNetwork);
@@ -134,7 +133,7 @@ public class Network {
 
             if (networkAddedTo == null) {
                 Network newNetwork = new Network();
-                newNetwork.addNetworkingNode(networkingNodeLocation, networkingNodeDirections);
+                newNetwork.addNetworkingNode(networkingNodeLocation, networkingNodeConnectingSides);
                 resultNetworks.add(newNetwork);
             }
         }
@@ -142,11 +141,11 @@ public class Network {
         // We have all connections for the resulting networks, now add leaves
         for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entrySet()) {
             final Vector3i leafNodeLocation = leafNode.getKey();
-            final Collection<Direction> leafNodeDirections = DirectionsUtil.getDirections(leafNode.getValue());
+            final byte leafNodeConnectingSides = leafNode.getValue();
 
             for (Network resultNetwork : resultNetworks) {
-                if (resultNetwork.canAddNode(leafNodeLocation, leafNodeDirections))
-                    resultNetwork.addLeafNode(leafNodeLocation, leafNodeDirections);
+                if (resultNetwork.canAddNode(leafNodeLocation, leafNodeConnectingSides))
+                    resultNetwork.addLeafNode(leafNodeLocation, leafNodeConnectingSides);
             }
         }
 
@@ -156,11 +155,11 @@ public class Network {
         return resultNetworks;
     }
 
-    public static boolean areNodesConnecting(Vector3i location1, Collection<Direction> directions1, Vector3i location2, Collection<Direction> directions2) {
-        for (Direction direction : directions1) {
+    public static boolean areNodesConnecting(Vector3i location1, byte directions1, Vector3i location2, byte directions2) {
+        for (Direction direction : DirectionsUtil.getDirections(directions1)) {
             Vector3i neighbour = new Vector3i(location1);
             neighbour.add(direction.getVector3i());
-            if (location2.equals(neighbour) && directions2.contains(direction.reverse()))
+            if (location2.equals(neighbour) && DirectionsUtil.hasDirection(directions2, direction.reverse()))
                 return true;
         }
         return false;
@@ -183,12 +182,12 @@ public class Network {
      * @param connectingOnSides
      * @return
      */
-    public boolean canAddNode(Vector3i location, Collection<Direction> connectingOnSides) {
+    public boolean canAddNode(Vector3i location, byte connectingOnSides) {
         if (isEmptyNetwork())
             return true;
         if (networkingNodes.containsKey(location))
             return false;
-        for (Direction connectingOnSide : connectingOnSides) {
+        for (Direction connectingOnSide : DirectionsUtil.getDirections(connectingOnSides)) {
             final Vector3i possibleNodeLocation = new Vector3i(location);
             possibleNodeLocation.add(connectingOnSide.getVector3i());
             final Byte directionsForNodeOnThatSide = networkingNodes.get(possibleNodeLocation);
