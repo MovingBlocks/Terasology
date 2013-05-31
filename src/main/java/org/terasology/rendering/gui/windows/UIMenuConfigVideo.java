@@ -51,6 +51,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton blurIntensityButton;
     private final UIStateButton bobbingButton;
     private final UIStateButton fullscreenButton;
+    private final UIStateButton outlineButton;
     private final UIButton backToConfigMenuButton;
 
     private final Config config = CoreRegistry.get(Config.class);
@@ -100,7 +101,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
                         config.getRendering().setFilmGrain(true);
-                        config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
                         config.getRendering().setDynamicShadows(false);
@@ -113,7 +113,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
                         config.getRendering().setFilmGrain(true);
-                        config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
                         config.getRendering().setDynamicShadows(false);
@@ -126,7 +125,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
                         config.getRendering().setFilmGrain(true);
-                        config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(true);
                         config.getRendering().setAnimateWater(false);
                         config.getRendering().setDynamicShadows(false);
@@ -139,7 +137,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
                         config.getRendering().setFilmGrain(true);
-                        config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(true);
                         config.getRendering().setAnimateWater(true);
                         config.getRendering().setDynamicShadows(true);
@@ -275,6 +272,23 @@ public class UIMenuConfigVideo extends UIWindow {
         fullscreenButton.setPosition(new Vector2f(fullscreenButton.getSize().x / 2f, 300f + 3 * 40f));
         fullscreenButton.setVisible(true);
 
+        outlineButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction outlineStateAction = new StateButtonAction() {
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton) element;
+                config.getRendering().setOutline(button.getState()!=0);
+
+                ShaderManager.getInstance().recompileAllShaders();
+            }
+        };
+        outlineButton.addState("Outline: Off", outlineStateAction);
+        outlineButton.addState("Outline: On", outlineStateAction);
+        outlineButton.addClickListener(clickAction);
+        outlineButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        outlineButton.setPosition(new Vector2f(outlineButton.getSize().x / 2f, 300f + 4 * 40f));
+        outlineButton.setVisible(true);
+
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
         backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -299,6 +313,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(bobbingButton);
         addDisplayElement(backToConfigMenuButton);
         addDisplayElement(fullscreenButton);
+        addDisplayElement(outlineButton);
 
         setup();
     }
@@ -339,6 +354,12 @@ public class UIMenuConfigVideo extends UIWindow {
             fullscreenButton.setState(1);
         } else {
             fullscreenButton.setState(0);
+        }
+
+        if (config.getRendering().isOutline() ) {
+            outlineButton.setState(1);
+        } else {
+            outlineButton.setState(0);
         }
     }
 }
