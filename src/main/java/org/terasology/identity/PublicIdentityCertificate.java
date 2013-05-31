@@ -16,15 +16,17 @@
 
 package org.terasology.identity;
 
-import com.sun.crypto.provider.TlsRsaPremasterSecretGenerator;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.interfaces.RSAPublicKey;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Objects;
@@ -85,9 +87,10 @@ public class PublicIdentityCertificate {
 
     /**
      * Encrypts data such that it can only be decrypted by the paired private certificate, which is held by the certificate owner.
-     * <p>
+     * <p/>
      * Note that only a limited amount of data can be encrypted in this fashion - for large exchanges this should be used
      * to establish shared symmetric key which can then be used for the main exchange.
+     *
      * @param data
      * @return The encrypted data
      */
@@ -146,6 +149,7 @@ public class PublicIdentityCertificate {
     /**
      * Verifies that the signature was created by this certificate's corresponding private certificate, over the
      * given data.
+     *
      * @param data
      * @param signature
      * @return

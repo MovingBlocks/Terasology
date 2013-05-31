@@ -77,7 +77,7 @@ public class ClassMetadata<T> {
         return fields.get(name.toLowerCase(Locale.ENGLISH));
     }
 
-    public Iterable<? extends FieldMetadata> iterateFields() {
+    public Iterable<FieldMetadata> iterateFields() {
         return fields.values();
     }
 

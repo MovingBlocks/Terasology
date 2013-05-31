@@ -26,15 +26,16 @@ public final class ReflectionUtil {
     private ReflectionUtil() {
     }
 
-    // TODO - Improve parameter lookup to go up the inheritance tree more
     /**
-     * Attempts to return the type of a paramater of a parameterised type. This uses compile-time information only - the
+     * Attempts to return the type of a parameter of a parameterised field. This uses compile-time information only - the
      * type should be obtained from a field with a the generic types bound.
+     *
      * @param type
      * @param index
-     * @return The type of the generic paramater at index for the given type, or null if it cannot be obtained.
+     * @return The type of the generic parameter at index for the given type, or null if it cannot be obtained.
      */
-    public static Type getTypeParameter(Field field, int index) {
+    // TODO - Improve parameter lookup to go up the inheritance tree more
+    public static Type getTypeParameter(Type type, int index) {
         if (!(type instanceof ParameterizedType)) {
             return null;
         }
@@ -43,5 +44,14 @@ public final class ReflectionUtil {
             return null;
         }
         return parameterizedType.getActualTypeArguments()[index];
+    }
+
+    public static Class<?> getClassOfType(Type type) {
+        if (type instanceof Class) {
+            return (Class) type;
+        } else if (type instanceof ParameterizedType) {
+            return (Class) ((ParameterizedType) type).getRawType();
+        }
+        return null;
     }
 }

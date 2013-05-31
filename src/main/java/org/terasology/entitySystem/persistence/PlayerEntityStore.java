@@ -24,11 +24,19 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EntityStore;
 import org.terasology.entitySystem.lifecycleEvents.OnStoreEvent;
 import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -85,8 +93,29 @@ public class PlayerEntityStore implements EntityStore {
 
     @Override
     public void store(EntityRef entity, String name) {
+
         if (entityStoreBuilder == null) {
             throw new IllegalStateException("Entity Store not ready for storing entities");
+        }
+        for (Component comp : entity.iterateComponents()) {
+            ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
+            for (FieldMetadata fieldMetadata : metadata.iterateFields()) {
+                if (fieldMetadata.isOwnedReference()) {
+                    Object value = fieldMetadata.getValue(comp);
+                    if (value instanceof Collection) {
+                        for (EntityRef ref : ((Collection<EntityRef>) value)) {
+                            if (ref.exists()) {
+                                store(ref, "");
+                            }
+                        }
+                    } else {
+                        EntityRef ref = (EntityRef) value;
+                        if (ref.exists()) {
+                            store(ref, "");
+                        }
+                    }
+                }
+            }
         }
         if (entity.exists()) {
             entity.send(new OnStoreEvent(this));
@@ -134,7 +163,7 @@ public class PlayerEntityStore implements EntityStore {
     }
 
     @Override
-    public Map<String, EntityRef> restoreAll()  {
+    public Map<String, EntityRef> restoreAll() {
         if (loadedData == null) {
             throw new IllegalStateException("Entity store not ready to restore entities");
         }

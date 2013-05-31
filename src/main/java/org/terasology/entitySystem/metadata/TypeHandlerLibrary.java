@@ -26,8 +26,7 @@ import org.terasology.entitySystem.metadata.core.ListTypeHandler;
 import org.terasology.entitySystem.metadata.core.MappedContainerTypeHandler;
 import org.terasology.entitySystem.metadata.core.SetTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
-import org.terasology.network.NoReplicate;
-import org.terasology.network.Replicate;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -80,19 +79,15 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 logger.error("Unsupported field type in component type {}, {} : {}", forClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
 
-                info.addField(new FieldMetadata(field, forClass, typeHandler, replicateFieldsByDefault));
+                info.addField(new FieldMetadata(field, typeHandler, replicateFieldsByDefault));
             }
         }
     }
 
     // TODO: Refactor
     private TypeHandler getHandlerFor(Type type, int depth) {
-        Class typeClass;
-        if (type instanceof Class) {
-            typeClass = (Class) type;
-        } else if (type instanceof ParameterizedType) {
-            typeClass = (Class) ((ParameterizedType) type).getRawType();
-        } else {
+        Class<?> typeClass = ReflectionUtil.getClassOfType(type);
+        if (typeClass == null) {
             logger.error("Cannot obtain class for type {}", type);
             return null;
         }
@@ -102,7 +97,7 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
         }
         // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
         else if (List.class.isAssignableFrom(typeClass)) {
-            Type parameter = getTypeParameter(type, 0);
+            Type parameter = ReflectionUtil.getTypeParameter(type, 0);
             if (parameter != null) {
                 TypeHandler innerHandler = getHandlerFor(parameter, depth);
                 if (innerHandler != null) {
@@ -114,7 +109,7 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
         }
         // For sets:
         else if (Set.class.isAssignableFrom(typeClass)) {
-            Type parameter = getTypeParameter(type, 0);
+            Type parameter = ReflectionUtil.getTypeParameter(type, 0);
             if (parameter != null) {
                 TypeHandler innerHandler = getHandlerFor(parameter, depth);
                 if (innerHandler != null) {
@@ -126,8 +121,8 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
         }
         // For Maps, createEntityRef the handler for the value type (and maybe key too?)
         else if (Map.class.isAssignableFrom(typeClass)) {
-            Type keyParameter = getTypeParameter(type, 0);
-            Type contentsParameter = getTypeParameter(type, 1);
+            Type keyParameter = ReflectionUtil.getTypeParameter(type, 0);
+            Type contentsParameter = ReflectionUtil.getTypeParameter(type, 1);
             if (keyParameter != null && contentsParameter != null && String.class == keyParameter) {
                 TypeHandler valueHandler = getHandlerFor(contentsParameter, depth);
                 if (valueHandler != null) {
@@ -164,7 +159,7 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 if (handler == null) {
                     logger.error("Unsupported field type in component type {}, {} : {}", typeClass.getSimpleName(), field.getName(), field.getGenericType());
                 } else {
-                    mappedHandler.addField(new FieldMetadata(field, typeClass, handler, false));
+                    mappedHandler.addField(new FieldMetadata(field, handler, false));
                 }
             }
             return mappedHandler;

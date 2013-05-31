@@ -22,10 +22,12 @@ import org.terasology.entitySystem.Owns;
 import org.terasology.network.NoReplicate;
 import org.terasology.network.Replicate;
 import org.terasology.protobuf.EntityData;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -44,8 +46,9 @@ public final class FieldMetadata {
     private Replicate replicationInfo;
     private boolean ownedReference;
 
-    public FieldMetadata(Field field, Class type, TypeHandler handler, boolean replicatedByDefault) {
+    public FieldMetadata(Field field, TypeHandler handler, boolean replicatedByDefault) {
         this.field = field;
+        Class<?> classOfField = field.getType();
         this.serializationHandler = handler;
         this.replicated = replicatedByDefault;
         if (field.getAnnotation(NoReplicate.class) != null) {
@@ -55,13 +58,13 @@ public final class FieldMetadata {
             replicated = true;
         }
         this.replicationInfo = field.getAnnotation(Replicate.class);
-        ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType()) || isCollectionOf(EntityRef.class, field.getType()));
-        getter = findGetter(type, field);
-        setter = findSetter(type, field);
+        ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType()) || isCollectionOf(EntityRef.class, field));
+        getter = findGetter(classOfField, field);
+        setter = findSetter(classOfField, field);
     }
 
     private boolean isCollectionOf(Class<?> targetType, Field field) {
-        if (Collection.class.isAssignableFrom(field.getType()) && )
+        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == EntityRef.class);
     }
 
     public Object deserialize(EntityData.Value value) {
@@ -125,6 +128,10 @@ public final class FieldMetadata {
 
     public boolean isReplicated() {
         return replicated;
+    }
+
+    public boolean isOwnedReference() {
+        return ownedReference;
     }
 
     public Replicate getReplicationInfo() {

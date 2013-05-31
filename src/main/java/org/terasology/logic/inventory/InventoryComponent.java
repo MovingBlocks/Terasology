@@ -19,6 +19,7 @@ package org.terasology.logic.inventory;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
@@ -33,6 +34,7 @@ import java.util.List;
 public final class InventoryComponent implements Component, ReplicationCheck {
 
     @Replicate
+    @Owns
     List<EntityRef> itemSlots = Lists.newArrayList();
 
     public boolean privateToOwner = true;

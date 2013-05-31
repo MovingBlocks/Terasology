@@ -22,6 +22,7 @@ import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.persistence.PlayerEntityStore;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
@@ -171,6 +172,9 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             ClientComponent client = entity.getComponent(ClientComponent.class);
             client.character = character;
             entity.saveComponent(client);
+            CharacterComponent characterComp = character.getComponent(CharacterComponent.class);
+            characterComp.controller = entity;
+            character.saveComponent(characterComp);
             Location.attachChild(character, entity);
         }
     }

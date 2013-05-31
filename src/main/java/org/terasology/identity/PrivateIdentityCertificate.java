@@ -16,8 +16,6 @@
 
 package org.terasology.identity;
 
-import sun.security.util.BigInt;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -26,8 +24,6 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
-import java.util.UUID;
 
 /**
  * A private certificate contains the key that only the certificate owner should know. Used for signing and decryption

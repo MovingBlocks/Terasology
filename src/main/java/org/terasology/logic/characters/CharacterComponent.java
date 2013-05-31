@@ -18,6 +18,7 @@ package org.terasology.logic.characters;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.FieldReplicateType;
@@ -39,6 +40,7 @@ public final class CharacterComponent implements Component {
     public float yaw;
 
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Owns
     public EntityRef movingItem = EntityRef.NULL;
 
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)

@@ -50,7 +50,7 @@ public class ComponentSerializerTest {
     @Test
     public void testGetterSetterUtilization() throws Exception {
         ClassMetadata info = new ClassMetadata(GetterSetterComponent.class);
-        info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler(), false));
+        info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), new Vector3fTypeHandler(), false));
 
         GetterSetterComponent comp = new GetterSetterComponent();
         GetterSetterComponent newComp = (GetterSetterComponent) componentSerializer.deserialize(componentSerializer.serialize(comp));
