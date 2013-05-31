@@ -18,12 +18,14 @@ public class BlockNetwork {
     public void addNetworkingBlock(Vector3i location, Collection<Direction> connectingOnSides) {
         networkingNodes.add(location);
         Network addedToNetwork = null;
+
+        // Try adding to existing networks
         final Iterator<Network> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
             final Network network = networkIterator.next();
-            if (network.canAddBlock(location, connectingOnSides)) {
+            if (network.canAddNode(location, connectingOnSides)) {
                 if (addedToNetwork == null) {
-                    network.addNetworkingBlock(location, connectingOnSides);
+                    network.addNetworkingNode(location, connectingOnSides);
                     addedToNetwork = network;
                 } else {
                     addedToNetwork.mergeInNetwork(network);
@@ -32,24 +34,34 @@ public class BlockNetwork {
             }
         }
 
+        // If it's not in any networks, create a new one
         if (addedToNetwork == null) {
             Network newNetwork = new Network();
-            newNetwork.addNetworkingBlock(location, connectingOnSides);
+            newNetwork.addNetworkingNode(location, connectingOnSides);
             networks.add(newNetwork);
+            addedToNetwork = newNetwork;
+        }
+
+        // Find all leaf nodes that it joins to its network
+        for (Map.Entry<Vector3i, Collection<Direction>> leafNode: leafNodes.entrySet()){
+            final Vector3i leafNodeLocation = leafNode.getKey();
+            final Collection<Direction> leafNodeConnectingOnSides = leafNode.getValue();
+            if (addedToNetwork.canAddNode(leafNodeLocation, leafNodeConnectingOnSides))
+                addedToNetwork.addLeafNode(leafNodeLocation, leafNodeConnectingOnSides);
         }
     }
 
     public void addLeafBlock(Vector3i location, Collection<Direction> connectingOnSides) {
         for (Network network : networks) {
-            if (network.canAddBlock(location, connectingOnSides))
-                network.addLeafBlock(location, connectingOnSides);
+            if (network.canAddNode(location, connectingOnSides))
+                network.addLeafNode(location, connectingOnSides);
         }
 
-        // Check for new degenerate networks
+        // Check for new degenerated networks
         for (Map.Entry<Vector3i, Collection<Direction>> leafNode : leafNodes.entrySet()){
             final Vector3i leafLocation = leafNode.getKey();
             final Collection<Direction> leafConnectingOnSides = leafNode.getValue();
-            if (!networkingNodes.contains(leafLocation) && Network.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
+            if (Network.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
                 Network degenerateNetwork = Network.createDegenerateNetwork(location, connectingOnSides, leafLocation, leafConnectingOnSides);
                 networks.add(degenerateNetwork);
             }
@@ -75,7 +87,7 @@ public class BlockNetwork {
         if (networkWithBlock == null)
             throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
 
-        final Collection<Network> resultNetworks = networkWithBlock.removeNetworkingBlock(location);
+        final Collection<Network> resultNetworks = networkWithBlock.removeNetworkingNode(location);
         if (resultNetworks != null) {
             networks.remove(networkWithBlock);
             networks.addAll(resultNetworks);
@@ -87,7 +99,7 @@ public class BlockNetwork {
         final Iterator<Network> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
             final Network network = networkIterator.next();
-            if (network.hasLeafBlock(location) && network.removeLeafBlock(location))
+            if (network.hasLeafNode(location) && network.removeLeafNode(location))
                 networkIterator.remove();
         }
     }
@@ -98,7 +110,7 @@ public class BlockNetwork {
 
     private Network findNetworkWithNetworkingBlock(Vector3i location) {
         for (Network network : networks) {
-            if (network.hasNetworkingBlock(location))
+            if (network.hasNetworkingNode(location))
                 return network;
         }
         return null;

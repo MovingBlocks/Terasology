@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BlockNetworkTest {
     private BlockNetwork blockNetwork;
@@ -47,5 +49,31 @@ public class BlockNetworkTest {
         blockNetwork.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
         blockNetwork.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
+    }
+
+    @Test
+    public void addLeafNodeThenNetworkingNode() {
+        blockNetwork.addLeafBlock(new Vector3i(0, 0, 1), allDirections);
+        blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        assertEquals(1, blockNetwork.getNetworks().size());
+        Network network = blockNetwork.getNetworks().iterator().next();
+        assertTrue(network.hasLeafNode(new Vector3i(0, 0, 1)));
+        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
+    }
+
+    @Test
+    public void newNetworkingNodeJoinsLeafNodeIntoExistingNetwork() {
+        blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+        blockNetwork.addLeafBlock(new Vector3i(1, 0, 0), allDirections);
+        assertEquals(1, blockNetwork.getNetworks().size());
+        Network network = blockNetwork.getNetworks().iterator().next();
+        assertFalse(network.hasLeafNode(new Vector3i(1, 0, 0)));
+        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
+
+        blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
+        assertEquals(1, blockNetwork.getNetworks().size());
+        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
+        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
+        assertTrue(network.hasLeafNode(new Vector3i(1, 0, 0)));
     }
 }
