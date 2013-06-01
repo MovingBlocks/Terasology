@@ -23,7 +23,7 @@ public class OwnershipHelperTest {
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager(Terasology.class.getClassLoader(), OwnershipHelperTest.class.getClassLoader());
+        modManager = new ModManager();
     }
 
     @Before

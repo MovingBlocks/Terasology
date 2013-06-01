@@ -82,7 +82,7 @@ public abstract class TerasologyTestingEnvironment {
 
             collisionGroupManager = new CollisionGroupManager();
             CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
-            modManager = new ModManager(Terasology.class.getClassLoader(), TerasologyTestingEnvironment.class.getClassLoader());
+            modManager = new ModManager();
             modManager.applyActiveMods();
             CoreRegistry.put(ModManager.class, modManager);
             AssetType.registerAssetTypes();

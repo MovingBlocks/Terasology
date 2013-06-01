@@ -75,7 +75,7 @@ public class ModManager {
         this(ModManager.class.getClassLoader());
     }
 
-    public ModManager(ClassLoader ... engineClassLoaders) {
+    private ModManager(ClassLoader ... engineClassLoaders) {
         this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
 
         ConfigurationBuilder builder = new ConfigurationBuilder()

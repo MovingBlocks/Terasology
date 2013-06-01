@@ -32,7 +32,7 @@ public class ComponentSerializerTest {
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager(Terasology.class.getClassLoader(), ComponentSerializerTest.class.getClassLoader());
+        modManager = new ModManager();
     }
 
     @Before
