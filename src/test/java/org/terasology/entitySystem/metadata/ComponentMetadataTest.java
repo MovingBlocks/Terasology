@@ -17,9 +17,13 @@
 package org.terasology.entitySystem.metadata;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
+import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.stubs.UnsupportedTypeComponent;
 
@@ -46,6 +50,15 @@ public class ComponentMetadataTest {
         assertNull(metadata.getField("value"));
         assertNull(metadata.getField("value2"));
         assertNull(metadata.getField("value3"));
+    }
+
+    @Test
+    public void ownsReferencesPopulated() {
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(new TypeHandlerLibraryBuilder().add(EntityRef.class, new EntityRefTypeHandler(null)).build());
+        ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
+        lib.register(OwnerComponent.class);
+        ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);
+        assertTrue(metadata.isReferenceOwner());
     }
 
 }

@@ -26,6 +26,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
 
     private boolean replicated = false;
     private boolean replicatedFromOwner = false;
+    private boolean referenceOwner = false;
 
 
     public ComponentMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
@@ -41,6 +42,13 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
                 replicatedFromOwner = true;
             }
         }
+        if (fieldInfo.isOwnedReference()) {
+            referenceOwner = true;
+        }
+    }
+
+    public boolean isReferenceOwner() {
+        return referenceOwner;
     }
 
     public boolean isReplicatedFromOwner() {

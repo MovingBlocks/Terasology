@@ -22,6 +22,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EntityStore;
+import org.terasology.entitySystem.OwnershipHelper;
 import org.terasology.entitySystem.lifecycleEvents.OnStoreEvent;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
@@ -55,9 +56,12 @@ public class PlayerEntityStore implements EntityStore {
 
     private EntityData.EntityStore loadedData;
 
+    private OwnershipHelper helper;
+
 
     public PlayerEntityStore(String playerId, EngineEntityManager manager) {
         entityManager = manager;
+        helper = new OwnershipHelper(manager.getComponentLibrary());
         serializer = new EntitySerializer(manager, manager.getComponentLibrary());
         serializer.setIgnoringEntityId(false);
         File playerSubDir = new File(PathManager.getInstance().getCurrentWorldPath(), PLAYER_STORE_SUBDIR);
@@ -97,25 +101,8 @@ public class PlayerEntityStore implements EntityStore {
         if (entityStoreBuilder == null) {
             throw new IllegalStateException("Entity Store not ready for storing entities");
         }
-        for (Component comp : entity.iterateComponents()) {
-            ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
-            for (FieldMetadata fieldMetadata : metadata.iterateFields()) {
-                if (fieldMetadata.isOwnedReference()) {
-                    Object value = fieldMetadata.getValue(comp);
-                    if (value instanceof Collection) {
-                        for (EntityRef ref : ((Collection<EntityRef>) value)) {
-                            if (ref.exists()) {
-                                store(ref, "");
-                            }
-                        }
-                    } else {
-                        EntityRef ref = (EntityRef) value;
-                        if (ref.exists()) {
-                            store(ref, "");
-                        }
-                    }
-                }
-            }
+        for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
+            store(ownedEntity);
         }
         if (entity.exists()) {
             entity.send(new OnStoreEvent(this));

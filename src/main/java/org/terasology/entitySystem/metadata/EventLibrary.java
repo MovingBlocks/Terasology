@@ -22,7 +22,7 @@ import org.terasology.entitySystem.event.Event;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface EventLibrary extends ClassLibrary<Event> {
+public interface EventLibrary extends ClassLibrary<Event, EventMetadata<? extends Event>> {
 
     /**
      * @param clazz

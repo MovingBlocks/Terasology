@@ -18,7 +18,6 @@ package org.terasology.entitySystem.metadata.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
@@ -27,7 +26,7 @@ import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> implements ComponentLibrary {
+public final class ComponentLibraryImpl extends BaseLibraryImpl<Component, ComponentMetadata<? extends Component>> implements ComponentLibrary {
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibraryImpl.class);
 
     private TypeHandlerLibrary metadataBuilder;
@@ -61,10 +60,10 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> imple
     }
 
     @Override
-    protected <U extends Component> ClassMetadata<U> createMetadata(Class<U> clazz, String... names) {
+    protected <U extends Component> ComponentMetadata<U> createMetadata(Class<U> clazz, String... names) {
         ComponentMetadata<U> info;
         try {
-            info = new ComponentMetadata<U>(clazz, names);
+            info = new ComponentMetadata<>(clazz, names);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
             return null;

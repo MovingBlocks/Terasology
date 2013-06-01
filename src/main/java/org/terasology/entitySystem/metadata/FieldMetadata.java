@@ -48,7 +48,6 @@ public final class FieldMetadata {
 
     public FieldMetadata(Field field, TypeHandler handler, boolean replicatedByDefault) {
         this.field = field;
-        Class<?> classOfField = field.getType();
         this.serializationHandler = handler;
         this.replicated = replicatedByDefault;
         if (field.getAnnotation(NoReplicate.class) != null) {
@@ -59,8 +58,8 @@ public final class FieldMetadata {
         }
         this.replicationInfo = field.getAnnotation(Replicate.class);
         ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType()) || isCollectionOf(EntityRef.class, field));
-        getter = findGetter(classOfField, field);
-        setter = findSetter(classOfField, field);
+        getter = findGetter(field);
+        setter = findSetter(field);
     }
 
     private boolean isCollectionOf(Class<?> targetType, Field field) {
@@ -138,20 +137,20 @@ public final class FieldMetadata {
         return replicationInfo;
     }
 
-    private Method findGetter(Class type, Field field) {
-        Method result = findMethod(type, "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
+    private Method findGetter(Field field) {
+        Method result = findMethod(field.getDeclaringClass(), "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
         if (result != null && field.getType().equals(result.getReturnType())) {
             return result;
         }
-        result = findMethod(type, "is" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
+        result = findMethod(field.getDeclaringClass(), "is" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
         if (result != null && field.getType().equals(result.getReturnType())) {
             return result;
         }
         return null;
     }
 
-    private Method findSetter(Class type, Field field) {
-        return findMethod(type, "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
+    private Method findSetter(Field field) {
+        return findMethod(field.getDeclaringClass(), "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
     }
 
     private Method findMethod(Class type, String methodName, Class<?>... parameters) {

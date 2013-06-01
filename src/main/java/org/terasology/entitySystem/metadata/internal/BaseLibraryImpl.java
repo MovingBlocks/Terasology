@@ -27,9 +27,9 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
+public abstract class BaseLibraryImpl<T, U extends ClassMetadata<? extends T>> implements ClassLibrary<T, U> {
 
-    private Map<Class<? extends T>, ClassMetadata<? extends T>> serializationLookup = Maps.newHashMap();
+    private Map<Class<? extends T>, U> serializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
 
     public abstract String[] getNamesFor(Class<? extends T> clazz);
@@ -40,7 +40,7 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
     }
 
     public void register(Class<? extends T> clazz, String... names) {
-        ClassMetadata<? extends T> metadata = createMetadata(clazz, names);
+        U metadata = createMetadata(clazz, names);
 
         serializationLookup.put(clazz, metadata);
 
@@ -49,7 +49,7 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
         }
     }
 
-    protected abstract <U extends T> ClassMetadata<U> createMetadata(Class<U> clazz, String... names);
+    protected abstract <CLAZZ extends T> U createMetadata(Class<CLAZZ> clazz, String... names);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -84,7 +84,7 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
     }
 
     @Override
-    public Iterator<ClassMetadata<? extends T>> iterator() {
+    public Iterator<U> iterator() {
         return serializationLookup.values().iterator();
     }
 }

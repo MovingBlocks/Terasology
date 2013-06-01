@@ -362,6 +362,9 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             eventSystem.send(ref, OnDeactivatedEvent.newInstance());
             eventSystem.send(ref, OnRemovedEvent.newInstance());
         }
+        for (Component comp : store.iterateComponents(entityId)) {
+            notifyComponentRemoved(ref, comp.getClass());
+        }
         entityCache.remove(entityId);
         freedIds.add(entityId);
         if (ref instanceof PojoEntityRef) {
@@ -416,8 +419,8 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
                 eventSystem.send(entityRef, OnDeactivatedEvent.newInstance(), component);
                 eventSystem.send(entityRef, OnRemovedEvent.newInstance(), component);
             }
-            store.remove(entityId, componentClass);
             notifyComponentRemoved(getEntity(entityId), componentClass);
+            store.remove(entityId, componentClass);
         }
     }
 

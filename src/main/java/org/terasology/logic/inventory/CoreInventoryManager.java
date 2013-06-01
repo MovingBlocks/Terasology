@@ -295,20 +295,6 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
      * Event handling
      */
 
-    @ReceiveEvent(components = InventoryComponent.class)
-    public void onDestroyed(OnRemovedEvent event, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority()) {
-            InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-            for (EntityRef content : inventory.itemSlots) {
-                if (content != entity) {
-                    content.destroy();
-                } else {
-                    logger.warn("Inventory contained itself: {}", entity);
-                }
-            }
-        }
-    }
-
     @ReceiveEvent(components = ClientComponent.class)
     public void onChange(InventoryChangeAcknowledgedRequest event, EntityRef inventoryEntity) {
         if (!networkSystem.getMode().isAuthority()) {
@@ -491,12 +477,6 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
         if (networkSystem.getMode().isAuthority()) {
             inventoryEntity.saveComponent(inventory);
 
-            // Update item ownership
-            NetworkComponent networkComponent = item.getComponent(NetworkComponent.class);
-            if (networkComponent != null) {
-                networkComponent.owner = inventoryEntity;
-                item.saveComponent(networkComponent);
-            }
             if (item.exists()) {
                 inventoryEntity.send(new ReceivedItemEvent(item, slot));
             }

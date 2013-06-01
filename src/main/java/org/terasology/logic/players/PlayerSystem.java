@@ -111,11 +111,6 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             clientLoc.setLocalRotation(new Quat4f(0, 0, 0, 1));
             clientEntity.saveComponent(clientLoc);
 
-            NetworkComponent netComp = playerCharacter.getComponent(NetworkComponent.class);
-            if (netComp != null) {
-                netComp.owner = clientEntity;
-                playerCharacter.saveComponent(netComp);
-            }
             Client clientListener = networkSystem.getOwner(clientEntity);
             int distance = clientListener.getViewDistance();
             if (!clientListener.isLocal()) {
@@ -164,11 +159,6 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
             }
             worldRenderer.getChunkProvider().updateRelevanceEntity(entity, distance);
-            NetworkComponent netComp = character.getComponent(NetworkComponent.class);
-            if (netComp != null) {
-                netComp.owner = entity;
-                character.saveComponent(netComp);
-            }
             ClientComponent client = entity.getComponent(ClientComponent.class);
             client.character = character;
             entity.saveComponent(client);

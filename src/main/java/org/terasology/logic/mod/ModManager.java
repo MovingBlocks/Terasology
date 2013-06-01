@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +69,23 @@ public class ModManager {
     private Reflections engineReflections;
     private Reflections activeModReflections;
 
+    private ClassLoader[] engineClassLoaders;
+
     public ModManager() {
-        engineReflections = new Reflections(
-                new ConfigurationBuilder()
-                        .addClassLoader(getClass().getClassLoader())
-                        .addUrls(ClasspathHelper.forPackage("org.terasology", getClass().getClassLoader()))
-                        .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
+        this(ModManager.class.getClassLoader());
+    }
+
+    public ModManager(ClassLoader ... engineClassLoaders) {
+        this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
+
+        ConfigurationBuilder builder = new ConfigurationBuilder()
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+
+        for (ClassLoader loader : engineClassLoaders) {
+             builder.addClassLoader(loader)
+                    .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
+        }
+        engineReflections = new Reflections(builder);
         refresh();
     }
 
@@ -103,11 +115,15 @@ public class ModManager {
                     urls.add(mod.getModClasspathUrl());
                 }
             }
-            allReflections = new Reflections(new ConfigurationBuilder()
+
+            ConfigurationBuilder builder = new ConfigurationBuilder()
                     .addUrls(urls)
-                    .addUrls(ClasspathHelper.forPackage("org.terasology", getClass().getClassLoader()))
-                    .addClassLoader(allModClassLoader)
-                    .addClassLoader(getClass().getClassLoader()));
+                    .addClassLoader(allModClassLoader);
+            for (ClassLoader engineLoader : engineClassLoaders) {
+                builder.addClassLoader(engineLoader)
+                       .addUrls(ClasspathHelper.forPackage("org.terasology", engineLoader));
+            }
+            allReflections = new Reflections(builder);
             allReflections.merge(getEngineReflections());
             for (Mod mod : getMods()) {
                 if (mod.isCodeMod()) {

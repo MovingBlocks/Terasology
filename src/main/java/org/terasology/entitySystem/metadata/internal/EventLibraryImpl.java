@@ -19,7 +19,6 @@ package org.terasology.entitySystem.metadata.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
@@ -27,7 +26,7 @@ import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 /**
  * @author Immortius
  */
-public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLibrary {
+public class EventLibraryImpl extends BaseLibraryImpl<Event, EventMetadata<? extends Event>> implements EventLibrary {
     private static final Logger logger = LoggerFactory.getLogger(EventLibraryImpl.class);
     private TypeHandlerLibrary metadataBuilder;
 
@@ -57,10 +56,10 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
     }
 
     @Override
-    protected <U extends Event> ClassMetadata<U> createMetadata(Class<U> clazz, String... names) {
-        EventMetadata<U> info;
+    protected <T extends Event> EventMetadata<T> createMetadata(Class<T> clazz, String... names) {
+        EventMetadata<T> info;
         try {
-            info = new EventMetadata<U>(clazz, names[0]);
+            info = new EventMetadata<>(clazz, names[0]);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
             return null;
@@ -69,4 +68,5 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
         metadataBuilder.populateFields(clazz, info, true);
         return info;
     }
+
 }

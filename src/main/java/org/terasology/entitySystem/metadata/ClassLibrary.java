@@ -19,7 +19,7 @@ package org.terasology.entitySystem.metadata;
 /**
  * @author Immortius
  */
-public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
+public interface ClassLibrary<T, U extends ClassMetadata<? extends T>> extends Iterable<U> {
 
     /**
      * Registers a class with this library
