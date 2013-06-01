@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.terasology.blockNetwork.BlockNetwork;
-import org.terasology.blockNetwork.BlockNetworkTopologyListener;
+import org.terasology.blockNetwork.NetworkTopologyListener;
 import org.terasology.blockNetwork.Network;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RegisterComponentSystem
-public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem, BlockNetworkTopologyListener {
+public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem, NetworkTopologyListener {
     @In
     private BlockEntityRegistry blockEntityRegistry;
 
@@ -34,12 +34,14 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
     private Map<Vector3i, Byte> signalProducers;
     private Map<Vector3i, Byte> signalConsumers;
 
-    private Map<Vector3i, Map<Network, Boolean>> consumerSignalInNetworks = Maps.newHashMap();
-
     private Multimap<Vector3i, Network> producerNetworks = HashMultimap.create();
     private Multimap<Network, Vector3i> producersInNetwork = HashMultimap.create();
 
+    private Multimap<Vector3i, Network> consumerNetworks = HashMultimap.create();
+    private Multimap<Network, Vector3i> consumersInNetwork = HashMultimap.create();
+
     private Map<Vector3i, Integer> producerSignalStrengths = Maps.newHashMap();
+    private Map<Vector3i, Map<Network, Boolean>> consumerSignalInNetworks = Maps.newHashMap();
 
     private Set<Vector3i> modifiedProducerSignalsSinceLastUpdate = Sets.newHashSet();
     private Set<Network> modifiedNetworksSinceLastUpdate = Sets.newHashSet();
@@ -154,11 +156,6 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
     @Override
     public void networkAdded(Network newNetwork) {
         modifiedNetworksSinceLastUpdate.add(newNetwork);
-    }
-
-    @Override
-    public void networkUpdated(Network network) {
-        modifiedNetworksSinceLastUpdate.add(network);
     }
 
     @Override

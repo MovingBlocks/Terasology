@@ -106,25 +106,6 @@ public class SimpleNetworkTest {
     }
 
     @Test
-    public void removeNetworkingNodeFromConnectedNetworkWithLeaf() {
-        network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
-        network.addLeafNode(new Vector3i(0, 0, 1), allDirections);
-
-        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
-        assertNotNull(resultNetworks);
-        assertEquals(0, resultNetworks.size());
-    }
-
-    @Test
-    public void removeNetworkingNodeFromConnectedNetworkWithNetworkingNode() {
-        network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
-        network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
-
-        assertNull(network.removeNetworkingNode(new Vector3i(0, 0, 0)));
-        assertEquals(1, network.getNetworkSize());
-    }
-
-    @Test
     public void removeLeafNodeFromConnectedNetworkWithNetworkingNode() {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
         network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
@@ -142,44 +123,54 @@ public class SimpleNetworkTest {
     }
 
     @Test
-    public void removingNetworkingNodeRemovesNetworkWithLeavesOnly() {
-        network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
-        network.addLeafNode(new Vector3i(0, 0, -1), allDirections);
-        network.addLeafNode(new Vector3i(0, 0, 1), allDirections);
-
-        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
-        assertNotNull(resultNetworks);
-        assertEquals(0, resultNetworks.size());
-    }
-
-    @Test
-    public void removingNetworkingNodeSplitsNetwork() {
-        network.addNetworkingNode(new Vector3i(0, 0, -1), allDirections);
-        network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
+    public void distanceForSameLeafNode() {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
+        network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
 
-        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
-        assertEquals(2, resultNetworks.size());
-        for (SimpleNetwork resultNetwork : resultNetworks)
-            assertEquals(1, resultNetwork.getNetworkSize());
+        assertTrue(network.isInDistance(0, new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 0), allDirections));
+        assertEquals(0, network.getDistance(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 0), allDirections));
+    }
+    
+    @Test
+    public void distanceForDegeneratedNetwork() {
+        network = SimpleNetwork.createDegenerateNetwork(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections);
+
+        assertTrue(network.isInDistance(1, new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections));
+        assertEquals(1, network.getDistance(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 1), allDirections));
     }
 
     @Test
-    public void removingNetworkingNodeDoesNotSplitNetworkIfThereIsAlternativePath() {
-        network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
-        network.addNetworkingNode(new Vector3i(1, 0, 0), allDirections);
-        network.addNetworkingNode(new Vector3i(1, 0, 1), allDirections);
+    public void distanceForTwoLeafNodesOnNetwork() {
         network.addNetworkingNode(new Vector3i(0, 0, 1), allDirections);
+        network.addLeafNode(new Vector3i(0, 0, 2), allDirections);
+        network.addLeafNode(new Vector3i(0, 0, 0), allDirections);
 
-        assertNull(network.removeNetworkingNode(new Vector3i(0, 0, 0)));
-        assertEquals(3, network.getNetworkSize());
+        assertTrue(network.isInDistance(2, new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 2), allDirections));
+        assertFalse(network.isInDistance(1, new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 2), allDirections));
+        assertEquals(2, network.getDistance(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 2), allDirections));
     }
 
     @Test
-    public void removeTheOnlyNetworkingNode() {
-        network.addNetworkingNode(new Vector3i(0, 0, 0), allDirections);
-        final Collection<SimpleNetwork> resultNetworks = network.removeNetworkingNode(new Vector3i(0, 0, 0));
-        assertNotNull(resultNetworks);
-        assertEquals(0, resultNetworks.size());
+    public void distanceForLongNetwork() {
+        for (int i=0; i<10; i++)
+            network.addNetworkingNode(new Vector3i(0, 0, i), allDirections);
+
+        assertTrue(network.isInDistance(9, new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 9), allDirections));
+        assertFalse(network.isInDistance(8, new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 9), allDirections));
+        assertEquals(9, network.getDistance(new Vector3i(0, 0, 0), allDirections, new Vector3i(0, 0, 9), allDirections));
+    }
+
+    @Test
+    public void distanceForBranchedNetwork() {
+        for (int i=0; i<10; i++)
+            network.addNetworkingNode(new Vector3i(0, 0, i), allDirections);
+
+        for (int i=1; i<=5; i++)
+            network.addNetworkingNode(new Vector3i(i, 0, 5), allDirections);
+
+        assertTrue(network.isInDistance(10, new Vector3i(0, 0, 0), allDirections, new Vector3i(5, 0, 5), allDirections));
+        assertFalse(network.isInDistance(9, new Vector3i(0, 0, 0), allDirections, new Vector3i(5, 0, 5), allDirections));
+        assertEquals(10, network.getDistance(new Vector3i(0, 0, 0), allDirections, new Vector3i(5, 0, 5), allDirections));
+
     }
 }

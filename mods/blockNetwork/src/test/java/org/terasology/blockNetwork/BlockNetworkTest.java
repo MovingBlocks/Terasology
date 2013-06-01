@@ -6,10 +6,12 @@ import org.terasology.math.Direction;
 import org.terasology.math.Vector3i;
 
 import java.util.Collection;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import com.google.common.collect.Multimap;
 
 public class BlockNetworkTest {
     private BlockNetwork blockNetwork;
@@ -79,7 +81,8 @@ public class BlockNetworkTest {
         blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
 
-        assertEquals(1, listener.networksUpdated);
+        assertEquals(1, listener.networksAdded);
+        assertEquals(2, listener.networkingNodesAdded);
     }
 
     @Test
@@ -97,7 +100,9 @@ public class BlockNetworkTest {
         assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
         assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
         assertTrue(network.hasLeafNode(new Vector3i(1, 0, 0), allDirections));
-        assertEquals(1, listener.networksUpdated);
+        assertEquals(1, listener.networksAdded);
+        assertEquals(2, listener.networkingNodesAdded);
+        assertEquals(1, listener.leafNodesAdded);
     }
 
     @Test
@@ -110,7 +115,6 @@ public class BlockNetworkTest {
 
         blockNetwork.removeNetworkingBlock(new Vector3i(0, 0, 0));
         assertEquals(2, blockNetwork.getNetworks().size());
-        assertEquals(1, listener.networkSplits);
     }
 
     @Test
@@ -126,22 +130,24 @@ public class BlockNetworkTest {
         assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, -1)));
         assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
         assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
-        assertEquals(1, listener.networkMerges);
+        assertEquals(1, listener.networksRemoved);
     }
 
-    private class TestListener implements BlockNetworkTopologyListener {
+    private class TestListener implements NetworkTopologyListener {
         public int networksAdded;
-        public int networksUpdated;
         public int networksRemoved;
-        public int networkSplits;
-        public int networkMerges;
+        public int networkingNodesAdded;
+        public int networkingNodesRemoved;
+        public int leafNodesAdded;
+        public int leafNodesRemoved;
 
         public void reset() {
             networksAdded = 0;
-            networksUpdated = 0;
             networksRemoved = 0;
-            networkSplits = 0;
-            networkMerges = 0;
+            networkingNodesAdded=0;
+            networkingNodesRemoved=0;
+            leafNodesAdded=0;
+            leafNodesRemoved=0;
         }
 
         @Override
@@ -150,23 +156,28 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkUpdated(Network network) {
-            networksUpdated++;
-        }
-
-        @Override
         public void networkRemoved(Network network) {
             networksRemoved++;
         }
 
         @Override
-        public void networkSplit(Network sourceNetwork, Collection<? extends Network> resultNetwork) {
-            networkSplits++;
+        public void networkingNodesAdded(Network network, Map<Vector3i, Byte> networkingNodes) {
+            networkingNodesAdded++;
         }
 
         @Override
-        public void networksMerged(Network mainNetwork, Network mergedNetwork) {
-            networkMerges++;
+        public void networkingNodesRemoved(Network network, Map<Vector3i, Byte> networkingNodes) {
+            networkingNodesRemoved++;
+        }
+
+        @Override
+        public void leafNodesAdded(Network network, Multimap<Vector3i, Byte> leafNodes) {
+            leafNodesAdded++;
+        }
+
+        @Override
+        public void leafNodesRemoved(Network network, Multimap<Vector3i, Byte> leafNodes) {
+            leafNodesRemoved++;
         }
     }
 }
