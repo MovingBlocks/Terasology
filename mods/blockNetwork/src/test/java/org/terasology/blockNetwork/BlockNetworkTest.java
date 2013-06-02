@@ -137,6 +137,23 @@ public class BlockNetworkTest {
         assertEquals(1, listener.networksRemoved);
     }
 
+    @Test
+    public void addLeafNetworkingLeaf() {
+        blockNetwork.addLeafBlock(new Vector3i(0, 0, 2), allDirections);
+        blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 1), allDirections);
+        blockNetwork.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+
+        blockNetwork.removeLeafBlock(new Vector3i(0, 0, 0), allDirections);
+        blockNetwork.addLeafBlock(new Vector3i(0, 0, 0), allDirections);
+
+        assertEquals(1, blockNetwork.getNetworks().size());
+
+        Network network = blockNetwork.getNetworks().iterator().next();
+        assertTrue(network.hasLeafNode(new Vector3i(0, 0, 0), allDirections));
+        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
+        assertTrue(network.hasLeafNode(new Vector3i(0, 0, 2), allDirections));
+    }
+
     private class TestListener implements NetworkTopologyListener {
         public int networksAdded;
         public int networksRemoved;

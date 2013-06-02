@@ -192,10 +192,10 @@ public class BlockNetwork {
                     else {
                         Map.Entry<Vector3i, Byte> onlyLeafNode = network.getLeafNodes().entries().iterator().next();
                         notifyLeafNodesRemoved(network, ImmutableMultimap.of(location, connectingOnSides, onlyLeafNode.getKey(), onlyLeafNode.getValue()));
-                    }
 
-                    networkIterator.remove();
-                    notifyNetworkRemoved(network);
+                        networkIterator.remove();
+                        notifyNetworkRemoved(network);
+                    }
                 }
             }
         } finally {
