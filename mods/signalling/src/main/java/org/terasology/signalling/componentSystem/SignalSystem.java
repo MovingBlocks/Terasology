@@ -59,7 +59,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         signalNetwork.addTopologyListener(this);
         signalProducers = Maps.newHashMap();
         signalConsumers = Maps.newHashMap();
-        
+
     }
 
     @Override
@@ -75,6 +75,8 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         for (Vector3i producerChanges : producersSignalsChanged)
             networksToRecalculate.addAll(producerNetworks.get(producerChanges));
 
+        Set<Vector3i> consumersToEvaluate = Sets.newHashSet();
+
         for (Network network : networksToRecalculate) {
             if (signalNetwork.isNetworkActive(network)) {
                 Collection<Vector3i> consumersInNetwork = this.consumersInNetwork.get(network);
@@ -82,22 +84,33 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
                     boolean consumerSignalInNetwork = getConsumerSignalInNetwork(network, consumerLocation);
                     consumerSignalInNetworks.get(consumerLocation).put(network, consumerSignalInNetwork);
                 }
-                consumersToRecalculate.addAll(consumersInNetwork);
+                consumersToEvaluate.addAll(consumersInNetwork);
             }
         }
 
-        // Send consumer status changes
         for (Vector3i modifiedConsumer : consumersToRecalculate) {
-            final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(modifiedConsumer);
-            final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
-            Map<Network, Boolean> consumerSignals = consumerSignalInNetworks.get(modifiedConsumer);
-            boolean newSignal = false;
-            if (consumerSignals != null)
-                newSignal = calculateResultSignal(consumerSignals.values());
-            if (newSignal != consumerComponent.hasSignal) {
-                consumerComponent.hasSignal = newSignal;
-                blockEntity.saveComponent(consumerComponent);
-                logger.info("Consumer has signal: " + newSignal);
+            Collection<Network> networks = consumerNetworks.get(modifiedConsumer);
+            for (Network network : networks) {
+                boolean consumerSignalInNetwork = getConsumerSignalInNetwork(network, modifiedConsumer);
+                consumerSignalInNetworks.get(modifiedConsumer).put(network, consumerSignalInNetwork);
+            }
+            consumersToEvaluate.add(modifiedConsumer);
+        }
+
+        // Send consumer status changes
+        for (Vector3i consumerToEvaluate : consumersToEvaluate) {
+            if (signalConsumers.containsKey(consumerToEvaluate)) {
+                final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(consumerToEvaluate);
+                final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
+                Map<Network, Boolean> consumerSignals = consumerSignalInNetworks.get(consumerToEvaluate);
+                boolean newSignal = false;
+                if (consumerSignals != null)
+                    newSignal = calculateResultSignal(consumerSignals.values());
+                if (newSignal != consumerComponent.hasSignal) {
+                    consumerComponent.hasSignal = newSignal;
+                    blockEntity.saveComponent(consumerComponent);
+                    logger.info("Consumer has signal: " + newSignal);
+                }
             }
         }
 
