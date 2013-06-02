@@ -18,6 +18,7 @@ package org.terasology.rendering.world;
 import com.google.common.collect.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1029,10 +1030,20 @@ public final class WorldRenderer {
         GL11.glReadBuffer(GL11.GL_FRONT);
         final int width = Display.getWidth();
         final int height = Display.getHeight();
-        //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
-        final int bpp = 4;
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
-        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        // In fullscreen Display.getDisplayMode().getBitsPerPixel() should return the actual bpp.
+        // If the screen is windowed, fallback to the DesktopDisplayMode value,
+        // Finally fallback to 32bpp default value.
+        DisplayMode dm = Display.getDisplayMode();
+        int bpp = 0;
+        if ( (bpp = dm.getBitsPerPixel()) == 0 && !dm.isFullscreenCapable())
+        {
+        	dm = Display.getDesktopDisplayMode();
+        	bpp = dm.getBitsPerPixel();
+        }
+        final int bytePP = ( bpp == 0 ? 32 : bpp ) / 8;
+        
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bytePP );
+        GL11.glReadPixels(0, 0, width, height, bytePP == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -1044,7 +1055,7 @@ public final class WorldRenderer {
 
                 for (int x = 0; x < width; x++)
                     for (int y = 0; y < height; y++) {
-                        int i = (x + width * y) * bpp;
+                        int i = (x + width * y) * bytePP;
                         int r = buffer.get(i) & 0xFF;
                         int g = buffer.get(i + 1) & 0xFF;
                         int b = buffer.get(i + 2) & 0xFF;
