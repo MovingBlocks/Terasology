@@ -1,5 +1,6 @@
 {
     "entity" : {
-        "prefab" : "signalling:SignalLimitedSwitch"
+        "prefab" : "signalling:SignalLimitedSwitch",
+        "mode" : "persistent"
     }
 }
