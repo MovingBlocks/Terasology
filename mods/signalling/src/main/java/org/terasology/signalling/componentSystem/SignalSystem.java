@@ -40,11 +40,14 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
     private Multimap<Vector3i, Network> consumerNetworks = HashMultimap.create();
     private Multimap<Network, Vector3i> consumersInNetwork = HashMultimap.create();
 
+    // Used to detect producer changes
     private Map<Vector3i, Integer> producerSignalStrengths = Maps.newHashMap();
+    // Used to store signal for consumer from non-modified networks
     private Map<Vector3i, Map<Network, Boolean>> consumerSignalInNetworks = Maps.newHashMap();
 
-    private Set<Vector3i> modifiedProducerSignalsSinceLastUpdate = Sets.newHashSet();
-    private Set<Network> modifiedNetworksSinceLastUpdate = Sets.newHashSet();
+    private Set<Network> networksToRecalculate = Sets.newHashSet();
+    private Set<Vector3i> consumersToRecalculate = Sets.newHashSet();
+    private Set<Vector3i> producersSignalsChanged = Sets.newHashSet();
 
     @Override
     public void initialise() {
@@ -62,68 +65,28 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
 
     @Override
     public void update(float delta) {
-        if (!modifiedNetworksSinceLastUpdate.isEmpty()) {
-            Set<Vector3i> modifiedConsumers = Sets.newHashSet();
+        // Mark all networks affected by the producer signal change
+        for (Vector3i producerChanges : producersSignalsChanged)
+            networksToRecalculate.addAll(producerNetworks.get(producerChanges));
 
-            // Update all the locations of producers, we need to iterate through ALL producers as some might have been
-            // added into a network they were not a part of before
-            for (Map.Entry<Vector3i, Byte> producer : signalProducers.entrySet()) {
-                final Vector3i producerLocation = producer.getKey();
-                final byte producerConnections = producer.getValue();
-                for (Network network : modifiedNetworksSinceLastUpdate) {
-                    if (signalNetwork.isNetworkActive(network) && network.hasLeafNode(producerLocation, producerConnections)) {
-                        producerNetworks.put(producerLocation, network);
-                        producersInNetwork.put(network, producerLocation);
-                    } else {
-                        producerNetworks.remove(producerLocation, network);
-                        producersInNetwork.remove(network, producerLocation);
-                    }
-                }
+        for (Network network : networksToRecalculate) {
+            Collection<Vector3i> consumersInNetwork = this.consumersInNetwork.get(network);
+            for (Vector3i consumerLocation : consumersInNetwork) {
+                boolean consumerSignalInNetwork = getConsumerSignalInNetwork(network, consumerLocation);
+                consumerSignalInNetworks.get(consumerLocation).put(network, consumerSignalInNetwork);
             }
+            consumersToRecalculate.addAll(consumersInNetwork);
+        }
 
-            // Add networks with modified producer strengths to list of modified networks
-            for (Vector3i producer : modifiedProducerSignalsSinceLastUpdate)
-                modifiedNetworksSinceLastUpdate.addAll(producerNetworks.get(producer));
-
-            // Calculate consumer status changes, we need to iterate through ALL consumers as some might have been
-            // added into a network they was not a part of before
-            for (Map.Entry<Vector3i, Byte> consumer : signalConsumers.entrySet()) {
-                boolean modifiedAnySignal = false;
-                final Vector3i consumerLocation = consumer.getKey();
-                final byte consumerConnections = consumer.getValue();
-
-                final Map<Network, Boolean> networkSignals = consumerSignalInNetworks.get(consumerLocation);
-                for (Network network : modifiedNetworksSinceLastUpdate) {
-                    if (signalNetwork.isNetworkActive(network) && network.hasLeafNode(consumerLocation, consumerConnections)) {
-                        boolean newSignal = getConsumerSignalInNetwork(network, consumerLocation);
-                        final Boolean oldSignal = networkSignals.get(network);
-                        if (oldSignal == null || oldSignal != newSignal) {
-                            networkSignals.put(network, newSignal);
-                            modifiedAnySignal = true;
-                        }
-                    } else {
-                        modifiedAnySignal = (networkSignals.remove(network) != null);
-                    }
-                }
-
-                if (modifiedAnySignal)
-                    modifiedConsumers.add(consumerLocation);
+        // Send consumer status changes
+        for (Vector3i modifiedConsumer : consumersToRecalculate) {
+            final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(modifiedConsumer);
+            final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
+            boolean newSignal = calculateResultSignal(consumerSignalInNetworks.get(modifiedConsumer).values());
+            if (newSignal != consumerComponent.hasSignal) {
+                consumerComponent.hasSignal = newSignal;
+                blockEntity.saveComponent(consumerComponent);
             }
-
-            modifiedProducerSignalsSinceLastUpdate.clear();
-            modifiedNetworksSinceLastUpdate.clear();
-
-            // Send consumer status changes
-            for (Vector3i modifiedConsumer : modifiedConsumers) {
-                final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(modifiedConsumer);
-                final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
-                boolean newSignal = calculateResultSignal(consumerSignalInNetworks.get(modifiedConsumer).values());
-                if (newSignal != consumerComponent.hasSignal) {
-                    consumerComponent.hasSignal = newSignal;
-                    blockEntity.saveComponent(consumerComponent);
-                }
-            }
-
         }
     }
 
@@ -136,18 +99,20 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         return false;
     }
 
+    //
     private boolean getConsumerSignalInNetwork(Network network, Vector3i location) {
         // Check for infinite signal strength (-1), if there - it powers whole network
         final Collection<Vector3i> producers = producersInNetwork.get(network);
         for (Vector3i producer : producers) {
             final int signalStrength = producerSignalStrengths.get(producer);
-            if (signalStrength==-1)
+            if (signalStrength == -1)
                 return true;
         }
 
-        for (Vector3i producer : producers) {
-            final int signalStrength = producerSignalStrengths.get(producer);
-            // TODO check if consumer block is within the specified signal strength
+        for (Vector3i producerLocation : producers) {
+            final int signalStrength = producerSignalStrengths.get(producerLocation);
+            if (network.isInDistance(signalStrength, producerLocation, signalProducers.get(producerLocation), location, signalConsumers.get(location)))
+                return true;
         }
 
         return false;
@@ -155,27 +120,55 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
 
     @Override
     public void networkAdded(Network newNetwork) {
-        modifiedNetworksSinceLastUpdate.add(newNetwork);
+    }
+
+    @Override
+    public void networkingNodesAdded(Network network, Map<Vector3i, Byte> networkingNodes) {
+        networksToRecalculate.add(network);
+    }
+
+    @Override
+    public void networkingNodesRemoved(Network network, Map<Vector3i, Byte> networkingNodes) {
+        networksToRecalculate.add(network);
+    }
+
+    @Override
+    public void leafNodesAdded(Network network, Multimap<Vector3i, Byte> leafNodes) {
+        for (Map.Entry<Vector3i, Byte> modifiedLeafNode : leafNodes.entries()) {
+            Vector3i nodeLocation = modifiedLeafNode.getKey();
+            Byte producerConnectingSides = signalProducers.get(nodeLocation);
+            if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.getValue()) {
+                networksToRecalculate.add(network);
+                producerNetworks.put(nodeLocation, network);
+                producersInNetwork.put(network, nodeLocation);
+            } else {
+                consumersToRecalculate.add(nodeLocation);
+                consumerNetworks.put(nodeLocation, network);
+                consumersInNetwork.put(network, nodeLocation);
+            }
+        }
+    }
+
+    @Override
+    public void leafNodesRemoved(Network network, Multimap<Vector3i, Byte> leafNodes) {
+        for (Map.Entry<Vector3i, Byte> modifiedLeafNode : leafNodes.entries()) {
+            Vector3i nodeLocation = modifiedLeafNode.getKey();
+            Byte producerConnectingSides = signalProducers.get(nodeLocation);
+            if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.getValue()) {
+                networksToRecalculate.add(network);
+                producerNetworks.remove(nodeLocation, network);
+                producersInNetwork.remove(network, nodeLocation);
+            } else {
+                consumersToRecalculate.add(nodeLocation);
+                consumerNetworks.remove(nodeLocation, network);
+                consumersInNetwork.remove(nodeLocation, network);
+                consumerSignalInNetworks.get(nodeLocation).remove(network);
+            }
+        }
     }
 
     @Override
     public void networkRemoved(Network network) {
-        modifiedNetworksSinceLastUpdate.add(network);
-        producersInNetwork.removeAll(network);
-    }
-
-    @Override
-    public void networkSplit(Network sourceNetwork, Collection<? extends Network> resultNetwork) {
-        modifiedNetworksSinceLastUpdate.add(sourceNetwork);
-        producersInNetwork.removeAll(sourceNetwork);
-        modifiedNetworksSinceLastUpdate.addAll(resultNetwork);
-    }
-
-    @Override
-    public void networksMerged(Network mainNetwork, Network mergedNetwork) {
-        modifiedNetworksSinceLastUpdate.add(mainNetwork);
-        modifiedNetworksSinceLastUpdate.add(mergedNetwork);
-        producersInNetwork.removeAll(mergedNetwork);
     }
 
     /**
@@ -240,7 +233,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
             int newSignalStrength = producerComponent.signalStrength;
             if (oldSignalStrength != newSignalStrength) {
                 producerSignalStrengths.put(location, newSignalStrength);
-                modifiedProducerSignalsSinceLastUpdate.add(location);
+                producersSignalsChanged.add(location);
             }
         }
     }
@@ -250,13 +243,9 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         byte connectingOnSides = block.getComponent(SignalProducerComponent.class).connectionSides;
 
-        signalProducers.remove(location);
-        final Collection<Network> networks = producerNetworks.removeAll(location);
-        for (Network network : networks)
-            producersInNetwork.remove(network, location);
-
-        producerSignalStrengths.remove(location);
         signalNetwork.removeLeafBlock(location, connectingOnSides);
+        signalProducers.remove(location);
+        producerSignalStrengths.remove(location);
     }
 
     /**
@@ -294,8 +283,8 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         Vector3i location = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
-        signalConsumers.remove(location);
-        consumerSignalInNetworks.put(location, Maps.<Network, Boolean>newHashMap());
         signalNetwork.removeLeafBlock(location, connectingOnSides);
+        signalConsumers.remove(location);
+        consumerSignalInNetworks.remove(location);
     }
 }
