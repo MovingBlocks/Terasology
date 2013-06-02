@@ -59,6 +59,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         signalNetwork.addTopologyListener(this);
         signalProducers = Maps.newHashMap();
         signalConsumers = Maps.newHashMap();
+        
     }
 
     @Override
