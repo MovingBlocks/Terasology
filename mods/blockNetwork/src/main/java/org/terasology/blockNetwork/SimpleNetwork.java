@@ -24,7 +24,7 @@ import org.terasology.math.Vector3i;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class SimpleNetwork implements Network {
-    private static final boolean SANITY_CHECK = true;
+    private static final boolean SANITY_CHECK = false;
     private Map<Vector3i, Byte> networkingNodes = Maps.newHashMap();
     private Multimap<Vector3i, Byte> leafNodes = HashMultimap.create();
 

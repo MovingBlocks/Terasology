@@ -158,6 +158,7 @@ public class BlockNetwork {
             // TODO: Improve to actually detects the branches of splits and build separate network for each disjunctioned
             // TODO: network
             Map<Vector3i, Byte> networkingNodes = Maps.newHashMap(networkWithBlock.getNetworkingNodes());
+            Multimap<Vector3i, Byte> leafNodes = HashMultimap.create(networkWithBlock.getLeafNodes());
 
             networkWithBlock.removeAllLeafNodes();
             notifyLeafNodesRemoved(networkWithBlock, leafNodes);

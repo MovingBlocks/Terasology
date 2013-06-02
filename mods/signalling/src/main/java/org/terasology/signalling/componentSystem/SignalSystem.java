@@ -19,6 +19,8 @@ import org.terasology.signalling.components.SignalConsumerComponent;
 import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
@@ -26,6 +28,8 @@ import java.util.Set;
 
 @RegisterComponentSystem
 public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem, NetworkTopologyListener {
+    private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
+
     @In
     private BlockEntityRegistry blockEntityRegistry;
 
@@ -52,6 +56,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
     @Override
     public void initialise() {
         signalNetwork = new BlockNetwork();
+        signalNetwork.addTopologyListener(this);
         signalProducers = Maps.newHashMap();
         signalConsumers = Maps.newHashMap();
     }
@@ -70,24 +75,34 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
             networksToRecalculate.addAll(producerNetworks.get(producerChanges));
 
         for (Network network : networksToRecalculate) {
-            Collection<Vector3i> consumersInNetwork = this.consumersInNetwork.get(network);
-            for (Vector3i consumerLocation : consumersInNetwork) {
-                boolean consumerSignalInNetwork = getConsumerSignalInNetwork(network, consumerLocation);
-                consumerSignalInNetworks.get(consumerLocation).put(network, consumerSignalInNetwork);
+            if (signalNetwork.isNetworkActive(network)) {
+                Collection<Vector3i> consumersInNetwork = this.consumersInNetwork.get(network);
+                for (Vector3i consumerLocation : consumersInNetwork) {
+                    boolean consumerSignalInNetwork = getConsumerSignalInNetwork(network, consumerLocation);
+                    consumerSignalInNetworks.get(consumerLocation).put(network, consumerSignalInNetwork);
+                }
+                consumersToRecalculate.addAll(consumersInNetwork);
             }
-            consumersToRecalculate.addAll(consumersInNetwork);
         }
 
         // Send consumer status changes
         for (Vector3i modifiedConsumer : consumersToRecalculate) {
             final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(modifiedConsumer);
             final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
-            boolean newSignal = calculateResultSignal(consumerSignalInNetworks.get(modifiedConsumer).values());
+            Map<Network, Boolean> consumerSignals = consumerSignalInNetworks.get(modifiedConsumer);
+            boolean newSignal = false;
+            if (consumerSignals != null)
+                newSignal = calculateResultSignal(consumerSignals.values());
             if (newSignal != consumerComponent.hasSignal) {
                 consumerComponent.hasSignal = newSignal;
                 blockEntity.saveComponent(consumerComponent);
+                logger.info("Consumer has signal: " + newSignal);
             }
         }
+
+        producersSignalsChanged.clear();
+        networksToRecalculate.clear();
+        consumersToRecalculate.clear();
     }
 
     private Boolean calculateResultSignal(Collection<Boolean> values) {
@@ -124,11 +139,13 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
 
     @Override
     public void networkingNodesAdded(Network network, Map<Vector3i, Byte> networkingNodes) {
+        logger.info("Cable added to network");
         networksToRecalculate.add(network);
     }
 
     @Override
     public void networkingNodesRemoved(Network network, Map<Vector3i, Byte> networkingNodes) {
+        logger.info("Cable removed from network");
         networksToRecalculate.add(network);
     }
 
@@ -138,10 +155,12 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
             Vector3i nodeLocation = modifiedLeafNode.getKey();
             Byte producerConnectingSides = signalProducers.get(nodeLocation);
             if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.getValue()) {
+                logger.info("Producer added to network");
                 networksToRecalculate.add(network);
                 producerNetworks.put(nodeLocation, network);
                 producersInNetwork.put(network, nodeLocation);
             } else {
+                logger.info("Consumer added to network");
                 consumersToRecalculate.add(nodeLocation);
                 consumerNetworks.put(nodeLocation, network);
                 consumersInNetwork.put(network, nodeLocation);
@@ -155,10 +174,12 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
             Vector3i nodeLocation = modifiedLeafNode.getKey();
             Byte producerConnectingSides = signalProducers.get(nodeLocation);
             if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.getValue()) {
+                logger.info("Producer removed from network");
                 networksToRecalculate.add(network);
                 producerNetworks.remove(nodeLocation, network);
                 producersInNetwork.remove(network, nodeLocation);
             } else {
+                logger.info("Consumer removed from network");
                 consumersToRecalculate.add(nodeLocation);
                 consumerNetworks.remove(nodeLocation, network);
                 consumersInNetwork.remove(nodeLocation, network);
