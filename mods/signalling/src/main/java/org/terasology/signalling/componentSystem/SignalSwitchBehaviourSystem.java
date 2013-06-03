@@ -10,18 +10,66 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.events.ActivateEvent;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 
 import javax.vecmath.Vector3f;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterComponentSystem
-public class SignalSwitchBehaviourSystem implements EventHandlerSystem {
+public class SignalSwitchBehaviourSystem implements EventHandlerSystem, UpdateSubscriberSystem {
     @In
     private WorldProvider worldProvider;
+    @In
+    private EntityManager entityManager;
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
+
+    private Set<Vector3i> activatedPressurePlates = Sets.newHashSet();
+
+    @Override
+    public void update(float delta) {
+        Set<Vector3i> toRemoveSignal = Sets.newHashSet(activatedPressurePlates);
+
+        Iterable<EntityRef> players = entityManager.iteratorEntities(PlayerComponent.class, LocationComponent.class);
+        for (EntityRef player : players) {
+            Vector3f playerLocation = player.getComponent(LocationComponent.class).getWorldPosition();
+            Vector3i locationBeneathPlayer = new Vector3i(playerLocation.x+0.5f, playerLocation.y - 0.5f, playerLocation.z+0.5f);
+            Block blockBeneathPlayer = worldProvider.getBlock(locationBeneathPlayer);
+            if (blockBeneathPlayer.getEntityPrefab().equals("signalling:PressurePlate")) {
+                EntityRef entityBeneathPlayer = blockEntityRegistry.getBlockEntityAt(locationBeneathPlayer);
+                SignalProducerComponent signalProducer = entityBeneathPlayer.getComponent(SignalProducerComponent.class);
+                if (signalProducer != null) {
+                    if (signalProducer.signalStrength==0) {
+                        signalProducer.signalStrength=-1;
+                        entityBeneathPlayer.saveComponent(signalProducer);
+                        activatedPressurePlates.add(locationBeneathPlayer);
+                    } else {
+                        toRemoveSignal.remove(locationBeneathPlayer);
+                    }
+                }
+            }
+        }
+
+        for (Vector3i pressurePlateLocation : toRemoveSignal) {
+            EntityRef entityBeneathPlayer = blockEntityRegistry.getBlockEntityAt(pressurePlateLocation);
+            SignalProducerComponent signalProducer = entityBeneathPlayer.getComponent(SignalProducerComponent.class);
+            if (signalProducer != null) {
+                if (signalProducer.signalStrength==-1) {
+                    signalProducer.signalStrength=0;
+                    entityBeneathPlayer.saveComponent(signalProducer);
+                    activatedPressurePlates.remove(pressurePlateLocation);
+                }
+            }
+        }
+    }
 
     @Override
     public void initialise() {
