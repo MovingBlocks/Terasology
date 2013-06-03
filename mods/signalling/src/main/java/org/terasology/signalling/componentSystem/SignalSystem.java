@@ -215,7 +215,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
         final LocationComponent location = block.getComponent(LocationComponent.class);
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-        signalNetwork.addNetworkingBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+        signalNetwork.addNetworkingBlock(new Vector3i(location.getWorldPosition()), connectingOnSides);
     }
 
     @ReceiveEvent(components = {SignalConductorComponent.class})
@@ -224,7 +224,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
             final LocationComponent location = block.getComponent(LocationComponent.class);
             byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-            signalNetwork.updateNetworkingBlock(new Vector3i(location.getLocalPosition()), connectingOnSides);
+            signalNetwork.updateNetworkingBlock(new Vector3i(location.getWorldPosition()), connectingOnSides);
         }
     }
 
@@ -232,7 +232,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
     public void conductorRemoved(RemovedComponentEvent event, EntityRef block) {
         final LocationComponent location = block.getComponent(LocationComponent.class);
 
-        signalNetwork.removeNetworkingBlock(new Vector3i(location.getLocalPosition()));
+        signalNetwork.removeNetworkingBlock(new Vector3i(location.getWorldPosition()));
     }
 
     /**

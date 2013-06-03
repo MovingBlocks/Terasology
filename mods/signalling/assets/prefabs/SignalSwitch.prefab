@@ -1,4 +1,5 @@
 {
+    "name": "Signal Emitter",
     "SignalProducer": {
         "connectionSides": 63,
         "signalStrength": -1

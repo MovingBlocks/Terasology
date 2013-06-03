@@ -1,7 +1,7 @@
 {
-    "name": "Signal Lamp",
+    "name": "(do not use)",
     "SignalConsumer": {
         "connectionSides": 63,
-        "hasSignal": false
+        "hasSignal": true
     }
 }
