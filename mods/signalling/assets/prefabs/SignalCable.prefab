@@ -1,0 +1,6 @@
+{
+    "name": "Signal Cable",
+    "SignalConductor" : {
+        "connectionSides": 63
+    }
+}
