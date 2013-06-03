@@ -18,12 +18,12 @@ package org.terasology.audio;
 
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;

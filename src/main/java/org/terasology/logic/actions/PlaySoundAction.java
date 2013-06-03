@@ -17,13 +17,13 @@ package org.terasology.logic.actions;
 
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.ActivateEvent;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.common.ActivateEvent;
 import org.terasology.utilities.procedural.FastRandom;
 
 import javax.vecmath.Vector3f;

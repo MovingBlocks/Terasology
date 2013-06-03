@@ -16,7 +16,7 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.components.LightComponent;
+import org.terasology.rendering.logic.LightComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;

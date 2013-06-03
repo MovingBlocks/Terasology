@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;

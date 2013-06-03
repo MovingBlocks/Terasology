@@ -31,16 +31,16 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.utility.DroppedItemTypeComponent;
+import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.logic.inventory.DroppedItemComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
 import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.ShaderManager;
@@ -185,7 +185,7 @@ public class MeshRenderer implements RenderSystem {
 
     @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
     public void onDestroyMesh(OnDeactivatedEvent event, EntityRef entity) {
-        if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
+        if (entity.getComponent(DroppedItemComponent.class) != null) {
             return;
         }
         removeMesh(entity);

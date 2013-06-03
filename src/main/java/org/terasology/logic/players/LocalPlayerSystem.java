@@ -16,13 +16,13 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Timer;

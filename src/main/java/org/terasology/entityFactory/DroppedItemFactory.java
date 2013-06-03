@@ -17,8 +17,8 @@
 package org.terasology.entityFactory;
 
 import com.google.common.collect.Maps;
-import org.terasology.components.utility.DroppedItemTypeComponent;
-import org.terasology.components.utility.LifespanComponent;
+import org.terasology.logic.inventory.DroppedItemComponent;
+import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -76,8 +76,8 @@ public class DroppedItemFactory {
             lifespanComp.lifespan = lifespan;
             itemEntity.saveComponent(lifespanComp);
 
-            DroppedItemTypeComponent droppedItem = itemEntity.getComponent(DroppedItemTypeComponent.class);
-            droppedItem.placedEntity = entityManager.copy(placedEntity);
+            DroppedItemComponent droppedItem = itemEntity.getComponent(DroppedItemComponent.class);
+            droppedItem.itemEntity = entityManager.copy(placedEntity);
             ItemComponent itemComponent = placedEntity.getComponent(ItemComponent.class);
 
             ItemComponent newItem = new ItemComponent();
@@ -90,7 +90,7 @@ public class DroppedItemFactory {
             newItem.stackId = itemComponent.stackId;
             newItem.renderWithIcon = itemComponent.renderWithIcon;
 
-            droppedItem.placedEntity.saveComponent(newItem);
+            droppedItem.itemEntity.saveComponent(newItem);
             itemEntity.saveComponent(droppedItem);
 
             return itemEntity;

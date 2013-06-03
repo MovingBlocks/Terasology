@@ -15,16 +15,16 @@
  */
 package org.terasology.logic.actions;
 
+import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.ActivateEvent;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.ImpulseEvent;

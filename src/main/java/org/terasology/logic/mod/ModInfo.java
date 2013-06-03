@@ -29,6 +29,7 @@ public class ModInfo {
     private String id;
     private String displayName;
     private String description;
+    private boolean serversideOnly = false;
     private Set<String> dependencies = Sets.newLinkedHashSet();
 
     public String getId() {
@@ -60,5 +61,16 @@ public class ModInfo {
             dependencies = Sets.newLinkedHashSet();
         }
         return dependencies;
+    }
+
+    /**
+     * @return Whether this mod is only required server-side
+     */
+    public boolean isServersideOnly() {
+        return serversideOnly;
+    }
+
+    public void setServersideOnly(boolean serversideOnly) {
+        this.serversideOnly = serversideOnly;
     }
 }

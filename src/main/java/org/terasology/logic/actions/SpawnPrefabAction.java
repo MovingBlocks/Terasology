@@ -16,14 +16,14 @@
 
 package org.terasology.logic.actions;
 
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.ActivateEvent;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.logic.common.ActivateEvent;
 
 import javax.vecmath.Vector3f;
 

@@ -16,6 +16,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.network.NetworkSystem;
 
 import java.util.List;

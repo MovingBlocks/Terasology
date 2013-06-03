@@ -5,7 +5,7 @@
     "BoxShape" : {
         "extents" : [1, 1, 1]
     },
-    "DroppedItemType": {
+    "DroppedItem": {
     },
     "RigidBody" : {
         "mass" : 1000f,

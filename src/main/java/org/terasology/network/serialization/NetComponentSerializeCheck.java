@@ -17,7 +17,7 @@
 package org.terasology.network.serialization;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityInfoComponent;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.persistence.ComponentSerializeCheck;
 

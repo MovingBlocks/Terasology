@@ -16,10 +16,10 @@
 
 package org.terasology.network.internal;
 
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;

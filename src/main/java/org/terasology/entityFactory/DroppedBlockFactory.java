@@ -16,7 +16,7 @@
 
 package org.terasology.entityFactory;
 
-import org.terasology.components.utility.LifespanComponent;
+import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

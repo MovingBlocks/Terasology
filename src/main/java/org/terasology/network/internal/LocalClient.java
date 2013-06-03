@@ -16,7 +16,7 @@
 
 package org.terasology.network.internal;
 
-import org.terasology.components.DisplayInformationComponent;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

@@ -15,13 +15,13 @@
  */
 package org.terasology.logic.health;
 
-import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.engine.CoreRegistry;
 

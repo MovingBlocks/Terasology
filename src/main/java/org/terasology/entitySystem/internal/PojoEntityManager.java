@@ -34,7 +34,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityChangeSubscriber;
-import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventSystem;

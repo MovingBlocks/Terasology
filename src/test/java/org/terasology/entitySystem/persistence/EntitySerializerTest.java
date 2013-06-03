@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.entitySystem.EntityInfoComponent;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;

@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.event;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 
 /**

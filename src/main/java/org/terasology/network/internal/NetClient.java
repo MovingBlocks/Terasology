@@ -28,7 +28,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.components.DisplayInformationComponent;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.config.Config;
