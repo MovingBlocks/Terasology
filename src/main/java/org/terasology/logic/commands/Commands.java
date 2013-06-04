@@ -650,7 +650,7 @@ public class Commands implements CommandProvider {
             EntityRef blockEntity = CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
             MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
             BlockPickupComponent blockPickup = blockEntity.getComponent(BlockPickupComponent.class);
-            blockPickup.blockFamily = block.getBlockFamily();
+            blockPickup.blockFamily = block.getPickupBlockFamily();
             blockMesh.mesh = block.getMesh();
             blockEntity.saveComponent(blockMesh);
             blockEntity.saveComponent(blockPickup);

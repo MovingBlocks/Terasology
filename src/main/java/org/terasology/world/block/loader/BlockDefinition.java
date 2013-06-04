@@ -107,6 +107,7 @@ public class BlockDefinition {
     public static class Inventory {
         public boolean directPickup = false;
         public boolean stackable = true;
+        public String pickupFamily = "";
     }
 
     public static class Type {

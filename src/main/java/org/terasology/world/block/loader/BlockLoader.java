@@ -591,6 +591,12 @@ public class BlockLoader {
         if (def.inventory != null) {
             block.setStackable(def.inventory.stackable);
             block.setDirectPickup(def.inventory.directPickup);
+            if (!def.inventory.pickupFamily.isEmpty()) {
+                BlockUri uri = new BlockUri(def.inventory.pickupFamily);
+                if (uri.isValid()) {
+                    block.setPickupBlockFamily(uri);
+                }
+            }
         }
 
         return block;
