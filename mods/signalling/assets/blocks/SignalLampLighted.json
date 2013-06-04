@@ -1,0 +1,7 @@
+{
+    "luminance": 30,
+    "entity" : {
+        "prefab" : "signalling:SignalLampLighted",
+        "mode" : "persistent"
+    }
+}
