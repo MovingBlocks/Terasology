@@ -196,7 +196,7 @@ public class SignalSystem implements EventHandlerSystem, UpdateSubscriberSystem,
                 logger.info("Consumer removed from network");
                 consumersToRecalculate.add(nodeLocation);
                 consumerNetworks.remove(nodeLocation, network);
-                consumersInNetwork.remove(nodeLocation, network);
+                consumersInNetwork.remove(network, nodeLocation);
                 consumerSignalInNetworks.get(nodeLocation).remove(network);
             }
         }
