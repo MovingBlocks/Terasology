@@ -317,77 +317,6 @@ public class BlockLoader {
         return result;
     }
 
-    private BlockFamily processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        String[] categories = new String[0];
-        if (blockDefJson.has("top")) {
-            JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
-            blockDefJson.remove("top");
-            mergeJsonInto(blockDefJson, topDefJson);
-            BlockDefinition topDef = loadBlockDefinition(topDefJson);
-            Block block = constructSingleBlock(blockDefUri, topDef);
-            block.setDirection(Side.TOP);
-            blockMap.put(Side.TOP, block);
-            categories = getCategories(topDef);
-        }
-        if (blockDefJson.has("sides")) {
-            JsonObject sideDefJson = blockDefJson.getAsJsonObject("sides");
-            blockDefJson.remove("sides");
-            mergeJsonInto(blockDefJson, sideDefJson);
-            BlockDefinition sideDef = loadBlockDefinition(sideDefJson);
-            constructHorizontalBlocks(blockDefUri, sideDef, blockMap);
-            categories = getCategories(sideDef);
-        }
-        if (blockDefJson.has("bottom")) {
-            JsonObject bottomDefJson = blockDefJson.getAsJsonObject("bottom");
-            blockDefJson.remove("bottom");
-            mergeJsonInto(blockDefJson, bottomDefJson);
-            BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
-            Block block = constructSingleBlock(blockDefUri, bottomDef);
-            block.setDirection(Side.BOTTOM);
-            blockMap.put(Side.BOTTOM, block);
-            categories = getCategories(bottomDef);
-        }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
-    }
-
-    private BlockFamily processConnectToAdjacentFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
-        Map<BlockAdjacentType, EnumMap<Side, Block>> blockMap = Maps.newEnumMap(BlockAdjacentType.class);
-        String[] categories = new String[0];
-
-        if (blockDefJson.has("types")) {
-
-            JsonArray blockTypes = blockDefJson.getAsJsonArray("types");
-
-            blockDefJson.remove("types");
-
-            for (JsonElement element : blockTypes.getAsJsonArray()) {
-                JsonObject typeDefJson = element.getAsJsonObject();
-
-                if (!typeDefJson.has("type")) {
-                    throw new IllegalArgumentException("Block type is empty");
-                }
-                BlockAdjacentType type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
-
-                if (type == null) {
-                    throw new IllegalArgumentException("Invalid type block: " + gson.fromJson(typeDefJson.get("type"), String.class));
-                }
-
-                if (!blockMap.containsKey(type)) {
-                    blockMap.put(type, Maps.<Side, Block>newEnumMap(Side.class));
-                }
-
-                typeDefJson.remove("type");
-                mergeJsonInto(blockDefJson, typeDefJson);
-                BlockDefinition typeDef = loadBlockDefinition(typeDefJson);
-                constructHorizontalBlocks(blockDefUri, typeDef, blockMap.get(type));
-
-
-            }
-        }
-        return new ConnectToAdjacentBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
-    }
-
     public void mergeJsonInto(JsonObject from, JsonObject to) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
@@ -400,12 +329,6 @@ public class BlockLoader {
                 }
             }
         }
-    }
-
-    private BlockFamily processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Block block = constructSingleBlock(blockDefUri, blockDef);
-
-        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block, getCategories(blockDef));
     }
 
     public Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
@@ -429,13 +352,6 @@ public class BlockLoader {
         return block;
     }
 
-    private BlockFamily processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, getCategories(blockDef));
-    }
-
     public void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
         Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
@@ -447,26 +363,6 @@ public class BlockLoader {
 
             block.setDirection(rot.rotate(Side.FRONT));
 
-            applyShape(block, shape, tileUris, rot);
-
-            for (BlockPart part : BlockPart.values()) {
-                block.setColorSource(part, colorSourceMap.get(part));
-                block.setColorOffset(part, colorOffsetsMap.get(part));
-            }
-
-            blockMap.put(rot.rotate(Side.FRONT), block);
-        }
-    }
-
-    private void constructConnectToAdjacentBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
-        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
-        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
-        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
-        BlockShape shape = getShape(blockDef);
-
-        for (Rotation rot : Rotation.horizontalRotations()) {
-            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-            block.setDirection(rot.rotate(Side.FRONT));
             applyShape(block, shape, tileUris, rot);
 
             for (BlockPart part : BlockPart.values()) {
