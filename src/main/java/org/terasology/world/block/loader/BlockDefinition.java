@@ -76,16 +76,9 @@ public class BlockDefinition {
 
     public String shape = "";
     public List<String> shapes = Lists.newArrayList();
-    public RotationType rotation = RotationType.NONE;
+    public String rotation = "symmetric";
 
     public List<Type> types;
-
-    public static enum RotationType {
-        NONE,
-        HORIZONTAL,
-        ALIGNTOSURFACE,
-        CONNECTTOADJACENT
-    }
 
     public static class Tiles {
         public EnumMap<BlockPart, String> map = Maps.newEnumMap(BlockPart.class);
