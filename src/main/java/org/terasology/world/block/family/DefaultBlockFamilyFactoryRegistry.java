@@ -21,16 +21,16 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegi
     public void loadBlockFamilyFactories(String packageName, Reflections reflections) {
         Set<Class<?>> blockFamilyFactories = reflections.getTypesAnnotatedWith(RegisterBlockFamilyFactory.class);
         for (Class<?> blockFamilyFactory : blockFamilyFactories) {
-            if (!BlockFamily.class.isAssignableFrom(blockFamilyFactory)) {
+            if (!BlockFamilyFactory.class.isAssignableFrom(blockFamilyFactory)) {
                 logger.error("Cannot load {}, must be a subclass of BlockFamilyFactory", blockFamilyFactory.getSimpleName());
                 continue;
             }
 
             RegisterBlockFamilyFactory registerInfo = blockFamilyFactory.getAnnotation(RegisterBlockFamilyFactory.class);
-            String id = packageName + ":" + blockFamilyFactory.getSimpleName();
+            String id = registerInfo.id();
             try {
                 BlockFamilyFactory newBlockFamilyFactory = (BlockFamilyFactory) blockFamilyFactory.newInstance();
-                blockFamilyFactoryRegistry.put(registerInfo.id().toLowerCase(), newBlockFamilyFactory);
+                blockFamilyFactoryRegistry.put(id.toLowerCase(), newBlockFamilyFactory);
                 logger.debug("Loaded block family factory {}", id);
             } catch (InstantiationException e) {
                 logger.error("Failed to load block family factory {}", id, e);
