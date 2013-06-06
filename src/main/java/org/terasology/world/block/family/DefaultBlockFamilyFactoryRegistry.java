@@ -12,9 +12,16 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegi
     private static final Logger logger = LoggerFactory.getLogger(DefaultBlockFamilyFactoryRegistry.class);
 
     private Map<String, BlockFamilyFactory> blockFamilyFactoryRegistry = Maps.newHashMap();
+    private BlockFamilyFactory defaultBlockFamilyFactory;
+
+    public void setDefaultBlockFamilyFactory(BlockFamilyFactory defaultBlockFamilyFactory) {
+        this.defaultBlockFamilyFactory = defaultBlockFamilyFactory;
+    }
 
     @Override
     public BlockFamilyFactory getBlockFamilyFactory(String id) {
+        if (id == null)
+            return defaultBlockFamilyFactory;
         return blockFamilyFactoryRegistry.get(id.toLowerCase());
     }
 

@@ -6,6 +6,7 @@ import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.SymmetricFamilyFactory;
 
 public class RegisterBlockFamilyFactories implements LoadProcess {
     @Override
@@ -21,6 +22,7 @@ public class RegisterBlockFamilyFactories implements LoadProcess {
     @Override
     public boolean step() {
         DefaultBlockFamilyFactoryRegistry blockFamilyRegistry = new DefaultBlockFamilyFactoryRegistry();
+        blockFamilyRegistry.setDefaultBlockFamilyFactory(new SymmetricFamilyFactory());
 
         ModManager modManager = CoreRegistry.get(ModManager.class);
 

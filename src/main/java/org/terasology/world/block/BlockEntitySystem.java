@@ -40,6 +40,7 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.management.BlockManager;
 
 /**
@@ -49,6 +50,9 @@ import org.terasology.world.block.management.BlockManager;
  */
 @RegisterComponentSystem
 public class BlockEntitySystem implements EventHandlerSystem {
+
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
 
     @In
     private WorldProvider worldProvider;
@@ -186,7 +190,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
             final Block blockAfterUpdate = neighbourBlock.getBlockFamily().getBlockAfterNeighborUpdate(worldProvider, neighbourPos, neighbourBlock);
             if (blockAfterUpdate != neighbourBlock) {
-                worldProvider.setBlock(neighbourPos, blockAfterUpdate, neighbourBlock);
+                blockEntityRegistry.setBlockRetainEntity(neighbourPos, blockAfterUpdate, neighbourBlock);
             }
         }
     }

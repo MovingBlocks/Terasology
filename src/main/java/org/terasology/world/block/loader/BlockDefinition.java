@@ -76,7 +76,7 @@ public class BlockDefinition {
 
     public String shape = "";
     public List<String> shapes = Lists.newArrayList();
-    public String rotation = "symmetric";
+    public String rotation;
 
     public List<Type> types;
 

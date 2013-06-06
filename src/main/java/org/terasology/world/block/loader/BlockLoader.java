@@ -269,7 +269,7 @@ public class BlockLoader {
     }
 
     private boolean isShapelessBlockFamily(BlockDefinition blockDef) {
-        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation.equals("symmetric") && !blockDef.liquid && blockDef.tiles == null;
+        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation==null && !blockDef.liquid && blockDef.tiles == null;
     }
 
     private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
