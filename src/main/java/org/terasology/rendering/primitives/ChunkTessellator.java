@@ -33,6 +33,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.Chunk;
 
+import com.google.common.base.Stopwatch;
+
 /**
  * Generates tessellated chunk meshes from chunks.
  *
@@ -70,6 +72,9 @@ public final class ChunkTessellator {
 
         Vector3i chunkOffset = new Vector3i(chunkPos.x * Chunk.SIZE_X, chunkPos.y * Chunk.SIZE_Y, chunkPos.z * Chunk.SIZE_Z);
 
+        final Stopwatch watch = new Stopwatch();
+        watch.start();
+        
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 float biomeTemp = biomeProvider.getTemperatureAt(chunkOffset.x + x, chunkOffset.z + z);
@@ -86,10 +91,18 @@ public final class ChunkTessellator {
             }
         }
 
+        watch.stop();
+        mesh.timeToGenerateBlockVertices = (int) watch.elapsedMillis();
+        
+        watch.reset().start();
         generateOptimizedBuffers(worldView, mesh);
+        watch.stop();
+        mesh.timeToGenerateOptimizedBuffers = (int) watch.elapsedMillis();
+        
         _statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();
+        
         return mesh;
     }
 

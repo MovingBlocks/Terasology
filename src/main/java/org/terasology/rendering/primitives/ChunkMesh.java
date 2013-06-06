@@ -127,7 +127,11 @@ public class ChunkMesh {
 
     /* CONCURRENCY */
     public ReentrantLock _lock = new ReentrantLock();
-
+    
+    /* MEASUREMENTS */
+    public int timeToGenerateBlockVertices = 0;
+    public int timeToGenerateOptimizedBuffers = 0;
+    
     public ChunkMesh() {
         _vertexElements[0] = new VertexElements();
         _vertexElements[1] = new VertexElements();
