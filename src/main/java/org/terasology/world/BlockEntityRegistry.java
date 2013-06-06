@@ -58,6 +58,28 @@ public interface BlockEntityRegistry {
     void replaceEntityAt(Vector3i blockPosition, EntityRef entity);
 
     /**
+     * Changes the block at the given block position without changing the entity.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param type
+     * @param oldType
+     * @return Whether the block was successfully replaced.
+     */
+    public boolean setBlockRetainEntity(int x, int y, int z, Block type, Block oldType);
+
+    /**
+     * Changes the block at the given block position without changing the entity.
+     *
+     * @param pos
+     * @param type
+     * @param oldType
+     * @return Whether the block was successfully replaced.
+     */
+    public boolean setBlockRetainEntity(Vector3i pos, Block type, Block oldType);
+
+    /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values. Additionally sets the entity for this block position if successful.
      * Block-entity related components will be added to the entity.

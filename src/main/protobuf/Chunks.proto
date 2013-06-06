@@ -53,3 +53,20 @@ message Chunk {
     
     extensions 100 to 1000;
 }
+
+message CompressedChunks {
+
+    enum CompressionMethod {
+        GZIP = 0;
+    }
+    
+    message CompressedChunk {
+        optional sint32 x    = 1;
+        optional sint32 y    = 2;
+        optional sint32 z    = 3;
+        optional bytes  data = 4;
+    }
+    
+    optional CompressionMethod method = 1 [default = GZIP];
+    repeated CompressedChunk   chunks = 2;
+}

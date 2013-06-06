@@ -18,6 +18,7 @@ package org.terasology.rendering.world;
 import com.google.common.collect.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.DefaultRenderingProcess;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.WorldTimeEventManager;
 import org.terasology.math.AABB;
@@ -71,13 +72,10 @@ import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -220,20 +218,36 @@ public final class WorldRenderer {
      */
     public WorldRenderer(WorldInfo worldInfo, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         // TODO: Cleaner method for this? Should not be using the world title
-        File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
-        if (f.exists()) {
-            try {
-                chunkStore = loadChunkStore(f);
-            } catch (IOException e) {
-                /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
-                   (don't have the game continue or we risk overwriting their game)
-                 */
-                e.printStackTrace();
+        try {
+            final long time = System.currentTimeMillis();
+            boolean loaded = false;
+            File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".chunks");
+            if (f.exists()) {
+                final ChunkStoreProtobuf store = new ChunkStoreProtobuf(false);
+                store.loadFromFile(f);
+                store.setup();
+                chunkStore = store;
+                loaded = true;
+            } else {
+                f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
+                if (f.exists()) {
+                    chunkStore = loadChunkStore(f);
+                    logger.info("Loaded chunks in old java object serialization format");
+                    loaded = true;
+                }
             }
+            if (loaded)
+                logger.info("It took {} ms to load chunks from file {}", (System.currentTimeMillis() - time), f);
+        } catch (Exception e) {
+            /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
+               (don't have the game continue or we risk overwriting their game)
+             */
+            logger.error("Error loading chunks", e);
         }
-        if (chunkStore == null) {
+
+        if (chunkStore == null)
             chunkStore = new ChunkStoreProtobuf();
-        }
+        
         chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
@@ -958,20 +972,11 @@ public final class WorldRenderer {
         CoreRegistry.get(AudioManager.class).stopAllSounds();
 
         chunkStore.dispose();
-        // TODO: this should be elsewhere, perhaps within the chunk cache.
-        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(worldProvider.getTitle()), worldProvider.getTitle() + ".dat");
-        try {
-            FileOutputStream fileOut = new FileOutputStream(chunkFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fileOut);
-            ObjectOutputStream out = new ObjectOutputStream(bos);
-            out.writeObject(chunkStore);
-            out.close();
-            bos.flush();
-            bos.close();
-            fileOut.close();
-        } catch (IOException e) {
-            logger.error("Error saving chunks", e);
-        }
+
+        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(worldProvider.getTitle()), worldProvider.getTitle() + ".chunks");
+        final long time = System.currentTimeMillis();
+        chunkStore.saveToFile(chunkFile);
+        logger.info("It took {} ms to save chunks to file {}", (System.currentTimeMillis() - time), chunkFile);
     }
 
     /**
@@ -1025,22 +1030,32 @@ public final class WorldRenderer {
         GL11.glReadBuffer(GL11.GL_FRONT);
         final int width = Display.getWidth();
         final int height = Display.getHeight();
-        //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
-        final int bpp = 4;
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
-        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        // In fullscreen Display.getDisplayMode().getBitsPerPixel() should return the actual bpp.
+        // If the screen is windowed, fallback to the DesktopDisplayMode value,
+        // Finally fallback to 32bpp default value.
+        DisplayMode dm = Display.getDisplayMode();
+        int bpp = 0;
+        if ( (bpp = dm.getBitsPerPixel()) == 0 && !dm.isFullscreenCapable())
+        {
+        	dm = Display.getDesktopDisplayMode();
+        	bpp = dm.getBitsPerPixel();
+        }
+        final int bytePP = ( bpp == 0 ? 32 : bpp ) / 8;
+        
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bytePP );
+        GL11.glReadPixels(0, 0, width, height, bytePP == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
 
-                File file = new File(PathManager.getInstance().getScreensPath(), sdf.format(cal.getTime()) + ".png");
+                File file = new File(PathManager.getInstance().getScreenshotPath(), sdf.format(cal.getTime()) + ".png");
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
                 for (int x = 0; x < width; x++)
                     for (int y = 0; y < height; y++) {
-                        int i = (x + width * y) * bpp;
+                        int i = (x + width * y) * bytePP;
                         int r = buffer.get(i) & 0xFF;
                         int g = buffer.get(i + 1) & 0xFF;
                         int b = buffer.get(i + 2) & 0xFF;

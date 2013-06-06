@@ -1,0 +1,6 @@
+{
+    "entity" : {
+        "prefab" : "signalling:SignalLamp",
+        "mode" : "persistent"
+    }
+}

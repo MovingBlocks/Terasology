@@ -106,25 +106,25 @@ public class BlockEntitySystem implements EventHandlerSystem {
         if ((oldBlock.isDirectPickup()) && event.getInstigator().exists()) {
             EntityRef item;
             if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
+                item = blockItemFactory.newInstance(oldBlock.getPickupBlockFamily(), entity);
             } else {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
+                item = blockItemFactory.newInstance(oldBlock.getPickupBlockFamily());
             }
             event.getInstigator().send(new ReceiveItemEvent(item));
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
             if (itemComp != null && !itemComp.container.exists()) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
-                EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+                EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getPickupBlockFamily(), 20);
                 block.send(new ImpulseEvent(random.randomVector3f(30)));
             }
         } else {
             /* PHYSICS */
             EntityRef block;
             if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20, entity);
+                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getPickupBlockFamily(), 20, entity);
             } else {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getPickupBlockFamily(), 20);
             }
             block.send(new ImpulseEvent(random.randomVector3f(30)));
             // added as a hook to catch minions breaking blocks

@@ -27,7 +27,7 @@ import org.terasology.audio.Sound;
 import org.terasology.audio.openAL.OpenALException;
 
 public abstract class OpenALStreamingSound implements Sound {
-    private final static int BUFFER_POOL_SIZE = 3;
+    private final static int BUFFER_POOL_SIZE = 8;
 
     private final AssetUri uri;
     protected final URL audioSource;

@@ -38,6 +38,7 @@ import org.terasology.utilities.collection.EnumBooleanMap;
 import java.util.*;
 import java.util.List;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.chunks.Chunk;
 
@@ -176,6 +177,7 @@ public class Block {
     // Inventory settings
     private boolean directPickup = false;
     private boolean stackable = true;
+    private BlockUri pickupBlockFamily = null;
 
     /* Mesh */
     private Mesh mesh;
@@ -449,6 +451,20 @@ public class Block {
 
     public void setStackable(boolean stackable) {
         this.stackable = stackable;
+    }
+
+    public void setPickupBlockFamily(BlockUri uri) {
+        this.pickupBlockFamily = uri;
+    }
+
+    public BlockFamily getPickupBlockFamily() {
+        if (pickupBlockFamily != null) {
+            BlockFamily family = BlockManager.getInstance().getBlockFamily(pickupBlockFamily);
+            if (family != null) {
+                return family;
+            }
+        }
+        return this.getBlockFamily();
     }
 
     /**

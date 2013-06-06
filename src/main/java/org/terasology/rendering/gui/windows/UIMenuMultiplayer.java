@@ -12,7 +12,7 @@ import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogServer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
