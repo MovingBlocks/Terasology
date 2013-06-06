@@ -18,6 +18,8 @@ package org.terasology.world.block.family;
 import java.util.Arrays;
 
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
@@ -38,8 +40,13 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockFor(Side attachmentSide, Side direction) {
+    public Block getBlockForPlacing(WorldProvider worldProvider, Vector3i blockLocation, Side attachmentSide, Side direction) {
         return block;
+    }
+
+    @Override
+    public Block getBlockAfterNeighborUpdate(WorldProvider worldProvider, Vector3i blockLocation, Block currentBlock) {
+        return currentBlock;
     }
 
     @Override

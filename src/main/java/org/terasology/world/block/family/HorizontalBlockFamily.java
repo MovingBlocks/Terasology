@@ -20,6 +20,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
@@ -53,12 +55,17 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockFor(Side attachmentSide, Side direction) {
+    public Block getBlockForPlacing(WorldProvider worldProvider, Vector3i blockLocation, Side attachmentSide, Side direction) {
         if (attachmentSide.isHorizontal()) {
             return blocks.get(attachmentSide);
         }
         return blocks.get(direction);
 
+    }
+
+    @Override
+    public Block getBlockAfterNeighborUpdate(WorldProvider worldProvider, Vector3i blockLocation, Block currentBlock) {
+        return currentBlock;
     }
 
     @Override

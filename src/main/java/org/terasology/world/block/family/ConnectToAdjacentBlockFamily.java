@@ -33,16 +33,6 @@ public class ConnectToAdjacentBlockFamily extends AbstractBlockFamily  {
 
     public static final int[][] mixedMap = { {-1,-1,0}, {-1,0,0}, {0,-1,1}, {0, 0,1},  {1,-1,0}, {1, 0,0}, {0,-1,-1}, {0, 0,-1} };
 
-    public static final int[][] viewFullMapWithoutDiagonal = {
-            {-1,-1,0}, {0,-1,1},  {1,-1,0}, {0,-1,-1},
-            {-1,0,0},  {0, 0,1},  {1, 0,0}, {0, 0,-1},
-            {-1, 1,0}, {0, 1,1},  {1, 1,0}, {0, 1,-1}
-    };
-    public static final int[][] viewFullMap = {
-            {-1,0,0},  {0, 0,1},  {1, 0,0}, {0, 0,-1}, {-1, 0,1}, {1, 0,1},  {1, 0,-1}, {-1, 0,-1},
-            {-1,-1,0}, {0,-1,1},  {1,-1,0}, {0,-1,-1}, {-1,-1,1}, {1,-1,1},  {1,-1,-1}, {-1,-1,-1},
-            {-1, 1,0}, {0, 1,1},  {1, 1,0}, {0, 1,-1}, {-1, 1,1}, {1, 1,1},  {1, 1,-1}, {-1, 1,-1},
-    };
     private Map<BlockAdjacentType,EnumMap<Side,Block>> blockVariations = Maps.newHashMap();
 
     public ConnectToAdjacentBlockFamily(BlockUri uri, Map<BlockAdjacentType,EnumMap<Side,Block>> blockVariations, String[] categories) {
@@ -71,16 +61,14 @@ public class ConnectToAdjacentBlockFamily extends AbstractBlockFamily  {
     }
 
     @Override
-    public Block getBlockFor(Side attachmentSide, Side direction) {
-        if (attachmentSide.isHorizontal()) {
-            return blockVariations.get(BlockAdjacentType.ARCHETYPE).get(attachmentSide);
-        }
-
-        return blockVariations.get(BlockAdjacentType.ARCHETYPE).get(direction);
+    public Block getBlockForPlacing(WorldProvider worldProvider, Vector3i blockLocation, Side attachmentSide, Side direction) {
+        AroundBlocksInfo info = checkAroundBlocks(blockLocation,  worldProvider);
+        return getBlockByAttachedSides(info);
     }
 
-    public Block getBlockFor(Vector3i position, WorldProvider world) {
-        AroundBlocksInfo info = checkAroundBlocks(position,  world);
+    @Override
+    public Block getBlockAfterNeighborUpdate(WorldProvider worldProvider, Vector3i blockLocation, Block currentBlock) {
+        AroundBlocksInfo info = checkAroundBlocks(blockLocation, worldProvider);
         return getBlockByAttachedSides(info);
     }
 
