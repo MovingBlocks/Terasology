@@ -15,7 +15,9 @@
  */
 package org.terasology.logic;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.LightComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -26,8 +28,7 @@ import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.character.CharacterMovementComponent;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>

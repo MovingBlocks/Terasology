@@ -17,7 +17,6 @@ package org.terasology.events;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;

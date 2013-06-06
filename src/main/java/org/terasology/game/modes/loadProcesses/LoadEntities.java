@@ -16,6 +16,9 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -25,9 +28,6 @@ import org.terasology.game.TerasologyConstants;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.game.paths.PathManager;
 import org.terasology.world.WorldInfo;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Immortius

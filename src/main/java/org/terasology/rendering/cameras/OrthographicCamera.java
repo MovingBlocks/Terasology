@@ -15,14 +15,13 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.math.TeraMath;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
-
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
+
+import javax.vecmath.Matrix4f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.math.TeraMath;
 
 /**
  * Simple default camera.

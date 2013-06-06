@@ -15,13 +15,15 @@
  */
 package org.terasology.componentSystem.items;
 
-import com.google.common.collect.Lists;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.components.ItemComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
@@ -39,7 +41,8 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.ConnectToAdjacentBlockFamily;
-import org.terasology.world.block.management.BlockManager;
+
+import com.google.common.collect.Lists;
 
 
 /**

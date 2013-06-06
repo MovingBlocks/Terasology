@@ -15,6 +15,14 @@
  */
 package org.terasology.game.modes;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -27,21 +35,13 @@ import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
+import org.terasology.game.paths.PathManager;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
 
 /**
  * Play mode.

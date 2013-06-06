@@ -16,6 +16,8 @@
 
 package org.terasology.logic.door;
 
+import javax.vecmath.Vector3f;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -43,8 +45,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockRegionComponent;
 import org.terasology.world.block.management.BlockManager;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

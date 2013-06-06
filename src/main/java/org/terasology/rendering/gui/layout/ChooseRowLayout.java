@@ -1,15 +1,17 @@
 package org.terasology.rendering.gui.layout;
 
 
-import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.Color;
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import javax.vecmath.Vector2f;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glVertex2f;
+import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 public class ChooseRowLayout implements Layout{
     private Vector2f size;

@@ -4,11 +4,10 @@ package org.terasology.world.generator.core;
 
 import java.util.Map;
 
-import javassist.bytecode.stackmap.TypeData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.utilities.HeightmapFileReader;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;

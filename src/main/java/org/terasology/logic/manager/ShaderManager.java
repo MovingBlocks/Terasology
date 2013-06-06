@@ -27,7 +27,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.shader.*;
+import org.terasology.rendering.shader.IShaderParameters;
+import org.terasology.rendering.shader.ShaderParametersBlock;
+import org.terasology.rendering.shader.ShaderParametersChunk;
+import org.terasology.rendering.shader.ShaderParametersCombine;
+import org.terasology.rendering.shader.ShaderParametersDebug;
+import org.terasology.rendering.shader.ShaderParametersDefault;
+import org.terasology.rendering.shader.ShaderParametersGelCube;
+import org.terasology.rendering.shader.ShaderParametersHdr;
+import org.terasology.rendering.shader.ShaderParametersLightShaft;
+import org.terasology.rendering.shader.ShaderParametersParticle;
+import org.terasology.rendering.shader.ShaderParametersPost;
+import org.terasology.rendering.shader.ShaderParametersPrePost;
+import org.terasology.rendering.shader.ShaderParametersSSAO;
+import org.terasology.rendering.shader.ShaderParametersShadowMap;
+import org.terasology.rendering.shader.ShaderParametersSky;
+import org.terasology.rendering.shader.ShaderParametersSobel;
+import org.terasology.rendering.shader.ShaderProgram;
 
 /**
  * Provides support for loading and applying shaders.

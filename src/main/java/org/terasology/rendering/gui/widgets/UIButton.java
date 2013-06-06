@@ -22,8 +22,6 @@ import java.util.Map;
 
 import javax.vecmath.Vector2f;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.game.CoreRegistry;

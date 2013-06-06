@@ -23,7 +23,6 @@ import javax.vecmath.Vector2f;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.EPNoise;
 import org.terasology.utilities.Noise;
-import org.terasology.utilities.WhiteNoise;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;

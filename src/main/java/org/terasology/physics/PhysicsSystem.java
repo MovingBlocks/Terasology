@@ -16,7 +16,6 @@
 
 package org.terasology.physics;
 
-import com.bulletphysics.BulletGlobals;
 import gnu.trove.iterator.TFloatIterator;
 
 import java.util.List;
@@ -44,6 +43,7 @@ import org.terasology.physics.shapes.CylinderShapeComponent;
 import org.terasology.physics.shapes.HullShapeComponent;
 import org.terasology.physics.shapes.SphereShapeComponent;
 
+import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphasePair;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;

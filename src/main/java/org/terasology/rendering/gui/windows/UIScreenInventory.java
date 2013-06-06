@@ -22,15 +22,18 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.game.types.GameType;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.types.GameType;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIItemCell;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * The player's inventory.

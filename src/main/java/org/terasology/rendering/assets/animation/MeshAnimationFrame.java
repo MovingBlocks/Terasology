@@ -16,12 +16,13 @@
 
 package org.terasology.rendering.assets.animation;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.Collection;
-import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
-import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;

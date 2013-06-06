@@ -15,15 +15,16 @@
 */
 package org.terasology.editor.ui;
 
-import org.terasology.editor.properties.IPropertyProvider;
-import org.terasology.editor.properties.Property;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
+
+import org.terasology.editor.properties.IPropertyProvider;
+import org.terasology.editor.properties.Property;
 
 /**
  *

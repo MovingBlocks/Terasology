@@ -15,11 +15,8 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;

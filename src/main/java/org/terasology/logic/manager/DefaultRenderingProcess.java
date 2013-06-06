@@ -15,8 +15,46 @@
  */
 package org.terasology.logic.manager;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glReadPixels;
+import static org.lwjgl.opengl.GL11.glTexCoord2d;
+import static org.lwjgl.opengl.GL11.glVertex3i;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.ARBHalfFloatPixel;
+import org.lwjgl.opengl.ARBTextureFloat;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.EXTFramebufferObject;
+import org.lwjgl.opengl.EXTPixelBufferObject;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -26,16 +64,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
-
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 
 /**
  * Responsible for applying and rendering various shader based

@@ -15,16 +15,17 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

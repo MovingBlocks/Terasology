@@ -15,6 +15,17 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glScissor;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
@@ -28,13 +39,6 @@ import org.terasology.rendering.gui.framework.style.StyleBorderImage;
 import org.terasology.rendering.gui.framework.style.StyleBorderSolid;
 import org.terasology.rendering.gui.framework.style.StyleShadow;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Composition of multiple display elements.

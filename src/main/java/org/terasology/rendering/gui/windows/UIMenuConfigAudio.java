@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
 import org.terasology.config.AudioConfig;
@@ -28,8 +30,6 @@ import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIWindow;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Overdhose

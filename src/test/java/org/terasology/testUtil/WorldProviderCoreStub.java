@@ -16,7 +16,8 @@
 
 package org.terasology.testUtil;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
+
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockUpdate;
 import org.terasology.world.WorldBiomeProvider;
@@ -26,7 +27,7 @@ import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius

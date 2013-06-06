@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
@@ -29,8 +31,6 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Simple pause menu providing buttons for respawning the player and creating a new world.

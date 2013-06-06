@@ -16,6 +16,10 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import java.util.Iterator;
+
+import javax.vecmath.Vector3f;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.LocalPlayerComponent;
@@ -33,9 +37,6 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkState;
 import org.terasology.world.chunks.provider.ChunkProvider;
-
-import javax.vecmath.Vector3f;
-import java.util.Iterator;
 
 /**
  * @author Immortius

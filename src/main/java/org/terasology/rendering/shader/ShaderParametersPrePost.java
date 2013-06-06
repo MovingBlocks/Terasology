@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.shader;
 
+import java.util.List;
+
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.DefaultRenderingProcess;
-
-import java.util.List;
 
 /**
  * Shader parameters for the Post-processing shader program.

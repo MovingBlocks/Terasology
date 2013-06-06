@@ -19,7 +19,6 @@ package org.terasology.logic.mod;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;

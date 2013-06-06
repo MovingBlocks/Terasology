@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.EventHandlerSystem;

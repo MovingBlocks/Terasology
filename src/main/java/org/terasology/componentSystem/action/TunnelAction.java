@@ -19,7 +19,12 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.TunnelActionComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;

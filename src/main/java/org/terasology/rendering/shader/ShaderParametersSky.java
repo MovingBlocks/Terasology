@@ -15,19 +15,20 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.asset.Assets;
-import org.terasology.game.CoreRegistry;
-import org.terasology.editor.properties.Property;
-import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
+import java.util.List;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
+import org.terasology.editor.properties.Property;
+import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 /**
  * Parameters for the sky shader program.

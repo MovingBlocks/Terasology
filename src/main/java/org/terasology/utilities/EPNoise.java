@@ -16,7 +16,6 @@
 package org.terasology.utilities;
 
 import org.terasology.math.TeraMath;
-import java.lang.Math;
 
 /**
  * Edited Perlin noise generator based on the reference implementation by Ken Perlin.

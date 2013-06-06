@@ -16,7 +16,8 @@
 
 package org.terasology.game.modes;
 
-import com.google.common.collect.Queues;
+import java.util.Queue;
+
 import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
 import org.terasology.world.WorldInfo;
 
-import java.util.Queue;
+import com.google.common.collect.Queues;
 
 /**
  * @author Immortius

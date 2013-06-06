@@ -16,11 +16,12 @@
 
 package org.terasology.world.block.family;
 
-import com.google.common.collect.Sets;
-import org.terasology.world.block.BlockUri;
-
 import java.util.Locale;
 import java.util.Set;
+
+import org.terasology.world.block.BlockUri;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius

@@ -23,6 +23,9 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -33,14 +36,11 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockItemComponent;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.inventory.Icon;
 import org.terasology.physics.ImpulseEvent;
@@ -51,9 +51,9 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * A cell which can contain an item and supports drag and drop.

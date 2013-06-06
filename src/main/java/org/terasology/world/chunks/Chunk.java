@@ -15,8 +15,11 @@
  */
 package org.terasology.world.chunks;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import java.text.DecimalFormat;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.vecmath.Vector3f;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.AdvancedConfig;
@@ -38,9 +41,8 @@ import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.liquid.LiquidData;
 
-import javax.vecmath.Vector3f;
-import java.text.DecimalFormat;
-import java.util.concurrent.locks.ReentrantLock;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks

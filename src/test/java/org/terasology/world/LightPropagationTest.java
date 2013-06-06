@@ -16,6 +16,8 @@
 
 package org.terasology.world;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Region3i;
@@ -28,8 +30,6 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.lighting.LightPropagator;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius

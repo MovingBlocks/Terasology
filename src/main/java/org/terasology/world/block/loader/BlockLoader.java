@@ -16,15 +16,30 @@
 
 package org.terasology.world.block.loader;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,27 +58,30 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.*;
+import org.terasology.world.block.family.AlignToSurfaceFamily;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.ConnectToAdjacentBlockFamily;
+import org.terasology.world.block.family.HorizontalBlockFamily;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
 /**
  * @author Immortius

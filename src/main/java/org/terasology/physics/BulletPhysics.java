@@ -27,7 +27,6 @@ import javax.vecmath.Vector3f;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
@@ -38,6 +37,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockComponent;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;

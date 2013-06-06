@@ -15,16 +15,17 @@
  */
 package org.terasology.rendering.shader;
 
+import java.util.List;
+
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-import java.util.List;
 
 /**
  * Shader parameters for the Light Shaft shader program.

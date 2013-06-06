@@ -16,6 +16,24 @@
 
 package org.terasology.config;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.lwjgl.input.Keyboard;
+import org.terasology.game.CoreRegistry;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
+import org.terasology.input.events.ButtonEvent;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -27,23 +45,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.lwjgl.input.Keyboard;
-import org.terasology.game.CoreRegistry;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.Input;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
-import org.terasology.input.events.ButtonEvent;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.

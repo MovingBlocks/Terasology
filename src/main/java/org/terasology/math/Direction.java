@@ -1,7 +1,8 @@
 package org.terasology.math;
 
-import javax.vecmath.Vector3f;
 import java.util.EnumMap;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

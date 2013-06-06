@@ -16,16 +16,20 @@
 package org.terasology.world.block.family;
 
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
+
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockUri;
 
-import java.util.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class ConnectToAdjacentBlockFamily extends AbstractBlockFamily  {
 

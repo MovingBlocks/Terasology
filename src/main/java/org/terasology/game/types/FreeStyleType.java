@@ -15,7 +15,14 @@
  */
 package org.terasology.game.types;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -41,12 +48,7 @@ import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.management.BlockManager;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 public class FreeStyleType extends GameType {
 

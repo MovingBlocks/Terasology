@@ -15,12 +15,20 @@
  */
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
@@ -40,13 +48,8 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
 
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.

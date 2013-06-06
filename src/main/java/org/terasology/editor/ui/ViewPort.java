@@ -15,10 +15,11 @@
 */
 package org.terasology.editor.ui;
 
+import java.awt.Canvas;
+import java.awt.Dimension;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.awt.*;
 
 /**
  * TeraEd main class.

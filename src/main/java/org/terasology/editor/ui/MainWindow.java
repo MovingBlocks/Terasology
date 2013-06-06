@@ -15,15 +15,8 @@
 */
 package org.terasology.editor.ui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.editor.TeraEd;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.shader.ShaderParametersBase;
-import org.terasology.rendering.shader.ShaderProgram;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -31,6 +24,21 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.ScrollPaneConstants;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.editor.TeraEd;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.shader.ShaderParametersBase;
+import org.terasology.rendering.shader.ShaderProgram;
 
 /**
  * TeraEd main class.

@@ -20,11 +20,11 @@ import javax.vecmath.Vector3f;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
-import org.terasology.world.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.inventory.ReceiveItemEvent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.management.BlockManager;
 
 /**

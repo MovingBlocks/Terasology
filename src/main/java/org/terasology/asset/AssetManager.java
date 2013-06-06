@@ -15,13 +15,6 @@
  */
 package org.terasology.asset;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.common.NullIterator;
-import org.terasology.logic.mod.ModManager;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -30,6 +23,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.logic.mod.ModManager;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 // TODO: Split out static methods to an Assets static class
 // TODO: Split out an interface, possibly two with one for loading and adding assets, the other with disposal and other more management methods

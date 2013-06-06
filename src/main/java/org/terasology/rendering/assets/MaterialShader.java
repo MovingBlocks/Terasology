@@ -16,8 +16,14 @@
 
 package org.terasology.rendering.assets;
 
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -30,13 +36,8 @@ import org.terasology.rendering.assets.metadata.ParamType;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;
 import org.terasology.rendering.shader.ShaderProgram;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Iterator;
-import java.util.Map;
+import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 
 /**
  * @author Immortius

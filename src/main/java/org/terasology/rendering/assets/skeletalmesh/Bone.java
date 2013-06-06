@@ -16,13 +16,14 @@
 
 package org.terasology.rendering.assets.skeletalmesh;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.Collection;
-import java.util.List;
+
+import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

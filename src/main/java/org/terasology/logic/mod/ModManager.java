@@ -16,22 +16,6 @@
 
 package org.terasology.logic.mod;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetSource;
-import org.terasology.asset.sources.ArchiveSource;
-import org.terasology.asset.sources.DirectorySource;
-import org.terasology.game.paths.PathManager;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -45,6 +29,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetSource;
+import org.terasology.asset.sources.ArchiveSource;
+import org.terasology.asset.sources.DirectorySource;
+import org.terasology.game.paths.PathManager;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
 
 /**
  * This manager handles the available mods, which ones are active and access to their assets and code

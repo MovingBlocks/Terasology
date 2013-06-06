@@ -33,8 +33,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.monitoring.impl.ChunkMonitorEntry;
+import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.world.chunks.Chunk;
 

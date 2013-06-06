@@ -16,14 +16,14 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import java.util.Iterator;
+
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
-
-import java.util.Iterator;
 
 /**
  * @author Immortius

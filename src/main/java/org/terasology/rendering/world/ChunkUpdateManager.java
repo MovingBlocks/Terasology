@@ -15,7 +15,8 @@
  */
 package org.terasology.rendering.world;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -25,7 +26,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  * Provides the mechanism for updating and generating chunks.

@@ -23,9 +23,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.math.Vector3i;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.Vector3i;
 
 /**
  * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the

@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.shader;
 
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
@@ -22,9 +26,11 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
+import javax.swing.JOptionPane;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -39,11 +45,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.MaterialShader;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.block.Block;
-
-import javax.swing.*;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector4f;
 
 /**
  * Wraps an OpenGL shader program. Provides convenience methods for setting

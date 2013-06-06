@@ -15,12 +15,12 @@
 */
 package org.terasology.editor.properties;
 
+import java.util.List;
+
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
-
-import java.util.List;
 
 /**
  *

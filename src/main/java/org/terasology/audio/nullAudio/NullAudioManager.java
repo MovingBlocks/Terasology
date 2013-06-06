@@ -15,16 +15,16 @@
  */
 package org.terasology.audio.nullAudio;
 
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
-import org.terasology.audio.nullAudio.NullSound;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 
 /**
  * Null implementation of the AudioManager

@@ -16,6 +16,29 @@
 
 package org.terasology.game;
 
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+
+import java.awt.Canvas;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JOptionPane;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -33,8 +56,8 @@ import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.game.paths.PathManager;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
@@ -45,28 +68,6 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyGameVersionInfo;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * @author Immortius

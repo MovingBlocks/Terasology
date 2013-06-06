@@ -16,13 +16,14 @@
 
 package org.terasology.game.modes.loadProcesses;
 
-import com.google.common.collect.Lists;
+import java.util.Iterator;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.game.modes.LoadProcess;
 
-import java.util.Iterator;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

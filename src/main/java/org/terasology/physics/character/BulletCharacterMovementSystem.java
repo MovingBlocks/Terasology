@@ -15,16 +15,11 @@
  */
 package org.terasology.physics.character;
 
-import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.collision.dispatch.GhostObject;
-import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
-import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Lists;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -48,10 +43,16 @@ import org.terasology.physics.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.CollisionWorld;
+import com.bulletphysics.collision.dispatch.GhostObject;
+import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius <immortius@gmail.com>

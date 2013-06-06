@@ -16,14 +16,12 @@
 
 package org.terasology.game.paths.windows;
 
+import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
 import com.sun.jna.platform.win32.Guid;
 import com.sun.jna.platform.win32.Ole32Util;
 import com.sun.jna.ptr.PointerByReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * @author Immortius

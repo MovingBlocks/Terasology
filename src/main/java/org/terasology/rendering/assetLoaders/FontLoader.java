@@ -16,7 +16,18 @@
 
 package org.terasology.rendering.assetLoaders;
 
-import com.google.common.collect.Lists;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.vecmath.Point4i;
+import javax.vecmath.Tuple4i;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
@@ -26,16 +37,7 @@ import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.FontCharacter;
 import org.terasology.rendering.assets.Texture;
 
-import javax.vecmath.Point4i;
-import javax.vecmath.Tuple4i;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

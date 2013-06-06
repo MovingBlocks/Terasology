@@ -15,8 +15,9 @@
  */
 package org.terasology.input;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
@@ -44,8 +45,8 @@ import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.

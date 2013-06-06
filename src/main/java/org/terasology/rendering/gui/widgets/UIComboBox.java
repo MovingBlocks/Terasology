@@ -16,11 +16,15 @@
 
 package org.terasology.rendering.gui.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.game.CoreRegistry;
@@ -30,11 +34,6 @@ import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionListener;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A combo box.

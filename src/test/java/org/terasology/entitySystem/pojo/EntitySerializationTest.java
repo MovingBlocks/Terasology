@@ -7,8 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
-import javax.vecmath.Vector3f;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,7 +17,6 @@ import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.ComponentUtil;
 import org.terasology.entitySystem.metadata.FieldMetadata;

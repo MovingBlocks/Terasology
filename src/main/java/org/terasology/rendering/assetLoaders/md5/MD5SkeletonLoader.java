@@ -16,20 +16,9 @@
 
 package org.terasology.rendering.assetLoaders.md5;
 
-import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +27,20 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

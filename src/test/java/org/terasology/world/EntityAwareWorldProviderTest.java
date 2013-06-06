@@ -16,7 +16,13 @@
 
 package org.terasology.world;
 
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,12 +41,7 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

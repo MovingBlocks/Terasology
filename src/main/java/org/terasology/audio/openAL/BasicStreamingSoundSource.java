@@ -15,11 +15,6 @@
  */
 package org.terasology.audio.openAL;
 
-import org.lwjgl.BufferUtils;
-import org.terasology.audio.Sound;
-
-import java.nio.IntBuffer;
-
 import static org.lwjgl.openal.AL10.AL_BUFFER;
 import static org.lwjgl.openal.AL10.AL_BUFFERS_PROCESSED;
 import static org.lwjgl.openal.AL10.AL_PLAYING;
@@ -31,6 +26,11 @@ import static org.lwjgl.openal.AL10.alSourceRewind;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourceUnqueueBuffers;
 import static org.lwjgl.openal.AL10.alSourcei;
+
+import java.nio.IntBuffer;
+
+import org.lwjgl.BufferUtils;
+import org.terasology.audio.Sound;
 
 public class BasicStreamingSoundSource extends BasicSoundSource {
 

@@ -20,8 +20,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.assets.Texture;
 
 /**

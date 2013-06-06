@@ -16,6 +16,12 @@
 
 package org.terasology.utilities.gson;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -27,12 +33,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius
