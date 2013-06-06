@@ -3,17 +3,17 @@
 
 package org.terasology.logic.generators;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.generator.tree.TreeGenerator;
-import org.terasology.world.generator.tree.TreeGeneratorLSystem;
-import org.terasology.world.generator.tree.TreeGeneratorCactus;
-import org.terasology.world.generator.core.ForestGenerator;
+import java.util.Map;
 
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.generator.core.ForestGenerator;
+import org.terasology.world.generator.tree.TreeGenerator;
+import org.terasology.world.generator.tree.TreeGeneratorCactus;
+import org.terasology.world.generator.tree.TreeGeneratorLSystem;
 
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 public class DefaultGenerators {
 

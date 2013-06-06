@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -40,9 +43,6 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 
 /**
  * HUD displayed on the user's screen.

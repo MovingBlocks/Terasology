@@ -1,7 +1,5 @@
 package org.terasology.utilities;
 
-import java.io.File;
-import java.util.Scanner;
 
 /**
  * Reads a heightmap encoded in a textfile

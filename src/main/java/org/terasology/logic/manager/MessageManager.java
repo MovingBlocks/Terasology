@@ -1,9 +1,9 @@
 package org.terasology.logic.manager;
 
-import org.newdawn.slick.Color;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.newdawn.slick.Color;
 
 /**
  * First draft for a message manager to display messages on the in-game chat. All chat message will get passed to this manager.

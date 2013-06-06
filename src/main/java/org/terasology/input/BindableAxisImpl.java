@@ -23,9 +23,9 @@ import javax.vecmath.Vector3f;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.math.Vector3i;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.Vector3i;
 
 /**
  * A Bind Axis is an simulated analog input axis, maintaining a value between -1 and 1.  It is linked to

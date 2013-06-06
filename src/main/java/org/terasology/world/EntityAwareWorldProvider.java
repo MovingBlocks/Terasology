@@ -16,9 +16,10 @@
 
 package org.terasology.world;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.world.LocationComponent;
@@ -38,9 +39,9 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockRegionComponent;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 
 /**
  * @author Immortius

@@ -16,7 +16,13 @@
 
 package org.terasology.rendering.gui.dialogs;
 
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.newdawn.slick.Color;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
@@ -33,11 +39,7 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

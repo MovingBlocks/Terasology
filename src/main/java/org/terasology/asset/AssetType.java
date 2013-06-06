@@ -16,10 +16,10 @@
 
 package org.terasology.asset;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.rendering.assetLoaders.FontLoader;
@@ -32,9 +32,10 @@ import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 
 
 /**

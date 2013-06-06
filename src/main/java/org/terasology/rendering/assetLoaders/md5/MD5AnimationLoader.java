@@ -16,15 +16,6 @@
 
 package org.terasology.rendering.assetLoaders.md5;
 
-import com.google.common.collect.Lists;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.math.AABB;
-import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.animation.MeshAnimationFrame;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +24,17 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.math.AABB;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationFrame;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

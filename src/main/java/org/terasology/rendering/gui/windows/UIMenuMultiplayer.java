@@ -20,12 +20,12 @@ import org.terasology.rendering.gui.framework.events.DialogListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIComposite;
+import org.terasology.rendering.gui.widgets.UIDialog.EReturnCode;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.widgets.UIDialog.EReturnCode;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

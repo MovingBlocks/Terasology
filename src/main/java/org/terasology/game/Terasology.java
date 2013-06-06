@@ -15,11 +15,11 @@
  */
 package org.terasology.game;
 
+import java.io.File;
+
 import org.slf4j.LoggerFactory;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.game.paths.PathManager;
-
-import java.io.File;
 
 /**
  * The heart and soul of Terasology.

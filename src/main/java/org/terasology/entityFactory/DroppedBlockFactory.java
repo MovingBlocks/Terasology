@@ -18,7 +18,6 @@ package org.terasology.entityFactory;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -26,8 +25,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.physics.RigidBodyComponent;
+import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**

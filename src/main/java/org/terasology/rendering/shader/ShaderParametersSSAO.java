@@ -15,18 +15,18 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.asset.Assets;
-import org.terasology.logic.manager.DefaultRenderingProcess;
-import org.terasology.editor.properties.Property;
-import org.terasology.rendering.assets.Texture;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
+import org.terasology.editor.properties.Property;
+import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.assets.Texture;
 
 /**
  * Shader parameters for the Post-processing shader program.

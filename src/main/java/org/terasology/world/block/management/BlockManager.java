@@ -15,30 +15,28 @@
  */
 package org.terasology.world.block.management;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
-import org.lwjgl.BufferUtils;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockLoader;
 
-import javax.vecmath.Vector2f;
-import java.nio.FloatBuffer;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 /**
  * Provides access to blocks by block id or block title.

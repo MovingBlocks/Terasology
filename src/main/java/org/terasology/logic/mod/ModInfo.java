@@ -16,11 +16,9 @@
 
 package org.terasology.logic.mod;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 /**
  * Information on a mod

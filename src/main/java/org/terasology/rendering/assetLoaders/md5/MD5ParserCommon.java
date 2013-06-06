@@ -16,12 +16,13 @@
 
 package org.terasology.rendering.assetLoaders.md5;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.io.BufferedReader;
-import java.io.IOException;
 
 /**
  * @author Immortius

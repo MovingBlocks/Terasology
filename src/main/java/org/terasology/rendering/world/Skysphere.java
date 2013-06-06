@@ -24,22 +24,17 @@ import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
 
-import java.nio.FloatBuffer;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.glu.Sphere;
-import org.terasology.asset.Assets;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.TeraMath;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Skysphere based on the Perez all weather luminance model.

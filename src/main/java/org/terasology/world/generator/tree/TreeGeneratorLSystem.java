@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generator.tree;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 

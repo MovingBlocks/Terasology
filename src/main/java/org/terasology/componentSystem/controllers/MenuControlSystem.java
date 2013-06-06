@@ -23,12 +23,12 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.input.events.KeyDownEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.input.ButtonState;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.input.binds.PauseButton;
-import org.terasology.game.CoreRegistry;
-import org.terasology.input.ButtonState;
+import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.world.WorldRenderer;
 

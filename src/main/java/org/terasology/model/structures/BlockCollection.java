@@ -15,7 +15,9 @@
  */
 package org.terasology.model.structures;
 
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.BlockUpdate;
@@ -23,8 +25,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import java.util.HashMap;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 
 /**

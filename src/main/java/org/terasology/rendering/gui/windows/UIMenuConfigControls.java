@@ -15,7 +15,12 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.config.BindsConfig;
@@ -37,10 +42,7 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.Collection;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * @author Overdhose

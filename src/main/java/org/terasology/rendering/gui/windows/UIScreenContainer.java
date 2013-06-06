@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
@@ -27,9 +30,6 @@ import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.gui.widgets.UIWindow;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 
 /**
  * Displays two inventories, and allows moving items between them

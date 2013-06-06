@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.shader;
 
+import java.util.List;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.config.Config;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
@@ -22,9 +26,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-
-import javax.vecmath.Vector3f;
-import java.util.List;
 
 /**
  * Basic shader parameters for all shader program.

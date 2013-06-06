@@ -16,11 +16,11 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import java.util.Iterator;
+
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
-
-import java.util.Iterator;
 
 /**
  * @author Immortius

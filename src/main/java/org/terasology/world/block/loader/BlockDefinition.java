@@ -21,8 +21,8 @@ import java.util.List;
 
 import javax.vecmath.Vector4f;
 
-import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockPart;
 

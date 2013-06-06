@@ -20,8 +20,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkState;
-import org.terasology.world.chunks.blockdata.TeraArray;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks

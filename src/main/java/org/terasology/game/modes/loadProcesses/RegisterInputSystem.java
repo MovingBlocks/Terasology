@@ -16,6 +16,8 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import java.util.Locale;
+
 import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +39,6 @@ import org.terasology.input.RegisterBindButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-
-import java.util.Locale;
 
 /**
  * @author Immortius

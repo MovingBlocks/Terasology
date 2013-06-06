@@ -15,9 +15,9 @@
  */
 package org.terasology.audio.openAL;
 
-import org.terasology.audio.Sound;
-
 import java.util.Set;
+
+import org.terasology.audio.Sound;
 
 public interface SoundPool {
 

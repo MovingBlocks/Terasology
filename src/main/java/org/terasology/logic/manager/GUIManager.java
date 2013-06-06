@@ -17,7 +17,8 @@ package org.terasology.logic.manager;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
@@ -31,13 +32,13 @@ import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.TerasologyEngine;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.ButtonState;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -52,16 +53,16 @@ import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuMultiplayer;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
-import org.terasology.rendering.gui.windows.UIScreenItems;
 import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
 import org.terasology.rendering.gui.windows.UIScreenInventory;
+import org.terasology.rendering.gui.windows.UIScreenItems;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
 import org.terasology.rendering.gui.windows.UIScreenMetrics;
 
-import javax.vecmath.Vector2f;
+import com.google.common.collect.Maps;
 
 /**
  * The GUI manager handles all windows within the UI.

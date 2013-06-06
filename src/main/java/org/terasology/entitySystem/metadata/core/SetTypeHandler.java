@@ -16,12 +16,13 @@
 
 package org.terasology.entitySystem.metadata.core;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius

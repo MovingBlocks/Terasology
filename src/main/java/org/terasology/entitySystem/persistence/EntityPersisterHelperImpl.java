@@ -15,10 +15,6 @@
  */
 package org.terasology.entitySystem.persistence;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
@@ -46,6 +42,7 @@ import org.terasology.protobuf.EntityData;
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

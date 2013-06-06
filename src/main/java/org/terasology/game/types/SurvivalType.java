@@ -19,7 +19,6 @@ import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.rendering.gui.widgets.UIWindow;
 
 public class SurvivalType extends GameType{
 

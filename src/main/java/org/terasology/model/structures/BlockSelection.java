@@ -15,11 +15,11 @@
  */
 package org.terasology.model.structures;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A selection of block positions, which may be relative (within a BlockCollection) or absolute (placed in a world)

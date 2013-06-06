@@ -15,12 +15,26 @@
  */
 package org.terasology.world.block;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Maps;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glIsEnabled;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.imageio.ImageIO;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -35,27 +49,15 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.collection.EnumBooleanMap;
-import java.util.*;
-import java.util.List;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.chunks.Chunk;
 
-import javax.imageio.ImageIO;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.EnumMap;
-
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Stores all information for a specific block type.

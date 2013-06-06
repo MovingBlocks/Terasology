@@ -15,15 +15,26 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
+import org.terasology.game.paths.PathManager;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
-import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -33,16 +44,6 @@ import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Select world menu screen.

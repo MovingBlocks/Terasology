@@ -16,13 +16,13 @@
 
 package org.terasology.rendering.logic;
 
+import java.util.Map;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-
-import java.util.Map;
 
 /**
  * @author Immortius

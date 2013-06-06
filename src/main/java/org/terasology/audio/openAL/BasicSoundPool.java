@@ -15,13 +15,13 @@
  */
 package org.terasology.audio.openAL;
 
-import org.terasology.audio.Sound;
-import org.terasology.audio.AudioManager;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 
 public class BasicSoundPool implements SoundPool {
     private final static int DEFAULT_POOL_SIZE = 32;

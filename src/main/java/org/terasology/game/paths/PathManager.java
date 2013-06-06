@@ -16,19 +16,17 @@
 
 package org.terasology.game.paths;
 
-import com.google.common.collect.ImmutableList;
-import org.lwjgl.LWJGLUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.game.paths.windows.SavedGamesPathFinder;
-
-import javax.swing.*;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.List;
+
+import javax.swing.JFileChooser;
+
+import org.lwjgl.LWJGLUtil;
+import org.terasology.game.paths.windows.SavedGamesPathFinder;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Immortius

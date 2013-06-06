@@ -1,6 +1,12 @@
 package org.terasology.components;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.components.world.LocationComponent;
@@ -8,12 +14,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>

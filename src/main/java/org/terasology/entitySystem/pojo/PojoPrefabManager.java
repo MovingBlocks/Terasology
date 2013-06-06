@@ -15,17 +15,17 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
-import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
-
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
+import com.google.common.collect.Sets;
 
 /**
  * Basic implementation of PrefabManager.

@@ -16,43 +16,34 @@
 
 package org.terasology.logic.manager;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
+import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.ReflectionUtils.withModifier;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.commands.Command;
-import org.terasology.logic.commands.CommandParam;
-import org.terasology.logic.commands.CommandProvider;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import static org.reflections.ReflectionUtils.withAnnotation;
-import static org.reflections.ReflectionUtils.withModifier;
+import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.commands.Command;
+import org.terasology.logic.commands.CommandParam;
+import org.terasology.logic.commands.CommandProvider;
+import org.terasology.logic.mod.ModManager;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 /**
  * The command manager handles the loading of commands which can be executed through the in-game chat.

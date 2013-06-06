@@ -15,19 +15,17 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.entitySystem.pojo.PojoPrefab;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.logic.mod.ModManager;
 
 import com.google.common.collect.Lists;
-import org.terasology.logic.mod.ModManager;
 
 /**
  * @author Immortius <immortius@gmail.com>

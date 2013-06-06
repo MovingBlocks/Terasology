@@ -16,7 +16,6 @@
 
 package org.terasology.input.binds;
 
-import org.lwjgl.input.Mouse;
 import org.terasology.input.ActivateMode;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;

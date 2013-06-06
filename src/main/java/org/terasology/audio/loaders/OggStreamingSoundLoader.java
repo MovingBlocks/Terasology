@@ -24,7 +24,6 @@ import java.util.List;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.openAL.OggStreamingSound;
 import org.terasology.audio.Sound;
 import org.terasology.game.CoreRegistry;
 

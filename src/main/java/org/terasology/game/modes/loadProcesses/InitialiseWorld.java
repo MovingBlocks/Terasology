@@ -16,6 +16,8 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
@@ -33,8 +35,6 @@ import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
-
-import java.util.Arrays;
 
 /**
  * @author Immortius

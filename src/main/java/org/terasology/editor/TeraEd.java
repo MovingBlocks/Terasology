@@ -15,6 +15,10 @@
 */
 package org.terasology.editor;
 
+import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
+import javax.swing.UIManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.properties.SceneProperties;
@@ -23,8 +27,6 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.game.paths.PathManager;
-
-import javax.swing.*;
 
 /**
  * TeraEd main class.

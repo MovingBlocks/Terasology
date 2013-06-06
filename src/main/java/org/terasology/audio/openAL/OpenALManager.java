@@ -15,26 +15,8 @@
  */
 package org.terasology.audio.openAL;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALC11;
-import org.lwjgl.openal.ALCcontext;
-import org.lwjgl.openal.ALCdevice;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
-import org.terasology.audio.AudioManager;
-import org.terasology.config.AudioConfig;
-import org.terasology.math.Direction;
-import org.terasology.utilities.OggReader;
+import static org.lwjgl.openal.AL10.alGenBuffers;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +30,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.openal.AL10.alGenBuffers;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALCcontext;
+import org.lwjgl.openal.ALCdevice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
+import org.terasology.config.AudioConfig;
+import org.terasology.math.Direction;
+import org.terasology.utilities.OggReader;
+
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 public class OpenALManager implements AudioManager {
 

@@ -16,6 +16,21 @@
 
 package org.terasology.config;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Map;
+
+import org.lwjgl.opengl.PixelFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.game.paths.PathManager;
+import org.terasology.input.Input;
+import org.terasology.utilities.gson.InputHandler;
+import org.terasology.utilities.gson.MultimapHandler;
+
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,20 +43,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.lwjgl.opengl.PixelFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.input.Input;
-import org.terasology.game.paths.PathManager;
-import org.terasology.utilities.gson.InputHandler;
-import org.terasology.utilities.gson.MultimapHandler;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Map;
 
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved

@@ -15,14 +15,15 @@
  */
 package org.terasology.audio;
 
-import org.terasology.asset.AssetUri;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.asset.AssetUri;
 
 /**
  * @author Immortius <immortius@gmail.com>

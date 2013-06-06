@@ -15,19 +15,19 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.animation.AnimationOpacity;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-
-import java.util.ArrayList;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.

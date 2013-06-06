@@ -16,9 +16,16 @@
 
 package org.terasology.logic.commands;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
@@ -43,13 +50,13 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
+import org.terasology.game.paths.PathManager;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.MessageManager.EMessageScope;
-import org.terasology.game.paths.PathManager;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
@@ -62,14 +69,9 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * The controller class for all commands which can be executed through the in-game chat. To add a command there needs to be a public method

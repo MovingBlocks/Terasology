@@ -15,6 +15,8 @@
  */
 package org.terasology.world.generator.core;
 
+import java.util.Map;
+
 import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.game.CoreRegistry;
@@ -24,8 +26,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
-
-import java.util.Map;
 
 /**
  * Generates some trees, flowers and high grass.

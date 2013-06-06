@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
@@ -31,8 +33,6 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIStateButton;
 import org.terasology.rendering.gui.widgets.UIWindow;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Overdhose

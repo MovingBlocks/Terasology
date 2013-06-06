@@ -20,7 +20,6 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HierarchicalAIComponent;
-import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -33,10 +32,10 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.math.TeraMath;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
-import org.terasology.math.TeraMath;
 
 /**
  * Hierarchical AI, idea from robotics

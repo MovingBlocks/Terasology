@@ -21,8 +21,6 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.game.CoreRegistry;

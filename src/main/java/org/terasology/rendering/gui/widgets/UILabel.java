@@ -15,6 +15,14 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import static org.lwjgl.opengl.GL11.glDisable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
@@ -25,13 +33,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.lwjgl.opengl.GL11.glDisable;
 
 /**
  * Simple text element supporting text shadowing.

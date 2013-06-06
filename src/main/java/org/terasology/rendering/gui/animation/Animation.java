@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.gui.animation;
 
+import java.util.ArrayList;
+
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
-
-import java.util.ArrayList;
 
 /**
  * 

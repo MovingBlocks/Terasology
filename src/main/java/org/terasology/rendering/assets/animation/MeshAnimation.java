@@ -16,15 +16,17 @@
 
 package org.terasology.rendering.assets.animation;
 
-import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+
+import java.util.List;
+
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

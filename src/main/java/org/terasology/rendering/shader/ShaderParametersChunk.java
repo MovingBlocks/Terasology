@@ -15,6 +15,14 @@
  */
 package org.terasology.rendering.shader;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+
+import java.util.List;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -26,13 +34,6 @@ import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-import java.util.List;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Chunk shader program.

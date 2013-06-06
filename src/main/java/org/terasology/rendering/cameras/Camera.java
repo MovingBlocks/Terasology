@@ -15,15 +15,15 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
-import org.terasology.model.structures.ViewFrustum;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.model.structures.ViewFrustum;
 
 /**
  * Camera base class.

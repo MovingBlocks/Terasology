@@ -1,7 +1,18 @@
 package org.terasology.componentSystem.rendering;
 
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Sets;
+import static org.lwjgl.opengl.GL11.glMultMatrix;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslated;
+
+import java.nio.FloatBuffer;
+import java.util.Set;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +33,8 @@ import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.nio.FloatBuffer;
-import java.util.Set;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glMultMatrix;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Sets;
 
 /*
 * @author Small-Jeeper

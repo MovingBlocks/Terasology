@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.shader;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+
+import java.nio.FloatBuffer;
+import java.util.List;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -28,11 +33,6 @@ import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
-
-import java.nio.FloatBuffer;
-import java.util.List;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.

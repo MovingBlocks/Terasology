@@ -16,14 +16,15 @@
 
 package org.terasology.logic.mod;
 
-import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.security.AccessControlException;
 import java.security.Permission;
 import java.util.Set;
 import java.util.logging.LoggingPermission;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius

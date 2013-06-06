@@ -15,7 +15,11 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
@@ -61,7 +65,11 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.*;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.ImpulseEvent;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -75,10 +83,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.BlockRegionComponent;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>

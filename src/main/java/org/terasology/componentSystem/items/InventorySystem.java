@@ -17,7 +17,6 @@ package org.terasology.componentSystem.items;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityRef;
