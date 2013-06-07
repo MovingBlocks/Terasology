@@ -169,7 +169,7 @@ public abstract class UIDisplayElement {
     /**
      * Process the bind keyboard input. Bind keyboard input will be passed down from the GUI Manager to each element within the active window.
      *
-     * @param event The lifecycleEvents which contains all necessary information.
+     * @param event The event which contains all necessary information.
      */
     public void processBindButton(BindButtonEvent event) {
         notifyBindKeyListeners(event);
@@ -178,7 +178,7 @@ public abstract class UIDisplayElement {
     /**
      * Process the raw keyboard input. Keyboard input will be passed down from the GUI Manager to each element within the active window.
      *
-     * @param event The lifecycleEvents which contains all necessary information.
+     * @param event The event which contains all necessary information.
      */
     public void processKeyboardInput(KeyEvent event) {
         notifyKeyListeners(event);
@@ -190,7 +190,7 @@ public abstract class UIDisplayElement {
      * @param button     The button. 0 = left, 1 = right, 2 = middle. If no button was pressed the value will be -1.
      * @param state      The state of the button. True if the button is pressed.
      * @param wheelMoved The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up. If lower than 0 the mouse wheel was moved down.
-     * @param consumed   True if the input lifecycleEvents was already consumed by another widget.
+     * @param consumed   True if the input event was already consumed by another widget.
      */
     public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
         if (!isVisible())
@@ -210,7 +210,7 @@ public abstract class UIDisplayElement {
                         if (!consumed) {
                             mouseIsDown = true;
                             if (consumeEvents) {
-                                //System.out.println("consumed mouse down lifecycleEvents (intersect): " + this);
+                                //System.out.println("consumed mouse down event (intersect): " + this);
                                 consumed = true;
                             }
                         }
@@ -228,7 +228,7 @@ public abstract class UIDisplayElement {
                         lastButton = button;
 
                         if (!consumed && consumeEvents) {
-                            //System.out.println("consumed mouse up/click lifecycleEvents (intersect): " + this);
+                            //System.out.println("consumed mouse up/click event (intersect): " + this);
                             consumed = true;
                         }
                     }
@@ -238,7 +238,7 @@ public abstract class UIDisplayElement {
                         if (!consumed) {
                             lastMouseState = EMouseEvents.ENTER;
                             if (consumeEvents) {
-                                //System.out.println("consumed mouse enter lifecycleEvents: " + this);
+                                //System.out.println("consumed mouse enter event: " + this);
                                 consumed = true;
                             }
                         }
@@ -255,7 +255,7 @@ public abstract class UIDisplayElement {
                     if (!consumed) {
                         lastMouseState = EMouseEvents.ENTER;
                         if (consumeEvents) {
-                            //System.out.println("consumed mouse hover lifecycleEvents: " + this);
+                            //System.out.println("consumed mouse hover event: " + this);
                             consumed = true;
                         }
                     }
@@ -942,7 +942,7 @@ public abstract class UIDisplayElement {
     }
 
     /*
-       The lifecycleEvents listeners which every display element in the UI supports
+       The event listeners which every display element in the UI supports
     */
 
     /**

@@ -129,6 +129,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
         this.timer = CoreRegistry.get(Timer.class);
+        this.identity = identity;
         CoreRegistry.get(WorldProvider.class).registerListener(this);
     }
 

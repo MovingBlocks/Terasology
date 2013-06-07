@@ -18,9 +18,13 @@ package org.terasology.logic.chat;
 
 import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
+import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.OwnerEvent;
 
 /**
+ * A chat message
  * @author Immortius
  */
 @OwnerEvent
@@ -40,9 +44,9 @@ public class ChatMessageEvent extends MessageEvent {
         return message;
     }
 
-    public String getFormattedMessage() {
+    public Message getFormattedMessage() {
         DisplayInformationComponent displayInfo = from.getComponent(DisplayInformationComponent.class);
-        return String.format("%s: %s", (displayInfo != null) ? displayInfo.name : "Unknown", message);
+        return new Message(String.format("%s: %s", (displayInfo != null) ? displayInfo.name : "Unknown", message), CoreMessageType.CHAT);
     }
 
 

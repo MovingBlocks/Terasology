@@ -22,10 +22,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Used to provide the name of a Command's params (since the names are otherwise unavailable)
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface CommandParam {
-    String name();
+    String value();
 }

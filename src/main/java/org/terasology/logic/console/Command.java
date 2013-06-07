@@ -22,12 +22,27 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Marks a method to be available as a command in the console, if it is in a ComponentSystem.
+ * <p/>
+ * Commands methods can have an EntityRef parameter at the end, which will be populated with the entity of the
+ * client calling the command.
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Command {
+    /**
+     * @return A short summary of what this Command does
+     */
     String shortDescription() default "";
 
+    /**
+     * @return A detailed description of how to use this command
+     */
     String helpText() default "";
+
+    /**
+     * @return Whether this command should be sent to and run on the server.
+     */
+    boolean runOnServer() default false;
 }

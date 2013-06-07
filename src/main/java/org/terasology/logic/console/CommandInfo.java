@@ -1,12 +1,18 @@
 package org.terasology.logic.console;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EntityRef;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Metadata on a command, including the ability to execute it.
@@ -16,29 +22,42 @@ import java.lang.reflect.Method;
 public class CommandInfo {
     private static final Logger logger = LoggerFactory.getLogger(CommandInfo.class);
 
-    private static final String BIND_CONTEXT = "command";
+    private static final Joiner PARAM_JOINER = Joiner.on(", ");
+    private static final String PROVIDER_VAR = "provider";
+    private static final String CLIENT_VAR = "client";
 
     private Object provider;
 
     private String name;
-    private String[] parameterNames;
+    private List<String> parameterNames = Lists.newArrayList();
     private String shortDescription;
     private String helpText;
+    private boolean clientEntityRequired;
+    private boolean runOnServer;
 
     public CommandInfo(Method method, Object provider) {
         this.provider = provider;
         this.name = method.getName();
-        this.parameterNames = new String[method.getParameterTypes().length];
+        Command commandAnnotation = method.getAnnotation(Command.class);
+        if (commandAnnotation == null) {
+            throw new IllegalArgumentException("Method not annotated with command");
+        }
         for (int i = 0; i < method.getParameterTypes().length; ++i) {
-            parameterNames[i] = method.getParameterTypes()[i].toString();
-            for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
-                if (paramAnnot instanceof CommandParam) {
-                    parameterNames[i] = ((CommandParam) paramAnnot).name();
-                    break;
+            Class<?> parameterType = method.getParameterTypes()[i];
+            if (i == method.getParameterTypes().length - 1 && parameterType == EntityRef.class) {
+                clientEntityRequired = true;
+            } else {
+                String paramName = method.getParameterTypes()[i].toString();
+                for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
+                    if (paramAnnot instanceof CommandParam) {
+                        paramName = ((CommandParam) paramAnnot).value();
+                        break;
+                    }
                 }
+                parameterNames.add(paramName);
             }
         }
-        Command commandAnnotation = method.getAnnotation(Command.class);
+        this.runOnServer = commandAnnotation.runOnServer();
         this.shortDescription = commandAnnotation.shortDescription();
         this.helpText = commandAnnotation.helpText();
     }
@@ -47,12 +66,12 @@ public class CommandInfo {
         return name;
     }
 
-    public String[] getParameterNames() {
-        return parameterNames;
+    public Collection<String> getParameterNames() {
+        return ImmutableList.copyOf(parameterNames);
     }
 
     public int getParameterCount() {
-        return parameterNames.length;
+        return parameterNames.size();
     }
 
     public String getShortDescription() {
@@ -61,6 +80,14 @@ public class CommandInfo {
 
     public String getHelpText() {
         return helpText;
+    }
+
+    public boolean isClientEntityRequired() {
+        return clientEntityRequired;
+    }
+
+    public boolean isRunOnServer() {
+        return runOnServer;
     }
 
     public String getUsageMessage() {
@@ -75,21 +102,28 @@ public class CommandInfo {
     }
 
     /**
-     * Execute the method which is assigned to the command.
      *
      * @param params
-     * @returns A message if this command returns a message
+     * @param callingClient
+     * @return
      */
-    public String execute(String params) {
+    public String execute(String params, EntityRef callingClient) {
         Binding bind = new Binding();
-        bind.setVariable(BIND_CONTEXT, provider);
+        bind.setVariable(PROVIDER_VAR, provider);
+        if (isClientEntityRequired()) {
+            bind.setVariable(CLIENT_VAR, callingClient);
+        }
         GroovyShell shell = new GroovyShell(bind);
 
-        logger.debug("Executing command {}.{}({})", BIND_CONTEXT, name, params);
-        Object result = shell.evaluate(BIND_CONTEXT + "." + name + "(" + params + ")");
-        if (result != null) {
-            return result.toString();
+        Object result;
+        if (isClientEntityRequired()) {
+            String fullParams = (params.trim().isEmpty()) ? CLIENT_VAR : PARAM_JOINER.join(params, CLIENT_VAR);
+            logger.debug("Executing command {}.{}({})", PROVIDER_VAR, name, fullParams);
+            result = shell.evaluate(PROVIDER_VAR + "." + name + "(" + fullParams + ")");
+        } else {
+            logger.debug("Executing command {}.{}({})", PROVIDER_VAR, name, params);
+            result = shell.evaluate(PROVIDER_VAR + "." + name + "(" + params + ")");
         }
-        return "";
+        return (result != null) ? result.toString() : "";
     }
 }

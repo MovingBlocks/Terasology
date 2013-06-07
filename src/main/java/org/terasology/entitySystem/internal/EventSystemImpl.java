@@ -117,10 +117,10 @@ public class EventSystemImpl implements EventSystem {
     }
 
     /**
-     * Events are added to the lifecycleEvents library if they have a network annotation
+     * Events are added to the event library if they have a network annotation
      *
      * @param eventType
-     * @return Whether the lifecycleEvents should be added to the lifecycleEvents library
+     * @return Whether the event should be added to the event library
      */
     private boolean shouldAddToLibrary(Class<? extends Event> eventType) {
         return eventType.getAnnotation(ServerEvent.class) != null

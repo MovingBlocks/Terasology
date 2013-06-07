@@ -137,9 +137,9 @@ public class BindableButtonImpl implements BindableButton {
      * @param pressed     Is the changing
      * @param delta       The length of the current frame
      * @param target      The current camera target
-     * @param keyConsumed Has the changing button's lifecycleEvents already been consumed
+     * @param keyConsumed Has the changing button's event already been consumed
      * @param guiOnly     Is the gui consuming input
-     * @return Whether the button's lifecycleEvents has been consumed
+     * @return Whether the button's event has been consumed
      */
     boolean updateBindState(boolean pressed, float delta, EntityRef[] inputEntities, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal, boolean keyConsumed, boolean guiOnly) {
         if (pressed) {

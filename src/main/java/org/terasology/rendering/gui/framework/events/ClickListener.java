@@ -23,9 +23,9 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 public interface ClickListener {
 
     /**
-     * Click lifecycleEvents. Will be called if the specific item was clicked.
+     * Click event. Will be called if the specific item was clicked.
      *
-     * @param element The element of the lifecycleEvents.
+     * @param element The element of the event.
      * @param button  The button. Left = 0, Right = 1, Middle = 2.
      */
     public void click(UIDisplayElement element, int button);

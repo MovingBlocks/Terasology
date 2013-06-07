@@ -26,6 +26,9 @@ import com.google.common.collect.Table;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.NetworkSystem;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.lang.reflect.Method;
@@ -46,6 +49,7 @@ import static org.reflections.ReflectionUtils.withModifier;
  */
 public class Console {
     private static final Logger logger = LoggerFactory.getLogger(Console.class);
+    public static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     private static final int MAX_MESSAGE_HISTORY = 255;
 
     private final List<CommandInfo> commands = Lists.newArrayList();
@@ -54,12 +58,18 @@ public class Console {
 
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
+    private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+
     private boolean commandsSorted = false;
 
     public Console() {
         addMessage("Welcome to the wonderful world of Terasology!\n\nType 'help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.\nBe sure to surround text type parameters in quotes.\nNo commas needed for multiple parameters.\nCommands are case-sensitive, block names and such are not.");
     }
 
+    /**
+     * Registers an object as a command provider - all methods annotated with @Command will be made available on the console.
+     * @param provider
+     */
     public void registerCommandProvider(Object provider) {
         Predicate<? super Method> predicate = Predicates.<Method>and(withModifier(Modifier.PUBLIC), withAnnotation(Command.class));
         Set<Method> commandMethods = Reflections.getAllMethods(provider.getClass(), predicate);
@@ -73,14 +83,27 @@ public class Console {
         }
     }
 
+    /**
+     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
+     * @param message
+     */
     public void addMessage(String message) {
         addMessage(new Message(message));
     }
 
+    /**
+     * Adds a message to the console
+     * @param message
+     * @param type
+     */
     public void addMessage(String message, MessageType type) {
         addMessage(new Message(message, type));
     }
 
+    /**
+     * Adds a message to the console
+     * @param message
+     */
     public void addMessage(Message message) {
         logger.info("[{}] {}", message.getType(), message.getMessage());
         messageHistory.add(message);
@@ -89,17 +112,30 @@ public class Console {
         }
     }
 
+    /**
+     * @return An iterator over all messages in the console
+     */
     public Iterable<Message> getMessages() {
         return messageHistory;
     }
 
+    /**
+     * Subscribe for notification of all messages added to the console
+     * @param subscriber
+     */
     public void subscribe(ConsoleSubscriber subscriber) {
         this.messageSubscribers.add(subscriber);
     }
 
+    /**
+     * Unsubscribe from receiving notification of messages being added to the console
+     * @param subscriber
+     */
     public void unsubscribe(ConsoleSubscriber subscriber) {
         this.messageSubscribers.remove(subscriber);
     }
+
+
 
     /**
      * Execute a command.
@@ -107,7 +143,7 @@ public class Console {
      * @param str The whole string of the command including the command name and the optional parameters.
      * @return Returns true if the command was executed successfully.
      */
-    public boolean execute(String str) {
+    public boolean execute(String str, EntityRef callingClient) {
         //remove double spaces
         str = str.replaceAll("\\s\\s+", " ");
 
@@ -126,7 +162,7 @@ public class Console {
         str = str.substring(commandEndIndex).trim();
 
         //get the parameters
-        String[] params = str.split(" (?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+        String[] params = str.split(PARAM_SPLIT_REGEX);
         String paramsStr = "";
         int paramsCount = 0;
 
@@ -155,23 +191,33 @@ public class Console {
 
             return false;
         }
-        String executeString = paramsStr;
-        logger.debug("Execute command with params '{}'", executeString);
 
-        try {
-            String result = cmd.execute(paramsStr);
-            if (result != null && !result.isEmpty()) {
-                addMessage(result);
-            }
-
+        if (cmd.isRunOnServer() && !networkSystem.getMode().isAuthority()) {
+            callingClient.send(new CommandEvent(commandName, paramsStr));
             return true;
-        } catch (Exception e) {
-            // TODO: better error handling and error message
-            addMessage(cmd.getUsageMessage());
-            addMessage("Error executing command '" + commandName + "'.");
-            logger.warn("Failed to execute command", e);
+        } else {
+            String executeString = paramsStr;
+            logger.debug("Execute command with params '{}'", executeString);
 
-            return false;
+            try {
+                String result = cmd.execute(paramsStr, callingClient);
+                if (result != null && !result.isEmpty()) {
+                    if (callingClient.exists()) {
+                        callingClient.send(new ConsoleMessageEvent(result));
+                    } else {
+                        addMessage(result);
+                    }
+                }
+
+                return true;
+            } catch (Exception e) {
+                // TODO: better error handling and error message
+                addMessage(cmd.getUsageMessage());
+                addMessage("Error executing command '" + commandName + "'.");
+                logger.warn("Failed to execute command", e);
+
+                return false;
+            }
         }
     }
 

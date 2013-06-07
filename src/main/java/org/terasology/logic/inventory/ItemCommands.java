@@ -56,7 +56,7 @@ public class ItemCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Adds an item to your inventory")
-    public String giveItem(@CommandParam(name = "prefabId or blockName") String itemPrefabName) {
+    public String giveItem(@CommandParam("prefabId or blockName") String itemPrefabName) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);

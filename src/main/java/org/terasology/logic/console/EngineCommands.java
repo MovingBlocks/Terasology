@@ -18,8 +18,6 @@ package org.terasology.logic.console;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.input.Keyboard;
-import org.terasology.asset.Assets;
-import org.terasology.audio.AudioManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
@@ -45,6 +43,7 @@ import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Direction;
+import org.terasology.network.ClientComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
@@ -70,9 +69,6 @@ import java.util.List;
  */
 @RegisterSystem
 public class EngineCommands implements ComponentSystem {
-
-    @In
-    private AudioManager audioManager;
 
     @In
     private LocalPlayer localPlayer;
@@ -110,30 +106,23 @@ public class EngineCommands implements ComponentSystem {
     //          Commands
     //==============================
 
-    @Command(shortDescription = "Toggle muting all sound")
-    public String toggleMute() {
-        audioManager.setMute(!audioManager.isMute());
-        return "All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.");
-    }
 
-    @Command(shortDescription = "Plays a test sound")
-    public void playTestSound(@CommandParam(name = "xOffset") float xOffset, @CommandParam(name = "yOffset") float zOffset) {
-        Vector3f position = localPlayer.getPosition();
-        position.x += xOffset;
-        position.z += zOffset;
-        audioManager.playSound(Assets.getSound("engine:dig"), position);
-    }
-
-    @Command(shortDescription = "Restores your health to max")
-    public void health() {
-        HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
-        health.currentHealth = health.maxHealth;
-        localPlayer.getCharacterEntity().send(new FullHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
-        localPlayer.getCharacterEntity().saveComponent(health);
+    @Command(shortDescription = "Restores your health to max", runOnServer = true)
+    public void health(EntityRef clientEntity) {
+        ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            EntityRef character = clientComp.character;
+            HealthComponent health = character.getComponent(HealthComponent.class);
+            if (health != null) {
+                health.currentHealth = health.maxHealth;
+                character.send(new FullHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
+                character.saveComponent(health);
+            }
+        }
     }
 
     @Command(shortDescription = "Restores your health by an amount")
-    public void health(@CommandParam(name = "amount") int amount) {
+    public void health(@CommandParam("amount") int amount) {
         HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.currentHealth = amount;
         if (health.currentHealth >= health.maxHealth) {
@@ -150,7 +139,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Set max health")
-    public void setMaxHealth(@CommandParam(name = "max") int max) {
+    public void setMaxHealth(@CommandParam("max") int max) {
         HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.maxHealth = max;
         health.currentHealth = health.maxHealth;
@@ -159,7 +148,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Set regen rate")
-    public void setRegenRaterate(@CommandParam(name = "rate") float rate) {
+    public void setRegenRaterate(@CommandParam("rate") float rate) {
         HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.regenRate = rate;
         localPlayer.getCharacterEntity().saveComponent(health);
@@ -172,28 +161,28 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Set ground friction")
-    public void setGroundFriction(@CommandParam(name = "amount") float amount) {
+    public void setGroundFriction(@CommandParam("amount") float amount) {
         CharacterMovementComponent move = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
         move.groundFriction = amount;
         localPlayer.getCharacterEntity().saveComponent(move);
     }
 
     @Command(shortDescription = "Set max ground speed", helpText = "Set maxGroundSpeed")
-    public void setMaxGroundSpeed(@CommandParam(name = "amount") float amount) {
+    public void setMaxGroundSpeed(@CommandParam("amount") float amount) {
         CharacterMovementComponent move = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
         move.maxGroundSpeed = amount;
         localPlayer.getCharacterEntity().saveComponent(move);
     }
 
     @Command(shortDescription = "Set max ghost speed")
-    public void setMaxGhostSpeed(@CommandParam(name = "amount") float amount) {
+    public void setMaxGhostSpeed(@CommandParam("amount") float amount) {
         CharacterMovementComponent move = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
         move.maxGhostSpeed = amount;
         localPlayer.getCharacterEntity().saveComponent(move);
     }
 
     @Command(shortDescription = "Set jump speed")
-    public void setJumpSpeed(@CommandParam(name = "amount") float amount) {
+    public void setJumpSpeed(@CommandParam("amount") float amount) {
         CharacterMovementComponent move = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
         move.jumpSpeed = amount;
         localPlayer.getCharacterEntity().saveComponent(move);
@@ -250,7 +239,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Reduce the player's health by an amount")
-    public void damage(@CommandParam(name = "amount") int amount) {
+    public void damage(@CommandParam("amount") int amount) {
         HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.currentHealth -= amount;
         if (health.currentHealth >= health.maxHealth) {
@@ -267,7 +256,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Teleports you to a location")
-    public void teleport(@CommandParam(name = "x") float x, @CommandParam(name = "y") float y, @CommandParam(name = "z") float z) {
+    public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         if (localPlayer != null) {
             LocationComponent location = localPlayer.getCharacterEntity().getComponent(LocationComponent.class);
             if (location != null) {
@@ -284,7 +273,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Maps a key to a function")
-    public String bindKey(@CommandParam(name = "key") String key, @CommandParam(name = "function") String bind) {
+    public String bindKey(@CommandParam("key") String key, @CommandParam("function") String bind) {
         inputSystem.linkBindButtonToKey(Keyboard.getKeyIndex(key), bind);
         StringBuilder builder = new StringBuilder();
         builder.append("Mapped ").append(Keyboard.getKeyName(Keyboard.getKeyIndex(key))).append(" to action ");
@@ -314,7 +303,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Spawns an instance of a prefab in the world")
-    public void spawnPrefab(@CommandParam(name = "prefabId") String prefabName) {
+    public void spawnPrefab(@CommandParam("prefabId") String prefabName) {
         Camera camera = worldRenderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -364,7 +353,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Sets the height the player can step up")
-    public void stepHeight(@CommandParam(name = "height") float amount) {
+    public void stepHeight(@CommandParam("height") float amount) {
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
         comp.stepHeight = amount;
@@ -372,7 +361,7 @@ public class EngineCommands implements ComponentSystem {
 
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
             "item in front of the player. You can simply pick it up.")
-    public String spawnBlock(@CommandParam(name = "blockName") String blockName) {
+    public String spawnBlock(@CommandParam("blockName") String blockName) {
         Camera camera = worldRenderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -401,13 +390,13 @@ public class EngineCommands implements ComponentSystem {
 
     @Command(shortDescription = "Toggles the maximum slope the player can walk up")
     public String sleigh() {
-            CharacterMovementComponent moveComp = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
-            if (moveComp.slopeFactor > 0.7f) {
-                moveComp.slopeFactor = 0.6f;
-            } else {
-                moveComp.slopeFactor = 0.9f;
-            }
-            return "Slope factor is now " + moveComp.slopeFactor;
+        CharacterMovementComponent moveComp = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
+        if (moveComp.slopeFactor > 0.7f) {
+            moveComp.slopeFactor = 0.6f;
+        } else {
+            moveComp.slopeFactor = 0.9f;
+        }
+        return "Slope factor is now " + moveComp.slopeFactor;
     }
 
     @Command(shortDescription = "Sets the spawn position of the player")
@@ -432,7 +421,7 @@ public class EngineCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Detailed help on a command")
-    public String help(@CommandParam(name = "command") String command) {
+    public String help(@CommandParam("command") String command) {
         Collection<CommandInfo> cmdCollection = console.getCommand(command);
         if (cmdCollection.isEmpty()) {
             return "No help available for command '" + command + "'. Unknown command.";

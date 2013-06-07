@@ -71,7 +71,7 @@ public class StateMainMenu implements GameState {
     public void init(GameEngine gameEngine) {
         _gameInstance = gameEngine;
 
-        //lets get the entity lifecycleEvents system running
+        //lets get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
 

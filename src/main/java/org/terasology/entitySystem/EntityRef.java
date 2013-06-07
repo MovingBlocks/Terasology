@@ -43,7 +43,7 @@ public abstract class EntityRef implements ComponentContainer {
     public abstract void destroy();
 
     /**
-     * Transmits an lifecycleEvents to this entity
+     * Transmits an event to this entity
      *
      * @param event
      */

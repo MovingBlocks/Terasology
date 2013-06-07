@@ -40,16 +40,16 @@ public class EventSerializer {
     private BiMap<Class<? extends Event>, Integer> idTable = ImmutableBiMap.<Class<? extends Event>, Integer>builder().build();
 
     /**
-     * Creates the lifecycleEvents serializer.
+     * Creates the event serializer.
      *
-     * @param eventLibrary The lifecycleEvents library used to provide information on each lifecycleEvents and its fields.
+     * @param eventLibrary The event library used to provide information on each event and its fields.
      */
     public EventSerializer(EventLibrary eventLibrary) {
         this.eventLibrary = eventLibrary;
     }
 
     /**
-     * Sets the mapping between lifecycleEvents classes and the ids that are used for serialization
+     * Sets the mapping between event classes and the ids that are used for serialization
      *
      * @param table
      */
@@ -58,7 +58,7 @@ public class EventSerializer {
     }
 
     /**
-     * Clears the mapping between lifecycleEvents classes and ids. This causes lifecycleEvents to be serialized with their lifecycleEvents
+     * Clears the mapping between event classes and ids. This causes event to be serialized with their event
      * name instead.
      */
     public void removeIdMapping() {
@@ -67,7 +67,7 @@ public class EventSerializer {
 
     /**
      * @param eventData
-     * @return The lifecycleEvents described by the eventData, or null if it couldn't be deserialized
+     * @return The event described by the eventData, or null if it couldn't be deserialized
      */
     public Event deserialize(EntityData.Event eventData) {
         Class<? extends Event> eventClass = getEventClass(eventData);
@@ -98,10 +98,10 @@ public class EventSerializer {
     }
 
     /**
-     * Serializes an lifecycleEvents.
+     * Serializes an event.
      *
      * @param event
-     * @return The serialized lifecycleEvents, or null if it could not be serialized.
+     * @return The serialized event, or null if it could not be serialized.
      */
     public EntityData.Event serialize(Event event) {
         ClassMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());
@@ -133,10 +133,10 @@ public class EventSerializer {
     }
 
     /**
-     * Determines the lifecycleEvents class that the serialized lifecycleEvents is for.
+     * Determines the event class that the serialized event is for.
      *
      * @param eventData
-     * @return The lifecycleEvents class the given eventData describes, or null if it is unknown.
+     * @return The event class the given eventData describes, or null if it is unknown.
      */
     public Class<? extends Event> getEventClass(EntityData.Event eventData) {
         if (eventData.hasType()) {

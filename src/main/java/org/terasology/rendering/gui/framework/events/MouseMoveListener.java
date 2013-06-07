@@ -25,30 +25,30 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  */
 public interface MouseMoveListener {
     /**
-     * Hover lifecycleEvents. Will be called if the mouse is over the element and moves. (Still mouse won't cause any events.)
+     * Hover event. Will be called if the mouse is over the element and moves. (Still mouse won't cause any events.)
      *
-     * @param element The element of the lifecycleEvents.
+     * @param element The element of the event.
      */
     public void hover(UIDisplayElement element);
 
     /**
-     * Enter lifecycleEvents. Will be called if the mouse enters the element.
+     * Enter event. Will be called if the mouse enters the element.
      *
-     * @param element The element of the lifecycleEvents.
+     * @param element The element of the event.
      */
     public void enter(UIDisplayElement element);
 
     /**
-     * Leave lifecycleEvents. Will be called if the mouse leaves the element.
+     * Leave event. Will be called if the mouse leaves the element.
      *
-     * @param element The element of the lifecycleEvents.
+     * @param element The element of the event.
      */
     public void leave(UIDisplayElement element);
 
     /**
-     * Move lifecycleEvents. Will be called if the mouse moves anywhere in the UI. (Still mouse won't cause any events.)
+     * Move event. Will be called if the mouse moves anywhere in the UI. (Still mouse won't cause any events.)
      *
-     * @param element The element of the lifecycleEvents.
+     * @param element The element of the event.
      */
     public void move(UIDisplayElement element);
 }

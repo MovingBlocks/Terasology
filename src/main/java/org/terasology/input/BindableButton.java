@@ -78,7 +78,7 @@ public interface BindableButton {
     void subscribe(BindButtonSubscriber subscriber);
 
     /**
-     * Used to unsubscribe from the button's lifecycleEvents
+     * Used to unsubscribe from the button's event
      *
      * @param subscriber
      */

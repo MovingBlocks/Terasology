@@ -145,7 +145,7 @@ public class PlayerInventorySystem implements ComponentSystem {
             return;
         }
         //if this is our first time throwing, set the timer to something sensible, we can return since
-        // this is a repeating lifecycleEvents.
+        // this is a repeating event.
         if (event.isDown() && lastTimeThrowInteraction == 0) {
             lastTimeThrowInteraction = timer.getTimeInMs();
             return;

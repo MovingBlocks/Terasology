@@ -177,14 +177,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (!isVisible())
             return consumed;
 
-        //cancel mouse click lifecycleEvents if the click is out of the cropped area
+        //cancel mouse click event if the click is out of the cropped area
         if (cropContainer) {
             if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
                 croped = true;
             }
         }
 
-        // Pass the mouse lifecycleEvents to all display elements
+        // Pass the mouse event to all display elements
         for (int i = displayElements.size() - 1; i >= 0; i--) {
             consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed, croped);
         }

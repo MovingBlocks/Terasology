@@ -24,6 +24,7 @@ import org.terasology.logic.console.CommandInfo;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.Message;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
@@ -49,6 +50,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
     private static final int MESSAGE_HISTORY_SIZE = 30;
 
     private final Console console;
+    private final LocalPlayer localPlayer;
 
     private final CircularBuffer<String> commandHistory = CircularBuffer.create(COMMAND_HISTORY_SIZE);
 
@@ -59,6 +61,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
 
     public UIScreenConsole() {
         console = CoreRegistry.get(Console.class);
+        localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         setCloseBinds(new String[]{"engine:console"});
@@ -84,7 +87,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
 
                         commandHistory.add(message);
                         commandCursor = commandHistory.size();
-                        console.execute(message);
+                        console.execute(message, localPlayer.getClientEntity());
                     }
                     //message history previous
                     else if (event.getKey() == Keyboard.KEY_UP) {

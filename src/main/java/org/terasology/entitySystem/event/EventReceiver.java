@@ -19,7 +19,7 @@ package org.terasology.entitySystem.event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
- * Interface for a single lifecycleEvents receiver
+ * Interface for a single event receiver
  *
  * @author Immortius
  */

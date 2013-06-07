@@ -21,6 +21,7 @@ import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
 /**
+ * This event is used to send a chat message to the server, from which it is broadcast to all players.
  * @author Immortius
  */
 @ServerEvent

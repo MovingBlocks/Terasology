@@ -27,17 +27,17 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 
 /**
+ * This system provides the ability to chat with a "say" command. Chat messages are broadcast to all players.
  * @author Immortius
  */
 @RegisterSystem
-public class MessagingSystem implements ComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(MessagingSystem.class);
+public class ChatSystem implements ComponentSystem {
+    private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
 
     @In
     private NetworkSystem networkSystem;
@@ -60,7 +60,7 @@ public class MessagingSystem implements ComponentSystem {
     }
 
     @Command(shortDescription = "Sends a message to all other players")
-    public void say(@CommandParam(name = "message") String message) {
+    public void say(@CommandParam("message") String message) {
         localPlayer.getClientEntity().send(new SendChatMessage(message));
     }
 
@@ -73,13 +73,5 @@ public class MessagingSystem implements ComponentSystem {
             }
         }
 
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onChatMessage(MessageEvent event, EntityRef entity) {
-        ClientComponent client = entity.getComponent(ClientComponent.class);
-        if (client.local) {
-            console.addMessage(event.getFormattedMessage(), CoreMessageType.CHAT);
-        }
     }
 }

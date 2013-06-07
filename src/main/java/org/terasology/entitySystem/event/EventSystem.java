@@ -32,7 +32,7 @@ public interface EventSystem {
     public void process();
 
     /**
-     * Registers an lifecycleEvents
+     * Registers an event
      *
      * @param id
      * @param eventType
@@ -40,14 +40,14 @@ public interface EventSystem {
     void registerEvent(String id, Class<? extends Event> eventType);
 
     /**
-     * Registers an object as an lifecycleEvents handler - all methods with the {@link ReceiveEvent} annotation will be registered
+     * Registers an object as an event handler - all methods with the {@link ReceiveEvent} annotation will be registered
      *
      * @param handler
      */
     void registerEventHandler(ComponentSystem handler);
 
     /**
-     * Registers an lifecycleEvents receiver object
+     * Registers an event receiver object
      *
      * @param eventReceiver
      * @param eventClass
@@ -68,7 +68,7 @@ public interface EventSystem {
     <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes);
 
     /**
-     * Sends an lifecycleEvents to all handlers for an entity's components
+     * Sends an event to all handlers for an entity's components
      *
      * @param entity
      * @param event
@@ -76,7 +76,7 @@ public interface EventSystem {
     void send(EntityRef entity, Event event);
 
     /**
-     * Sends an lifecycleEvents to a handlers for a specific component of an entity
+     * Sends an event to a handlers for a specific component of an entity
      *
      * @param entity
      * @param event

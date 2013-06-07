@@ -16,9 +16,12 @@
 
 package org.terasology.audio;
 
+import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.console.Command;
+import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -27,6 +30,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -48,6 +53,20 @@ public class AudioSystem implements UpdateSubscriberSystem {
 
     @Override
     public void shutdown() {
+    }
+
+    @Command(shortDescription = "Toggle muting all sound")
+    public String mute() {
+        audioManager.setMute(!audioManager.isMute());
+        return "All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.");
+    }
+
+    @Command(shortDescription = "Plays a test sound")
+    public void playTestSound(@CommandParam("xOffset") float xOffset, @CommandParam("zOffset") float zOffset) {
+        Vector3f position = localPlayer.getPosition();
+        position.x += xOffset;
+        position.z += zOffset;
+        audioManager.playSound(Assets.getSound("engine:dig"), position);
     }
 
     @ReceiveEvent(components = {})

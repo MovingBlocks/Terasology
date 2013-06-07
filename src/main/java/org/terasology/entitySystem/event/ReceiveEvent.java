@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * This annotation is used to mark up methods that can be registered to receive events through the EventSystem
  * <p/>
  * These methods should have the form
- * <code>public void handlerMethod(EventType lifecycleEvents, EntityRef entity)</code>
+ * <code>public void handlerMethod(EventType event, EntityRef entity)</code>
  *
  * @author Immortius <immortius@gmail.com>
  */

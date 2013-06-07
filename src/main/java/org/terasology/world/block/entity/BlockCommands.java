@@ -89,7 +89,7 @@ public class BlockCommands implements ComponentSystem {
     @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in " +
             "front of the player. The block is set directly into the world and might override existing blocks. After " +
             "placement the block can be destroyed like any regular placed block.")
-    public String placeBlock(@CommandParam(name = "blockName") String blockName) {
+    public String placeBlock(@CommandParam("blockName") String blockName) {
         Camera camera = renderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -215,17 +215,17 @@ public class BlockCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
-    public String giveBlock(@CommandParam(name = "blockName") String uri) {
+    public String giveBlock(@CommandParam("blockName") String uri) {
         return giveBlock(uri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
-    public String giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri) {
+    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri) {
         return giveBlock(uri, shapeUri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
-    public String giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
+    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("quantity") int quantity) {
         List<BlockUri> matchingUris = blockManager.resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
@@ -241,7 +241,7 @@ public class BlockCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
-    public String giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
+    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = blockManager.resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             return "No block found for '" + uri + "'";

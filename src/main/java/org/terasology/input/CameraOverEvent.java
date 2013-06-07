@@ -19,7 +19,7 @@ package org.terasology.input;
 import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
- * This lifecycleEvents is sent when the camera starts pointing at a target, to the target
+ * This event is sent when the camera starts pointing at a target, to the target
  */
 public class CameraOverEvent extends AbstractEvent {
 

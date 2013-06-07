@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
@@ -236,10 +235,10 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         when(parentEntity.exists()).thenReturn(true);
         parent.setWorldPosition(new Vector3f(1, 0, 0));
 
-        loc.setWorldPosition(new Vector3f(2,0,0));
+        loc.setWorldPosition(new Vector3f(2, 0, 0));
         Location.attachChild(parentEntity, entity);
 
-        TeraAssert.assertEquals(new Vector3f(2,0,0), loc.getWorldPosition(), 0.000001f);
+        TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(), 0.000001f);
     }
 
     @Test
@@ -250,11 +249,11 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         when(parentEntity.exists()).thenReturn(true);
         parent.setWorldPosition(new Vector3f(1, 0, 0));
 
-        loc.setWorldPosition(new Vector3f(2,0,0));
+        loc.setWorldPosition(new Vector3f(2, 0, 0));
         Location.attachChild(parentEntity, entity);
         Location.removeChild(parentEntity, entity);
 
-        TeraAssert.assertEquals(new Vector3f(2,0,0), loc.getWorldPosition(), 0.000001f);
+        TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(), 0.000001f);
     }
 
     @Test
@@ -265,7 +264,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         when(parentEntity.exists()).thenReturn(true);
         parent.setWorldPosition(new Vector3f(1, 0, 0));
 
-        loc.setWorldPosition(new Vector3f(2,0,0));
+        loc.setWorldPosition(new Vector3f(2, 0, 0));
         Location.attachChild(parentEntity, entity);
         System.out.println(entity.toFullDescription());
         Location locationSystem = new Location();
@@ -274,7 +273,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         when(parentEntity.exists()).thenReturn(false);
         System.out.println(entity.toFullDescription());
 
-        TeraAssert.assertEquals(new Vector3f(2,0,0), loc.getWorldPosition(), 0.000001f);
+        TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(), 0.000001f);
     }
 
 
