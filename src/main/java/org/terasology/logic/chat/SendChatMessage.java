@@ -14,20 +14,33 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.commands;
+package org.terasology.logic.chat;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.terasology.network.NetworkEvent;
+import org.terasology.network.Replicate;
+import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Command {
-    String shortDescription() default "";
+@ServerEvent
+public class SendChatMessage extends NetworkEvent {
+    @Replicate
+    private String message;
 
-    String helpText() default "";
+    private SendChatMessage() {
+    }
+
+    public SendChatMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{message = '" + message + "'}";
+    }
 }

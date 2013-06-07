@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.commands;
+package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -22,14 +22,18 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.Share;
+import org.terasology.logic.console.Command;
+import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -48,13 +52,45 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class BlockCommands implements CommandProvider {
+@RegisterSystem()
+@Share(BlockCommands.class)
+public class BlockCommands implements ComponentSystem {
+
+    // TODO: Remove once camera is handled better
+    @In
+    private WorldRenderer renderer;
+
+    @In
+    private BlockManager blockManager;
+
+    @In
+    private WorldProvider world;
+
+    @In
+    private PrefabManager prefabManager;
+
+    @In
+    private InventoryManager inventoryManager;
+
+    @In
+    private LocalPlayer localPlayer;
+
+    private BlockItemFactory blockItemFactory;
+
+    @Override
+    public void initialise() {
+        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
+    }
+
+    @Override
+    public void shutdown() {
+    }
 
     @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in " +
             "front of the player. The block is set directly into the world and might override existing blocks. After " +
             "placement the block can be destroyed like any regular placed block.")
-    public void placeBlock(@CommandParam(name = "blockName") String blockName) {
-        Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+    public String placeBlock(@CommandParam(name = "blockName") String blockName) {
+        Camera camera = renderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
         offset.scale(3);
@@ -62,58 +98,47 @@ public class BlockCommands implements CommandProvider {
 
         BlockFamily blockFamily;
 
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         List<BlockUri> matchingUris = blockManager.resolveBlockUri(blockName);
         if (matchingUris.size() == 1) {
             blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
 
         } else if (matchingUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + blockName + "'");
-
-            return;
+            return "No block found for '" + blockName + "'";
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
-            MessageManager.getInstance().addMessage(builder.toString());
-
-            return;
+            return builder.toString();
         }
 
-        WorldProvider provider = CoreRegistry.get(WorldProvider.class);
-        if (provider != null) {
-            Block oldBlock = provider.getBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z);
-            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, blockFamily.getArchetypeBlock(), oldBlock);
+        if (world != null) {
+            Block oldBlock = world.getBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z);
+            world.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, blockFamily.getArchetypeBlock(), oldBlock);
 
             StringBuilder builder = new StringBuilder();
             builder.append(blockFamily.getArchetypeBlock());
             builder.append(" block placed at position (");
             builder.append((int) spawnPos.x).append((int) spawnPos.y).append((int) spawnPos.z).append(")");
-            MessageManager.getInstance().addMessage(builder.toString());
-            return;
+            return builder.toString();
         }
-        MessageManager.getInstance().addMessage("Sorry, something went wrong!");
+        return "Sorry, something went wrong!";
     }
 
     @Command(shortDescription = "Lists all available items")
-    public void listItems() {
+    public String listItems() {
         StringBuilder items = new StringBuilder();
-        PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
-        Iterator<Prefab> it = prefMan.listPrefabs().iterator();
-        while (it.hasNext()) {
-            Prefab prefab = it.next();
+        for (Prefab prefab : prefabManager.listPrefabs()) {
             if (!items.toString().isEmpty()) {
                 items.append("\n");
             }
             items.append(prefab.getName());
         }
 
-        MessageManager.getInstance().addMessage(items.toString());
+        return items.toString();
     }
 
     @Command(shortDescription = "List all available blocks")
-    public void listBlocks() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
         stringBuilder.append(StringConstants.NEW_LINE);
@@ -136,12 +161,11 @@ public class BlockCommands implements CommandProvider {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     @Command(shortDescription = "Lists all blocks by category")
-    public void listBlocksByCategory() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    public String listBlocksByCategory() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
             stringBuilder.append(category);
@@ -155,11 +179,11 @@ public class BlockCommands implements CommandProvider {
             }
             stringBuilder.append(StringConstants.NEW_LINE);
         }
-        MessageManager.getInstance().addMessage(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     @Command(shortDescription = "Lists all available shapes")
-    public void listShapes() {
+    public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
         stringBuilder.append(StringConstants.NEW_LINE);
@@ -171,12 +195,11 @@ public class BlockCommands implements CommandProvider {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
-    public void listFreeShapeBlocks() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
         stringBuilder.append(StringConstants.NEW_LINE);
@@ -188,57 +211,49 @@ public class BlockCommands implements CommandProvider {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
-    public void giveBlock(@CommandParam(name = "blockName") String uri) {
-        giveBlock(uri, 16);
+    public String giveBlock(@CommandParam(name = "blockName") String uri) {
+        return giveBlock(uri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
-    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri) {
-        giveBlock(uri, shapeUri, 16);
+    public String giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri) {
+        return giveBlock(uri, shapeUri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
-    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    public String giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> matchingUris = blockManager.resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
-            giveBlock(blockFamily, quantity);
+            return giveBlock(blockFamily, quantity);
         } else if (matchingUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + uri + "'");
+            return "No block found for '" + uri + "'";
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
-            MessageManager.getInstance().addMessage(builder.toString());
+            return builder.toString();
         }
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
-    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    public String giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = blockManager.resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + uri + "'");
-
-            return;
+            return "No block found for '" + uri + "'";
         } else if (resolvedBlockUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, resolvedBlockUris);
-            MessageManager.getInstance().addMessage(builder.toString());
-
-            return;
+            return builder.toString();
         }
         List<AssetUri> resolvedShapeUris = resolveShapeUri(shapeUri);
         if (resolvedShapeUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No shape found for '" + shapeUri + "'");
-
-            return;
+            return "No shape found for '" + shapeUri + "'";
         } else if (resolvedShapeUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique shape name, possible matches: ");
@@ -250,16 +265,15 @@ public class BlockCommands implements CommandProvider {
                 }
             }
 
-            return;
+            return builder.toString();
         }
 
         BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).getSimpleString());
         if (blockUri.isValid()) {
-            giveBlock(blockManager.getBlockFamily(blockUri), quantity);
-            return;
+            return giveBlock(blockManager.getBlockFamily(blockUri), quantity);
         }
 
-        MessageManager.getInstance().addMessage("Invalid block or shape");
+        return "Invalid block or shape";
     }
 
     /**
@@ -268,26 +282,21 @@ public class BlockCommands implements CommandProvider {
      * @param blockFamily the block family of the queried block
      * @param quantity    the number of blocks that are queried
      */
-    private void giveBlock(BlockFamily blockFamily, int quantity) {
-        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+    private String giveBlock(BlockFamily blockFamily, int quantity) {
         if (quantity < 1) {
-            MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted");
-            return;
+            return "Here, have these zero (0) items just like you wanted";
         }
 
-        BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
-        EntityRef item = factory.newInstance(blockFamily, quantity);
+        EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
         if (!item.exists()) {
-            MessageManager.getInstance().addMessage("Unknown block or item");
-
-            return;
+            return "Unknown block or item";
         }
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (!inventoryManager.giveItem(playerEntity, item)) {
             item.destroy();
         }
 
-        MessageManager.getInstance().addMessage("You received " + quantity + " blocks of " + blockFamily.getDisplayName());
+        return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
     }
 
 
@@ -327,4 +336,5 @@ public class BlockCommands implements CommandProvider {
         Collections.sort(result);
         return result;
     }
+
 }

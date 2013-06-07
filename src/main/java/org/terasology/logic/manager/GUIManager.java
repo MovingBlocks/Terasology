@@ -20,6 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.world.WorldComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
@@ -49,7 +50,6 @@ import org.terasology.rendering.gui.windows.UIMenuJoinServer;
 import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
-import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
@@ -97,7 +97,7 @@ public class GUIManager implements ComponentSystem {
         registeredWindows.put("death", UIScreenDeath.class);
         registeredWindows.put("pause", UIMenuPause.class);
         registeredWindows.put("inventory", UIScreenInventory.class);
-        registeredWindows.put("chat", UIScreenChat.class);
+        registeredWindows.put("chat", UIScreenConsole.class);
         registeredWindows.put("hud", UIScreenHUD.class);
     }
 

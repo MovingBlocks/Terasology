@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entityFactory;
+package org.terasology.logic.players;
 
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -21,8 +21,8 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.entity.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;

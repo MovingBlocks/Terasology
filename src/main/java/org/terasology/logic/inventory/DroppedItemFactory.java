@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entityFactory;
+package org.terasology.logic.inventory;
 
 import com.google.common.collect.Maps;
 import org.terasology.logic.inventory.DroppedItemComponent;

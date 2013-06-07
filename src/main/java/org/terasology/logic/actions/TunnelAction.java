@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.actions;
 
-import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.world.block.entity.DroppedBlockFactory;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

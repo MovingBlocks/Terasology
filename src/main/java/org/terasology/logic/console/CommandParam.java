@@ -16,31 +16,16 @@
 
 package org.terasology.logic.console;
 
-import org.terasology.network.NetworkEvent;
-import org.terasology.network.Replicate;
-import org.terasology.network.ServerEvent;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Immortius
  */
-@ServerEvent
-public class SendChatMessage extends NetworkEvent {
-    @Replicate
-    private String message;
-
-    private SendChatMessage() {
-    }
-
-    public SendChatMessage(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{message = '" + message + "'}";
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface CommandParam {
+    String name();
 }

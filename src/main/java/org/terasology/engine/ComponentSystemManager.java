@@ -27,6 +27,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
+import org.terasology.logic.console.Console;
 import org.terasology.network.NetworkMode;
 
 import java.lang.reflect.Field;
@@ -56,6 +57,8 @@ public class ComponentSystemManager {
     private List<RenderSystem> renderSubscribers = Lists.newArrayList();
     private List<ComponentSystem> store = Lists.newArrayList();
     private List<Class<?>> sharedSystems = Lists.newArrayList();
+
+    private Console console = null;
 
     public boolean initialised = false;
 
@@ -124,6 +127,7 @@ public class ComponentSystemManager {
 
     public void initialise() {
         if (!initialised) {
+            console = CoreRegistry.get(Console.class);
             for (ComponentSystem system : iterateAll()) {
                 initialiseSystem(system);
             }
@@ -143,6 +147,10 @@ public class ComponentSystemManager {
                 }
             }
         }
+        if (console != null) {
+            console.registerCommandProvider(system);
+        }
+
         system.initialise();
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console;
+package org.terasology.logic.chat;
 
 import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityRef;

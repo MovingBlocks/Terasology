@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entityFactory;
+package org.terasology.world.block.entity;
 
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.location.LocationComponent;

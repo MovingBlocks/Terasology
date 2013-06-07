@@ -14,39 +14,60 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.commands;
+package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.manager.MessageManager;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.world.block.entity.BlockCommands;
+import org.terasology.logic.console.Command;
+import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.players.LocalPlayer;
 
 /**
  * @author Immortius
  */
-public class ItemCommands implements CommandProvider {
+public class ItemCommands implements ComponentSystem {
 
-    private BlockCommands blockCommands = new BlockCommands();
+    @In
+    private BlockCommands blockCommands;
+
+    @In
+    private InventoryManager inventoryManager;
+
+    @In
+    private PrefabManager prefabManager;
+
+    @In
+    private EntityManager entityManager;
+
+    @In
+    private LocalPlayer localPlayer;
+
+    @Override
+    public void initialise() {
+    }
+
+    @Override
+    public void shutdown() {
+    }
 
     @Command(shortDescription = "Adds an item to your inventory")
-    public void giveItem(@CommandParam(name = "prefabId or blockName") String itemPrefabName) {
-        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
-        Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
-        System.out.println("Found prefab: " + prefab);
+    public String giveItem(@CommandParam(name = "prefabId or blockName") String itemPrefabName) {
+        Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
-            EntityRef item = CoreRegistry.get(EntityManager.class).create(prefab);
-            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+            EntityRef item = entityManager.create(prefab);
+            EntityRef playerEntity = localPlayer.getCharacterEntity();
             if (!inventoryManager.giveItem(playerEntity, item)) {
                 item.destroy();
             }
-            MessageManager.getInstance().addMessage("You received an item of " + prefab.getName());
+            return "You received an item of " + prefab.getName();
         } else {
-            blockCommands.giveBlock(itemPrefabName);
+            return blockCommands.giveBlock(itemPrefabName);
         }
     }
+
 }

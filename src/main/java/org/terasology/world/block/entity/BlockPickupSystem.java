@@ -18,7 +18,6 @@ package org.terasology.world.block.entity;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
-import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

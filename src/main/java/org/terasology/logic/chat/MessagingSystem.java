@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console;
+package org.terasology.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,11 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.manager.MessageManager;
+import org.terasology.logic.console.Command;
+import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 
@@ -41,6 +45,12 @@ public class MessagingSystem implements ComponentSystem {
     @In
     private EntityManager entityManager;
 
+    @In
+    private Console console;
+
+    @In
+    private LocalPlayer localPlayer;
+
     @Override
     public void initialise() {
     }
@@ -49,10 +59,15 @@ public class MessagingSystem implements ComponentSystem {
     public void shutdown() {
     }
 
+    @Command(shortDescription = "Sends a message to all other players")
+    public void say(@CommandParam(name = "message") String message) {
+        localPlayer.getClientEntity().send(new SendChatMessage(message));
+    }
+
     @ReceiveEvent(components = ClientComponent.class)
     public void onReceiveMessage(SendChatMessage event, EntityRef entity) {
         if (networkSystem.getMode().isAuthority()) {
-            logger.info("Received message from {} : '{}'", entity, event.getMessage());
+            logger.debug("Received message from {} : '{}'", entity, event.getMessage());
             for (EntityRef client : entityManager.listEntitiesWith(ClientComponent.class)) {
                 client.send(new ChatMessageEvent(event.getMessage(), entity.getComponent(ClientComponent.class).clientInfo));
             }
@@ -64,8 +79,7 @@ public class MessagingSystem implements ComponentSystem {
     public void onChatMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
-            logger.info("Message Received : '{}'", event.getFormattedMessage());
-            MessageManager.getInstance().addMessage(event.getFormattedMessage());
+            console.addMessage(event.getFormattedMessage(), CoreMessageType.CHAT);
         }
     }
 }

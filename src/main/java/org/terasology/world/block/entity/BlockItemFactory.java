@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entityFactory;
+package org.terasology.world.block.entity;
 
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.entitySystem.EntityManager;

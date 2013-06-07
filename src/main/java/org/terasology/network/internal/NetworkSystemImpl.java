@@ -45,7 +45,6 @@ import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.entitySystem.persistence.PlayerEntityStore;
-import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.Client;
@@ -645,7 +644,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         netClientList.remove(client);
         clientList.remove(client);
         logger.info("Client disconnected: " + client.getName());
-        MessageManager.getInstance().addMessage("Client disconnected: " + client.getName());
         PlayerEntityStore playerStore = new PlayerEntityStore(client.getId(), entityManager);
         playerStore.beginStore();
         client.getEntity().send(new DisconnectedEvent(playerStore));

@@ -13,29 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+
+package org.terasology.logic.chat;
+
+import org.terasology.entitySystem.event.AbstractEvent;
 
 /**
- * This is a stub for user rights management. It serves mainly as a reminder that there needs to be some sort of rights management
- *
- * @author Kai Kratz <kaikratz@googlemail.com>
+ * @author Immortius
  */
-public class UserLevel {
+public abstract class MessageEvent extends AbstractEvent {
 
-    private static UserLevel _userLevel;
-
-    public static UserLevel getInstance() {
-        if (_userLevel == null) {
-            _userLevel = new UserLevel();
-        }
-        return _userLevel;
-    }
-
-    private UserLevel() {
-    }
-
-    public boolean hasRights() {
-        //should query server / world if user has rights
-        return true;
-    }
+    public abstract String getFormattedMessage();
 }

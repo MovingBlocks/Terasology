@@ -14,14 +14,32 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console;
+package org.terasology.logic.chat;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.network.OwnerEvent;
 
 /**
+ * Simple message lifecycleEvents. Not ideal in general, but useful for quickly getting things working.
+ *
  * @author Immortius
  */
-public abstract class MessageEvent extends AbstractEvent {
+@OwnerEvent
+public class SimpleMessageEvent extends MessageEvent {
+    private String message;
 
-    public abstract String getFormattedMessage();
+    protected SimpleMessageEvent() {
+    }
+
+    public SimpleMessageEvent(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public String getFormattedMessage() {
+        return message;
+    }
 }
