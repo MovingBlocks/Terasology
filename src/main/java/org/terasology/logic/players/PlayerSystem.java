@@ -31,6 +31,7 @@ import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
@@ -105,18 +106,14 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         if (client != null) {
             PlayerFactory playerFactory = new PlayerFactory(entityManager, inventoryManager);
             EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z), clientEntity);
-            Location.attachChild(playerCharacter, clientEntity);
-            LocationComponent clientLoc = clientEntity.getComponent(LocationComponent.class);
-            clientLoc.setLocalPosition(new Vector3f());
-            clientLoc.setLocalRotation(new Quat4f(0, 0, 0, 1));
-            clientEntity.saveComponent(clientLoc);
+            Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
 
             Client clientListener = networkSystem.getOwner(clientEntity);
             int distance = clientListener.getViewDistance();
             if (!clientListener.isLocal()) {
                 distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
             }
-            worldRenderer.getChunkProvider().updateRelevanceEntity(playerCharacter, distance);
+            worldRenderer.getChunkProvider().updateRelevanceEntity(clientEntity, distance);
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
         }
@@ -162,10 +159,19 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             ClientComponent client = entity.getComponent(ClientComponent.class);
             client.character = character;
             entity.saveComponent(client);
+
             CharacterComponent characterComp = character.getComponent(CharacterComponent.class);
-            characterComp.controller = entity;
-            character.saveComponent(characterComp);
-            Location.attachChild(character, entity);
+            if (characterComp != null) {
+                characterComp.controller = entity;
+                character.saveComponent(characterComp);
+                NetworkComponent netComp = character.getComponent(NetworkComponent.class);
+                netComp.owner = entity;
+                character.saveComponent(netComp);
+                Location.attachChild(character, entity, new Vector3f(), new Quat4f(0,0,0,1));
+            } else {
+                character.destroy();
+                spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+            }
         }
     }
 

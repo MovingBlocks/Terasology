@@ -16,6 +16,7 @@
 
 package org.terasology.network.internal;
 
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -61,7 +62,7 @@ public class NetworkEntitySystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = NetworkComponent.class)
+    @ReceiveEvent(components = NetworkComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void onAddNetworkComponent(OnActivatedEvent event, EntityRef entity) {
         if (networkSystem.getMode() == NetworkMode.SERVER) {
             networkSystem.registerNetworkEntity(entity);
@@ -70,12 +71,14 @@ public class NetworkEntitySystem implements ComponentSystem {
 
     @ReceiveEvent(components = NetworkComponent.class)
     public void onNetworkComponentChanged(OnChangedEvent event, EntityRef entity) {
+
         networkSystem.updateNetworkEntity(entity);
     }
 
     @ReceiveEvent(components = NetworkComponent.class)
-    public void onRemoveNetworkComponent(OnDeactivatedEvent event, EntityRef entity) {
+    public void onDeactivateNetworkComponent(OnDeactivatedEvent event, EntityRef entity) {
         networkSystem.unregisterNetworkEntity(entity);
+        NetworkComponent networkComp = entity.getComponent(NetworkComponent.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class)

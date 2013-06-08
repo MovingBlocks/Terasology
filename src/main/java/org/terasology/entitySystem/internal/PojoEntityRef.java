@@ -30,7 +30,6 @@ import org.terasology.network.NetworkComponent;
 public class PojoEntityRef extends EntityRef {
     int id;
     PojoEntityManager entityManager;
-    private boolean destroying;
 
     PojoEntityRef(PojoEntityManager manager, int id) {
         this.id = id;
@@ -95,6 +94,14 @@ public class PojoEntityRef extends EntityRef {
     @Override
     public boolean exists() {
         return id != PojoEntityManager.NULL_ID;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        if (exists()) {
+            return entityManager.isEntityLoaded(id);
+        }
+        return false;
     }
 
     @Override

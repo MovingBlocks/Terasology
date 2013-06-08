@@ -69,7 +69,6 @@ public class StateIngame implements GameState {
 
 
     public StateIngame() {
-
     }
 
     public void init(GameEngine engine) {
@@ -102,7 +101,7 @@ public class StateIngame implements GameState {
         }
         entityManager.clear();
         if (worldRenderer != null) {
-            worldRenderer.dispose();
+            worldRenderer.dispose(saveWorld);
             worldRenderer = null;
         }
     }

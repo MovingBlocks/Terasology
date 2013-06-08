@@ -17,6 +17,7 @@ package org.terasology.world.block.entity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.family.BlockFamily;
@@ -29,6 +30,8 @@ import org.terasology.world.block.family.BlockFamily;
 public final class BlockItemComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public BlockFamily blockFamily;
+
+    @Owns
     public EntityRef placedEntity = EntityRef.NULL;
 
     public BlockItemComponent() {

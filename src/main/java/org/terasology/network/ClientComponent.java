@@ -32,6 +32,5 @@ public class ClientComponent implements Component {
     public EntityRef clientInfo = EntityRef.NULL;
 
     @Replicate
-    @Owns
     public EntityRef character = EntityRef.NULL;
 }

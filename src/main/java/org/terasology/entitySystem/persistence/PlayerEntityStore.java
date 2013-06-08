@@ -97,7 +97,6 @@ public class PlayerEntityStore implements EntityStore {
 
     @Override
     public void store(EntityRef entity, String name) {
-
         if (entityStoreBuilder == null) {
             throw new IllegalStateException("Entity Store not ready for storing entities");
         }

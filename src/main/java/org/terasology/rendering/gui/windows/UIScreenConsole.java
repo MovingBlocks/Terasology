@@ -110,7 +110,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                         }
                     }
                     //guess command
-                    else if (event.getKey() == Keyboard.KEY_TAB) {
+                    else if (event.getKey() == Keyboard.KEY_TAB && !inputBox.getText().trim().isEmpty()) {
                         String message = inputBox.getText().trim();
 
                         String commandName = message.substring(1);

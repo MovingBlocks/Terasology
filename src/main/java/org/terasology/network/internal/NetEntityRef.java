@@ -49,6 +49,11 @@ public class NetEntityRef extends EntityRef {
     }
 
     @Override
+    public boolean isLoaded() {
+        return getActualEntityRef().isLoaded();
+    }
+
+    @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return getActualEntityRef().hasComponent(component);
     }

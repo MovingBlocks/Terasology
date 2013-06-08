@@ -22,6 +22,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
 
@@ -40,6 +41,38 @@ public class Location implements ComponentSystem {
     public void shutdown() {
     }
 
+    /**
+     * Attaches an entity to another entity. Both must have location components.
+     * This method sets the child's relative offset and rotation to the
+     * @param parent
+     * @param child
+     * @param offset
+     * @param relativeRotation
+     */
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
+        LocationComponent childLoc = child.getComponent(LocationComponent.class);
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
+        if (childLoc != null && parentLoc != null && !childLoc.getParent().equals(parent)) {
+            LocationComponent oldParentLoc = childLoc.getParent().getComponent(LocationComponent.class);
+            if (oldParentLoc != null) {
+                oldParentLoc.children.remove(child);
+                childLoc.getParent().saveComponent(oldParentLoc);
+            }
+            childLoc.parent = parent;
+            childLoc.setLocalPosition(offset);
+            childLoc.setLocalRotation(relativeRotation);
+            parentLoc.children.add(child);
+            child.saveComponent(childLoc);
+            parent.saveComponent(parentLoc);
+        }
+    }
+
+    /**
+     * Attaches an entity to another entity. Both must have location components. The child maintains its previous position
+     * and rotation but follows the parent.
+     * @param parent
+     * @param child
+     */
     public static void attachChild(EntityRef parent, EntityRef child) {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);

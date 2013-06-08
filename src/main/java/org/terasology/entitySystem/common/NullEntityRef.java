@@ -43,6 +43,11 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
+    public boolean isLoaded() {
+        return false;
+    }
+
+    @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return false;
     }

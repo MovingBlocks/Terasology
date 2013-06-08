@@ -73,6 +73,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
 
     private void receivedServerInfo(ServerInfoMessage message) {
         if (awaitingServerInfo) {
+            logger.info("Received server info");
             awaitingServerInfo = false;
             server.setServerInfo(message);
         }

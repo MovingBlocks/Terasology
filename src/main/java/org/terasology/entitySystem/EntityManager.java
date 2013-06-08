@@ -93,6 +93,12 @@ public interface EntityManager {
 
     /**
      * @param id
+     * @return Whether the entity in question is currently loaded
+     */
+    boolean isEntityLoaded(int id);
+
+    /**
+     * @param id
      * @return The entity with the given id, or the null entity
      */
     EntityRef getEntity(int id);

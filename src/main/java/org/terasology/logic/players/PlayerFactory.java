@@ -15,12 +15,15 @@
  */
 package org.terasology.logic.players;
 
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.entity.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
@@ -45,14 +48,15 @@ public class PlayerFactory {
     }
 
     public EntityRef newInstance(Vector3f spawnPosition, EntityRef controller) {
-        EntityRef player = entityManager.create("engine:player", spawnPosition);
+        EntityBuilder builder = entityManager.newBuilder("engine:player");
+        builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
+        builder.getComponent(NetworkComponent.class).owner = controller;
         EntityRef transferSlot = entityManager.create("engine:transferSlot");
 
-        CharacterComponent playerComponent = player.getComponent(CharacterComponent.class);
+        CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         playerComponent.movingItem = transferSlot;
         playerComponent.controller = controller;
-        player.saveComponent(playerComponent);
 
         // Goodie chest
         EntityRef chest = blockFactory.newInstance(blockManager.getBlockFamily("core:chest"));
@@ -93,6 +97,8 @@ public class PlayerFactory {
 
         // Place inner chest into outer chest
         inventoryManager.giveItem(chestContents, innerChest);
+
+        EntityRef player = builder.build();
 
         inventoryManager.giveItem(player, entityManager.create("core:pickaxe"));
         inventoryManager.giveItem(player, entityManager.create("core:axe"));

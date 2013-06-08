@@ -328,6 +328,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         logger.debug("Registered Network Entity: {}", entity);
 
+
         netIdToEntityId.put(netComponent.getNetworkId(), entity.getId());
 
         if (mode == NetworkMode.SERVER) {
@@ -355,6 +356,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     public void updateNetworkEntity(EntityRef entity) {
         NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
+        if (netComponent.getNetworkId() == 0) {
+            return;
+        }
 
         EntityRef lastOwnerEntity = ownerLookup.get(entity);
         if (lastOwnerEntity == null) {
@@ -367,10 +371,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
             if (!Objects.equal(lastOwner, newOwner)) {
                 recursiveUpdateOwnership(entity, lastOwner, newOwner);
-                int id = netComponent.getNetworkId();
-                for (Component component : entity.iterateComponents()) {
-                    if (entitySystemLibrary.getComponentLibrary().getMetadata(component.getClass()).isReplicated()) {
-                        newOwner.setComponentDirty(id, component.getClass());
+                if (newOwner != null) {
+                    int id = netComponent.getNetworkId();
+                    for (Component component : entity.iterateComponents()) {
+                        if (entitySystemLibrary.getComponentLibrary().getMetadata(component.getClass()).isReplicated()) {
+                            newOwner.setComponentDirty(id, component.getClass());
+                        }
                     }
                 }
             }
@@ -417,6 +423,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     client.setNetRemoved(netComponent.getNetworkId());
                 }
             }
+            netComponent.setNetworkId(0);
+            entity.saveComponent(netComponent);
         }
         ownerLookup.remove(entity);
     }
@@ -643,6 +651,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private void processRemovedClient(Client client) {
         netClientList.remove(client);
         clientList.remove(client);
+        clientPlayerLookup.remove(client.getEntity());
         logger.info("Client disconnected: " + client.getName());
         PlayerEntityStore playerStore = new PlayerEntityStore(client.getId(), entityManager);
         playerStore.beginStore();

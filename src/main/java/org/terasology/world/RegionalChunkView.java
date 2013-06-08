@@ -126,11 +126,13 @@ public class RegionalChunkView implements ChunkView {
 
     @Override
     public void setBlock(int blockX, int blockY, int blockZ, Block type) {
-        if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
+        if (!locked.get()) {
+            throw new IllegalStateException("Attempted to modify block though an unlocked view");
+        } else if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
         } else {
-            throw new IllegalStateException("Attempted to modify block though an unlocked view");
+            logger.warn("Attempt to modify block outside of the view");
         }
     }
 

@@ -15,6 +15,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.lifecycleEvents.*;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -300,6 +301,57 @@ public class PojoEntityManagerTest {
         prefab.addComponent(new StringComponent("Test"));
         EntityRef entity1 = entityManager.create(prefab);
         assertFalse(entity1.isPersisted());
+    }
+
+    @Test
+    public void isLoadedTrueOnCreate() {
+        EntityRef entity = entityManager.create();
+        assertTrue(entity.isLoaded());
+    }
+
+    @Test
+    public void isLoadedFalseAfterDestroyed() {
+        EntityRef entity = entityManager.create();
+        int id = entity.getId();
+        entity.destroy();
+        assertFalse(entity.isLoaded());
+        assertFalse(entityManager.isEntityLoaded(id));
+    }
+
+    @Test
+    public void isLoadedFalseAfterPersist() {
+        EntityRef entity = entityManager.create();
+        int id = entity.getId();
+        entityManager.removedForStoring(entity);
+        assertFalse(entity.isLoaded());
+        assertFalse(entityManager.isEntityLoaded(id));
+    }
+
+    @Test
+    public void isLoadedTrueAfterRestore() {
+        EntityRef entity = entityManager.createEntityWithId(2, NullIterator.<Component>newInstance());
+        assertTrue(entity.isLoaded());
+        assertTrue(entityManager.isEntityLoaded(2));
+    }
+
+    @Test
+    public void loadedStateClearedWhenEntityManagerCleared() {
+        EntityRef entity = entityManager.create();
+        int id = entity.getId();
+        entityManager.clear();
+        assertFalse(entity.isLoaded());
+        assertFalse(entityManager.isEntityLoaded(id));
+    }
+
+    @Test
+    public void destructionOfUnloadedEntitiesPrevented() {
+        EntityRef entity = entityManager.create();
+        int id = entity.getId();
+        entityManager.removedForStoring(entity);
+        assertTrue(entity.exists());
+        entity.destroy();
+        assertTrue(entity.exists());
+        assertFalse(entityManager.getFreedIds().contains(id));
     }
 
 }

@@ -29,20 +29,24 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.lifecycleEvents.*;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.EventSystem;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnAddedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.logic.location.LocationComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -64,6 +68,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);
 
     private int nextEntityId = 1;
+    private TIntSet loadedIds = new TIntHashSet();
     private TIntSet freedIds = new TIntHashSet();
     private Map<Integer, EntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
@@ -94,6 +99,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     public void clear() {
         store.clear();
         nextEntityId = 1;
+        loadedIds.clear();
         freedIds.clear();
         entityCache.clear();
     }
@@ -132,9 +138,13 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             TIntIterator iterator = freedIds.iterator();
             int id = iterator.next();
             iterator.remove();
+            loadedIds.add(id);
             return createEntityRef(id);
         }
-        if (nextEntityId == NULL_ID) nextEntityId++;
+        if (nextEntityId == NULL_ID) {
+            nextEntityId++;
+        }
+        loadedIds.add(nextEntityId);
         return createEntityRef(nextEntityId++);
     }
 
@@ -356,6 +366,10 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     }
 
     void destroy(int entityId) {
+        // Don't allow the destruction of unloaded entities.
+        if (!loadedIds.contains(entityId)) {
+            return;
+        }
         EntityRef ref = createEntityRef(entityId);
         if (eventSystem != null) {
             eventSystem.send(ref, OnDeactivatedEvent.newInstance());
@@ -365,6 +379,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             notifyComponentRemoved(ref, comp.getClass());
         }
         entityCache.remove(entityId);
+        loadedIds.remove(entityId);
         freedIds.add(entityId);
         if (ref instanceof PojoEntityRef) {
             ((PojoEntityRef) ref).invalidate();
@@ -379,8 +394,14 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             if (eventSystem != null) {
                 eventSystem.send(entity, OnDeactivatedEvent.newInstance());
             }
+            loadedIds.remove(entityId);
             store.remove(entityId);
         }
+    }
+
+    @Override
+    public boolean isEntityLoaded(int id) {
+        return loadedIds.contains(id);
     }
 
     <T extends Component> T getComponent(int entityId, Class<T> componentClass) {
@@ -459,6 +480,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             for (Component c : components) {
                 store.put(id, c);
             }
+            loadedIds.add(id);
             if (eventSystem != null) {
                 eventSystem.send(entity, OnActivatedEvent.newInstance());
             }

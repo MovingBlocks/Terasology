@@ -834,13 +834,15 @@ public final class WorldRenderer {
     /**
      * Disposes this world.
      */
-    public void dispose() {
+    public void dispose(boolean saveWorld) {
         worldProvider.dispose();
-        WorldInfo worldInfo = worldProvider.getWorldInfo();
-        try {
-            WorldInfo.save(new File(PathManager.getInstance().getCurrentWorldPath(), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
-        } catch (IOException e) {
-            logger.error("Failed to save world manifest", e);
+        if (saveWorld) {
+            WorldInfo worldInfo = worldProvider.getWorldInfo();
+            try {
+                WorldInfo.save(new File(PathManager.getInstance().getCurrentWorldPath(), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
+            } catch (IOException e) {
+                logger.error("Failed to save world manifest", e);
+            }
         }
 
         audioManager.stopAllSounds();
