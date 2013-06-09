@@ -1,0 +1,8 @@
+{
+    "Questing" : {
+        "quests" : ["Dirt fo' days!", "Heres the second one!", "This is the final!"],
+        "friendlyGoals" : ["Get a dirt block", "Get a grass block", "Get a sand block"],
+        "goals" : ["block:engine:dirt","block:engine:grass","block:engine:sand"],
+        "onAchieve" : "Well done!"
+    }
+}
