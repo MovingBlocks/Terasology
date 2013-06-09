@@ -1,6 +1,5 @@
 package org.terasology.monitoring;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +7,7 @@ import java.util.Map;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
+import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.MiniatureChunk;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkState;
@@ -36,11 +36,9 @@ public class ChunkMonitor {
         final LinkedList<Vector3i> cached = new LinkedList<Vector3i>();
         farStore.list(cached);
         for (final Vector3i pos : cached) {
-            ChunkMonitorEntry entry = chunks.get(pos);
-            if (entry == null) {
-                entry = new ChunkMonitorEntry(pos);
-                chunks.put(pos, entry);
-            }
+            final ChunkMonitorEntry entry = chunks.get(pos);
+            if (entry == null)
+                chunks.put(pos, new ChunkMonitorEntry(pos));
         }
     }
     
@@ -56,7 +54,7 @@ public class ChunkMonitor {
             entry = new ChunkMonitorEntry(pos);
             chunks.put(pos, entry);
         }
-        entry.setChunk(chunk);
+        entry.addChunk(chunk);
         return entry;
     }
     
@@ -84,6 +82,11 @@ public class ChunkMonitor {
             post(new ChunkMonitorEvent.Created(entry)); 
     }
     
+    public static void fireChunkDisposed(Chunk chunk) {
+        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+        post(new ChunkMonitorEvent.Disposed(chunk.getPos()));
+    }
+
     public static void fireChunkRevived(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         post(new ChunkMonitorEvent.Revived(chunk.getPos()));
@@ -99,17 +102,13 @@ public class ChunkMonitor {
         post(new ChunkMonitorEvent.Deflated(chunk.getPos(), oldSize, newSize));
     }
     
-    public static void fireChunkDisposed(Chunk chunk) {
-        Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Disposed(chunk.getPos()));
+    public static void fireChunkTessellated(Vector3i chunkPos, ChunkMesh[] mesh) {
+        Preconditions.checkNotNull(chunkPos, "The parameter 'chunkPos' must not be null");
+        post(new ChunkMonitorEvent.Tessellated(chunkPos, mesh));
     }
-
+    
     public static synchronized void getChunks(List<ChunkMonitorEntry> output) {
         Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
-        final Iterator<ChunkMonitorEntry> it = chunks.values().iterator();
-        while (it.hasNext()) {
-            final ChunkMonitorEntry e = it.next();
-            output.add(e);
-        }
+        output.addAll(chunks.values());
     }
 }

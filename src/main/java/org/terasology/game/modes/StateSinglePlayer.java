@@ -30,7 +30,7 @@ import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;

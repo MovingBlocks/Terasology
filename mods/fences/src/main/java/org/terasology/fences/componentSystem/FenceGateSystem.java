@@ -65,9 +65,9 @@ public class FenceGateSystem  implements EventHandlerSystem {
 
         Block newBlock = null;
         if ( fenceGateComponent.isClosed ){
-            newBlock = BlockManager.getInstance().getBlockFamily("fences:FenceGateClosed").getBlockFor(primeBlock.getDirection(), Side.FRONT);
+            newBlock = BlockManager.getInstance().getBlockFamily("fences:FenceGateClosed").getBlockForPlacing(worldProvider, primePos, primeBlock.getDirection(), Side.FRONT);
         }else{
-            newBlock = BlockManager.getInstance().getBlockFamily("fences:FenceGateOpen").getBlockFor( primeBlock.getDirection(), Side.FRONT );
+            newBlock = BlockManager.getInstance().getBlockFamily("fences:FenceGateOpen").getBlockForPlacing(worldProvider, primePos, primeBlock.getDirection(), Side.FRONT);
 
         }
 
