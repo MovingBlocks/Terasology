@@ -226,6 +226,20 @@ public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
                 }
 
                 break;
+                        case HILLS:
+                if(y >= 28 && y <= 34)  {
+                    c.setBlock(x,y,z,sand);
+                } else if(depth == 0 && y > 32 && y < 128) {
+                    c.setBlock(x,y,z,grass);
+                } else if(depth <= 0 && y >= 64) {
+                    c.setBlock(x,y,z, grass);
+                } else if(depth <= 0 && y < 32) {
+                    c.setBlock(x,y,z,stone);
+                } else{
+                    c.setBlock(x,y,z, dirt);
+                }
+
+                break;
         }
     }
 
