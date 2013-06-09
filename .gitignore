@@ -35,7 +35,7 @@ natives
 /mods/*/build
 /mods/*/.*
 
-# ???
+# ??? Maybe /bin is Eclipse output?
 /bin
 /dev
 .DS_Store

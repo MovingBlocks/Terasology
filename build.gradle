@@ -80,8 +80,8 @@ dependencies {
     natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
 }
 
-// On Windows this task will extract the needed LWJGL natives from the downloaded .zip
 task extractWindowsNatives(type:Sync) {
+    description = "Extracts the Windows natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
     }
@@ -89,8 +89,8 @@ task extractWindowsNatives(type:Sync) {
     exclude ('META-INF/**')
 }
 
-// On Mac this task will extract the needed LWJGL natives from the downloaded .zip
 task extractMacOSXNatives(type:Sync) {
+    description = "Extracts the MacOS natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
     }
@@ -98,8 +98,8 @@ task extractMacOSXNatives(type:Sync) {
     exclude ('META-INF/**')
 }
 
-// On Linux this task will extract the needed LWJGL natives from the downloaded .zip
 task extractLinuxNatives(type:Sync) {
+    description = "Extracts the Linux natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
     }
@@ -107,8 +107,8 @@ task extractLinuxNatives(type:Sync) {
     exclude ('META-INF/**')
 }
 
-// Catch-all that'll make sure any platform gets its natives extracted
 task extractNatives {
+    description = "Triggers all of the natives extraction tasks"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
@@ -348,14 +348,14 @@ pmd.ignoreFailures = true
 // Miscellaneous                                                                                                     //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Helper task for when we're trying to run the game from the command line or via TeraEd
 task assembleMainOutput(type:Sync) {
+    description = "Helper task for when we're trying to run the game from the command line or via TeraEd"
     from sourceSets.main.output
     into "$buildDir/$destDirMainOutput"
 }
 
-// Another helper task for when we're trying to run the game from the command line or via TeraEd
 task modClasses {
+    description = "Another helper task for when we're trying to run the game from the command line or via TeraEd"
     subprojects.each { project ->
         if (project.name != 'mods') {
             modClasses.dependsOn project.tasks['classes']
@@ -364,7 +364,7 @@ task modClasses {
 }
 
 task run(type:JavaExec) {
-    description = "Run 'Terasology'"
+    description = "Run 'Terasology' to play the game"
 
     dependsOn extractNatives
     dependsOn assembleMainOutput
@@ -375,7 +375,7 @@ task run(type:JavaExec) {
 }
 
 task runTeraEd(type:JavaExec) {
-    description = "Run 'TeraEd'"
+    description = "Run 'TeraEd' to customize shader settings while the game is running"
 
     dependsOn extractNatives
     dependsOn assembleMainOutput
@@ -448,8 +448,8 @@ task createVersionFile(type: Copy) {
 // Distributions (prepared artifacts)                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Prepare the mods
 task modAssemble {
+    description = "Assembles the mods"
     subprojects.each { project ->
         if (project.name != 'mods') {
             modAssemble.dependsOn project.tasks['assemble']
@@ -457,8 +457,8 @@ task modAssemble {
     }
 }
 
-// Distribute the mods
 task distMods {
+    description = "Distributes the mods"
     dependsOn modAssemble
     subprojects.each { project ->
         if (project.name != 'mods') {
