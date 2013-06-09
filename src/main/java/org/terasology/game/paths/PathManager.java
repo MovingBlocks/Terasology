@@ -88,7 +88,7 @@ public final class PathManager {
     public void useDefaultHomePath() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
-                homePath = new File("~" + TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = new File(System.getProperty("user.home") + TERASOLOGY_HIDDEN_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_MACOSX:
                 homePath = new File(System.getProperty("user.home") + "/Library/Application Support/" + TERASOLOGY_FOLDER_NAME);
