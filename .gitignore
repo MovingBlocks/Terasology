@@ -1,3 +1,16 @@
+# Ignore project stuff
+/*.iml
+/*.ipr
+/*.iws
+/.idea
+/.classpath
+/.project
+/.settings
+
+# Ignore output stuff
+*.log
+/.checkstyle
+/.gradle
 /SAVED_WORLDS
 /worlds
 /screenshots
@@ -6,30 +19,23 @@
 /out
 /target
 /build
-/dev
-.DS_Store
-/Terasology.iml
-/Terasology.ipr
-/Terasology.iws
-/.idea
-/.classpath
-/.project
-/.settings
-/.checkstyle
-/.gradle
-/bin
-/data/console/consolelog.json
+config.cfg
+entityDump.txt
+
+# Ignore natives (extracted to project root during setup)
+natives
+
+# Ignore linuxy stuff
+*.directory
+*~
+
+# Ignore project stuff, output, etc for mods
 /mods/*/classes
 /mods/*/testClasses
 /mods/*/build
 /mods/*/.*
-*~
-config.cfg
-entityDump.txt
 
-# Ignore error logs 
-*.log
-
-#Ignore linux directory files
-*.directory
-
+# ??? Maybe /bin is Eclipse output?
+/bin
+/dev
+.DS_Store

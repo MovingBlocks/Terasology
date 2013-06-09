@@ -20,6 +20,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
@@ -54,8 +56,13 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockFor(Side attachmentSide, Side direction) {
+    public Block getBlockForPlacing(WorldProvider worldProvider, Vector3i blockLocation, Side attachmentSide, Side direction) {
         return blocks.get(attachmentSide);
+    }
+
+    @Override
+    public Block getBlockAfterNeighborUpdate(WorldProvider worldProvider, Vector3i blockLocation, Block currentBlock) {
+        return currentBlock;
     }
 
     @Override

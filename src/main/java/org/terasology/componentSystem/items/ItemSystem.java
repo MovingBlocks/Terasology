@@ -16,8 +16,6 @@
 package org.terasology.componentSystem.items;
 
 import com.google.common.collect.Lists;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.components.ItemComponent;
@@ -39,7 +37,6 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.ConnectToAdjacentBlockFamily;
-import org.terasology.world.block.management.BlockManager;
 
 
 /**
@@ -121,7 +118,7 @@ public class ItemSystem implements EventHandlerSystem {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem, EntityRef item ) {
+    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem, EntityRef item) {
         if (type == null)
             return true;
 
@@ -130,13 +127,7 @@ public class ItemSystem implements EventHandlerSystem {
         if (!blockAtTarget.isReplacementAllowed())
             placementPos.add(surfaceDirection.getVector3i());
 
-        Block blockToPlace;
-
-        if( type instanceof ConnectToAdjacentBlockFamily){
-            blockToPlace = ( (ConnectToAdjacentBlockFamily) type ).getBlockFor(placementPos, worldProvider);
-        }else{
-            blockToPlace = type.getBlockFor(surfaceDirection, secondaryDirection);
-        }
+        Block blockToPlace = type.getBlockForPlacing(worldProvider, placementPos, surfaceDirection, secondaryDirection);
 
         if (blockToPlace == null)
             return false;
@@ -150,7 +141,7 @@ public class ItemSystem implements EventHandlerSystem {
                 }
 
                 item.saveComponent(new BlockComponent());
-                item.send( new BlockChangedEvent( placementPos, blockToPlace, blockAtPlacement) );
+                item.send(new BlockChangedEvent(placementPos, blockToPlace, blockAtPlacement));
                 return true;
             }
         }
