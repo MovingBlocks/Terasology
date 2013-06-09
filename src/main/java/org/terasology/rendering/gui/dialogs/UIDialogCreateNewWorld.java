@@ -161,11 +161,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         //getGUIManager().showMessage("reminder to reset variables");
                     }else if(chunkGenerator.getSelectionIndex() == 1){ //Perlin with Setup
                         MapSetupButton.setVisible(true);
-                    }else if(chunkGenerator.getSelectionIndex() == 1){ //Flat
+                    }else if(chunkGenerator.getSelectionIndex() == 2){ //Flat
                         MapSetupButton.setVisible(false);
-                    }else if(chunkGenerator.getSelectionIndex() == 2){ //multiworld
+                    }else if(chunkGenerator.getSelectionIndex() == 3){ //multiworld
                         MapSetupButton.setVisible(false);
-                    }else if(chunkGenerator.getSelectionIndex() == 3){ //heightmap
+                    }else if(chunkGenerator.getSelectionIndex() == 4){ //heightmap
                         MapSetupButton.setVisible(false);
                     }
                 }
