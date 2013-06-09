@@ -44,6 +44,8 @@ import org.terasology.world.generator.core.ForestGenerator;
 import org.terasology.world.generator.core.MultiTerrainGenerator;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
+import org.terasology.world.generator.core.PerlinTerrainGeneratorWithSetup;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -72,6 +74,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UILabel typeOfGameLabel;
 
     private ModConfig modConfig;
+    private UIButton MapSetupButton;
 
     public UIDialogCreateNewWorld() {
         super(new Vector2f(512f, 380f));
@@ -122,31 +125,51 @@ public class UIDialogCreateNewWorld extends UIDialog {
         typeOfGame.select(0);
         typeOfGame.setVisible(true);
 
-        chunkGeneratorLabel = new UILabel("Choose Chunk Generator:");
+        chunkGeneratorLabel = new UILabel("Choose Map Generator:");
         chunkGeneratorLabel.setColor(Color.darkGray);
         chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         chunkGeneratorLabel.setVisible(true);
 
         chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
-        item = new UIListItem("Perlin", new Integer(0));
+        item = new UIListItem("Perlin", 0);
         item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
         chunkGenerator.addItem(item);
-        item = new UIListItem("Flat", new Integer(1));
+        item = new UIListItem("Perlin with setup", 0);
         item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
         chunkGenerator.addItem(item);
-        item = new UIListItem("Multi", new Integer(2));
+        item = new UIListItem("Flat", 1);
+        item.setTextColor(Color.black);
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
+        chunkGenerator.addItem(item);
+        item = new UIListItem("Multi",2);
         item.setTextColor(Color.cyan);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
         chunkGenerator.addItem(item);
-        item = new UIListItem("Heigthmap Generator", new Integer(3));
+        item = new UIListItem("Heigthmap Generator", 3);
         item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
         chunkGenerator.addItem(item);
         chunkGenerator.select(0);
         chunkGenerator.setVisible(true);
-
+        chunkGenerator.addSelectionListener(new SelectionListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                    if(chunkGenerator.getSelectionIndex() == 0){  //Perlin
+                        MapSetupButton.setVisible(false);
+                        //getGUIManager().showMessage("reminder to reset variables");
+                    }else if(chunkGenerator.getSelectionIndex() == 1){ //Perlin with Setup
+                        MapSetupButton.setVisible(true);
+                    }else if(chunkGenerator.getSelectionIndex() == 1){ //Flat
+                        MapSetupButton.setVisible(false);
+                    }else if(chunkGenerator.getSelectionIndex() == 2){ //multiworld
+                        MapSetupButton.setVisible(false);
+                    }else if(chunkGenerator.getSelectionIndex() == 3){ //heightmap
+                        MapSetupButton.setVisible(false);
+                    }
+                }
+            });
 
         inputWorldTitleLabel.setPosition(new Vector2f(15f, 32f));
         inputWorldTitle.setPosition(new Vector2f(inputWorldTitleLabel.getPosition().x, inputWorldTitleLabel.getPosition().y + inputWorldTitleLabel.getSize().y + 8f));
@@ -159,8 +182,26 @@ public class UIDialogCreateNewWorld extends UIDialog {
         chunkGeneratorLabel.setPosition(new Vector2f(typeOfGame.getPosition().x, typeOfGame.getPosition().y + typeOfGame.getSize().y + 16f));
         chunkGenerator.setPosition(new Vector2f(chunkGeneratorLabel.getPosition().x, chunkGeneratorLabel.getPosition().y + chunkGeneratorLabel.getSize().y + 8f));
 
+            MapSetupButton = new UIButton(new Vector2f(90, 30), UIButton.ButtonType.NORMAL);
+            MapSetupButton.setPosition(new Vector2f(chunkGeneratorLabel.getPosition().x + 200f, chunkGeneratorLabel.getPosition().y - 0f + chunkGeneratorLabel.getSize().y));
+            MapSetupButton.setVisible(false);
+            MapSetupButton.getLabel().setText("Setup...");
+            MapSetupButton.addClickListener(new ClickListener() {
+                @Override
+                public void click(UIDisplayElement element, int button) {
+                    if(chunkGenerator.getSelectionIndex() == 0){  //Perlin
+                    }else if(chunkGenerator.getSelectionIndex() == 1){ //Perlin with Setup
+                        UIDialogSetUpMap dialog = new UIDialogSetUpMap();
+                        dialog.open();
+                    }else if(chunkGenerator.getSelectionIndex() == 1){ //Flat
+                    }else if(chunkGenerator.getSelectionIndex() == 2){ //multiworld
+                    }else if(chunkGenerator.getSelectionIndex() == 3){ //heightmap
+                    }
+                }
+            }
+            );
 
-        UIButton modButton = new UIButton(new Vector2f(80, 30), UIButton.ButtonType.NORMAL);
+        UIButton modButton = new UIButton(new Vector2f(90, 30), UIButton.ButtonType.NORMAL);
         modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 58f));
         modButton.setVisible(true);
         modButton.getLabel().setText("Mods...");
@@ -180,6 +221,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         parent.addDisplayElement(typeOfGame);
         parent.addDisplayElement(typeOfGameLabel);
         parent.addDisplayElement(modButton);
+        parent.addDisplayElement(MapSetupButton);
         parent.layout();
     }
 
@@ -224,7 +266,13 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
                 List<String> chunkList = new ArrayList<String>();
                 switch (chunkGenerator.getSelectionIndex()) {
-                    case 1:   //flat
+                    case 1:   //Perlin with Setup
+                        chunkList.add(PerlinTerrainGeneratorWithSetup.class.getName());
+                        chunkList.add(FloraGenerator.class.getName());
+                        chunkList.add(LiquidsGenerator.class.getName());
+                        chunkList.add(ForestGenerator.class.getName());
+                         break;
+                    case 2:   //flat
                         chunkList.add(FlatTerrainGenerator.class.getName());
                         //if (checkboxFlora == selected) ... (pseudo code)
                         chunkList.add(FloraGenerator.class.getName());
@@ -232,13 +280,13 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         chunkList.add(ForestGenerator.class.getName());
                         break;
 
-                    case 2:   //multiworld
+                    case 3:   //multiworld
                         chunkList.add(MultiTerrainGenerator.class.getName());
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
                         chunkList.add(ForestGenerator.class.getName());
                         break;
-                    case 3:   //Nym
+                    case 4:   //Nym
                         chunkList.add(BasicHMTerrainGenerator.class.getName());
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
