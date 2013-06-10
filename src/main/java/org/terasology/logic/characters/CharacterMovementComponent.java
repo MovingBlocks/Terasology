@@ -18,6 +18,8 @@ package org.terasology.logic.characters;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
+import org.terasology.network.FieldReplicateType;
+import org.terasology.network.Replicate;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
 
@@ -36,18 +38,26 @@ public final class CharacterMovementComponent implements Component {
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR);
 
     // Speed settings
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float maxGroundSpeed = 5.0f;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float maxWaterSpeed = 2.0f;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float maxGhostSpeed = 5.0f;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float runFactor = 1.5f;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float jumpSpeed = 10.0f;
 
     // Movement settings
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float stepHeight = 0.35f;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float slopeFactor = 0.6f; // Cosine of the maximum slope traversable. 1 is no slope, 0 is any slope
 
     // Determines how easily the play can change direction
     // TODO: Separate player agiliy from environmental friction, and ground from air control
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float groundFriction = 8.0f;
     public float distanceBetweenFootsteps = 1f;
     public boolean faceMovementDirection = false;

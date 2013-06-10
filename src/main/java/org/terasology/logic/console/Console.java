@@ -16,6 +16,7 @@
 
 package org.terasology.logic.console;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
@@ -50,6 +51,7 @@ import static org.reflections.ReflectionUtils.withModifier;
 public class Console {
     private static final Logger logger = LoggerFactory.getLogger(Console.class);
     public static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
+    private static final Joiner PARAMETER_JOINER = Joiner.on(", ");
     private static final int MAX_MESSAGE_HISTORY = 255;
 
     private final List<CommandInfo> commands = Lists.newArrayList();
@@ -68,6 +70,7 @@ public class Console {
 
     /**
      * Registers an object as a command provider - all methods annotated with @Command will be made available on the console.
+     *
      * @param provider
      */
     public void registerCommandProvider(Object provider) {
@@ -85,6 +88,7 @@ public class Console {
 
     /**
      * Adds a message to the console (as a CoreMessageType.CONSOLE message)
+     *
      * @param message
      */
     public void addMessage(String message) {
@@ -93,6 +97,7 @@ public class Console {
 
     /**
      * Adds a message to the console
+     *
      * @param message
      * @param type
      */
@@ -102,6 +107,7 @@ public class Console {
 
     /**
      * Adds a message to the console
+     *
      * @param message
      */
     public void addMessage(Message message) {
@@ -121,6 +127,7 @@ public class Console {
 
     /**
      * Subscribe for notification of all messages added to the console
+     *
      * @param subscriber
      */
     public void subscribe(ConsoleSubscriber subscriber) {
@@ -129,12 +136,12 @@ public class Console {
 
     /**
      * Unsubscribe from receiving notification of messages being added to the console
+     *
      * @param subscriber
      */
     public void unsubscribe(ConsoleSubscriber subscriber) {
         this.messageSubscribers.remove(subscriber);
     }
-
 
 
     /**
@@ -162,24 +169,12 @@ public class Console {
         str = str.substring(commandEndIndex).trim();
 
         //get the parameters
-        String[] params = str.split(PARAM_SPLIT_REGEX);
-        String paramsStr = "";
-        int paramsCount = 0;
+        List<String> params = splitParameters(str);
 
-        for (String s : params) {
-            if (s.trim().isEmpty()) {
-                continue;
-            }
-
-            if (!paramsStr.isEmpty()) {
-                paramsStr += ",";
-            }
-            paramsStr += s;
-            paramsCount++;
-        }
+        String paramsStr = PARAMETER_JOINER.join(params);
 
         //get the command
-        CommandInfo cmd = commandLookup.get(commandName, paramsCount);
+        CommandInfo cmd = commandLookup.get(commandName, params.size());
 
         //check if the command is loaded
         if (cmd == null) {
@@ -219,6 +214,18 @@ public class Console {
                 return false;
             }
         }
+    }
+
+    public List<String> splitParameters(String paramStr) {
+        String[] rawParams = paramStr.split(PARAM_SPLIT_REGEX);
+        List<String> params = Lists.newArrayList();
+        for (String s : rawParams) {
+            if (s.trim().isEmpty()) {
+                continue;
+            }
+            params.add(s);
+        }
+        return params;
     }
 
     /**

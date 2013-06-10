@@ -40,16 +40,7 @@ public class ChatSystem implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
 
     @In
-    private NetworkSystem networkSystem;
-
-    @In
     private EntityManager entityManager;
-
-    @In
-    private Console console;
-
-    @In
-    private LocalPlayer localPlayer;
 
     @Override
     public void initialise() {
@@ -59,19 +50,11 @@ public class ChatSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @Command(shortDescription = "Sends a message to all other players")
-    public void say(@CommandParam("message") String message) {
-        localPlayer.getClientEntity().send(new SendChatMessage(message));
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onReceiveMessage(SendChatMessage event, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority()) {
-            logger.debug("Received message from {} : '{}'", entity, event.getMessage());
-            for (EntityRef client : entityManager.listEntitiesWith(ClientComponent.class)) {
-                client.send(new ChatMessageEvent(event.getMessage(), entity.getComponent(ClientComponent.class).clientInfo));
-            }
+    @Command(shortDescription = "Sends a message to all other players", runOnServer = true)
+    public void say(@CommandParam("message") String message, EntityRef speaker) {
+        logger.debug("Received chat message from {} : '{}'", speaker, message);
+        for (EntityRef client : entityManager.listEntitiesWith(ClientComponent.class)) {
+            client.send(new ChatMessageEvent(message, speaker.getComponent(ClientComponent.class).clientInfo));
         }
-
     }
 }

@@ -140,17 +140,23 @@ public final class FieldMetadata {
     private Method findGetter(Field field) {
         Method result = findMethod(field.getDeclaringClass(), "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
         if (result != null && field.getType().equals(result.getReturnType())) {
+            result.setAccessible(true);
             return result;
         }
         result = findMethod(field.getDeclaringClass(), "is" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
         if (result != null && field.getType().equals(result.getReturnType())) {
+            result.setAccessible(true);
             return result;
         }
         return null;
     }
 
     private Method findSetter(Field field) {
-        return findMethod(field.getDeclaringClass(), "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
+        Method result = findMethod(field.getDeclaringClass(), "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
+        if (result != null) {
+            result.setAccessible(true);
+        }
+        return result;
     }
 
     private Method findMethod(Class type, String methodName, Class<?>... parameters) {

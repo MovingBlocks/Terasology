@@ -22,6 +22,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
+import org.terasology.network.ClientComponent;
 import org.terasology.world.block.entity.BlockCommands;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
@@ -44,9 +45,6 @@ public class ItemCommands implements ComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @In
-    private LocalPlayer localPlayer;
-
     @Override
     public void initialise() {
     }
@@ -55,18 +53,18 @@ public class ItemCommands implements ComponentSystem {
     public void shutdown() {
     }
 
-    @Command(shortDescription = "Adds an item to your inventory")
-    public String giveItem(@CommandParam("prefabId or blockName") String itemPrefabName) {
+    @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
+    public String giveItem(@CommandParam("prefabId or blockName") String itemPrefabName, EntityRef client) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);
-            EntityRef playerEntity = localPlayer.getCharacterEntity();
+            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
             if (!inventoryManager.giveItem(playerEntity, item)) {
                 item.destroy();
             }
             return "You received an item of " + prefab.getName();
         } else {
-            return blockCommands.giveBlock(itemPrefabName);
+            return blockCommands.giveBlock(itemPrefabName, client);
         }
     }
 

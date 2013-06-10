@@ -35,6 +35,7 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.ClientComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.StringConstants;
@@ -86,6 +87,7 @@ public class BlockCommands implements ComponentSystem {
     public void shutdown() {
     }
 
+    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera)
     @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in " +
             "front of the player. The block is set directly into the world and might override existing blocks. After " +
             "placement the block can be destroyed like any regular placed block.")
@@ -214,22 +216,22 @@ public class BlockCommands implements ComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
-    public String giveBlock(@CommandParam("blockName") String uri) {
-        return giveBlock(uri, 16);
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory", runOnServer = true)
+    public String giveBlock(@CommandParam("blockName") String uri, EntityRef client) {
+        return giveBlock(uri, 16, client);
     }
 
-    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
-    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri) {
-        return giveBlock(uri, shapeUri, 16);
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory", runOnServer = true)
+    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, EntityRef client) {
+        return giveBlock(uri, shapeUri, 16, client);
     }
 
-    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
-    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("quantity") int quantity) {
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory", runOnServer = true)
+    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("quantity") int quantity, EntityRef client) {
         List<BlockUri> matchingUris = blockManager.resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
-            return giveBlock(blockFamily, quantity);
+            return giveBlock(blockFamily, quantity, client);
         } else if (matchingUris.isEmpty()) {
             return "No block found for '" + uri + "'";
         } else {
@@ -240,8 +242,8 @@ public class BlockCommands implements ComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
-    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity) {
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory", runOnServer = true)
+    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity, EntityRef client) {
         List<BlockUri> resolvedBlockUris = blockManager.resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             return "No block found for '" + uri + "'";
@@ -270,7 +272,7 @@ public class BlockCommands implements ComponentSystem {
 
         BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).getSimpleString());
         if (blockUri.isValid()) {
-            return giveBlock(blockManager.getBlockFamily(blockUri), quantity);
+            return giveBlock(blockManager.getBlockFamily(blockUri), quantity, client);
         }
 
         return "Invalid block or shape";
@@ -282,7 +284,7 @@ public class BlockCommands implements ComponentSystem {
      * @param blockFamily the block family of the queried block
      * @param quantity    the number of blocks that are queried
      */
-    private String giveBlock(BlockFamily blockFamily, int quantity) {
+    private String giveBlock(BlockFamily blockFamily, int quantity, EntityRef client) {
         if (quantity < 1) {
             return "Here, have these zero (0) items just like you wanted";
         }
@@ -291,7 +293,7 @@ public class BlockCommands implements ComponentSystem {
         if (!item.exists()) {
             return "Unknown block or item";
         }
-        EntityRef playerEntity = localPlayer.getCharacterEntity();
+        EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
         if (!inventoryManager.giveItem(playerEntity, item)) {
             item.destroy();
         }
