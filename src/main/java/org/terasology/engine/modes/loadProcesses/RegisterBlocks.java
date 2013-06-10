@@ -48,7 +48,7 @@ public class RegisterBlocks implements LoadProcess {
             blockManager = new BlockManagerAuthority(worldInfo.getBlockIdMap());
             blockManager.subscribe(CoreRegistry.get(NetworkSystem.class));
         } else {
-            blockManager = new BlockManagerClient(worldInfo.getBlockIdMap());
+            blockManager = new BlockManagerClient(networkSystem.getServer().getInfo().getRegisterBlockFamilyList(), worldInfo.getBlockIdMap());
         }
         blockManager.buildAtlas();
         CoreRegistry.put(BlockManager.class, blockManager);

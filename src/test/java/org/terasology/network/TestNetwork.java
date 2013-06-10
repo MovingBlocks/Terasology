@@ -16,45 +16,78 @@
 
 package org.terasology.network;
 
+import com.google.common.collect.Lists;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Timer;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.internal.NetworkSystemImpl;
 
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 /**
  * @author Immortius
  */
-public class TestNetwork {
+public class TestNetwork extends TerasologyTestingEnvironment {
 
-    @Before
-    public void setup() {
-        CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+    private List<NetworkSystem> netSystems = Lists.newArrayList();
+
+    @After
+    public void cleanUp() {
+        for (NetworkSystem sys : netSystems) {
+            sys.shutdown();
+        }
+
     }
 
     @Test
     public void testNetwork() throws Exception {
-        EngineEntityManager entityManager = new EntitySystemBuilder().build(new ModManager());
+        EngineEntityManager entityManager = getEntityManager();
         Timer timer = mock(Timer.class);
         NetworkSystem server = new NetworkSystemImpl(timer);
+        netSystems.add(server);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
         server.host(7777);
 
         Thread.sleep(500);
 
         NetworkSystem client = new NetworkSystemImpl(timer);
+        netSystems.add(client);
         client.join("localhost", 7777);
 
         Thread.sleep(500);
 
         server.shutdown();
         client.shutdown();
+    }
+
+
+    @Test
+    public void entityNetworkIdChangedOnServerStart() throws HostingFailedException {
+        EngineEntityManager entityManager = getEntityManager();
+        NetworkComponent netComp = new NetworkComponent();
+        netComp.setNetworkId(122);
+        EntityRef entity = entityManager.create(netComp);
+        Timer timer = mock(Timer.class);
+        NetworkSystem server = new NetworkSystemImpl(timer);
+        netSystems.add(server);
+        server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
+        server.host(7777);
+
+        assertFalse(122 == entity.getComponent(NetworkComponent.class).getNetworkId());
+        server.shutdown();
     }
 }

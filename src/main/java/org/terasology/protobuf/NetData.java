@@ -11204,39 +11204,59 @@ public final class NetData {
     org.terasology.protobuf.NetData.SerializationInfoOrBuilder getEventOrBuilder(
         int index);
 
-    // repeated int32 assetIds = 6 [packed = true];
+    // repeated int32 assetId = 6 [packed = true];
     /**
-     * <code>repeated int32 assetIds = 6 [packed = true];</code>
+     * <code>repeated int32 assetId = 6 [packed = true];</code>
      */
-    java.util.List<java.lang.Integer> getAssetIdsList();
+    java.util.List<java.lang.Integer> getAssetIdList();
     /**
-     * <code>repeated int32 assetIds = 6 [packed = true];</code>
+     * <code>repeated int32 assetId = 6 [packed = true];</code>
      */
-    int getAssetIdsCount();
+    int getAssetIdCount();
     /**
-     * <code>repeated int32 assetIds = 6 [packed = true];</code>
+     * <code>repeated int32 assetId = 6 [packed = true];</code>
      */
-    int getAssetIds(int index);
+    int getAssetId(int index);
 
-    // repeated string assetUris = 7;
+    // repeated string assetUri = 7;
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
     java.util.List<java.lang.String>
-    getAssetUrisList();
+    getAssetUriList();
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
-    int getAssetUrisCount();
+    int getAssetUriCount();
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
-    java.lang.String getAssetUris(int index);
+    java.lang.String getAssetUri(int index);
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
     com.google.protobuf.ByteString
-        getAssetUrisBytes(int index);
+        getAssetUriBytes(int index);
+
+    // repeated string registerBlockFamily = 8;
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    java.util.List<java.lang.String>
+    getRegisterBlockFamilyList();
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    int getRegisterBlockFamilyCount();
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    java.lang.String getRegisterBlockFamily(int index);
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    com.google.protobuf.ByteString
+        getRegisterBlockFamilyBytes(int index);
 
     // optional string version = 15;
     /**
@@ -11394,31 +11414,39 @@ public final class NetData {
             }
             case 48: {
               if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
-                assetIds_ = new java.util.ArrayList<java.lang.Integer>();
+                assetId_ = new java.util.ArrayList<java.lang.Integer>();
                 mutable_bitField0_ |= 0x00000020;
               }
-              assetIds_.add(input.readInt32());
+              assetId_.add(input.readInt32());
               break;
             }
             case 50: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000020) == 0x00000020) && input.getBytesUntilLimit() > 0) {
-                assetIds_ = new java.util.ArrayList<java.lang.Integer>();
+                assetId_ = new java.util.ArrayList<java.lang.Integer>();
                 mutable_bitField0_ |= 0x00000020;
               }
               while (input.getBytesUntilLimit() > 0) {
-                assetIds_.add(input.readInt32());
+                assetId_.add(input.readInt32());
               }
               input.popLimit(limit);
               break;
             }
             case 58: {
               if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
-                assetUris_ = new com.google.protobuf.LazyStringArrayList();
+                assetUri_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000040;
               }
-              assetUris_.add(input.readBytes());
+              assetUri_.add(input.readBytes());
+              break;
+            }
+            case 66: {
+              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+                registerBlockFamily_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000080;
+              }
+              registerBlockFamily_.add(input.readBytes());
               break;
             }
             case 122: {
@@ -11465,10 +11493,13 @@ public final class NetData {
           event_ = java.util.Collections.unmodifiableList(event_);
         }
         if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
-          assetIds_ = java.util.Collections.unmodifiableList(assetIds_);
+          assetId_ = java.util.Collections.unmodifiableList(assetId_);
         }
         if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
-          assetUris_ = new com.google.protobuf.UnmodifiableLazyStringList(assetUris_);
+          assetUri_ = new com.google.protobuf.UnmodifiableLazyStringList(assetUri_);
+        }
+        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+          registerBlockFamily_ = new com.google.protobuf.UnmodifiableLazyStringList(registerBlockFamily_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -11664,58 +11695,88 @@ public final class NetData {
       return event_.get(index);
     }
 
-    // repeated int32 assetIds = 6 [packed = true];
-    public static final int ASSETIDS_FIELD_NUMBER = 6;
-    private java.util.List<java.lang.Integer> assetIds_;
+    // repeated int32 assetId = 6 [packed = true];
+    public static final int ASSETID_FIELD_NUMBER = 6;
+    private java.util.List<java.lang.Integer> assetId_;
     /**
-     * <code>repeated int32 assetIds = 6 [packed = true];</code>
+     * <code>repeated int32 assetId = 6 [packed = true];</code>
      */
     public java.util.List<java.lang.Integer>
-        getAssetIdsList() {
-      return assetIds_;
+        getAssetIdList() {
+      return assetId_;
     }
     /**
-     * <code>repeated int32 assetIds = 6 [packed = true];</code>
+     * <code>repeated int32 assetId = 6 [packed = true];</code>
      */
-    public int getAssetIdsCount() {
-      return assetIds_.size();
+    public int getAssetIdCount() {
+      return assetId_.size();
     }
     /**
-     * <code>repeated int32 assetIds = 6 [packed = true];</code>
+     * <code>repeated int32 assetId = 6 [packed = true];</code>
      */
-    public int getAssetIds(int index) {
-      return assetIds_.get(index);
+    public int getAssetId(int index) {
+      return assetId_.get(index);
     }
-    private int assetIdsMemoizedSerializedSize = -1;
+    private int assetIdMemoizedSerializedSize = -1;
 
-    // repeated string assetUris = 7;
-    public static final int ASSETURIS_FIELD_NUMBER = 7;
-    private com.google.protobuf.LazyStringList assetUris_;
+    // repeated string assetUri = 7;
+    public static final int ASSETURI_FIELD_NUMBER = 7;
+    private com.google.protobuf.LazyStringList assetUri_;
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
     public java.util.List<java.lang.String>
-        getAssetUrisList() {
-      return assetUris_;
+        getAssetUriList() {
+      return assetUri_;
     }
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
-    public int getAssetUrisCount() {
-      return assetUris_.size();
+    public int getAssetUriCount() {
+      return assetUri_.size();
     }
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
-    public java.lang.String getAssetUris(int index) {
-      return assetUris_.get(index);
+    public java.lang.String getAssetUri(int index) {
+      return assetUri_.get(index);
     }
     /**
-     * <code>repeated string assetUris = 7;</code>
+     * <code>repeated string assetUri = 7;</code>
      */
     public com.google.protobuf.ByteString
-        getAssetUrisBytes(int index) {
-      return assetUris_.getByteString(index);
+        getAssetUriBytes(int index) {
+      return assetUri_.getByteString(index);
+    }
+
+    // repeated string registerBlockFamily = 8;
+    public static final int REGISTERBLOCKFAMILY_FIELD_NUMBER = 8;
+    private com.google.protobuf.LazyStringList registerBlockFamily_;
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    public java.util.List<java.lang.String>
+        getRegisterBlockFamilyList() {
+      return registerBlockFamily_;
+    }
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    public int getRegisterBlockFamilyCount() {
+      return registerBlockFamily_.size();
+    }
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    public java.lang.String getRegisterBlockFamily(int index) {
+      return registerBlockFamily_.get(index);
+    }
+    /**
+     * <code>repeated string registerBlockFamily = 8;</code>
+     */
+    public com.google.protobuf.ByteString
+        getRegisterBlockFamilyBytes(int index) {
+      return registerBlockFamily_.getByteString(index);
     }
 
     // optional string version = 15;
@@ -11842,8 +11903,9 @@ public final class NetData {
       blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       component_ = java.util.Collections.emptyList();
       event_ = java.util.Collections.emptyList();
-      assetIds_ = java.util.Collections.emptyList();
-      assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      assetId_ = java.util.Collections.emptyList();
+      assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       version_ = "";
       worldName_ = "";
       clientId_ = 0;
@@ -11905,15 +11967,18 @@ public final class NetData {
       for (int i = 0; i < event_.size(); i++) {
         output.writeMessage(5, event_.get(i));
       }
-      if (getAssetIdsList().size() > 0) {
+      if (getAssetIdList().size() > 0) {
         output.writeRawVarint32(50);
-        output.writeRawVarint32(assetIdsMemoizedSerializedSize);
+        output.writeRawVarint32(assetIdMemoizedSerializedSize);
       }
-      for (int i = 0; i < assetIds_.size(); i++) {
-        output.writeInt32NoTag(assetIds_.get(i));
+      for (int i = 0; i < assetId_.size(); i++) {
+        output.writeInt32NoTag(assetId_.get(i));
       }
-      for (int i = 0; i < assetUris_.size(); i++) {
-        output.writeBytes(7, assetUris_.getByteString(i));
+      for (int i = 0; i < assetUri_.size(); i++) {
+        output.writeBytes(7, assetUri_.getByteString(i));
+      }
+      for (int i = 0; i < registerBlockFamily_.size(); i++) {
+        output.writeBytes(8, registerBlockFamily_.getByteString(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(15, getVersionBytes());
@@ -11974,26 +12039,35 @@ public final class NetData {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < assetIds_.size(); i++) {
+        for (int i = 0; i < assetId_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(assetIds_.get(i));
+            .computeInt32SizeNoTag(assetId_.get(i));
         }
         size += dataSize;
-        if (!getAssetIdsList().isEmpty()) {
+        if (!getAssetIdList().isEmpty()) {
           size += 1;
           size += com.google.protobuf.CodedOutputStream
               .computeInt32SizeNoTag(dataSize);
         }
-        assetIdsMemoizedSerializedSize = dataSize;
+        assetIdMemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < assetUris_.size(); i++) {
+        for (int i = 0; i < assetUri_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(assetUris_.getByteString(i));
+            .computeBytesSizeNoTag(assetUri_.getByteString(i));
         }
         size += dataSize;
-        size += 1 * getAssetUrisList().size();
+        size += 1 * getAssetUriList().size();
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < registerBlockFamily_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(registerBlockFamily_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getRegisterBlockFamilyList().size();
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -12153,18 +12227,20 @@ public final class NetData {
         } else {
           eventBuilder_.clear();
         }
-        assetIds_ = java.util.Collections.emptyList();
+        assetId_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000020);
-        assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000040);
-        version_ = "";
+        registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000080);
-        worldName_ = "";
+        version_ = "";
         bitField0_ = (bitField0_ & ~0x00000100);
-        clientId_ = 0;
+        worldName_ = "";
         bitField0_ = (bitField0_ & ~0x00000200);
-        time_ = 0L;
+        clientId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000400);
+        time_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -12232,29 +12308,35 @@ public final class NetData {
           result.event_ = eventBuilder_.build();
         }
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
-          assetIds_ = java.util.Collections.unmodifiableList(assetIds_);
+          assetId_ = java.util.Collections.unmodifiableList(assetId_);
           bitField0_ = (bitField0_ & ~0x00000020);
         }
-        result.assetIds_ = assetIds_;
+        result.assetId_ = assetId_;
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
-          assetUris_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              assetUris_);
+          assetUri_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              assetUri_);
           bitField0_ = (bitField0_ & ~0x00000040);
         }
-        result.assetUris_ = assetUris_;
-        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+        result.assetUri_ = assetUri_;
+        if (((bitField0_ & 0x00000080) == 0x00000080)) {
+          registerBlockFamily_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              registerBlockFamily_);
+          bitField0_ = (bitField0_ & ~0x00000080);
+        }
+        result.registerBlockFamily_ = registerBlockFamily_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000001;
         }
         result.version_ = version_;
-        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000002;
         }
         result.worldName_ = worldName_;
-        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000004;
         }
         result.clientId_ = clientId_;
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000008;
         }
         result.time_ = time_;
@@ -12372,33 +12454,43 @@ public final class NetData {
             }
           }
         }
-        if (!other.assetIds_.isEmpty()) {
-          if (assetIds_.isEmpty()) {
-            assetIds_ = other.assetIds_;
+        if (!other.assetId_.isEmpty()) {
+          if (assetId_.isEmpty()) {
+            assetId_ = other.assetId_;
             bitField0_ = (bitField0_ & ~0x00000020);
           } else {
-            ensureAssetIdsIsMutable();
-            assetIds_.addAll(other.assetIds_);
+            ensureAssetIdIsMutable();
+            assetId_.addAll(other.assetId_);
           }
           onChanged();
         }
-        if (!other.assetUris_.isEmpty()) {
-          if (assetUris_.isEmpty()) {
-            assetUris_ = other.assetUris_;
+        if (!other.assetUri_.isEmpty()) {
+          if (assetUri_.isEmpty()) {
+            assetUri_ = other.assetUri_;
             bitField0_ = (bitField0_ & ~0x00000040);
           } else {
-            ensureAssetUrisIsMutable();
-            assetUris_.addAll(other.assetUris_);
+            ensureAssetUriIsMutable();
+            assetUri_.addAll(other.assetUri_);
+          }
+          onChanged();
+        }
+        if (!other.registerBlockFamily_.isEmpty()) {
+          if (registerBlockFamily_.isEmpty()) {
+            registerBlockFamily_ = other.registerBlockFamily_;
+            bitField0_ = (bitField0_ & ~0x00000080);
+          } else {
+            ensureRegisterBlockFamilyIsMutable();
+            registerBlockFamily_.addAll(other.registerBlockFamily_);
           }
           onChanged();
         }
         if (other.hasVersion()) {
-          bitField0_ |= 0x00000080;
+          bitField0_ |= 0x00000100;
           version_ = other.version_;
           onChanged();
         }
         if (other.hasWorldName()) {
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000200;
           worldName_ = other.worldName_;
           onChanged();
         }
@@ -13337,161 +13429,254 @@ public final class NetData {
         return eventBuilder_;
       }
 
-      // repeated int32 assetIds = 6 [packed = true];
-      private java.util.List<java.lang.Integer> assetIds_ = java.util.Collections.emptyList();
-      private void ensureAssetIdsIsMutable() {
+      // repeated int32 assetId = 6 [packed = true];
+      private java.util.List<java.lang.Integer> assetId_ = java.util.Collections.emptyList();
+      private void ensureAssetIdIsMutable() {
         if (!((bitField0_ & 0x00000020) == 0x00000020)) {
-          assetIds_ = new java.util.ArrayList<java.lang.Integer>(assetIds_);
+          assetId_ = new java.util.ArrayList<java.lang.Integer>(assetId_);
           bitField0_ |= 0x00000020;
          }
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
       public java.util.List<java.lang.Integer>
-          getAssetIdsList() {
-        return java.util.Collections.unmodifiableList(assetIds_);
+          getAssetIdList() {
+        return java.util.Collections.unmodifiableList(assetId_);
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
-      public int getAssetIdsCount() {
-        return assetIds_.size();
+      public int getAssetIdCount() {
+        return assetId_.size();
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
-      public int getAssetIds(int index) {
-        return assetIds_.get(index);
+      public int getAssetId(int index) {
+        return assetId_.get(index);
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
-      public Builder setAssetIds(
+      public Builder setAssetId(
           int index, int value) {
-        ensureAssetIdsIsMutable();
-        assetIds_.set(index, value);
+        ensureAssetIdIsMutable();
+        assetId_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
-      public Builder addAssetIds(int value) {
-        ensureAssetIdsIsMutable();
-        assetIds_.add(value);
+      public Builder addAssetId(int value) {
+        ensureAssetIdIsMutable();
+        assetId_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
-      public Builder addAllAssetIds(
+      public Builder addAllAssetId(
           java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureAssetIdsIsMutable();
-        super.addAll(values, assetIds_);
+        ensureAssetIdIsMutable();
+        super.addAll(values, assetId_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 assetIds = 6 [packed = true];</code>
+       * <code>repeated int32 assetId = 6 [packed = true];</code>
        */
-      public Builder clearAssetIds() {
-        assetIds_ = java.util.Collections.emptyList();
+      public Builder clearAssetId() {
+        assetId_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000020);
         onChanged();
         return this;
       }
 
-      // repeated string assetUris = 7;
-      private com.google.protobuf.LazyStringList assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureAssetUrisIsMutable() {
+      // repeated string assetUri = 7;
+      private com.google.protobuf.LazyStringList assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureAssetUriIsMutable() {
         if (!((bitField0_ & 0x00000040) == 0x00000040)) {
-          assetUris_ = new com.google.protobuf.LazyStringArrayList(assetUris_);
+          assetUri_ = new com.google.protobuf.LazyStringArrayList(assetUri_);
           bitField0_ |= 0x00000040;
          }
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
       public java.util.List<java.lang.String>
-          getAssetUrisList() {
-        return java.util.Collections.unmodifiableList(assetUris_);
+          getAssetUriList() {
+        return java.util.Collections.unmodifiableList(assetUri_);
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public int getAssetUrisCount() {
-        return assetUris_.size();
+      public int getAssetUriCount() {
+        return assetUri_.size();
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public java.lang.String getAssetUris(int index) {
-        return assetUris_.get(index);
+      public java.lang.String getAssetUri(int index) {
+        return assetUri_.get(index);
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
       public com.google.protobuf.ByteString
-          getAssetUrisBytes(int index) {
-        return assetUris_.getByteString(index);
+          getAssetUriBytes(int index) {
+        return assetUri_.getByteString(index);
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public Builder setAssetUris(
+      public Builder setAssetUri(
           int index, java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureAssetUrisIsMutable();
-        assetUris_.set(index, value);
+  ensureAssetUriIsMutable();
+        assetUri_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public Builder addAssetUris(
+      public Builder addAssetUri(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureAssetUrisIsMutable();
-        assetUris_.add(value);
+  ensureAssetUriIsMutable();
+        assetUri_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public Builder addAllAssetUris(
+      public Builder addAllAssetUri(
           java.lang.Iterable<java.lang.String> values) {
-        ensureAssetUrisIsMutable();
-        super.addAll(values, assetUris_);
+        ensureAssetUriIsMutable();
+        super.addAll(values, assetUri_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public Builder clearAssetUris() {
-        assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      public Builder clearAssetUri() {
+        assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000040);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string assetUris = 7;</code>
+       * <code>repeated string assetUri = 7;</code>
        */
-      public Builder addAssetUrisBytes(
+      public Builder addAssetUriBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureAssetUrisIsMutable();
-        assetUris_.add(value);
+  ensureAssetUriIsMutable();
+        assetUri_.add(value);
+        onChanged();
+        return this;
+      }
+
+      // repeated string registerBlockFamily = 8;
+      private com.google.protobuf.LazyStringList registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureRegisterBlockFamilyIsMutable() {
+        if (!((bitField0_ & 0x00000080) == 0x00000080)) {
+          registerBlockFamily_ = new com.google.protobuf.LazyStringArrayList(registerBlockFamily_);
+          bitField0_ |= 0x00000080;
+         }
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public java.util.List<java.lang.String>
+          getRegisterBlockFamilyList() {
+        return java.util.Collections.unmodifiableList(registerBlockFamily_);
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public int getRegisterBlockFamilyCount() {
+        return registerBlockFamily_.size();
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public java.lang.String getRegisterBlockFamily(int index) {
+        return registerBlockFamily_.get(index);
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public com.google.protobuf.ByteString
+          getRegisterBlockFamilyBytes(int index) {
+        return registerBlockFamily_.getByteString(index);
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public Builder setRegisterBlockFamily(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRegisterBlockFamilyIsMutable();
+        registerBlockFamily_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public Builder addRegisterBlockFamily(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRegisterBlockFamilyIsMutable();
+        registerBlockFamily_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public Builder addAllRegisterBlockFamily(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureRegisterBlockFamilyIsMutable();
+        super.addAll(values, registerBlockFamily_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public Builder clearRegisterBlockFamily() {
+        registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string registerBlockFamily = 8;</code>
+       */
+      public Builder addRegisterBlockFamilyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRegisterBlockFamilyIsMutable();
+        registerBlockFamily_.add(value);
         onChanged();
         return this;
       }
@@ -13502,7 +13687,7 @@ public final class NetData {
        * <code>optional string version = 15;</code>
        */
       public boolean hasVersion() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional string version = 15;</code>
@@ -13542,7 +13727,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000080;
+  bitField0_ |= 0x00000100;
         version_ = value;
         onChanged();
         return this;
@@ -13551,7 +13736,7 @@ public final class NetData {
        * <code>optional string version = 15;</code>
        */
       public Builder clearVersion() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         version_ = getDefaultInstance().getVersion();
         onChanged();
         return this;
@@ -13564,7 +13749,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000080;
+  bitField0_ |= 0x00000100;
         version_ = value;
         onChanged();
         return this;
@@ -13576,7 +13761,7 @@ public final class NetData {
        * <code>optional string worldName = 16;</code>
        */
       public boolean hasWorldName() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional string worldName = 16;</code>
@@ -13616,7 +13801,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000100;
+  bitField0_ |= 0x00000200;
         worldName_ = value;
         onChanged();
         return this;
@@ -13625,7 +13810,7 @@ public final class NetData {
        * <code>optional string worldName = 16;</code>
        */
       public Builder clearWorldName() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         worldName_ = getDefaultInstance().getWorldName();
         onChanged();
         return this;
@@ -13638,7 +13823,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000100;
+  bitField0_ |= 0x00000200;
         worldName_ = value;
         onChanged();
         return this;
@@ -13650,7 +13835,7 @@ public final class NetData {
        * <code>optional int32 clientId = 17;</code>
        */
       public boolean hasClientId() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional int32 clientId = 17;</code>
@@ -13662,7 +13847,7 @@ public final class NetData {
        * <code>optional int32 clientId = 17;</code>
        */
       public Builder setClientId(int value) {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         clientId_ = value;
         onChanged();
         return this;
@@ -13671,7 +13856,7 @@ public final class NetData {
        * <code>optional int32 clientId = 17;</code>
        */
       public Builder clearClientId() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         clientId_ = 0;
         onChanged();
         return this;
@@ -13683,7 +13868,7 @@ public final class NetData {
        * <code>optional int64 time = 18;</code>
        */
       public boolean hasTime() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional int64 time = 18;</code>
@@ -13695,7 +13880,7 @@ public final class NetData {
        * <code>optional int64 time = 18;</code>
        */
       public Builder setTime(long value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         time_ = value;
         onChanged();
         return this;
@@ -13704,7 +13889,7 @@ public final class NetData {
        * <code>optional int64 time = 18;</code>
        */
       public Builder clearTime() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         time_ = 0L;
         onChanged();
         return this;
@@ -17744,27 +17929,28 @@ public final class NetData {
       "*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t" +
       "\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(\005\"[\n\024ClientConnectMes" +
       "sage\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\031\n\021v" +
-      "iewDistanceLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\232\002\n\021Se" +
+      "iewDistanceLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\265\002\n\021Se" +
       "rverInfoMessage\022\033\n\006module\030\001 \003(\0132\013.Module",
       "Info\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003" +
       " \003(\t\022%\n\tcomponent\030\004 \003(\0132\022.SerializationI" +
-      "nfo\022!\n\005event\030\005 \003(\0132\022.SerializationInfo\022\024" +
-      "\n\010assetIds\030\006 \003(\005B\002\020\001\022\021\n\tassetUris\030\007 \003(\t\022" +
-      "\017\n\007version\030\017 \001(\t\022\021\n\tworldName\030\020 \001(\t\022\020\n\010c" +
-      "lientId\030\021 \001(\005\022\014\n\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]" +
-      "\n\021SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030" +
-      "\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001" +
-      "(\014*\t\010\210\'\020\200\200\200\200\002\")\n\nModuleInfo\022\020\n\010moduleId\030" +
-      "\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022",
-      "\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010blockP" +
-      "os\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023Up" +
-      "dateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.Pack" +
-      "edEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023Re" +
-      "moveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200" +
-      "\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n" +
-      "\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockPos\030\003" +
-      " \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.te" +
-      "rasology.protobufB\007NetDataH\001"
+      "nfo\022!\n\005event\030\005 \003(\0132\022.SerializationInfo\022\023" +
+      "\n\007assetId\030\006 \003(\005B\002\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n" +
+      "\023registerBlockFamily\030\010 \003(\t\022\017\n\007version\030\017 " +
+      "\001(\t\022\021\n\tworldName\030\020 \001(\t\022\020\n\010clientId\030\021 \001(\005" +
+      "\022\014\n\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Serializati" +
+      "onInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfiel" +
+      "dName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002" +
+      "\")\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200",
+      "\200\200\002\"`\n\023CreateEntityMessage\022\035\n\006entity\030\001 \001" +
+      "(\0132\r.PackedEntity\022\037\n\010blockPos\030\002 \001(\0132\r.Ve" +
+      "ctor3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023UpdateEntityMes" +
+      "sage\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\r\n\005n" +
+      "etId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEntityMes" +
+      "sage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014EventM" +
+      "essage\022\020\n\010targetId\030\001 \001(\005\022\025\n\005event\030\002 \001(\0132" +
+      "\006.Event\022%\n\016targetBlockPos\030\003 \001(\0132\r.Vector" +
+      "3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.terasology.prot" +
+      "obufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -17848,7 +18034,7 @@ public final class NetData {
           internal_static_ServerInfoMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ServerInfoMessage_descriptor,
-              new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetIds", "AssetUris", "Version", "WorldName", "ClientId", "Time", });
+              new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "Version", "WorldName", "ClientId", "Time", });
           internal_static_SerializationInfo_descriptor =
             getDescriptor().getMessageTypes().get(13);
           internal_static_SerializationInfo_fieldAccessorTable = new

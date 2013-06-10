@@ -112,8 +112,6 @@ public class Server implements ChunkReadyListener {
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
         this.serverInfo = serverInfo;
         clientEntity = new NetEntityRef(serverInfo.getClientId(), networkSystem);
-
-
     }
 
     public EntityRef getEntity() {
@@ -329,13 +327,7 @@ public class Server implements ChunkReadyListener {
     }
 
     private void createEntityMessage(NetData.CreateEntityMessage message) {
-        EntityRef newEntity;
-        if (message.hasBlockPos()) {
-            newEntity = blockEntityRegistry.getOrCreateBlockEntityAt(NetMessageUtil.convert(message.getBlockPos()));
-            entitySerializer.deserializeOnto(newEntity, message.getEntity());
-        } else {
-            newEntity = entitySerializer.deserialize(message.getEntity());
-        }
+        EntityRef newEntity = entitySerializer.deserialize(message.getEntity());
         if (newEntity == null) {
             logger.error("Received entity is null");
         } else if (newEntity.getComponent(NetworkComponent.class) == null) {

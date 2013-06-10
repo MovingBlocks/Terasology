@@ -30,6 +30,7 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.NullAudioManager;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Terasology;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -60,6 +61,7 @@ public abstract class TerasologyTestingEnvironment {
     private static AudioManager audioManager;
     private static CollisionGroupManager collisionGroupManager;
     private static ModManager modManager;
+    private ComponentSystemManager componentSystemManager;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
@@ -101,6 +103,8 @@ public abstract class TerasologyTestingEnvironment {
     @Before
     public void setup() throws Exception {
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class));
+        componentSystemManager = new ComponentSystemManager();
+        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
         prefabLoadStep.begin();
         while (!prefabLoadStep.step()) ;

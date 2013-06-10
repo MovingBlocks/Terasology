@@ -17,13 +17,16 @@
 package org.terasology.entitySystem;
 
 /**
+ * Primarily for internal use, is informed of all component lifecycle events for all components.
  * @author Immortius
  */
 public interface EntityChangeSubscriber {
 
     void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component);
 
+    void onEntityComponentChange(EntityRef entity, Class<? extends Component> component);
+
     void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component);
 
-    void onEntityComponentChange(EntityRef entity, Class<? extends Component> component);
+
 }

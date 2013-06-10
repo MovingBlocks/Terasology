@@ -31,6 +31,7 @@ public final class BlockComponent implements Component {
     private Vector3i position = new Vector3i();
 
     // Does this block component exist only for excavation (and should be removed when back at full heath)
+    @Replicate
     public boolean temporary = false;
 
     public BlockComponent() {

@@ -31,6 +31,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.ai.HierarchicalAIComponent;
 import org.terasology.logic.ai.SimpleAIComponent;
@@ -91,6 +92,8 @@ public class EngineCommands implements ComponentSystem {
     @In
     private Console console;
 
+    @In
+    private CameraTargetSystem cameraTargetSystem;
 
     @Override
     public void initialise() {
@@ -98,6 +101,13 @@ public class EngineCommands implements ComponentSystem {
 
     @Override
     public void shutdown() {
+    }
+
+
+    @Command(shortDescription = "Displays debug information on the target entity")
+    public String debugTarget() {
+        EntityRef cameraTarget = cameraTargetSystem.getTarget();
+        return cameraTarget.toFullDescription();
     }
 
     //TODO  Add multiplayer commands, when ready for that

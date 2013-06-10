@@ -16,6 +16,7 @@
 
 package org.terasology.world.block.management;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.loader.FreeformFamily;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,10 +42,10 @@ public class BlockManagerClient extends BlockManager {
     private BlockLoader blockLoader;
 
     public BlockManagerClient() {
-        this(Maps.<String, Byte>newHashMap());
+        this(Lists.<String>newArrayList(), Maps.<String, Byte>newHashMap());
     }
 
-    public BlockManagerClient(Map<String, Byte> knownBlockMappings) {
+    public BlockManagerClient(List<String> registeredBlockFamilies, Map<String, Byte> knownBlockMappings) {
         blockLoader = new BlockLoader();
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
@@ -54,12 +56,11 @@ public class BlockManagerClient extends BlockManager {
             addFreeformBlockFamily(freeformFamily.uri, freeformFamily.categories);
         }
 
-        for (String uri : knownBlockMappings.keySet()) {
-            BlockUri blockUri = new BlockUri(uri);
-            BlockUri familyUri = blockUri.getRootFamilyUri();
+        for (String rawFamilyUri : registeredBlockFamilies) {
+            BlockUri familyUri = new BlockUri(rawFamilyUri);
             BlockFamily family;
             if (isFreeformFamily(familyUri)) {
-                family = blockLoader.loadWithShape(blockUri.getFamilyUri());
+                family = blockLoader.loadWithShape(familyUri);
             } else {
                 family = getAvailableBlockFamily(familyUri);
             }
@@ -75,8 +76,15 @@ public class BlockManagerClient extends BlockManager {
                 }
                 registerFamily(family);
             } else {
-                logger.error("Block not available: {}", uri);
+                logger.error("Family not available: {}", rawFamilyUri);
             }
+        }
+
+        for (String uri : knownBlockMappings.keySet()) {
+            BlockUri blockUri = new BlockUri(uri);
+            BlockUri familyUri = blockUri.getRootFamilyUri();
+
+
         }
     }
 

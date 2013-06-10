@@ -32,8 +32,8 @@ public class NetworkComponent implements Component {
 
     public enum ReplicateMode {
         ALWAYS, // Always replicate this entity to all clients
-        OWNER, // Always replicate this entity to its owner
-        RELEVANT; // Replicate to client which this entity is relevant to (based on distance)
+        RELEVANT, // Replicate to client which this entity is relevant to (based on distance)
+        OWNER; // Always replicate this entity to its owner
     }
 
     public ReplicateMode replicateMode = ReplicateMode.RELEVANT;

@@ -113,8 +113,9 @@ message ServerInfoMessage {
     repeated string blockName = 3;
     repeated SerializationInfo component = 4;
     repeated SerializationInfo event = 5;
-    repeated int32 assetIds = 6 [packed=true];
-    repeated string assetUris = 7;
+    repeated int32 assetId = 6 [packed=true];
+    repeated string assetUri = 7;
+    repeated string registerBlockFamily = 8;
 
     optional string version = 15;
     optional string worldName = 16;
