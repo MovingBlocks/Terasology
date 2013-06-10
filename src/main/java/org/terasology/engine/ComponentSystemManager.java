@@ -74,7 +74,7 @@ public class ComponentSystemManager {
             }
 
             RegisterSystem registerInfo = system.getAnnotation(RegisterSystem.class);
-            if (shouldRegister(registerInfo, netMode)) {
+            if (registerInfo.value().isValidFor(netMode)) {
                 String id = packageName + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
                 try {
@@ -96,17 +96,6 @@ public class ComponentSystemManager {
             }
         }
 
-    }
-
-    private boolean shouldRegister(RegisterSystem registerInfo, NetworkMode netMode) {
-        switch (registerInfo.value()) {
-            case AUTHORITY:
-                return netMode.isAuthority();
-            case CLIENT:
-                return netMode == NetworkMode.CLIENT;
-            default:
-                return true;
-        }
     }
 
     public <T extends ComponentSystem> void register(ComponentSystem object, String name) {

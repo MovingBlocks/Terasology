@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.event;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.RegisterMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,6 +38,8 @@ public @interface ReceiveEvent {
      * What components that the entity must have for this method to be invoked
      */
     Class<? extends Component>[] components();
+
+    RegisterMode netFilter() default RegisterMode.ALWAYS;
 
     int priority() default EventPriority.PRIORITY_NORMAL;
 }

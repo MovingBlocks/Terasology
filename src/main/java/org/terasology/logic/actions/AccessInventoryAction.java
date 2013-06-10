@@ -49,15 +49,13 @@ public class AccessInventoryAction implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = {AccessInventoryActionComponent.class})
+    @ReceiveEvent(components = {AccessInventoryActionComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority()) {
-            InventoryComponent inv = entity.getComponent(InventoryComponent.class);
-            if (inv != null) {
-                inv.accessors.add(event.getInstigator());
-                entity.saveComponent(inv);
-                event.getInstigator().send(new OpenInventoryEvent(entity));
-            }
+        InventoryComponent inv = entity.getComponent(InventoryComponent.class);
+        if (inv != null) {
+            inv.accessors.add(event.getInstigator());
+            entity.saveComponent(inv);
+            event.getInstigator().send(new OpenInventoryEvent(entity));
         }
     }
 

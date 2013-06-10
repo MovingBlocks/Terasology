@@ -41,6 +41,7 @@ import com.google.common.collect.Maps;
 import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
@@ -318,19 +319,17 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         }
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.CLIENT)
     public void resynch(PhysicsResynchEvent event, EntityRef entity) {
-        if (!networkSystem.getMode().isAuthority()) {
-            logger.debug("Received resynch event");
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            Vector3f delta = new Vector3f(event.getPosition());
-            delta.sub(loc.getWorldPosition());
-            pendingResynch.put(entity, new ResynchData(delta, new Quat4f()));
-            RigidBody body = entityRigidBodies.get(entity);
-            if (body != null) {
-                body.setLinearVelocity(event.getVelocity());
-                body.setAngularVelocity(event.getAngularVelocity());
-            }
+        logger.debug("Received resynch event");
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        Vector3f delta = new Vector3f(event.getPosition());
+        delta.sub(loc.getWorldPosition());
+        pendingResynch.put(entity, new ResynchData(delta, new Quat4f()));
+        RigidBody body = entityRigidBodies.get(entity);
+        if (body != null) {
+            body.setLinearVelocity(event.getVelocity());
+            body.setAngularVelocity(event.getAngularVelocity());
         }
     }
 

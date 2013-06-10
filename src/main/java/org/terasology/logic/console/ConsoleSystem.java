@@ -1,6 +1,7 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
@@ -85,15 +86,13 @@ public class ConsoleSystem implements ComponentSystem{
         }
     }
 
-    @ReceiveEvent(components = ClientComponent.class)
+    @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onCommand(CommandEvent event, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority()) {
-            List<String> params = console.splitParameters(event.getParams());
-            for (CommandInfo cmd : console.getCommand(event.getCommand())) {
-                if (cmd.getParameterCount() == params.size() && cmd.isRunOnServer()) {
-                    console.execute(event.getCommand() + " " + event.getParams(), entity);
-                    break;
-                }
+        List<String> params = console.splitParameters(event.getParams());
+        for (CommandInfo cmd : console.getCommand(event.getCommand())) {
+            if (cmd.getParameterCount() == params.size() && cmd.isRunOnServer()) {
+                console.execute(event.getCommand() + " " + event.getParams(), entity);
+                break;
             }
         }
     }

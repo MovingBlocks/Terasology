@@ -16,11 +16,25 @@
 
 package org.terasology.entitySystem;
 
+import org.terasology.network.NetworkMode;
+
 /**
  * @author Immortius
  */
 public enum RegisterMode {
-    ALWAYS,
-    AUTHORITY,
-    CLIENT
+    ALWAYS(true, true),
+    AUTHORITY(true, false),
+    CLIENT(false, true);
+
+    private boolean validWhenAuthority;
+    private boolean validWhenClient;
+
+    private RegisterMode(boolean validWhenAuthority, boolean validWhenClient) {
+        this.validWhenAuthority = validWhenAuthority;
+        this.validWhenClient = validWhenClient;
+    }
+
+    public boolean isValidFor(NetworkMode mode) {
+        return (mode.isAuthority()) ? validWhenAuthority : validWhenClient;
+    }
 }

@@ -140,9 +140,10 @@ public class EventSystemImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
-                if (!Modifier.isPublic(method.getModifiers())) {
-                    method.setAccessible(true);
+                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode())) {
+                    continue;
                 }
+                method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
 
                 if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1])) {

@@ -377,7 +377,7 @@ public class TerasologyEngine implements GameEngine {
             // Only process rendering and updating once a second
             if (!Display.isActive() && currentState.isHibernationAllowed()) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     logger.warn("Display inactivity sleep interrupted", e);
                 }

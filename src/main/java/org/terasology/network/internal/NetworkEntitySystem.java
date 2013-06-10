@@ -16,6 +16,7 @@
 
 package org.terasology.network.internal;
 
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
@@ -62,7 +63,7 @@ public class NetworkEntitySystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = NetworkComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = NetworkComponent.class, priority = EventPriority.PRIORITY_CRITICAL, netFilter = RegisterMode.AUTHORITY)
     public void onAddNetworkComponent(OnActivatedEvent event, EntityRef entity) {
         if (networkSystem.getMode() == NetworkMode.SERVER) {
             networkSystem.registerNetworkEntity(entity);
@@ -81,14 +82,12 @@ public class NetworkEntitySystem implements ComponentSystem {
         NetworkComponent networkComp = entity.getComponent(NetworkComponent.class);
     }
 
-    @ReceiveEvent(components = ClientComponent.class)
+    @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onChangeViewRequest(ChangeViewRangeRequest request, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority()) {
-            Client client = networkSystem.getOwner(entity);
-            if (client != null) {
-                client.setViewDistanceMode(request.getNewViewRange());
-                worldRenderer.getChunkProvider().updateRelevanceEntity(entity, client.getViewDistance() + ChunkConstants.FULL_GENERATION_DISTANCE);
-            }
+        Client client = networkSystem.getOwner(entity);
+        if (client != null) {
+            client.setViewDistanceMode(request.getNewViewRange());
+            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, client.getViewDistance() + ChunkConstants.FULL_GENERATION_DISTANCE);
         }
     }
 

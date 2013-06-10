@@ -293,33 +293,29 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
      * Event handling
      */
 
-    @ReceiveEvent(components = ClientComponent.class)
+    @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.CLIENT)
     public void onChange(InventoryChangeAcknowledgedRequest event, EntityRef inventoryEntity) {
-        if (!networkSystem.getMode().isAuthority()) {
-            logger.info("Received InventoryChangeAcknowledged for request {}", event.getChangeId());
-            Iterator<MoveItemRequest> i = pendingMoves.iterator();
-            while (i.hasNext()) {
-                if (i.next().getChangeId() == event.getChangeId()) {
-                    i.remove();
-                }
+        logger.info("Received InventoryChangeAcknowledged for request {}", event.getChangeId());
+        Iterator<MoveItemRequest> i = pendingMoves.iterator();
+        while (i.hasNext()) {
+            if (i.next().getChangeId() == event.getChangeId()) {
+                i.remove();
             }
-            recalculatePredictedState();
         }
+        recalculatePredictedState();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = {ClientComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onMoveItemRequest(MoveItemRequest request, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority()) {
-            logger.info("Received move item request");
-            // TODO: Check if allowed to move item - must own or have open both inventories
-            if (request instanceof MoveItemAmountRequest) {
-                MoveItemAmountRequest moveAmount = (MoveItemAmountRequest) request;
-                moveItemAmount(request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot(), moveAmount.getAmount());
-            } else {
-                moveItem(request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot());
-            }
-            entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
+        logger.info("Received move item request");
+        // TODO: Check if allowed to move item - must own or have open both inventories
+        if (request instanceof MoveItemAmountRequest) {
+            MoveItemAmountRequest moveAmount = (MoveItemAmountRequest) request;
+            moveItemAmount(request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot(), moveAmount.getAmount());
+        } else {
+            moveItem(request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot());
         }
+        entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
     }
 
     /**
