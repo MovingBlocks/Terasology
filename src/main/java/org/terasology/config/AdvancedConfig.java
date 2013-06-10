@@ -1,13 +1,19 @@
+/*
+ * Copyright (c) 2013 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.config;
-
-import java.lang.reflect.Type;
-import java.util.Arrays;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraArrays;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonDeserializationContext;
@@ -17,6 +23,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraArrays;
+import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
+
+import java.lang.reflect.Type;
+import java.util.Arrays;
 
 /**
  * Allows to configure internal details of the Terasology engine.
@@ -166,38 +181,48 @@ public final class AdvancedConfig {
 
     public static AdvancedConfig createDefault() {
         return new AdvancedConfig()
-        .setBlocksFactory(TeraDenseArray8Bit.class.getName())
-        .setSunlightFactory(TeraDenseArray8Bit.class.getName())
-        .setLightFactory(TeraDenseArray8Bit.class.getName())
-        .setExtraFactory(TeraDenseArray8Bit.class.getName())
-        .setChunkDeflationEnabled(true)
-        .setChunkDeflationLoggingEnabled(false)
-        .setAdvancedMonitoringEnabled(false)
-        .setAdvancedMonitorVisibleAtStartup(false);
+            .setBlocksFactory(TeraSparseArray16Bit.class.getName())
+            .setSunlightFactory(TeraDenseArray8Bit.class.getName())
+            .setLightFactory(TeraDenseArray8Bit.class.getName())
+            .setExtraFactory(TeraDenseArray8Bit.class.getName())
+            .setChunkDeflationEnabled(true)
+            .setChunkDeflationLoggingEnabled(false)
+            .setAdvancedMonitoringEnabled(false)
+            .setAdvancedMonitorVisibleAtStartup(false);
     }
 
     public static class Handler implements JsonSerializer<AdvancedConfig>, JsonDeserializer<AdvancedConfig> {
 
         @Override
-        public AdvancedConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public AdvancedConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
+
             AdvancedConfig config = AdvancedConfig.createDefault();
             JsonObject input = json.getAsJsonObject();
-            if (input.has("blocksFactory")) 
+            if (input.has("blocksFactory")) {
                 config.setBlocksFactoryDontThrow(input.get("blocksFactory").getAsString());
-            if (input.has("sunlightFactory")) 
+            }
+            if (input.has("sunlightFactory")) {
                 config.setSunlightFactoryDontThrow(input.get("sunlightFactory").getAsString());
-            if (input.has("lightFactory")) 
+            }
+            if (input.has("lightFactory")) {
                 config.setLightFactoryDontThrow(input.get("lightFactory").getAsString());
-            if (input.has("extraFactory")) 
+            }
+            if (input.has("extraFactory")) {
                 config.setExtraFactoryDontThrow(input.get("extraFactory").getAsString());
-            if (input.has("chunkDeflationEnabled")) 
+            }
+            if (input.has("chunkDeflationEnabled")) {
                 config.setChunkDeflationEnabled(input.get("chunkDeflationEnabled").getAsBoolean());
-            if (input.has("chunkDeflationLoggingEnabled")) 
+            }
+            if (input.has("chunkDeflationLoggingEnabled")) {
                 config.setChunkDeflationLoggingEnabled(input.get("chunkDeflationLoggingEnabled").getAsBoolean());
-            if (input.has("advancedMonitoringEnabled"))
+            }
+            if (input.has("advancedMonitoringEnabled")) {
                 config.setAdvancedMonitoringEnabled(input.get("advancedMonitoringEnabled").getAsBoolean());
-            if (input.has("advancedMonitorVisibleAtStartup"))
+            }
+            if (input.has("advancedMonitorVisibleAtStartup")) {
                 config.setAdvancedMonitorVisibleAtStartup(input.get("advancedMonitorVisibleAtStartup").getAsBoolean());
+            }
             return config;
         }
 
@@ -220,8 +245,9 @@ public final class AdvancedConfig {
     public static TeraArray.Factory getTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
         final TeraArrays.Entry entry = TeraArrays.getInstance().getEntry(factory);
-        if (entry != null)
+        if (entry != null) {
             return entry.factory;
+        }
         return null;
     }
     

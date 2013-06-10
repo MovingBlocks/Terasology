@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,10 @@ package org.terasology.world.block;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -35,8 +35,6 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.collection.EnumBooleanMap;
-import java.util.*;
-import java.util.List;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.shapes.BlockMeshPart;
@@ -48,14 +46,14 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
 
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Stores all information for a specific block type.
@@ -131,7 +129,7 @@ public class Block {
         }
     }
 
-    private byte id = 0x0;
+    private short id = 0x0;
     private String displayName = "Untitled block";
     private BlockUri uri;
     private BlockFamily family = null;
@@ -202,11 +200,11 @@ public class Block {
         }
     }
 
-    public byte getId() {
+    public Short getId() {
         return id;
     }
 
-    public void setId(byte id) {
+    public void setId(short id) {
         this.id = id;
     }
 
@@ -666,8 +664,9 @@ public class Block {
     }
 
     public void renderWithLightValue(float light) {
-        if (isInvisible())
+        if (isInvisible()) {
             return;
+        }
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();

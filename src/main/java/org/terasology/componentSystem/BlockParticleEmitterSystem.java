@@ -138,8 +138,9 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f pos = location.getWorldPosition();
             pos.add(particle.position);
-            if (worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).getId() != 0x0)
+            if (worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).getId() != 0x0) {
                 particle.velocity.y = 0;
+            }
         }
     }
 
@@ -178,7 +179,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 applyOrientation();
                 glScalef(particle.size, particle.size, particle.size);
 
-                float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x, worldPos.y + particle.position.y, worldPos.z + particle.position.z));
+                float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
+                    worldPos.y + particle.position.y, worldPos.z + particle.position.z));
                 renderParticle(particle, particleEffect.blockType.getArchetypeBlock().getId(), temperature, humidity, light);
                 glPopMatrix();
             }
@@ -196,17 +198,18 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         // And undo all rotations and scaling
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (i == j)
+                if (i == j) {
                     model.put(i * 4 + j, 1.0f);
-                else
+                } else {
                     model.put(i * 4 + j, 0.0f);
+                }
             }
         }
 
         GL11.glLoadMatrix(model);
     }
 
-    protected void renderParticle(Particle particle, byte blockType, float temperature, float humidity, float light) {
+    protected void renderParticle(Particle particle, short blockType, float temperature, float humidity, float light) {
         int displayList = displayLists.get(BlockManager.getInstance().getBlock(blockType).getBlockFamily());
         if (displayList == 0) {
             displayList = glGenLists(1);
@@ -227,7 +230,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         glCallList(displayList);
     }
 
-    private void drawParticle(byte blockType) {
+    private void drawParticle(short blockType) {
         Block b = BlockManager.getInstance().getBlock(blockType);
 
         glBegin(GL_QUADS);
