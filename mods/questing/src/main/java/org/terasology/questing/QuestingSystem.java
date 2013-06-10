@@ -26,6 +26,7 @@ public class QuestingSystem implements EventHandlerSystem {
 
     public static String questList; //One list to hold them all,
     private static String goalList; //A list for all of the goals
+    private static int questAmount = 0;
 
     public static String[] goals; //A list to hold all of the goals, in a non-friendly way, so that the engine can read them
 
@@ -49,13 +50,15 @@ public class QuestingSystem implements EventHandlerSystem {
 
         goals = blockType.split(", "); //Splits the goals into different parts
 
+        questAmount = goals.length;
+
         logger.info("Quest list updated to {}", questList);
     }
 
     @Override
     public void shutdown() {}
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = {InventoryComponent.class}, priority = EventPriority.PRIORITY_CRITICAL)
     public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
         //logger.info("Receive Item event fired with receiveItem.");
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);
@@ -63,10 +66,11 @@ public class QuestingSystem implements EventHandlerSystem {
         String stackID = item.stackId;
         //logger.info("Item name is: " + stackID);
 
-        //TODO: ADD A CHECK HERE TO SEE IF THAT EXISTS
-        if(stackID.equals(goals[currentQuest])) {
-            logger.info("Quest finished!"); //TODO: Set up a UI alert for finished quest
-            currentQuest += 1;
+        if(questAmount != currentQuest) {
+            if(stackID.equals(goals[currentQuest])) {
+                logger.info("Quest finished!"); //TODO: Set up a UI alert for finished quest
+                currentQuest += 1;
+            }
         }
     }
 }
