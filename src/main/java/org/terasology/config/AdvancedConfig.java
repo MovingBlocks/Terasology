@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArrays;
+import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -181,7 +181,7 @@ public final class AdvancedConfig {
 
     public static AdvancedConfig createDefault() {
         return new AdvancedConfig()
-            .setBlocksFactory(TeraSparseArray16Bit.class.getName())
+            .setBlocksFactory(TeraDenseArray16Bit.class.getName())
             .setSunlightFactory(TeraDenseArray8Bit.class.getName())
             .setLightFactory(TeraDenseArray8Bit.class.getName())
             .setExtraFactory(TeraDenseArray8Bit.class.getName())
