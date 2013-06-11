@@ -112,7 +112,9 @@ public class UIDialogMods extends UIDialog {
         modList.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(final UIDisplayElement element, final int button) {
-                toggleSelectedModActivation();
+                if (!((Mod)modList.getSelection().getValue()).getModInfo().getId().equals("core")) {
+                    toggleSelectedModActivation();
+                }
             }
         });
 
