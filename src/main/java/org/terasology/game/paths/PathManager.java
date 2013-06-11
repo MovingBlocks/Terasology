@@ -18,16 +18,12 @@ package org.terasology.game.paths;
 
 import com.google.common.collect.ImmutableList;
 import org.lwjgl.LWJGLUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.game.paths.windows.SavedGamesPathFinder;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -35,7 +31,7 @@ import java.util.List;
  */
 public final class PathManager {
     public static final String TERASOLOGY_FOLDER_NAME = "Terasology";
-    public static final String TERASOLOGY_HIDDEN_FOLDER_NAME = "/.terasology";
+    public static final String TERASOLOGY_HIDDEN_FOLDER_NAME = ".terasology";
 
     private static final String WORLD_DIR = "worlds";
     private static final String LOG_DIR = "logs";
@@ -65,7 +61,7 @@ public final class PathManager {
             }
         } catch (URISyntaxException e) {
             // Can't use logger, because logger not set up when PathManager is used.
-            System.out.println("Failed to conver to uri");
+            System.out.println("Failed to convert to uri");
         }
         if (installPath == null) {
             installPath = new File("").getAbsoluteFile();
@@ -88,10 +84,10 @@ public final class PathManager {
     public void useDefaultHomePath() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
-                homePath = new File(System.getProperty("user.home") + TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = new File(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_MACOSX:
-                homePath = new File(System.getProperty("user.home") + "/Library/Application Support/" + TERASOLOGY_FOLDER_NAME);
+                homePath = new File(System.getProperty("user.home"), "Library/Application Support/" + TERASOLOGY_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
                 String savedGamesPath = SavedGamesPathFinder.findSavedGamesPath();
@@ -107,7 +103,7 @@ public final class PathManager {
                 homePath = new File(rawPath, TERASOLOGY_FOLDER_NAME);
                 break;
             default:
-                homePath = new File(System.getProperty("user.home") + TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = new File(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
         }
         updateDirs();
     }

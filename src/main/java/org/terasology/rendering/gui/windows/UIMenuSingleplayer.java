@@ -217,7 +217,7 @@ public class UIMenuSingleplayer extends UIWindow {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
                     String type = ((GameType) Class.forName(info.getGameType().substring(6)).newInstance()).getName();
-                    String worldDescription = "(" + type + ")\n" + date.format(world.getKey());
+                    String worldDescription = " (" + type + ")\n" + date.format(world.getKey());
                     UIListItem item = new UIListItem(info.getTitle() + worldDescription, info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
