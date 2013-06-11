@@ -177,21 +177,20 @@ public class CharacterSystem implements ComponentSystem {
             return;
         }
 
-        //drop the item
-        EntityRef selectedItemEntity = event.getItem();
-        Vector3f impulse = event.getImpulse();
-        Vector3f newPosition = event.getNewPosition();
-        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+        EntityRef itemEntity = inventoryManager.removeItem(event.getInventoryEntity(), event.getItem(), 1);
 
         //don't perform actual drop on client side
         if (networkSystem.getMode().isAuthority()) {
+            Vector3f impulse = event.getImpulse();
+            Vector3f newPosition = event.getNewPosition();
+            ItemComponent item = itemEntity.getComponent(ItemComponent.class);
 
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 
-            BlockItemComponent blockItem = selectedItemEntity.getComponent(BlockItemComponent.class);
+            BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
             if (blockItem == null) {
                 DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
-                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
+                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, itemEntity);
 
                 if (!droppedItem.equals(EntityRef.NULL)) {
                     droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
@@ -199,23 +198,15 @@ public class CharacterSystem implements ComponentSystem {
             } else {
                 DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
                 EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), blockItem.blockFamily, 20, blockItem.placedEntity);
-                if (!droppedBlock.equals(EntityRef.NULL)) {
+                if (droppedBlock.exists()) {
                     droppedBlock.send(new ImpulseEvent(new Vector3f(impulse)));
                     blockItem.placedEntity = EntityRef.NULL;
-                    selectedItemEntity.saveComponent(blockItem);
-                } else {
-                    // Didn't create the dropped block, so don't decrement the stack
-                    return;
+                    itemEntity.saveComponent(blockItem);
+                    itemEntity.destroy();
                 }
             }
 
         }
-        // decrease item stack
-        // note this occurs on both the client and server side
-        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
-        int newStackSize = inventoryManager.getStackSize(selectedItemEntity) - 1;
-        inventoryManager.setStackSize(selectedItemEntity, event.getInventoryEntity(), newStackSize);
-
     }
 
 }

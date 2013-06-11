@@ -17,6 +17,7 @@
 package org.terasology.logic.inventory;
 
 import com.google.common.collect.Maps;
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.logic.inventory.DroppedItemComponent;
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -30,6 +31,7 @@ import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.world.block.entity.DroppedBlockFactory;
 
 import javax.vecmath.Vector3f;
 import java.util.Map;
@@ -60,40 +62,12 @@ public class DroppedItemFactory {
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab("core:droppeditem");
 
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-            EntityRef itemEntity = entityManager.create(prefab, location);
-            MeshComponent itemMeshComponent = itemEntity.getComponent(MeshComponent.class);
-            /*if(itemEntity.hasComponent(BoxShapeComponent.class)){
-                itemEntity.removeComponent(BoxShapeComponent.class);
-            }
-            HullShapeComponent hull = new HullShapeComponent();
-            hull.sourceMesh = itemMesh;
-            itemEntity.addComponent(hull);*/
-            //HullShapeComponent
-            itemMeshComponent.mesh = itemMesh;
-            itemEntity.saveComponent(itemMeshComponent);
-
-            LifespanComponent lifespanComp = itemEntity.getComponent(LifespanComponent.class);
-            lifespanComp.lifespan = lifespan;
-            itemEntity.saveComponent(lifespanComp);
-
-            DroppedItemComponent droppedItem = itemEntity.getComponent(DroppedItemComponent.class);
-            droppedItem.itemEntity = entityManager.copy(placedEntity);
-            ItemComponent itemComponent = placedEntity.getComponent(ItemComponent.class);
-
-            ItemComponent newItem = new ItemComponent();
-
-            newItem.stackCount = 1;
-            newItem.name = itemComponent.name;
-            newItem.baseDamage = itemComponent.baseDamage;
-            newItem.consumedOnUse = itemComponent.consumedOnUse;
-            newItem.icon = itemComponent.icon;
-            newItem.stackId = itemComponent.stackId;
-            newItem.renderWithIcon = itemComponent.renderWithIcon;
-
-            droppedItem.itemEntity.saveComponent(newItem);
-            itemEntity.saveComponent(droppedItem);
-
-            return itemEntity;
+            EntityBuilder itemEntity = entityManager.newBuilder(prefab);
+            itemEntity.getComponent(LocationComponent.class).setWorldPosition(location);
+            itemEntity.getComponent(MeshComponent.class).mesh = itemMesh;
+            itemEntity.getComponent(LifespanComponent.class).lifespan = lifespan;
+            itemEntity.getComponent(DroppedItemComponent.class).itemEntity = placedEntity;
+            return itemEntity.build();
         }
         return EntityRef.NULL;
     }

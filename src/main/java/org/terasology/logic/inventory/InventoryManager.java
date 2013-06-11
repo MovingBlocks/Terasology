@@ -46,6 +46,16 @@ public interface InventoryManager {
     void removeItem(EntityRef inventoryEntity, EntityRef item);
 
     /**
+     * Removes a number of an item from the inventory. If the count equals or exceeds actual stack size of the item,
+     * the entire stack is removed. Otherwise a new item is created of the correct stack size, and the existing item's
+     * stack size is decremented to match.
+     *
+     * @param inventoryEntity
+     * @param item
+     */
+    EntityRef removeItem(EntityRef inventoryEntity, EntityRef item, int stackCount);
+
+    /**
      * Removes an item from the inventory and destroys it
      *
      * @param inventoryEntity
@@ -67,16 +77,10 @@ public interface InventoryManager {
     int getStackSize(EntityRef item);
 
     /**
-     * @param item
-     * @param newStackSize
-     */
-    void setStackSize(EntityRef item, int newStackSize);
-
-    /**
      *  This version of setStackSize will destroy the item if newStackSize is <=0
-     * @param item
      * @param inventoryEntity
+     * @param item
      * @param newStackSize
      */
-    void setStackSize(EntityRef item, EntityRef inventoryEntity, int newStackSize);
+    void setStackSize(EntityRef inventoryEntity, EntityRef item, int newStackSize);
 }

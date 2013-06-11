@@ -17,5 +17,6 @@
     },
     "Lifespan" : {
         "lifespan" : 30
-    }
+    },
+    "Network" : {}
 }
