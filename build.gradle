@@ -121,7 +121,7 @@ task extractNatives {
 // Set the expected module Java level (can use a higher Java to run, but should not use features from a higher Java)
 sourceCompatibility = 1.6
 
-// Add additional "source set" beyond the default (src/java/main + src/java/test), in this case src/java/dev (utility)
+// Add additional "source set" beyond the default (src/main/ + src/test/), in this case src/dev/ (utility)
 sourceSets {
     dev
 }
@@ -157,8 +157,8 @@ dependencies {
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
     compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
     compile group: 'org.newdawn.slick', name: 'slick', version: '236'
-	compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
-	compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
 
     // Wildcard dependency to catch any libs provided with the project
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -594,10 +594,24 @@ eclipseClasspath.dependsOn extractNatives
 
 // For IntelliJ add a bunch of excluded directories
 idea {
+    // Add development "dev" dir
+    module.sourceDirs += sourceSets.dev.allJava.srcDirs
+    
+    // Exclude Gradle dir
+    module.excludeDirs += file('gradle')
+
+    // Exclude Eclipse dirs
     module.excludeDirs += file('bin')
-    module.excludeDirs += file('logs')
+    module.excludeDirs += file('.settings')
+    
+    // Exclude special dirs
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
+    
+    // Exclude output dirs
+    module.excludeDirs += file('logs')
     module.excludeDirs += file('SAVED_WORLDS')
+    module.excludeDirs += file('worlds')
     module.excludeDirs += file('screens')
+    module.excludeDirs += file('screenshots')
 }
