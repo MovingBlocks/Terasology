@@ -25,11 +25,13 @@ apply plugin: 'checkstyle'
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter;
 
+// Template for building new copies of "mod.txt" (should really move to a file template)
 def DEFAULT_MOD_TXT_START = '{\n    "id" : "'
 def DEFAULT_MOD_TXT_END = '",\n    "displayName" : "",\n    "author" : "",\n    "description" : "",\n    "dependencies" : []\n}'
 
+// Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
 ext {
-    startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
+    // Project paths
     dirApplet = 'applet'
     dirNatives = 'natives'
     dirSavedWorlds = 'SAVED_WORLDS'
@@ -42,30 +44,44 @@ ext {
     mainClassNameEditor = 'org.terasology.editor.TeraEd'
     mainClassName = 'org.terasology.game.Terasology'
     jarFileName = 'Terasology.jar'
-    env = System.getenv() // read environment variables, including variables passed by jenkins continuous integration server
+
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
+
+    // Stuff for our automatic version file setup
+    startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'
     displayVersion = "prealpha"
 }
 
+// Declare remote repositories we're interested in - library files will be fetched from here
 repositories {
+    // Main Maven repo
     mavenCentral()
+    // Custom repo for slick
     maven {
         url "http://slick2d-maven-dependencies.googlecode.com/svn/trunk/repository/"
     }
 }
 
-/* Natives ----------------------------------------------------------------- */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Natives                                                                                                           //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Define a custom configuration named "natives"
 configurations {
     natives
 }
 
+// For the "natives" configuration make it depend on the native files from LWJGL
 dependencies {
     natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
 }
 
 task extractWindowsNatives(type:Sync) {
+    description = "Extracts the Windows natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
     }
@@ -74,6 +90,7 @@ task extractWindowsNatives(type:Sync) {
 }
 
 task extractMacOSXNatives(type:Sync) {
+    description = "Extracts the MacOS natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
     }
@@ -82,6 +99,7 @@ task extractMacOSXNatives(type:Sync) {
 }
 
 task extractLinuxNatives(type:Sync) {
+    description = "Extracts the Linux natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
     }
@@ -90,27 +108,41 @@ task extractLinuxNatives(type:Sync) {
 }
 
 task extractNatives {
+    description = "Triggers all of the natives extraction tasks"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
 }
 
-/* Java ------------------------------------------------------------- */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Java Section                                                                                                      //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Set the expected module Java level (can use a higher Java to run, but should not use features from a higher Java)
 sourceCompatibility = 1.6
 
+// Add additional "source set" beyond the default (src/main/ + src/test/), in this case src/dev/ (utility)
 sourceSets {
     dev
 }
 
+// Customizations for the main compilation configuration
 configurations {
+
+    // Exclude a couple JWJGL modules that aren't needed during compilation (OS specific stuff in these two perhaps)
     compile {
         exclude module: 'lwjgl-platform'
         exclude module: 'jinput-platform'
     }
+
+    // Beyond the standard compile "configuration" we declare one called "devCompile" specific to the "dev" source set
     devCompile.extendsFrom compile
 }
 
+// Primary dependencies definition
 dependencies {
+
+    // Main library files fetched online
     compile group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
     compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
@@ -125,14 +157,25 @@ dependencies {
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
     compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
     compile group: 'org.newdawn.slick', name: 'slick', version: '236'
-    // Would have liked to have left this runtime, but needed to "compile" the groovy config in IntelliJ
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
+
+    // Wildcard dependency to catch any libs provided with the project
     compile fileTree(dir: 'libs', include: '*.jar')
+
+    // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
+    //TODO: Find way to avoid compiling logback.groovy to the resource dir
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
+
+    // These dependencies are only needed for running tests
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
+
+    // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
 }
 
+// Instructions for packaging a jar file for the main project
 jar {
     archiveName = jarFileName
     manifest {
@@ -155,21 +198,33 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+// Extra details provided for unit tests
 test {
+
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
     ignoreFailures = true
+
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     testLogging.showStandardStreams = true
+
+    // Arguments to include while running tests
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
-/* Mods -------------------------------------------------------------------- */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Mods section (set up as modules in IntelliJ)                                                                      //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 subprojects {
+
+    // Ignore the actual "mods" directory as Gradle will travel the project "tree" and process in-between directories
     if (name != 'mods') {
+
+        // Each mod gets set up as Java and prepped for either Eclipse or IntelliJ
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'idea'
-        
+
+        // Change the output dir for each mod
         sourceSets {
             main {
                 java {
@@ -177,6 +232,8 @@ subprojects {
                 }
             }
         }
+
+        // Generate all the valid sub directories
         task createSkeleton() {
             mkdir('assets')
             mkdir('src/main/java')
@@ -193,10 +250,14 @@ subprojects {
             mkdir('assets/textures')
             mkdir('src/test/java')
         }
+
+        // Keep everything in the "assets" dir in sync with the compiled output (since they're already "ready")
         task syncAssets(type: Sync) {
             from 'assets'
             into 'classes/assets'
         }
+
+        // Deal with the mod info file and if one doesn't exist make a new one
         def modFile = file('mod.txt')
         if (!modFile.exists()) {
             modFile.createNewFile()
@@ -206,37 +267,55 @@ subprojects {
                 writer.write(DEFAULT_MOD_TXT_END) 
             }
         }
+
+        // Put the info file into the output
         jar.doFirst {
             copy {
                 from 'mod.txt'
                 into 'classes'
             }
         }
+
+        // Jarring up modules should include the assets
         jar.dependsOn syncAssets
+
+        // Go parse out any dependencies defined in the mod info file, we'll need those later
         def slurper = new JsonSlurper()
         def modConfig = slurper.parseText( file('mod.txt').text)
         def modDepends = modConfig.dependencies;
+
+        // Prep an IntelliJ module for the mod
         idea {
             module {
+
+                // Change around the output specific to the mod a bit
                 inheritOutputDirs = false
                 outputDir = file('classes')
                 testOutputDir = file('testClasses')
+
+                // Generate the project config in a .idea dir rather than as a .iml file
                 iml {
                     generateTo = file('.idea')
                 }
             }
         }
+
+        // For Eclipse just make sure the classpath is right
         eclipse {
             classpath {
                 defaultOutputDir = file('classes')
             }
         }
+
+        // Same repo config per module as parent project (maybe there's a way to simply inherit?
         repositories {
             mavenCentral()
             maven {
                 url "http://slick2d-maven-dependencies.googlecode.com/svn/trunk/repository/"
             }
         }
+
+        // Set dependencies, note how the parsed dependencies from the mod info file are included here
         dependencies {
             compile project(':')
             testCompile group: 'junit', name: 'junit', version: '4.10'
@@ -247,10 +326,13 @@ subprojects {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checkstyle settings                                                                                               //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* Check ------------------------------------------------------------------- */
 checkstyle.ignoreFailures = true
 checkstyle.configProperties.samedir = checkstyle.configFile.parentFile
+
 /* Optional check plugins
 apply plugin: 'codenarc'
 apply plugin: 'findbugs'
@@ -262,13 +344,18 @@ findbugs.ignoreFailures = true
 pmd.ignoreFailures = true
 */
 
-/* Misc tasks ------------------------------------------------------------------- */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Miscellaneous                                                                                                     //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 task assembleMainOutput(type:Sync) {
+    description = "Helper task for when we're trying to run the game from the command line or via TeraEd"
     from sourceSets.main.output
     into "$buildDir/$destDirMainOutput"
 }
 
 task modClasses {
+    description = "Another helper task for when we're trying to run the game from the command line or via TeraEd"
     subprojects.each { project ->
         if (project.name != 'mods') {
             modClasses.dependsOn project.tasks['classes']
@@ -276,16 +363,8 @@ task modClasses {
     }
 }
 
-task modAssemble {
-    subprojects.each { project ->
-        if (project.name != 'mods') {
-            modAssemble.dependsOn project.tasks['assemble']
-        }
-    }
-}
-
 task run(type:JavaExec) {
-    description = "Run 'Terasology'"
+    description = "Run 'Terasology' to play the game"
 
     dependsOn extractNatives
     dependsOn assembleMainOutput
@@ -296,7 +375,7 @@ task run(type:JavaExec) {
 }
 
 task runTeraEd(type:JavaExec) {
-    description = "Run 'TeraEd'"
+    description = "Run 'TeraEd' to customize shader settings while the game is running"
 
     dependsOn extractNatives
     dependsOn assembleMainOutput
@@ -330,7 +409,10 @@ task runProtobufWindows(type:Exec) {
     commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
 }
 
-/* Distributions: Application/Applet ----------------------------------------*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Version file stuff                                                                                                //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 task createVersionInfoFile {
     inputs.property('dateTime', startDateTimeString)
     onlyIf { env.BUILD_URL != null }
@@ -362,7 +444,21 @@ task createVersionFile(type: Copy) {
     filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Distributions (prepared artifacts)                                                                                //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+task modAssemble {
+    description = "Assembles the mods"
+    subprojects.each { project ->
+        if (project.name != 'mods') {
+            modAssemble.dependsOn project.tasks['assemble']
+        }
+    }
+}
+
 task distMods {
+    description = "Distributes the mods"
     dependsOn modAssemble
     subprojects.each { project ->
         if (project.name != 'mods') {
@@ -407,10 +503,12 @@ task distApplication(type:Sync) {
     }
 }
 
+// Make a configuration specific to applet stuff
 configurations {
     applet
 }
 
+// Applet needs the LWJGL applet dependency
 dependencies {
     applet group: 'org.lwjgl.lwjgl', name: 'lwjgl_util_applet', version: '2.8.5'
 }
@@ -442,6 +540,8 @@ task distApplet(type:Sync) {
         from "$buildDir/$destDirMods"
     }
 }
+
+// At the end of the applet distribution sign the jar files so they can get expanded rights in a browser
 distApplet.doLast {
     file("$buildDir/$destDirApplet").listFiles().each {
         if (it.getName().endsWith(".jar"))
@@ -484,15 +584,34 @@ task distAppletZip(type:Zip) {
     from "$buildDir/$versionFileName"
 }
 
-/* IDE --------------------------------------------------------------------- */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// General IDE customization                                                                                         //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Make sure the IDE prep includes extraction of natives
 ideaModule.dependsOn extractNatives
 eclipseClasspath.dependsOn extractNatives
 
+// For IntelliJ add a bunch of excluded directories
 idea {
+    // Add development "dev" dir
+    module.sourceDirs += sourceSets.dev.allJava.srcDirs
+    
+    // Exclude Gradle dir
+    module.excludeDirs += file('gradle')
+
+    // Exclude Eclipse dirs
     module.excludeDirs += file('bin')
-    module.excludeDirs += file('logs')
+    module.excludeDirs += file('.settings')
+    
+    // Exclude special dirs
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
+    
+    // Exclude output dirs
+    module.excludeDirs += file('logs')
     module.excludeDirs += file('SAVED_WORLDS')
+    module.excludeDirs += file('worlds')
     module.excludeDirs += file('screens')
+    module.excludeDirs += file('screenshots')
 }

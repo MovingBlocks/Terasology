@@ -177,7 +177,7 @@ public class UISlider extends UIDisplayContainer {
      * Changes the slider position based on the mouse position.
      * @param pos The position of the mouse in x direction.
      */
-    private void changeSlider(float pos) {
+    public void changeSlider(float pos) {
         float sliderPos = pos - getPosition().x - slider.getSize().x / 2;
         if (sliderPos < 0)
         {

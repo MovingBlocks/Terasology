@@ -1,0 +1,6 @@
+{
+    "entity" : {
+        "prefab" : "signalling:PressurePlate",
+        "mode" : "persistent"
+    }
+}

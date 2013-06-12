@@ -34,7 +34,7 @@ import org.terasology.world.generator.core.PerlinTerrainGenerator;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class TerrainPreviewGenerator {
+public final class TerrainPreviewGeneratorDev {
 
     private static final String SEED = "rAtAiWyKgDlEeFjKiSsPzKaOuKhRrWqV";
 
@@ -50,14 +50,14 @@ public final class TerrainPreviewGenerator {
     PerlinTerrainGenerator generator;
 
     public static void main(final String[] args) {
-        final TerrainPreviewGenerator gen = new TerrainPreviewGenerator(SEED);
+        final TerrainPreviewGeneratorDev gen = new TerrainPreviewGeneratorDev(SEED);
 
         gen.generateMap(MapStyle.BIOMES, "Biomes.png");
         gen.generateMap(MapStyle.COLOR_LUT, "ColorLut.png");
         gen.generateMap(MapStyle.FOLIAGE_LUT, "FoliageLut.png");
     }
 
-    public TerrainPreviewGenerator(final String seed) {
+    public TerrainPreviewGeneratorDev(final String seed) {
         biomeProvider = new WorldBiomeProviderImpl(seed);
         generator = new PerlinTerrainGenerator();
         generator.setWorldSeed(seed);

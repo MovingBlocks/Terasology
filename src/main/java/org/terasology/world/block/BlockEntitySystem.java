@@ -15,11 +15,8 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
@@ -43,7 +40,7 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.family.ConnectToAdjacentBlockFamily;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.management.BlockManager;
 
 /**
@@ -53,6 +50,9 @@ import org.terasology.world.block.management.BlockManager;
  */
 @RegisterComponentSystem
 public class BlockEntitySystem implements EventHandlerSystem {
+
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
 
     @In
     private WorldProvider worldProvider;
@@ -66,6 +66,12 @@ public class BlockEntitySystem implements EventHandlerSystem {
     private BlockItemFactory blockItemFactory;
     private DroppedBlockFactory droppedBlockFactory;
     private FastRandom random;
+
+    private static final int[][] neighborBlockDirections = {
+            {-1,-1,0}, {0,-1,1},  {1,-1,0}, {0,-1,-1},
+            {-1,0,0},  {0, 0,1},  {1, 0,0}, {0, 0,-1},
+            {-1, 1,0}, {0, 1,1},  {1, 1,0}, {0, 1,-1}
+    };
 
     @Override
     public void initialise() {
@@ -93,7 +99,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
             worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getInstance().getAir(), upperBlock);
         }
 
-        entity.send( new BlockChangedEvent( blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock) );
+        entity.send(new BlockChangedEvent(blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock));
 
         // TODO: Configurable via block definition
         audioManager.playSound(Assets.getSound("engine:RemoveBlock"), 0.6f);
@@ -106,25 +112,25 @@ public class BlockEntitySystem implements EventHandlerSystem {
         if ((oldBlock.isDirectPickup()) && event.getInstigator().exists()) {
             EntityRef item;
             if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
+                item = blockItemFactory.newInstance(oldBlock.getPickupBlockFamily(), entity);
             } else {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
+                item = blockItemFactory.newInstance(oldBlock.getPickupBlockFamily());
             }
             event.getInstigator().send(new ReceiveItemEvent(item));
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
             if (itemComp != null && !itemComp.container.exists()) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
-                EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+                EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getPickupBlockFamily(), 20);
                 block.send(new ImpulseEvent(random.randomVector3f(30)));
             }
         } else {
             /* PHYSICS */
             EntityRef block;
             if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20, entity);
+                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getPickupBlockFamily(), 20, entity);
             } else {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getPickupBlockFamily(), 20);
             }
             block.send(new ImpulseEvent(random.randomVector3f(30)));
             // added as a hook to catch minions breaking blocks
@@ -175,26 +181,17 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onReplaceAroundBlocks(BlockChangedEvent event, EntityRef entity) {
-        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-
         Vector3i placementPos = event.getBlockPosition();
 
-        for (int i=0; i< ConnectToAdjacentBlockFamily.viewFullMap.length; i++){
+        // Updating only non-diagonal neighbours
+        for (int[] directionChanges : neighborBlockDirections) {
+            Vector3i neighbourPos = new Vector3i(placementPos.x + directionChanges[0], placementPos.y + directionChanges[1], placementPos.z + directionChanges[2]);
+            Block neighbourBlock = worldProvider.getBlock(neighbourPos);
 
-            int x = ConnectToAdjacentBlockFamily.viewFullMap[i][0];
-            int y = ConnectToAdjacentBlockFamily.viewFullMap[i][1];
-            int z = ConnectToAdjacentBlockFamily.viewFullMap[i][2];
-
-            Vector3i currentPos = new Vector3i(placementPos.x + x, placementPos.y + y, placementPos.z + z);
-
-            Block aroundBlock = worldProvider.getBlock(currentPos);
-
-            if ( aroundBlock.getBlockFamily() instanceof ConnectToAdjacentBlockFamily ){
-                Block replaceBlock = ( (ConnectToAdjacentBlockFamily) aroundBlock.getBlockFamily() ).getBlockFor(currentPos, worldProvider);
-                worldProvider.setBlock( currentPos, replaceBlock, aroundBlock );
+            final Block blockAfterUpdate = neighbourBlock.getBlockFamily().getBlockAfterNeighborUpdate(worldProvider, neighbourPos, neighbourBlock);
+            if (blockAfterUpdate != neighbourBlock) {
+                blockEntityRegistry.setBlockRetainEntity(neighbourPos, blockAfterUpdate, neighbourBlock);
             }
-
         }
     }
-
 }

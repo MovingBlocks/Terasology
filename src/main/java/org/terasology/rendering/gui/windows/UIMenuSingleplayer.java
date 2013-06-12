@@ -23,7 +23,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -37,12 +37,10 @@ import org.terasology.world.WorldUtil;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * Select world menu screen.
@@ -182,47 +180,45 @@ public class UIMenuSingleplayer extends UIWindow {
 
     public void fillList() {
         list.removeAll();
-        String typeGame = "";
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
-        File[] listFiles = worldCatalog.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                if (file.isDirectory()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
+        // Create a map that sorts valid saved worlds by their last modified date
+        SortedMap<Date, File> savedWorlds = new TreeMap<Date, File>(Collections.reverseOrder());
+        for (File f : worldCatalog.listFiles()) {
 
-        //TODO type safety!
-        Arrays.sort(listFiles, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                if (((File) o1).isDirectory() && ((File) o2).isDirectory()) {
-                    File f1 = new File(((File) o1).getAbsolutePath(), "entity.dat");
-                    File f2 = new File(((File) o2).getAbsolutePath(), "entity.dat");
-                    if (f1.lastModified() > f2.lastModified()) {
-                        return -1;
-                    } else if (f1.lastModified() < f2.lastModified()) {
-                        return +1;
-                    }
-                }
-
-                return 0;
-            }
-        });
-
-        DateFormat date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
-        for (File file : listFiles) {
-            File worldManifest = new File(file, WorldInfo.DEFAULT_FILE_NAME);
-            if (!worldManifest.exists())
+            // Ignore non-directories
+            if (!f.isDirectory()) {
                 continue;
+            }
+
+            // Ignore worlds without entity.dat - TODO: Find a file to date-test in a less fragile (hard coded) fashion?
+            File entityDat = new File (f, "entity.dat");
+            if (!entityDat.exists()) {
+                continue;
+            }
+
+            // Map together the world directories with the modified timestamp from the entity file inside
+            savedWorlds.put(new Date(entityDat.lastModified()), f);
+        }
+
+        // Format year-month-date to reduce day/month swap confusion
+        DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        for (Map.Entry<Date, File> world : savedWorlds.entrySet()) {
+
+            File worldManifest = new File(world.getValue(), WorldInfo.DEFAULT_FILE_NAME);
+
+            // Ignore worlds with no manifest
+            if (!worldManifest.exists()) {
+                continue;
+            }
+
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    typeGame = ((GameType) Class.forName(info.getGameType().substring(6)).newInstance()).getName();
-                    UIListItem item = new UIListItem(info.getTitle() + "(" + typeGame + ")\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString(), info);
+                    String type = ((GameType) Class.forName(info.getGameType().substring(6)).newInstance()).getName();
+                    String worldDescription = " (" + type + ")\n" + date.format(world.getKey());
+                    UIListItem item = new UIListItem(info.getTitle() + worldDescription, info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }
