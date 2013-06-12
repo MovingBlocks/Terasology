@@ -74,9 +74,9 @@ public class BlockNetwork {
                     newLeafNodes.addAll(leafNodes);
 
                     network.removeAllLeafNodes();
-                    notifyLeafNodesRemoved(network, toMultimap(leafNodes));
+                    notifyLeafNodesRemoved(network, leafNodes);
                     network.removeAllNetworkingNodes();
-                    notifyNetworkingNodesRemoved(network, toMultimap(networkingNodes));
+                    notifyNetworkingNodesRemoved(network, networkingNodes);
 
                     networkIterator.remove();
                     notifyNetworkRemoved(network);
@@ -94,7 +94,7 @@ public class BlockNetwork {
 
         for (NetworkNode networkingNode : networkingNodesToAdd)
             addToNetwork.addNetworkingNode(networkingNode);
-        notifyNetworkingNodesAdded(addToNetwork, toMultimap(networkingNodesToAdd));
+        notifyNetworkingNodesAdded(addToNetwork, networkingNodesToAdd);
 
         for (NetworkNode leafNode : newLeafNodes)
             addToNetwork.addLeafNode(leafNode);
@@ -108,7 +108,7 @@ public class BlockNetwork {
         }
 
         if (newLeafNodes.size() > 0)
-            notifyLeafNodesAdded(addToNetwork, toMultimap(newLeafNodes));
+            notifyLeafNodesAdded(addToNetwork, newLeafNodes);
     }
 
     public void addLeafBlock(Vector3i location, byte connectingOnSides) {
@@ -120,7 +120,7 @@ public class BlockNetwork {
             for (SimpleNetwork network : networks) {
                 if (network.canAddLeafNode(networkNode)) {
                     network.addLeafNode(networkNode);
-                    notifyLeafNodesAdded(network, toMultimap(Collections.singleton(networkNode)));
+                    notifyLeafNodesAdded(network, Collections.singleton(networkNode));
                 }
             }
 
@@ -130,7 +130,7 @@ public class BlockNetwork {
                     SimpleNetwork degenerateNetwork = SimpleNetwork.createDegenerateNetwork(networkNode, leafNode);
                     networks.add(degenerateNetwork);
                     notifyNetworkAdded(degenerateNetwork);
-                    notifyLeafNodesAdded(degenerateNetwork, toMultimap(Sets.newHashSet(networkNode, leafNode)));
+                    notifyLeafNodesAdded(degenerateNetwork, Sets.newHashSet(networkNode, leafNode));
                 }
             }
 
@@ -170,9 +170,9 @@ public class BlockNetwork {
             Set<NetworkNode> leafNodes = Sets.newHashSet(networkWithBlock.getLeafNodes());
 
             networkWithBlock.removeAllLeafNodes();
-            notifyLeafNodesRemoved(networkWithBlock, toMultimap(leafNodes));
+            notifyLeafNodesRemoved(networkWithBlock, leafNodes);
             networkWithBlock.removeAllNetworkingNodes();
-            notifyNetworkingNodesRemoved(networkWithBlock, toMultimap(networkingNodes));
+            notifyNetworkingNodesRemoved(networkWithBlock, Collections.unmodifiableSet(networkingNodes));
 
             networks.remove(networkWithBlock);
             notifyNetworkRemoved(networkWithBlock);
@@ -199,10 +199,10 @@ public class BlockNetwork {
                 if (network.hasLeafNode(networkNode)) {
                     boolean degenerate = network.removeLeafNode(networkNode);
                     if (!degenerate)
-                        notifyLeafNodesRemoved(network, ImmutableMultimap.of(location, connectingOnSides));
+                        notifyLeafNodesRemoved(network, Collections.singleton(networkNode));
                     else {
                         NetworkNode onlyLeafNode = network.getLeafNodes().iterator().next();
-                        notifyLeafNodesRemoved(network, toMultimap(Sets.<NetworkNode>newHashSet(networkNode, onlyLeafNode)));
+                        notifyLeafNodesRemoved(network, Sets.<NetworkNode>newHashSet(networkNode, onlyLeafNode));
 
                         networkIterator.remove();
                         notifyNetworkRemoved(network);
@@ -240,22 +240,22 @@ public class BlockNetwork {
             listener.networkRemoved(network);
     }
 
-    private void notifyNetworkingNodesAdded(SimpleNetwork network, Multimap<Vector3i, Byte> networkingNodes) {
+    private void notifyNetworkingNodesAdded(SimpleNetwork network, Set<NetworkNode> networkingNodes) {
         for (NetworkTopologyListener listener : listeners)
             listener.networkingNodesAdded(network, networkingNodes);
     }
 
-    private void notifyNetworkingNodesRemoved(SimpleNetwork network, Multimap<Vector3i, Byte> networkingNodes) {
+    private void notifyNetworkingNodesRemoved(SimpleNetwork network, Set<NetworkNode> networkingNodes) {
         for (NetworkTopologyListener listener : listeners)
             listener.networkingNodesRemoved(network, networkingNodes);
     }
 
-    private void notifyLeafNodesAdded(SimpleNetwork network, Multimap<Vector3i, Byte> leafNodes) {
+    private void notifyLeafNodesAdded(SimpleNetwork network, Set<NetworkNode> leafNodes) {
         for (NetworkTopologyListener listener : listeners)
             listener.leafNodesAdded(network, leafNodes);
     }
 
-    private void notifyLeafNodesRemoved(SimpleNetwork network, Multimap<Vector3i, Byte> leafNodes) {
+    private void notifyLeafNodesRemoved(SimpleNetwork network, Set<NetworkNode> leafNodes) {
         for (NetworkTopologyListener listener : listeners)
             listener.leafNodesRemoved(network, leafNodes);
     }

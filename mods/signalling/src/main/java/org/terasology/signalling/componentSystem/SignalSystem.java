@@ -172,23 +172,23 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @Override
-    public void networkingNodesAdded(Network network, Multimap<Vector3i, Byte> networkingNodes) {
+    public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes) {
         logger.info("Cable added to network");
         networksToRecalculate.add(network);
     }
 
     @Override
-    public void networkingNodesRemoved(Network network, Multimap<Vector3i, Byte> networkingNodes) {
+    public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes) {
         logger.info("Cable removed from network");
         networksToRecalculate.add(network);
     }
 
     @Override
-    public void leafNodesAdded(Network network, Multimap<Vector3i, Byte> leafNodes) {
-        for (Map.Entry<Vector3i, Byte> modifiedLeafNode : leafNodes.entries()) {
-            Vector3i nodeLocation = modifiedLeafNode.getKey();
+    public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
+        for (NetworkNode modifiedLeafNode : leafNodes) {
+            Vector3i nodeLocation = modifiedLeafNode.location.toVector3i();
             Byte producerConnectingSides = signalProducers.get(nodeLocation);
-            if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.getValue()) {
+            if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.connectionSides) {
                 logger.info("Producer added to network");
                 networksToRecalculate.add(network);
                 producerNetworks.put(nodeLocation, network);
@@ -203,11 +203,11 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @Override
-    public void leafNodesRemoved(Network network, Multimap<Vector3i, Byte> leafNodes) {
-        for (Map.Entry<Vector3i, Byte> modifiedLeafNode : leafNodes.entries()) {
-            Vector3i nodeLocation = modifiedLeafNode.getKey();
+    public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
+        for (NetworkNode modifiedLeafNode : leafNodes) {
+            Vector3i nodeLocation = modifiedLeafNode.location.toVector3i();
             Byte producerConnectingSides = signalProducers.get(nodeLocation);
-            if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.getValue()) {
+            if (producerConnectingSides != null && producerConnectingSides.byteValue() == modifiedLeafNode.connectionSides) {
                 logger.info("Producer removed from network");
                 networksToRecalculate.add(network);
                 producerNetworks.remove(nodeLocation, network);

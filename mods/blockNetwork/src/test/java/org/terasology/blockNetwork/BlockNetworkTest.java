@@ -186,30 +186,30 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Multimap<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes) {
             networkingNodesAdded++;
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Multimap<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes) {
             networkingNodesRemoved++;
         }
 
         @Override
-        public void leafNodesAdded(Network network, Multimap<Vector3i, Byte> leafNodes) {
+        public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
             leafNodesAdded++;
         }
 
         @Override
-        public void leafNodesRemoved(Network network, Multimap<Vector3i, Byte> leafNodes) {
+        public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
             leafNodesRemoved++;
         }
     }
 
     private class ValidatingListener implements NetworkTopologyListener {
         private Set<Network> networks = Sets.newHashSet();
-        private Multimap<Network, Vector3i> networkingNodes = HashMultimap.create();
-        private Multimap<Network, Vector3i> leafNodes = HashMultimap.create();
+        private Multimap<Network, NetworkNode> networkingNodes = HashMultimap.create();
+        private Multimap<Network, NetworkNode> leafNodes = HashMultimap.create();
 
         @Override
         public void networkAdded(Network network) {
@@ -217,30 +217,30 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Multimap<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes) {
             assertTrue(networks.contains(network));
-            for (Vector3i networkingNode : networkingNodes.keySet())
+            for (NetworkNode networkingNode : networkingNodes)
                 assertTrue(this.networkingNodes.put(network, networkingNode));
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Multimap<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes) {
             assertTrue(networks.contains(network));
-            for (Vector3i networkingNode : networkingNodes.keySet())
+            for (NetworkNode networkingNode : networkingNodes)
                 assertTrue(this.networkingNodes.remove(network, networkingNode));
         }
 
         @Override
-        public void leafNodesAdded(Network network, Multimap<Vector3i, Byte> leafNodes) {
+        public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
             assertTrue(networks.contains(network));
-            for (Vector3i leafNode : leafNodes.keySet())
+            for (NetworkNode leafNode : leafNodes)
                 assertTrue(this.leafNodes.put(network, leafNode));
         }
 
         @Override
-        public void leafNodesRemoved(Network network, Multimap<Vector3i, Byte> leafNodes) {
+        public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
             assertTrue(networks.contains(network));
-            for (Vector3i leafNode : leafNodes.keySet())
+            for (NetworkNode leafNode : leafNodes)
                 assertTrue(this.leafNodes.remove(network, leafNode));
         }
 
