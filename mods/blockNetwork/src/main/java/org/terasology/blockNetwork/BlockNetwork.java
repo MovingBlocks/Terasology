@@ -10,8 +10,8 @@ import java.util.*;
  */
 public class BlockNetwork {
     private Set<SimpleNetwork> networks = Sets.newHashSet();
-    private Multimap<Vector3i, Byte> leafNodes = HashMultimap.create();
-    private Set<Vector3i> networkingNodes = Sets.newHashSet();
+    private Set<NetworkNode> leafNodes = Sets.newHashSet();
+    private Set<NetworkNode> networkingNodes = Sets.newHashSet();
 
     private Set<NetworkTopologyListener> listeners = new HashSet<NetworkTopologyListener>();
 
@@ -34,40 +34,49 @@ public class BlockNetwork {
         validateNotMutating();
         mutating = true;
         try {
-            networkingNodes.add(location);
+            final NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
+            networkingNodes.add(networkNode);
 
-            addNetworkingBlockInternal(location, connectingOnSides);
+            addNetworkingBlockInternal(networkNode);
         } finally {
             mutating = false;
         }
     }
 
-    private void addNetworkingBlockInternal(Vector3i location, byte connectingOnSides) {
+    private Multimap<Vector3i, Byte> toMultimap(Set<NetworkNode> networkNodes) {
+        Multimap<Vector3i, Byte> result = HashMultimap.create();
+        for (NetworkNode networkNode : networkNodes) {
+            result.put(networkNode.location.toVector3i(), networkNode.connectionSides);
+        }
+        return result;
+    }
+
+    private void addNetworkingBlockInternal(NetworkNode networkNode) {
         SimpleNetwork addToNetwork = null;
 
-        Map<Vector3i, Byte> networkingNodesToAdd = Maps.newHashMap();
-        networkingNodesToAdd.put(location, connectingOnSides);
+        Set<NetworkNode> networkingNodesToAdd = Sets.newHashSet();
+        networkingNodesToAdd.add(networkNode);
 
-        Multimap<Vector3i, Byte> newLeafNodes = HashMultimap.create();
+        Set<NetworkNode> newLeafNodes = Sets.newHashSet();
 
         // Try adding to existing networks
         final Iterator<SimpleNetwork> networkIterator = networks.iterator();
         while (networkIterator.hasNext()) {
             final SimpleNetwork network = networkIterator.next();
-            if (network.canAddNetworkingNode(location, connectingOnSides)) {
+            if (network.canAddNetworkingNode(networkNode)) {
                 if (addToNetwork == null) {
                     addToNetwork = network;
                 } else {
-                    Map<Vector3i, Byte> networkingNodes = Maps.newHashMap(network.getNetworkingNodes());
-                    Multimap<Vector3i, Byte> leafNodes = HashMultimap.create(network.getLeafNodes());
+                    Set<NetworkNode> networkingNodes = Sets.newHashSet(network.getNetworkingNodes());
+                    Set<NetworkNode> leafNodes = Sets.newHashSet(network.getLeafNodes());
 
-                    networkingNodesToAdd.putAll(networkingNodes);
-                    newLeafNodes.putAll(leafNodes);
+                    networkingNodesToAdd.addAll(networkingNodes);
+                    newLeafNodes.addAll(leafNodes);
 
                     network.removeAllLeafNodes();
-                    notifyLeafNodesRemoved(network, leafNodes);
+                    notifyLeafNodesRemoved(network, toMultimap(leafNodes));
                     network.removeAllNetworkingNodes();
-                    notifyNetworkingNodesRemoved(network, networkingNodes);
+                    notifyNetworkingNodesRemoved(network, toMultimap(networkingNodes));
 
                     networkIterator.remove();
                     notifyNetworkRemoved(network);
@@ -83,59 +92,57 @@ public class BlockNetwork {
             addToNetwork = newNetwork;
         }
 
-        for (Map.Entry<Vector3i, Byte> networkingNode : networkingNodesToAdd.entrySet())
-            addToNetwork.addNetworkingNode(networkingNode.getKey(), networkingNode.getValue());
-        notifyNetworkingNodesAdded(addToNetwork, networkingNodesToAdd);
+        for (NetworkNode networkingNode : networkingNodesToAdd)
+            addToNetwork.addNetworkingNode(networkingNode);
+        notifyNetworkingNodesAdded(addToNetwork, toMultimap(networkingNodesToAdd));
 
-        for (Map.Entry<Vector3i, Byte> leafNode : newLeafNodes.entries())
-            addToNetwork.addLeafNode(leafNode.getKey(), leafNode.getValue());
+        for (NetworkNode leafNode : newLeafNodes)
+            addToNetwork.addLeafNode(leafNode);
 
         // Find all leaf nodes that it joins to its network
-        for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entries()) {
-            final Vector3i leafNodeLocation = leafNode.getKey();
-            final byte leafNodeConnectingOnSides = leafNode.getValue();
-            if (addToNetwork.canAddLeafNode(leafNodeLocation, leafNodeConnectingOnSides)) {
-                addToNetwork.addLeafNode(leafNodeLocation, leafNodeConnectingOnSides);
-                newLeafNodes.put(leafNodeLocation, leafNodeConnectingOnSides);
+        for (NetworkNode leafNode : leafNodes) {
+            if (addToNetwork.canAddLeafNode(leafNode)) {
+                addToNetwork.addLeafNode(leafNode);
+                newLeafNodes.add(leafNode);
             }
         }
 
         if (newLeafNodes.size() > 0)
-            notifyLeafNodesAdded(addToNetwork, newLeafNodes);
+            notifyLeafNodesAdded(addToNetwork, toMultimap(newLeafNodes));
     }
 
     public void addLeafBlock(Vector3i location, byte connectingOnSides) {
         validateNotMutating();
         mutating = true;
         try {
+            final NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
+
             for (SimpleNetwork network : networks) {
-                if (network.canAddLeafNode(location, connectingOnSides)) {
-                    network.addLeafNode(location, connectingOnSides);
-                    notifyLeafNodesAdded(network, ImmutableMultimap.of(location, connectingOnSides));
+                if (network.canAddLeafNode(networkNode)) {
+                    network.addLeafNode(networkNode);
+                    notifyLeafNodesAdded(network, toMultimap(Collections.singleton(networkNode)));
                 }
             }
 
             // Check for new degenerated networks
-            for (Map.Entry<Vector3i, Byte> leafNode : leafNodes.entries()) {
-                final Vector3i leafLocation = leafNode.getKey();
-                final byte leafConnectingOnSides = leafNode.getValue();
-                if (SimpleNetwork.areNodesConnecting(location, connectingOnSides, leafLocation, leafConnectingOnSides)) {
-                    SimpleNetwork degenerateNetwork = SimpleNetwork.createDegenerateNetwork(location, connectingOnSides, leafLocation, leafConnectingOnSides);
+            for (NetworkNode leafNode : leafNodes) {
+                if (SimpleNetwork.areNodesConnecting(networkNode, leafNode)) {
+                    SimpleNetwork degenerateNetwork = SimpleNetwork.createDegenerateNetwork(networkNode, leafNode);
                     networks.add(degenerateNetwork);
                     notifyNetworkAdded(degenerateNetwork);
-                    notifyLeafNodesAdded(degenerateNetwork, ImmutableMultimap.of(location, connectingOnSides, leafLocation, leafConnectingOnSides));
+                    notifyLeafNodesAdded(degenerateNetwork, toMultimap(Sets.newHashSet(networkNode, leafNode)));
                 }
             }
 
-            leafNodes.put(location, connectingOnSides);
+            leafNodes.add(networkNode);
         } finally {
             mutating = false;
         }
     }
 
-    public void updateNetworkingBlock(Vector3i location, byte connectingOnSides) {
-        removeNetworkingBlock(location);
-        addNetworkingBlock(location, connectingOnSides);
+    public void updateNetworkingBlock(Vector3i location, byte oldConnectingOnSides, byte newConnectingOnSides) {
+        removeNetworkingBlock(location, oldConnectingOnSides);
+        addNetworkingBlock(location, newConnectingOnSides);
     }
 
     public void updateLeafBlock(Vector3i location, byte oldConnectingOnSides, byte newConnectingOnSides) {
@@ -143,34 +150,36 @@ public class BlockNetwork {
         addLeafBlock(location, newConnectingOnSides);
     }
 
-    public void removeNetworkingBlock(Vector3i location) {
+    public void removeNetworkingBlock(Vector3i location, byte connectingOnSides) {
         validateNotMutating();
         mutating = true;
         try {
-            SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(location);
+            NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
+
+            SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
 
             if (networkWithBlock == null)
                 throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
 
-            networkingNodes.remove(location);
+            networkingNodes.remove(networkNode);
 
             // Naive implementation, just remove everything and start over
             // TODO: Improve to actually detects the branches of splits and build separate network for each disjunctioned
             // TODO: network
-            Map<Vector3i, Byte> networkingNodes = Maps.newHashMap(networkWithBlock.getNetworkingNodes());
-            Multimap<Vector3i, Byte> leafNodes = HashMultimap.create(networkWithBlock.getLeafNodes());
+            Set<NetworkNode> networkingNodes = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
+            Set<NetworkNode> leafNodes = Sets.newHashSet(networkWithBlock.getLeafNodes());
 
             networkWithBlock.removeAllLeafNodes();
-            notifyLeafNodesRemoved(networkWithBlock, leafNodes);
+            notifyLeafNodesRemoved(networkWithBlock, toMultimap(leafNodes));
             networkWithBlock.removeAllNetworkingNodes();
-            notifyNetworkingNodesRemoved(networkWithBlock, networkingNodes);
+            notifyNetworkingNodesRemoved(networkWithBlock, toMultimap(networkingNodes));
 
             networks.remove(networkWithBlock);
             notifyNetworkRemoved(networkWithBlock);
 
-            for (Map.Entry<Vector3i, Byte> networkingNode : networkingNodes.entrySet()) {
-                if (!networkingNode.getKey().equals(location))
-                    addNetworkingBlockInternal(networkingNode.getKey(), networkingNode.getValue());
+            for (NetworkNode networkingNode : networkingNodes) {
+                if (!networkingNode.equals(networkNode))
+                    addNetworkingBlockInternal(networkingNode);
             }
         } finally {
             mutating = false;
@@ -181,17 +190,19 @@ public class BlockNetwork {
         validateNotMutating();
         mutating = true;
         try {
-            leafNodes.remove(location, connectingOnSides);
+            NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
+
+            leafNodes.remove(networkNode);
             final Iterator<SimpleNetwork> networkIterator = networks.iterator();
             while (networkIterator.hasNext()) {
                 final SimpleNetwork network = networkIterator.next();
-                if (network.hasLeafNode(location, connectingOnSides)) {
-                    boolean degenerate = network.removeLeafNode(location, connectingOnSides);
+                if (network.hasLeafNode(networkNode)) {
+                    boolean degenerate = network.removeLeafNode(networkNode);
                     if (!degenerate)
                         notifyLeafNodesRemoved(network, ImmutableMultimap.of(location, connectingOnSides));
                     else {
-                        Map.Entry<Vector3i, Byte> onlyLeafNode = network.getLeafNodes().entries().iterator().next();
-                        notifyLeafNodesRemoved(network, ImmutableMultimap.of(location, connectingOnSides, onlyLeafNode.getKey(), onlyLeafNode.getValue()));
+                        NetworkNode onlyLeafNode = network.getLeafNodes().iterator().next();
+                        notifyLeafNodesRemoved(network, toMultimap(Sets.<NetworkNode>newHashSet(networkNode, onlyLeafNode)));
 
                         networkIterator.remove();
                         notifyNetworkRemoved(network);
@@ -211,9 +222,9 @@ public class BlockNetwork {
         return networks.contains(network);
     }
 
-    private SimpleNetwork findNetworkWithNetworkingBlock(Vector3i location) {
+    private SimpleNetwork findNetworkWithNetworkingBlock(NetworkNode networkNode) {
         for (SimpleNetwork network : networks) {
-            if (network.hasNetworkingNode(location))
+            if (network.hasNetworkingNode(networkNode))
                 return network;
         }
         return null;
@@ -229,12 +240,12 @@ public class BlockNetwork {
             listener.networkRemoved(network);
     }
 
-    private void notifyNetworkingNodesAdded(SimpleNetwork network, Map<Vector3i, Byte> networkingNodes) {
+    private void notifyNetworkingNodesAdded(SimpleNetwork network, Multimap<Vector3i, Byte> networkingNodes) {
         for (NetworkTopologyListener listener : listeners)
             listener.networkingNodesAdded(network, networkingNodes);
     }
 
-    private void notifyNetworkingNodesRemoved(SimpleNetwork network, Map<Vector3i, Byte> networkingNodes) {
+    private void notifyNetworkingNodesRemoved(SimpleNetwork network, Multimap<Vector3i, Byte> networkingNodes) {
         for (NetworkTopologyListener listener : listeners)
             listener.networkingNodesRemoved(network, networkingNodes);
     }

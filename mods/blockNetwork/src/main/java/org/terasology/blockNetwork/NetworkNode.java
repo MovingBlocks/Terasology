@@ -6,11 +6,11 @@ import org.terasology.math.Vector3i;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class NetworkNode {
-    public final Vector3i location;
+    public final ImmutableBlockLocation location;
     public final byte connectionSides;
 
     public NetworkNode(Vector3i location, byte connectionSides) {
-        this.location = location;
+        this.location = new ImmutableBlockLocation(location.x, location.y, location.z);
         this.connectionSides = connectionSides;
     }
 

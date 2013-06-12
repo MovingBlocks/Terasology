@@ -30,13 +30,17 @@ public class BlockNetworkTest {
         allDirections = DirectionsUtil.addDirection((byte) 0, Direction.UP, Direction.LEFT, Direction.FORWARD, Direction.DOWN, Direction.RIGHT, Direction.BACKWARD);
     }
 
+    private NetworkNode toNode(Vector3i location, byte directions) {
+        return new NetworkNode(location, directions);
+    }
+
     @Test
     public void addAndRemoveNetworkingBlock() {
         blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
         assertEquals(1, listener.networksAdded);
 
-        blockNetwork.removeNetworkingBlock(new Vector3i(0, 0, 0));
+        blockNetwork.removeNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(0, blockNetwork.getNetworks().size());
         assertEquals(1, listener.networksRemoved);
     }
@@ -71,8 +75,8 @@ public class BlockNetworkTest {
         blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
         Network network = blockNetwork.getNetworks().iterator().next();
-        assertTrue(network.hasLeafNode(new Vector3i(0, 0, 1), allDirections));
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
+        assertTrue(network.hasLeafNode(toNode(new Vector3i(0, 0, 1), allDirections)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 0), allDirections)));
 
         assertEquals(1, listener.networksAdded);
     }
@@ -95,15 +99,15 @@ public class BlockNetworkTest {
         blockNetwork.addLeafBlock(new Vector3i(1, 0, 0), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
         Network network = blockNetwork.getNetworks().iterator().next();
-        assertFalse(network.hasLeafNode(new Vector3i(1, 0, 0), allDirections));
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
+        assertFalse(network.hasLeafNode(toNode(new Vector3i(1, 0, 0), allDirections)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections)));
         assertEquals(1, listener.networksAdded);
 
         blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
-        assertTrue(network.hasLeafNode(new Vector3i(1, 0, 0), allDirections));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 0), allDirections)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections)));
+        assertTrue(network.hasLeafNode(toNode(new Vector3i(1, 0, 0), allDirections)));
         assertEquals(1, listener.networksAdded);
         assertEquals(2, listener.networkingNodesAdded);
         assertEquals(1, listener.leafNodesAdded);
@@ -117,7 +121,7 @@ public class BlockNetworkTest {
         assertEquals(1, blockNetwork.getNetworks().size());
         assertEquals(1, listener.networksAdded);
 
-        blockNetwork.removeNetworkingBlock(new Vector3i(0, 0, 0));
+        blockNetwork.removeNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(2, blockNetwork.getNetworks().size());
     }
 
@@ -131,9 +135,9 @@ public class BlockNetworkTest {
         blockNetwork.addNetworkingBlock(new Vector3i(0, 0, 0), allDirections);
         assertEquals(1, blockNetwork.getNetworks().size());
         Network network = blockNetwork.getNetworks().iterator().next();
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, -1)));
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 0)));
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, -1), allDirections)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 0), allDirections)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections)));
         assertEquals(1, listener.networksRemoved);
     }
 
@@ -149,9 +153,9 @@ public class BlockNetworkTest {
         assertEquals(1, blockNetwork.getNetworks().size());
 
         Network network = blockNetwork.getNetworks().iterator().next();
-        assertTrue(network.hasLeafNode(new Vector3i(0, 0, 0), allDirections));
-        assertTrue(network.hasNetworkingNode(new Vector3i(0, 0, 1)));
-        assertTrue(network.hasLeafNode(new Vector3i(0, 0, 2), allDirections));
+        assertTrue(network.hasLeafNode(toNode(new Vector3i(0, 0, 0), allDirections)));
+        assertTrue(network.hasNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections)));
+        assertTrue(network.hasLeafNode(toNode(new Vector3i(0, 0, 2), allDirections)));
     }
 
     private class TestListener implements NetworkTopologyListener {
@@ -182,12 +186,12 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Map<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesAdded(Network network, Multimap<Vector3i, Byte> networkingNodes) {
             networkingNodesAdded++;
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Map<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesRemoved(Network network, Multimap<Vector3i, Byte> networkingNodes) {
             networkingNodesRemoved++;
         }
 
@@ -213,14 +217,14 @@ public class BlockNetworkTest {
         }
 
         @Override
-        public void networkingNodesAdded(Network network, Map<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesAdded(Network network, Multimap<Vector3i, Byte> networkingNodes) {
             assertTrue(networks.contains(network));
             for (Vector3i networkingNode : networkingNodes.keySet())
                 assertTrue(this.networkingNodes.put(network, networkingNode));
         }
 
         @Override
-        public void networkingNodesRemoved(Network network, Map<Vector3i, Byte> networkingNodes) {
+        public void networkingNodesRemoved(Network network, Multimap<Vector3i, Byte> networkingNodes) {
             assertTrue(networks.contains(network));
             for (Vector3i networkingNode : networkingNodes.keySet())
                 assertTrue(this.networkingNodes.remove(network, networkingNode));

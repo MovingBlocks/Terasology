@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.terasology.blockNetwork.BlockNetwork;
+import org.terasology.blockNetwork.NetworkNode;
 import org.terasology.blockNetwork.NetworkTopologyListener;
 import org.terasology.blockNetwork.Network;
 import org.terasology.entitySystem.*;
@@ -159,7 +160,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
         for (Vector3i producerLocation : producers) {
             final int signalStrength = producerSignalStrengths.get(producerLocation);
-            if (network.isInDistance(signalStrength, producerLocation, signalProducers.get(producerLocation), location, signalConsumers.get(location)))
+            if (network.isInDistance(signalStrength, new NetworkNode(producerLocation, signalProducers.get(producerLocation)), new NetworkNode(location, signalConsumers.get(location))))
                 return true;
         }
 
@@ -171,13 +172,13 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @Override
-    public void networkingNodesAdded(Network network, Map<Vector3i, Byte> networkingNodes) {
+    public void networkingNodesAdded(Network network, Multimap<Vector3i, Byte> networkingNodes) {
         logger.info("Cable added to network");
         networksToRecalculate.add(network);
     }
 
     @Override
-    public void networkingNodesRemoved(Network network, Map<Vector3i, Byte> networkingNodes) {
+    public void networkingNodesRemoved(Network network, Multimap<Vector3i, Byte> networkingNodes) {
         logger.info("Cable removed from network");
         networksToRecalculate.add(network);
     }
@@ -241,13 +242,16 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         if (block.hasComponent(BlockComponent.class)) {
             byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-            signalNetwork.updateNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides);
+            // TODO Remove the 0 parameter, as it's just a hack for now
+            signalNetwork.updateNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), (byte) 0, connectingOnSides);
         }
     }
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
     public void conductorRemoved(OnRemovedEvent event, EntityRef block) {
-        signalNetwork.removeNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()));
+        byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
+
+        signalNetwork.removeNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides);
     }
 
     /**
