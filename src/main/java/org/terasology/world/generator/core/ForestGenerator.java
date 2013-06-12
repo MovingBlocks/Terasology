@@ -18,6 +18,8 @@ package org.terasology.world.generator.core;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
@@ -35,6 +37,9 @@ import com.google.common.collect.ListMultimap;
  * @author Immortius
  */
 public class ForestGenerator implements SecondPassChunkGenerator {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ForestGenerator.class);
+    
     private String seed;
     private WorldBiomeProvider biomeProvider;
 
@@ -69,6 +74,10 @@ public class ForestGenerator implements SecondPassChunkGenerator {
                     int randZ = z + random.randomInt(3);
 
                     Block posBlock = view.getBlock(randX, y, randZ);
+                    if (posBlock == null) {
+                        logger.error("WorldView.getBlock({}, {}, {}) return null, skipping forest generation (watchdog for issue #534)", randX, y, randZ);
+                        return;
+                    }
 
                     if (posBlock.equals(sandBlock) || posBlock.equals(grassBlock) || posBlock.equals(snowBlock)) {
                         double rand = Math.abs(random.randomDouble());
