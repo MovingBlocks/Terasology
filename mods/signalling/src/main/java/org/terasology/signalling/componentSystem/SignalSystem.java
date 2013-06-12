@@ -226,6 +226,9 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void networkRemoved(Network network) {
     }
 
+    private NetworkNode toNode(Vector3i location, byte directions) {
+        return new NetworkNode(location, directions);
+    }
     /**
      * ****************************** Conductor events ********************************
      */
@@ -234,7 +237,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void conductorAdded(OnAddedEvent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-        signalNetwork.addNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides);
+        signalNetwork.addNetworkingBlock(toNode(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides));
     }
 
     @ReceiveEvent(components = {SignalConductorComponent.class})
@@ -243,7 +246,8 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
             // TODO Remove the 0 parameter, as it's just a hack for now
-            signalNetwork.updateNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), (byte) 0, connectingOnSides);
+            final Vector3i position = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
+            signalNetwork.updateNetworkingBlock(toNode(position, (byte) 0), toNode(new Vector3i(position), connectingOnSides));
         }
     }
 
@@ -251,7 +255,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void conductorRemoved(OnRemovedEvent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-        signalNetwork.removeNetworkingBlock(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides);
+        signalNetwork.removeNetworkingBlock(toNode(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides));
     }
 
     /**
@@ -266,7 +270,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
         signalProducers.put(location, connectingOnSides);
         producerSignalStrengths.put(location, producerComponent.signalStrength);
-        signalNetwork.addLeafBlock(location, connectingOnSides);
+        signalNetwork.addLeafBlock(toNode(location, connectingOnSides));
     }
 
     @ReceiveEvent(components = {SignalProducerComponent.class})
@@ -280,7 +284,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             byte newConnectionSides = producerComponent.connectionSides;
             if (oldConnectionSides != newConnectionSides) {
                 signalProducers.put(location, newConnectionSides);
-                signalNetwork.updateLeafBlock(location, oldConnectionSides, newConnectionSides);
+                signalNetwork.updateLeafBlock(toNode(location, oldConnectionSides), toNode(location, newConnectionSides));
             }
 
             int oldSignalStrength = producerSignalStrengths.get(location);
@@ -297,7 +301,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalProducerComponent.class).connectionSides;
 
-        signalNetwork.removeLeafBlock(location, connectingOnSides);
+        signalNetwork.removeLeafBlock(toNode(location, connectingOnSides));
         signalProducers.remove(location);
         producerSignalStrengths.remove(location);
     }
@@ -313,7 +317,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
         signalConsumers.put(location, connectingOnSides);
         consumerSignalInNetworks.put(location, Maps.<Network, Boolean>newHashMap());
-        signalNetwork.addLeafBlock(location, connectingOnSides);
+        signalNetwork.addLeafBlock(toNode(location, connectingOnSides));
     }
 
     @ReceiveEvent(components = {SignalConsumerComponent.class})
@@ -327,7 +331,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             byte newConnectionSides = consumerComponent.connectionSides;
             if (oldConnectionSides != newConnectionSides) {
                 signalConsumers.put(location, newConnectionSides);
-                signalNetwork.updateLeafBlock(location, oldConnectionSides, newConnectionSides);
+                signalNetwork.updateLeafBlock(toNode(location, oldConnectionSides), toNode(location, newConnectionSides));
             }
             // Mode could have changed
             consumersToRecalculate.add(location);
@@ -339,7 +343,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
-        signalNetwork.removeLeafBlock(location, connectingOnSides);
+        signalNetwork.removeLeafBlock(toNode(location, connectingOnSides));
         signalConsumers.remove(location);
         consumerSignalInNetworks.remove(location);
     }

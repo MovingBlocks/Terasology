@@ -1,7 +1,6 @@
 package org.terasology.blockNetwork;
 
 import com.google.common.collect.*;
-import org.terasology.math.Vector3i;
 
 import java.util.*;
 
@@ -30,25 +29,16 @@ public class BlockNetwork {
             throw new IllegalStateException("Can't modify block network while modification is in progress");
     }
 
-    public void addNetworkingBlock(Vector3i location, byte connectingOnSides) {
+    public void addNetworkingBlock(NetworkNode networkNode) {
         validateNotMutating();
         mutating = true;
         try {
-            final NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
             networkingNodes.add(networkNode);
 
             addNetworkingBlockInternal(networkNode);
         } finally {
             mutating = false;
         }
-    }
-
-    private Multimap<Vector3i, Byte> toMultimap(Set<NetworkNode> networkNodes) {
-        Multimap<Vector3i, Byte> result = HashMultimap.create();
-        for (NetworkNode networkNode : networkNodes) {
-            result.put(networkNode.location.toVector3i(), networkNode.connectionSides);
-        }
-        return result;
     }
 
     private void addNetworkingBlockInternal(NetworkNode networkNode) {
@@ -111,12 +101,10 @@ public class BlockNetwork {
             notifyLeafNodesAdded(addToNetwork, newLeafNodes);
     }
 
-    public void addLeafBlock(Vector3i location, byte connectingOnSides) {
+    public void addLeafBlock(NetworkNode networkNode) {
         validateNotMutating();
         mutating = true;
         try {
-            final NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
-
             for (SimpleNetwork network : networks) {
                 if (network.canAddLeafNode(networkNode)) {
                     network.addLeafNode(networkNode);
@@ -140,22 +128,20 @@ public class BlockNetwork {
         }
     }
 
-    public void updateNetworkingBlock(Vector3i location, byte oldConnectingOnSides, byte newConnectingOnSides) {
-        removeNetworkingBlock(location, oldConnectingOnSides);
-        addNetworkingBlock(location, newConnectingOnSides);
+    public void updateNetworkingBlock(NetworkNode oldNode, NetworkNode newNode) {
+        removeNetworkingBlock(oldNode);
+        addNetworkingBlock(newNode);
     }
 
-    public void updateLeafBlock(Vector3i location, byte oldConnectingOnSides, byte newConnectingOnSides) {
-        removeLeafBlock(location, oldConnectingOnSides);
-        addLeafBlock(location, newConnectingOnSides);
+    public void updateLeafBlock(NetworkNode oldNode, NetworkNode newNode) {
+        removeLeafBlock(oldNode);
+        addLeafBlock(newNode);
     }
 
-    public void removeNetworkingBlock(Vector3i location, byte connectingOnSides) {
+    public void removeNetworkingBlock(NetworkNode networkNode) {
         validateNotMutating();
         mutating = true;
         try {
-            NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
-
             SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
 
             if (networkWithBlock == null)
@@ -186,12 +172,10 @@ public class BlockNetwork {
         }
     }
 
-    public void removeLeafBlock(Vector3i location, byte connectingOnSides) {
+    public void removeLeafBlock(NetworkNode networkNode) {
         validateNotMutating();
         mutating = true;
         try {
-            NetworkNode networkNode = new NetworkNode(location, connectingOnSides);
-
             leafNodes.remove(networkNode);
             final Iterator<SimpleNetwork> networkIterator = networks.iterator();
             while (networkIterator.hasNext()) {
