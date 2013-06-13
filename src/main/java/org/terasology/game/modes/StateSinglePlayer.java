@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.MenuControlSystem;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventSystem;
@@ -29,6 +30,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -134,7 +136,12 @@ public class StateSinglePlayer implements GameState {
         glLoadIdentity();
 
         if (worldRenderer != null) {
-            worldRenderer.render();
+            if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_DEFAULT);
+            } else {
+                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_OCULUS_LEFT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_OCULUS_RIGHT_EYE);
+            }
         }
 
         /* UI */

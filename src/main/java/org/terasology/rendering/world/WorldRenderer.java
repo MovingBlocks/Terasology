@@ -44,6 +44,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshRenderer;
@@ -125,12 +126,9 @@ public final class WorldRenderer {
     private LocalPlayer player;
 
     /* CAMERAS */
-    private Camera localPlayerCamera = new PerspectiveCamera();
-
-    //private Camera lightCamera = new PerspectiveCamera();
+    private Camera localPlayerCamera = null;
     private Camera lightCamera = new OrthographicCamera(-500f, 500f, 500f, -500f);
-
-    private Camera activeCamera = localPlayerCamera;
+    private Camera activeCamera = null;
 
     /* CHUNKS */
     private ChunkTessellator chunkTessellator;
@@ -143,6 +141,8 @@ public final class WorldRenderer {
     private final LinkedList<Chunk> renderQueueChunksOpaqueShadow = Lists.newLinkedList();
     private final PriorityQueue<Chunk> renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
     private final PriorityQueue<Chunk> renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+
+    private WorldRenderingStage currentRenderStage = WorldRenderingStage.WRS_DEFAULT;
 
     /* HORIZON */
     private final Skysphere skysphere;
@@ -167,10 +167,16 @@ public final class WorldRenderer {
     private int statChunkMeshEmpty, statChunkNotReady, statRenderedTriangles;
 
     /* ENUMS */
-    private enum CHUNK_RENDER_MODE {
-        DEFAULT,
-        REFLECTED,
-        SHADOW_MAP
+    public enum ChunkRenderMode {
+        CRM_DEFAULT,
+        CRM_REFLECTED,
+        CRM_SHADOW_MAP
+    }
+
+    public enum WorldRenderingStage {
+        WRS_DEFAULT,
+        WRS_OCULUS_LEFT_EYE,
+        WRS_OCULUS_RIGHT_EYE
     }
 
     private ComponentSystemManager _systemManager;
@@ -260,10 +266,17 @@ public final class WorldRenderer {
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
         blockGrid = new BlockGrid();
 
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+            localPlayerCamera = new OculusStereoCamera();
+        } else {
+            localPlayerCamera = new PerspectiveCamera();
+        }
+
+        activeCamera = localPlayerCamera;
+
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         _systemManager = CoreRegistry.get(ComponentSystemManager.class);
-
 
         initTimeEvents();
     }
@@ -567,7 +580,20 @@ public final class WorldRenderer {
     /**
      * Renders the world.
      */
-    public void render() {
+    public void render(DefaultRenderingProcess.RenderType renderType) {
+
+        switch (renderType) {
+            case RT_DEFAULT:
+                currentRenderStage = WorldRenderingStage.WRS_DEFAULT;
+                break;
+            case RT_OCULUS_LEFT_EYE:
+                currentRenderStage = WorldRenderingStage.WRS_OCULUS_LEFT_EYE;
+                break;
+            case RT_OCULUS_RIGHT_EYE:
+                currentRenderStage = WorldRenderingStage.WRS_OCULUS_RIGHT_EYE;
+                break;
+        }
+
         resetStats();
 
         updateAndQueueVisibleChunks();
@@ -575,12 +601,14 @@ public final class WorldRenderer {
         DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
         glCullFace(GL11.GL_FRONT);
         getActiveCamera().setReflected(true);
-        renderWorldReflection(getActiveCamera());
+        renderWorldReflection(activeCamera);
         getActiveCamera().setReflected(false);
         glCullFace(GL11.GL_BACK);
         DefaultRenderingProcess.getInstance().endRenderReflectedScene();
 
-        if (config.getRendering().isDynamicShadows()) {
+        if (config.getRendering().isDynamicShadows()
+                // Only render the shadow map once
+                && (renderType == DefaultRenderingProcess.RenderType.RT_DEFAULT || renderType == DefaultRenderingProcess.RenderType.RT_OCULUS_LEFT_EYE)) {
             DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
             //glCullFace(GL11.GL_FRONT);
             renderShadowMap(lightCamera);
@@ -592,10 +620,13 @@ public final class WorldRenderer {
 
         /* RENDER THE FINAL POST-PROCESSED SCENE */
         PerformanceMonitor.startActivity("Render Post-Processing");
-        DefaultRenderingProcess.getInstance().renderScene();
+        DefaultRenderingProcess.getInstance().renderScene(renderType);
         PerformanceMonitor.endActivity();
 
-        if (activeCamera != null && !config.getSystem().isDebugFirstPersonElementsHidden()) {
+        if (activeCamera != null
+                // TODO: First person view is currently not working with OculusVR support enabled
+                && renderType == DefaultRenderingProcess.RenderType.RT_DEFAULT
+                && !config.getSystem().isDebugFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
 
             glClear(GL_DEPTH_BUFFER_BIT);
@@ -648,7 +679,7 @@ public final class WorldRenderer {
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         while (renderQueueChunksOpaque.size() > 0)
-            renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, CHUNK_RENDER_MODE.DEFAULT);
+            renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.CRM_DEFAULT);
 
         PerformanceMonitor.endActivity();
 
@@ -661,7 +692,7 @@ public final class WorldRenderer {
          * SECOND RENDER PASS: BILLBOARDS
          */
         while (renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, CHUNK_RENDER_MODE.DEFAULT);
+            renderChunk(renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, ChunkRenderMode.CRM_DEFAULT);
 
         PerformanceMonitor.endActivity();
 
@@ -677,7 +708,7 @@ public final class WorldRenderer {
         */
         while (renderQueueChunksSortedWater.size() > 0) {
             Chunk c = renderQueueChunksSortedWater.poll();
-            renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, CHUNK_RENDER_MODE.DEFAULT);
+            renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.CRM_DEFAULT);
         }
 
         PerformanceMonitor.endActivity();
@@ -719,7 +750,7 @@ public final class WorldRenderer {
             camera.lookThrough();
 
             for (Chunk c : renderQueueChunksOpaque)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, CHUNK_RENDER_MODE.REFLECTED);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.CRM_REFLECTED);
         }
 
         PerformanceMonitor.endActivity();
@@ -731,7 +762,7 @@ public final class WorldRenderer {
         camera.lookThrough();
 
         while (renderQueueChunksOpaqueShadow.size() > 0)
-            renderChunk(renderQueueChunksOpaqueShadow.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, CHUNK_RENDER_MODE.SHADOW_MAP);
+            renderChunk(renderQueueChunksOpaqueShadow.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.CRM_SHADOW_MAP);
 
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderShadows();
@@ -740,7 +771,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera,CHUNK_RENDER_MODE mode) {
+    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera,ChunkRenderMode mode) {
 
         if (chunk.getChunkState() == ChunkState.COMPLETE && chunk.getMesh() != null) {
 
@@ -750,7 +781,7 @@ public final class WorldRenderer {
             Vector3d chunkPositionRelToCamera =
                     new Vector3d(chunk.getPos().x * Chunk.SIZE_X - cameraPosition.x, chunk.getPos().y * Chunk.SIZE_Y - cameraPosition.y, chunk.getPos().z * Chunk.SIZE_Z - cameraPosition.z);
 
-            if (mode == CHUNK_RENDER_MODE.DEFAULT || mode == CHUNK_RENDER_MODE.REFLECTED) {
+            if (mode == ChunkRenderMode.CRM_DEFAULT || mode == ChunkRenderMode.CRM_REFLECTED) {
                 shader = ShaderManager.getInstance().getShaderProgram("chunk");
                 shader.enable();
 
@@ -774,12 +805,12 @@ public final class WorldRenderer {
                 shader.setFloat3("chunkPositionWorld", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
                 shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
-                if (mode == CHUNK_RENDER_MODE.REFLECTED) {
+                if (mode == ChunkRenderMode.CRM_REFLECTED) {
                     shader.setFloat("clip", camera.getClipHeight());
                 } else {
                     shader.setFloat("clip", 0.0f);
                 }
-            } else if (mode == CHUNK_RENDER_MODE.SHADOW_MAP) {
+            } else if (mode == ChunkRenderMode.CRM_SHADOW_MAP) {
                 shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
                 shader.enable();
             }
@@ -1154,5 +1185,9 @@ public final class WorldRenderer {
 
     public ChunkTessellator getChunkTesselator() {
         return chunkTessellator;
+    }
+
+    public WorldRenderingStage getCurrentRenderStage() {
+        return currentRenderStage;
     }
 }

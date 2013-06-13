@@ -36,6 +36,7 @@ public class RenderingConfig {
     private boolean eyeAdaptation = true;
     private boolean bloom = false;
     private boolean dynamicShadows = false;
+    private boolean oculusVrSupport = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -267,6 +268,14 @@ public class RenderingConfig {
 
     public void setBloom(boolean bloom) {
         this.bloom = bloom;
+    }
+
+    public boolean isOculusVrSupport() {
+        return oculusVrSupport;
+    }
+
+    public void setOculusVrSupport(boolean oculusVrSupport) {
+        this.oculusVrSupport = oculusVrSupport;
     }
 
     public int getActiveViewingDistance() {

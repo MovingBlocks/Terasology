@@ -75,9 +75,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 	private static Collection<String> taintedReasons = new HashSet<String>();
 
     public enum FBOType {
-        DEFAULT,
-        HDR,
-        NO_COLOR
+        FBOT_DEFAULT,
+        FBOT_HDR,
+        FBOT_NO_COLOR
+    }
+
+    public enum RenderType {
+        RT_DEFAULT,
+        RT_OCULUS_LEFT_EYE,
+        RT_OCULUS_RIGHT_EYE
     }
 
     public class PBO {
@@ -185,11 +191,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
-        createFBO("scene16", 16, 16, FBOType.DEFAULT, false, false);
-        createFBO("scene8", 8, 8, FBOType.DEFAULT, false, false);
-        createFBO("scene4", 4, 4, FBOType.DEFAULT, false, false);
-        createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
-        createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
+        createFBO("scene16", 16, 16, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scene8", 8, 8, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scene4", 4, 4, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scene2", 2, 2, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scene1", 1, 1, FBOType.FBOT_DEFAULT, false, false);
 
         readBackPBOFront = new PBO();
         readBackPBOBack = new PBO();
@@ -240,32 +246,32 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
 
-        createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
-        createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
+        createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, true, true);
+        createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, true, true);
 
-        createFBO("sceneShadowMap", 1024, 1024, FBOType.NO_COLOR, true, false);
+        createFBO("sceneShadowMap", 1024, 1024, FBOType.FBOT_NO_COLOR, true, false);
 
-        createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
+        createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, true, true);
 
-        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
-        createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
+        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, false, false);
+        createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, false, false);
 
-        createFBO("sobel", Display.getWidth(), Display.getHeight(), FBOType.DEFAULT, false, false);
+        createFBO("sobel", Display.getWidth(), Display.getHeight(), FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("ssao", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
-        createFBO("ssaoBlurred0", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
-        createFBO("ssaoBlurred1", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
+        createFBO("ssao", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("ssaoBlurred0", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("ssaoBlurred1", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("lightShafts", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
+        createFBO("lightShafts", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("sceneReflected", halfWidth, halfHeight, FBOType.HDR, true, false);
+        createFBO("sceneReflected", halfWidth, halfHeight, FBOType.FBOT_HDR, true, false);
 
-        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
-        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
-        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("sceneBlur0", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
-        createFBO("sceneBlur1", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBlur0", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBlur1", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -298,8 +304,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-        if (type != FBOType.NO_COLOR) {
-            if (type == FBOType.HDR) {
+        if (type != FBOType.FBOT_NO_COLOR) {
+            if (type == FBOType.FBOT_HDR) {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
             } else {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
@@ -344,7 +350,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
 
-        if (type != FBOType.NO_COLOR) {
+        if (type != FBOType.FBOT_NO_COLOR) {
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
         }
 
@@ -359,7 +365,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-        if (type != FBOType.NO_COLOR) {
+        if (type != FBOType.FBOT_NO_COLOR) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
         }
         if (normals) {
@@ -392,14 +398,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
                 
                 /*
-                 * On some graphics cards, FBOType.NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
+                 * On some graphics cards, FBOType.FBOT_NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
                  * Attempt to continue without this FBO.
                  */
-                if (type == FBOType.NO_COLOR) {
+                if (type == FBOType.FBOT_NO_COLOR) {
                 	logger.error("FrameBuffer: " + title
-                            + ", ...but the FBOType was NO_COLOR, ignoring this error and continuing without this FBO.");
+                            + ", ...but the FBOType was FBOT_NO_COLOR, ignoring this error and continuing without this FBO.");
                 	
-                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.NO_COLOR.");
+                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.FBOT_NO_COLOR.");
                 	return null;
                 }
             default:
@@ -507,11 +513,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
+    public void renderScene() {
+        renderScene(RenderType.RT_DEFAULT);
+    }
+
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
      * of the view port changes.
      */
-    public void renderScene() {
+    public void renderScene(RenderType renderType) {
         createOrUpdateFullscreenFbos();
 
         if (config.getRendering().isOutline()) {
@@ -554,10 +564,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             }
         }
 
-        renderFinalScene();
+        renderFinalScene(renderType);
     }
 
-    private void renderFinalScene() {
+    private void renderFinalScene(RenderType renderType) {
         ShaderProgram shader;
 
         if (config.getSystem().isDebugRenderingEnabled()) {
@@ -567,7 +577,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         shader.enable();
-        renderFullQuad();
+
+        switch (renderType) {
+            case RT_DEFAULT:
+                renderFullscreenQuad();
+                break;
+            case RT_OCULUS_LEFT_EYE:
+                renderFullscreenQuad(0,0, Display.getWidth() / 2, Display.getHeight());
+                break;
+            case RT_OCULUS_RIGHT_EYE:
+                renderFullscreenQuad(Display.getWidth() / 2, 0, Display.getWidth() / 2, Display.getHeight());
+                break;
+        }
     }
 
     private void generateCombinedScene() {
@@ -576,7 +597,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         DefaultRenderingProcess.getInstance().getFBO("sceneCombined").bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sceneCombined").unbind();
     }
@@ -588,7 +609,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").unbind();
     }
@@ -602,7 +623,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, lightshaft.width, lightshaft.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("lightShafts").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
@@ -617,7 +638,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, ssao.width, ssao.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("ssao").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
@@ -632,7 +653,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, sobel.width, sobel.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sobel").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
@@ -657,7 +678,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + (id - 1)).bindTexture();
         }
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + id).unbind();
 
@@ -671,7 +692,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("scenePrePost").unbind();
     }
@@ -689,7 +710,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sceneHighPass").unbind();
 
@@ -716,7 +737,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
         }
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + id).unbind();
 
@@ -742,7 +763,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
         }
 
-        renderFullQuad();
+        renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + id).unbind();
 
@@ -770,7 +791,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                 DefaultRenderingProcess.getInstance().getFBO("scene" + sizePrev).bindTexture();
             }
 
-            renderFullQuad();
+            renderFullscreenQuad();
 
             DefaultRenderingProcess.getInstance().getFBO("scene" + size).unbind();
 
@@ -779,7 +800,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    public void renderFullQuad() {
+    public void renderFullscreenQuad() {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
@@ -794,6 +815,27 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
+    }
+
+    public void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
+        glViewport(x, y, viewportWidth, viewportHeight);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+
+        renderQuad();
+
+        glPopMatrix();
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void renderQuad() {

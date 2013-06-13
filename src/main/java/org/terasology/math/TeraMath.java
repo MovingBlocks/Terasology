@@ -437,11 +437,8 @@ public final class TeraMath {
         return m;
     }
 
-    public static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
+    public static Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
         Matrix4f m = new Matrix4f();
-
-        float aspectRatio = (float) Display.getWidth() / Display.getHeight();
-        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
         float f = 1.0f / (float) Math.tan(fovY * 0.5f);
 
@@ -451,6 +448,17 @@ public final class TeraMath {
         m.m03 = 0; m.m13 = 0; m.m23 = -1; m.m33 = 0;
 
         m.transpose();
+
+        return m;
+    }
+
+    public static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
+        Matrix4f m = new Matrix4f();
+
+        float aspectRatio = (float) Display.getWidth() / Display.getHeight();
+        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
+
+        createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
 
         return m;
     }

@@ -69,6 +69,7 @@ public class PerspectiveCamera extends Camera {
 
         _viewMatrix = TeraMath.createViewMatrix(0f, _bobbingVerticalOffsetFactor * 2.0f, 0f, _viewingDirection.x, _viewingDirection.y + _bobbingVerticalOffsetFactor * 2.0f,
                 _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+
         _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
 
         _prevViewProjectionMatrix = new Matrix4f(_viewProjectionMatrix);
