@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-@RegisterSystem(value=RegisterMode.AUTHORITY)
+@RegisterSystem(value = RegisterMode.AUTHORITY)
 public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyListener {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
 
@@ -39,9 +39,10 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     private BlockNetwork signalNetwork;
 
-    // we assume there can be only one consumer and one producer per block
+    // we assume there can be only one consumer, one producer, and/or one conductor per block
     private Map<Vector3i, NetworkNode> signalProducers;
     private Map<Vector3i, NetworkNode> signalConsumers;
+    private Map<Vector3i, NetworkNode> signalConductors;
 
     private Multimap<NetworkNode, Network> producerNetworks = HashMultimap.create();
     private Multimap<Network, NetworkNode> producersInNetwork = HashMultimap.create();
@@ -226,6 +227,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     private NetworkNode toNode(Vector3i location, byte directions) {
         return new NetworkNode(location, directions);
     }
+
     /**
      * ****************************** Conductor events ********************************
      */
@@ -234,7 +236,11 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void conductorAdded(OnAddedEvent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-        signalNetwork.addNetworkingBlock(toNode(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides));
+        final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
+        final NetworkNode conductorNode = toNode(location, connectingOnSides);
+
+        signalConductors.put(location, conductorNode);
+        signalNetwork.addNetworkingBlock(conductorNode);
     }
 
     @ReceiveEvent(components = {SignalConductorComponent.class})
@@ -242,9 +248,14 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         if (block.hasComponent(BlockComponent.class)) {
             byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-            // TODO Remove the 0 parameter, as it's just a hack for now
-            final Vector3i position = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
-            signalNetwork.updateNetworkingBlock(toNode(position, (byte) 0), toNode(new Vector3i(position), connectingOnSides));
+            final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
+
+            final NetworkNode oldConductorNode = signalConductors.get(location);
+            if (oldConductorNode != null) {
+                final NetworkNode newConductorNode = toNode(new Vector3i(location), connectingOnSides);
+                signalConductors.put(location, newConductorNode);
+                signalNetwork.updateNetworkingBlock(oldConductorNode, newConductorNode);
+            }
         }
     }
 
@@ -252,7 +263,9 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void conductorRemoved(OnRemovedEvent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
-        signalNetwork.removeNetworkingBlock(toNode(new Vector3i(block.getComponent(BlockComponent.class).getPosition()), connectingOnSides));
+        final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
+        signalConductors.remove(location);
+        signalNetwork.removeNetworkingBlock(toNode(location, connectingOnSides));
     }
 
     /**
