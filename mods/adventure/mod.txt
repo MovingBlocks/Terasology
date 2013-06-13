@@ -1,0 +1,7 @@
+{
+    "id" : "adventure",
+    "displayName" : "Adventure Mod",
+    "author" : "MrBarsack",
+    "description" : "A module to simplify the creation of adventure maps.",
+    "dependencies" : []
+}
