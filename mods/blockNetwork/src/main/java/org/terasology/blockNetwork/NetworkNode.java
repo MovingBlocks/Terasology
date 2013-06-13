@@ -1,5 +1,6 @@
 package org.terasology.blockNetwork;
 
+import org.terasology.math.Direction;
 import org.terasology.math.Vector3i;
 
 /**
@@ -12,6 +13,10 @@ public class NetworkNode {
     public NetworkNode(Vector3i location, byte connectionSides) {
         this.location = new ImmutableBlockLocation(location.x, location.y, location.z);
         this.connectionSides = connectionSides;
+    }
+
+    public NetworkNode(Vector3i location, Direction ... directions) {
+        this(location, DirectionsUtil.getDirections(directions));
     }
 
     @Override

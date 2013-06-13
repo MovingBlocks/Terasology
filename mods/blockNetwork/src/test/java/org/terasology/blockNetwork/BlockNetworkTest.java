@@ -9,12 +9,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.HashMultimap;
+
+import static org.junit.Assert.*;
 
 public class BlockNetworkTest {
     private BlockNetwork blockNetwork;
@@ -61,7 +60,7 @@ public class BlockNetworkTest {
     public void addTwoNeighbouringLeafBlocks() {
         blockNetwork.addLeafBlock(toNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(0, listener.networksAdded);
-        
+
         blockNetwork.addLeafBlock(toNode(new Vector3i(0, 0, 1), allDirections));
         assertEquals(1, blockNetwork.getNetworks().size());
         assertEquals(1, listener.networksAdded);
@@ -71,7 +70,7 @@ public class BlockNetworkTest {
     public void addLeafNodeThenNetworkingNode() {
         blockNetwork.addLeafBlock(toNode(new Vector3i(0, 0, 1), allDirections));
         assertEquals(0, listener.networksAdded);
-        
+
         blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(1, blockNetwork.getNetworks().size());
         Network network = blockNetwork.getNetworks().iterator().next();
@@ -85,7 +84,7 @@ public class BlockNetworkTest {
     public void addTwoNeighbouringNetworkingBlocks() {
         blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, 0), allDirections));
         assertEquals(1, listener.networksAdded);
-        
+
         blockNetwork.addNetworkingBlock(toNode(new Vector3i(0, 0, 1), allDirections));
         assertEquals(1, blockNetwork.getNetworks().size());
 
@@ -158,6 +157,45 @@ public class BlockNetworkTest {
         assertTrue(network.hasLeafNode(toNode(new Vector3i(0, 0, 2), allDirections)));
     }
 
+    @Test
+    public void addTwoOverlappingCrossingNetworkingNodes() {
+        Vector3i location = new Vector3i(0, 0, 0);
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.LEFT, Direction.RIGHT));
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.FORWARD, Direction.BACKWARD));
+
+        assertEquals(2, blockNetwork.getNetworks().size());
+    }
+
+    @Test
+    public void tryAddingOverlappingConnectionsNetworkingNodes() {
+        Vector3i location = new Vector3i(0, 0, 0);
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.LEFT, Direction.RIGHT));
+        try {
+            blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.FORWARD, Direction.BACKWARD, Direction.LEFT));
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException exp) {
+            // expected
+        }
+    }
+
+    @Test
+    public void cablesInTheSameBlockCanConnectAndHaveCorrectDistance() {
+        Vector3i location = new Vector3i(0, 0, 0);
+        final NetworkNode leftRight = new NetworkNode(location, Direction.LEFT, Direction.RIGHT);
+        blockNetwork.addNetworkingBlock(leftRight);
+        final NetworkNode frontBack = new NetworkNode(location, Direction.FORWARD, Direction.BACKWARD);
+        blockNetwork.addNetworkingBlock(frontBack);
+
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections));
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(1, 0, 1), allDirections));
+        blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(1, 0, 0), allDirections));
+
+        assertEquals(1, blockNetwork.getNetworks().size());
+
+        Network network = blockNetwork.getNetworks().iterator().next();
+        assertEquals(4, network.getDistance(leftRight, frontBack));
+    }
+
     private class TestListener implements NetworkTopologyListener {
         public int networksAdded;
         public int networksRemoved;
@@ -169,10 +207,10 @@ public class BlockNetworkTest {
         public void reset() {
             networksAdded = 0;
             networksRemoved = 0;
-            networkingNodesAdded=0;
-            networkingNodesRemoved=0;
-            leafNodesAdded=0;
-            leafNodesRemoved=0;
+            networkingNodesAdded = 0;
+            networkingNodesRemoved = 0;
+            leafNodesAdded = 0;
+            leafNodesRemoved = 0;
         }
 
         @Override

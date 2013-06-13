@@ -9,8 +9,8 @@ import java.util.*;
  */
 public class BlockNetwork {
     private Set<SimpleNetwork> networks = Sets.newHashSet();
-    private Set<NetworkNode> leafNodes = Sets.newHashSet();
-    private Set<NetworkNode> networkingNodes = Sets.newHashSet();
+    private Multimap<ImmutableBlockLocation, NetworkNode> leafNodes = HashMultimap.create();
+    private Multimap<ImmutableBlockLocation, NetworkNode> networkingNodes = HashMultimap.create();
 
     private Set<NetworkTopologyListener> listeners = new HashSet<NetworkTopologyListener>();
 
@@ -33,11 +33,26 @@ public class BlockNetwork {
         validateNotMutating();
         mutating = true;
         try {
-            networkingNodes.add(networkNode);
+            validateNoNetworkingOverlap(networkNode);
+            networkingNodes.put(networkNode.location, networkNode);
 
             addNetworkingBlockInternal(networkNode);
         } finally {
             mutating = false;
+        }
+    }
+
+    private void validateNoNetworkingOverlap(NetworkNode networkNode) {
+        for (NetworkNode nodeAtSamePosition : networkingNodes.get(networkNode.location)) {
+            if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0)
+                throw new IllegalStateException("There is a networking block at that position connecting to some of the same sides already");
+        }
+    }
+
+    private void validateNoLeafOverlap(NetworkNode networkNode) {
+        for (NetworkNode nodeAtSamePosition : leafNodes.get(networkNode.location)) {
+            if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0)
+                throw new IllegalStateException("There is a leaf block at that position connecting to some of the same sides already");
         }
     }
 
@@ -90,7 +105,7 @@ public class BlockNetwork {
             addToNetwork.addLeafNode(leafNode);
 
         // Find all leaf nodes that it joins to its network
-        for (NetworkNode leafNode : leafNodes) {
+        for (NetworkNode leafNode : leafNodes.values()) {
             if (addToNetwork.canAddLeafNode(leafNode)) {
                 addToNetwork.addLeafNode(leafNode);
                 newLeafNodes.add(leafNode);
@@ -105,6 +120,8 @@ public class BlockNetwork {
         validateNotMutating();
         mutating = true;
         try {
+            validateNoLeafOverlap(networkNode);
+
             for (SimpleNetwork network : networks) {
                 if (network.canAddLeafNode(networkNode)) {
                     network.addLeafNode(networkNode);
@@ -113,7 +130,7 @@ public class BlockNetwork {
             }
 
             // Check for new degenerated networks
-            for (NetworkNode leafNode : leafNodes) {
+            for (NetworkNode leafNode : leafNodes.values()) {
                 if (SimpleNetwork.areNodesConnecting(networkNode, leafNode)) {
                     SimpleNetwork degenerateNetwork = SimpleNetwork.createDegenerateNetwork(networkNode, leafNode);
                     networks.add(degenerateNetwork);
@@ -122,7 +139,7 @@ public class BlockNetwork {
                 }
             }
 
-            leafNodes.add(networkNode);
+            leafNodes.put(networkNode.location, networkNode);
         } finally {
             mutating = false;
         }
@@ -147,7 +164,7 @@ public class BlockNetwork {
             if (networkWithBlock == null)
                 throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
 
-            networkingNodes.remove(networkNode);
+            networkingNodes.remove(networkNode.location, networkNode);
 
             // Naive implementation, just remove everything and start over
             // TODO: Improve to actually detects the branches of splits and build separate network for each disjunctioned
@@ -176,7 +193,7 @@ public class BlockNetwork {
         validateNotMutating();
         mutating = true;
         try {
-            leafNodes.remove(networkNode);
+            leafNodes.remove(networkNode.location, networkNode);
             final Iterator<SimpleNetwork> networkIterator = networks.iterator();
             while (networkIterator.hasNext()) {
                 final SimpleNetwork network = networkIterator.next();

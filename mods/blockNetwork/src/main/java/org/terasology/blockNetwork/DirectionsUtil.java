@@ -23,10 +23,21 @@ public class DirectionsUtil {
         directionBits.put(Direction.BACKWARD, (byte) 32);
     }
 
-    public static byte getDirections(Collection<Direction> directions) {
+    public static byte getDirections(Set<Direction> directions) {
         byte result = 0;
         for (Direction direction : directions)
             result += directionBits.get(direction);
+        return result;
+    }
+
+    public static byte getDirections(Direction... directions) {
+        byte result = 0;
+        for (Direction direction : directions) {
+            final byte directionBit = directionBits.get(direction);
+            if ((result & directionBit) > 0)
+                throw new IllegalArgumentException("Cannot have multiples of the same direction");
+            result += directionBit;
+        }
         return result;
     }
 
@@ -48,7 +59,7 @@ public class DirectionsUtil {
         return (directionBit & directionBits.get(direction)) > 0;
     }
 
-    public static byte addDirection(byte directionBit, Direction ... direction) {
+    public static byte addDirection(byte directionBit, Direction... direction) {
         for (Direction oneDirection : direction) {
             directionBit |= directionBits.get(oneDirection);
         }
