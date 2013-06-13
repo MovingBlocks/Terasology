@@ -237,6 +237,7 @@ subprojects {
         task createSkeleton() {
             mkdir('assets')
             mkdir('src/main/java')
+            mkdir('assets/animations')
             mkdir('assets/blocks')
             mkdir('assets/blockTiles')
             mkdir('assets/fonts')
@@ -246,6 +247,7 @@ subprojects {
             mkdir('assets/prefabs')
             mkdir('assets/shaders')
             mkdir('assets/shapes')
+            mkdir('assets/skeletalMesh')
             mkdir('assets/sounds')
             mkdir('assets/textures')
             mkdir('src/test/java')

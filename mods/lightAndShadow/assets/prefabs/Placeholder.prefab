@@ -1,0 +1,26 @@
+{
+    "persisted" : true,
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "lightAndShadow:Placeholder",
+        "material" : "lightAndShadow:Placeholder",
+        "animation" : "lightAndShadow:Placeholder",
+        "loop" : true
+    },
+
+	"CharacterMovement" : {
+    	"faceMovementDirection" : true
+  },
+  "Animation" : {
+		"walkAnim" = "lightAndShadow:Placeholder",
+		"randomAnim" : ["lightAndShadow:Placeholder", "lightAndShadow:Placeholder"]
+	},
+  "SimpleMinionAI" : {},
+  "CharacterSound" : {
+	    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+	    "footstepVolume" : 0.5
+  },
+    "Spawnable" : {
+      "type" : "oreon"
+    }
+}
