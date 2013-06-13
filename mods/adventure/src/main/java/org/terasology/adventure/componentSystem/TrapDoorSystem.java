@@ -59,7 +59,7 @@ public class TrapDoorSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {TrapDoorComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        TrapDoorComponent trapDoorComponent = entity.getComponent( TrapDoorComponent.class );
+        TrapDoorComponent trapDoorComponent = entity.getComponent(TrapDoorComponent.class);
         trapDoorComponent.isClosed = !trapDoorComponent.isClosed;
         entity.saveComponent(trapDoorComponent);
 
@@ -73,14 +73,14 @@ public class TrapDoorSystem implements EventHandlerSystem {
         Block primeBlock = worldProvider.getBlock(primePos);
 
         Block newBlock = null;
-        if ( trapDoorComponent.isClosed ){
-            newBlock = BlockManager.getInstance().getBlockFamily("adventure:TrapDoorOpen").getBlockFor(primeBlock.getDirection(), Side.FRONT);
-        }else{
-            newBlock = BlockManager.getInstance().getBlockFamily("adventure:TrapDoorClosed").getBlockFor( primeBlock.getDirection(), Side.FRONT );
+        if (!trapDoorComponent.isClosed) {
+            newBlock = BlockManager.getInstance().getBlockFamily("adventure:TrapDoorOpen").getBlockForPlacing(worldProvider, primePos, primeBlock.getDirection(), Side.FRONT);
+        } else {
+            newBlock = BlockManager.getInstance().getBlockFamily("adventure:TrapDoorClosed").getBlockForPlacing(worldProvider, primePos, primeBlock.getDirection(), Side.FRONT);
 
         }
 
-        if ( newBlock != null ){
+        if (newBlock != null) {
             blockEntityRegistry.setBlock(primePos, newBlock, primeBlock, entity);
         }
 
