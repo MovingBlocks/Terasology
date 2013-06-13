@@ -61,7 +61,11 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.*;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.ImpulseEvent;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -79,6 +83,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -131,12 +136,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @Override
     public void update(float delta) {
-        if (!localPlayer.isValid())
+        if (!localPlayer.isValid()) {
             return;
+        }
 
         // Used for adjusting the focus of the depth of field effect
         BulletPhysics physicsRenderer = CoreRegistry.get(BulletPhysics.class);
-        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(playerCamera.getPosition()), new Vector3f(localPlayer.getViewDirection()), 500.0f, eyeFocusFilter);
+        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(playerCamera.getPosition()),
+            new Vector3f(localPlayer.getViewDirection()), 500.0f, eyeFocusFilter);
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
             playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getPosition());
@@ -159,7 +166,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
+            TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
         updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation, entity);
 
         // Hand animation update
@@ -200,7 +208,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             characterMovement.jump = true;
             if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
                 if (debugEnabled) {
-                characterMovement.isGhosting = !characterMovement.isGhosting;
+                    characterMovement.isGhosting = !characterMovement.isGhosting;
                 }
             }
             lastTimeSpacePressed = timer.getTimeInMs();
@@ -226,7 +234,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class},
+        priority = EventPriority.PRIORITY_NORMAL)
     public void onRun(RunButton event, EntityRef entity) {
         CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
         characterMovement.isRunning = event.isDown();
@@ -253,7 +262,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 LocationComponent location = target.getComponent(LocationComponent.class);
                 if (mesh != null && mesh.mesh != null && location != null) {
                     aabb = mesh.mesh.getAABB();
-                    aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+                    aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(),
+                        location.getWorldScale());
                 }
             }
             if (aabb != null) {
@@ -307,12 +317,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
-    private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
+    private void updateMovement(LocalPlayerComponent localPlayerComponent,
+                                CharacterMovementComponent characterMovementComponent, LocationComponent location) {
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
         if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
             Quat4f viewRot = new Quat4f();
-            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
+                TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
         } else if (characterMovementComponent.isClimbing) {
@@ -320,20 +332,25 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             float pitch = localPlayerComponent.viewPitch > 0 ? 60f : -60f;
 
             Quat4f viewRot = new Quat4f();
-            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * pitch, 0);
+            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
+                TeraMath.DEG_TO_RAD * pitch, 0);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
         } else {
             QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
         }
         float lengthSquared = relMove.lengthSquared();
-        if (lengthSquared > 1) relMove.normalize();
+        if (lengthSquared > 1) {
+            relMove.normalize();
+        }
         characterMovementComponent.setDrive(relMove);
     }
 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
-    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation, EntityRef entity) {        // The camera position is the player's position plus the eye offset
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation,
+                              EntityRef entity) {
+        // The camera position is the player's position plus the eye offset
         Vector3d cameraPosition = new Vector3d();
         // TODO: don't hardset eye position
         cameraPosition.add(new Vector3d(position), new Vector3d(0, 0.6f, 0));
@@ -343,15 +360,18 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
-        if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
+        if (stepDelta < 0) {
+            stepDelta += charMovementComp.distanceBetweenFootsteps;
+        }
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
 
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
-        if ((playerCamera.getClass() == PerspectiveCamera.class)&& !(localPlayerComponent.isDead)) {
+        if ((playerCamera.getClass() == PerspectiveCamera.class) && !(localPlayerComponent.isDead)) {
             if (config.getRendering().isCameraBobbing()) {
                 ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
+                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang
+                    .Math.PI / 4f, 0.025f, 3f));
             } else {
                 ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(0.0f);
                 ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(0.0f);
@@ -365,7 +385,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class}, priority = EventPriority.PRIORITY_LOW)
+    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class},
+        priority = EventPriority.PRIORITY_LOW)
     public void onAttackRequest(AttackButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
 
@@ -383,7 +404,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (useButtonPushed) {
             LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
             InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-            if (localPlayerComp.isDead) return;
+            if (localPlayerComp.isDead) {
+                return;
+            }
 
             EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
             attack(event.getTarget(), entity, selectedItemEntity, event.getTargetBlockPosition());
@@ -406,9 +429,21 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             BlockRegionComponent blockRegionComponent = target.getComponent(BlockRegionComponent.class);
             if (blockComp != null || blockRegionComponent != null) {
                 Block block = worldProvider.getBlock(blockTargetPos);
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
+                Map<String, Integer> perBlockDamageBonus = item.getPerBlockDamageBonus();
+
+                int damageBonus = 0;
+                for (String key : block.getBlockFamily().getCategories()) {
+                    if (perBlockDamageBonus.containsKey(key)) {
+                        final int extraDamage = perBlockDamageBonus.get(key);
+                        damageBonus = extraDamage > damageBonus ? extraDamage : damageBonus;
+                    }
                 }
+                final String blockFamily = block.getBlockFamily().getURI().toString();
+                if (perBlockDamageBonus.containsKey(blockFamily)) {
+                    final int extraDamage = perBlockDamageBonus.get(blockFamily);
+                    damageBonus = extraDamage > damageBonus ? extraDamage : damageBonus;
+                }
+                damage += damageBonus;
             }
         }
         target.send(new DamageEvent(damage, player));
@@ -421,10 +456,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) {
+            return;
+        }
 
         EntityRef target = event.getTarget();
-        event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
+        event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(),
+            playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
         event.consume();
     }
 
@@ -448,7 +486,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             return;
         }
 
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud")
+            .getElementById("crosshair");
         crossHair.setTextureSize(new Vector2f(22f, 22f));
 
         float dropPower = getDropPower();
@@ -459,29 +498,35 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
             ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
 
-            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x * 2f,
-                    playerCamera.getPosition().y + playerCamera.getViewingDirection().y * 2f,
-                    playerCamera.getPosition().z + playerCamera.getViewingDirection().z * 2f
+            Vector3f newPosition = new Vector3f(
+                playerCamera.getPosition().x + playerCamera.getViewingDirection().x * 2f,
+                playerCamera.getPosition().y + playerCamera.getViewingDirection().y * 2f,
+                playerCamera.getPosition().z + playerCamera.getViewingDirection().z * 2f
             );
 
             boolean changed = false;
             if (!selectedItemEntity.hasComponent(BlockItemComponent.class)) {
                 DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
-                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
+                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200,
+                    selectedItemEntity);
 
                 if (!droppedItem.equals(EntityRef.NULL)) {
-                    droppedItem.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x * dropPower, playerCamera.getViewingDirection().y * dropPower, playerCamera.getViewingDirection().z * dropPower)));
+                    droppedItem.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x * dropPower,
+                        playerCamera.getViewingDirection().y * dropPower,
+                        playerCamera.getViewingDirection().z * dropPower)));
                     changed = true;
                 }
             } else {
                 DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20,
-                        selectedItemEntity.getComponent(BlockItemComponent.class).placedEntity);
+                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition),
+                    block.blockFamily, 20, selectedItemEntity.getComponent(BlockItemComponent.class).placedEntity);
                 BlockItemComponent blockItem = selectedItemEntity.getComponent(BlockItemComponent.class);
                 blockItem.placedEntity = EntityRef.NULL;
                 selectedItemEntity.saveComponent(blockItem);
                 if (!droppedBlock.equals(EntityRef.NULL)) {
-                    droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x * dropPower, playerCamera.getViewingDirection().y * dropPower, playerCamera.getViewingDirection().z * dropPower)));
+                    droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x * dropPower,
+                        playerCamera.getViewingDirection().y * dropPower,
+                        playerCamera.getViewingDirection().z * dropPower)));
                     changed = true;
                 }
             }
@@ -533,7 +578,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayer.getEntity().saveComponent(localPlayerComp);
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class},
+        priority = EventPriority.PRIORITY_NORMAL)
     public void onUseItemRequest(UseItemButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
             return;
@@ -541,7 +587,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) {
+            return;
+        }
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
 
@@ -558,9 +606,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     private void useItem(EntityRef target, EntityRef player, EntityRef item, Vector3f hitPosition, Vector3f hitNormal) {
         if (target.exists()) {
-            item.send(new ActivateEvent(target, player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), hitPosition, hitNormal));
+            item.send(new ActivateEvent(target, player, new Vector3f(playerCamera.getPosition()),
+                new Vector3f(playerCamera.getViewingDirection()), hitPosition, hitNormal));
         } else {
-            item.send(new ActivateEvent(player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
+            item.send(new ActivateEvent(player, new Vector3f(playerCamera.getPosition()),
+                new Vector3f(playerCamera.getViewingDirection())));
         }
     }
 
@@ -569,7 +619,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     public void resetDropMark() {
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud")
+            .getElementById("crosshair");
         lastTimeThrowInteraction = 0;
         crossHair.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
         crossHair.getTextureOrigin().set(new Vector2f(24f / 256f, 24f / 256f));

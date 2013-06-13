@@ -20,6 +20,7 @@
  */
 {
     "shape" : "engine:cactus",
+    "categories" : ["wood"],
     "tiles" : {
         "top" : "engine:CactusTop",
         "bottom" : "engine:CactusBottom"
