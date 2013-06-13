@@ -44,9 +44,10 @@ public class ShaderParametersPost extends ShaderParametersBase {
     FastRandom rand = new FastRandom();
 
     Texture vignetteTexture = Assets.getTexture("engine:vignette");
-    Texture noiseTexture = Assets.getTexture("engine:noise");
 
-    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
+    Texture filmGrainNoiseTexture = Assets.getTexture("engine:noise");
+    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.025f, 0.0f, 1.0f);
+
     Property blurStart = new Property("blurStart", 0.1f, 0.0f, 1.0f);
     Property blurLength = new Property("blurLength", 0.1f, 0.0f, 1.0f);
 
@@ -90,16 +91,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
+            glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
             program.setInt("texNoise", texId++);
             program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
             program.setFloat("noiseOffset", rand.randomPosFloat());
 
-            FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-            rtSize.put((float) sceneCombined.width).put((float) sceneCombined.height);
-            rtSize.flip();
-
-            program.setFloat2("renderTargetSize", rtSize);
+            program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight());
+            program.setFloat2("renderTargetSize", sceneCombined.width, sceneCombined.height);
         }
 
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
