@@ -63,7 +63,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalNetwork.addTopologyListener(this);
         signalProducers = Maps.newHashMap();
         signalConsumers = Maps.newHashMap();
-
+        signalConductors = Maps.newHashMap();
     }
 
     @Override
@@ -71,6 +71,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalNetwork = null;
         signalProducers = null;
         signalConsumers = null;
+        signalConductors = null;
     }
 
     @Override
