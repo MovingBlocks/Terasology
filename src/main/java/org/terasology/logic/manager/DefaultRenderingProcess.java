@@ -240,25 +240,27 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         if (!recreate)
             return;
 
-        final int halfWidth = Display.getWidth() / 2;
-        final int halfHeight = Display.getHeight() / 2;
+        int fullWidth = Display.getWidth();
+        int fullHeight = Display.getHeight();
+        final int halfWidth = fullWidth / 2;
+        final int halfHeight = fullHeight / 2;
         final int quarterWidth = halfWidth / 2;
         final int quarterHeight = halfHeight / 2;
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
 
-        createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, true, true);
-        createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, true, true);
+        createFBO("sceneOpaque", fullWidth, fullHeight, FBOType.FBOT_HDR, true, true);
+        createFBO("sceneTransparent", fullWidth, fullHeight, FBOType.FBOT_HDR, true, true);
 
         createFBO("sceneShadowMap", 1024, 1024, FBOType.FBOT_NO_COLOR, true, false);
 
-        createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, true, true);
+        createFBO("sceneCombined", fullWidth, fullHeight, FBOType.FBOT_HDR, true, true);
 
-        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, false, false);
-        createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, false, false);
-        createFBO("sceneFinal", Display.getWidth(), Display.getHeight(), FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scenePrePost", fullWidth, fullHeight, FBOType.FBOT_HDR, false, false);
+        createFBO("sceneToneMapped", fullWidth, fullHeight, FBOType.FBOT_HDR, false, false);
+        createFBO("sceneFinal", fullWidth, fullHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("sobel", Display.getWidth(), Display.getHeight(), FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sobel", fullWidth, fullHeight, FBOType.FBOT_DEFAULT, false, false);
 
         createFBO("ssao", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
         createFBO("ssaoBlurred0", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
@@ -617,14 +619,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         float as = (float) vpWidth / vpHeight;
 
-        program.setFloat4("ocHmdWarpParam", OculusVrHelper.ocDistortionParams[0], OculusVrHelper.ocDistortionParams[1], OculusVrHelper.ocDistortionParams[2], OculusVrHelper.ocDistortionParams[3]);
+        program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1], OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3]);
 
-        float ocLensCenter = (stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.ocLensViewportShift : OculusVrHelper.ocLensViewportShift;
+        float ocLensCenter = (stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 
         program.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f);
         program.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f);
 
-        float scaleFactor = 1.0f / OculusVrHelper.ocScaleFactor;
+        float scaleFactor = 1.0f / OculusVrHelper.getScaleFactor();
 
         program.setFloat2("ocScale", (w/2) * scaleFactor, (h/2) * scaleFactor * as);
         program.setFloat2("ocScaleIn", (2/w), (2/h) / as);

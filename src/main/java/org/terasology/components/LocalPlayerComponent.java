@@ -24,6 +24,7 @@ public final class LocalPlayerComponent implements Component {
     // View Direction should be in another component, possible Creature?
     public float viewYaw = 0;
     public float viewPitch = 0;
+    public float viewRoll = 0;
 
 
     // Should this be in another component? Player probably.

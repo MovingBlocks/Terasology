@@ -44,6 +44,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.version.TerasologyGameVersionInfo;
 
 import javax.swing.*;
@@ -297,6 +298,20 @@ public class TerasologyEngine implements GameEngine {
                 } else {
                     System.loadLibrary("OpenAL32");
                 }
+
+                try {
+                    if (System.getProperty("os.arch").contains("64")) {
+                        System.loadLibrary("tera-ovr64");
+                        OculusVrHelper.nativeLibraryIsLoaded = true;
+                    } else {
+                        OculusVrHelper.nativeLibraryIsLoaded = true;
+                        System.loadLibrary("tera-ovr");
+                    }
+                } catch (UnsatisfiedLinkError  e) {
+                    logger.warn("Could not find TeraOVR native library. No worries... It's completely optional.");
+                }
+
+
                 break;
             default:
                 logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());

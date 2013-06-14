@@ -108,17 +108,17 @@ public class OculusStereoCamera extends Camera {
 
     public void updateMatrices(float overrideFov) {
 
-        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.ocYFov, OculusVrHelper.ocAspectRatio, 0.1f, 5000.0f);
+        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), 0.1f, 5000.0f);
 
         Matrix4f projTranslationLeftEye = new Matrix4f();
         projTranslationLeftEye.setIdentity();
 
-        projTranslationLeftEye.setTranslation(new Vector3f(OculusVrHelper.ocProjectionCenterOffset, 0.0f, 0.0f));
+        projTranslationLeftEye.setTranslation(new Vector3f(OculusVrHelper.getProjectionCenterOffset(), 0.0f, 0.0f));
 
         Matrix4f projTranslationRightEye = new Matrix4f();
         projTranslationRightEye.setIdentity();
 
-        projTranslationRightEye.setTranslation(new Vector3f(-OculusVrHelper.ocProjectionCenterOffset, 0.0f, 0.0f));
+        projTranslationRightEye.setTranslation(new Vector3f(-OculusVrHelper.getProjectionCenterOffset(), 0.0f, 0.0f));
 
         projectionMatrixLeftEye.mul(projTranslationLeftEye, projectionMatrix);
         projectionMatrixRightEye.mul(projTranslationRightEye, projectionMatrix);
@@ -126,7 +126,7 @@ public class OculusStereoCamera extends Camera {
         viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-        final float halfIPD = OculusVrHelper.ocInterpupillaryDistance * 0.5f;
+        final float halfIPD = OculusVrHelper.getInterpupillaryDistance() * 0.5f;
 
         Matrix4f viewTranslationLeftEye = new Matrix4f();
         viewTranslationLeftEye.setIdentity();

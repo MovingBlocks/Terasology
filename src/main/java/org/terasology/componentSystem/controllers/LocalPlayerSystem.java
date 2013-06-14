@@ -16,6 +16,7 @@
 package org.terasology.componentSystem.controllers;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.TeraOVR;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
@@ -73,6 +74,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -164,10 +166,23 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         updateMovement(localPlayerComponent, characterMovementComponent, location);
 
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+                && OculusVrHelper.nativeLibraryIsLoaded) {
+            LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+            localPlayer.viewYaw = TeraOVR.getYaw() * (180.0f / (float) Math.PI);
+            localPlayer.viewPitch = -1.0f * TeraOVR.getPitch() * (180.0f / (float) Math.PI);
+            localPlayer.viewRoll = -1.0f * TeraOVR.getRoll() * (180.0f / (float) Math.PI);
+
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            if (loc != null) {
+                QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw,  TeraMath.DEG_TO_RAD * localPlayer.viewPitch, TeraMath.DEG_TO_RAD * localPlayer.viewRoll);
+            }
+        }
+
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
         QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
-            TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+            TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, TeraMath.DEG_TO_RAD * localPlayerComponent.viewRoll);
         updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation, entity);
 
         // Hand animation update
@@ -324,7 +339,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
             Quat4f viewRot = new Quat4f();
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
-                TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+                TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, TeraMath.DEG_TO_RAD * localPlayerComponent.viewRoll);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
         } else if (characterMovementComponent.isClimbing) {
@@ -333,7 +348,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             Quat4f viewRot = new Quat4f();
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
-                TeraMath.DEG_TO_RAD * pitch, 0);
+                TeraMath.DEG_TO_RAD * pitch, TeraMath.DEG_TO_RAD * localPlayerComponent.viewRoll);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
         } else {
@@ -358,6 +373,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = new Vector3f(0, 0, 1);
         QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
+
+        Vector3f rightDir = new Vector3f(viewDir.z, 0, -viewDir.x);
+        QuaternionUtil.quatRotate(rotation, rightDir, rightDir);
+
+        playerCamera.getUp().cross(viewDir, rightDir);
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {
