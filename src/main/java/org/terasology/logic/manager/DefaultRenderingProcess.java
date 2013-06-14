@@ -24,6 +24,7 @@ import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -80,10 +81,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         FBOT_NO_COLOR
     }
 
-    public enum RenderType {
-        RT_DEFAULT,
-        RT_OCULUS_LEFT_EYE,
-        RT_OCULUS_RIGHT_EYE
+    public enum StereoRenderState {
+        SRS_MONO,
+        SRS_OCULUS_LEFT_EYE,
+        SRS_OCULUS_RIGHT_EYE
     }
 
     public class PBO {
@@ -255,6 +256,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, false, false);
         createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.FBOT_HDR, false, false);
+        createFBO("sceneFinal", Display.getWidth(), Display.getHeight(), FBOType.FBOT_DEFAULT, false, false);
 
         createFBO("sobel", Display.getWidth(), Display.getHeight(), FBOType.FBOT_DEFAULT, false, false);
 
@@ -514,14 +516,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void renderScene() {
-        renderScene(RenderType.RT_DEFAULT);
+        renderScene(StereoRenderState.SRS_MONO);
     }
 
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
      * of the view port changes.
      */
-    public void renderScene(RenderType renderType) {
+    public void renderScene(StereoRenderState stereoRenderState) {
         createOrUpdateFullscreenFbos();
 
         if (config.getRendering().isOutline()) {
@@ -564,10 +566,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             }
         }
 
-        renderFinalScene(renderType);
+        if (stereoRenderState == StereoRenderState.SRS_OCULUS_LEFT_EYE
+                || stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) {
+            renderFinalSceneToRT(stereoRenderState);
+        }
+
+        if (stereoRenderState == StereoRenderState.SRS_MONO
+                || stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) {
+            renderFinalScene();
+        }
     }
 
-    private void renderFinalScene(RenderType renderType) {
+    private void renderFinalSceneToRT(StereoRenderState stereoRenderState) {
         ShaderProgram shader;
 
         if (config.getSystem().isDebugRenderingEnabled()) {
@@ -578,16 +588,73 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         shader.enable();
 
-        switch (renderType) {
-            case RT_DEFAULT:
+        DefaultRenderingProcess.getInstance().getFBO("sceneFinal").bind();
+
+        if (stereoRenderState == StereoRenderState.SRS_MONO || stereoRenderState == StereoRenderState.SRS_OCULUS_LEFT_EYE) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
+
+        switch (stereoRenderState) {
+            case SRS_MONO:
                 renderFullscreenQuad();
                 break;
-            case RT_OCULUS_LEFT_EYE:
+            case SRS_OCULUS_LEFT_EYE:
                 renderFullscreenQuad(0,0, Display.getWidth() / 2, Display.getHeight());
                 break;
-            case RT_OCULUS_RIGHT_EYE:
+            case SRS_OCULUS_RIGHT_EYE:
                 renderFullscreenQuad(Display.getWidth() / 2, 0, Display.getWidth() / 2, Display.getHeight());
                 break;
+        }
+
+        DefaultRenderingProcess.getInstance().getFBO("sceneFinal").unbind();
+    }
+
+    private void updateOcShaderParametersForVP(ShaderProgram program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
+        float w = (float) vpWidth / Display.getWidth();
+        float h = (float) vpHeight / Display.getHeight();
+        float x = (float) vpX / Display.getWidth();
+        float y = (float) vpY / Display.getHeight();
+
+        float as = (float) vpWidth / vpHeight;
+
+        program.setFloat4("ocHmdWarpParam", OculusVrHelper.ocDistortionParams[0], OculusVrHelper.ocDistortionParams[1], OculusVrHelper.ocDistortionParams[2], OculusVrHelper.ocDistortionParams[3]);
+
+        float ocLensCenter = (stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.ocLensViewportShift : OculusVrHelper.ocLensViewportShift;
+
+        program.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f);
+        program.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f);
+
+        float scaleFactor = 1.0f / OculusVrHelper.ocScaleFactor;
+
+        program.setFloat2("ocScale", (w/2) * scaleFactor, (h/2) * scaleFactor * as);
+        program.setFloat2("ocScaleIn", (2/w), (2/h) / as);
+    }
+
+    private void renderFinalScene() {
+
+        ShaderProgram shader = null;
+
+        if (config.getRendering().isOculusVrSupport()) {
+            shader = ShaderManager.getInstance().getShaderProgram("ocDistortion");
+            shader.enable();
+
+            updateOcShaderParametersForVP(shader, 0, 0, Display.getWidth() / 2, Display.getHeight(), StereoRenderState.SRS_OCULUS_LEFT_EYE);
+        } else {
+            if (config.getSystem().isDebugRenderingEnabled()) {
+                shader = ShaderManager.getInstance().getShaderProgram("debug");
+            } else {
+                shader = ShaderManager.getInstance().getShaderProgram("post");
+            }
+
+            shader.enable();
+        }
+
+        renderFullscreenQuad();
+
+        if (config.getRendering().isOculusVrSupport()) {
+            updateOcShaderParametersForVP(shader, Display.getWidth() / 2, 0, Display.getWidth() / 2, Display.getHeight(), StereoRenderState.SRS_OCULUS_RIGHT_EYE);
+
+            renderFullscreenQuad();
         }
     }
 

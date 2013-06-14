@@ -19,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -44,20 +43,20 @@ public class OrthographicCamera extends Camera {
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_projectionMatrix));
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(projectionMatrix));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_viewMatrix));
-        _viewFrustum.updateFrustum();
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(viewMatrix));
+        viewFrustum.updateFrustum();
     }
 
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_normViewMatrix));
-        _viewFrustum.updateFrustum();
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(normViewMatrix));
+        viewFrustum.updateFrustum();
     }
 
     public void update(float deltaT) {
@@ -66,15 +65,15 @@ public class OrthographicCamera extends Camera {
     }
 
     public void updateMatrices() {
-        updateMatrices(_activeFov);
+        updateMatrices(activeFov);
     }
 
     public void updateMatrices(float overrideFov) {
-        _projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -1000.0f, 1000.0f);
-        _viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
-        _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
+        projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -1000.0f, 1000.0f);
+        viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-        _prevViewProjectionMatrix = new Matrix4f(_viewProjectionMatrix);
-        _viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(_viewMatrix, _projectionMatrix);
+        prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
+        viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
     }
 }

@@ -18,6 +18,7 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Matrix4f;
@@ -87,13 +88,13 @@ public class OculusStereoCamera extends Camera {
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(getViewMatrix()));
-        _viewFrustum.updateFrustum();
+        viewFrustum.updateFrustum();
     }
 
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_normViewMatrix));
-        _viewFrustum.updateFrustum();
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(normViewMatrix));
+        viewFrustum.updateFrustum();
     }
 
     public void update(float deltaT) {
@@ -102,46 +103,30 @@ public class OculusStereoCamera extends Camera {
     }
 
     public void updateMatrices() {
-        updateMatrices(_activeFov);
+        updateMatrices(activeFov);
     }
 
     public void updateMatrices(float overrideFov) {
-        final float ocVerticalRes = 800.0f;
-        final float ocHorizontalRes = 1280.0f;
-        final float ocVerticalScreenSize = 0.0935f;
-        final float ocHorizontalScreenSize = 0.14976f;
-        final float ocEyeToScreenDistance = 0.041f;
-        final float ocLensSeparationDistance = 0.0635f;
-        final float ocInterpupillaryDistance = 0.064f;
 
-        final float ocHalfScreenDistance = ocHorizontalScreenSize * 0.5f;
-        final float ocYFov = 2.0f * (float) Math.atan(ocHalfScreenDistance/ocEyeToScreenDistance);
-
-        final float ocAspectRatio = (ocHorizontalRes * 0.5f) / ocVerticalRes;
-
-        float ocViewCenter = ocHorizontalScreenSize * 0.25f;
-        float ocEyeProjectionShift = ocViewCenter - ocLensSeparationDistance * 0.5f;
-        float ocProjectionCenterOffset = 4.0f * ocEyeProjectionShift / ocHorizontalScreenSize;
-
-        _projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(ocYFov, ocAspectRatio, 0.1f, 5000.0f);
+        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.ocYFov, OculusVrHelper.ocAspectRatio, 0.1f, 5000.0f);
 
         Matrix4f projTranslationLeftEye = new Matrix4f();
         projTranslationLeftEye.setIdentity();
 
-        projTranslationLeftEye.setTranslation(new Vector3f(ocProjectionCenterOffset, 0.0f, 0.0f));
+        projTranslationLeftEye.setTranslation(new Vector3f(OculusVrHelper.ocProjectionCenterOffset, 0.0f, 0.0f));
 
         Matrix4f projTranslationRightEye = new Matrix4f();
         projTranslationRightEye.setIdentity();
 
-        projTranslationRightEye.setTranslation(new Vector3f(-ocProjectionCenterOffset, 0.0f, 0.0f));
+        projTranslationRightEye.setTranslation(new Vector3f(-OculusVrHelper.ocProjectionCenterOffset, 0.0f, 0.0f));
 
-        projectionMatrixLeftEye.mul(projTranslationLeftEye, _projectionMatrix);
-        projectionMatrixRightEye.mul(projTranslationRightEye, _projectionMatrix);
+        projectionMatrixLeftEye.mul(projTranslationLeftEye, projectionMatrix);
+        projectionMatrixRightEye.mul(projTranslationRightEye, projectionMatrix);
 
-        _viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
-        _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
+        viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-        final float halfIPD = ocInterpupillaryDistance * 0.5f;
+        final float halfIPD = OculusVrHelper.ocInterpupillaryDistance * 0.5f;
 
         Matrix4f viewTranslationLeftEye = new Matrix4f();
         viewTranslationLeftEye.setIdentity();
@@ -153,14 +138,14 @@ public class OculusStereoCamera extends Camera {
 
         viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
 
-        viewMatrixLeftEye.mul(_viewMatrix, viewTranslationLeftEye);
-        viewMatrixRightEye.mul(_viewMatrix, viewTranslationRightEye);
+        viewMatrixLeftEye.mul(viewMatrix, viewTranslationLeftEye);
+        viewMatrixRightEye.mul(viewMatrix, viewTranslationRightEye);
 
         viewProjectionMatrixLeftEye = TeraMath.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = TeraMath.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
-        _prevViewProjectionMatrix = new Matrix4f(_viewProjectionMatrix);
-        _viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(_viewMatrix, _projectionMatrix);
-        _inverseViewProjectionMatrix.invert(_viewProjectionMatrix);
+        prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
+        viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
     }
 }

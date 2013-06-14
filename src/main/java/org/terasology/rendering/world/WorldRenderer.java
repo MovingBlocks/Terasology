@@ -580,16 +580,16 @@ public final class WorldRenderer {
     /**
      * Renders the world.
      */
-    public void render(DefaultRenderingProcess.RenderType renderType) {
+    public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
 
-        switch (renderType) {
-            case RT_DEFAULT:
+        switch (stereoRenderState) {
+            case SRS_MONO:
                 currentRenderStage = WorldRenderingStage.WRS_DEFAULT;
                 break;
-            case RT_OCULUS_LEFT_EYE:
+            case SRS_OCULUS_LEFT_EYE:
                 currentRenderStage = WorldRenderingStage.WRS_OCULUS_LEFT_EYE;
                 break;
-            case RT_OCULUS_RIGHT_EYE:
+            case SRS_OCULUS_RIGHT_EYE:
                 currentRenderStage = WorldRenderingStage.WRS_OCULUS_RIGHT_EYE;
                 break;
         }
@@ -608,7 +608,7 @@ public final class WorldRenderer {
 
         if (config.getRendering().isDynamicShadows()
                 // Only render the shadow map once
-                && (renderType == DefaultRenderingProcess.RenderType.RT_DEFAULT || renderType == DefaultRenderingProcess.RenderType.RT_OCULUS_LEFT_EYE)) {
+                && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE)) {
             DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
             //glCullFace(GL11.GL_FRONT);
             renderShadowMap(lightCamera);
@@ -620,12 +620,12 @@ public final class WorldRenderer {
 
         /* RENDER THE FINAL POST-PROCESSED SCENE */
         PerformanceMonitor.startActivity("Render Post-Processing");
-        DefaultRenderingProcess.getInstance().renderScene(renderType);
+        DefaultRenderingProcess.getInstance().renderScene(stereoRenderState);
         PerformanceMonitor.endActivity();
 
         if (activeCamera != null
                 // TODO: First person view is currently not working with OculusVR support enabled
-                && renderType == DefaultRenderingProcess.RenderType.RT_DEFAULT
+                && stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO
                 && !config.getSystem().isDebugFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
 

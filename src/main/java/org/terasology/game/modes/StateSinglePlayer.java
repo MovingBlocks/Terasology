@@ -137,10 +137,10 @@ public class StateSinglePlayer implements GameState {
 
         if (worldRenderer != null) {
             if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
-                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_DEFAULT);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_MONO);
             } else {
-                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_OCULUS_LEFT_EYE);
-                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_OCULUS_RIGHT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_RIGHT_EYE);
             }
         }
 
