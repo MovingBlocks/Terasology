@@ -37,6 +37,7 @@ public final class TerasologyApplet extends Applet {
     @Override
     public void init() {
         super.init();
+        PathManager.getInstance().useDefaultHomePath();
         obtainMods();
         startGame();
     }
@@ -44,8 +45,6 @@ public final class TerasologyApplet extends Applet {
     private void obtainMods() {
         String[] mods = getParameter("mods").split(",");
         String modsPath = getParameter("mods_path") + "mods/";
-        //int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
-        //String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
         for (String mod : mods) {
             try {
                 URL url = new URL(modsPath + mod);
@@ -57,8 +56,7 @@ public final class TerasologyApplet extends Applet {
                 }
                 fos.close();
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Failure in obtainMods' run for mod " + mod + ": " + e.toString());
+                throw new RuntimeException("Failure in obtainMods' run for mod " + mod, e);
             }
         }
     }
@@ -68,13 +66,11 @@ public final class TerasologyApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    PathManager.getInstance().useDefaultHomePath();
                     engine = new TerasologyEngine();
                     engine.run(new StateMainMenu());
                     engine.dispose();
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Failure in startGame's run: " + e.toString());
+                    throw new RuntimeException("Failure in startGame's run", e);
                 }
             }
         };
@@ -101,8 +97,7 @@ public final class TerasologyApplet extends Applet {
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to cleanly shut down engine");
+            throw new RuntimeException("Failed to cleanly shut down engine", e);
         }
 
         super.destroy();
