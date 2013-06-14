@@ -36,13 +36,15 @@ import java.nio.channels.ReadableByteChannel;
  */
 @SuppressWarnings("serial")
 public final class TerasologyApplet extends Applet {
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyApplet.class);
+    private static Logger logger;
     private TerasologyEngine engine;
     private Thread gameThread;
 
     @Override
     public void init() {
         super.init();
+        PathManager.getInstance().useDefaultHomePath();
+        logger = LoggerFactory.getLogger(TerasologyApplet.class);
         obtainMods();
         startGame();
     }
@@ -50,8 +52,6 @@ public final class TerasologyApplet extends Applet {
     private void obtainMods() {
         String[] mods = getParameter("mods").split(",");
         String modsPath = getParameter("mods_path") + "mods/";
-        //int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
-        //String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
         for (String mod : mods) {
             try {
                 URL url = new URL(modsPath + mod);
@@ -77,7 +77,6 @@ public final class TerasologyApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    PathManager.getInstance().useDefaultHomePath();
                     engine = new TerasologyEngine();
                     engine.run(new StateMainMenu());
                     engine.dispose();
@@ -107,7 +106,9 @@ public final class TerasologyApplet extends Applet {
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            logger.error("Failed to cleanly shut down engine");
+            if (logger != null) {
+                logger.error("Failed to cleanly shut down engine");
+            }
         }
 
         super.destroy();

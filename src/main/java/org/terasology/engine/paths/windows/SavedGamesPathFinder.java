@@ -16,18 +16,31 @@
 
 package org.terasology.engine.paths.windows;
 
+import com.google.common.collect.ImmutableMap;
 import com.sun.jna.platform.win32.Guid;
 import com.sun.jna.platform.win32.Ole32Util;
 import com.sun.jna.ptr.PointerByReference;
+
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class SavedGamesPathFinder {
 
+    private static final Map<String, Integer> FOLDER_ID_TO_CSIDL = ImmutableMap.of(Shell32.FOLDERID_DOCUMENTS, 0x0005);
+
     public static String findSavedGamesPath() {
+        return findWindowsPath(Shell32.FOLDERID_SAVED_GAMES);
+    }
+
+    public static String findDocumentsPath() {
+        return findWindowsPath(Shell32.FOLDERID_DOCUMENTS);
+    }
+
+    private static String findWindowsPath(String folderId) {
         try {
-            Guid.GUID pathGUID = Ole32Util.getGUIDFromString(Shell32.FOLDERID_SAVED_GAMES);
+            Guid.GUID pathGUID = Ole32Util.getGUIDFromString(folderId);
             PointerByReference outPath = new PointerByReference();
             int hResult = Shell32.INSTANCE.SHGetKnownFolderPath(pathGUID, 0, null, outPath);
             if (hResult == 0) {
@@ -41,7 +54,28 @@ public class SavedGamesPathFinder {
                 return path;
             }
         } catch (UnsatisfiedLinkError e) {
-            // This is expected behaviour on versions of Windows preceding Vista.
+            return findWindowsPathFallback(folderId);
+        }
+        return null;
+    }
+
+    private static String findWindowsPathFallback(String folderId) {
+        Integer csidlId = FOLDER_ID_TO_CSIDL.get(folderId);
+        if (csidlId == null) {
+            return null;
+        }
+        try {
+            char[] outPath = new char[255];
+            int hResult = Shell32.INSTANCE.SHGetFolderPath(null, csidlId, null, 0, outPath);
+            if (hResult == 0) {
+                int end = 0;
+                while (end < outPath.length && outPath[end] != 0) {
+                    end++;
+                }
+                return new String(outPath, 0, end);
+            }
+        } catch (UnsatisfiedLinkError e) {
+            System.out.println("SHGetFolderPath not available");
         }
         return null;
     }

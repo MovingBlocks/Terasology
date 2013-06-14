@@ -19,6 +19,7 @@ package org.terasology.engine.paths.windows;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Guid;
+import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
@@ -32,10 +33,13 @@ import com.sun.jna.win32.W32APIOptions;
 public interface Shell32 extends StdCallLibrary {
 
     public static final String FOLDERID_SAVED_GAMES = "{4C5C32FF-BB9D-43b0-B5B4-2D72E54EAAA4}";
+    public static final String FOLDERID_DOCUMENTS = "{FDD39AD0-238F-46AF-ADB4-6C85480369C7}";
 
     static Shell32 INSTANCE = (Shell32) Native.loadLibrary("shell32",
             Shell32.class, W32APIOptions.UNICODE_OPTIONS);
 
     public int SHGetKnownFolderPath(Guid.GUID rfid, int dwFlags, WinNT.HANDLE hToken,
                                     PointerByReference pszPath);
+
+    public int SHGetFolderPath(WinDef.HWND hwndOwner, int nFolder, WinNT.HANDLE hToken, int dwFlags, char[] pszPath);
 }
