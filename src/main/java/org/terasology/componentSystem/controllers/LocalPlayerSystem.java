@@ -372,12 +372,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = new Vector3f(0, 0, 1);
+        Vector3f upDir = new Vector3f(0, 1, 0);
+
         QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
-
-        Vector3f rightDir = new Vector3f(viewDir.z, 0, -viewDir.x);
-        QuaternionUtil.quatRotate(rotation, rightDir, rightDir);
-
-        playerCamera.getUp().cross(viewDir, rightDir);
+        QuaternionUtil.quatRotate(rotation, upDir, playerCamera.getUp());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {
