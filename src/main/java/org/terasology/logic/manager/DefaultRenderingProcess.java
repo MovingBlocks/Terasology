@@ -374,7 +374,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
         }
         bufferIds.flip();
-        GL20.glDrawBuffers(bufferIds);
+        if (bufferIds.limit() == 0) {
+            GL11.glReadBuffer(GL11.GL_NONE);
+            GL20.glDrawBuffers(GL11.GL_NONE);
+        } else {
+            GL20.glDrawBuffers(bufferIds);
+        }
 
         int checkFB = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
         switch (checkFB) {
