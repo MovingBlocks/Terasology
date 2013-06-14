@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.event;
+package org.terasology.world.chunks;
 
-import org.terasology.network.NoReplicate;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public abstract class AbstractEvent implements Event {
-    @NoReplicate
-    protected boolean cancelled;
+public class OnChunkLoaded implements Event {
+    private Vector3i chunkPos = new Vector3i();
 
-    @Override
-    public void cancel() {
-        cancelled = true;
+    public OnChunkLoaded(Vector3i chunkPos) {
+        this.chunkPos.set(chunkPos);
     }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
+    public Vector3i getChunkPos() {
+        return chunkPos;
     }
 }

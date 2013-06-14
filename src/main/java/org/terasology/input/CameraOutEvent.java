@@ -15,12 +15,12 @@
  */
 package org.terasology.input;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * Event when the camera ceases to be over an entity - sent to the involved entity
  */
-public class CameraOutEvent extends AbstractEvent {
+public class CameraOutEvent implements Event {
 
     public CameraOutEvent() {
     }

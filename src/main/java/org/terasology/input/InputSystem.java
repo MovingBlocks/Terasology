@@ -20,11 +20,11 @@ import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.input.events.InputEvent;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
@@ -199,7 +199,7 @@ public class InputSystem implements ComponentSystem {
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
-                if (event.isCancelled()) {
+                if (event.isConsumed()) {
                     break;
                 }
             }
@@ -212,7 +212,7 @@ public class InputSystem implements ComponentSystem {
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
-                if (event.isCancelled()) {
+                if (event.isConsumed()) {
                     break;
                 }
             }
@@ -278,7 +278,7 @@ public class InputSystem implements ComponentSystem {
         setupTarget(event);
         for (EntityRef entity : getInputEntities()) {
             entity.send(event);
-            if (event.isCancelled()) {
+            if (event.isConsumed()) {
                 break;
             }
         }
@@ -304,7 +304,7 @@ public class InputSystem implements ComponentSystem {
         setupTarget(event);
         for (EntityRef entity : getInputEntities()) {
             entity.send(event);
-            if (event.isCancelled()) {
+            if (event.isConsumed()) {
                 break;
             }
         }
@@ -316,7 +316,7 @@ public class InputSystem implements ComponentSystem {
         setupTarget(mouseWheelEvent);
         for (EntityRef entity : getInputEntities()) {
             entity.send(mouseWheelEvent);
-            if (mouseWheelEvent.isCancelled()) {
+            if (mouseWheelEvent.isConsumed()) {
                 break;
             }
         }

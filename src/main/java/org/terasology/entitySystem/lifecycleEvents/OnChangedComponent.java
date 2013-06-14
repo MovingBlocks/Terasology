@@ -16,18 +16,24 @@
 
 package org.terasology.entitySystem.lifecycleEvents;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
- * This event is sent when an entity is created or a component added to an existing entity.
+ * This event occurs whenever a component is changed and saved.
+ *
+ * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
+ * at least one is involved in the action causing the event.
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public class OnAddedEvent extends AbstractEvent {
-    private static OnAddedEvent instance = new OnAddedEvent();
+public class OnChangedComponent implements Event {
 
-    public static OnAddedEvent newInstance() {
+    private static OnChangedComponent instance = new OnChangedComponent();
+
+    public static OnChangedComponent newInstance() {
         return instance;
     }
 
-    private OnAddedEvent() {
+    private OnChangedComponent() {
     }
 }

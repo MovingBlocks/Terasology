@@ -42,10 +42,10 @@ import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -108,12 +108,12 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void newRigidBody(OnActivatedEvent event, EntityRef entity) {
+    public void newRigidBody(OnActivatedComponent event, EntityRef entity) {
         newRigidBodies.add(entity);
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
-    public void newTrigger(OnActivatedEvent event, EntityRef entity) {
+    public void newTrigger(OnActivatedComponent event, EntityRef entity) {
         createTrigger(entity);
     }
 
@@ -123,7 +123,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
-    public void removeRigidBody(OnDeactivatedEvent event, EntityRef entity) {
+    public void removeRigidBody(BeforeDeactivateComponent event, EntityRef entity) {
         RigidBody body = entityRigidBodies.remove(entity);
         if (body != null) {
             physics.removeRigidBody(body);
@@ -131,7 +131,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
-    public void removeTrigger(OnDeactivatedEvent event, EntityRef entity) {
+    public void removeTrigger(BeforeDeactivateComponent event, EntityRef entity) {
         GhostObject ghost = entityTriggers.remove(entity);
         if (ghost != null) {
             physics.removeCollider(ghost);
@@ -139,7 +139,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
-    public void updateTrigger(OnChangedEvent event, EntityRef entity) {
+    public void updateTrigger(OnChangedComponent event, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
@@ -157,7 +157,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
-    public void updateRigidBody(OnChangedEvent event, EntityRef entity) {
+    public void updateRigidBody(OnChangedComponent event, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBody rigidBody = entityRigidBodies.get(entity);
 

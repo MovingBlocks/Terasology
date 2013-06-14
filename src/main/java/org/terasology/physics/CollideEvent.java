@@ -16,13 +16,13 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius
  */
-public class CollideEvent extends AbstractEvent {
+public class CollideEvent implements Event {
     private EntityRef otherEntity;
 
     public CollideEvent(EntityRef other) {

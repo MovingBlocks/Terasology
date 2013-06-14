@@ -16,13 +16,13 @@
 
 package org.terasology.input;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius
  */
-public class CameraTargetChangedEvent extends AbstractEvent {
+public class CameraTargetChangedEvent implements Event {
     private EntityRef oldTarget;
     private EntityRef newTarget;
 

@@ -16,7 +16,7 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 
 import javax.vecmath.Vector3f;
@@ -25,7 +25,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @BroadcastEvent
-public class ImpulseEvent extends AbstractEvent {
+public class ImpulseEvent implements Event {
     private Vector3f impulse;
 
     protected ImpulseEvent() {

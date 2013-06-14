@@ -15,16 +15,17 @@
  */
 package org.terasology.logic.common;
 
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.logic.location.LocationComponent;
 
 import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class ActivateEvent extends AbstractEvent {
+// TODO: This should not be consumable. Instead have a consumable BeforeActivate event to allow cancellation
+public class ActivateEvent extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef target;
     private Vector3f origin;

@@ -24,9 +24,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -83,7 +83,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
-    public void onCreate(final OnActivatedEvent event, final EntityRef entity) {
+    public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
         float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
@@ -99,7 +99,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class, LocationComponent.class})
-    public void onDestroy(final OnDeactivatedEvent event, final EntityRef entity) {
+    public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         CharacterMovementComponent comp = entity.getComponent(CharacterMovementComponent.class);
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         ClientComponent controller = character.controller.getComponent(ClientComponent.class);

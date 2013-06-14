@@ -17,14 +17,14 @@
 package org.terasology.network.events;
 
 import org.terasology.entitySystem.EntityStore;
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.persistence.PlayerEntityStore;
 
 /**
  * Event notifying of a client disconnecting.
  * @author Immortius
  */
-public class DisconnectedEvent extends AbstractEvent {
+public class DisconnectedEvent implements Event {
     private PlayerEntityStore entityStore;
 
     public DisconnectedEvent(PlayerEntityStore entityStore) {

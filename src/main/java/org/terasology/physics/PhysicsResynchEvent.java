@@ -16,7 +16,7 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 
 import javax.vecmath.Quat4f;
@@ -26,7 +26,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @BroadcastEvent
-public class PhysicsResynchEvent extends AbstractEvent {
+public class PhysicsResynchEvent implements Event {
     private Vector3f position = new Vector3f();
     private Quat4f rotation = new Quat4f();
     private Vector3f velocity = new Vector3f();

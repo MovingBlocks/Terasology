@@ -38,12 +38,12 @@ public abstract class EntityRef implements ComponentContainer {
     public abstract boolean exists();
 
     /**
-     * @return Whether this entity is currently loaded (not persisted)
+     * @return Whether this entity is currently loaded (not stored)
      */
-    public abstract boolean isLoaded();
+    public abstract boolean isActive();
 
     /**
-     * Removes all components from this entity, effectively destroying it
+     * Removes all components and destroys it
      */
     public abstract void destroy();
 
@@ -60,9 +60,9 @@ public abstract class EntityRef implements ComponentContainer {
      */
     public abstract int getId();
 
-    public abstract boolean isPersisted();
+    public abstract boolean isPersistent();
 
-    public abstract void setPersisted(boolean persisted);
+    public abstract void setPersistent(boolean persistent);
 
     public abstract Prefab getParentPrefab();
 

@@ -15,16 +15,16 @@
  */
 package org.terasology.input.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.ConsumableEvent;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
 
 
-public abstract class InputEvent extends AbstractEvent {
-    private boolean consumed;
+public abstract class InputEvent implements ConsumableEvent {
     private float delta;
+    private boolean consumed = false;
 
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPosition;
@@ -62,18 +62,18 @@ public abstract class InputEvent extends AbstractEvent {
         return delta;
     }
 
-    public void consume() {
-        consumed = true;
-        cancel();
-    }
-
+    @Override
     public boolean isConsumed() {
         return consumed;
     }
 
+    @Override
+    public void consume() {
+        this.consumed = true;
+    }
+
     protected void reset(float delta) {
         consumed = false;
-        cancelled = false;
         this.delta = delta;
         this.target = EntityRef.NULL;
     }

@@ -16,13 +16,13 @@
 
 package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Immortius
  */
-public class ReceivedItemEvent extends AbstractEvent {
+public class ReceivedItemEvent implements Event {
     private EntityRef item;
     private int slot = -1;
 

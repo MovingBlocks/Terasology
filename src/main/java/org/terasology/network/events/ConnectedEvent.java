@@ -16,18 +16,15 @@
 
 package org.terasology.network.events;
 
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EntityStore;
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.persistence.PlayerEntityStore;
-
-import java.util.Map;
 
 /**
  * Event notifying that a new client has connected - sent against the client by the network system.
+ *
  * @author Immortius
  */
-public class ConnectedEvent extends AbstractEvent {
+public class ConnectedEvent implements Event {
 
     private PlayerEntityStore entityStore;
 

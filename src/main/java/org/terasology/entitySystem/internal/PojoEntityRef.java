@@ -42,7 +42,7 @@ public class PojoEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean isPersisted() {
+    public boolean isPersistent() {
         if (exists()) {
             EntityInfoComponent info = getComponent(EntityInfoComponent.class);
             if (info == null) {
@@ -55,15 +55,15 @@ public class PojoEntityRef extends EntityRef {
     }
 
     @Override
-    public void setPersisted(boolean persisted) {
+    public void setPersistent(boolean persistent) {
         if (exists()) {
             EntityInfoComponent info = getComponent(EntityInfoComponent.class);
             if (info == null) {
                 info = new EntityInfoComponent();
-                info.persisted = persisted;
+                info.persisted = persistent;
                 addComponent(info);
-            } else if (info.persisted != persisted) {
-                info.persisted = persisted;
+            } else if (info.persisted != persistent) {
+                info.persisted = persistent;
                 saveComponent(info);
             }
         }
@@ -97,7 +97,7 @@ public class PojoEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean isLoaded() {
+    public boolean isActive() {
         if (exists()) {
             return entityManager.isEntityLoaded(id);
         }

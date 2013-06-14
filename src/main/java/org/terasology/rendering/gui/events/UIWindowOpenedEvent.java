@@ -16,13 +16,13 @@
 
 package org.terasology.rendering.gui.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * @author Immortius
  */
-public class UIWindowOpenedEvent extends AbstractEvent {
+public class UIWindowOpenedEvent implements Event {
     private UIWindow window;
 
     public UIWindowOpenedEvent(UIWindow window) {

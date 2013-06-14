@@ -15,13 +15,13 @@
  */
 package org.terasology.logic.health;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class DamageEvent extends AbstractEvent {
+public class DamageEvent implements Event {
     private int amount;
     private EntityRef instigator;
 

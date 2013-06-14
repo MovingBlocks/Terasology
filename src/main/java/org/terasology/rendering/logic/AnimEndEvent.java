@@ -16,13 +16,13 @@
 
 package org.terasology.rendering.logic;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 
 /**
  * @author Immortius
  */
-public class AnimEndEvent extends AbstractEvent {
+public class AnimEndEvent implements Event {
     private MeshAnimation animation;
 
     public AnimEndEvent(MeshAnimation animation) {

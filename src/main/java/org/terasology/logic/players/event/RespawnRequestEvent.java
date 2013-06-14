@@ -16,12 +16,12 @@
 
 package org.terasology.logic.players.event;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
  */
 @ServerEvent
-public class RespawnRequestEvent extends AbstractEvent {
+public class RespawnRequestEvent implements Event {
 }

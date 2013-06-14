@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class JumpEvent extends AbstractEvent {
+public class JumpEvent implements Event {
 }

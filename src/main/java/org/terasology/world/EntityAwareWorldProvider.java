@@ -20,10 +20,10 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -219,7 +219,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onCreate(OnActivatedEvent event, EntityRef entity) {
+    public void onCreate(OnActivatedComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         EntityRef oldEntity = blockComponentLookup.put(new Vector3i(block.getPosition()), entity);
         if (oldEntity != null && !Objects.equal(oldEntity, entity)) {
@@ -228,7 +228,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onDestroy(OnDeactivatedEvent event, EntityRef entity) {
+    public void onDestroy(BeforeDeactivateComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         Vector3i pos = new Vector3i(block.getPosition());
         if (blockComponentLookup.get(pos) == entity) {
@@ -237,7 +237,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onNewBlockRegion(OnActivatedEvent event, EntityRef entity) {
+    public void onNewBlockRegion(OnActivatedComponent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
         for (Vector3i pos : regionComp.region) {
@@ -246,7 +246,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionChanged(OnChangedEvent event, EntityRef entity) {
+    public void onBlockRegionChanged(OnChangedComponent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
         for (Vector3i pos : oldRegion) {
             blockRegionLookup.remove(pos);
@@ -259,7 +259,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionRemoved(OnDeactivatedEvent event, EntityRef entity) {
+    public void onBlockRegionRemoved(BeforeDeactivateComponent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
         for (Vector3i pos : oldRegion) {
             blockRegionLookup.remove(pos);

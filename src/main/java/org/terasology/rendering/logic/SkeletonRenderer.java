@@ -24,9 +24,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -77,7 +77,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {SkeletalMeshComponent.class, LocationComponent.class})
-    public void newSkeleton(OnActivatedEvent event, EntityRef entity) {
+    public void newSkeleton(OnActivatedComponent event, EntityRef entity) {
         SkeletalMeshComponent skeleton = entity.getComponent(SkeletalMeshComponent.class);
         if (skeleton.mesh == null) {
             return;

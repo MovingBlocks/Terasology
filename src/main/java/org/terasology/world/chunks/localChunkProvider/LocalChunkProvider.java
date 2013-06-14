@@ -33,14 +33,14 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.ChunkView;
 import org.terasology.world.RegionalChunkView;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.BeforeChunkUnload;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkReadyEvent;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.ChunkUnloadedEvent;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
@@ -226,7 +226,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 List<Vector3i> readyChunkPositions = Lists.newArrayListWithExpectedSize(readyChunks.size());
                 readyChunks.drainTo(readyChunkPositions);
                 for (Vector3i readyChunkPos : readyChunkPositions) {
-                    worldEntity.send(new ChunkReadyEvent(readyChunkPos));
+                    worldEntity.send(new OnChunkLoaded(readyChunkPos));
                     Chunk chunk = getChunk(readyChunkPos);
                     for (ChunkRelevanceRegion region : regions.values()) {
                         region.chunkReady(chunk);
@@ -265,7 +265,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         for (ChunkRelevanceRegion region : regions.values()) {
                             region.chunkUnloaded(pos);
                         }
-                        worldEntity.send(new ChunkUnloadedEvent(pos));
+                        worldEntity.send(new BeforeChunkUnload(pos));
                     }
 
                 }

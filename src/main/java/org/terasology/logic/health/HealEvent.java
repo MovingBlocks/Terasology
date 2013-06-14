@@ -1,12 +1,12 @@
 package org.terasology.logic.health;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Immortius
  */
-public class HealEvent extends AbstractEvent {
+public class HealEvent implements Event {
     private int amount;
     private EntityRef instigator;
 

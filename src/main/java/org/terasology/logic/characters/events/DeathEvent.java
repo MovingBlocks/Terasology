@@ -16,13 +16,13 @@
 
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**
  * @author Immortius
  */
 @OwnerEvent
-public class DeathEvent extends AbstractEvent {
+public class DeathEvent implements Event {
 
 }

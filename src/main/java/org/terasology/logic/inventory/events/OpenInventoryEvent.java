@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.OwnerEvent;
 
@@ -23,7 +23,7 @@ import org.terasology.network.OwnerEvent;
  * @author Immortius <immortius@gmail.com>
  */
 @OwnerEvent
-public class OpenInventoryEvent extends AbstractEvent {
+public class OpenInventoryEvent implements Event {
     private EntityRef container;
 
     protected OpenInventoryEvent() {
