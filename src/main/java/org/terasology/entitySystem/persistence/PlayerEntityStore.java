@@ -23,10 +23,7 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EntityStore;
 import org.terasology.entitySystem.OwnershipHelper;
-import org.terasology.entitySystem.lifecycleEvents.OnStoreEvent;
 import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 
@@ -37,7 +34,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -104,7 +100,6 @@ public class PlayerEntityStore implements EntityStore {
             store(ownedEntity);
         }
         if (entity.exists()) {
-            entity.send(new OnStoreEvent(this));
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
             entityStoreBuilder.addEntity(entityData);
             entityStoreBuilder.addEntityName(name);

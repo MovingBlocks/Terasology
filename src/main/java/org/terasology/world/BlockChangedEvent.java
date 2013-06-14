@@ -16,7 +16,7 @@
 
 package org.terasology.world;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 
@@ -25,7 +25,7 @@ import org.terasology.world.block.Block;
  *
  * @author Immortius
  */
-public class BlockChangedEvent extends AbstractEvent {
+public class BlockChangedEvent implements Event {
     private Block oldType;
     private Block newType;
     private Vector3i blockPosition;

@@ -16,21 +16,24 @@
 
 package org.terasology.entitySystem.lifecycleEvents;
 
-import org.terasology.entitySystem.EntityStore;
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
+ * This event occurs after an entity is created, an entity is loaded or a component is added to an entity. This occurs
+ * after OnAddedComponent where relevant.
  *
+ * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
+ * at least one is involved in the action causing the event.
+ * @author Immortius <immortius@gmail.com>
  */
-public class OnStoreEvent extends AbstractEvent {
+public class OnActivatedComponent implements Event {
 
-    private EntityStore entityStore;
+    private static OnActivatedComponent instance = new OnActivatedComponent();
 
-    public OnStoreEvent(EntityStore store) {
-        this.entityStore = store;
+    public static OnActivatedComponent newInstance() {
+        return instance;
     }
 
-    public EntityStore getStore() {
-        return entityStore;
+    private OnActivatedComponent() {
     }
 }

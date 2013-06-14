@@ -16,15 +16,15 @@
 
 package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
  */
 @ServerEvent
-public class MoveItemRequest extends AbstractEvent {
+public class MoveItemRequest implements Event {
     private EntityRef fromInventory = EntityRef.NULL;
     private int fromSlot;
     private EntityRef toInventory = EntityRef.NULL;

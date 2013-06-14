@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks;
+package org.terasology.entitySystem.event;
 
-import org.terasology.entitySystem.event.AbstractEvent;
-import org.terasology.math.Vector3i;
+import org.terasology.network.NoReplicate;
 
 /**
  * @author Immortius
  */
-public class ChunkUnloadedEvent extends AbstractEvent {
+public abstract class AbstractConsumableEvent implements ConsumableEvent {
+    @NoReplicate
+    protected boolean consumed;
 
-    private Vector3i chunkPos = new Vector3i();
-
-    public ChunkUnloadedEvent(Vector3i chunkPos) {
-        this.chunkPos.set(chunkPos);
+    @Override
+    public void consume() {
+        consumed = true;
     }
 
-    public Vector3i getChunkPos() {
-        return chunkPos;
+    @Override
+    public boolean isConsumed() {
+        return consumed;
     }
 }

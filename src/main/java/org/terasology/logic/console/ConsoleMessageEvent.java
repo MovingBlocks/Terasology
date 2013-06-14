@@ -7,7 +7,7 @@ import org.terasology.network.OwnerEvent;
  * @author Immortius
  */
 @OwnerEvent
-public class ConsoleMessageEvent extends MessageEvent {
+public class ConsoleMessageEvent implements MessageEvent {
 
     private String message;
 

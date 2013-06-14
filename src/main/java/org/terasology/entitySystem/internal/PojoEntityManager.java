@@ -37,11 +37,11 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.EventSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnAddedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -160,8 +160,8 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             store.put(entity.getId(), c);
         }
         if (eventSystem != null) {
-            eventSystem.send(entity, OnAddedEvent.newInstance());
-            eventSystem.send(entity, OnActivatedEvent.newInstance());
+            eventSystem.send(entity, OnAddedComponent.newInstance());
+            eventSystem.send(entity, OnActivatedComponent.newInstance());
         }
         return entity;
     }
@@ -372,8 +372,8 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         }
         EntityRef ref = createEntityRef(entityId);
         if (eventSystem != null) {
-            eventSystem.send(ref, OnDeactivatedEvent.newInstance());
-            eventSystem.send(ref, OnRemovedEvent.newInstance());
+            eventSystem.send(ref, BeforeDeactivateComponent.newInstance());
+            eventSystem.send(ref, BeforeRemoveComponent.newInstance());
         }
         for (Component comp : store.iterateComponents(entityId)) {
             notifyComponentRemoved(ref, comp.getClass());
@@ -392,7 +392,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         if (entity.exists()) {
             int entityId = entity.getId();
             if (eventSystem != null) {
-                eventSystem.send(entity, OnDeactivatedEvent.newInstance());
+                eventSystem.send(entity, BeforeDeactivateComponent.newInstance());
             }
             loadedIds.remove(entityId);
             store.remove(entityId);
@@ -417,10 +417,10 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         if (eventSystem != null) {
             EntityRef entityRef = createEntityRef(entityId);
             if (oldComponent == null) {
-                eventSystem.send(entityRef, OnAddedEvent.newInstance(), component);
-                eventSystem.send(entityRef, OnActivatedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnAddedComponent.newInstance(), component);
+                eventSystem.send(entityRef, OnActivatedComponent.newInstance(), component);
             } else {
-                eventSystem.send(entityRef, OnChangedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnChangedComponent.newInstance(), component);
             }
         }
         if (oldComponent == null) {
@@ -436,8 +436,8 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         if (component != null) {
             if (eventSystem != null) {
                 EntityRef entityRef = createEntityRef(entityId);
-                eventSystem.send(entityRef, OnDeactivatedEvent.newInstance(), component);
-                eventSystem.send(entityRef, OnRemovedEvent.newInstance(), component);
+                eventSystem.send(entityRef, BeforeDeactivateComponent.newInstance(), component);
+                eventSystem.send(entityRef, BeforeRemoveComponent.newInstance(), component);
             }
             notifyComponentRemoved(getEntity(entityId), componentClass);
             store.remove(entityId, componentClass);
@@ -452,10 +452,10 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         if (eventSystem != null) {
             EntityRef entityRef = createEntityRef(entityId);
             if (oldComponent == null) {
-                eventSystem.send(entityRef, OnAddedEvent.newInstance(), component);
-                eventSystem.send(entityRef, OnActivatedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnAddedComponent.newInstance(), component);
+                eventSystem.send(entityRef, OnActivatedComponent.newInstance(), component);
             } else {
-                eventSystem.send(entityRef, OnChangedEvent.newInstance(), component);
+                eventSystem.send(entityRef, OnChangedComponent.newInstance(), component);
             }
         }
         if (oldComponent == null) {
@@ -482,7 +482,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             }
             loadedIds.add(id);
             if (eventSystem != null) {
-                eventSystem.send(entity, OnActivatedEvent.newInstance());
+                eventSystem.send(entity, OnActivatedComponent.newInstance());
             }
             return entity;
         }

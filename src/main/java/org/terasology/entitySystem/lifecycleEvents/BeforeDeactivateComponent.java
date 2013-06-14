@@ -16,21 +16,24 @@
 
 package org.terasology.entitySystem.lifecycleEvents;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
- * This event occurs when an entity is created, a component is added or a component is activated - either through being added to an entity, or from an entity being
- * restored. It occurs after the OnAddedEvent.
+ * When a component is about to leave the active state, either due to being removed, the entity it is attached to being destroyed,
+ * or the entity being stored, this event is sent.
+ *
+ * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
+ * at least one is involved in the action causing the event.
  * @author Immortius <immortius@gmail.com>
  */
-public class OnActivatedEvent extends AbstractEvent {
+public class BeforeDeactivateComponent implements Event {
 
-    private static OnActivatedEvent instance = new OnActivatedEvent();
+    private static BeforeDeactivateComponent instance = new BeforeDeactivateComponent();
 
-    public static OnActivatedEvent newInstance() {
+    public static BeforeDeactivateComponent newInstance() {
         return instance;
     }
 
-    private OnActivatedEvent() {
+    private BeforeDeactivateComponent() {
     }
 }

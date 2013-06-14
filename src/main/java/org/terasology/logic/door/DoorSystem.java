@@ -21,20 +21,20 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DamageEvent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
@@ -75,7 +75,7 @@ public class DoorSystem implements ComponentSystem {
         DoorComponent door = entity.getComponent(DoorComponent.class);
         BlockComponent targetBlockComp = event.getTarget().getComponent(BlockComponent.class);
         if (targetBlockComp == null) {
-            event.cancel();
+            event.consume();
             return;
         }
 
@@ -83,7 +83,7 @@ public class DoorSystem implements ComponentSystem {
         horizDir.y = 0;
         Side facingDir = Side.inDirection(horizDir);
         if (!facingDir.isHorizontal()) {
-            event.cancel();
+            event.consume();
             return;
         }
 
@@ -95,7 +95,7 @@ public class DoorSystem implements ComponentSystem {
         primePos.add(offsetDir.getVector3i());
         Block primeBlock = worldProvider.getBlock(primePos);
         if (!primeBlock.isReplacementAllowed()) {
-            event.cancel();
+            event.consume();
             return;
         }
         Block belowBlock = worldProvider.getBlock(primePos.x, primePos.y - 1, primePos.z);
@@ -117,13 +117,13 @@ public class DoorSystem implements ComponentSystem {
             topBlockPos = new Vector3i(primePos.x, primePos.y + 1, primePos.z);
             topBlock = aboveBlock;
         } else {
-            event.cancel();
+            event.consume();
             return;
         }
 
         Side attachSide = determineAttachSide(facingDir, offsetDir, bottomBlockPos, topBlockPos);
         if (attachSide == null) {
-            event.cancel();
+            event.consume();
             return;
         }
 

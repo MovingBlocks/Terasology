@@ -147,8 +147,8 @@ public class PojoEntityManagerTest {
         EntityRef entity1 = entityManager.create();
         StringComponent comp = entity1.addComponent(new StringComponent());
 
-        verify(eventSystem).send(entity1, OnAddedEvent.newInstance(), comp);
-        verify(eventSystem).send(entity1, OnActivatedEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnAddedComponent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnActivatedComponent.newInstance(), comp);
     }
 
     @Test
@@ -160,8 +160,8 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         entity1.removeComponent(StringComponent.class);
 
-        verify(eventSystem).send(entity1, OnDeactivatedEvent.newInstance(), comp);
-        verify(eventSystem).send(entity1, OnRemovedEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, BeforeDeactivateComponent.newInstance(), comp);
+        verify(eventSystem).send(entity1, BeforeRemoveComponent.newInstance(), comp);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         entity1.saveComponent(comp);
 
-        verify(eventSystem).send(entity1, OnChangedEvent.newInstance(), comp);
+        verify(eventSystem).send(entity1, OnChangedComponent.newInstance(), comp);
     }
 
     @Test
@@ -185,7 +185,7 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         StringComponent comp2 = entity1.addComponent(new StringComponent());
 
-        verify(eventSystem).send(entity1, OnChangedEvent.newInstance(), comp2);
+        verify(eventSystem).send(entity1, OnChangedComponent.newInstance(), comp2);
     }
     
     @Test
@@ -197,8 +197,8 @@ public class PojoEntityManagerTest {
         entityManager.setEventSystem(eventSystem);
         entity1.destroy();
         
-        verify(eventSystem).send(entity1, OnDeactivatedEvent.newInstance());
-        verify(eventSystem).send(entity1, OnRemovedEvent.newInstance());
+        verify(eventSystem).send(entity1, BeforeDeactivateComponent.newInstance());
+        verify(eventSystem).send(entity1, BeforeRemoveComponent.newInstance());
     }
     
     @Test
@@ -300,13 +300,13 @@ public class PojoEntityManagerTest {
         prefab.setPersisted(false);
         prefab.addComponent(new StringComponent("Test"));
         EntityRef entity1 = entityManager.create(prefab);
-        assertFalse(entity1.isPersisted());
+        assertFalse(entity1.isPersistent());
     }
 
     @Test
     public void isLoadedTrueOnCreate() {
         EntityRef entity = entityManager.create();
-        assertTrue(entity.isLoaded());
+        assertTrue(entity.isActive());
     }
 
     @Test
@@ -314,7 +314,7 @@ public class PojoEntityManagerTest {
         EntityRef entity = entityManager.create();
         int id = entity.getId();
         entity.destroy();
-        assertFalse(entity.isLoaded());
+        assertFalse(entity.isActive());
         assertFalse(entityManager.isEntityLoaded(id));
     }
 
@@ -323,14 +323,14 @@ public class PojoEntityManagerTest {
         EntityRef entity = entityManager.create();
         int id = entity.getId();
         entityManager.removedForStoring(entity);
-        assertFalse(entity.isLoaded());
+        assertFalse(entity.isActive());
         assertFalse(entityManager.isEntityLoaded(id));
     }
 
     @Test
     public void isLoadedTrueAfterRestore() {
         EntityRef entity = entityManager.createEntityWithId(2, NullIterator.<Component>newInstance());
-        assertTrue(entity.isLoaded());
+        assertTrue(entity.isActive());
         assertTrue(entityManager.isEntityLoaded(2));
     }
 
@@ -339,7 +339,7 @@ public class PojoEntityManagerTest {
         EntityRef entity = entityManager.create();
         int id = entity.getId();
         entityManager.clear();
-        assertFalse(entity.isLoaded());
+        assertFalse(entity.isActive());
         assertFalse(entityManager.isEntityLoaded(id));
     }
 

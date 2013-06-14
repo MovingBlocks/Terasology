@@ -20,13 +20,13 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnDeactivatedEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.inventory.ItemComponent;
@@ -70,14 +70,14 @@ public class BlockItemSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = BlockItemComponent.class)
-    public void onDestroyed(OnDeactivatedEvent event, EntityRef entity) {
+    public void onDestroyed(BeforeDeactivateComponent event, EntityRef entity) {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         if (!event.getTarget().exists()) {
-            event.cancel();
+            event.consume();
             return;
         }
 
@@ -98,13 +98,13 @@ public class BlockItemSystem implements ComponentSystem {
                     }
                 } else {
                     // Something changed the block on another thread, cancel
-                    event.cancel();
+                    event.consume();
                     return;
                 }
             }
             event.getInstigator().send(new PlaySoundEvent(event.getInstigator(), Assets.getSound("engine:PlaceBlock"), 0.5f));
         } else {
-            event.cancel();
+            event.consume();
         }
     }
 

@@ -3,6 +3,8 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
@@ -13,7 +15,6 @@ import org.terasology.entitySystem.internal.PojoEntityManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.entitySystem.event.AbstractEvent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -158,7 +159,7 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.receivedList.size());
     }
 
-    private static class TestEvent extends AbstractEvent {
+    private static class TestEvent extends AbstractConsumableEvent {
 
     }
 
@@ -215,7 +216,7 @@ public class PojoEventSystemTests {
         public void handleStringEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
             if (cancel) {
-                event.cancel();
+                event.consume();
             }
         }
 

@@ -43,7 +43,7 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean isLoaded() {
+    public boolean isActive() {
         return false;
     }
 
@@ -89,12 +89,12 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean isPersisted() {
+    public boolean isPersistent() {
         return false;
     }
 
     @Override
-    public void setPersisted(boolean persisted) {
+    public void setPersistent(boolean persistent) {
     }
 
     @Override

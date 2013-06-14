@@ -16,18 +16,21 @@
 
 package org.terasology.entitySystem.lifecycleEvents;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 /**
- * This event is sent when a component is removed from an entity, or an entity is destroyed.
+ * When a component is about to be removed from an entity, or an entity is about to be destroyed, this event is sent.
+ *
+ * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
+ * at least one is involved in the action causing the event.
  */
-public class OnRemovedEvent extends AbstractEvent {
-    private static OnRemovedEvent instance = new OnRemovedEvent();
+public class BeforeRemoveComponent implements Event {
+    private static BeforeRemoveComponent instance = new BeforeRemoveComponent();
 
-    public static OnRemovedEvent newInstance() {
+    public static BeforeRemoveComponent newInstance() {
         return instance;
     }
 
-    private OnRemovedEvent() {
+    private BeforeRemoveComponent() {
     }
 }

@@ -49,8 +49,8 @@ public class NetEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean isLoaded() {
-        return getActualEntityRef().isLoaded();
+    public boolean isActive() {
+        return getActualEntityRef().isActive();
     }
 
     @Override
@@ -99,13 +99,13 @@ public class NetEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean isPersisted() {
-        return getActualEntityRef().isPersisted();
+    public boolean isPersistent() {
+        return getActualEntityRef().isPersistent();
     }
 
     @Override
-    public void setPersisted(boolean persisted) {
-        getActualEntityRef().setPersisted(persisted);
+    public void setPersistent(boolean persistent) {
+        getActualEntityRef().setPersistent(persistent);
     }
 
     @Override

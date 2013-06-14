@@ -16,16 +16,17 @@
 
 package org.terasology.world.chunks;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public class ChunkReadyEvent extends AbstractEvent {
+public class BeforeChunkUnload implements Event {
+
     private Vector3i chunkPos = new Vector3i();
 
-    public ChunkReadyEvent(Vector3i chunkPos) {
+    public BeforeChunkUnload(Vector3i chunkPos) {
         this.chunkPos.set(chunkPos);
     }
 

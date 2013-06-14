@@ -194,7 +194,7 @@ public class BindableButtonImpl implements BindableButton {
                     buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
-                        if (buttonEvent.isCancelled()) {
+                        if (buttonEvent.isConsumed()) {
                             break;
                         }
                     }

@@ -36,7 +36,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkReadyEvent;
+import org.terasology.world.chunks.OnChunkLoaded;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -132,7 +132,7 @@ public class LiquidSimulator implements ComponentSystem {
     }
 
     @ReceiveEvent(components = WorldComponent.class)
-    public void chunkReady(ChunkReadyEvent event, EntityRef worldEntity) {
+    public void chunkReady(OnChunkLoaded event, EntityRef worldEntity) {
         blockQueue.offer(new ReviewChunk(event.getChunkPos()));
     }
 

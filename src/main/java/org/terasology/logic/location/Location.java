@@ -16,11 +16,11 @@
 
 package org.terasology.logic.location;
 
+import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -105,7 +105,7 @@ public class Location implements ComponentSystem {
     }
 
     @ReceiveEvent(components = LocationComponent.class)
-    public void onDestroyed(OnRemovedEvent event, EntityRef entity) {
+    public void onDestroyed(BeforeRemoveComponent event, EntityRef entity) {
         LocationComponent parentLoc = entity.getComponent(LocationComponent.class);
         if (parentLoc == null)
         if (parentLoc.parent != null) {

@@ -16,14 +16,14 @@
 
 package org.terasology.network;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
  * Optional parent for events that are replicated over the network. Inherit this to make use of advanced features
  * @author Immortius
  */
-public class NetworkEvent extends AbstractEvent {
+public abstract class NetworkEvent implements Event {
 
     private EntityRef instigator = EntityRef.NULL;
 

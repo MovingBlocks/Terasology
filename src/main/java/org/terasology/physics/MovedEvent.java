@@ -16,7 +16,7 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 import javax.vecmath.Vector3f;
 
@@ -25,9 +25,8 @@ import javax.vecmath.Vector3f;
  * User: Pencilcheck
  * Date: 12/23/12
  * Time: 12:30 AM
- * To change this template use File | Settings | File Templates.
  */
-public class MovedEvent extends AbstractEvent {
+public class MovedEvent implements Event {
     private Vector3f delta;
     private Vector3f final_position;
 

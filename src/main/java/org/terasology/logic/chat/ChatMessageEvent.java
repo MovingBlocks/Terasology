@@ -28,7 +28,7 @@ import org.terasology.network.OwnerEvent;
  * @author Immortius
  */
 @OwnerEvent
-public class ChatMessageEvent extends MessageEvent {
+public class ChatMessageEvent implements MessageEvent {
     private String message;
     private EntityRef from;
 

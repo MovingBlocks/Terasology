@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 
 import javax.vecmath.Vector3f;
 
@@ -23,7 +23,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-public class HorizontalCollisionEvent extends AbstractEvent {
+public class HorizontalCollisionEvent implements Event {
     private Vector3f velocity;
     private Vector3f location;
 

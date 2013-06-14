@@ -16,17 +16,17 @@
 
 package org.terasology.logic.console;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.logic.console.Message;
 
 /**
  * @author Immortius
  */
-public abstract class MessageEvent extends AbstractEvent {
+public interface MessageEvent extends Event {
 
     /**
      * @return The final message, combining all message elements
      */
-    public abstract Message getFormattedMessage();
+    Message getFormattedMessage();
 
 }

@@ -18,8 +18,10 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
 
 
 public class DroppedItemComponent implements Component {
+    @Owns
     public EntityRef itemEntity = EntityRef.NULL;
 }

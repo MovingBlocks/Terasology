@@ -42,7 +42,7 @@ public class WorldSerializerTest {
     @Test
     public void testNotPersistedIfFlagedOtherwise() throws Exception {
         EntityRef entity = entityManager.create();
-        entity.setPersisted(false);
+        entity.setPersistent(false);
         int id = entity.getId();
 
         EntityData.World worldData = worldSerializer.serializeWorld(false);

@@ -16,7 +16,7 @@
 
 package org.terasology.network.events;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
@@ -24,7 +24,7 @@ import org.terasology.network.ServerEvent;
  * @author Immortius
  */
 @ServerEvent
-public class ChangeViewRangeRequest extends AbstractEvent {
+public class ChangeViewRangeRequest implements Event {
 
     private int newViewRange;
 

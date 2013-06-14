@@ -16,13 +16,13 @@
 
 package org.terasology.logic.health;
 
-import org.terasology.entitySystem.event.AbstractEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class HealthChangedEvent extends AbstractEvent {
+public class HealthChangedEvent implements Event {
     private EntityRef instigator;
     private int currentHealth;
     private int maxHealth;
