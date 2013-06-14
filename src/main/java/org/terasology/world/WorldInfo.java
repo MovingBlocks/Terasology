@@ -16,6 +16,7 @@
 
 package org.terasology.world;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 import org.terasology.config.ModConfig;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +43,7 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time = 0;
+    private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Byte> blockIdMap = Maps.newHashMap();
     private String[] chunkGenerators = new String[]{};
     private ModConfig modConfiguration = new ModConfig();
@@ -113,6 +116,14 @@ public class WorldInfo {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public List<String> getRegisteredBlockFamilies() {
+        return registeredBlockFamilies;
+    }
+
+    public void setRegisteredBlockFamilies(List<String> registeredBlockFamilies) {
+        this.registeredBlockFamilies = registeredBlockFamilies;
     }
 
     public Map<String, Byte> getBlockIdMap() {

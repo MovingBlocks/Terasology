@@ -21,8 +21,7 @@ import org.terasology.engine.modes.LoadProcess;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerAuthority;
-import org.terasology.world.block.management.BlockManagerClient;
+import org.terasology.world.block.management.BlockManagerImpl;
 
 /**
  * @author Immortius
@@ -43,12 +42,12 @@ public class RegisterBlocks implements LoadProcess {
     @Override
     public boolean step() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        BlockManager blockManager;
+        BlockManagerImpl blockManager;
         if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerAuthority(worldInfo.getBlockIdMap());
+            blockManager = new BlockManagerImpl(worldInfo.getRegisteredBlockFamilies(), worldInfo.getBlockIdMap(), true);
             blockManager.subscribe(CoreRegistry.get(NetworkSystem.class));
         } else {
-            blockManager = new BlockManagerClient(networkSystem.getServer().getInfo().getRegisterBlockFamilyList(), worldInfo.getBlockIdMap());
+            blockManager = new BlockManagerImpl(worldInfo.getRegisteredBlockFamilies(), worldInfo.getBlockIdMap(), false);
         }
         blockManager.buildAtlas();
         CoreRegistry.put(BlockManager.class, blockManager);

@@ -27,6 +27,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -92,6 +93,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             modConfig.addMod(mod.getModInfo().getId());
         }
         WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, modConfig);
+        List<String> registeredBlockFamilies = Lists.newArrayList();
+        for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
+            registeredBlockFamilies.add(family.getURI().toString());
+        }
+        worldInfo.setRegisteredBlockFamilies(registeredBlockFamilies);
         worldInfo.setBlockIdMap(blockManager.getBlockIdMap());
         return worldInfo;
     }

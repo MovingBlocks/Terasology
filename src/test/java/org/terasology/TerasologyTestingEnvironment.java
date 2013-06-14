@@ -41,7 +41,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerAuthority;
+import org.terasology.world.block.management.BlockManagerImpl;
 
 import java.io.File;
 
@@ -69,7 +69,7 @@ public abstract class TerasologyTestingEnvironment {
         if (!setup) {
             setup = true;
             bindLwjgl();
-            blockManager = new BlockManagerAuthority();
+            blockManager = new BlockManagerImpl();
             CoreRegistry.put(BlockManager.class, blockManager);
 
             config = new Config();

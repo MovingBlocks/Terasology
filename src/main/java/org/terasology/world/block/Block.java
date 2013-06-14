@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
@@ -59,7 +60,7 @@ import static org.lwjgl.opengl.GL11.glIsEnabled;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-// TODO: Make this immutable, add a block builder class
+// TODO: Make this immutable, add a block builder class?
 public class Block {
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
@@ -165,6 +166,7 @@ public class Block {
     // Entity integration
     private String entityPrefab = "";
     private BlockEntityMode entityMode = BlockEntityMode.ON_INTERACTION;
+    private EntityRef blockEntity = EntityRef.NULL;
 
     // Inventory settings
     private boolean directPickup = false;
@@ -383,6 +385,14 @@ public class Block {
 
     public void setEntityMode(BlockEntityMode entityMode) {
         this.entityMode = entityMode;
+    }
+
+    public EntityRef getBlockTypeEntity() {
+        return blockEntity;
+    }
+
+    public void setBlockTypeEntity(EntityRef entity) {
+        this.blockEntity = entity;
     }
 
     /**
@@ -612,6 +622,9 @@ public class Block {
 
         if (mesh == null) {
             generateMesh();
+            if (mesh == null) {
+                return;
+            }
         } else if (mesh.isDisposed()) {
             logger.error("Cannot render disposed mesh");
             return;

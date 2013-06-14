@@ -17,12 +17,14 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.persistence.PlayerEntityStore;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.persistence.PlayerEntityStore;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.location.Location;
@@ -167,7 +169,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 NetworkComponent netComp = character.getComponent(NetworkComponent.class);
                 netComp.owner = entity;
                 character.saveComponent(netComp);
-                Location.attachChild(character, entity, new Vector3f(), new Quat4f(0,0,0,1));
+                Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
             } else {
                 character.destroy();
                 spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));

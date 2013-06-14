@@ -16,8 +16,6 @@
 
 package org.terasology.world.liquid;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +29,10 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius
@@ -44,15 +45,15 @@ public class LiquidSimulationTest extends TerasologyTestingEnvironment {
 
     @Before
     public void setup() {
-        Chunk[] chunks = new Chunk[] {new Chunk(new Vector3i(-1,0,-1)), new Chunk(new Vector3i(0,0,-1)), new Chunk(new Vector3i(1,0,-1)),
-                new Chunk(new Vector3i(-1,0,0)), new Chunk(new Vector3i(0,0,0)), new Chunk(new Vector3i(1,0,0)),
-                new Chunk(new Vector3i(-1,0,1)), new Chunk(new Vector3i(0,0,1)), new Chunk(new Vector3i(1,0,1))};
+        Chunk[] chunks = new Chunk[]{new Chunk(new Vector3i(-1, 0, -1)), new Chunk(new Vector3i(0, 0, -1)), new Chunk(new Vector3i(1, 0, -1)),
+                new Chunk(new Vector3i(-1, 0, 0)), new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)),
+                new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), new Chunk(new Vector3i(1, 0, 1))};
 
-        view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1,1,1));
+        view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         view.lock();
 
 
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        BlockManagerImpl blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
         dirt = new Block();
         dirt.setDisplayName("Dirt");
@@ -77,15 +78,15 @@ public class LiquidSimulationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void calcStateSolidBlock() {
-        view.setBlock(new Vector3i(0,1,0), dirt);
-        view.setLiquid(new Vector3i(1, 1, 0), new LiquidData(LiquidType.WATER, (byte)7));
+        view.setBlock(new Vector3i(0, 1, 0), dirt);
+        view.setLiquid(new Vector3i(1, 1, 0), new LiquidData(LiquidType.WATER, (byte) 7));
 
         assertEquals(new LiquidData(), LiquidSimulator.calcStateFor(new Vector3i(0, 1, 0), view));
     }
 
     @Test
     public void calcStateFlowIntoDecaying() {
-        view.setLiquid(new Vector3i(1, 1, 0), new LiquidData(LiquidType.WATER, (byte)7));
+        view.setLiquid(new Vector3i(1, 1, 0), new LiquidData(LiquidType.WATER, (byte) 7));
 
         assertEquals(new LiquidData(LiquidType.WATER, 2), LiquidSimulator.calcStateFor(new Vector3i(0, 1, 0), view));
     }
