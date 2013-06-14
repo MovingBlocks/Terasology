@@ -300,17 +300,10 @@ public class TerasologyEngine implements GameEngine {
                 }
 
                 try {
-                    if (System.getProperty("os.arch").contains("64")) {
-                        System.loadLibrary("tera-ovr64");
-                        OculusVrHelper.nativeLibraryIsLoaded = true;
-                    } else {
-                        OculusVrHelper.nativeLibraryIsLoaded = true;
-                        System.loadLibrary("tera-ovr");
-                    }
+                    OculusVrHelper.loadNatives();
                 } catch (UnsatisfiedLinkError  e) {
-                    logger.warn("Could not find TeraOVR native library. No worries... It's completely optional.");
+                    logger.warn("Could not load TeraOVR native library. No worries... It's completely optional.");
                 }
-
 
                 break;
             default:

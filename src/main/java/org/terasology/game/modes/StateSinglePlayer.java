@@ -85,7 +85,7 @@ public class StateSinglePlayer implements GameState {
         guiManager.openWindow(MenuControlSystem.HUD);
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
-                && OculusVrHelper.nativeLibraryIsLoaded) {
+                && OculusVrHelper.isNativeLibraryLoaded()) {
             logger.info("Trying to initialize Oculus SDK...");
             TeraOVR.initSDK();
             logger.info("Done!");
@@ -116,7 +116,7 @@ public class StateSinglePlayer implements GameState {
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
-                && OculusVrHelper.nativeLibraryIsLoaded) {
+                && OculusVrHelper.isNativeLibraryLoaded()) {
             logger.info("Shutting down Oculus SDK...");
             TeraOVR.clear();
             logger.info("Done!");

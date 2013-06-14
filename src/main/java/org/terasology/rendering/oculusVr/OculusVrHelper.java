@@ -46,25 +46,43 @@ public class OculusVrHelper {
     private static float percievedHalfRTDistance;
     private static float yFov;
 
-    public static boolean nativeLibraryIsLoaded = false;
+    private static boolean nativeLibraryLoaded = false;
+
+    private static float lastPitch, lastYaw, lastRoll;
 
     static {
         updateHelperVariables();
     }
 
-    public static void updateFromDevice() {
-        verticalRes = TeraOVR.getVResolution();
-        horizontalRes = TeraOVR.getHResolution();
-        verticalScreenSize = TeraOVR.getVScreenSize();
-        horizontalScreenSize = TeraOVR.getHScreenSize();
-        eyeToScreenDistance = TeraOVR.getEyeToScreenDistance();
-        lensSeparationDistance = TeraOVR.getLensSeparationDistance();
-        interpupillaryDistance = TeraOVR.getInterpupillaryDistance();
+    public static void loadNatives() {
+        if (System.getProperty("os.arch").contains("64")) {
+            System.loadLibrary("tera-ovr64");
+            nativeLibraryLoaded = true;
+        } else {
+            System.loadLibrary("tera-ovr");
+            nativeLibraryLoaded = true;
+        }
+    }
 
-        distortionParams[0] = TeraOVR.getDistortitionK0();
-        distortionParams[1] = TeraOVR.getDistortitionK1();
-        distortionParams[2] = TeraOVR.getDistortitionK2();
-        distortionParams[3] = TeraOVR.getDistortitionK3();
+    public static void updateFromDevice() {
+        if (nativeLibraryLoaded) {
+            verticalRes = TeraOVR.getVResolution();
+            horizontalRes = TeraOVR.getHResolution();
+            verticalScreenSize = TeraOVR.getVScreenSize();
+            horizontalScreenSize = TeraOVR.getHScreenSize();
+            eyeToScreenDistance = TeraOVR.getEyeToScreenDistance();
+            lensSeparationDistance = TeraOVR.getLensSeparationDistance();
+            interpupillaryDistance = TeraOVR.getInterpupillaryDistance();
+
+            distortionParams[0] = TeraOVR.getDistortitionK0();
+            distortionParams[1] = TeraOVR.getDistortitionK1();
+            distortionParams[2] = TeraOVR.getDistortitionK2();
+            distortionParams[3] = TeraOVR.getDistortitionK3();
+
+            lastPitch = TeraOVR.getPitch();
+            lastRoll = TeraOVR.getRoll();
+            lastYaw = TeraOVR.getYaw();
+        }
 
         updateHelperVariables();
     }
@@ -160,5 +178,45 @@ public class OculusVrHelper {
 
     public static float getyFov() {
         return yFov;
+    }
+
+    public static boolean isNativeLibraryLoaded() {
+        return nativeLibraryLoaded;
+    }
+
+    public static float getYawRelativeToLastCall() {
+        if (nativeLibraryLoaded) {
+            final float newYaw = TeraOVR.getYaw();
+            final float relYaw = newYaw - lastYaw;
+            lastYaw = newYaw;
+
+            return relYaw;
+        }
+
+        return 0.0f;
+    }
+
+    public static float getPitchRelativeToLastCall() {
+        if (nativeLibraryLoaded) {
+            final float newPitch = TeraOVR.getPitch();
+            final float relPitch = newPitch - lastPitch;
+            lastPitch = newPitch;
+
+            return relPitch;
+        }
+
+        return 0.0f;
+    }
+
+    public static float getRollRelativeToLastCall() {
+        if (nativeLibraryLoaded) {
+            final float newRoll = TeraOVR.getRoll();
+            final float relRoll = newRoll - lastRoll;
+            lastRoll = newRoll;
+
+            return relRoll;
+        }
+
+        return 0.0f;
     }
 }

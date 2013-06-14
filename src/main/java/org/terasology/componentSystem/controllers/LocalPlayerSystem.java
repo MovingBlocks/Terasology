@@ -114,6 +114,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
+    // Don't serialize this with the player...
+    private float viewRoll = 0;
+
     private int verticalStep = 0;
     private final int maxVerticalStep = 2;
 
@@ -167,22 +170,22 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         updateMovement(localPlayerComponent, characterMovementComponent, location);
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
-                && OculusVrHelper.nativeLibraryIsLoaded) {
+                && OculusVrHelper.isNativeLibraryLoaded()) {
             LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
-            localPlayer.viewYaw = TeraOVR.getYaw() * (180.0f / (float) Math.PI);
-            localPlayer.viewPitch = -1.0f * TeraOVR.getPitch() * (180.0f / (float) Math.PI);
-            localPlayer.viewRoll = -1.0f * TeraOVR.getRoll() * (180.0f / (float) Math.PI);
+            localPlayer.viewYaw += OculusVrHelper.getYawRelativeToLastCall() * (180.0f / (float) Math.PI);
+            localPlayer.viewPitch += -1.0f * OculusVrHelper.getPitchRelativeToLastCall() * (180.0f / (float) Math.PI);
+            viewRoll += -1.0f * OculusVrHelper.getRollRelativeToLastCall() * (180.0f / (float) Math.PI);
 
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             if (loc != null) {
-                QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw,  TeraMath.DEG_TO_RAD * localPlayer.viewPitch, TeraMath.DEG_TO_RAD * localPlayer.viewRoll);
+                QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw,  TeraMath.DEG_TO_RAD * localPlayer.viewPitch, TeraMath.DEG_TO_RAD * viewRoll);
             }
         }
 
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
         QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
-            TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, TeraMath.DEG_TO_RAD * localPlayerComponent.viewRoll);
+            TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, TeraMath.DEG_TO_RAD * viewRoll);
         updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation, entity);
 
         // Hand animation update
@@ -339,7 +342,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
             Quat4f viewRot = new Quat4f();
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
-                TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, TeraMath.DEG_TO_RAD * localPlayerComponent.viewRoll);
+                TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, TeraMath.DEG_TO_RAD * viewRoll);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
         } else if (characterMovementComponent.isClimbing) {
@@ -348,7 +351,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             Quat4f viewRot = new Quat4f();
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw,
-                TeraMath.DEG_TO_RAD * pitch, TeraMath.DEG_TO_RAD * localPlayerComponent.viewRoll);
+                TeraMath.DEG_TO_RAD * pitch, TeraMath.DEG_TO_RAD * viewRoll);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
         } else {
