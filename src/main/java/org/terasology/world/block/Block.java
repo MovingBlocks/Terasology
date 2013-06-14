@@ -387,11 +387,11 @@ public class Block {
         this.entityMode = entityMode;
     }
 
-    public EntityRef getBlockTypeEntity() {
+    public EntityRef getEntity() {
         return blockEntity;
     }
 
-    public void setBlockTypeEntity(EntityRef entity) {
+    public void setEntity(EntityRef entity) {
         this.blockEntity = entity;
     }
 

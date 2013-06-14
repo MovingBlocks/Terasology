@@ -68,7 +68,7 @@ public class BlockManagerImpl extends BlockManager {
     private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<>(256);
     private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<>(256);
 
-    private Set<BlockRegistrationListener> listeners = Sets.newSetFromMap(new MapMaker().weakKeys().<BlockRegistrationListener, Boolean>makeMap());
+    private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
 
     private BlockLoader blockLoader;
 

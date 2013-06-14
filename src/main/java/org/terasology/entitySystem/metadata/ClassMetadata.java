@@ -20,6 +20,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -107,6 +108,13 @@ public class ClassMetadata<T> {
             logger.error("Exception during serializing type: {}", clazz, e);
         } catch (InvocationTargetException e) {
             logger.error("Exception during serializing type: {}", clazz, e);
+        }
+        return null;
+    }
+
+    public T clone(Component component) {
+        if (clazz.isInstance(component)) {
+            return clone((T)component);
         }
         return null;
     }
