@@ -66,6 +66,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
 
+    private int rtFullWidth;
+    private int rtFullHeight;
+    private int rtHalfWidth;
+    private int rtHalfHeight;
+    private int rtQuarterWidth;
+    private int rtQuarterHeight;
+    private int rtHalfQuarterWidth;
+    private int rtHalfQuarterHeight;
+
     private int displayListQuad = -1;
 
     private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
@@ -234,48 +243,54 @@ public class DefaultRenderingProcess implements IPropertyProvider {
      * Initially creates the scene FBO and updates it according to the size of the viewport.
      */
     private void createOrUpdateFullscreenFbos() {
+        rtFullWidth = Display.getWidth();
+        rtFullHeight = Display.getHeight();
+
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+            rtFullWidth *= OculusVrHelper.getScaleFactor();
+            rtFullHeight *= OculusVrHelper.getScaleFactor();
+        }
+
+        rtHalfWidth = rtFullWidth / 2;
+        rtHalfHeight = rtFullHeight / 2;
+        rtQuarterWidth = rtHalfWidth / 2;
+        rtQuarterHeight = rtHalfHeight / 2;
+        rtHalfQuarterWidth = rtQuarterWidth / 2;
+        rtHalfQuarterHeight = rtQuarterHeight / 2;
+
         FBO scene = getFBO("sceneOpaque");
-        boolean recreate = scene == null || (scene.width != Display.getWidth() || scene.height != Display.getHeight());
+        boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
 
         if (!recreate)
             return;
 
-        int fullWidth = Display.getWidth();
-        int fullHeight = Display.getHeight();
-        final int halfWidth = fullWidth / 2;
-        final int halfHeight = fullHeight / 2;
-        final int quarterWidth = halfWidth / 2;
-        final int quarterHeight = halfHeight / 2;
-        final int halfQuarterWidth = quarterWidth / 2;
-        final int halfQuarterHeight = quarterHeight / 2;
-
-        createFBO("sceneOpaque", fullWidth, fullHeight, FBOType.FBOT_HDR, true, true);
-        createFBO("sceneTransparent", fullWidth, fullHeight, FBOType.FBOT_HDR, true, true);
+        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, true, true);
+        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, true, true);
 
         createFBO("sceneShadowMap", 1024, 1024, FBOType.FBOT_NO_COLOR, true, false);
 
-        createFBO("sceneCombined", fullWidth, fullHeight, FBOType.FBOT_HDR, true, true);
+        createFBO("sceneCombined", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, true, true);
 
-        createFBO("scenePrePost", fullWidth, fullHeight, FBOType.FBOT_HDR, false, false);
-        createFBO("sceneToneMapped", fullWidth, fullHeight, FBOType.FBOT_HDR, false, false);
-        createFBO("sceneFinal", fullWidth, fullHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, false, false);
+        createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, false, false);
+        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("sobel", fullWidth, fullHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("ssao", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("ssaoBlurred0", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("ssaoBlurred1", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("ssao", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("ssaoBlurred0", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("ssaoBlurred1", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("lightShafts", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("lightShafts", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("sceneReflected", halfWidth, halfHeight, FBOType.FBOT_HDR, true, false);
+        createFBO("sceneReflected", rtHalfWidth, rtHalfHeight, FBOType.FBOT_HDR, true, false);
 
-        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneHighPass", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBloom0", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBloom1", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
 
-        createFBO("sceneBlur0", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("sceneBlur1", halfWidth, halfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBlur0", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBlur1", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -501,7 +516,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void endRenderReflectedScene() {
         getFBO("sceneReflected").unbind();
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     public void beginRenderSceneShadowMap() {
@@ -514,7 +529,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void endRenderSceneShadowMap() {
         getFBO("sceneShadowMap").unbind();
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     public void renderScene() {
@@ -601,10 +616,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                 renderFullscreenQuad();
                 break;
             case SRS_OCULUS_LEFT_EYE:
-                renderFullscreenQuad(0,0, Display.getWidth() / 2, Display.getHeight());
+                renderFullscreenQuad(0,0, rtFullWidth / 2, rtFullHeight);
                 break;
             case SRS_OCULUS_RIGHT_EYE:
-                renderFullscreenQuad(Display.getWidth() / 2, 0, Display.getWidth() / 2, Display.getHeight());
+                renderFullscreenQuad(rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight);
                 break;
         }
 
@@ -612,10 +627,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void updateOcShaderParametersForVP(ShaderProgram program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
-        float w = (float) vpWidth / Display.getWidth();
-        float h = (float) vpHeight / Display.getHeight();
-        float x = (float) vpX / Display.getWidth();
-        float y = (float) vpY / Display.getHeight();
+        float w = (float) vpWidth / rtFullWidth;
+        float h = (float) vpHeight / rtFullHeight;
+        float x = (float) vpX / rtFullWidth;
+        float y = (float) vpY / rtFullHeight;
 
         float as = (float) vpWidth / vpHeight;
 
@@ -640,7 +655,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             shader = ShaderManager.getInstance().getShaderProgram("ocDistortion");
             shader.enable();
 
-            updateOcShaderParametersForVP(shader, 0, 0, Display.getWidth() / 2, Display.getHeight(), StereoRenderState.SRS_OCULUS_LEFT_EYE);
+            updateOcShaderParametersForVP(shader, 0, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.SRS_OCULUS_LEFT_EYE);
         } else {
             if (config.getSystem().isDebugRenderingEnabled()) {
                 shader = ShaderManager.getInstance().getShaderProgram("debug");
@@ -651,12 +666,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             shader.enable();
         }
 
-        renderFullscreenQuad();
+        renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
         if (config.getRendering().isOculusVrSupport()) {
-            updateOcShaderParametersForVP(shader, Display.getWidth() / 2, 0, Display.getWidth() / 2, Display.getHeight(), StereoRenderState.SRS_OCULUS_RIGHT_EYE);
+            updateOcShaderParametersForVP(shader, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.SRS_OCULUS_RIGHT_EYE);
 
-            renderFullscreenQuad();
+            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
         }
     }
 
@@ -695,7 +710,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("lightShafts").unbind();
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateSSAO() {
@@ -710,7 +725,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("ssao").unbind();
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateSobel() {
@@ -725,7 +740,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         renderFullscreenQuad();
 
         DefaultRenderingProcess.getInstance().getFBO("sobel").unbind();
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateBlurredSSAO(int id) {
@@ -751,7 +766,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + id).unbind();
 
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generatePrePost() {
@@ -783,7 +798,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         DefaultRenderingProcess.getInstance().getFBO("sceneHighPass").unbind();
 
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateBlur(int id) {
@@ -810,7 +825,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + id).unbind();
 
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateBloom(int id) {
@@ -836,7 +851,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + id).unbind();
 
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateDownsampledScene() {
@@ -866,7 +881,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         }
 
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     public void renderFullscreenQuad() {
@@ -903,8 +918,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
-
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void renderQuad() {
@@ -943,7 +956,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     public FBO getFBO(String title) {
         return _FBOs.get(title);
     }
-
 
     @Override
     public void addPropertiesToList(List<Property> properties) {

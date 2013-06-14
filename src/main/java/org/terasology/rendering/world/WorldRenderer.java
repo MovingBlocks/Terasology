@@ -484,10 +484,14 @@ public final class WorldRenderer {
         });
     }
 
+    public void updateAndQueueVisibleChunks() {
+        updateAndQueueVisibleChunks(true, true);
+    }
+
     /**
      * Updates the currently visible chunks (in sight of the player).
      */
-    public void updateAndQueueVisibleChunks() {
+    public void updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
         statDirtyChunks = 0;
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
@@ -496,7 +500,7 @@ public final class WorldRenderer {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
 
-            if (config.getRendering().isDynamicShadows()) {
+            if (config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
                 if (isChunkVisibleLight(c) && isChunkValidForRender(c)) {
                     if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
                         renderQueueChunksOpaqueShadow.add(c);
@@ -522,31 +526,33 @@ public final class WorldRenderer {
                 else
                     statIgnoredPhases++;
 
-                if (i < MAX_ANIMATED_CHUNKS)
-                    c.setAnimated(true);
-                else
-                    c.setAnimated(false);
+                if (processChunkUpdates) {
+                    if (i < MAX_ANIMATED_CHUNKS)
+                        c.setAnimated(true);
+                    else
+                        c.setAnimated(false);
 
-                if (c.getPendingMesh() != null) {
-                    for (int j = 0; j < c.getPendingMesh().length; j++) {
-                        c.getPendingMesh()[j].generateVBOs();
-                    }
-                    if (c.getMesh() != null) {
-                        for (int j = 0; j < c.getMesh().length; j++) {
-                            c.getMesh()[j].dispose();
+                    if (c.getPendingMesh() != null) {
+                        for (int j = 0; j < c.getPendingMesh().length; j++) {
+                            c.getPendingMesh()[j].generateVBOs();
                         }
+                        if (c.getMesh() != null) {
+                            for (int j = 0; j < c.getMesh().length; j++) {
+                                c.getMesh()[j].dispose();
+                            }
+                        }
+                        c.setMesh(c.getPendingMesh());
+                        c.setPendingMesh(null);
                     }
-                    c.setMesh(c.getPendingMesh());
-                    c.setPendingMesh(null);
-                }
 
-                if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
-                    statDirtyChunks++;
-                    chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
+                    if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
+                        statDirtyChunks++;
+                        chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
+                    }
                 }
 
                 statVisibleChunks++;
-            } else if (i > config.getRendering().getMaxChunkVBOs()) {
+            } else if (i > config.getRendering().getMaxChunkVBOs() && processChunkUpdates) {
                 if (mesh != null) {
                     // Make sure not too many chunk VBOs are available in the video memory at the same time
                     // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
@@ -596,7 +602,13 @@ public final class WorldRenderer {
 
         resetStats();
 
-        updateAndQueueVisibleChunks();
+        if (stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO
+                || stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE) {
+            updateAndQueueVisibleChunks();
+        } else {
+            // Don't cause havoc in the second pass for the second eye
+            updateAndQueueVisibleChunks(false, false);
+        }
 
         DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
         glCullFace(GL11.GL_FRONT);
@@ -707,8 +719,7 @@ public final class WorldRenderer {
         * THIRD (AND FOURTH) RENDER PASS: WATER AND ICE
         */
         while (renderQueueChunksSortedWater.size() > 0) {
-            Chunk c = renderQueueChunksSortedWater.poll();
-            renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.CRM_DEFAULT);
+            renderChunk(renderQueueChunksSortedWater.poll(), ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.CRM_DEFAULT);
         }
 
         PerformanceMonitor.endActivity();
