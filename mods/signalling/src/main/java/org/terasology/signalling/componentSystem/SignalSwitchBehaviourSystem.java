@@ -3,7 +3,7 @@ package org.terasology.signalling.componentSystem;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
@@ -109,7 +109,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     }
 
     @ReceiveEvent(components = {SignalConsumerStatusComponent.class})
-    public void consumerModified(OnChangedEvent event, EntityRef entity) {
+    public void consumerModified(OnChangedComponent event, EntityRef entity) {
         if (entity.hasComponent(BlockComponent.class)) {
             SignalConsumerStatusComponent consumerStatusComponent = entity.getComponent(SignalConsumerStatusComponent.class);
             Vector3i blockLocation = new Vector3i(entity.getComponent(BlockComponent.class).getPosition());

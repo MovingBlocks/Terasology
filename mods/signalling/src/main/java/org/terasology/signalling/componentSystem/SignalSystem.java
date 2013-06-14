@@ -10,9 +10,7 @@ import org.terasology.blockNetwork.NetworkTopologyListener;
 import org.terasology.blockNetwork.Network;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnAddedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedEvent;
-import org.terasology.entitySystem.lifecycleEvents.OnRemovedEvent;
+import org.terasology.entitySystem.lifecycleEvents.*;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -233,7 +231,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      */
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
-    public void conductorAdded(OnAddedEvent event, EntityRef block) {
+    public void conductorAdded(OnActivatedComponent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
         final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
@@ -244,7 +242,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @ReceiveEvent(components = {SignalConductorComponent.class})
-    public void conductorUpdated(OnChangedEvent event, EntityRef block) {
+    public void conductorUpdated(OnChangedComponent event, EntityRef block) {
         if (block.hasComponent(BlockComponent.class)) {
             byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
@@ -260,7 +258,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
-    public void conductorRemoved(OnRemovedEvent event, EntityRef block) {
+    public void conductorRemoved(BeforeDeactivateComponent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
         final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
@@ -273,7 +271,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      */
 
     @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
-    public void producerAdded(OnAddedEvent event, EntityRef block) {
+    public void producerAdded(OnActivatedComponent event, EntityRef block) {
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         final SignalProducerComponent producerComponent = block.getComponent(SignalProducerComponent.class);
         byte connectingOnSides = producerComponent.connectionSides;
@@ -286,7 +284,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @ReceiveEvent(components = {SignalProducerComponent.class})
-    public void producerUpdated(OnChangedEvent event, EntityRef block) {
+    public void producerUpdated(OnChangedComponent event, EntityRef block) {
         if (block.hasComponent(BlockComponent.class)) {
             Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
             final SignalProducerComponent producerComponent = block.getComponent(SignalProducerComponent.class);
@@ -312,7 +310,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
-    public void producerRemoved(OnRemovedEvent event, EntityRef block) {
+    public void producerRemoved(BeforeDeactivateComponent event, EntityRef block) {
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalProducerComponent.class).connectionSides;
 
@@ -327,7 +325,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      */
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
-    public void consumerAdded(OnAddedEvent event, EntityRef block) {
+    public void consumerAdded(OnActivatedComponent event, EntityRef block) {
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
@@ -339,7 +337,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @ReceiveEvent(components = {SignalConsumerComponent.class})
-    public void consumerUpdated(OnChangedEvent event, EntityRef block) {
+    public void consumerUpdated(OnChangedComponent event, EntityRef block) {
         if (block.hasComponent(BlockComponent.class)) {
             Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
             final SignalConsumerComponent consumerComponent = block.getComponent(SignalConsumerComponent.class);
@@ -359,7 +357,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
-    public void consumerRemoved(OnRemovedEvent event, EntityRef block) {
+    public void consumerRemoved(BeforeDeactivateComponent event, EntityRef block) {
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
