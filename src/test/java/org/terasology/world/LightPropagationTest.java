@@ -16,6 +16,7 @@
 
 package org.terasology.world;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +31,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerAuthority;
+import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.lighting.LightPropagator;
 
@@ -59,7 +60,7 @@ public class LightPropagationTest extends TerasologyTestingEnvironment {
         view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         view.lock();
         propagator = new LightPropagator(view);
-        BlockManagerAuthority blockManager = new BlockManagerAuthority(Maps.<String, Byte>newHashMap());
+        BlockManagerImpl blockManager = new BlockManagerImpl(Lists.<String>newArrayList(), Maps.<String, Byte>newHashMap(), true);
         CoreRegistry.put(BlockManager.class, blockManager);
 
         air = BlockManager.getAir();

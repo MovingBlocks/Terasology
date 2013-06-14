@@ -1,0 +1,7 @@
+{
+    "BlockType" : {
+    },
+    "Network" : {
+        "replicateMode" : "ALWAYS"
+    }
+}

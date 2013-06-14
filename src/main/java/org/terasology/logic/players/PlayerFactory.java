@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.players;
 
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;

@@ -58,6 +58,7 @@ public class JoinServer implements LoadProcess {
             for (int i = 0; i < serverInfo.getBlockIdCount(); ++i) {
                 blockMap.put(serverInfo.getBlockName(i), (byte) serverInfo.getBlockId(i));
             }
+            worldInfo.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
             worldInfo.setBlockIdMap(blockMap);
             worldInfo.setTime(networkSystem.getServer().getInfo().getTime());
 

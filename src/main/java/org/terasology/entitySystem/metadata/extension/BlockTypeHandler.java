@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 
 import java.util.List;
@@ -27,42 +27,42 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class BlockFamilyTypeHandler implements TypeHandler<BlockFamily> {
+public class BlockTypeHandler implements TypeHandler<Block> {
 
     private BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
     @Override
-    public EntityData.Value serialize(BlockFamily value) {
+    public EntityData.Value serialize(Block value) {
         return EntityData.Value.newBuilder().addString(value.getURI().toString()).build();
     }
 
     @Override
-    public BlockFamily deserialize(EntityData.Value value) {
+    public Block deserialize(EntityData.Value value) {
         if (value.getStringCount() > 0) {
-            return blockManager.getBlockFamily(value.getString(0));
+            return blockManager.getBlock(value.getString(0));
         }
         return null;
     }
 
     @Override
-    public BlockFamily copy(BlockFamily value) {
+    public Block copy(Block value) {
         return value;
     }
 
     @Override
-    public EntityData.Value serialize(Iterable<BlockFamily> value) {
+    public EntityData.Value serialize(Iterable<Block> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
-        for (BlockFamily item : value) {
+        for (Block item : value) {
             result.addString(item.getURI().toString());
         }
         return result.build();
     }
 
     @Override
-    public List<BlockFamily> deserializeList(EntityData.Value value) {
-        List<BlockFamily> result = Lists.newArrayListWithCapacity(value.getStringCount());
+    public List<Block> deserializeList(EntityData.Value value) {
+        List<Block> result = Lists.newArrayListWithCapacity(value.getStringCount());
         for (String item : value.getStringList()) {
-            result.add(blockManager.getBlockFamily(item));
+            result.add(blockManager.getBlock(item));
         }
         return result;
     }

@@ -38,6 +38,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerImpl;
 
 /**
  * Event handler for events affecting block entities

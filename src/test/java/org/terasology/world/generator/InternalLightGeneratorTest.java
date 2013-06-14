@@ -16,8 +16,6 @@
 
 package org.terasology.world.generator;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.engine.CoreRegistry;
@@ -29,9 +27,11 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerAuthority;
+import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.lighting.InternalLightProcessor;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius
@@ -43,7 +43,7 @@ public class InternalLightGeneratorTest {
 
     @Before
     public void setup() {
-        BlockManagerAuthority blockManager = new BlockManagerAuthority();
+        BlockManagerImpl blockManager = new BlockManagerImpl();
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = BlockManager.getAir();
         solidBlock = new Block();
@@ -60,7 +60,7 @@ public class InternalLightGeneratorTest {
     @Test
     public void unblockedSunlightPropagation() {
 
-        Chunk chunk = new Chunk(0,0,0);
+        Chunk chunk = new Chunk(0, 0, 0);
         InternalLightProcessor.generateInternalLighting(chunk);
 
         for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z))) {
@@ -70,7 +70,7 @@ public class InternalLightGeneratorTest {
 
     @Test
     public void blockedSunlightPropagation() {
-        Chunk chunk = new Chunk(0,0,0);
+        Chunk chunk = new Chunk(0, 0, 0);
         chunk.setBlock(0, 15, 0, solidBlock);
         InternalLightProcessor.generateInternalLighting(chunk);
 
@@ -82,8 +82,8 @@ public class InternalLightGeneratorTest {
 
     @Test
     public void pinholeSunlightPropagation() {
-        Chunk chunk = new Chunk(0,0,0);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, Chunk.SIZE_Y - 1,0), new Vector3i(Chunk.SIZE_X,1, Chunk.SIZE_Z))) {
+        Chunk chunk = new Chunk(0, 0, 0);
+        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, Chunk.SIZE_Y - 1, 0), new Vector3i(Chunk.SIZE_X, 1, Chunk.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
         chunk.setBlock(8, Chunk.SIZE_Y - 1, 8, airBlock);
@@ -99,17 +99,17 @@ public class InternalLightGeneratorTest {
 
     @Test
     public void sunlightPropagatesUpward() {
-        Chunk chunk = new Chunk(0,0,0);
-        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(9,9,9), Vector3i.one())) {
+        Chunk chunk = new Chunk(0, 0, 0);
+        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(9, 9, 9), Vector3i.one())) {
             chunk.setBlock(pos, solidBlock);
         }
 
-        chunk.setBlock(new Vector3i(9,9,9), airBlock);
-        chunk.setBlock(new Vector3i(9,8,9), airBlock);
+        chunk.setBlock(new Vector3i(9, 9, 9), airBlock);
+        chunk.setBlock(new Vector3i(9, 8, 9), airBlock);
 
         InternalLightProcessor.generateInternalLighting(chunk);
-        assertEquals((byte)13, chunk.getSunlight(new Vector3i(9,7,9)));
-        assertEquals((byte)12, chunk.getSunlight(new Vector3i(9,8,9)));
-        assertEquals((byte)11, chunk.getSunlight(new Vector3i(9,9,9)));
+        assertEquals((byte) 13, chunk.getSunlight(new Vector3i(9, 7, 9)));
+        assertEquals((byte) 12, chunk.getSunlight(new Vector3i(9, 8, 9)));
+        assertEquals((byte) 11, chunk.getSunlight(new Vector3i(9, 9, 9)));
     }
 }

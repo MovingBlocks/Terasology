@@ -20,22 +20,22 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.testUtil.WorldProviderCoreStub;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerAuthority;
+import org.terasology.world.block.management.BlockManagerImpl;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class EntityAwareWorldProviderTest {
     private PrefabManager prefabManager;
     private EntityManager entityManager;
     private static ModManager modManager;
-    private BlockManagerAuthority blockManager;
+    private BlockManagerImpl blockManager;
 
     @BeforeClass
     public static void commonSetup() {
@@ -64,7 +64,7 @@ public class EntityAwareWorldProviderTest {
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerAuthority());
+        blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl());
 
         entityManager = builder.build(modManager);
         prefabManager = entityManager.getPrefabManager();
