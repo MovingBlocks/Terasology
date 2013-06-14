@@ -375,7 +375,9 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
         bufferIds.flip();
         if (bufferIds.limit() == 0) {
-            GL11.glReadBuffer(GL11.GL_NONE);
+            if (depth && type == FBOType.FBOT_NO_COLOR) {
+                GL11.glReadBuffer(GL11.GL_NONE);
+            }
             GL20.glDrawBuffers(GL11.GL_NONE);
         } else {
             GL20.glDrawBuffers(bufferIds);
