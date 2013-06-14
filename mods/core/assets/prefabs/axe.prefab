@@ -3,9 +3,7 @@
         "name" : "Axe",
         "icon" : "Axe",
         "perBlockDamageBonus" : {
-            "BirkTrunk" : 1,
-            "OakTrunk" : 1,
-            "PineTrunk" : 1
+            "wood" : 2
         },
         "renderWithIcon" : true
     }

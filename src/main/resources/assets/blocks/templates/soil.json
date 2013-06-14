@@ -1,0 +1,8 @@
+/**
+ * Soils are just some easy to break blocks.
+ */
+{
+    "template" : true,
+    "hardness" : 2,
+    "categories" : ["soil"]
+}

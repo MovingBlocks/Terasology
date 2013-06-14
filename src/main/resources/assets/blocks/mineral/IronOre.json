@@ -18,4 +18,5 @@
  * A mineral block that would drop Iron
  */
 {
+    "basedOn" : "engine:mineral"
 }

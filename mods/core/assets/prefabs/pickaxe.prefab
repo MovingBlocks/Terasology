@@ -3,7 +3,8 @@
         "name" : "Pick Axe",
         "icon" : "PickAxe",
         "perBlockDamageBonus" : {
-            "Stone" : 1
+            "stone" : 4,
+            "mineral" : 2
         },
         "renderWithIcon" : true
     },
