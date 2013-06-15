@@ -109,14 +109,17 @@ public class BlockEntitySystem implements ComponentSystem {
         entity.destroy();
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = {BlockComponent.class, BlockDamagedComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
-        entity.destroy();
+        entity.removeComponent(BlockDamagedComponent.class);
     }
 
     @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
+        if (!entity.hasComponent(BlockDamagedComponent.class)) {
+            entity.addComponent(new BlockDamagedComponent());
+        }
     }
 
     @ReceiveEvent(components = {BlockComponent.class})

@@ -44,6 +44,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Vector3i;
+import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.testUtil.WorldProviderCoreStub;
@@ -299,6 +300,29 @@ public class EntityAwareWorldProviderTest {
         worldProvider.setBlock(0, 0, 0, blockWithRetainedComponent, BlockManager.getAir());
 
         assertEquals(2, entity.getComponent(RetainedOnBlockChangeComponent.class).value);
+    }
+
+    @Test
+    public void networkComponentAddedWhenChangedToNonTemporary() {
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.addComponent(new RetainedOnBlockChangeComponent(2));
+
+        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)), checker.receivedEvents);
+        assertTrue(entity.hasComponent(NetworkComponent.class));
+    }
+
+    @Test
+    public void networkComponentRemovedWhenTemporaryCleanedUp() {
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.addComponent(new RetainedOnBlockChangeComponent(2));
+
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
+        entity.removeComponent(RetainedOnBlockChangeComponent.class);
+
+        worldProvider.update(1.0f);
+
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
     }
 
     public static class LifecycleEventChecker {

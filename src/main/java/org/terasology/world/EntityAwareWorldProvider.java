@@ -96,21 +96,24 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        Vector3i pos = new Vector3i(x, y, z);
-        EntityRef blockEntity = getBlockEntityAt(pos);
-        if (super.setBlock(x, y, z, type, oldType)) {
-            // TODO: fix threading handling
-            if (Thread.currentThread().equals(mainThread)) {
+        if (Thread.currentThread().equals(mainThread)) {
+            Vector3i pos = new Vector3i(x, y, z);
+            EntityRef blockEntity = getBlockEntityAt(pos);
+            if (super.setBlock(x, y, z, type, oldType)) {
                 EntityRef regionEntity = blockRegionLookup.get(pos);
                 if (regionEntity != null) {
                     regionEntity.send(new OnChangedBlock(pos, type, oldType));
                 }
                 updateBlockEntity(blockEntity, oldType, type);
                 blockEntity.send(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
-            } else {
-                eventQueue.add(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
+                return true;
             }
-            return true;
+        } else {
+            // TODO: fix threading handling
+            if (super.setBlock(x, y, z, type, oldType)) {
+                eventQueue.add(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
+                return true;
+            }
         }
         return false;
     }
@@ -335,18 +338,15 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private void cleanUpTemporaryEntity(EntityRef entity) {
         Prefab prefab = entity.getParentPrefab();
-        if (prefab == null) {
-            for (Component comp : entity.iterateComponents()) {
-                if (!COMMON_BLOCK_COMPONENTS.contains(comp.getClass())) {
-                    entity.removeComponent(comp.getClass());
-                }
+
+        for (Component comp : entity.iterateComponents()) {
+            if (!COMMON_BLOCK_COMPONENTS.contains(comp.getClass()) && (prefab == null || !prefab.hasComponent(comp.getClass()))) {
+                entity.removeComponent(comp.getClass());
             }
-        } else {
-            for (Component comp : entity.iterateComponents()) {
-                if (!COMMON_BLOCK_COMPONENTS.contains(comp.getClass()) && !prefab.hasComponent(comp.getClass())) {
-                    entity.removeComponent(comp.getClass());
-                }
-            }
+        }
+        entity.removeComponent(NetworkComponent.class);
+
+        if (prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 Component currentComp = entity.getComponent(comp.getClass());
                 if (currentComp == null) {
