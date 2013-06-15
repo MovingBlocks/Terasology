@@ -98,7 +98,7 @@ public class OculusVrHelper {
         lensShift =  horizontalScreenSize * 0.25f - lensOffset;
         lensViewportShift =  4.0f * lensShift / horizontalScreenSize;
 
-        scaleFactor = 1.5f;
+        scaleFactor = 1.3f;
         percievedHalfRTDistance = (verticalScreenSize / 2) * scaleFactor;
         yFov = 2.0f * (float) Math.atan(percievedHalfRTDistance / eyeToScreenDistance);
         //yFov = 2.0f * (float) Math.atan(halfScreenDistance/eyeToScreenDistance);

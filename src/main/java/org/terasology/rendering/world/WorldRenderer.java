@@ -782,7 +782,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera,ChunkRenderMode mode) {
+    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera, ChunkRenderMode mode) {
 
         if (chunk.getChunkState() == ChunkState.COMPLETE && chunk.getMesh() != null) {
 
