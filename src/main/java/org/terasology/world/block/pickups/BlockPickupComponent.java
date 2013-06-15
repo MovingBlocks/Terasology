@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block;
+// TODO: Move to another package
+package org.terasology.world.block.pickups;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.Replicate;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * @author Immortius
  */
-public enum BlockEntityMode {
-    ON_INTERACTION,
-    WHILE_PLACED,
-    PERSISTENT
+public class BlockPickupComponent implements Component {
+    @Replicate
+    public BlockFamily blockFamily;
+    @Replicate
+    public EntityRef placedEntity = EntityRef.NULL;
 }

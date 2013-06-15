@@ -73,7 +73,7 @@ import java.util.Set;
  */
 public class EntitySystemBuilder {
 
-    public EngineEntityManager build(ModManager modManager) {
+    public EngineEntityManager build(ModManager modManager, NetworkSystem networkSystem) {
         PojoEntityManager entityManager = new PojoEntityManager();
         TypeHandlerLibrary typeHandlerLibrary = buildTypeLibrary(entityManager);
         EntitySystemLibrary library = new EntitySystemLibraryImpl(typeHandlerLibrary);
@@ -86,7 +86,7 @@ public class EntitySystemBuilder {
         entityManager.setPrefabManager(prefabManager);
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
-        entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), CoreRegistry.get(NetworkSystem.class)));
+        entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 

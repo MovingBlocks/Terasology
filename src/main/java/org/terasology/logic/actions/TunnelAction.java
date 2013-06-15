@@ -30,7 +30,7 @@ import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.DroppedBlockFactory;
+import org.terasology.world.block.pickups.DroppedBlockFactory;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
@@ -95,7 +95,7 @@ public class TunnelAction implements ComponentSystem {
                     if (currentBlock.isDestructible()) {
                         worldProvider.setBlock(blockPos, BlockManager.getAir(), currentBlock);
 
-                        EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
+                        EntityRef blockEntity = blockEntityRegistry.getExistingEntityAt(blockPos);
                         blockEntity.destroy();
 
                         if (random.randomInt(6) == 0) {

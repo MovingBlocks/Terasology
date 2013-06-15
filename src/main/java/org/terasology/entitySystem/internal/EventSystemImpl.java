@@ -35,7 +35,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
@@ -50,7 +49,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

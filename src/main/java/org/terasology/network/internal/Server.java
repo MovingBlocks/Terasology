@@ -49,7 +49,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
@@ -198,7 +198,7 @@ public class Server implements ChunkReadyListener {
         Event event = eventSerializer.deserialize(message.getEvent());
         EntityRef target = EntityRef.NULL;
         if (message.hasTargetBlockPos()) {
-            target = blockEntityRegistry.getOrCreateBlockEntityAt(NetMessageUtil.convert(message.getTargetBlockPos()));
+            target = blockEntityRegistry.getBlockEntityAt(NetMessageUtil.convert(message.getTargetBlockPos()));
         } else if (message.hasTargetId()) {
             target = networkSystem.getEntity(message.getTargetId());
         }
@@ -316,7 +316,7 @@ public class Server implements ChunkReadyListener {
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
+                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }

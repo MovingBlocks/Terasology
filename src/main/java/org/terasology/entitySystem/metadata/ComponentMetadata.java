@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
+import org.terasology.world.block.ForceBlockActive;
 
 /**
  * @author Immortius
@@ -27,11 +28,17 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
     private boolean replicated = false;
     private boolean replicatedFromOwner = false;
     private boolean referenceOwner = false;
-
+    private boolean forceBlockActive = false;
+    private boolean retainUnalteredOnBlockChange = false;
 
     public ComponentMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
         super(simpleClass, names);
         replicated = simpleClass.getAnnotation(Replicate.class) != null;
+        ForceBlockActive forceBlockActiveAnnotation = simpleClass.getAnnotation(ForceBlockActive.class);
+        if (forceBlockActiveAnnotation != null) {
+            forceBlockActive = true;
+            retainUnalteredOnBlockChange = forceBlockActiveAnnotation.retainUnalteredOnBlockChange();
+        }
     }
 
     public void addField(FieldMetadata fieldInfo) {
@@ -47,6 +54,13 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
         }
     }
 
+    public T clone(Component component) {
+        if (getType().isInstance(component)) {
+            return super.clone(getType().cast(component));
+        }
+        return null;
+    }
+
     public boolean isReferenceOwner() {
         return referenceOwner;
     }
@@ -57,5 +71,13 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
 
     public boolean isReplicated() {
         return replicated;
+    }
+
+    public boolean isForceBlockActive() {
+        return forceBlockActive;
+    }
+
+    public boolean isRetainUnalteredOnBlockChange() {
+        return retainUnalteredOnBlockChange;
     }
 }

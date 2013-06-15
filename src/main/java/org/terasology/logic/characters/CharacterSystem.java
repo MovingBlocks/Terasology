@@ -19,7 +19,7 @@ package org.terasology.logic.characters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.world.block.entity.DroppedBlockFactory;
+import org.terasology.world.block.pickups.DroppedBlockFactory;
 import org.terasology.logic.inventory.DroppedItemFactory;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
@@ -47,8 +47,8 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
-import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Vector3f;
 

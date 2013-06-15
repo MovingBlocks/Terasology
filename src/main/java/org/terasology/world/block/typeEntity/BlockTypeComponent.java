@@ -1,4 +1,4 @@
-package org.terasology.world.block.entity;
+package org.terasology.world.block.typeEntity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;

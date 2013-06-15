@@ -25,7 +25,7 @@ import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 
 import java.util.List;
 
@@ -69,7 +69,7 @@ public class IterateSingleComponentBenchmark extends AbstractBenchmark {
 
     @Override
     public void run() {
-        for (EntityRef entity : entityManager.listEntitiesWith(LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             loc.getLocalPosition();
         }

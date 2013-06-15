@@ -42,7 +42,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;

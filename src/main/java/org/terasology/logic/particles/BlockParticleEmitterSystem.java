@@ -21,7 +21,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -92,7 +91,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
             Iterator<Particle> iterator = particleEffect.particles.iterator();
             while (iterator.hasNext()) {
@@ -158,7 +157,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 

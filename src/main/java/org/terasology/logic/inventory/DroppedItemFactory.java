@@ -18,7 +18,6 @@ package org.terasology.logic.inventory;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.EntityBuilder;
-import org.terasology.logic.inventory.DroppedItemComponent;
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -26,12 +25,10 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.world.block.entity.DroppedBlockFactory;
 
 import javax.vecmath.Vector3f;
 import java.util.Map;

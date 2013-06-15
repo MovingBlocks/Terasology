@@ -19,7 +19,6 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -35,10 +34,11 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockEntityMode;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerImpl;
+import org.terasology.world.block.pickups.DroppedBlockFactory;
 
 /**
  * Event handler for events affecting block entities
@@ -91,18 +91,8 @@ public class BlockEntitySystem implements ComponentSystem {
         // TODO: Configurable via block definition
         entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
 
-        if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-            entity.removeComponent(HealthComponent.class);
-            entity.removeComponent(BlockComponent.class);
-        }
-
         if ((oldBlock.isDirectPickup()) && event.getInstigator().exists()) {
-            EntityRef item;
-            if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
-            } else {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
-            }
+            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
 
             if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
@@ -112,27 +102,16 @@ public class BlockEntitySystem implements ComponentSystem {
             }
         } else {
             /* PHYSICS */
-            EntityRef block;
-            if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20, entity);
-            } else {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
-            }
+            EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
             block.send(new ImpulseEvent(random.randomVector3f(30)));
         }
 
-        if (oldBlock.getEntityMode() != BlockEntityMode.PERSISTENT) {
-            entity.destroy();
-        }
+        entity.destroy();
     }
 
-    // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged?
     @ReceiveEvent(components = {BlockComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
-        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-        if (blockComp.temporary) {
-            entity.destroy();
-        }
+        entity.destroy();
     }
 
     @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)

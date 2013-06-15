@@ -16,7 +16,6 @@
 package org.terasology.logic.ai;
 
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.ai.SimpleAIComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -59,7 +58,7 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 

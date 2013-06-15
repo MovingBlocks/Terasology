@@ -15,8 +15,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.location.LocationComponent;
@@ -26,7 +24,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockPickupComponent;
+import org.terasology.world.block.pickups.BlockPickupComponent;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Quat4f;

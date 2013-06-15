@@ -54,16 +54,17 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     public static void initialise() {
         ModManager modManager = new ModManager();
         CoreRegistry.put(ModManager.class, modManager);
-        entityManager = new EntitySystemBuilder().build(modManager);
     }
 
     @Before
     public void setup() {
+        mockTimer = mock(Timer.class);
+        networkSystem = new NetworkSystemImpl(mockTimer);
+
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
         CoreRegistry.put(BlockManager.class, new BlockManagerImpl());
         entityManager.clear();
-        mockTimer = mock(Timer.class);
-        networkSystem = new NetworkSystemImpl(mockTimer);
         client = mock(NetClient.class);
         NetworkComponent clientNetComp = new NetworkComponent();
         clientNetComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;

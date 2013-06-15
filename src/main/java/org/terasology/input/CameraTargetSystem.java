@@ -67,7 +67,7 @@ public class CameraTargetSystem implements ComponentSystem {
 
     public EntityRef getTarget() {
         if (!target.exists() && targetBlockPos != null) {
-            target = blockRegistry.getOrCreateEntityAt(targetBlockPos);
+            target = blockRegistry.getEntityAt(targetBlockPos);
         }
         return target;
     }
@@ -89,7 +89,7 @@ public class CameraTargetSystem implements ComponentSystem {
         // Repair lost target
         // TODO: Improvements to temporary chunk handling will remove the need for this
         if (!target.exists() && targetBlockPos != null) {
-            target = blockRegistry.getOrCreateEntityAt(targetBlockPos);
+            target = blockRegistry.getEntityAt(targetBlockPos);
         }
         boolean lostTarget = false;
         if (!target.exists()) {

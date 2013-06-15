@@ -24,8 +24,8 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkComponent;
-import org.terasology.world.block.entity.BlockItemComponent;
-import org.terasology.world.block.entity.BlockItemFactory;
+import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;

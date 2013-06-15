@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block.entity;
+package org.terasology.world.block.pickups;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
@@ -28,6 +28,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.physics.CollideEvent;
+import org.terasology.world.block.items.BlockItemFactory;
 
 /**
  * @author Immortius

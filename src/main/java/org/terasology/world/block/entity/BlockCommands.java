@@ -43,6 +43,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;

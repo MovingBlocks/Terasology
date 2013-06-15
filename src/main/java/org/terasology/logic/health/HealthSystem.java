@@ -45,7 +45,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(HealthComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth <= 0) continue;
 

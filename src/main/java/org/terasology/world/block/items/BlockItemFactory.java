@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block.entity;
+package org.terasology.world.block.items;
 
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.world.block.BlockEntityMode;
-import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
@@ -65,12 +63,6 @@ public class BlockItemFactory {
 
         BlockItemComponent blockItem = entity.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;
-        if (blockFamily.getArchetypeBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
-            if (!placedEntity.exists()) {
-                placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
-            }
-            blockItem.placedEntity = placedEntity;
-        }
         entity.saveComponent(blockItem);
 
         return entity;

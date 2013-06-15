@@ -27,12 +27,12 @@ public class AICommands implements ComponentSystem {
     @Command(shortDescription = "Destroys all AIs in the world", runOnServer = true)
     public String destroyAI() {
         int simpleAI = 0;
-        for (EntityRef ref : entityManager.listEntitiesWith(SimpleAIComponent.class)) {
+        for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
             ref.destroy();
             simpleAI++;
         }
         int hierarchicalAI = 0;
-        for (EntityRef ref : entityManager.listEntitiesWith(HierarchicalAIComponent.class)) {
+        for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
             ref.destroy();
             hierarchicalAI++;
         }
@@ -42,11 +42,11 @@ public class AICommands implements ComponentSystem {
     @Command(shortDescription = "Count all AIs in the world", runOnServer = true)
     public String countAI() {
         int simpleAIs = 0;
-        for (EntityRef ref : entityManager.listEntitiesWith(SimpleAIComponent.class)) {
+        for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
             simpleAIs++;
         }
         int hierarchical = 0;
-        for (EntityRef ref : entityManager.listEntitiesWith(HierarchicalAIComponent.class)) {
+        for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
             hierarchical++;
         }
         return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;

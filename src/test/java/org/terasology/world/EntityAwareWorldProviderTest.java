@@ -16,23 +16,41 @@
 
 package org.terasology.world;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.EventReceiver;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.stubs.ForceBlockActiveComponent;
+import org.terasology.entitySystem.stubs.IntegerComponent;
+import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.math.Vector3i;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.testUtil.WorldProviderCoreStub;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockEntityMode;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
@@ -41,20 +59,25 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
  */
 public class EntityAwareWorldProviderTest {
 
-    public static final String PREFAB_URI = "unittest:blockprefab";
     private EntityAwareWorldProvider worldProvider;
-    private PrefabManager prefabManager;
-    private EntityManager entityManager;
+    private EngineEntityManager entityManager;
     private static ModManager modManager;
     private BlockManagerImpl blockManager;
+    private WorldProviderCoreStub worldStub;
+
+    private Block simpleBlock;
+    private Block blockWithString;
+    private Block blockWithDifferentString;
+    private Block blockWithRetainedComponent;
 
     @BeforeClass
     public static void commonSetup() {
@@ -64,83 +87,300 @@ public class EntityAwareWorldProviderTest {
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
+
         blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl());
+        NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        entityManager = builder.build(modManager, networkSystem);
+        PrefabManager prefabManager = entityManager.getPrefabManager();
+        worldStub = new WorldProviderCoreStub(BlockManager.getAir());
+        worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 
-        entityManager = builder.build(modManager);
-        prefabManager = entityManager.getPrefabManager();
-        worldProvider = new EntityAwareWorldProvider(new WorldProviderCoreStub(BlockManager.getAir()));
-        worldProvider.entityManager = entityManager;
+        simpleBlock = new Block();
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:simpeBlock"), simpleBlock), true);
+
+        blockWithString = new Block();
+        Prefab prefabWithString = prefabManager.createPrefab("test:prefabWithString");
+        prefabWithString.addComponent(new StringComponent("Test"));
+        blockWithString.setPrefab("test:prefabWithString");
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithString"), blockWithString), true);
+
+        blockWithDifferentString = new Block();
+        Prefab prefabWithDifferentString = prefabManager.createPrefab("test:prefabWithDifferentString");
+        prefabWithDifferentString.addComponent(new StringComponent("Test2"));
+        blockWithDifferentString.setPrefab("test:prefabWithDifferentString");
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithDifferentString"), blockWithDifferentString), true);
+
+        blockWithRetainedComponent = new Block();
+        Prefab prefabWithRetainedComponent = prefabManager.createPrefab("test:prefabWithRetainedComponent");
+        prefabWithRetainedComponent.addComponent(new RetainedOnBlockChangeComponent(3));
+        blockWithRetainedComponent.setPrefab("test:prefabWithRetainedComponent");
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithRetainedComponent"), blockWithRetainedComponent), true);
+
+        worldProvider.initialise();
     }
 
     @Test
-    public void testAddBlockWithPersistentEntity() {
-
-        Prefab prefab = prefabManager.createPrefab(PREFAB_URI);
-        prefab.addComponent(new StringComponent());
-
-        Block persistentEntityBlock = new Block();
-        persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
-        persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
-
-        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
-        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.listEntitiesWith(BlockComponent.class));
-        assertEquals(1, blockEntities.size());
-        assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
-        assertNotNull(blockEntities.get(0).getComponent(BlockComponent.class));
-        assertFalse(blockEntities.get(0).getComponent(BlockComponent.class).temporary);
+    public void testGetTemporaryBlockSendsNoEvent() {
+        BlockEventChecker checker = new BlockEventChecker();
+        entityManager.getEventSystem().registerEventHandler(checker);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        assertTrue(blockEntity.exists());
+        assertFalse(checker.addedReceived);
+        assertFalse(checker.activateReceived);
+        assertFalse(checker.deactivateReceived);
+        assertFalse(checker.removedReceived);
     }
 
     @Test
-    public void testAddBlockWithPlacedEntity() {
-
-        Prefab prefab = prefabManager.createPrefab(PREFAB_URI);
-        prefab.addComponent(new StringComponent());
-
-        Block persistentEntityBlock = new Block();
-        persistentEntityBlock.setEntityMode(BlockEntityMode.WHILE_PLACED);
-        persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
-
-        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir()));
-        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.listEntitiesWith(BlockComponent.class));
-        assertEquals(1, blockEntities.size());
-        assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
-        assertNotNull(blockEntities.get(0).getComponent(BlockComponent.class));
-        assertFalse(blockEntities.get(0).getComponent(BlockComponent.class).temporary);
+    public void testTemporaryCleanedUpWithNoEvent() {
+        BlockEventChecker checker = new BlockEventChecker();
+        entityManager.getEventSystem().registerEventHandler(checker);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        worldProvider.update(1.0f);
+        assertFalse(blockEntity.exists());
+        assertFalse(checker.addedReceived);
+        assertFalse(checker.activateReceived);
+        assertFalse(checker.deactivateReceived);
+        assertFalse(checker.removedReceived);
     }
 
     @Test
-    public void testAddBlockWithExistingEntity() {
+    public void testActiveBlockNotCleanedUp() {
+        Block testBlock = new Block();
+        testBlock.setKeepActive(true);
+        BlockFamily blockFamily = new SymmetricFamily(new BlockUri("test:keepActive"), testBlock);
+        blockManager.addBlockFamily(blockFamily, true);
+        worldStub.setBlock(0, 0, 0, testBlock, BlockManager.getAir());
 
-        Prefab prefab = prefabManager.createPrefab(PREFAB_URI);
-        prefab.addComponent(new StringComponent());
+        BlockEventChecker checker = new BlockEventChecker();
+        entityManager.getEventSystem().registerEventHandler(checker);
 
-        Block persistentEntityBlock = new Block();
-        persistentEntityBlock.setEntityMode(BlockEntityMode.PERSISTENT);
-        persistentEntityBlock.setEntityPrefab(PREFAB_URI);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("unittest:block"), persistentEntityBlock), false);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        worldProvider.update(1.0f);
+        assertTrue(blockEntity.exists());
+        assertTrue(blockEntity.isActive());
+        assertTrue(checker.addedReceived);
+        assertTrue(checker.activateReceived);
+    }
 
-        EntityRef entity = entityManager.create(prefab);
+    @Test
+    public void testComponentsAddedAndActivatedWhenBlockChanged() {
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+
+        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        assertTrue(blockEntity.exists());
+
+        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), blockEntity), new EventInfo(OnActivatedComponent.newInstance(), blockEntity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void testComponentsDeactivatedAndRemovedWhenBlockChanged() {
+        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+
+        worldProvider.setBlock(0, 0, 0, BlockManager.getAir(), blockWithString);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        assertTrue(blockEntity.exists());
+
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), blockEntity), new EventInfo(BeforeRemoveComponent.newInstance(), blockEntity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void testComponentsUpdatedWhenBlockChanged() {
+        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+
+        worldProvider.setBlock(0, 0, 0, blockWithDifferentString, blockWithString);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        assertTrue(blockEntity.exists());
+
+        assertEquals(Lists.newArrayList(new EventInfo(OnChangedComponent.newInstance(), blockEntity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void testPrefabUpdatedWhenBlockChanged() {
+        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        assertEquals(blockWithString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
+        worldProvider.setBlock(0, 0, 0, blockWithDifferentString, blockWithString);
+        assertEquals(blockWithDifferentString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0,0,0)).getParentPrefab().getName());
+    }
+
+    @Test
+    public void testEntityNotRemovedIfForceBlockActiveComponentAdded() {
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        blockEntity.addComponent(new ForceBlockActiveComponent());
+        worldProvider.update(1.0f);
+        assertTrue(blockEntity.exists());
+        assertTrue(blockEntity.isActive());
+    }
+
+    @Test
+    public void testEntityBecomesTemporaryIfForceBlockActiveComponentRemoved() {
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        blockEntity.addComponent(new ForceBlockActiveComponent());
+        worldProvider.update(1.0f);
+        blockEntity.removeComponent(ForceBlockActiveComponent.class);
+        worldProvider.update(1.0f);
+        assertFalse(blockEntity.exists());
+        assertFalse(blockEntity.isActive());
+    }
+
+    @Test
+    public void testEntityExtraComponentsRemovedBeforeCleanUp() {
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.addComponent(new StringComponent("test"));
+
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+
+        worldProvider.update(1.0f);
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void testEntityExtraComponentsRemovedBeforeCleanUpForBlocksWithPrefabs() {
+        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.addComponent(new IntegerComponent(1));
+
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), IntegerComponent.class);
+
+        worldProvider.update(1.0f);
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void testEntityMissingComponentsAddedBeforeCleanUp() {
+        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.removeComponent(StringComponent.class);
+
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+
+        worldProvider.update(1.0f);
+        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void testChangedComponentsRevertedBeforeCleanUp() {
+        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
         StringComponent comp = entity.getComponent(StringComponent.class);
-        comp.value = "hi";
+        comp.value = "Moo";
         entity.saveComponent(comp);
 
-        assertTrue(worldProvider.setBlock(0, 0, 0, persistentEntityBlock, BlockManager.getAir(), entity));
-        List<EntityRef> blockEntities = Lists.newArrayList(entityManager.listEntitiesWith(BlockComponent.class));
-        for (EntityRef entityFound : blockEntities) {
-            System.out.println(entityFound.toFullDescription());
-        }
-        assertEquals(1, blockEntities.size());
-        assertEquals(blockEntities.get(0), entity);
-        assertNotNull(blockEntities.get(0).getComponent(StringComponent.class));
-        assertEquals("hi", blockEntities.get(0).getComponent(StringComponent.class).value);
-        assertNotNull(blockEntities.get(0).getComponent(BlockComponent.class));
-        assertFalse(blockEntities.get(0).getComponent(BlockComponent.class).temporary);
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+
+        worldProvider.update(1.0f);
+        assertEquals(Lists.newArrayList(new EventInfo(OnChangedComponent.newInstance(), entity)), checker.receivedEvents);
     }
 
     @Test
-    public void testAddBlockWithPreExistingEntity() {
+    public void allComponentsNotMarkedAsRetainedRemovedOnBlockChange() {
+        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.addComponent(new ForceBlockActiveComponent());
+        entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
+        worldProvider.setBlock(0, 0, 0, BlockManager.getAir(), blockWithString);
+
+        assertTrue(entity.hasComponent(RetainedOnBlockChangeComponent.class));
+        assertFalse(entity.hasComponent(ForceBlockActiveComponent.class));
+    }
+
+    @Test
+    public void retainedComponentsNotAltered() {
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        entity.addComponent(new RetainedOnBlockChangeComponent(2));
+
+        worldProvider.setBlock(0, 0, 0, blockWithRetainedComponent, BlockManager.getAir());
+
+        assertEquals(2, entity.getComponent(RetainedOnBlockChangeComponent.class).value);
+    }
+
+    public static class LifecycleEventChecker {
+        public List<EventInfo> receivedEvents = Lists.newArrayList();
+
+        public LifecycleEventChecker(EventSystem eventSystem, Class<? extends Component> forComponent) {
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<OnAddedComponent>(), OnAddedComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<OnActivatedComponent>(), OnActivatedComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<OnChangedComponent>(), OnChangedComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<BeforeDeactivateComponent>(), BeforeDeactivateComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<BeforeRemoveComponent>(), BeforeRemoveComponent.class, forComponent);
+        }
+
+        private class LifecycleEventReceiver<T extends Event> implements EventReceiver<T> {
+
+            @Override
+            public void onEvent(T event, EntityRef entity) {
+                receivedEvents.add(new EventInfo(event, entity));
+            }
+        }
+    }
+
+    public static class BlockEventChecker implements ComponentSystem {
+
+        public boolean addedReceived = false;
+        public boolean activateReceived = false;
+        public boolean deactivateReceived = false;
+        public boolean removedReceived = false;
+
+        @Override
+        public void initialise() {
+        }
+
+        @Override
+        public void shutdown() {
+        }
+
+        @ReceiveEvent(components = BlockComponent.class)
+        public void onAdded(OnAddedComponent event, EntityRef entity) {
+            addedReceived = true;
+        }
+
+        @ReceiveEvent(components = BlockComponent.class)
+        public void onActivated(OnActivatedComponent event, EntityRef entity) {
+            activateReceived = true;
+        }
+
+        @ReceiveEvent(components = BlockComponent.class)
+        public void onDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
+            deactivateReceived = true;
+        }
+
+        @ReceiveEvent(components = BlockComponent.class)
+        public void onRemoved(BeforeRemoveComponent event, EntityRef entity) {
+            removedReceived = true;
+        }
+    }
+
+    public static class EventInfo {
+        public EntityRef targetEntity;
+        public Event event;
+
+        public EventInfo(Event event, EntityRef target) {
+            this.event = event;
+            this.targetEntity = target;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof EventInfo) {
+                EventInfo other = (EventInfo) obj;
+                return Objects.equal(other.targetEntity, targetEntity) && Objects.equal(other.event, event);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(targetEntity, event);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package org.terasology.world.block.entity;
+package org.terasology.world.block.typeEntity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityBuilder;
@@ -31,7 +31,7 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
     }
 
     private void connectExistingEntities() {
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockTypeComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockTypeComponent.class)) {
             BlockTypeComponent blockTypeComp = entity.getComponent(BlockTypeComponent.class);
             blockTypeComp.block.setEntity(entity);
         }
@@ -58,7 +58,7 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
         EntityBuilder builder = entityManager.newBuilder(blockTypePrefab);
         builder.getComponent(BlockTypeComponent.class).block = block;
         // TODO: Copy across settings as necessary
-        Prefab prefab = entityManager.getPrefabManager().getPrefab(block.getEntityPrefab());
+        Prefab prefab = entityManager.getPrefabManager().getPrefab(block.getPrefab());
         if (prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 if (!(comp instanceof NetworkComponent)) {

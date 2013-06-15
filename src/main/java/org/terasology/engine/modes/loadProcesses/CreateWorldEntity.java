@@ -39,7 +39,7 @@ public class CreateWorldEntity implements LoadProcess {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
-        Iterator<EntityRef> worldEntityIterator = entityManager.listEntitiesWith(WorldComponent.class).iterator();
+        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         // TODO: Move the world renderer bits elsewhere
         if (worldEntityIterator.hasNext()) {
             worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());

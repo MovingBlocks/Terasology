@@ -47,10 +47,10 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
@@ -67,7 +67,7 @@ import java.util.List;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 // TODO: Merge this with Physics System
-public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
+public class BulletPhysics implements EventReceiver<OnChangedBlock> {
 
     private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
@@ -94,7 +94,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-        CoreRegistry.get(EventSystem.class).registerEventReceiver(this, BlockChangedEvent.class, BlockComponent.class);
+        CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);
 
         PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
@@ -190,7 +190,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         closest.collisionFilterGroup = CollisionFilterGroups.SENSOR_TRIGGER;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
-            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+            return new HitResult(blockEntityRegistry.getEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
         } else if (closest.userData instanceof EntityRef) {
             return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
@@ -209,7 +209,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         closest.collisionFilterMask = filter;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
-            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
+            return new HitResult(blockEntityRegistry.getEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
         } else if (closest.userData instanceof EntityRef) {
             return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
@@ -217,7 +217,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
     }
 
     @Override
-    public void onEvent(BlockChangedEvent event, EntityRef entity) {
+    public void onEvent(OnChangedBlock event, EntityRef entity) {
         Vector3f min = event.getBlockPosition().toVector3f();
         min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
         Vector3f max = event.getBlockPosition().toVector3f();

@@ -144,7 +144,7 @@ public class GUIManager implements ComponentSystem {
 
             renderer.addDisplayElementToPosition(0, window);
             window.initialise();
-            for (EntityRef worldEntity : CoreRegistry.get(EntityManager.class).listEntitiesWith(WorldComponent.class)) {
+            for (EntityRef worldEntity : CoreRegistry.get(EntityManager.class).getEntitiesWith(WorldComponent.class)) {
                 worldEntity.send(new UIWindowOpenedEvent(window));
             }
         }

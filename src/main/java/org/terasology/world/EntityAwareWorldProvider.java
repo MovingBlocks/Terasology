@@ -17,100 +17,98 @@
 package org.terasology.world;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.ComponentContainer;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityBuilder;
+import org.terasology.entitySystem.EntityChangeSubscriber;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockEntityMode;
-import org.terasology.world.block.BlockRegionComponent;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.regions.BlockRegionComponent;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Immortius
  */
-public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem {
-    @In
-    EntityManager entityManager;
+public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
 
-    @In
-    private NetworkSystem networkSystem;
+    private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS = ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class, EntityInfoComponent.class);
+
+    private EngineEntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
     // TODO: Or perhaps a build in indexing system for entities
-    private Map<Vector3i, EntityRef> blockComponentLookup = Maps.newHashMap();
+    private Map<Vector3i, EntityRef> blockEntityLookup = Maps.newHashMap();
 
     private Map<Vector3i, EntityRef> blockRegionLookup = Maps.newHashMap();
     private Map<EntityRef, Region3i> blockRegions = Maps.newHashMap();
 
-    private List<EntityRef> tempBlocks = Lists.newArrayList();
+    private Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
     private Thread mainThread;
-    private BlockingQueue<BlockChangedEvent> eventQueue = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<OnChangedBlock> eventQueue = Queues.newLinkedBlockingQueue();
 
     public EntityAwareWorldProvider(WorldProviderCore base) {
         super(base);
         mainThread = Thread.currentThread();
+        entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
+    }
+
+    public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager) {
+        this(base);
+        this.entityManager = entityManager;
     }
 
     @Override
     public void initialise() {
-        for (EntityRef blockComp : entityManager.listEntitiesWith(BlockComponent.class)) {
-            BlockComponent comp = blockComp.getComponent(BlockComponent.class);
-            blockComponentLookup.put(new Vector3i(comp.getPosition()), blockComp);
-        }
-
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockComponent.class)) {
-            BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (blockComp.temporary) {
-                HealthComponent health = entity.getComponent(HealthComponent.class);
-                if (health == null || health.currentHealth == health.maxHealth || health.currentHealth == 0) {
-                    entity.destroy();
-                }
-            }
-        }
+        entityManager.subscribe(this);
     }
 
     @Override
     public void shutdown() {
-
+        entityManager.unsubscribe(this);
     }
 
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
+        Vector3i pos = new Vector3i(x, y, z);
+        EntityRef blockEntity = getBlockEntityAt(pos);
         if (super.setBlock(x, y, z, type, oldType)) {
+            // TODO: fix threading handling
             if (Thread.currentThread().equals(mainThread)) {
-                Vector3i pos = new Vector3i(x, y, z);
                 EntityRef regionEntity = blockRegionLookup.get(pos);
                 if (regionEntity != null) {
-                    regionEntity.send(new BlockChangedEvent(pos, type, oldType));
+                    regionEntity.send(new OnChangedBlock(pos, type, oldType));
                 }
-                EntityRef blockEntity = getBlockEntityAt(new Vector3i(x, y, z));
-                if (blockEntity.exists()) {
-                    blockEntity.destroy();
-                }
-                blockEntity = getOrCreateBlockEntityAt(pos);
-                blockEntity.send(new BlockChangedEvent(new Vector3i(x, y, z), type, oldType));
+                updateBlockEntity(blockEntity, oldType, type);
+                blockEntity.send(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
             } else {
-                eventQueue.add(new BlockChangedEvent(new Vector3i(x, y, z), type, oldType));
+                eventQueue.add(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
             }
             return true;
         }
@@ -118,126 +116,171 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public EntityRef getBlockEntityAt(Vector3i blockPosition) {
-        EntityRef result = blockComponentLookup.get(blockPosition);
+    public EntityRef getExistingBlockEntityAt(Vector3i blockPosition) {
+        EntityRef result = blockEntityLookup.get(blockPosition);
         return (result == null) ? EntityRef.NULL : result;
     }
 
     @Override
-    public EntityRef getOrCreateBlockEntityAt(Vector3i blockPosition) {
-        EntityRef blockEntity = getBlockEntityAt(blockPosition);
-        if (!blockEntity.exists()) {
+    public EntityRef getBlockEntityAt(Vector3i blockPosition) {
+        EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
+        if (!blockEntity.exists() && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
             Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
-            blockEntity = entityManager.create(block.getEntityPrefab());
-            if (block.getEntityMode() == BlockEntityMode.ON_INTERACTION) {
-                tempBlocks.add(blockEntity);
-            }
-            setupBlockEntity(blockPosition, blockEntity, block);
+            blockEntity = createBlockEntity(blockPosition, block);
         }
         return blockEntity;
     }
 
-    private void setupBlockEntity(Vector3i blockPosition, EntityRef blockEntity, Block block) {
-        blockEntity.addComponent(new LocationComponent(blockPosition.toVector3f()));
-        blockEntity.addComponent(new BlockComponent(blockPosition, block.getEntityMode() == BlockEntityMode.ON_INTERACTION));
-        if (block.getEntityMode() != BlockEntityMode.ON_INTERACTION && !blockEntity.hasComponent(NetworkComponent.class)) {
-            blockEntity.addComponent(new NetworkComponent());
+    private boolean isTemporaryBlock(ComponentContainer entity, Block block) {
+        return isTemporaryBlock(entity, block, null);
+    }
+
+    private boolean isTemporaryBlock(ComponentContainer entity, Block block, Class<? extends Component> ignoreComponent) {
+        if (block.isKeepActive()) {
+            return false;
         }
-        // TODO: Get regen and wait from block config?
-        if (block.isDestructible()) {
-            blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+
+        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
+            if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType()) {
+                if (entity.hasComponent(metadata.getType())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Transforms a block entity with the change of block type. This is driven from the delta between the old and new
+     * block type prefabs, but takes into account changes made to the block entity.
+     *
+     * @param blockEntity The entity to update
+     * @param oldType     The previous type of the block
+     * @param type        The new type of the block
+     */
+    private void updateBlockEntity(EntityRef blockEntity, Block oldType, Block type) {
+        Prefab oldPrefab = entityManager.getPrefabManager().getPrefab(oldType.getPrefab());
+        Prefab newPrefab = entityManager.getPrefabManager().getPrefab(type.getPrefab());
+
+        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
+            if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()
+                    && (newPrefab == null || !newPrefab.hasComponent(metadata.getType()))) {
+                blockEntity.removeComponent(metadata.getType());
+            }
+        }
+
+        if (Objects.equal(newPrefab, oldPrefab)) {
+            return;
+        }
+
+        if (newPrefab != null) {
+            for (Component comp : newPrefab.iterateComponents()) {
+                ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
+                if (!blockEntity.hasComponent(comp.getClass())) {
+                    blockEntity.addComponent(metadata.clone(comp));
+                } else if (!metadata.isRetainUnalteredOnBlockChange()) {
+                    updateComponent(blockEntity, metadata, comp);
+                }
+            }
+
+            EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
+            if (entityInfo == null) {
+                entityInfo = new EntityInfoComponent();
+                entityInfo.parentPrefab = newPrefab.getName();
+                blockEntity.addComponent(entityInfo);
+            } else if (!entityInfo.parentPrefab.equals(newPrefab.getName())) {
+                entityInfo.parentPrefab = newPrefab.getName();
+                blockEntity.saveComponent(entityInfo);
+            }
+        } else if (oldPrefab != null) {
+            EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
+            if (entityInfo != null) {
+                entityInfo.parentPrefab = "";
+                blockEntity.saveComponent(entityInfo);
+            }
         }
     }
 
+    private void updateComponent(EntityRef blockEntity, ComponentMetadata<?> metadata, Component targetComponent) {
+        Component currentComp = blockEntity.getComponent(targetComponent.getClass());
+        if (currentComp != null) {
+            boolean changed = false;
+            for (FieldMetadata field : metadata.iterateFields()) {
+                Object newVal = field.getValue(targetComponent);
+                if (!Objects.equal(field.getValue(currentComp), newVal)) {
+                    field.setValue(currentComp, newVal);
+                    changed = true;
+                }
+            }
+            if (changed) {
+                blockEntity.saveComponent(currentComp);
+            }
+        }
+    }
+
+    private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
+        EntityBuilder builder = entityManager.newBuilder(block.getPrefab());
+        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new BlockComponent(blockPosition));
+        if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
+            builder.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+        }
+        boolean isTemporary = isTemporaryBlock(builder, block);
+        if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {
+            builder.addComponent(new NetworkComponent());
+        }
+
+        EntityRef blockEntity;
+        if (isTemporary) {
+            blockEntity = builder.buildNoEvents();
+            temporaryBlockEntities.add(blockEntity);
+        } else {
+            blockEntity = builder.build();
+        }
+
+        blockEntityLookup.put(new Vector3i(blockPosition), blockEntity);
+        return blockEntity;
+    }
+
     @Override
-    public EntityRef getEntityAt(Vector3i blockPosition) {
+    public EntityRef getExistingEntityAt(Vector3i blockPosition) {
         EntityRef result = blockRegionLookup.get(blockPosition);
         if (result == null) {
-            return getBlockEntityAt(blockPosition);
+            return getExistingBlockEntityAt(blockPosition);
         }
         return result;
     }
 
     @Override
-    public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
-        EntityRef entity = getEntityAt(blockPosition);
+    public EntityRef getEntityAt(Vector3i blockPosition) {
+        EntityRef entity = getExistingEntityAt(blockPosition);
         if (!entity.exists()) {
-            return getOrCreateBlockEntityAt(blockPosition);
+            return getBlockEntityAt(blockPosition);
         }
         return entity;
     }
 
-    @Override
-    public void replaceEntityAt(Vector3i blockPosition, EntityRef entity) {
-        replaceEntityAt(blockPosition, entity, getBlock(blockPosition.x, blockPosition.y, blockPosition.z));
-    }
-
-    @Override
-    public boolean setBlockRetainEntity(int x, int y, int z, Block type, Block oldType) {
-        return setBlockRetainEntity(new Vector3i(x, y, z), type, oldType);
-    }
-
-    @Override
-    public boolean setBlockRetainEntity(Vector3i pos, Block type, Block oldType) {
-        if (super.setBlock(pos.x, pos.y, pos.z, type, oldType)) {
-            if (Thread.currentThread().equals(mainThread)) {
-                getOrCreateEntityAt(pos).send(new BlockChangedEvent(pos, type, oldType));
-            } else {
-                eventQueue.add(new BlockChangedEvent(pos, type, oldType));
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private void replaceEntityAt(Vector3i blockPosition, EntityRef entity, Block blockType) {
-        EntityRef oldEntity = blockComponentLookup.put(blockPosition, entity);
-        if (oldEntity != null) {
-            oldEntity.destroy();
-        }
-        setupBlockEntity(blockPosition, entity, blockType);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType, EntityRef entity) {
-        return setBlock(new Vector3i(x, y, z), type, oldType, entity);
-    }
-
-    @Override
-    public boolean setBlock(Vector3i pos, Block type, Block oldType, EntityRef entity) {
-        if (super.setBlock(pos.x, pos.y, pos.z, type, oldType)) {
-            if (entity.exists()) {
-                replaceEntityAt(pos, entity, type);
-            } else if (Thread.currentThread().equals(mainThread)) {
-                getOrCreateEntityAt(pos).send(new BlockChangedEvent(pos, type, oldType));
-            } else {
-                eventQueue.add(new BlockChangedEvent(pos, type, oldType));
-            }
-            return true;
-        }
-        return false;
-    }
-
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onCreate(OnActivatedComponent event, EntityRef entity) {
+    public void onActivateBlock(OnActivatedComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
-        EntityRef oldEntity = blockComponentLookup.put(new Vector3i(block.getPosition()), entity);
+        EntityRef oldEntity = blockEntityLookup.put(new Vector3i(block.getPosition()), entity);
+        // If this is a client, then an existing block entity may exist. Destroy it.
         if (oldEntity != null && !Objects.equal(oldEntity, entity)) {
             oldEntity.destroy();
         }
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onDestroy(BeforeDeactivateComponent event, EntityRef entity) {
+    public void onDeactivateBlock(BeforeDeactivateComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         Vector3i pos = new Vector3i(block.getPosition());
-        if (blockComponentLookup.get(pos) == entity) {
-            blockComponentLookup.remove(pos);
+        if (blockEntityLookup.get(pos) == entity) {
+            blockEntityLookup.remove(pos);
         }
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onNewBlockRegion(OnActivatedComponent event, EntityRef entity) {
+    public void onBlockRegionActivated(OnActivatedComponent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
         for (Vector3i pos : regionComp.region) {
@@ -259,7 +302,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionRemoved(BeforeDeactivateComponent event, EntityRef entity) {
+    public void onBlockRegionDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
         for (Vector3i pos : oldRegion) {
             blockRegionLookup.remove(pos);
@@ -269,35 +312,89 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void update(float delta) {
+        // TODO: This should be handled by the event system?
         int processed = 0;
         PerformanceMonitor.startActivity("BlockChangedEventQueue");
-        BlockChangedEvent event = eventQueue.poll();
+        OnChangedBlock event = eventQueue.poll();
         while (event != null) {
-            getOrCreateEntityAt(event.getBlockPosition()).send(event);
+            getEntityAt(event.getBlockPosition()).send(event);
             if (processed++ >= 4) {
                 break;
             }
             event = eventQueue.poll();
         }
         PerformanceMonitor.endActivity();
-        PerformanceMonitor.startActivity("Temp Blocks Cleanup");
-        for (EntityRef entity : tempBlocks) {
-            BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (blockComp == null || !blockComp.temporary) {
-                if (blockComp != null && !entity.hasComponent(NetworkComponent.class)) {
-                    entity.addComponent(new NetworkComponent());
-                }
-                continue;
-            }
 
-            HealthComponent healthComp = entity.getComponent(HealthComponent.class);
-            if (healthComp == null || healthComp.currentHealth == healthComp.maxHealth) {
-                entity.destroy();
-            } else if (networkSystem.getMode().isAuthority() && !entity.hasComponent(NetworkComponent.class)) {
+        PerformanceMonitor.startActivity("Temp Blocks Cleanup");
+        for (EntityRef entity : temporaryBlockEntities) {
+            cleanUpTemporaryEntity(entity);
+        }
+        temporaryBlockEntities.clear();
+        PerformanceMonitor.endActivity();
+    }
+
+    private void cleanUpTemporaryEntity(EntityRef entity) {
+        Prefab prefab = entity.getParentPrefab();
+        if (prefab == null) {
+            for (Component comp : entity.iterateComponents()) {
+                if (!COMMON_BLOCK_COMPONENTS.contains(comp.getClass())) {
+                    entity.removeComponent(comp.getClass());
+                }
+            }
+        } else {
+            for (Component comp : entity.iterateComponents()) {
+                if (!COMMON_BLOCK_COMPONENTS.contains(comp.getClass()) && !prefab.hasComponent(comp.getClass())) {
+                    entity.removeComponent(comp.getClass());
+                }
+            }
+            for (Component comp : prefab.iterateComponents()) {
+                Component currentComp = entity.getComponent(comp.getClass());
+                if (currentComp == null) {
+                    entity.addComponent(entityManager.getComponentLibrary().getMetadata(comp.getClass()).clone(comp));
+                } else {
+                    ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
+                    boolean changed = false;
+                    for (FieldMetadata field : metadata.iterateFields()) {
+                        Object expected = field.getValue(comp);
+                        if (!Objects.equal(expected, field.getValue(currentComp))) {
+                            field.setValue(currentComp, expected);
+                            changed = true;
+                        }
+                    }
+                    if (changed) {
+                        entity.saveComponent(currentComp);
+                    }
+                }
+            }
+        }
+        entityManager.destroyEntityWithoutEvents(entity);
+    }
+
+
+    @Override
+    public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
+        if (temporaryBlockEntities.contains(entity) && entityManager.getComponentLibrary().getMetadata(component).isForceBlockActive()) {
+            temporaryBlockEntities.remove(entity);
+            if (!entity.hasComponent(NetworkComponent.class)) {
                 entity.addComponent(new NetworkComponent());
             }
         }
-        tempBlocks.clear();
-        PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void onEntityComponentChange(EntityRef entity, Class<? extends Component> component) {
+    }
+
+    @Override
+    public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
+        if (entityManager.getComponentLibrary().getMetadata(component).isForceBlockActive()) {
+            BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+            if (blockComp != null) {
+                Block block = getBlock(blockComp.getPosition().x, blockComp.getPosition().y, blockComp.getPosition().z);
+                if (isTemporaryBlock(entity, block, component)) {
+                    temporaryBlockEntities.add(entity);
+                }
+            }
+        }
     }
 }

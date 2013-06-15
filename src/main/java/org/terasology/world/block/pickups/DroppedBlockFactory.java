@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block.entity;
+package org.terasology.world.block.pickups;
 
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -25,7 +25,6 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.physics.RigidBodyComponent;
 import org.terasology.rendering.logic.MeshComponent;
-import org.terasology.world.block.entity.BlockPickupComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector3f;

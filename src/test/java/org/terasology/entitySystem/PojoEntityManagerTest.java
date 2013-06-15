@@ -1,5 +1,31 @@
 package org.terasology.entitySystem;
 
+import com.google.common.collect.Lists;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.internal.PojoEntityManager;
+import org.terasology.entitySystem.internal.PojoPrefabManager;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.stubs.EntityRefComponent;
+import org.terasology.entitySystem.stubs.IntegerComponent;
+import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkSystem;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -8,33 +34,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.terasology.entitySystem.common.NullIterator;
-import org.terasology.entitySystem.lifecycleEvents.*;
-import org.terasology.entitySystem.internal.PojoPrefabManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.stubs.EntityRefComponent;
-import org.terasology.entitySystem.stubs.IntegerComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
-
-import com.google.common.collect.Lists;
-import org.terasology.entitySystem.event.EventSystem;
-import org.terasology.logic.mod.ModManager;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityManagerTest {
 
-    EngineEntityManager entityManager;
+    PojoEntityManager entityManager;
 
     private static ModManager modManager;
 
@@ -47,9 +52,9 @@ public class PojoEntityManagerTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = builder.build(modManager);
+        entityManager = (PojoEntityManager) builder.build(modManager, mock(NetworkSystem.class));
     }
-    
+
     @Test
     public void createEntity() {
         EntityRef entity = entityManager.create();
@@ -64,7 +69,7 @@ public class PojoEntityManagerTest {
         assertNotNull(entity.getComponent(StringComponent.class));
         assertEquals(comp, entity.getComponent(StringComponent.class));
     }
-    
+
     @Test
     public void addAndRetrieveComponent() {
         EntityRef entity = entityManager.create();
@@ -72,10 +77,10 @@ public class PojoEntityManagerTest {
 
         StringComponent comp = new StringComponent();
         entity.addComponent(comp);
-        
+
         assertEquals(comp, entity.getComponent(StringComponent.class));
     }
-    
+
     @Test
     public void removeComponent() {
         EntityRef entity = entityManager.create();
@@ -86,16 +91,16 @@ public class PojoEntityManagerTest {
 
         assertNull(entity.getComponent(StringComponent.class));
     }
-    
+
     @Test
     public void replaceComponent() {
         EntityRef entity = entityManager.create();
-        
+
         StringComponent comp = new StringComponent();
         comp.value = "Hello";
         StringComponent comp2 = new StringComponent();
         comp2.value = "Goodbye";
-        
+
         entity.addComponent(comp);
         entity.addComponent(comp2);
 
@@ -105,7 +110,7 @@ public class PojoEntityManagerTest {
     @Test
     public void destroyEntity() {
         EntityRef entity = entityManager.create();
-        
+
         entity.addComponent(new StringComponent());
         entity.addComponent(new IntegerComponent());
         entity.destroy();
@@ -125,14 +130,14 @@ public class PojoEntityManagerTest {
             assertEquals(comp, item.getValue());
         }
     }
-    
+
     @Test
     public void changeComponentsDuringIterator() {
         EntityRef entity1 = entityManager.create();
         entity1.addComponent(new StringComponent());
         EntityRef entity2 = entityManager.create();
         entity2.addComponent(new StringComponent());
-        
+
         Iterator<Map.Entry<EntityRef, StringComponent>> iterator = entityManager.listComponents(StringComponent.class).iterator();
         iterator.next();
 
@@ -181,41 +186,41 @@ public class PojoEntityManagerTest {
         EventSystem eventSystem = mock(EventSystem.class);
 
         EntityRef entity1 = entityManager.create();
-        StringComponent comp1 = entity1.addComponent(new StringComponent());
+        entity1.addComponent(new StringComponent());
         entityManager.setEventSystem(eventSystem);
         StringComponent comp2 = entity1.addComponent(new StringComponent());
 
         verify(eventSystem).send(entity1, OnChangedComponent.newInstance(), comp2);
     }
-    
+
     @Test
     public void massRemovedComponentEventSentOnDestroy() {
         EventSystem eventSystem = mock(EventSystem.class);
 
         EntityRef entity1 = entityManager.create();
-        StringComponent comp1 = entity1.addComponent(new StringComponent());
+        entity1.addComponent(new StringComponent());
         entityManager.setEventSystem(eventSystem);
         entity1.destroy();
-        
+
         verify(eventSystem).send(entity1, BeforeDeactivateComponent.newInstance());
         verify(eventSystem).send(entity1, BeforeRemoveComponent.newInstance());
     }
-    
+
     @Test
     public void iterateEntitiesFindsEntityWithSingleComponent() {
         EntityRef entity1 = entityManager.create();
-        StringComponent comp1 = entity1.addComponent(new StringComponent());
-        
-        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class));
+        entity1.addComponent(new StringComponent());
+
+        List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class));
         assertEquals(Lists.newArrayList(entity1), results);
     }
 
     @Test
     public void iterateEntitiesDoesNotFindEntityMissingAComponent() {
         EntityRef entity1 = entityManager.create();
-        StringComponent comp1 = entity1.addComponent(new StringComponent());
+        entity1.addComponent(new StringComponent());
 
-        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class, IntegerComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class, IntegerComponent.class));
         assertEquals(Lists.newArrayList(), results);
     }
 
@@ -225,21 +230,21 @@ public class PojoEntityManagerTest {
         StringComponent comp1 = entity1.addComponent(new StringComponent());
         IntegerComponent comp2 = entity1.addComponent(new IntegerComponent());
 
-        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class, IntegerComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class, IntegerComponent.class));
         assertEquals(Lists.newArrayList(entity1), results);
     }
 
     @Test
     public void iterateWithNoComponents() {
-        List<EntityRef> results = Lists.newArrayList(entityManager.listEntitiesWith(StringComponent.class));
+        List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class));
         assertEquals(Lists.newArrayList(), results);
     }
-    
+
     @Test
     public void getComponentCountWhenNoComponents() {
         assertEquals(0, entityManager.getComponentCount(StringComponent.class));
     }
-    
+
     @Test
     public void getComponentCount() {
         entityManager.create().addComponent(new StringComponent());
@@ -254,10 +259,10 @@ public class PojoEntityManagerTest {
 
         EntityRef reference = entityManager.create();
         EntityRefComponent refComp = reference.addComponent(new EntityRefComponent());
-        refComp.entityRef = entityManager.listEntitiesWith(StringComponent.class).iterator().next();
+        refComp.entityRef = entityManager.getEntitiesWith(StringComponent.class).iterator().next();
 
         assertTrue(main.exists());
-        entityManager.listEntitiesWith(StringComponent.class).iterator().next().destroy();
+        entityManager.getEntitiesWith(StringComponent.class).iterator().next().destroy();
 
         assertFalse(main.exists());
         assertFalse(refComp.entityRef.exists());
@@ -315,23 +320,20 @@ public class PojoEntityManagerTest {
         int id = entity.getId();
         entity.destroy();
         assertFalse(entity.isActive());
-        assertFalse(entityManager.isEntityLoaded(id));
     }
 
     @Test
     public void isLoadedFalseAfterPersist() {
         EntityRef entity = entityManager.create();
         int id = entity.getId();
-        entityManager.removedForStoring(entity);
+        entityManager.deactivateForStorage(entity);
         assertFalse(entity.isActive());
-        assertFalse(entityManager.isEntityLoaded(id));
     }
 
     @Test
     public void isLoadedTrueAfterRestore() {
         EntityRef entity = entityManager.createEntityWithId(2, NullIterator.<Component>newInstance());
         assertTrue(entity.isActive());
-        assertTrue(entityManager.isEntityLoaded(2));
     }
 
     @Test
@@ -340,14 +342,13 @@ public class PojoEntityManagerTest {
         int id = entity.getId();
         entityManager.clear();
         assertFalse(entity.isActive());
-        assertFalse(entityManager.isEntityLoaded(id));
     }
 
     @Test
     public void destructionOfUnloadedEntitiesPrevented() {
         EntityRef entity = entityManager.create();
         int id = entity.getId();
-        entityManager.removedForStoring(entity);
+        entityManager.deactivateForStorage(entity);
         assertTrue(entity.exists());
         entity.destroy();
         assertTrue(entity.exists());
