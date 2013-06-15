@@ -821,6 +821,7 @@ public final class WorldRenderer {
                 } else {
                     shader.setFloat("clip", 0.0f);
                 }
+
             } else if (mode == ChunkRenderMode.CRM_SHADOW_MAP) {
                 shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
                 shader.enable();
@@ -1067,54 +1068,6 @@ public final class WorldRenderer {
         }
         return complete;
     }
-
-    public void printScreen() {
-        GL11.glReadBuffer(GL11.GL_FRONT);
-        final int width = Display.getWidth();
-        final int height = Display.getHeight();
-        // In fullscreen Display.getDisplayMode().getBitsPerPixel() should return the actual bpp.
-        // If the screen is windowed, fallback to the DesktopDisplayMode value,
-        // Finally fallback to 32bpp default value.
-        DisplayMode dm = Display.getDisplayMode();
-        int bpp = 0;
-        if ( (bpp = dm.getBitsPerPixel()) == 0 && !dm.isFullscreenCapable())
-        {
-        	dm = Display.getDesktopDisplayMode();
-        	bpp = dm.getBitsPerPixel();
-        }
-        final int bytePP = ( bpp == 0 ? 32 : bpp ) / 8;
-        
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bytePP );
-        GL11.glReadPixels(0, 0, width, height, bytePP == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
-
-                File file = new File(PathManager.getInstance().getScreenshotPath(), sdf.format(cal.getTime()) + ".png");
-                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-                for (int x = 0; x < width; x++)
-                    for (int y = 0; y < height; y++) {
-                        int i = (x + width * y) * bytePP;
-                        int r = buffer.get(i) & 0xFF;
-                        int g = buffer.get(i + 1) & 0xFF;
-                        int b = buffer.get(i + 2) & 0xFF;
-                        image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-                    }
-
-                try {
-                    ImageIO.write(image, "png", file);
-                } catch (IOException e) {
-                    logger.warn("Could not save screenshot!", e);
-                }
-            }
-        };
-
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
-    }
-
 
     @Override
     public String toString() {

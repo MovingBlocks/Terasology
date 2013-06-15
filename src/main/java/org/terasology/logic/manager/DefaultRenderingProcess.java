@@ -23,24 +23,27 @@ import org.terasology.config.Config;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 
 /**
- * Responsible for applying and rendering various shader based
- * post processing effects.
+ * The default rendering process.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -74,6 +77,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int rtQuarterHeight;
     private int rtHalfQuarterWidth;
     private int rtHalfQuarterHeight;
+
+    private final int screenshotRtWidth = 1024;
+    private final int screenshotRtHeight = 780;
+    private int overwriteRtWidth = 0;
+    private int overwriteRtHeight = 0;
+
+
+    private boolean takeScreenshot = false;
 
     private int displayListQuad = -1;
 
@@ -238,17 +249,31 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     	taintedReasons.add(reason);
     }
 
-
     /**
-     * Initially creates the scene FBO and updates it according to the size of the viewport.
+     * Creates the scene FBOs and updates them according to the size of the viewport. The current size
+     * provided by the display class is only used if the parameters overwriteRTWidth and overwriteRTHeight are set
+     * to zero.
      */
     private void createOrUpdateFullscreenFbos() {
-        rtFullWidth = Display.getWidth();
-        rtFullHeight = Display.getHeight();
+
+        rtFullWidth = overwriteRtWidth;
+        rtFullHeight = overwriteRtHeight;
+
+        if (overwriteRtWidth == 0) {
+            rtFullWidth = Display.getWidth();
+        }
+
+        if (overwriteRtHeight == 0) {
+            rtFullHeight = Display.getHeight();
+        }
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
-            rtFullWidth *= OculusVrHelper.getScaleFactor();
-            rtFullHeight *= OculusVrHelper.getScaleFactor();
+            if (overwriteRtWidth == 0) {
+                rtFullWidth *= OculusVrHelper.getScaleFactor();
+            }
+            if (overwriteRtHeight == 0) {
+                rtFullHeight *= OculusVrHelper.getScaleFactor();
+            }
         }
 
         rtHalfWidth = rtFullWidth / 2;
@@ -394,6 +419,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         if (bufferIds.limit() == 0) {
             if (depth && type == FBOType.FBOT_NO_COLOR) {
                 GL11.glReadBuffer(GL11.GL_NONE);
+            } else {
+                GL11.glReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
             }
             GL20.glDrawBuffers(GL11.GL_NONE);
         } else {
@@ -591,8 +618,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         if (stereoRenderState == StereoRenderState.SRS_OCULUS_LEFT_EYE
-                || stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) {
+                || stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE
+                || (stereoRenderState == StereoRenderState.SRS_MONO && takeScreenshot)
+                || (stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE && takeScreenshot)) {
+
             renderFinalSceneToRT(stereoRenderState);
+
+            if (takeScreenshot) {
+                saveScreenshot();
+            }
         }
 
         if (stereoRenderState == StereoRenderState.SRS_MONO
@@ -620,7 +654,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         switch (stereoRenderState) {
             case SRS_MONO:
-                renderFullscreenQuad();
+                renderFullscreenQuad(0,0, rtFullWidth, rtFullHeight);
                 break;
             case SRS_OCULUS_LEFT_EYE:
                 renderFullscreenQuad(0,0, rtFullWidth / 2, rtFullHeight);
@@ -656,7 +690,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private void renderFinalScene() {
 
-        ShaderProgram shader = null;
+        ShaderProgram shader;
 
         if (config.getRendering().isOculusVrSupport()) {
             shader = ShaderManager.getInstance().getShaderProgram("ocDistortion");
@@ -954,6 +988,63 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         glCallList(displayListQuad);
+    }
+
+    public void takeScreenshot() {
+        takeScreenshot = true;
+
+        overwriteRtWidth = 1920*2;
+        overwriteRtHeight = 1080*2;
+        createOrUpdateFullscreenFbos();
+    }
+
+    public void saveScreenshot() {
+        if (!takeScreenshot) {
+            return;
+        }
+
+        final FBO fboSceneFinal = DefaultRenderingProcess.getInstance().getFBO("sceneFinal");
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width * fboSceneFinal.height * 4);
+
+        fboSceneFinal.bindTexture();
+        GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        fboSceneFinal.unbindTexture();
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
+
+                final String fileName = "Terasology-" + sdf.format(cal.getTime()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + ".png";
+                File file = new File( PathManager.getInstance().getScreenshotPath(), fileName);
+                BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
+
+                for (int x = 0; x < fboSceneFinal.width; x++)
+                    for (int y = 0; y < fboSceneFinal.height; y++) {
+                        int i = (x + fboSceneFinal.width * y) * 4;
+                        int r = buffer.get(i) & 0xFF;
+                        int g = buffer.get(i + 1) & 0xFF;
+                        int b = buffer.get(i + 2) & 0xFF;
+                        image.setRGB(x, fboSceneFinal.height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+                    }
+
+                try {
+                    ImageIO.write(image, "png", file);
+                    logger.info("Screenshot '"+fileName+"' saved! ");
+                } catch (IOException e) {
+                    logger.warn("Could not save screenshot!", e);
+                }
+            }
+        };
+
+        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
+
+        takeScreenshot = false;
+        overwriteRtWidth = 0;
+        overwriteRtWidth = 0;
+
+        createOrUpdateFullscreenFbos();
     }
 
     public float getExposure() {
