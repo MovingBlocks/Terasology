@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
+import org.terasology.math.TeraMath;
 import org.terasology.model.structures.ViewFrustum;
 
 import javax.vecmath.Matrix4f;
@@ -51,6 +52,11 @@ public abstract class Camera {
     protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
     protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
 
+    /* USED FOR DIRTY CHECKS */
+    protected Vector3f previousPosition = new Vector3f();
+    protected Vector3f previousViewingDirection = new Vector3f();
+    protected float lastFov = 0.0f;
+
     /* ETC */
     protected boolean reflected = false;
 
@@ -80,6 +86,14 @@ public abstract class Camera {
         }
     }
 
+    public void updateFrustum() {
+        if (getViewMatrix() == null || getProjectionMatrix() == null) {
+            return;
+        }
+
+        viewFrustum.updateFrustum(TeraMath.matrixToBuffer(getViewMatrix()), TeraMath.matrixToBuffer(getProjectionMatrix()));
+    }
+
     public abstract void loadProjectionMatrix();
 
     public abstract void loadModelViewMatrix();
@@ -88,7 +102,7 @@ public abstract class Camera {
 
     public abstract void updateMatrices();
 
-    public abstract void updateMatrices(float overrideFov);
+    public abstract void updateMatrices(float fov);
 
     public Vector3f getPosition() {
         return position;

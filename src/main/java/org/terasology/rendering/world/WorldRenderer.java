@@ -594,9 +594,13 @@ public final class WorldRenderer {
                 break;
             case SRS_OCULUS_LEFT_EYE:
                 currentRenderStage = WorldRenderingStage.WRS_OCULUS_LEFT_EYE;
+                // Make sure the frustum is up-to-date for each eye
+                activeCamera.updateFrustum();
                 break;
             case SRS_OCULUS_RIGHT_EYE:
                 currentRenderStage = WorldRenderingStage.WRS_OCULUS_RIGHT_EYE;
+                // Make sure the frustum is up-to-date for each eye
+                activeCamera.updateFrustum();
                 break;
         }
 

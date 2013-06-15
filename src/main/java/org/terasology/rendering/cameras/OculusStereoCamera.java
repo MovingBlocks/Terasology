@@ -79,22 +79,23 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Deprecated
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(getProjectionMatrix()));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
+    @Deprecated
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(getViewMatrix()));
-        viewFrustum.updateFrustum();
     }
 
+    @Deprecated
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(normViewMatrix));
-        viewFrustum.updateFrustum();
     }
 
     public void update(float deltaT) {
@@ -106,7 +107,11 @@ public class OculusStereoCamera extends Camera {
         updateMatrices(activeFov);
     }
 
-    public void updateMatrices(float overrideFov) {
+    public void updateMatrices(float fov) {
+        // Nothing to do...
+        if (previousPosition.equals(getPosition()) && previousViewingDirection.equals(getViewingDirection())) {
+            return;
+        }
 
         projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), 0.1f, 5000.0f);
 
@@ -147,5 +152,11 @@ public class OculusStereoCamera extends Camera {
         prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+
+        // Used for dirty checks
+        previousPosition.set(getPosition());
+        previousViewingDirection.set(getViewingDirection());
+
+        updateFrustum();
     }
 }

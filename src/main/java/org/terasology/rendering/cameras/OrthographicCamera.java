@@ -50,13 +50,11 @@ public class OrthographicCamera extends Camera {
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(viewMatrix));
-        viewFrustum.updateFrustum();
     }
 
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(normViewMatrix));
-        viewFrustum.updateFrustum();
     }
 
     public void update(float deltaT) {
@@ -68,12 +66,23 @@ public class OrthographicCamera extends Camera {
         updateMatrices(activeFov);
     }
 
-    public void updateMatrices(float overrideFov) {
+    public void updateMatrices(float fov) {
+        // Nothing to do...
+        if (previousPosition.equals(getPosition()) && previousViewingDirection.equals(getViewingDirection())) {
+            return;
+        }
+
         projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -1000.0f, 1000.0f);
         viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
         prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+
+        // Used for dirty checks
+        previousPosition.set(getPosition());
+        previousViewingDirection.set(getViewingDirection());
+
+        updateFrustum();
     }
 }
