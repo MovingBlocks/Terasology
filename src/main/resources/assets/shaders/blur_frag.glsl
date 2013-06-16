@@ -21,7 +21,7 @@ uniform float radius = 16.0;
 void main() {
     const vec2 vTexelSize = vec2( 1.0/1024.0, 1.0/1024.0 );
 
-    const vec2 vTaps[12] = vec2[12](
+    vec2 vTaps[12] = vec2[12](
         vec2(-0.326212,-0.40581), vec2(-0.840144,-0.07358),
         vec2(-0.695914,0.457137), vec2(-0.203345,0.620716),
         vec2(0.96234,-0.194983), vec2(0.473434,-0.480026),

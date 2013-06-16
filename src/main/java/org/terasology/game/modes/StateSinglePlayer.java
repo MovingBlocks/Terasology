@@ -17,6 +17,7 @@ package org.terasology.game.modes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.TeraOVR;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.MenuControlSystem;
 import org.terasology.config.Config;
@@ -34,6 +35,7 @@ import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -81,6 +83,16 @@ public class StateSinglePlayer implements GameState {
         inputSystem = CoreRegistry.get(InputSystem.class);
 
         guiManager.openWindow(MenuControlSystem.HUD);
+
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+                && OculusVrHelper.isNativeLibraryLoaded()) {
+            logger.info("Trying to initialize Oculus SDK...");
+            TeraOVR.initSDK();
+            logger.info("Done!");
+            logger.info("Updaiting Oculus projection parameters from device...");
+            OculusVrHelper.updateFromDevice();
+            logger.info("Done!");
+        }
     }
 
     @Override
@@ -101,6 +113,13 @@ public class StateSinglePlayer implements GameState {
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
+        }
+
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+                && OculusVrHelper.isNativeLibraryLoaded()) {
+            logger.info("Shutting down Oculus SDK...");
+            TeraOVR.clear();
+            logger.info("Done!");
         }
     }
 
@@ -137,10 +156,10 @@ public class StateSinglePlayer implements GameState {
 
         if (worldRenderer != null) {
             if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
-                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_DEFAULT);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_MONO);
             } else {
-                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_OCULUS_LEFT_EYE);
-                worldRenderer.render(DefaultRenderingProcess.RenderType.RT_OCULUS_RIGHT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_RIGHT_EYE);
             }
         }
 

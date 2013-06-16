@@ -215,7 +215,7 @@ public class RenderingConfig {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur;
+        return motionBlur && !oculusVrSupport;
     }
 
     public void setMotionBlur(boolean motionBlur) {

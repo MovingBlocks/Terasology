@@ -92,6 +92,7 @@ public class ShaderManager {
         createAndStoreShaderProgram("shadowMap", new ShaderParametersShadowMap());
         createAndStoreShaderProgram("debug", new ShaderParametersDebug());
         //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
+        createAndStoreShaderProgram("ocDistortion", new ShaderParametersOcDistortion());
     }
 
     public void enableMaterial(Material material) {

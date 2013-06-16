@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-void main() {
-	gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = gl_Color;
+package org.terasology.ligthandshadow.logic;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.world.block.family.BlockFamily;
+
+/**
+ * This is the component class for playing cards, which are constructed of a top and a bottom block.
+ */
+public class CardComponent implements Component {
+    public BlockFamily topBlockFamily;
+    public BlockFamily bottomBlockFamily;
 }

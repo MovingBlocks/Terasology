@@ -484,10 +484,14 @@ public final class WorldRenderer {
         });
     }
 
+    public void updateAndQueueVisibleChunks() {
+        updateAndQueueVisibleChunks(true, true);
+    }
+
     /**
      * Updates the currently visible chunks (in sight of the player).
      */
-    public void updateAndQueueVisibleChunks() {
+    public void updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
         statDirtyChunks = 0;
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
@@ -496,7 +500,7 @@ public final class WorldRenderer {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
 
-            if (config.getRendering().isDynamicShadows()) {
+            if (config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
                 if (isChunkVisibleLight(c) && isChunkValidForRender(c)) {
                     if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
                         renderQueueChunksOpaqueShadow.add(c);
@@ -522,31 +526,33 @@ public final class WorldRenderer {
                 else
                     statIgnoredPhases++;
 
-                if (i < MAX_ANIMATED_CHUNKS)
-                    c.setAnimated(true);
-                else
-                    c.setAnimated(false);
+                if (processChunkUpdates) {
+                    if (i < MAX_ANIMATED_CHUNKS)
+                        c.setAnimated(true);
+                    else
+                        c.setAnimated(false);
 
-                if (c.getPendingMesh() != null) {
-                    for (int j = 0; j < c.getPendingMesh().length; j++) {
-                        c.getPendingMesh()[j].generateVBOs();
-                    }
-                    if (c.getMesh() != null) {
-                        for (int j = 0; j < c.getMesh().length; j++) {
-                            c.getMesh()[j].dispose();
+                    if (c.getPendingMesh() != null) {
+                        for (int j = 0; j < c.getPendingMesh().length; j++) {
+                            c.getPendingMesh()[j].generateVBOs();
                         }
+                        if (c.getMesh() != null) {
+                            for (int j = 0; j < c.getMesh().length; j++) {
+                                c.getMesh()[j].dispose();
+                            }
+                        }
+                        c.setMesh(c.getPendingMesh());
+                        c.setPendingMesh(null);
                     }
-                    c.setMesh(c.getPendingMesh());
-                    c.setPendingMesh(null);
-                }
 
-                if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
-                    statDirtyChunks++;
-                    chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
+                    if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
+                        statDirtyChunks++;
+                        chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
+                    }
                 }
 
                 statVisibleChunks++;
-            } else if (i > config.getRendering().getMaxChunkVBOs()) {
+            } else if (i > config.getRendering().getMaxChunkVBOs() && processChunkUpdates) {
                 if (mesh != null) {
                     // Make sure not too many chunk VBOs are available in the video memory at the same time
                     // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
@@ -580,23 +586,33 @@ public final class WorldRenderer {
     /**
      * Renders the world.
      */
-    public void render(DefaultRenderingProcess.RenderType renderType) {
+    public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
 
-        switch (renderType) {
-            case RT_DEFAULT:
+        switch (stereoRenderState) {
+            case SRS_MONO:
                 currentRenderStage = WorldRenderingStage.WRS_DEFAULT;
                 break;
-            case RT_OCULUS_LEFT_EYE:
+            case SRS_OCULUS_LEFT_EYE:
                 currentRenderStage = WorldRenderingStage.WRS_OCULUS_LEFT_EYE;
+                // Make sure the frustum is up-to-date for each eye
+                activeCamera.updateFrustum();
                 break;
-            case RT_OCULUS_RIGHT_EYE:
+            case SRS_OCULUS_RIGHT_EYE:
                 currentRenderStage = WorldRenderingStage.WRS_OCULUS_RIGHT_EYE;
+                // Make sure the frustum is up-to-date for each eye
+                activeCamera.updateFrustum();
                 break;
         }
 
         resetStats();
 
-        updateAndQueueVisibleChunks();
+        if (stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO
+                || stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE) {
+            updateAndQueueVisibleChunks();
+        } else {
+            // Don't cause havoc in the second pass for the second eye
+            updateAndQueueVisibleChunks(false, false);
+        }
 
         DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
         glCullFace(GL11.GL_FRONT);
@@ -608,7 +624,7 @@ public final class WorldRenderer {
 
         if (config.getRendering().isDynamicShadows()
                 // Only render the shadow map once
-                && (renderType == DefaultRenderingProcess.RenderType.RT_DEFAULT || renderType == DefaultRenderingProcess.RenderType.RT_OCULUS_LEFT_EYE)) {
+                && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE)) {
             DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
             //glCullFace(GL11.GL_FRONT);
             renderShadowMap(lightCamera);
@@ -620,12 +636,12 @@ public final class WorldRenderer {
 
         /* RENDER THE FINAL POST-PROCESSED SCENE */
         PerformanceMonitor.startActivity("Render Post-Processing");
-        DefaultRenderingProcess.getInstance().renderScene(renderType);
+        DefaultRenderingProcess.getInstance().renderScene(stereoRenderState);
         PerformanceMonitor.endActivity();
 
         if (activeCamera != null
                 // TODO: First person view is currently not working with OculusVR support enabled
-                && renderType == DefaultRenderingProcess.RenderType.RT_DEFAULT
+                && stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO
                 && !config.getSystem().isDebugFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
 
@@ -707,8 +723,7 @@ public final class WorldRenderer {
         * THIRD (AND FOURTH) RENDER PASS: WATER AND ICE
         */
         while (renderQueueChunksSortedWater.size() > 0) {
-            Chunk c = renderQueueChunksSortedWater.poll();
-            renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.CRM_DEFAULT);
+            renderChunk(renderQueueChunksSortedWater.poll(), ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.CRM_DEFAULT);
         }
 
         PerformanceMonitor.endActivity();
@@ -771,7 +786,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera,ChunkRenderMode mode) {
+    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera, ChunkRenderMode mode) {
 
         if (chunk.getChunkState() == ChunkState.COMPLETE && chunk.getMesh() != null) {
 
@@ -810,6 +825,7 @@ public final class WorldRenderer {
                 } else {
                     shader.setFloat("clip", 0.0f);
                 }
+
             } else if (mode == ChunkRenderMode.CRM_SHADOW_MAP) {
                 shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
                 shader.enable();
@@ -1056,54 +1072,6 @@ public final class WorldRenderer {
         }
         return complete;
     }
-
-    public void printScreen() {
-        GL11.glReadBuffer(GL11.GL_FRONT);
-        final int width = Display.getWidth();
-        final int height = Display.getHeight();
-        // In fullscreen Display.getDisplayMode().getBitsPerPixel() should return the actual bpp.
-        // If the screen is windowed, fallback to the DesktopDisplayMode value,
-        // Finally fallback to 32bpp default value.
-        DisplayMode dm = Display.getDisplayMode();
-        int bpp = 0;
-        if ( (bpp = dm.getBitsPerPixel()) == 0 && !dm.isFullscreenCapable())
-        {
-        	dm = Display.getDesktopDisplayMode();
-        	bpp = dm.getBitsPerPixel();
-        }
-        final int bytePP = ( bpp == 0 ? 32 : bpp ) / 8;
-        
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bytePP );
-        GL11.glReadPixels(0, 0, width, height, bytePP == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
-
-                File file = new File(PathManager.getInstance().getScreenshotPath(), sdf.format(cal.getTime()) + ".png");
-                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-                for (int x = 0; x < width; x++)
-                    for (int y = 0; y < height; y++) {
-                        int i = (x + width * y) * bytePP;
-                        int r = buffer.get(i) & 0xFF;
-                        int g = buffer.get(i + 1) & 0xFF;
-                        int b = buffer.get(i + 2) & 0xFF;
-                        image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-                    }
-
-                try {
-                    ImageIO.write(image, "png", file);
-                } catch (IOException e) {
-                    logger.warn("Could not save screenshot!", e);
-                }
-            }
-        };
-
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
-    }
-
 
     @Override
     public String toString() {
