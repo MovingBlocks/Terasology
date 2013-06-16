@@ -442,18 +442,27 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
+                break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
+                break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
+                break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
+                break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
+                break;
+            case EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+                logger.error("FrameBuffer: " + title
+                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
+                break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
@@ -469,8 +478,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                 	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.NO_COLOR.");
                 	return null;
                 }
+
+                break;
             default:
-                throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
+                logger.error("Unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
+                break;
         }
 
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
