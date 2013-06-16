@@ -18,7 +18,6 @@ package org.terasology.rendering.cameras;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
@@ -32,7 +31,7 @@ import org.terasology.math.TeraMath;
 public class PerspectiveCamera extends Camera {
 
     private float bobbingRotationOffsetFactor, bobbingVerticalOffsetFactor;
-    private float previousBobbingRotationOffsetFactor, previousBobbingVerticalOffsetFactor;
+    private float cachedBobbingRotationOffsetFactor, cachedBobbingVerticalOffsetFactor;
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
@@ -60,9 +59,11 @@ public class PerspectiveCamera extends Camera {
     }
 
     public void updateMatrices(float fov) {
+        prevViewProjectionMatrix.set(viewProjectionMatrix);
+
         // Nothing to do...
-        if (previousPosition.equals(getPosition()) && previousViewingDirection.equals(getViewingDirection())
-                && previousBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && previousBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+                && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
                 && lastFov == fov) {
             return;
         }
@@ -78,15 +79,14 @@ public class PerspectiveCamera extends Camera {
 
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x + right.x, up.y + right.y, up.z + right.z);
 
-        prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks
-        previousPosition.set(getPosition());
-        previousViewingDirection.set(getViewingDirection());
-        previousBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
-        previousBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
+        cachedPosition.set(getPosition());
+        cachedViewigDirection.set(getViewingDirection());
+        cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
+        cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
         lastFov = fov;
 
         updateFrustum();

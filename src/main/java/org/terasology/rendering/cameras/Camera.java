@@ -53,8 +53,8 @@ public abstract class Camera {
     protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
 
     /* USED FOR DIRTY CHECKS */
-    protected Vector3f previousPosition = new Vector3f();
-    protected Vector3f previousViewingDirection = new Vector3f();
+    protected Vector3f cachedPosition = new Vector3f();
+    protected Vector3f cachedViewigDirection = new Vector3f();
     protected float lastFov = 0.0f;
 
     /* ETC */

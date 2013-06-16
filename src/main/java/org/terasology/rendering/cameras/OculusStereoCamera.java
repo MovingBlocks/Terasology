@@ -108,8 +108,10 @@ public class OculusStereoCamera extends Camera {
     }
 
     public void updateMatrices(float fov) {
+        prevViewProjectionMatrix.set(viewProjectionMatrix);
+
         // Nothing to do...
-        if (previousPosition.equals(getPosition()) && previousViewingDirection.equals(getViewingDirection())) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())) {
             return;
         }
 
@@ -149,13 +151,12 @@ public class OculusStereoCamera extends Camera {
         viewProjectionMatrixLeftEye = TeraMath.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = TeraMath.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
-        prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks
-        previousPosition.set(getPosition());
-        previousViewingDirection.set(getViewingDirection());
+        cachedPosition.set(getPosition());
+        cachedViewigDirection.set(getViewingDirection());
 
         updateFrustum();
     }
