@@ -40,11 +40,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
-    private Texture water = Assets.getTexture("engine:custom_water_still");
-    private Texture lava = Assets.getTexture("engine:custom_lava_still");
-    private Texture waterNormal = Assets.getTexture("engine:water_normal");
-    private Texture effects = Assets.getTexture("engine:effects");
-
     Property skyInscatteringLength = new Property("skyInscatteringLength", 1.0f, 0.0f, 1.0f);
     Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.075f, 0.0f, 1.0f);
     Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.60f, 0.0f, 1.0f);
@@ -77,7 +72,12 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         super.applyParameters(program);
 
         Texture terrain = Assets.getTexture("engine:terrain");
-        if (terrain == null) {
+        Texture water = Assets.getTexture("engine:custom_water_still");
+        Texture lava = Assets.getTexture("engine:custom_lava_still");
+        Texture waterNormal = Assets.getTexture("engine:water_normal");
+        Texture effects = Assets.getTexture("engine:effects");
+
+        if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
             return;
         }
 
