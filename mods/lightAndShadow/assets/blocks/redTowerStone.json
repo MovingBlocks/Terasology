@@ -1,4 +1,4 @@
 {
     "basedOn" : "lightAndShadow:towerStone",
-    "categories" : ["darkSide"]
+    "categories" : ["lightSide", "stone"]
 }
