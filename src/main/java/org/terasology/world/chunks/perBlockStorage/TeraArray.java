@@ -7,6 +7,7 @@ import java.io.ObjectOutput;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
+import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
@@ -59,6 +60,8 @@ public abstract class TeraArray implements Externalizable {
     public static interface Factory<T extends TeraArray> {
 
         public Class<T> getArrayClass();
+        
+        public ChunksProtobuf.Type getProtobufType();
 
         public SerializationHandler<T> createSerializationHandler();
         
