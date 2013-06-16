@@ -35,8 +35,8 @@ import java.util.Set;
  */
 public final class ChunkUpdateManager {
 
-    public enum UPDATE_TYPE {
-        DEFAULT, PLAYER_TRIGGERED
+    public enum UpdateType {
+        DEFAULT, FORCE_UPDATE
     }
 
     /* CONST */
@@ -62,9 +62,9 @@ public final class ChunkUpdateManager {
      * @return True if a chunk update was executed
      */
     // TODO: Review this system
-    public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {
+    public boolean queueChunkUpdate(Chunk chunk, final UpdateType type) {
 
-        if (!currentlyProcessedChunks.contains(chunk) && (currentlyProcessedChunks.size() < MAX_THREADS || type != UPDATE_TYPE.DEFAULT)) {
+        if (!currentlyProcessedChunks.contains(chunk) && (currentlyProcessedChunks.size() < MAX_THREADS || type != UpdateType.DEFAULT)) {
             executeChunkUpdate(chunk);
             return true;
         }
