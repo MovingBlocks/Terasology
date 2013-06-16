@@ -271,8 +271,9 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
                         chunkList.add(ForestGenerator.class.getName());
+                        break;
 
-                        // Perlin with parameters and preview
+                    // Perlin with parameters and preview
                     case 1:
                         chunkList.add(PerlinTerrainGeneratorWithSetup.class.getName());
                         chunkList.add(FloraGenerator.class.getName());
