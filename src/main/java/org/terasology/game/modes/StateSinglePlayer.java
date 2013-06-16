@@ -89,7 +89,7 @@ public class StateSinglePlayer implements GameState {
             logger.info("Trying to initialize Oculus SDK...");
             TeraOVR.initSDK();
             logger.info("Done!");
-            logger.info("Updaiting Oculus projection parameters from device...");
+            logger.info("Updating Oculus projection parameters from device...");
             OculusVrHelper.updateFromDevice();
             logger.info("Done!");
         }
