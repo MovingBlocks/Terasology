@@ -54,13 +54,10 @@ void main() {
 #endif
 
     vec4 color = vec4(0.0);
-    float depth = depthOpaque;
     vec4 normals = vec4(0.0);
 
     // Combine transparent and opaque RTs
     if (depthTransparent < depthOpaque) {
-        depth = depthTransparent;
-
         // TODO: Fix alpha blending...
         //float fade = 1.0 - colorTransparent.a;
         float fade = 0.0;
@@ -83,5 +80,5 @@ void main() {
 
     gl_FragData[0].rgba = color.rgba;
     gl_FragData[1].rgba = normals.rgba;
-    gl_FragDepth = depth;
+    gl_FragDepth = depthOpaque;
 }
