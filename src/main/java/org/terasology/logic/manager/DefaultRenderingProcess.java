@@ -147,10 +147,17 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         public ByteBuffer readBackPixels() {
             bind();
             cachedBuffer = EXTPixelBufferObject.glMapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
+
+            // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
+            ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
+            resultBuffer.put(cachedBuffer);
+            cachedBuffer.rewind();
+            resultBuffer.flip();
+
             EXTPixelBufferObject.glUnmapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT);
             unbind();
 
-            return cachedBuffer;
+            return resultBuffer;
         }
     }
 
