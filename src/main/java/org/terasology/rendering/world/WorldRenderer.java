@@ -36,10 +36,7 @@ import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.WorldTimeEventManager;
-import org.terasology.math.AABB;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.*;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
@@ -111,6 +108,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
+    public static final int MAX_CHUNK_VBOS = 2304; // 48*48 for the ultra viewing distance heavy
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);
@@ -491,11 +489,15 @@ public final class WorldRenderer {
     /**
      * Updates the currently visible chunks (in sight of the player).
      */
-    public void updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
+    public int updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
         statDirtyChunks = 0;
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
 
+        final int sqrViewingDistance = config.getRendering().getActiveViewingDistance();
+        final int maxChunkVbos = TeraMath.clamp(sqrViewingDistance, 512, MAX_CHUNK_VBOS);
+
+        int processedChunks = 0;
         for (int i = 0; i < chunksInProximity.size(); i++) {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
@@ -509,50 +511,37 @@ public final class WorldRenderer {
                 }
             }
 
-            if (isChunkVisible(c) && isChunkValidForRender(c)) {
+            if (isChunkValidForRender(c)) {
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
-                    renderQueueChunksOpaque.add(c);
-                else
-                    statIgnoredPhases++;
+                if (isChunkVisible(c)) {
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
+                        renderQueueChunksOpaque.add(c);
+                    else
+                        statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.WATER_AND_ICE) > 0)
-                    renderQueueChunksSortedWater.add(c);
-                else
-                    statIgnoredPhases++;
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.WATER_AND_ICE) > 0)
+                        renderQueueChunksSortedWater.add(c);
+                    else
+                        statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0 && i < MAX_BILLBOARD_CHUNKS)
-                    renderQueueChunksSortedBillboards.add(c);
-                else
-                    statIgnoredPhases++;
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0 && i < MAX_BILLBOARD_CHUNKS)
+                        renderQueueChunksSortedBillboards.add(c);
+                    else
+                        statIgnoredPhases++;
 
-                if (processChunkUpdates) {
-                    if (i < MAX_ANIMATED_CHUNKS)
+                    statVisibleChunks++;
+
+                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS)
                         c.setAnimated(true);
                     else
                         c.setAnimated(false);
-
-                    if (c.getPendingMesh() != null) {
-                        for (int j = 0; j < c.getPendingMesh().length; j++) {
-                            c.getPendingMesh()[j].generateVBOs();
-                        }
-                        if (c.getMesh() != null) {
-                            for (int j = 0; j < c.getMesh().length; j++) {
-                                c.getMesh()[j].dispose();
-                            }
-                        }
-                        c.setMesh(c.getPendingMesh());
-                        c.setPendingMesh(null);
-                    }
-
-                    if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
-                        statDirtyChunks++;
-                        chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
-                    }
                 }
 
-                statVisibleChunks++;
-            } else if (i > config.getRendering().getMaxChunkVBOs() && processChunkUpdates) {
+                // Process all chunks in the area, not only the visible ones
+                if (processChunkUpdates && processChunkUpdate(c)) {
+                    processedChunks++;
+                }
+            } else if (i > maxChunkVbos && processChunkUpdates) {
                 if (mesh != null) {
                     // Make sure not too many chunk VBOs are available in the video memory at the same time
                     // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
@@ -563,6 +552,32 @@ public final class WorldRenderer {
                 }
             }
         }
+
+        return processedChunks;
+    }
+
+    private boolean processChunkUpdate(Chunk c) {
+        if (c.getPendingMesh() != null) {
+            for (int j = 0; j < c.getPendingMesh().length; j++) {
+                c.getPendingMesh()[j].generateVBOs();
+            }
+            if (c.getMesh() != null) {
+                for (int j = 0; j < c.getMesh().length; j++) {
+                    c.getMesh()[j].dispose();
+                }
+            }
+            c.setMesh(c.getPendingMesh());
+            c.setPendingMesh(null);
+        }
+
+        if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
+            statDirtyChunks++;
+            chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
+
+            return true;
+        }
+
+        return false;
     }
 
     private int triangleCount(ChunkMesh[] mesh, ChunkMesh.RENDER_PHASE type) {

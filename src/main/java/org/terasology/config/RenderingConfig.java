@@ -18,7 +18,6 @@ public class RenderingConfig {
     private int viewDistanceFar = 32;
     private int viewDistanceUltra = 48;
     private int activeViewDistanceMode = 0;
-    private int maxChunkVBOs = 512;
     private boolean flickeringLight = false;
     private boolean animateGrass = false;
     private boolean animateWater = false;
@@ -118,20 +117,10 @@ public class RenderingConfig {
         this.activeViewDistanceMode = activeViewDistanceMode;
         // TODO: Remove this, switch to a property change listener
 
-        int chunksToLoad = getActiveViewingDistance() * getActiveViewingDistance();
-        setMaxChunkVBOs(chunksToLoad >= 512 ? 512 : chunksToLoad);
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         if (worldRenderer != null) {
             worldRenderer.changeViewDistance(getActiveViewingDistance());
         }
-    }
-
-    public int getMaxChunkVBOs() {
-        return maxChunkVBOs;
-    }
-
-    public void setMaxChunkVBOs(int maxChunkVBOs) {
-        this.maxChunkVBOs = maxChunkVBOs;
     }
 
     public boolean isFlickeringLight() {
