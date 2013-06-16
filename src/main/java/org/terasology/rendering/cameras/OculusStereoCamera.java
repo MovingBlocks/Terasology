@@ -46,9 +46,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
             return viewProjectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
             return viewProjectionMatrixRightEye;
         }
 
@@ -58,9 +58,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getViewMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
             return viewMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
             return viewMatrixRightEye;
         }
 
@@ -70,9 +70,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
             return projectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
             return projectionMatrixRightEye;
         }
 

@@ -96,15 +96,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 	private static Collection<String> taintedReasons = new HashSet<String>();
 
     public enum FBOType {
-        FBOT_DEFAULT,
-        FBOT_HDR,
-        FBOT_NO_COLOR
+        DEFAULT,
+        HDR,
+        NO_COLOR
     }
 
     public enum StereoRenderState {
-        SRS_MONO,
-        SRS_OCULUS_LEFT_EYE,
-        SRS_OCULUS_RIGHT_EYE
+        MONO,
+        OCULUS_LEFT_EYE,
+        OCULUS_RIGHT_EYE
     }
 
     public class PBO {
@@ -220,11 +220,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
-        createFBO("scene16", 16, 16, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("scene8", 8, 8, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("scene4", 4, 4, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("scene2", 2, 2, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("scene1", 1, 1, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scene16", 16, 16, FBOType.DEFAULT, false, false);
+        createFBO("scene8", 8, 8, FBOType.DEFAULT, false, false);
+        createFBO("scene4", 4, 4, FBOType.DEFAULT, false, false);
+        createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
+        createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
 
         readBackPBOFront = new PBO();
         readBackPBOBack = new PBO();
@@ -297,33 +297,33 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         if (!recreate)
             return;
 
-        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, true, true);
-        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, true, true);
+        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true);
+        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, true, true);
 
-        createFBO("sceneShadowMap", 1024, 1024, FBOType.FBOT_NO_COLOR, true, false);
+        createFBO("sceneShadowMap", 1024, 1024, FBOType.NO_COLOR, true, false);
 
-        createFBO("sceneCombined", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, true, true);
+        createFBO("sceneCombined", rtFullWidth, rtFullHeight, FBOType.HDR, true, true);
 
-        createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, false, false);
-        createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.FBOT_HDR, false, false);
-        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
+        createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
+        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("ssao", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("ssaoBlurred0", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("ssaoBlurred1", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("ssao", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        createFBO("ssaoBlurred0", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        createFBO("ssaoBlurred1", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("lightShafts", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("lightShafts", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneReflected", rtHalfWidth, rtHalfHeight, FBOType.FBOT_HDR, true, false);
+        createFBO("sceneReflected", rtHalfWidth, rtHalfHeight, FBOType.HDR, true, false);
 
-        createFBO("sceneHighPass", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("sceneBloom0", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("sceneBloom1", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneHighPass", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBloom0", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBloom1", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneBlur0", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
-        createFBO("sceneBlur1", rtHalfWidth, rtHalfHeight, FBOType.FBOT_DEFAULT, false, false);
+        createFBO("sceneBlur0", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBlur1", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -356,8 +356,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-        if (type != FBOType.FBOT_NO_COLOR) {
-            if (type == FBOType.FBOT_HDR) {
+        if (type != FBOType.NO_COLOR) {
+            if (type == FBOType.HDR) {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
             } else {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
@@ -402,7 +402,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
 
-        if (type != FBOType.FBOT_NO_COLOR) {
+        if (type != FBOType.NO_COLOR) {
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
         }
 
@@ -417,7 +417,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-        if (type != FBOType.FBOT_NO_COLOR) {
+        if (type != FBOType.NO_COLOR) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
         }
         if (normals) {
@@ -425,7 +425,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
         bufferIds.flip();
         if (bufferIds.limit() == 0) {
-            if (depth && type == FBOType.FBOT_NO_COLOR) {
+            if (depth && type == FBOType.NO_COLOR) {
                 GL11.glReadBuffer(GL11.GL_NONE);
             } else {
                 GL11.glReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
@@ -459,14 +459,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
                 
                 /*
-                 * On some graphics cards, FBOType.FBOT_NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
+                 * On some graphics cards, FBOType.NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
                  * Attempt to continue without this FBO.
                  */
-                if (type == FBOType.FBOT_NO_COLOR) {
+                if (type == FBOType.NO_COLOR) {
                 	logger.error("FrameBuffer: " + title
-                            + ", ...but the FBOType was FBOT_NO_COLOR, ignoring this error and continuing without this FBO.");
+                            + ", ...but the FBOType was NO_COLOR, ignoring this error and continuing without this FBO.");
                 	
-                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.FBOT_NO_COLOR.");
+                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.NO_COLOR.");
                 	return null;
                 }
             default:
@@ -593,7 +593,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void renderScene() {
-        renderScene(StereoRenderState.SRS_MONO);
+        renderScene(StereoRenderState.MONO);
     }
 
     /**
@@ -643,10 +643,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             }
         }
 
-        if (stereoRenderState == StereoRenderState.SRS_OCULUS_LEFT_EYE
-                || stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE
-                || (stereoRenderState == StereoRenderState.SRS_MONO && takeScreenshot)
-                || (stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE && takeScreenshot)) {
+        if (stereoRenderState == StereoRenderState.OCULUS_LEFT_EYE
+                || stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE
+                || (stereoRenderState == StereoRenderState.MONO && takeScreenshot)
+                || (stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE && takeScreenshot)) {
 
             renderFinalSceneToRT(stereoRenderState);
 
@@ -655,8 +655,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             }
         }
 
-        if (stereoRenderState == StereoRenderState.SRS_MONO
-                || stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) {
+        if (stereoRenderState == StereoRenderState.MONO
+                || stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE) {
             renderFinalScene();
         }
     }
@@ -674,18 +674,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         bindFbo("sceneFinal");
 
-        if (stereoRenderState == StereoRenderState.SRS_MONO || stereoRenderState == StereoRenderState.SRS_OCULUS_LEFT_EYE) {
+        if (stereoRenderState == StereoRenderState.MONO || stereoRenderState == StereoRenderState.OCULUS_LEFT_EYE) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
         switch (stereoRenderState) {
-            case SRS_MONO:
+            case MONO:
                 renderFullscreenQuad(0,0, rtFullWidth, rtFullHeight);
                 break;
-            case SRS_OCULUS_LEFT_EYE:
+            case OCULUS_LEFT_EYE:
                 renderFullscreenQuad(0,0, rtFullWidth / 2, rtFullHeight);
                 break;
-            case SRS_OCULUS_RIGHT_EYE:
+            case OCULUS_RIGHT_EYE:
                 renderFullscreenQuad(rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight);
                 break;
         }
@@ -703,7 +703,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1], OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3]);
 
-        float ocLensCenter = (stereoRenderState == StereoRenderState.SRS_OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
+        float ocLensCenter = (stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 
         program.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f);
         program.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f);
@@ -722,7 +722,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             shader = ShaderManager.getInstance().getShaderProgram("ocDistortion");
             shader.enable();
 
-            updateOcShaderParametersForVP(shader, 0, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.SRS_OCULUS_LEFT_EYE);
+            updateOcShaderParametersForVP(shader, 0, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.OCULUS_LEFT_EYE);
         } else {
             if (config.getSystem().isDebugRenderingEnabled()) {
                 shader = ShaderManager.getInstance().getShaderProgram("debug");
@@ -736,7 +736,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
         if (config.getRendering().isOculusVrSupport()) {
-            updateOcShaderParametersForVP(shader, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.SRS_OCULUS_RIGHT_EYE);
+            updateOcShaderParametersForVP(shader, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.OCULUS_RIGHT_EYE);
 
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
         }
