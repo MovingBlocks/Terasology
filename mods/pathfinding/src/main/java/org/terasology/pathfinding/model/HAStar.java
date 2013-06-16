@@ -104,7 +104,6 @@ public class HAStar {
         Node start = nodes.get(this.start);
         Node current = nodes.get(end);
         while (current!=start && current!=null) {
-            last = current.block.floor.heightMap;
             if( current.path!=null ) {
                 path.addAll(current.path);
                 localPathsUsed ++;
