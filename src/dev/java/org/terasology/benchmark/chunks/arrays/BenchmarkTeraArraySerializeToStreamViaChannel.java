@@ -7,7 +7,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
 import org.terasology.benchmark.BenchmarkResult;
-import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
 
 public class BenchmarkTeraArraySerializeToStreamViaChannel extends BenchmarkTeraArraySerialization {
 

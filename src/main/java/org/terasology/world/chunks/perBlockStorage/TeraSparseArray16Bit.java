@@ -1,4 +1,4 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
 import java.io.IOException;
 import java.io.ObjectInput;

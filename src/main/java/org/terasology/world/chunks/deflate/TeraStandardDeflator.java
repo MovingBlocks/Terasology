@@ -1,9 +1,9 @@
 package org.terasology.world.chunks.deflate;
 
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraSparseArray16Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraSparseArray4Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraSparseArray8Bit;
 
 /**
  * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.

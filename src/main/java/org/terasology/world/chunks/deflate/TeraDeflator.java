@@ -1,6 +1,6 @@
 package org.terasology.world.chunks.deflate;
 
-import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
 
 /**
  * TeraDeflator is the abstract base class used to implement chunk deflation.

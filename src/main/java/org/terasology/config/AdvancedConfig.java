@@ -15,6 +15,16 @@
  */
 package org.terasology.config;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArrays;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit;
+
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -23,15 +33,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraArrays;
-import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-
-import java.lang.reflect.Type;
-import java.util.Arrays;
 
 /**
  * Allows to configure internal details of the Terasology engine.

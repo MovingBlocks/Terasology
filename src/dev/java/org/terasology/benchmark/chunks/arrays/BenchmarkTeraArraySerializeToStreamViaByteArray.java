@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
 import org.terasology.benchmark.BenchmarkResult;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraArray.SerializationHandler;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArray.SerializationHandler;
 
 public class BenchmarkTeraArraySerializeToStreamViaByteArray extends BenchmarkTeraArraySerialization {
 

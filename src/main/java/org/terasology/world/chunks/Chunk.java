@@ -30,12 +30,12 @@ import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraArrays;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArrays;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray4Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
