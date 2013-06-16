@@ -23,6 +23,8 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
@@ -30,7 +32,7 @@ import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.pickups.DroppedBlockFactory;
+import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
@@ -47,14 +49,16 @@ public class TunnelAction implements ComponentSystem {
     private FastRandom random = new FastRandom();
     private BulletPhysics physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
-    private DroppedBlockFactory droppedBlockFactory;
+    private ItemPickupFactory itemPickupFactory;
+    private BlockItemFactory blockItemFactory;
 
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysics.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-        droppedBlockFactory = new DroppedBlockFactory(CoreRegistry.get(EntityManager.class));
+        itemPickupFactory = new ItemPickupFactory(CoreRegistry.get(EntityManager.class));
+        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
     }
 
     @Override
@@ -89,18 +93,10 @@ public class TunnelAction implements ComponentSystem {
 
                     Block currentBlock = worldProvider.getBlock(blockPos);
 
-                    if (currentBlock.getId() == 0x0)
-                        continue;
-
                     if (currentBlock.isDestructible()) {
-                        worldProvider.setBlock(blockPos, BlockManager.getAir(), currentBlock);
-
-                        EntityRef blockEntity = blockEntityRegistry.getExistingEntityAt(blockPos);
-                        blockEntity.destroy();
-
                         if (random.randomInt(6) == 0) {
-                            EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily(), 5);
-                            block.send(new ImpulseEvent(impulse));
+                            EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
+                            blockEntity.send(new DamageEvent(1000, EntityRef.NULL));
                         }
 
                         blockCounter--;

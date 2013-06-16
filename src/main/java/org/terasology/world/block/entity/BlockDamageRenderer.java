@@ -94,7 +94,7 @@ public class BlockDamageRenderer implements RenderSystem {
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.getEntitiesWith(HealthComponent.class, BlockComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockDamagedComponent.class, HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth == health.maxHealth) {
                 continue;
@@ -141,16 +141,13 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderFirstPerson() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void renderOpaque() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void renderTransparent() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

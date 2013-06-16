@@ -172,6 +172,17 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             }
         }
 
+        HealthComponent health = blockEntity.getComponent(HealthComponent.class);
+        if (health == null && type.isDestructible()) {
+            blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));
+        } else if (health != null && !type.isDestructible()) {
+            blockEntity.removeComponent(HealthComponent.class);
+        } else if (health != null && type.isDestructible()) {
+            health.maxHealth = type.getHardness();
+            health.currentHealth = Math.min(health.currentHealth, health.maxHealth);
+            blockEntity.saveComponent(health);
+        }
+
         if (Objects.equal(newPrefab, oldPrefab)) {
             return;
         }

@@ -302,7 +302,7 @@ public final class ChunkTessellator {
             drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
             Block bottomBlock = view.getBlock(x, y - 1, z);
-            if (bottomBlock.isLiquid() || bottomBlock.getId() == 0x0) {
+            if (bottomBlock.isLiquid() || bottomBlock.isInvisible()) {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
@@ -334,7 +334,7 @@ public final class ChunkTessellator {
         // Liquids can be transparent but there should be no visible adjacent faces
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
 
-        return blockToCheck.getId() == 0x0 ||
+        return blockToCheck.isInvisible() ||
                 !blockToCheck.isFullSide(side.reverse()) ||
                 (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
     }

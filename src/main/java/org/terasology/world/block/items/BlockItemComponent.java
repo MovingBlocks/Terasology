@@ -31,9 +31,6 @@ public final class BlockItemComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public BlockFamily blockFamily;
 
-    @Owns
-    public EntityRef placedEntity = EntityRef.NULL;
-
     public BlockItemComponent() {
     }
 

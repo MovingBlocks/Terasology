@@ -24,6 +24,13 @@ import org.terasology.entitySystem.EntityRef;
 public interface InventoryManager {
 
     /**
+     * Moves all items from one inventory to another, as far as possible
+     * @param fromInventory
+     * @param toInventory
+     */
+    void moveAll(EntityRef fromInventory, EntityRef toInventory);
+
+    /**
      * @param inventoryEntity
      * @param item
      * @return Whether the given item can be added to the inventory

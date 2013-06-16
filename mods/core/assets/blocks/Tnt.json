@@ -23,7 +23,6 @@
         "bottom" : "core:TntBottom"
     },
     "entity" : {
-        "prefab" : "core:TNT",
-        "mode" : "on_interaction"
+        "prefab" : "core:TNT"
     }
 }

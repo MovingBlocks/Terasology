@@ -167,7 +167,7 @@ public class UIScreenInventory extends UIWindow {
 //                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 //                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 //                LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-//                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+//                BlockPickupFactory droppedBlockFactory = new BlockPickupFactory(entityManager);
 //                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
 //
 //                for (int i = 0; i < itemComp.stackCount; i++) {

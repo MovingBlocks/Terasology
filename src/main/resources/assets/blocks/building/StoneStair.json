@@ -20,6 +20,5 @@
 {
     "rotation" : "horizontal",
     "tile" : "engine:stone",
-    "shape" : "engine:stair",
-    "craftPlace" : false
+    "shape" : "engine:stair"
 }

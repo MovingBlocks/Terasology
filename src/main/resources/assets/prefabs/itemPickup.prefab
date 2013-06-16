@@ -1,24 +1,22 @@
 {
     "Location" : {
-        "scale" : 0.5,
-        "replicateChanges" : false
+        "scale" : 0.3
     },
     "BoxShape" : {
         "extents" : [1, 1, 1]
     },
+    "Pickup": {
+    },
     "RigidBody" : {
-        "mass" : 10f,
+        "mass" : 1000f,
         "collisionGroup" : "engine:debris",
         "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
     },
     "Mesh" : {
-        "mesh" : "engine:cube",
-        "material" : "engine:terrain"
+        "material" : "engine:droppedItem"
     },
     "Lifespan" : {
         "lifespan" : 30
-    },
-    "BlockPickup" : {
     },
     "Network" : {}
 }

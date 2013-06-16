@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.items;
 
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -32,40 +33,30 @@ public class BlockItemFactory {
     }
 
     public EntityRef newInstance(BlockFamily blockFamily) {
-        return newInstance(blockFamily, 1, EntityRef.NULL);
-    }
-
-    public EntityRef newInstance(BlockFamily blockFamily, EntityRef placedEntity) {
-        return newInstance(blockFamily, 1, placedEntity);
+        return newInstance(blockFamily, 1);
     }
 
     public EntityRef newInstance(BlockFamily blockFamily, int quantity) {
-        return newInstance(blockFamily, quantity, EntityRef.NULL);
-    }
-
-    private EntityRef newInstance(BlockFamily blockFamily, int quantity, EntityRef placedEntity) {
         if (blockFamily == null) {
             return EntityRef.NULL;
         }
 
-        EntityRef entity = entityManager.create("engine:blockItemBase");
+        EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
-            entity.addComponent(new LightComponent());
+            builder.addComponent(new LightComponent());
         }
 
-        ItemComponent item = entity.getComponent(ItemComponent.class);
+        ItemComponent item = builder.getComponent(ItemComponent.class);
         item.name = blockFamily.getDisplayName();
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
             item.stackCount = (byte) quantity;
         }
-        entity.saveComponent(item);
 
-        BlockItemComponent blockItem = entity.getComponent(BlockItemComponent.class);
+        BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;
-        entity.saveComponent(blockItem);
 
-        return entity;
+        return builder.build();
     }
 
 }

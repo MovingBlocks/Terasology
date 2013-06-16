@@ -1,0 +1,49 @@
+package org.terasology.world.block.pickups;
+
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.items.OnBlockItemPlaced;
+import org.terasology.world.block.items.OnBlockToItem;
+
+/**
+ * @author Immortius
+ */
+@RegisterSystem
+public class ChestSystem implements ComponentSystem {
+
+    @In
+    private SlotBasedInventoryManager inventoryManager;
+
+    @Override
+    public void initialise() {
+    }
+
+    @Override
+    public void shutdown() {
+    }
+
+    @ReceiveEvent(components = {InventoryComponent.class, BlockComponent.class})
+    public void onPickedUp(OnBlockToItem event, EntityRef blockEntity) {
+        EntityRef item = event.getItem();
+        item.addComponent(new InventoryComponent(inventoryManager.getNumSlots(blockEntity)));
+        inventoryManager.moveAll(blockEntity, item);
+        ItemComponent itemComponent = item.getComponent(ItemComponent.class);
+        if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
+            itemComponent.stackId = "";
+            item.saveComponent(itemComponent);
+        }
+    }
+
+    @ReceiveEvent(components = {InventoryComponent.class, BlockItemComponent.class})
+    public void onPlaced(OnBlockItemPlaced event, EntityRef itemEntity) {
+        inventoryManager.moveAll(itemEntity, event.getPlacedBlock());
+    }
+}

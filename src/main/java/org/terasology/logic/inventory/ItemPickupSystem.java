@@ -18,14 +18,12 @@ package org.terasology.logic.inventory;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
-import org.terasology.logic.inventory.DroppedItemComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.physics.CollideEvent;
 
 
@@ -39,12 +37,12 @@ public class ItemPickupSystem implements ComponentSystem {
     public void initialise() {
     }
 
-    @ReceiveEvent(components = DroppedItemComponent.class)
+    @ReceiveEvent(components = PickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
-        DroppedItemComponent droppedItem = entity.getComponent(DroppedItemComponent.class);
-        if (inventoryManager.giveItem(event.getOtherEntity(), droppedItem.itemEntity)) {
-            droppedItem.itemEntity = EntityRef.NULL;
-            entity.saveComponent(droppedItem);
+        PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
+        if (inventoryManager.giveItem(event.getOtherEntity(), pickupComponent.itemEntity)) {
+            pickupComponent.itemEntity = EntityRef.NULL;
+            entity.saveComponent(pickupComponent);
             entity.destroy();
             event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
         }

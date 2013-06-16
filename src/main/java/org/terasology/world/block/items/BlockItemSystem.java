@@ -70,11 +70,6 @@ public class BlockItemSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = BlockItemComponent.class)
-    public void onDestroyed(BeforeDeactivateComponent event, EntityRef entity) {
-        entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
-    }
-
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         if (!event.getTarget().exists()) {
@@ -98,6 +93,8 @@ public class BlockItemSystem implements ComponentSystem {
                     // Something changed the block on another thread, cancel
                     event.consume();
                     return;
+                } else {
+                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
                 }
             }
             event.getInstigator().send(new PlaySoundEvent(event.getInstigator(), Assets.getSound("engine:PlaceBlock"), 0.5f));

@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-// TODO: Move to another package
-package org.terasology.world.block.pickups;
+package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.network.Replicate;
-import org.terasology.world.block.family.BlockFamily;
+import org.terasology.entitySystem.Owns;
 
-/**
- * @author Immortius
- */
-public class BlockPickupComponent implements Component {
-    @Replicate
-    public BlockFamily blockFamily;
-    @Replicate
-    public EntityRef placedEntity = EntityRef.NULL;
+
+public class PickupComponent implements Component {
+    @Owns
+    public EntityRef itemEntity = EntityRef.NULL;
 }
