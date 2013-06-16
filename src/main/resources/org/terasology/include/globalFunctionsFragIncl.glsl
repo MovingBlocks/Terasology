@@ -90,7 +90,7 @@ float timeToTick(float time, float speed) {
 
 float fresnel(float nDotL, float fresnelBias, float fresnelPow) {
   float facing = (1.0 - nDotL);
-  return max(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0);
+  return clamp(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0, 1.0);
 }
 
 bool checkFlag(int flag, float val) {

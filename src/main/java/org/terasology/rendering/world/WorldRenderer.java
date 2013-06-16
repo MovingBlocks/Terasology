@@ -703,10 +703,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
-        DefaultRenderingProcess.getInstance().beginRenderSceneTransparent(true);
-
-        PerformanceMonitor.startActivity("Render Chunks (Transparent)");
+        PerformanceMonitor.startActivity("Render Chunks (Billboards)");
 
         /*
          * SECOND RENDER PASS: BILLBOARDS
@@ -716,7 +713,11 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render Chunks (Water, Ice)");
+        DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
+        DefaultRenderingProcess.getInstance().beginRenderSceneTransparent(true);
+
+
+        PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
 
         // Make sure the water surface is rendered if the player is swimming
         if (headUnderWater) {
