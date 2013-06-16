@@ -5,7 +5,7 @@ import java.util.Map;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.ChunksProtobuf;
-import org.terasology.world.chunks.blockdata.TeraArrays;
+import org.terasology.world.chunks.perBlockStorage.TeraArrays;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

@@ -22,7 +22,7 @@ import java.util.Arrays;
  * </p>
  * Note: </br>
  * This class is deprecated and should not be used. 
- * Its functionality is now covered by {@link org.terasology.world.chunks.blockdata.TeraDenseArray8Bit TeraDenseArray8Bit}.
+ * Its functionality is now covered by {@link org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit TeraDenseArray8Bit}.
  * </p>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

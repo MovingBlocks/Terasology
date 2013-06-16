@@ -1,4 +1,4 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public abstract class TeraArray implements Externalizable {
      * It should be implemented as a static subclass of the corresponding tera array class and it should be called Factory.
      *  
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
+     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.Factory
      *
      */
     public static interface Factory<T extends TeraArray> {
@@ -70,11 +70,11 @@ public abstract class TeraArray implements Externalizable {
 
     /**
      * This is the interface for serialization handlers for tera arrays. Every tera array is required to implement
-     * a serialization handler. It is recommended to subclass {@link org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
+     * a serialization handler. It is recommended to subclass {@link org.terasology.world.chunks.perBlockStorage.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
      * instead of using this interface directly. It should be implemented as a static subclass of the corresponding tera array class. 
      * 
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler
+     * @see org.terasology.world.chunks.perBlockStorage.TeraArray.BasicSerializationHandler
      */
     public static interface SerializationHandler<T extends TeraArray> extends org.terasology.io.SerializationHandler<T> {
         
@@ -91,8 +91,8 @@ public abstract class TeraArray implements Externalizable {
      * Tera arrays should implement their serialization handlers as a static subclass called SerializationHandler.
      * 
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.SerializationHandler
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
+     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.SerializationHandler
+     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.Factory
      *
      */
     protected static abstract class BasicSerializationHandler<T extends TeraArray> implements SerializationHandler<T> {

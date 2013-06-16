@@ -8,12 +8,12 @@ import org.terasology.benchmark.Benchmark;
 import org.terasology.benchmark.PrintToConsoleCallback;
 import org.terasology.benchmark.Benchmarks;
 import org.terasology.utilities.FastRandom;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray4Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraSparseArray4Bit;
+import org.terasology.world.chunks.perBlockStorage.TeraSparseArray8Bit;
 
 /**
  * TeraArraysBenchmark simplifies the execution of the benchmarks for tera arrays.

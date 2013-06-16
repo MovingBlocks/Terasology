@@ -1,4 +1,4 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
 /**
  * TeraArrayUtils contains some methods used in some TeraArray implementations.
