@@ -128,8 +128,8 @@ public final class WorldRenderer {
     /* RENDERING */
     private final LinkedList<Chunk> renderQueueChunksOpaque = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksOpaqueShadow = Lists.newLinkedList();
-    private final PriorityQueue<Chunk> renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaBlend = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaReject = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
 
     private WorldRenderingStage currentRenderStage = WorldRenderingStage.DEFAULT;
 
@@ -517,13 +517,13 @@ public final class WorldRenderer {
                     else
                         statIgnoredPhases++;
 
-                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.WATER_AND_ICE) > 0)
-                        renderQueueChunksSortedWater.add(c);
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_BLEND) > 0)
+                        renderQueueChunksSortedAlphaBlend.add(c);
                     else
                         statIgnoredPhases++;
 
-                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0 && i < MAX_BILLBOARD_CHUNKS)
-                        renderQueueChunksSortedBillboards.add(c);
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_REJECT) > 0 && i < MAX_BILLBOARD_CHUNKS)
+                        renderQueueChunksSortedAlphaReject.add(c);
                     else
                         statIgnoredPhases++;
 
@@ -706,10 +706,10 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Render Chunks (Billboards)");
 
         /*
-         * SECOND RENDER PASS: BILLBOARDS
+         * SECOND RENDER PASS: ALPHA REJECT
          */
-        while (renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueueChunksSortedAlphaReject.size() > 0)
+            renderChunk(renderQueueChunksSortedAlphaReject.poll(), ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
 
         PerformanceMonitor.endActivity();
 
@@ -725,10 +725,10 @@ public final class WorldRenderer {
         }
 
         /*
-        * THIRD (AND FOURTH) RENDER PASS: WATER AND ICE
+        * THIRD (AND FOURTH) RENDER PASS: ALPHA BLEND
         */
-        while (renderQueueChunksSortedWater.size() > 0) {
-            renderChunk(renderQueueChunksSortedWater.poll(), ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueueChunksSortedAlphaBlend.size() > 0) {
+            renderChunk(renderQueueChunksSortedAlphaBlend.poll(), ChunkMesh.RENDER_PHASE.ALPHA_BLEND, camera, ChunkRenderMode.DEFAULT);
         }
 
         PerformanceMonitor.endActivity();
@@ -805,10 +805,10 @@ public final class WorldRenderer {
                 shader = ShaderManager.getInstance().getShaderProgram("chunk");
                 shader.enable();
 
-                if (phase == ChunkMesh.RENDER_PHASE.WATER_AND_ICE) {
+                if (phase == ChunkMesh.RENDER_PHASE.ALPHA_BLEND) {
                     // This chunks can actually contain water...
                     shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue());
-                } else if (phase == ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) {
+                } else if (phase == ChunkMesh.RENDER_PHASE.ALPHA_REJECT) {
                     shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
                 } else {
                     shader.setActiveFeatures(0);

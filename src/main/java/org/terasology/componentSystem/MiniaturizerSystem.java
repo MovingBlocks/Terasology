@@ -86,8 +86,8 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
             ShaderManager.getInstance().getShaderProgram("chunk").setFloat("blockScale", MiniaturizerComponent.SCALE);
 
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.OPAQUE);
-            min.chunkMesh.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
-            min.chunkMesh.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
+            min.chunkMesh.render(ChunkMesh.RENDER_PHASE.ALPHA_REJECT);
+            min.chunkMesh.render(ChunkMesh.RENDER_PHASE.ALPHA_BLEND);
             glPopMatrix();
 
         }

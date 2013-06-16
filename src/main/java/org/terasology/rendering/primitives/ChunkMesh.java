@@ -98,8 +98,8 @@ public class ChunkMesh {
 
     public enum RENDER_PHASE {
         OPAQUE,
-        BILLBOARD_AND_TRANSLUCENT,
-        WATER_AND_ICE;
+        ALPHA_REJECT,
+        ALPHA_BLEND;
     }
 
     /* CONST */
@@ -235,13 +235,13 @@ public class ChunkMesh {
             case OPAQUE:
                 renderVbo(0);
                 break;
-            case BILLBOARD_AND_TRANSLUCENT:
+            case ALPHA_REJECT:
                 renderVbo(1);
                 glDisable(GL_CULL_FACE);
                 renderVbo(2);
                 glEnable(GL_CULL_FACE);
                 break;
-            case WATER_AND_ICE:
+            case ALPHA_BLEND:
                 renderVbo(3);
                 break;
         }
@@ -284,7 +284,7 @@ public class ChunkMesh {
     public int triangleCount(RENDER_PHASE phase) {
         if (phase == RENDER_PHASE.OPAQUE)
             return _vertexCount[0] / 3;
-        else if (phase == RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT)
+        else if (phase == RENDER_PHASE.ALPHA_REJECT)
             return (_vertexCount[1] + _vertexCount[2]) / 3;
         else
             return _vertexCount[3] / 3;
