@@ -2,6 +2,7 @@ package org.terasology.pathfinding.model;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.math.Vector3i;
 
@@ -14,50 +15,6 @@ public class HAStarTest {
     private WalkableBlock start;
     private WalkableBlock end;
 
-    @Test
-    public void stairsClosed() {
-        executeExample(new String[]{
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXX   XXX",
-                "XXX   XXX|   XXX   |         |XXX   XXX",
-                "XXX   XXX|         |   XXX   |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-        }, new String[]{
-                "?        |         |         |         ",
-                "         |         |         |         ",
-                "         |         |         |         ",
-                "         |         |         |         ",
-                "         |         |         |         ",
-                "         |         |         |         ",
-                "         |         |         |         ",
-                "         |         |         |        !",
-        });
-    }
-    @Test
-    public void stairs() {
-        executeExample(new String[]{
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXX   XXX",
-                "XXX   XXX|   XXX   |         |XXX   XXX",
-                "XXX   XXX|         |   XXX   |XXX   XXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-                "XXXXXXXXX|         |         |XXXXXXXXX",
-        }, new String[]{
-                "?1       |         |         |         ",
-                "  2      |         |         |         ",
-                "   3     |         |         |         ",
-                "    4    |         |         |         ",
-                "         |     5   |         |         ",
-                "         |         |     6   |      7  ",
-                "         |         |         |       8 ",
-                "         |         |         |        !",
-        });
-    }
     @Test
     public void stairs2() {
         executeExample(new String[]{
