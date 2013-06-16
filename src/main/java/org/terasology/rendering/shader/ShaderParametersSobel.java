@@ -36,12 +36,15 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         super.applyParameters(program);
 
         DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        scene.bindDepthTexture();
-        program.setInt("texDepth", 0);
 
-        program.setFloat("texelWidth", 1.0f / scene.width);
-        program.setFloat("texelHeight", 1.0f / scene.height);
+        if (scene != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            scene.bindDepthTexture();
+            program.setInt("texDepth", 0);
+
+            program.setFloat("texelWidth", 1.0f / scene.width);
+            program.setFloat("texelHeight", 1.0f / scene.height);
+        }
 
         program.setFloat("pixelOffsetX", (Float) pixelOffsetX.getValue());
         program.setFloat("pixelOffsetY", (Float) pixelOffsetY.getValue());

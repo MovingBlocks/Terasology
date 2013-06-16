@@ -32,11 +32,9 @@ public class ShaderParametersOcDistortion extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        DefaultRenderingProcess.FBO sceneFinal = DefaultRenderingProcess.getInstance().getFBO("sceneFinal");
-
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneFinal.bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneFinal");
         program.setInt("texSceneFinal", texId++);
     }
 

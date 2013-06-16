@@ -197,7 +197,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
     }
 
-    private HashMap<String, FBO> _FBOs = new HashMap<String, FBO>();
+    private HashMap<String, FBO> FBOs = new HashMap<String, FBO>();
 
     /**
      * Returns (and creates – if necessary) the static instance
@@ -292,7 +292,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         rtHalfQuarterHeight = rtQuarterHeight / 2;
 
         FBO scene = getFBO("sceneOpaque");
-        boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
+        final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
 
         if (!recreate)
             return;
@@ -327,8 +327,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void deleteFBO(String title) {
-        if (_FBOs.containsKey(title)) {
-            FBO fbo = _FBOs.get(title);
+        if (FBOs.containsKey(title)) {
+            FBO fbo = FBOs.get(title);
 
             EXTFramebufferObject.glDeleteFramebuffersEXT(fbo.fboId);
             EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo.depthRboId);
@@ -475,13 +475,17 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
 
-        _FBOs.put(title, fbo);
+        FBOs.put(title, fbo);
         return fbo;
     }
 
     private void updateExposure() {
         if (config.getRendering().isEyeAdaptation()) {
-            FBO scene = DefaultRenderingProcess.getInstance().getFBO("scene1");
+            FBO scene = getFBO("scene1");
+
+            if (scene == null) {
+                return;
+            }
 
             readBackPBOCurrent.copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
@@ -530,7 +534,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void beginRenderSceneOpaque(boolean clear) {
-        getFBO("sceneOpaque").bind();
+        bindFbo("sceneOpaque");
 
         if (clear) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -538,11 +542,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void endRenderSceneOpaque() {
-        getFBO("sceneOpaque").unbind();
+        unbindFbo("sceneOpaque");
     }
 
     public void beginRenderSceneTransparent(boolean clear) {
-        getFBO("sceneTransparent").bind();
+        bindFbo("sceneTransparent");
 
         if (clear) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -550,11 +554,16 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void endRenderSceneTransparent() {
-        getFBO("sceneTransparent").unbind();
+        unbindFbo("sceneTransparent");
     }
 
     public void beginRenderReflectedScene() {
         FBO reflected = getFBO("sceneReflected");
+
+        if (reflected == null) {
+            return;
+        }
+
         reflected.bind();
 
         glViewport(0, 0, reflected.width, reflected.height);
@@ -562,7 +571,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void endRenderReflectedScene() {
-        getFBO("sceneReflected").unbind();
+        unbindFbo("sceneReflected");
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
@@ -570,12 +579,16 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         FBO shadowMap = getFBO("sceneShadowMap");
         shadowMap.bind();
 
+        if (shadowMap == null) {
+            return;
+        }
+
         glViewport(0, 0, shadowMap.width, shadowMap.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public void endRenderSceneShadowMap() {
-        getFBO("sceneShadowMap").unbind();
+        unbindFbo("sceneShadowMap");
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
@@ -659,7 +672,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         shader.enable();
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneFinal").bind();
+        bindFbo("sceneFinal");
 
         if (stereoRenderState == StereoRenderState.SRS_MONO || stereoRenderState == StereoRenderState.SRS_OCULUS_LEFT_EYE) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -677,7 +690,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                 break;
         }
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneFinal").unbind();
+        unbindFbo("sceneFinal");
     }
 
     private void updateOcShaderParametersForVP(ShaderProgram program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
@@ -732,30 +745,37 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private void generateCombinedScene() {
         ShaderManager.getInstance().enableShader("combine");
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneCombined").bind();
+        bindFbo("sceneCombined");
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneCombined").unbind();
+        unbindFbo("sceneCombined");
     }
 
 
     private void generateToneMappedScene() {
         ShaderManager.getInstance().enableShader("hdr");
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bind();
+        bindFbo("sceneToneMapped");
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").unbind();
+        unbindFbo("sceneToneMapped");
     }
 
     private void generateLightShafts() {
         ShaderManager.getInstance().enableShader("lightshaft");
 
-        FBO lightshaft = DefaultRenderingProcess.getInstance().getFBO("lightShafts");
+        FBO lightshaft = getFBO("lightShafts");
+
+        if (lightshaft == null) {
+            return;
+        }
+
         lightshaft.bind();
 
         glViewport(0, 0, lightshaft.width, lightshaft.height);
@@ -763,14 +783,19 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("lightShafts").unbind();
+        lightshaft.unbind();
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateSSAO() {
         ShaderManager.getInstance().enableShader("ssao");
 
-        FBO ssao = DefaultRenderingProcess.getInstance().getFBO("ssao");
+        FBO ssao = getFBO("ssao");
+
+        if (ssao == null) {
+            return;
+        }
+
         ssao.bind();
 
         glViewport(0, 0, ssao.width, ssao.height);
@@ -778,14 +803,19 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("ssao").unbind();
+        ssao.unbind();
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateSobel() {
         ShaderManager.getInstance().enableShader("sobel");
 
-        FBO sobel = DefaultRenderingProcess.getInstance().getFBO("sobel");
+        FBO sobel = getFBO("sobel");
+
+        if (sobel == null) {
+            return;
+        }
+
         sobel.bind();
 
         glViewport(0, 0, sobel.width, sobel.height);
@@ -793,7 +823,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("sobel").unbind();
+        sobel.unbind();
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
@@ -803,7 +833,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         shader.enable();
         shader.setFloat("radius", (Float) ssaoBlurRadius.getValue());
 
-        FBO ssao = DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + id);
+        FBO ssao = getFBO("ssaoBlurred" + id);
+
+        if (ssao == null) {
+            return;
+        }
+
         ssao.bind();
 
         glViewport(0, 0, ssao.width, ssao.height);
@@ -811,14 +846,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            DefaultRenderingProcess.getInstance().getFBO("ssao").bindTexture();
+            bindFboTexture("ssao");
         } else {
-            DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + (id - 1)).bindTexture();
+            bindFboTexture("ssaoBlurred" + (id - 1));
         }
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred" + id).unbind();
+        ssao.unbind();
 
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
@@ -826,13 +861,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private void generatePrePost() {
         ShaderManager.getInstance().enableShader("prePost");
 
-        DefaultRenderingProcess.getInstance().getFBO("scenePrePost").bind();
+        bindFbo("scenePrePost");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("scenePrePost").unbind();
+        unbindFbo("scenePrePost");
     }
 
     private void generateHighPass() {
@@ -840,29 +875,38 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         program.setFloat("highPassThreshold", (Float) bloomHighPassThreshold.getValue());
         program.enable();
 
-        FBO highPass = DefaultRenderingProcess.getInstance().getFBO("sceneHighPass");
+        FBO highPass = getFBO("sceneHighPass");
+
+        if (highPass == null) {
+            return;
+        }
+
         highPass.bind();
 
         glViewport(0, 0, highPass.width, highPass.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
+        bindFboTexture("sceneToneMapped");
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneHighPass").unbind();
+        highPass.unbind();
 
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateBlur(int id) {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
-
         shader.enable();
 
         shader.setFloat("radius", (Float) overallBlurFactor.getValue() * config.getRendering().getBlurRadius());
 
-        FBO blur = DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + id);
+        FBO blur = getFBO("sceneBlur" + id);
+
+        if (blur == null) {
+            return;
+        }
+
         blur.bind();
 
         glViewport(0, 0, blur.width, blur.height);
@@ -870,14 +914,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
+            getFBO("sceneToneMapped").bindTexture();
         } else {
-            DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
+            getFBO("sceneBlur" + (id - 1)).bindTexture();
         }
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneBlur" + id).unbind();
+        blur.unbind();
 
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
@@ -888,7 +932,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         shader.enable();
         shader.setFloat("radius", 32.0f);
 
-        FBO bloom = DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + id);
+        FBO bloom = getFBO("sceneBloom" + id);
+
+        if (bloom == null) {
+            return;
+        }
+
         bloom.bind();
 
         glViewport(0, 0, bloom.width, bloom.height);
@@ -896,14 +945,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            DefaultRenderingProcess.getInstance().getFBO("sceneHighPass").bindTexture();
+            getFBO("sceneHighPass").bindTexture();
         } else {
-            DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
+            getFBO("sceneBloom" + (id - 1)).bindTexture();
         }
 
         renderFullscreenQuad();
 
-        DefaultRenderingProcess.getInstance().getFBO("sceneBloom" + id).unbind();
+        bloom.unbind();
 
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
@@ -918,21 +967,20 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             int size = (int) java.lang.Math.pow(2, i);
             shader.setFloat("size", size);
 
-            DefaultRenderingProcess.getInstance().getFBO("scene" + size).bind();
+            bindFbo("scene" + size);
             glViewport(0, 0, size, size);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (i == 4) {
-                DefaultRenderingProcess.getInstance().getFBO("scenePrePost").bindTexture();
+                bindFboTexture("scenePrePost");
             } else {
-                DefaultRenderingProcess.getInstance().getFBO("scene" + sizePrev).bindTexture();
+                bindFboTexture("scene" + sizePrev);
             }
 
             renderFullscreenQuad();
 
-            DefaultRenderingProcess.getInstance().getFBO("scene" + size).unbind();
-
+            unbindFbo("scene" + size);
         }
 
         glViewport(0, 0, rtFullWidth, rtFullHeight);
@@ -1016,7 +1064,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             return;
         }
 
-        final FBO fboSceneFinal = DefaultRenderingProcess.getInstance().getFBO("sceneFinal");
+        final FBO fboSceneFinal = getFBO("sceneFinal");
+
+        if (fboSceneFinal == null) {
+            return;
+        }
+
         final ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width * fboSceneFinal.height * 4);
 
         fboSceneFinal.bindTexture();
@@ -1065,7 +1118,73 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public FBO getFBO(String title) {
-        return _FBOs.get(title);
+        FBO fbo = FBOs.get(title);
+
+        if (fbo == null) {
+            logger.error("Failed to retrieve FBO '" + title + "'!");
+        }
+
+        return fbo;
+    }
+
+    public boolean bindFbo(String title) {
+        FBO fbo = null;
+
+        if ((fbo = FBOs.get(title)) != null) {
+            fbo.bind();
+            return true;
+        }
+
+        logger.error("Failed to bind FBO since the requested FBO could not be found!");
+        return false;
+    }
+
+    public boolean unbindFbo(String title) {
+        FBO fbo = null;
+
+        if ((fbo = FBOs.get(title)) != null) {
+            fbo.unbind();
+            return true;
+        }
+
+        logger.error("Failed to unbind FBO since the requested FBO could not be found!");
+        return false;
+    }
+
+    public boolean bindFboTexture(String title) {
+        FBO fbo = null;
+
+        if ((fbo = FBOs.get(title)) != null) {
+            fbo.bindTexture();
+            return true;
+        }
+
+        logger.error("Failed to bind FBO texture since the requested FBO could not be found!");
+        return false;
+    }
+
+    public boolean bindFboDepthTexture(String title) {
+        FBO fbo = null;
+
+        if ((fbo = FBOs.get(title)) != null) {
+            fbo.bindDepthTexture();
+            return true;
+        }
+
+        logger.error("Failed to bind FBO depth texture since the requested FBO could not be found!");
+        return false;
+    }
+
+    public boolean bindFboNormalsTexture(String title) {
+        FBO fbo = null;
+
+        if ((fbo = FBOs.get(title)) != null) {
+            fbo.bindNormalsTexture();
+            return true;
+        }
+
+        logger.error("Failed to bind FBO normals texture since the requested FBO could not be found!");
+        return false;
     }
 
     @Override

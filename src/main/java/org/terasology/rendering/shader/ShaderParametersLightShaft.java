@@ -43,12 +43,15 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         super.applyParameters(program);
 
         DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        scene.bindTexture();
-        program.setInt("texScene", 0);
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        scene.bindNormalsTexture();
-        program.setInt("texNormals", 0);
+
+        if (scene != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            scene.bindTexture();
+            program.setInt("texScene", 0);
+            GL13.glActiveTexture(GL13.GL_TEXTURE1);
+            scene.bindNormalsTexture();
+            program.setInt("texNormals", 0);
+        }
 
         program.setFloat("density", (Float) density.getValue());
         program.setFloat("exposure", (Float) exposure.getValue());

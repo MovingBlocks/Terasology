@@ -35,31 +35,31 @@ public class ShaderParametersDebug extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
+        DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
         program.setInt("texSceneShadowMap", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaqueColor", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindNormalsTexture();
+        DefaultRenderingProcess.getInstance().bindFboNormalsTexture("sceneOpaque");
         program.setInt("texSceneOpaqueNormals", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindDepthTexture();
+        DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneOpaque");
         program.setInt("texSceneOpaqueDepth", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneTransparent").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneTransparent");
         program.setInt("texSceneTransparentColor", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneTransparent").bindNormalsTexture();
+        DefaultRenderingProcess.getInstance().bindFboNormalsTexture("sceneTransparent");
         program.setInt("texSceneTransparentNormals", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneTransparent").bindDepthTexture();
+        DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneTransparent");
         program.setInt("texSceneTransparentDepth", texId++);
 
         program.setInt("debugRenderingStage", CoreRegistry.get(Config.class).getSystem().getDebugRenderingStage());

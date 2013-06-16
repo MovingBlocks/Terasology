@@ -57,15 +57,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         LocalPlayerSystem localPlayerSystem = CoreRegistry.get(LocalPlayerSystem.class);
 
-        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
-
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneToneMapped");
         program.setInt("texScene", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneBloom1").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom1");
         program.setInt("texBloom", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
@@ -85,19 +83,24 @@ public class ShaderParametersPost extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
         program.setInt("texVignette", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneCombined.bindDepthTexture();
-        program.setInt("texDepth", texId++);
+        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
 
-        if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
+        if (sceneCombined != null) {
+
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
-            program.setInt("texNoise", texId++);
-            program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
-            program.setFloat("noiseOffset", rand.randomPosFloat());
+            sceneCombined.bindDepthTexture();
+            program.setInt("texDepth", texId++);
 
-            program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight());
-            program.setFloat2("renderTargetSize", sceneCombined.width, sceneCombined.height);
+            if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
+                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+                glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
+                program.setInt("texNoise", texId++);
+                program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
+                program.setFloat("noiseOffset", rand.randomPosFloat());
+
+                program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight());
+                program.setFloat2("renderTargetSize", sceneCombined.width, sceneCombined.height);
+            }
         }
 
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();

@@ -39,46 +39,49 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
+        int texId = 0;
+
         DefaultRenderingProcess.FBO sceneOpaque = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
-        int texId = 0;
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindTexture();
-        program.setInt("texSceneOpaque", texId++);
+        if (sceneOpaque != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneOpaque.bindTexture();
+            program.setInt("texSceneOpaque", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindDepthTexture();
-        program.setInt("texSceneOpaqueDepth", texId++);
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneOpaque.bindDepthTexture();
+            program.setInt("texSceneOpaqueDepth", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindNormalsTexture();
-        program.setInt("texSceneOpaqueNormals", texId++);
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneOpaque.bindNormalsTexture();
+            program.setInt("texSceneOpaqueNormals", texId++);
+        }
 
         DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneTransparent.bindTexture();
-        program.setInt("texSceneTransparent", texId++);
+        if (sceneTransparent != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneTransparent.bindTexture();
+            program.setInt("texSceneTransparent", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneTransparent.bindDepthTexture();
-        program.setInt("texSceneTransparentDepth", texId++);
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneTransparent.bindDepthTexture();
+            program.setInt("texSceneTransparentDepth", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneTransparent.bindNormalsTexture();
-        program.setInt("texSceneTransparentNormals", texId++);
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneTransparent.bindNormalsTexture();
+            program.setInt("texSceneTransparentNormals", texId++);
+        }
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
-            DefaultRenderingProcess.FBO ssao = DefaultRenderingProcess.getInstance().getFBO("ssaoBlurred1");
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            ssao.bindTexture();
+            DefaultRenderingProcess.getInstance().bindFboTexture("ssaoBlurred1");
             program.setInt("texSsao", texId++);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
-            DefaultRenderingProcess.FBO sobel = DefaultRenderingProcess.getInstance().getFBO("sobel");
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sobel.bindTexture();
+            DefaultRenderingProcess.getInstance().bindFboTexture("sobel");
             program.setInt("texEdges", texId++);
 
             program.setFloat("outlineDepthThreshold", (Float) outlineDepthThreshold.getValue());

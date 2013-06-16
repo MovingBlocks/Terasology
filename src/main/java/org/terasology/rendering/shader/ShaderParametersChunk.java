@@ -98,15 +98,15 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         program.setInt("textureEffects", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneReflected").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneReflected");
         program.setInt("textureWaterReflection", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
+            DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
             program.setInt("texSceneShadowMap", texId++);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();

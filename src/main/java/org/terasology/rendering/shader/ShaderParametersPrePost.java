@@ -34,16 +34,14 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
-
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneCombined.bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneCombined");
         program.setInt("texScene", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().getFBO("lightShafts").bindTexture();
+            DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");
             program.setInt("texLightShafts", texId++);
         }
     }
