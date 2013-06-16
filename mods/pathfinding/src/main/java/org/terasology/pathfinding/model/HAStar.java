@@ -9,7 +9,6 @@ import java.util.*;
  */
 public class HAStar {
     private Path localPath;
-    private PathCache cache;
     private HAStar localAStar;
 
     private List<Node> nodes = new ArrayList<Node>();
@@ -46,14 +45,12 @@ public class HAStar {
                 return -(fA < fB ? -1 : ( fA > fB ? 1 : 0 ));
             }
         }, 16*1024, 16*1024);
-        cache = new PathCache();
         if( useContour ) {
             localAStar = new HAStar(false);
         }
     }
 
     public void reset() {
-        cache.clear();
         nodes.clear();
         nodeMap.clear();
         closedList.clear();
@@ -106,7 +103,12 @@ public class HAStar {
         Path path = new Path();
         Node start = nodes.get(this.start);
         Node current = nodes.get(end);
+        HeightMap last = null;
         while (current!=start && current!=null) {
+            if( last!=current.block.floor.heightMap ) {
+                System.out.println("HM in path "+current.block.floor.heightMap.id );
+            }
+            last = current.block.floor.heightMap;
             if( current.path!=null ) {
                 path.addAll(current.path);
                 localPathsUsed ++;
@@ -123,7 +125,9 @@ public class HAStar {
         Floor currentFloor = currentNode.block.floor;
         Set<WalkableBlock> neighbors = new HashSet<WalkableBlock>();
         boolean onEndFloor = nodes.get(end).block.floor == currentFloor;
-        if( !useContour || onEndFloor  ) {
+        boolean onStartFloor = nodes.get(start).block.floor == currentFloor;
+        if( !useContour || onEndFloor || onStartFloor ) {
+            // normal A* if on start or end floor
             for (WalkableBlock neighbor : currentNode.block.neighbors) {
                 if( neighbor==null ) {
                     continue;
@@ -131,17 +135,17 @@ public class HAStar {
                 neighbors.add(neighbor);
             }
         } else {
+            // otherwise use contour points...
             for (WalkableBlock block : currentFloor.contour()) {
                 if( block==currentNode.block) {
                     continue;
                 }
                 neighbors.add(block);
             }
-            for (Floor neighborFloor : currentFloor.neighborRegions) {
-                for (WalkableBlock neighborContour : neighborFloor.contour()) {
-                    if( neighborContour.hasNeighbor(currentNode.block)) {
-                        neighbors.add(neighborContour);
-                    }
+            // .. and neighbors of other floor, that are part of their contour
+            for (WalkableBlock neighbor : currentNode.block.neighbors) {
+                if( neighbor!=null && neighbor.floor!=currentFloor && neighbor.floor.isContour(neighbor)) {
+                    neighbors.add(neighbor);
                 }
             }
         }

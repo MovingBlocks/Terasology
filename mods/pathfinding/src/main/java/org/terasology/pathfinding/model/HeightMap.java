@@ -33,6 +33,7 @@ public class HeightMap {
     public Vector3i worldPos;
     public final Set<WalkableBlock> borderBlocks = new HashSet<WalkableBlock>();
     public PathCache pathCache = new PathCache();
+    public int id;
 
     public HeightMap(WorldProvider world, Vector3i chunkPos) {
         this.world = world;
@@ -67,14 +68,58 @@ public class HeightMap {
             }
         }
 
-        optimizeContours();
-        if( left!=null ) left.optimizeContours();
-        if( right!=null ) right.optimizeContours();
-        if( up!=null ) up.optimizeContours();
-        if( down!=null ) down.optimizeContours();
+        findContour();
+        pathCache.clear();
+        if( left!=null ) {
+            left.findContour();
+            left.pathCache.clear();
+        }
+        if( right!=null ) {
+            right.findContour();
+            right.pathCache.clear();
+        }
+        if( up!=null ) {
+            up.findContour();
+            up.pathCache.clear();
+        }
+        if( down!=null ) {
+            down.findContour();
+            down.pathCache.clear();
+        }
     }
 
-    private void optimizeContours() {
+    public void findContour() {
+        for (Floor floor : floors) {
+            floor.resetContour();
+        }
+        for (int z = 0; z < HeightMap.SIZE_Z; z++) {
+            for (int x = 0; x < HeightMap.SIZE_X; x++) {
+                for (WalkableBlock block : getCell(x,z).blocks) {
+                    Floor floor = block.floor;
+                    boolean foundNeighborFloor = false;
+                    for (WalkableBlock neighbor : block.neighbors) {
+                        if( neighbor!=null && neighbor.floor!=floor ) {
+                            int heightDiff = block.height()-neighbor.height();
+                            if( heightDiff>0 ) {
+                                if( world.getBlock(neighbor.x(),neighbor.height()+3, neighbor.z()).isPenetrable() ) {
+                                    foundNeighborFloor = true;
+                                }
+                            } else if( heightDiff<0 ) {
+                                if( world.getBlock(x,block.height()+3, z).isPenetrable() ) {
+                                    foundNeighborFloor = true;
+                                }
+                            } else if( heightDiff==0 ) {
+                                foundNeighborFloor = true;
+                            }
+                            break;
+                        }
+                    }
+                    if( foundNeighborFloor ) {
+                        floor.setContour(block);
+                    }
+                }
+            }
+        }
         for (Floor floor : floors) {
             floor.findContour();
         }
@@ -91,8 +136,6 @@ public class HeightMap {
 
                 floor.addNeighborBlock(block, candidate);
                 candidate.floor.addNeighborBlock(candidate, block);
-//                floor.neighborRegions.add(candidate.region.floor);
-//                candidate.region.floor.neighborRegions.add(floor);
             }
         }
     }
@@ -114,6 +157,10 @@ public class HeightMap {
                 disconnectFromNeighbor(block, x, 0, down, DIR_DOWN);
             }
         }
+        if( left!=null ) left.findContour();
+        if( right!=null ) right.findContour();
+        if( up!=null ) up.findContour();
+        if( down!=null ) down.findContour();
     }
 
     private void disconnectFromNeighbor(WalkableBlock block, int dx, int dz, HeightMap neighbor, int neighborId) {
@@ -121,10 +168,10 @@ public class HeightMap {
         Floor floor = block.floor;
         for (WalkableBlock candidate : neighborCell.blocks) {
             if( Math.abs(candidate.height()-block.height())<2 && candidate.floor.heightMap!=this) {
-//                block.neighbors[neighborId] = null;
-//                floor.neighborRegions.remove(candidate.region.floor);
+                block.neighbors[neighborId] = null;
                 candidate.neighbors[(neighborId+4)%8] = null;
-                candidate.floor.neighborRegions.remove(floor);
+                floor.removeNeighborBlock(block, candidate);
+                candidate.floor.removeNeighborBlock(candidate, block);
             }
         }
     }

@@ -70,7 +70,6 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
         }
 
         public void kill() {
-            logger.info("kill path request : "+startPos+" -> "+targetPos);
             taskMap.remove(this);
             callback = null;
         }
@@ -125,6 +124,7 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
                                 monitor.increment(0);
                             } else {
                                 if( !pathsValid ) {
+                                    pathfinder.clearCache();
                                     int count = 0;
                                     long time = System.nanoTime();
                                     int notFound = 0;

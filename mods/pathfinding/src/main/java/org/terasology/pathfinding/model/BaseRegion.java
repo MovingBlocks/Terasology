@@ -81,6 +81,10 @@ public abstract class BaseRegion<N extends BaseRegion> {
         contour = new BitMap();
     }
 
+    public void resetContour() {
+        contour = new BitMap();
+    }
+
     public void findContour() {
         BitMap newContour = new BitMap();
         newContour.runKernel(EDGE_KERNEL, contour);
@@ -94,7 +98,7 @@ public abstract class BaseRegion<N extends BaseRegion> {
         return contour.isPassable(x,y);
     }
     public void setContour( int x, int y ) {
-        contour.setPassable(x,y);
+        contour.setPassable(x, y);
     }
     public void setContour( WalkableBlock block ) {
         setContour(TeraMath.calcBlockPosX(block.x()), TeraMath.calcBlockPosZ(block.z()));

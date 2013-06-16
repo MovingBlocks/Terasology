@@ -71,28 +71,7 @@ public class FloorFinder {
             entry.getKey().floor = entry.getValue().floor;
         }
 
-        for (int z = 0; z < HeightMap.SIZE_Z; z++) {
-            for (int x = 0; x < HeightMap.SIZE_X; x++) {
-                for (WalkableBlock block : map.getCell(x,z).blocks) {
-                    Floor floor = block.floor;
-                    boolean foundNeighborFloor = false;
-                    for (WalkableBlock neighbor : block.neighbors) {
-                        if( neighbor!=null && neighbor.floor!=floor ) {
-                            foundNeighborFloor = true;
-                            break;
-                        }
-                    }
-                    if( foundNeighborFloor ) {
-                        floor.setContour(block);
-                    }
-                }
-
-            }
-        }
-
-        for (Floor floor : map.floors) {
-            floor.findContour();
-        }
+        map.findContour();
     }
 
     void findRegions(HeightMap map) {

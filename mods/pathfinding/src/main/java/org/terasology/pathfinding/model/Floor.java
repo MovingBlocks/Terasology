@@ -23,6 +23,10 @@ public class Floor extends BaseRegion<Floor> {
         neighbor.floor.setContour(neighbor);
     }
 
+    public void removeNeighborBlock( WalkableBlock current, WalkableBlock neighbor ) {
+        neighborRegions.remove(neighbor.floor);
+    }
+
     public void merge( Region neighbor ) {
         map.merge(neighbor.map);
         neighbor.floor = this;
