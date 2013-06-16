@@ -146,13 +146,20 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         public ByteBuffer readBackPixels() {
             bind();
-            cachedBuffer = EXTPixelBufferObject.glMapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
 
-            // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
-            ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
-            resultBuffer.put(cachedBuffer);
-            cachedBuffer.rewind();
-            resultBuffer.flip();
+            ByteBuffer resultBuffer = null;
+
+            try {
+                cachedBuffer = EXTPixelBufferObject.glMapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
+
+                // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
+                resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
+                resultBuffer.put(cachedBuffer);
+                cachedBuffer.rewind();
+                resultBuffer.flip();
+            } catch (RuntimeException e) {
+                logger.error("Failed to read back pixels from PBO.");
+            }
 
             EXTPixelBufferObject.glUnmapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT);
             unbind();
@@ -491,6 +498,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             }
 
             ByteBuffer pixels = readBackPBOCurrent.readBackPixels();
+
+            if (pixels == null || pixels.limit() < 3) {
+                logger.error("Failed to update exposure value.");
+                return;
+            }
 
             currentSceneLuminance = 0.2126f * (pixels.get(2)& 0xFF) / 255.f + 0.7152f * (pixels.get(1) & 0xFF) / 255.f + 0.0722f * (pixels.get(0) & 0xFF) / 255.f;
 
