@@ -43,63 +43,45 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
         public Vector3i start;
         public Map<Vector3i, PathfinderSystem.FindPathTask> targets = new HashMap<Vector3i, PathfinderSystem.FindPathTask>();
         public Path path;
-        public boolean valid;
 
         private PathState(Vector3i start) {
             this.start = start;
         }
 
-        public void removeTask( Vector3i target ) {
-            PathfinderSystem.FindPathTask task = targets.remove(target);
-            task.kill();
-            path = null;
-            valid = false;
+        public boolean removeTask( Vector3i target ) {
+            PathfinderSystem.FindPathTask old = targets.remove(target);
+            if( old!=null ) {
+                old.kill();
+                return true;
+            }
+            return false;
         }
 
         public void addTask( Vector3i target ) {
-            PathfinderSystem.FindPathTask current = targets.get(target);
-            if( current!=null ) {
-                current.kill();
-                path = null;
-                valid = false;
+            if( targets.containsKey(target) ) {
+                return;
             }
-            current = system.observePath(start, target, new PathfinderSystem.Callback() {
-                @Override
-                public void onPathInvalided(Vector3i start, Vector3i end) {
-                    valid = false;
-                    path = null;
-                }
-
+            PathfinderSystem.FindPathTask current = system.requestPath(start, target, new PathfinderSystem.Callback() {
                 @Override
                 public void onPathReady(Path path) {
-                    if( valid ) {
-                        if( path!=null ) {
-                            if( PathState.this.path!=null ) {
-                                if( path.size()<PathState.this.path.size() ) {
+                    if( PathState.this.path==null ) {
+                        PathState.this.path = path;
+                    } else {
+                        if (path!=Path.INVALID && path!=null ) {
+                            if (PathState.this.path != Path.INVALID) {
+                                if (path.size() < PathState.this.path.size()) {
                                     PathState.this.path = path;
-                                    valid = true;
                                 }
                             } else {
                                 PathState.this.path = path;
-                                valid = true;
                             }
+                        } else {
+                            PathState.this.path = Path.INVALID;
                         }
-                    } else {
-                        PathState.this.path = path;
-                        valid = true;
                     }
                 }
             });
             targets.put(target, current);
-        }
-
-        public void kill() {
-            for (PathfinderSystem.FindPathTask task : targets.values()) {
-                task.kill();
-            }
-            targets.clear();
-            valid = false;
-            path = null;
         }
     }
 
@@ -140,7 +122,7 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
         for (Map.Entry<Vector3i, PathState> entry : startBlocks.entrySet()) {
             PathState component = entry.getValue();
 
-            if( component.path != null && component.valid ) {
+            if( component.path != null && component.path!=Path.INVALID ) {
                 int no = 1;
                 for (WalkableBlock block : component.path) {
                     infoGrid.addInfo(block.getBlockPosition(), "path", "step: "+no);
@@ -155,7 +137,6 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
         Vector3i blockPos = new Vector3i(block.getComponent(LocationComponent.class).getWorldPosition());
         PathState pathState = startBlocks.get(blockPos);
         if( pathState==null ) {
-            logger.info("Adding start block "+blockPos);
             pathState = new PathState(blockPos);
             startBlocks.put(blockPos, pathState);
         }
@@ -175,8 +156,9 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
         if( pathState==null ) {
             return;
         }
-        logger.info("Removing start block "+blockPos);
-        pathState.kill();
+        for (PathfinderSystem.FindPathTask task : pathState.targets.values()) {
+            task.kill();
+        }
         startBlocks.remove(blockPos);
     }
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, TargetBlockComponent.class})
@@ -185,23 +167,22 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
         if( targetBlocks.contains(blockPos) ) {
             return;
         }
-        logger.info("Adding target block "+blockPos);
         for (Map.Entry<Vector3i, PathState> entry : startBlocks.entrySet()) {
             final PathState pathState = entry.getValue();
             pathState.addTask(blockPos);
         }
         targetBlocks.add(blockPos);
 
-        for (int z = -3; z <=3; z++) {
-            for (int x = -3; x <= 3; x++) {
-                if( x==0 && z==0 ) {
-                    continue;
-                }
-                Vector3i pos = new Vector3i(blockPos.x+x* Chunk.SIZE_X, blockPos.y, blockPos.z+z*Chunk.SIZE_Z);
-                Block old = world.getBlock(pos);
-                world.setBlock(pos, startBlock, old);
-            }
-        }
+//        for (int z = -3; z <=3; z++) {
+//            for (int x = -3; x <= 3; x++) {
+//                if( x==0 && z==0 ) {
+//                    continue;
+//                }
+//                Vector3i pos = new Vector3i(blockPos.x+x* Chunk.SIZE_X, blockPos.y, blockPos.z+z*Chunk.SIZE_Z);
+//                Block old = world.getBlock(pos);
+//                world.setBlock(pos, startBlock, old);
+//            }
+//        }
     }
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, TargetBlockComponent.class})
     public void targetBlockUpdated( ChangedComponentEvent event, EntityRef block ) {
@@ -212,10 +193,11 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
         if( !targetBlocks.contains(blockPos) ) {
             return;
         }
-        logger.info("Removing target block "+blockPos);
         for (Map.Entry<Vector3i, PathState> entry : startBlocks.entrySet()) {
             PathState pathState = entry.getValue();
             pathState.removeTask(blockPos);
+            pathState.path = null;
+
         }
         targetBlocks.remove(blockPos);
     }

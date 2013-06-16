@@ -18,7 +18,7 @@ Terasology requires the latest version of Oracle's [Java Virtual Machine (JVM)](
 
 Download the latest [stable version here](http://jenkins.movingblocks.net/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
 
-You can use one of the default launch scripts to start the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
+You can use one of the default launch scripts to startPos the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
 
 Controls
 --------
@@ -27,7 +27,7 @@ Note that these instructions are meant for the stable release. The latest develo
 
 * [W,A,S,D] - Movement
 * [E] - Activate (Chest, TNT, etc)
-* [Q] - Throw held (block) item (hold down to charge for a longer throw!) OR start crafting (if placing object on ground with crafting module active)
+* [Q] - Throw held (block) item (hold down to charge for a longer throw!) OR startPos crafting (if placing object on ground with crafting module active)
 * [Space] - Jump
 * [Shift] - Hold to run
 * [Left click] - Activate left click action (default = remove block)

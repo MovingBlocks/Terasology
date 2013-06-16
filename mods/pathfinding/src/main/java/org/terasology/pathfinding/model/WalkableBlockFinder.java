@@ -71,12 +71,12 @@ public class WalkableBlockFinder {
                     int heightDiff = block.height() - neighborBlock.height();
                     if( heightDiff>-2 && heightDiff<2 ) {
                         if( heightDiff>0 ) {
-                            Block air = world.getBlock(nx, block.height() + 2, nz);
+                            Block air = world.getBlock(nx, neighborBlock.height() + 3, nz);
                             if( air.isPenetrable() ) {
                                 block.neighbors[i] = neighborBlock;
                             }
                         } else if( heightDiff<0 ) {
-                            Block air = world.getBlock(x, neighborBlock.height() + 2, z);
+                            Block air = world.getBlock(x, block.height() + 3, z);
                             if( air.isPenetrable() ) {
                                 block.neighbors[i] = neighborBlock;
                             }

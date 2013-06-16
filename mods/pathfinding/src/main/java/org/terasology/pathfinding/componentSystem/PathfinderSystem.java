@@ -2,28 +2,18 @@ package org.terasology.pathfinding.componentSystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
-import org.terasology.pathfinding.components.StartBlockComponent;
-import org.terasology.pathfinding.components.TargetBlockComponent;
 import org.terasology.pathfinding.model.HeightMap;
 import org.terasology.pathfinding.model.Path;
 import org.terasology.pathfinding.model.Pathfinder;
 import org.terasology.pathfinding.model.WalkableBlock;
-import org.terasology.pathfinding.rendering.InfoGrid;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockComponent;
@@ -41,82 +31,54 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
 
     public interface Callback {
         void onPathReady( Path path );
-        void onPathInvalided( Vector3i start, Vector3i end );
     }
 
-    public abstract class Task implements Comparable<Task> {
-        public abstract void process();
-        public abstract int monitorId();
-        public void kill(){}
-        @Override
-        public int compareTo(Task o) {
-            return this.monitorId()<o.monitorId() ? -1 : this.monitorId()>o.monitorId() ? 1 : 0;
-        }
-    }
-
-    public class UpdateChunkTask extends Task {
+    public class UpdateChunkTask {
         public Vector3i chunkPos;
 
         private UpdateChunkTask(Vector3i chunkPos) {
             this.chunkPos = chunkPos;
         }
 
-        @Override
         public void process() {
             maps.remove(chunkPos);
-            HeightMap map = updateMap(chunkPos);
+            HeightMap map = pathfinder.update(chunkPos);
             maps.put(chunkPos, map);
         }
-
-        @Override
-        public int monitorId() {
-            return 0;
-        }
-
     }
 
-    public class FindPathTask extends Task {
-        public Vector3i start;
-        public Vector3i end;
+    public class FindPathTask {
+        public Vector3i startPos;
+        public Vector3i targetPos;
         public Path path;
         public Callback callback;
-        public boolean observed;
 
-        private FindPathTask(Vector3i start, Vector3i end, boolean observed, Callback callback ) {
-            this.start = start;
-            this.end = end;
+        private FindPathTask(Vector3i startPos, Vector3i targetPos, Callback callback ) {
+            this.startPos = startPos;
+            this.targetPos = targetPos;
             this.callback = callback;
-            this.observed = observed;
         }
 
-        @Override
         public void process() {
-            path = findPath(start, end);
-
+            WalkableBlock start = pathfinder.getBlock(startPos);
+            WalkableBlock target = pathfinder.getBlock(targetPos);
+            path = null;
+            if( start!=null && target!=null ) {
+                path = pathfinder.findPath(target, start);
+            }
             outputQueue.offer(this);
         }
 
-        public void enqueue() {
-            inputQueue.offer(this);
-            callback.onPathInvalided(start, end);
-        }
-
-        @Override
         public void kill() {
-            observed = false;
-            inputQueue.remove(this);
-            observedPaths.remove(this);
-        }
-
-        @Override
-        public int monitorId() {
-            return 1;
+            logger.info("kill path request : "+startPos+" -> "+targetPos);
+            taskMap.remove(this);
+            callback = null;
         }
     }
 
-    private BlockingQueue<Task> inputQueue = new PriorityBlockingQueue<Task>(100);
+    private BlockingQueue<UpdateChunkTask> updateChunkQueue = new ArrayBlockingQueue<UpdateChunkTask>(100);
     private BlockingQueue<FindPathTask> outputQueue = new ArrayBlockingQueue<FindPathTask>(100);
-    private Set<FindPathTask> observedPaths = new HashSet<FindPathTask>();
+    private Set<FindPathTask> taskMap = Collections.synchronizedSet(new HashSet<FindPathTask>());
 
     private ExecutorService inputThreads;
 
@@ -125,17 +87,15 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
     @In
     private WorldProvider world;
 
+    private boolean pathsValid;
+
     public PathfinderSystem() {
         CoreRegistry.put(PathfinderSystem.class, this);
     }
 
-    public void requestPath( Vector3i start, Vector3i end, Callback callback ) {
-        inputQueue.offer(new FindPathTask(start, end, false, callback));
-    }
-
-    public FindPathTask observePath( Vector3i start, Vector3i end, Callback callback ) {
-        FindPathTask task = new FindPathTask(start, end, true, callback);
-        inputQueue.offer(task);
+    public FindPathTask requestPath(Vector3i start, Vector3i end, Callback callback) {
+        FindPathTask task = new FindPathTask(start, end, callback);
+        taskMap.add(task);
         return task;
     }
 
@@ -158,10 +118,31 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
                     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                     while (running) {
                         try {
-                            Task task = inputQueue.take();
-                            task.process();
-                            monitor.increment(task.monitorId());
-                            logger.info("-- Observed Paths: "+observedPaths.size()+" --");
+                            UpdateChunkTask task = updateChunkQueue.poll(1, TimeUnit.SECONDS);
+                            if( task!=null ) {
+                                pathsValid = false;
+                                task.process();
+                                monitor.increment(0);
+                            } else {
+                                if( !pathsValid ) {
+                                    int count = 0;
+                                    long time = System.nanoTime();
+                                    int notFound = 0;
+                                    for (FindPathTask pathTask : taskMap) {
+                                        if( pathTask !=null ) {
+                                            count ++;
+                                            pathTask.process();
+                                            if( pathTask.path==null || pathTask.path==Path.INVALID ) {
+                                                notFound ++;
+                                            }
+                                            monitor.increment(1);
+                                        }
+                                    }
+                                    pathsValid = true;
+                                    float ms = (System.nanoTime() - time) / 1000 / 1000f;
+                                    logger.info("Searching "+count+" pathes took "+ ms +" ms ("+(1000f/count)+" pps), not found="+notFound);
+                                }
+                            }
                         } catch (InterruptedException e) {
                             monitor.addError(e);
                             logger.error("Thread interrupted", e);
@@ -183,43 +164,22 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
         while (!outputQueue.isEmpty()) {
             FindPathTask task = outputQueue.poll();
             task.callback.onPathReady(task.path);
-            if( task.observed ) {
-                observedPaths.add(task);
-            }
         }
     }
 
     @Override
     public void shutdown() {
-
-    }
-
-    private Path findPath(Vector3i startPos, Vector3i targetPos) {
-        WalkableBlock start = pathfinder.getBlock(startPos);
-        WalkableBlock target = pathfinder.getBlock(targetPos);
-        Path path = null;
-        if( start!=null && target!=null ) {
-            path = pathfinder.findPath(target, start);
-        }
-        return path;
-    }
-
-    private HeightMap updateMap(Vector3i targetPos) {
-        HeightMap map = pathfinder.update(targetPos);
-        for (FindPathTask path : observedPaths) {
-            path.enqueue();
-        }
-        return map;
+        inputThreads.shutdown();
     }
 
     @ReceiveEvent(components = BlockComponent.class)
     public void blockChanged(BlockChangedEvent event, EntityRef entity) {
-        inputQueue.offer(new UpdateChunkTask(TeraMath.calcChunkPos(event.getBlockPosition())));
+        updateChunkQueue.offer(new UpdateChunkTask(TeraMath.calcChunkPos(event.getBlockPosition())));
     }
 
     @ReceiveEvent(components = WorldComponent.class)
     public void chunkReady(ChunkReadyEvent event, EntityRef worldEntity) {
         Vector3i chunkPos = new Vector3i(event.getChunkPos());
-        inputQueue.offer(new UpdateChunkTask(chunkPos));
+        updateChunkQueue.offer(new UpdateChunkTask(chunkPos));
     }
 }

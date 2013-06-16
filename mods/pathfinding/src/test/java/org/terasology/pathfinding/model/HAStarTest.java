@@ -120,7 +120,7 @@ public class HAStarTest {
             }
         }, pathData);
         expected.put(0, start.getBlockPosition());
-//        expected.put(expected.size(), end.getBlockPosition());
+//        expected.put(expected.size(), targetPos.getBlockPosition());
 
         HAStar haStar = new HAStar();
 

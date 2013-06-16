@@ -34,18 +34,13 @@ public class Pathfinder {
             @Override
             public Path run(WalkableBlock from, WalkableBlock to) {
                 haStar.reset();
-                Path path = null;
-                long time = System.nanoTime();
+                Path path;
                 if( haStar.run(start, end) ) {
                     path = haStar.getPath();
                     path.add(start);
-                    Collections.reverse(path);
-                    logger.info("Found path of "+path.size()+" steps, "+ haStar);
                 } else {
-                    logger.info("No path found "+ haStar);
                     path = Path.INVALID;
                 }
-                logger.info("Searching path "+start.getBlockPosition()+"->"+end.getBlockPosition()+" took "+((System.nanoTime()-time)/1000/1000f)+" ms");
                 return path;
             }
         });

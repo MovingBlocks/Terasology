@@ -52,6 +52,11 @@ public class ContourFinderTest {
     @Test
     public void testSingleLine(){
         assertContour(new String[]{
+                "XX",
+        }, new String[]{
+                "CC",
+        });
+        assertContour(new String[]{
                 "XXXXXXX",
         }, new String[]{
                 "CIIIIIC",
@@ -77,6 +82,109 @@ public class ContourFinderTest {
                 "    I    ",
                 "    I    ",
                 "    C    ",
+        });
+    }
+
+    @Test
+    public void testDoubleLine(){
+        assertContour(new String[]{
+                "XXXXXXX",
+                "XXXXXXX",
+        }, new String[]{
+                "CIIIIIC",
+                "CIIIIIC",
+        });
+        assertContour(new String[]{
+                "XX",
+                "XX",
+                "XX",
+                "XX",
+        }, new String[]{
+                "CC",
+                "II",
+                "II",
+                "CC",
+        });
+        assertContour(new String[]{
+                "         ",
+                " XXXXXXX ",
+                " XXXXXXX ",
+                "         ",
+        }, new String[]{
+                "         ",
+                " CIIIIIC ",
+                " CIIIIIC ",
+                "         ",
+        });
+        assertContour(new String[]{
+                "          ",
+                " XXXXXXXX ",
+                " XXXXXXXX ",
+                "    XX    ",
+                "    XX    ",
+                "    XX    ",
+        }, new String[]{
+                "          ",
+                " CIIIIIIC ",
+                " CIIIIIIC ",
+                "    II    ",
+                "    II    ",
+                "    CC    ",
+        });
+    }
+    @Test
+    public void testDoubleLineInverted(){
+        assertContour(new String[]{
+                "XXXXXXXXX",
+                "XXXXXXXXX",
+                "XX     XX",
+                "XX     XX",
+                "XXXXXXXXX",
+                "XXXXXXXXX",
+        }, new String[]{
+                "IIIIIIIII",
+                "IIIIIIIII",
+                "II     II",
+                "II     II",
+                "IIIIIIIII",
+                "IIIIIIIII",
+        });
+        assertContour(new String[]{
+                "XX",
+                "XX",
+                "XX",
+                "XX",
+        }, new String[]{
+                "CC",
+                "II",
+                "II",
+                "CC",
+        });
+        assertContour(new String[]{
+                "         ",
+                " XXXXXXX ",
+                " XXXXXXX ",
+                "         ",
+        }, new String[]{
+                "         ",
+                " CIIIIIC ",
+                " CIIIIIC ",
+                "         ",
+        });
+        assertContour(new String[]{
+                "          ",
+                " XXXXXXXX ",
+                " XXXXXXXX ",
+                "    XX    ",
+                "    XX    ",
+                "    XX    ",
+        }, new String[]{
+                "          ",
+                " CIIIIIIC ",
+                " CIIIIIIC ",
+                "    II    ",
+                "    II    ",
+                "    CC    ",
         });
     }
 
@@ -297,6 +405,7 @@ public class ContourFinderTest {
             }
         }, contour);
         for (Floor floor : helper.map.floors) {
+            floor.findContour();
             floor.findContour();
         }
         String[] actual = helper.evaluate(new TestHelper.Runner() {

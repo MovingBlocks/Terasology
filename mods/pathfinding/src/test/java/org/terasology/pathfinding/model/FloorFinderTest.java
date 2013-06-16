@@ -12,6 +12,37 @@ import java.util.Set;
 
 public class FloorFinderTest {
     @Test
+    public void stairs3() {
+        assertFloors(new String[]{
+                "XXXXXXXXX|         |         |         |         |XXXXXXXXX",
+                "XXXXXXXXX|   XX    |         |         |         |XXX  XXXX",
+                "XXXXXXXXX|         |   XX    |         |         |XXX  XXXX",
+                "XXXXXXXXX|         |         |   XX    |         |XXX  XXXX",
+                "XXXXXXXXX|         |         |         |   XX    |XXX  XXXX",
+                "XXXXXXXXX|         |         |         |         |XXXXXXXXX",
+                "XXXXXXXXX|         |         |         |         |XXXXXXXXX",
+                "XXXXXXXXX|         |         |         |         |XXXXXXXXX",
+        },new String[]{
+                "000000000|         |         |         |         |111111111",
+                "000  0000|   00    |         |         |         |111  1111",
+                "000  0000|         |   00    |         |         |111  1111",
+                "222222222|         |         |   00    |         |111  1111",
+                "222222222|         |         |         |   00    |000  0000",
+                "222222222|         |         |         |         |000000000",
+                "222222222|         |         |         |         |000000000",
+                "222222222|         |         |         |         |000000000",
+        },new String[]{
+                "IIIIIIIII|         |         |         |         |IIIIIIIII",
+                "III  IIII|   II    |         |         |         |III  IIII",
+                "CIC  CIIC|         |   II    |         |         |III  IIII",
+                "CIIIIIIIC|         |         |   II    |         |CIC  CIIC",
+                "IIIIIIIII|         |         |         |   II    |CII  IIIC",
+                "IIIIIIIII|         |         |         |         |IIIIIIIII",
+                "IIIIIIIII|         |         |         |         |IIIIIIIII",
+                "IIIIIIIII|         |         |         |         |IIIIIIIII",
+        }, new int[][]{ {1, 2}, {0}, {0}} );
+    }
+    @Test
     public void stairs2() {
         assertFloors(new String[]{
                 "XXXXXXXXX|         |         |XXXXXXXXX|         |         |XXXXXXXXX",
