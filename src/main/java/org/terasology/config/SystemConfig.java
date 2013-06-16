@@ -27,6 +27,7 @@ public class SystemConfig {
     private int debugRenderingStage;
     private boolean debugFirstPersonElementsHidden;
     private boolean debugRenderWireframe;
+    private boolean debugHudHidden;
 
     public boolean isDebugFirstPersonElementsHidden() {
         return debugFirstPersonElementsHidden;
@@ -98,5 +99,13 @@ public class SystemConfig {
 
     public void setDebugRenderWireframe(boolean debugRenderWireframe) {
         this.debugRenderWireframe = debugRenderWireframe;
+    }
+
+    public boolean isDebugHudHidden() {
+        return debugHudHidden;
+    }
+
+    public void setDebugHudHidden(boolean debugHudHidden) {
+        this.debugHudHidden = debugHudHidden;
     }
 }
