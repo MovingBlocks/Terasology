@@ -22,7 +22,11 @@ import org.terasology.pathfinding.model.HeightMap;
 import org.terasology.pathfinding.model.Path;
 import org.terasology.pathfinding.model.WalkableBlock;
 import org.terasology.pathfinding.rendering.InfoGrid;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
 
 import java.util.*;
 
@@ -32,6 +36,8 @@ import java.util.*;
 @RegisterComponentSystem
 public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscriberSystem, RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(PathfinderExampleSystem.class);
+    private WorldProvider world;
+    private Block startBlock;
 
     private class PathState {
         public Vector3i start;
@@ -106,6 +112,8 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
     public void initialise() {
         system = CoreRegistry.get(PathfinderSystem.class);
         infoGrid = new InfoGrid();
+        world = CoreRegistry.get(WorldProvider.class);
+        startBlock = BlockManager.getInstance().getBlock("pathfinding:StartBlock");
     }
 
     @Override
@@ -135,7 +143,7 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
             if( component.path != null && component.valid ) {
                 int no = 1;
                 for (WalkableBlock block : component.path) {
-                    infoGrid.addInfo(block.getBlockPosition(), "path "+component.start, "step: "+no);
+                    infoGrid.addInfo(block.getBlockPosition(), "path", "step: "+no);
                     no++;
                 }
             }
@@ -183,6 +191,17 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
             pathState.addTask(blockPos);
         }
         targetBlocks.add(blockPos);
+
+        for (int z = -3; z <=3; z++) {
+            for (int x = -3; x <= 3; x++) {
+                if( x==0 && z==0 ) {
+                    continue;
+                }
+                Vector3i pos = new Vector3i(blockPos.x+x* Chunk.SIZE_X, blockPos.y, blockPos.z+z*Chunk.SIZE_Z);
+                Block old = world.getBlock(pos);
+                world.setBlock(pos, startBlock, old);
+            }
+        }
     }
     @ReceiveEvent(components = {BlockComponent.class, LocationComponent.class, TargetBlockComponent.class})
     public void targetBlockUpdated( ChangedComponentEvent event, EntityRef block ) {

@@ -8,9 +8,21 @@ import java.util.*;
  * @author synopia
  */
 public class HAStar {
-
     private Path localPath;
     private PathCache cache;
+    private HAStar localAStar;
+
+    private List<Node> nodes = new ArrayList<Node>();
+
+    private Map<WalkableBlock, Integer> nodeMap = new HashMap<WalkableBlock, Integer>();
+    private int start;
+    private int end;
+    private int cacheHits;
+    private int localPathsUsed;
+    private BinaryHeap openList;
+
+    private BitSet closedList = new BitSet(16*1024);
+    private boolean useContour;
 
     private class Node {
         int id;
@@ -20,18 +32,6 @@ public class HAStar {
         WalkableBlock block;
         Path path;
     }
-
-    private List<Node> nodes = new ArrayList<Node>();
-    private Map<WalkableBlock, Integer> nodeMap = new HashMap<WalkableBlock, Integer>();
-    private int start;
-    private int end;
-    private int cacheHits;
-    private int localPathsUsed;
-
-    private BinaryHeap openList;
-    private List<Integer> closedList = new ArrayList<Integer>();
-
-    private boolean useContour;
 
     public HAStar() {
         this(true);
@@ -47,6 +47,9 @@ public class HAStar {
             }
         }, 16*1024, 16*1024);
         cache = new PathCache();
+        if( useContour ) {
+            localAStar = new HAStar(false);
+        }
     }
 
     public void reset() {
@@ -89,7 +92,7 @@ public class HAStar {
                 break;
             }
             expand( current );
-            closedList.add(current);
+            closedList.set(current);
 
             if( openList.getSize()>maxSize ) {
                 maxSize = openList.getSize();
@@ -150,7 +153,7 @@ public class HAStar {
 
     private void expandNeighbor(int current, Node currentNode, WalkableBlock neighbor) {
         int successor = create(neighbor);
-        if( closedList.contains(successor) ) {
+        if( closedList.get(successor) ) {
             return;
         }
         float tentativeG = currentNode.g + c(current, successor);
@@ -192,9 +195,9 @@ public class HAStar {
         localPath = fromNode.block.floor.heightMap.pathCache.findPath(fromNode.block, toNode.block, new PathCache.Callback() {
             @Override
             public Path run(WalkableBlock from, WalkableBlock to) {
-                HAStar local = new HAStar(false);
-                if( local.run(from, to) ) {
-                    return local.getPath();
+                localAStar.reset();
+                if( localAStar.run(from, to) ) {
+                    return localAStar.getPath();
                 }
                 return Path.INVALID;
             }
@@ -216,6 +219,6 @@ public class HAStar {
 
     @Override
     public String toString() {
-        return "closed list size="+closedList.size()+", cache hits="+cacheHits+", local paths used="+localPathsUsed;
+        return "closed list size="+closedList.cardinality()+", cache hits="+cacheHits+", local paths used="+localPathsUsed;
     }
 }
