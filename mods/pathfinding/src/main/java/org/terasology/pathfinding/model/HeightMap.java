@@ -33,7 +33,6 @@ public class HeightMap {
     public Vector3i worldPos;
     public final Set<WalkableBlock> borderBlocks = new HashSet<WalkableBlock>();
     public PathCache pathCache = new PathCache();
-    public int id;
 
     public HeightMap(WorldProvider world, Vector3i chunkPos) {
         this.world = world;

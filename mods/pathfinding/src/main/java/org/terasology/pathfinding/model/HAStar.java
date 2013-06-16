@@ -103,11 +103,7 @@ public class HAStar {
         Path path = new Path();
         Node start = nodes.get(this.start);
         Node current = nodes.get(end);
-        HeightMap last = null;
         while (current!=start && current!=null) {
-            if( last!=current.block.floor.heightMap ) {
-                System.out.println("HM in path "+current.block.floor.heightMap.id );
-            }
             last = current.block.floor.heightMap;
             if( current.path!=null ) {
                 path.addAll(current.path);

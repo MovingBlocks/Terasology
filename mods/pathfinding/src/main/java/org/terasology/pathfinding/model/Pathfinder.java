@@ -52,15 +52,11 @@ public class Pathfinder {
         });
     }
 
-    static int nextId = 1;
     public HeightMap init( Vector3i chunkPos ) {
         HeightMap heightMap = heightMaps.get(chunkPos);
         if( heightMap==null ) {
             long time = System.nanoTime();
             heightMap = new HeightMap(world, chunkPos);
-            heightMap.id = nextId;
-            nextId++;
-            System.out.println("New hightmap "+heightMap.id);
             heightMap.update();
             logger.info("Update chunk " + chunkPos + " took " + ((System.nanoTime() - time) / 1000 / 1000f) + " ms");
             logger.info("Found " + heightMap);
