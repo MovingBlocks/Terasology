@@ -619,14 +619,6 @@ public final class WorldRenderer {
             updateAndQueueVisibleChunks(false, false);
         }
 
-        DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
-        glCullFace(GL11.GL_FRONT);
-        getActiveCamera().setReflected(true);
-        renderWorldReflection(activeCamera);
-        getActiveCamera().setReflected(false);
-        glCullFace(GL11.GL_BACK);
-        DefaultRenderingProcess.getInstance().endRenderReflectedScene();
-
         if (config.getRendering().isDynamicShadows()
                 // Only render the shadow map once
                 && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE)) {
@@ -636,6 +628,15 @@ public final class WorldRenderer {
             //glCullFace(GL11.GL_BACK);
             DefaultRenderingProcess.getInstance().endRenderSceneShadowMap();
         }
+
+        DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
+        glCullFace(GL11.GL_FRONT);
+        getActiveCamera().setReflected(true);
+        renderWorldReflection(activeCamera);
+        getActiveCamera().setReflected(false);
+        glCullFace(GL11.GL_BACK);
+        DefaultRenderingProcess.getInstance().endRenderReflectedScene();
+
 
         renderWorld(getActiveCamera());
 
