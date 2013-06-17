@@ -87,8 +87,10 @@ public class PerBlockStorageManager {
     }
     
     public void refresh() {
-        if (getEngineReflections() == null) 
-            throw new IllegalStateException("Unable to scan for available per block storage types.");
+        if (getEngineReflections() == null) {
+            logger.error("Unable to scan for available per block storage types.");
+            return;
+        }
         scanForTeraArrays();
     }
 }
