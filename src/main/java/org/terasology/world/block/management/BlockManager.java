@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,23 +19,19 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.map.hash.TByteObjectHashMap;
-import gnu.trove.map.hash.TObjectByteHashMap;
-import org.lwjgl.BufferUtils;
+import gnu.trove.iterator.TObjectShortIterator;
+import gnu.trove.map.hash.TObjectShortHashMap;
+import gnu.trove.map.hash.TShortObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockLoader;
 
-import javax.vecmath.Vector2f;
-import java.nio.FloatBuffer;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -57,10 +53,10 @@ public class BlockManager {
     /* BLOCKS */
     private final Map<BlockUri, Block> blocksByUri     = Maps.newHashMapWithExpectedSize(256);
     private final Map<String, Block> blocksByPrefabName  = Maps.newHashMapWithExpectedSize(256);
-    private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<Block>(256);
+    private final TShortObjectHashMap<Block> blocksById = new TShortObjectHashMap<Block>(256);
 
     private int nextId = 1;
-    private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<BlockUri>(256);
+    private final TObjectShortHashMap<BlockUri> idByUri = new TObjectShortHashMap<BlockUri>(256);
 
     /* Families */
     private final Set<BlockUri> shapelessBlockDefinition = Sets.newHashSet();
@@ -70,8 +66,9 @@ public class BlockManager {
     private final Multimap<String, BlockUri> categoryLookup = HashMultimap.create();
 
     public static BlockManager getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new BlockManager();
+        }
 
         return instance;
     }
@@ -102,7 +99,7 @@ public class BlockManager {
         air.setShadowCasting(false);
         air.setAttachmentAllowed(false);
         air.setHardness((byte) 0);
-        air.setId((byte) 0);
+        air.setId((short) 0);
         air.setDisplayName("Air");
         air.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, "air"));
         blocksById.put(air.getId(), air);
@@ -111,10 +108,10 @@ public class BlockManager {
         familyByUri.put(air.getURI(), new SymmetricFamily(air.getURI(), air));
     }
 
-    public void load(Map<String, Byte> knownBlockMappings) {
+    public void load(Map<String, Short> knownBlockMappings) {
         reset();
-        for (Map.Entry<String, Byte> entry : knownBlockMappings.entrySet()) {
-            idByUri.put(new BlockUri(entry.getKey()), (byte) entry.getValue());
+        for (Map.Entry<String, Short> entry : knownBlockMappings.entrySet()) {
+            idByUri.put(new BlockUri(entry.getKey()), entry.getValue());
         }
         nextId = idByUri.size();
 
@@ -133,7 +130,7 @@ public class BlockManager {
         bindBlocks(knownBlockMappings);
     }
 
-    private void bindBlocks(Map<String, Byte> knownBlockMappings) {
+    private void bindBlocks(Map<String, Short> knownBlockMappings) {
         for (String blockUri : knownBlockMappings.keySet()) {
             Block block = getBlock(new BlockUri(blockUri));
             if (block == null) {
@@ -142,9 +139,9 @@ public class BlockManager {
         }
     }
 
-    public Map<String, Byte> getBlockIdMap() {
-        Map<String, Byte> result = Maps.newHashMapWithExpectedSize(idByUri.size());
-        TObjectByteIterator<BlockUri> iterator = idByUri.iterator();
+    public Map<String, Short> getBlockIdMap() {
+        Map<String, Short> result = Maps.newHashMapWithExpectedSize(idByUri.size());
+        TObjectShortIterator<BlockUri> iterator = idByUri.iterator();
         while (iterator.hasNext()) {
             iterator.advance();
             result.put(iterator.key().toString(), iterator.value());
@@ -199,27 +196,26 @@ public class BlockManager {
                 block = family.getBlockFor(uri);
             }
             if (block == null) {
-                return blocksById.get((byte) 0);
+                return blocksById.get((short) 0);
             }
         }
         return block;
     }
 
     public Block getBlock(Prefab prefab){
-        Block result = blocksByPrefabName.get(prefab.getName());
-        return result;
+        return blocksByPrefabName.get(prefab.getName());
     }
 
-    public Block getBlock(byte id) {
+    public Block getBlock(short id) {
         Block result = blocksById.get(id);
         if (result == null) {
-            return blocksById.get((byte) 0);
+            return blocksById.get((short) 0);
         }
         return result;
     }
 
     public Block getAir() {
-        return blocksById.get((byte) 0);
+        return blocksById.get((short) 0);
     }
 
     public void addBlockFamily(BlockFamily family) {
@@ -247,9 +243,9 @@ public class BlockManager {
     private void registerBlockFamily(BlockFamily family) {
         familyByUri.put(family.getURI(), family);
         for (Block block : family.getBlocks()) {
-            byte id = idByUri.get(block.getURI());
+            short id = idByUri.get(block.getURI());
             if (id == 0) {
-                id = (byte) nextId++;
+                id = (short) nextId++;
                 idByUri.put(block.getURI(), id);
             }
             block.setId(id);
@@ -303,6 +299,7 @@ public class BlockManager {
     }
 
     public boolean hasBlockFamily(BlockUri uri) {
-        return familyByUri.containsKey(uri) || partiallyRegisteredFamilies.containsKey(uri) || shapelessBlockDefinition.contains(uri);
+        return familyByUri.containsKey(uri) || partiallyRegisteredFamilies.containsKey(uri)
+            || shapelessBlockDefinition.contains(uri);
     }
 }

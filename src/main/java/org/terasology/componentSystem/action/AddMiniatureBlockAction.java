@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,7 +28,6 @@ import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -72,9 +71,11 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
                         Vector3i localPos = new Vector3i();
                         Vector3i globalPos = new Vector3i(x, y, z);
                         localPos.sub(globalPos, grid.getMinBounds());
-
-                        if (localPos.x >= MiniatureChunk.SIZE_X || localPos.y >= MiniatureChunk.SIZE_Y || localPos.z >= MiniatureChunk.SIZE_Z || localPos.x < 0 || localPos.y < 0 || localPos.z < 0)
+                        if (localPos.x >= MiniatureChunk.SIZE_X || localPos.y >= MiniatureChunk.SIZE_Y
+                            || localPos.z >= MiniatureChunk.SIZE_Z || localPos.x < 0 || localPos.y < 0
+                            || localPos.z < 0) {
                             continue;
+                        }
 
                         chunk.setSunlight(localPos, worldProvider.getSunlight(globalPos));
                         chunk.setLight(localPos, worldProvider.getLight(globalPos));
