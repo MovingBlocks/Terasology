@@ -50,24 +50,6 @@ public abstract class TeraArray implements Externalizable {
     protected abstract void initialize();
     
     /**
-     * This is the interface for tera array factories. Every tera array is required to implement a factory.
-     * It should be implemented as a static subclass of the corresponding tera array class and it should be called Factory.
-     *  
-     * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.Factory
-     *
-     */
-    public static interface Factory<T extends TeraArray> {
-
-        public String getId();
-        
-        public T create();
-        
-        public T create(int sizeX, int sizeY, int sizeZ);
-        
-    }
-
-    /**
      * This is the interface for serialization handlers for tera arrays. Every tera array is required to implement
      * a serialization handler. It is recommended to subclass {@link org.terasology.world.chunks.perBlockStorage.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
      * instead of using this interface directly. It should be implemented as a static subclass of the corresponding tera array class. 

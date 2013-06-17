@@ -52,7 +52,7 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         }
     }
 
-    public static class Factory implements TeraArray.Factory<TeraSparseArray8Bit> {
+    public static class Factory implements PerBlockStorageFactory<TeraSparseArray8Bit> {
         
         @Override
         public String getId() {

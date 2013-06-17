@@ -44,19 +44,19 @@ public class PerBlockStorageManager {
     private Map<String, TeraArray.SerializationHandler<? extends TeraArray>> serializersByClassName;
     private Map<ChunksProtobuf.Type, TeraArray.SerializationHandler<? extends TeraArray>> serializersByProtobufType;
     
-    private TeraArray.Factory<TeraArray> blockStorageFactory;
-    private TeraArray.Factory<TeraArray> sunlightStorageFactory;
-    private TeraArray.Factory<TeraArray> lightStorageFactory;
-    private TeraArray.Factory<TeraArray> extraStorageFactory;
+    private PerBlockStorageFactory<TeraArray> blockStorageFactory;
+    private PerBlockStorageFactory<TeraArray> sunlightStorageFactory;
+    private PerBlockStorageFactory<TeraArray> lightStorageFactory;
+    private PerBlockStorageFactory<TeraArray> extraStorageFactory;
     
     @SuppressWarnings("unchecked")
-    private Iterable<Class<? extends TeraArray.Factory<? extends TeraArray>>> getArrayFactoryClasses(Class<? extends TeraArray> arrayClass) {
+    private Iterable<Class<? extends PerBlockStorageFactory<? extends TeraArray>>> getArrayFactoryClasses(Class<? extends TeraArray> arrayClass) {
         Preconditions.checkNotNull(arrayClass, "The parameter 'arrayClass' must not be null");
         final Class<?>[] classes = arrayClass.getClasses();
-        final List<Class<? extends TeraArray.Factory<? extends TeraArray>>> result = Lists.newArrayList();
+        final List<Class<? extends PerBlockStorageFactory<? extends TeraArray>>> result = Lists.newArrayList();
         for (Class<?> factoryClass : classes) {
-            if (TeraArray.Factory.class.isAssignableFrom(factoryClass) && !Modifier.isAbstract(factoryClass.getModifiers())) {
-                result.add((Class<? extends TeraArray.Factory<? extends TeraArray>>) factoryClass);
+            if (PerBlockStorageFactory.class.isAssignableFrom(factoryClass) && !Modifier.isAbstract(factoryClass.getModifiers())) {
+                result.add((Class<? extends PerBlockStorageFactory<? extends TeraArray>>) factoryClass);
             }
         }
         return result;
@@ -104,10 +104,10 @@ public class PerBlockStorageManager {
                 return;
             }
             final String pakkage = mod != null ? mod.getModInfo().getId() : "engine";
-            final Iterable<Class<? extends TeraArray.Factory<? extends TeraArray>>> factoryClasses = getArrayFactoryClasses(arrayClass);
-            for (final Class<? extends TeraArray.Factory<? extends TeraArray>> factoryClass : factoryClasses) {
+            final Iterable<Class<? extends PerBlockStorageFactory<? extends TeraArray>>> factoryClasses = getArrayFactoryClasses(arrayClass);
+            for (final Class<? extends PerBlockStorageFactory<? extends TeraArray>> factoryClass : factoryClasses) {
                 try {
-                    final TeraArray.Factory<? extends TeraArray> factory = factoryClass.newInstance();
+                    final PerBlockStorageFactory<? extends TeraArray> factory = factoryClass.newInstance();
                     final String storageId = pakkage + ":" + factory.getId();
                     final FactoryEntry entry = new FactoryEntry(mod, storageId, factory);
                     if (factoriesById.containsKey(storageId)) {
@@ -154,9 +154,9 @@ public class PerBlockStorageManager {
         
         public final Mod mod;
         public final String id;
-        public final TeraArray.Factory factory;
+        public final PerBlockStorageFactory factory;
         
-        public FactoryEntry(Mod mod, String id, TeraArray.Factory factory) {
+        public FactoryEntry(Mod mod, String id, PerBlockStorageFactory factory) {
             this.mod = mod;
             this.id = Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
             this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory must not be null");
@@ -233,10 +233,10 @@ public class PerBlockStorageManager {
     }
     
     @SuppressWarnings("unchecked")
-    public TeraArray.Factory<TeraArray> getArrayFactory(String id) {
+    public PerBlockStorageFactory<TeraArray> getArrayFactory(String id) {
         final FactoryEntry entry = getArrayFactoryEntry(id);
         if (entry != null)
-            return (TeraArray.Factory<TeraArray>) entry.factory;
+            return (PerBlockStorageFactory<TeraArray>) entry.factory;
         return null;
     }
     
