@@ -14,7 +14,9 @@ public class SystemConfig {
         DEBUG_STAGE_TRANSPARENT_NORMALS,
         DEBUG_STAGE_TRANSPARENT_DEPTH,
         DEBUG_STAGE_TRANSPARENT_NORMALS_ALPHA,
-        DEBUG_STAGE_SHADOW_MAP
+        DEBUG_STAGE_SHADOW_MAP,
+        DEBUG_STAGE_SSAO,
+        DEBUG_STAGE_SOBEL
     }
 
     private long dayNightLengthInMs = 1800000;

@@ -62,6 +62,14 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneTransparent");
         program.setInt("texSceneTransparentDepth", texId++);
 
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        DefaultRenderingProcess.getInstance().bindFboTexture("ssaoBlurred1");
+        program.setInt("texSSAO", texId++);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        DefaultRenderingProcess.getInstance().bindFboTexture("sobel");
+        program.setInt("texSobel", texId++);
+
         program.setInt("debugRenderingStage", CoreRegistry.get(Config.class).getSystem().getDebugRenderingStage());
     }
 }
