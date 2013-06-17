@@ -58,7 +58,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
             {
                 min.chunkMesh = worldRenderer.getChunkTesselator().generateMinaturizedMesh(min.miniatureChunk);
                 min.chunkMesh.generateVBOs();
-                min.chunkMesh._vertexElements = null;
+                min.chunkMesh.vertexElements = null;
             }
 
             //min.orientation += delta * 15f;

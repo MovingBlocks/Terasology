@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+package org.terasology.rendering.renderingProcesses;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -25,6 +26,7 @@ import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.paths.PathManager;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -268,11 +270,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         rtFullHeight = overwriteRtHeight;
 
         if (overwriteRtWidth == 0) {
-            rtFullWidth = Display.getWidth();
+            rtFullWidth = org.lwjgl.opengl.Display.getWidth();
         }
 
         if (overwriteRtHeight == 0) {
-            rtFullHeight = Display.getHeight();
+            rtFullHeight = org.lwjgl.opengl.Display.getHeight();
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
@@ -745,12 +747,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             shader.enable();
         }
 
-        renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+        renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), org.lwjgl.opengl.Display.getHeight());
 
         if (config.getRendering().isOculusVrSupport()) {
             updateOcShaderParametersForVP(shader, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.OCULUS_RIGHT_EYE);
 
-            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+            renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), Display.getHeight());
         }
     }
 

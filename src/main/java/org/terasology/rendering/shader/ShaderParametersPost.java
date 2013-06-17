@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -23,13 +22,12 @@ import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import java.nio.FloatBuffer;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;

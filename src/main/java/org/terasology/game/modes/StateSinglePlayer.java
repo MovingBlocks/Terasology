@@ -31,7 +31,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;

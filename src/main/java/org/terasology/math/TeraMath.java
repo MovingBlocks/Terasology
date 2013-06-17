@@ -51,7 +51,7 @@ public final class TeraMath {
     }
 
     /**
-     * Returns the absolute value.
+     * Returns the absolute value (float variant).
      *
      * @param d
      * @return the absolute value
@@ -61,7 +61,7 @@ public final class TeraMath {
     }
 
     /**
-     * Returns the absolute value.
+     * Returns the absolute value (double variant).
      *
      * @param d
      * @return
@@ -70,11 +70,24 @@ public final class TeraMath {
         return (d >= 0) ? d : -d;
     }
 
+
+    /**
+     * Fast floor function (double variant).
+     *
+     * @param d
+     * @return
+     */
     public static double fastFloor(double d) {
         int i = (int) d;
         return (d < 0 && d != i) ? i - 1 : i;
     }
 
+    /**
+     * Fast floor function (float variant).
+     *
+     * @param d
+     * @return
+     */
     public static float fastFloor(float d) {
         int i = (int) d;
         return (d < 0 && d != i) ? i - 1 : i;
@@ -82,6 +95,9 @@ public final class TeraMath {
 
     /**
      * Clamps a given value to be an element of [0..1].
+     *
+     * @param value
+     * @return
      */
     public static double clamp(double value) {
         if (value > 1.0)
@@ -91,6 +107,14 @@ public final class TeraMath {
         return value;
     }
 
+    /**
+     * Clamps a given value to be an element of [min..max].
+     *
+     * @param value
+     * @param min
+     * @param max
+     * @return
+     */
     public static double clamp(double value, double min, double max) {
         if (value > max)
             return max;
@@ -99,6 +123,14 @@ public final class TeraMath {
         return value;
     }
 
+    /**
+     * Clamps a given value to be an element of [min..max].
+     *
+     * @param value
+     * @param min
+     * @param max
+     * @return
+     */
     public static float clamp(float value, float min, float max) {
         if (value > max)
             return max;
@@ -107,6 +139,14 @@ public final class TeraMath {
         return value;
     }
 
+    /**
+     * Clamps a given value to be an element of [min..max].
+     *
+     * @param value
+     * @param min
+     * @param max
+     * @return
+     */
     public static int clamp(int value, int min, int max) {
         if (value > max)
             return max;
@@ -131,10 +171,16 @@ public final class TeraMath {
         return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
     }
 
+    /**
+     * Linear interpolation.
+     */
     public static double lerp(double x1, double x2, double p) {
         return x1 * (1.0 - p) + x2 * p;
     }
 
+    /**
+     * Linear interpolation.
+     */
     public static float lerpf(float x1, float x2, float p) {
         return x1 * (1.0f - p) + x2 * p;
     }
@@ -241,6 +287,12 @@ public final class TeraMath {
         return (z >> chunkPowerZ);
     }
 
+    /**
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param z The Z-coordinate of the block
+     * @return The Z-coordinate of the chunk
+     */
     public static int calcChunkPosZ(int z) {
         return calcChunkPosZ(z, Chunk.POWER_Z);
     }

@@ -24,7 +24,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.BlockGrid;
-import org.terasology.world.MiniatureChunk;
+import org.terasology.world.chunks.MiniatureChunk;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;

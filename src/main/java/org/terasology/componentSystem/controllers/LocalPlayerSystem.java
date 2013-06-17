@@ -16,7 +16,6 @@
 package org.terasology.componentSystem.controllers;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.TeraOVR;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
@@ -68,8 +67,8 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.character.CharacterMovementComponent;
-import org.terasology.rendering.AABBRenderer;
-import org.terasology.rendering.BlockOverlayRenderer;
+import org.terasology.rendering.renderer.AABBRenderer;
+import org.terasology.rendering.renderer.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.gui.widgets.UIImage;
