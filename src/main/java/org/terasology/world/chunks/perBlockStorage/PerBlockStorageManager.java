@@ -157,4 +157,20 @@ public class PerBlockStorageManager {
         }
         scanForTeraArrays();
     }
+    
+    public TeraArray.Factory<? extends TeraArray> getFactory(String id) {
+        return factoriesById.get(Preconditions.checkNotNull(id, "The parameter 'id' must not be null"));
+    }
+    
+    public TeraArray.Factory<? extends TeraArray> getFactory(ChunksProtobuf.Type protobufType) {
+        return factoriesById.get(Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null"));
+    }
+    
+    public TeraArray.SerializationHandler<? extends TeraArray> getSerializationHandler(String id) {
+        return handlersById.get(Preconditions.checkNotNull(id, "The parameter 'id' must not be null"));
+    }
+    
+    public TeraArray.SerializationHandler<? extends TeraArray> getSerializationHandler(ChunksProtobuf.Type protobufType) {
+        return handlersById.get(Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null"));
+    }
 }
