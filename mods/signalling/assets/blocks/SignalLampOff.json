@@ -1,7 +1,6 @@
 {
     "displayName": "Signal Lamp",
     "entity" : {
-        "prefab" : "signalling:SignalLamp",
-        "mode" : "persistent"
+        "prefab" : "signalling:SignalLampOff"
     }
 }

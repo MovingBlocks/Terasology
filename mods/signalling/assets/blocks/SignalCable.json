@@ -2,7 +2,6 @@
     "displayName": "Signal Cable",
     "tile"  : "signalling:SignalStripedCable",
     "entity" : {
-        "prefab" : "signalling:SignalCable",
-        "mode" : "persistent"
+        "prefab" : "signalling:SignalCable"
     }
 }
