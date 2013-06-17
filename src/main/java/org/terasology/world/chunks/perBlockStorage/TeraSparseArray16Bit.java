@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
 
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.Type;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
@@ -116,6 +118,11 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         @Override
         public Class<TeraSparseArray16Bit> getArrayClass() {
             return TeraSparseArray16Bit.class;
+        }
+
+        @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.SparseArray16Bit;
         }
 
         @Override
