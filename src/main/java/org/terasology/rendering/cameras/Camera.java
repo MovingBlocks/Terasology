@@ -43,6 +43,7 @@ public abstract class Camera {
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum viewFrustum = new ViewFrustum();
+    protected final ViewFrustum viewFrustumReflected = new ViewFrustum();
 
     /* MATRICES */
     protected Matrix4f projectionMatrix = new Matrix4f();
@@ -52,10 +53,13 @@ public abstract class Camera {
     protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
     protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
 
+    protected Matrix4f viewMatrixReflected = new Matrix4f();
+    protected Matrix4f normViewMatrixReflected = new Matrix4f();
+
     /* USED FOR DIRTY CHECKS */
     protected Vector3f cachedPosition = new Vector3f();
     protected Vector3f cachedViewigDirection = new Vector3f();
-    protected float lastFov = 0.0f;
+    protected float cachedFov = 0.0f;
 
     /* ETC */
     protected boolean reflected = false;
@@ -66,11 +70,6 @@ public abstract class Camera {
     public void lookThrough() {
         loadProjectionMatrix();
         loadModelViewMatrix();
-
-        if (reflected) {
-            glTranslatef(0.0f, 2f * ((float) -position.y + 32f), 0.0f);
-            glScalef(1.0f, -1.0f, 1.0f);
-        }
     }
 
 
@@ -80,10 +79,6 @@ public abstract class Camera {
     public void lookThroughNormalized() {
         loadProjectionMatrix();
         loadNormalizedModelViewMatrix();
-
-        if (reflected) {
-            glScalef(1.0f, -1.0f, 1.0f);
-        }
     }
 
     public void updateFrustum() {
@@ -91,7 +86,8 @@ public abstract class Camera {
             return;
         }
 
-        viewFrustum.updateFrustum(TeraMath.matrixToBuffer(getViewMatrix()), TeraMath.matrixToBuffer(getProjectionMatrix()));
+        viewFrustum.updateFrustum(TeraMath.matrixToBuffer(viewMatrix), TeraMath.matrixToBuffer(projectionMatrix));
+        viewFrustumReflected.updateFrustum(TeraMath.matrixToBuffer(viewMatrixReflected), TeraMath.matrixToBuffer(projectionMatrix));
     }
 
     public abstract void loadProjectionMatrix();
@@ -103,22 +99,6 @@ public abstract class Camera {
     public abstract void updateMatrices();
 
     public abstract void updateMatrices(float fov);
-
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public Vector3f getViewingDirection() {
-        return viewingDirection;
-    }
-
-    public Vector3f getUp() {
-        return up;
-    }
-
-    public ViewFrustum getViewFrustum() {
-        return viewFrustum;
-    }
 
     public void update(float delta) {
         double diff = Math.abs(activeFov - targetFov);
@@ -151,12 +131,28 @@ public abstract class Camera {
         this.reflected = reflected;
     }
 
+    public void updatePrevViewProjectionMatrix() {
+        prevViewProjectionMatrix.set(viewProjectionMatrix);
+    }
+
     public float getClipHeight() {
         return 31.5f;
     }
 
     public Matrix4f getViewMatrix() {
-        return viewMatrix;
+        if (!reflected) {
+            return viewMatrix;
+        }
+
+        return viewMatrixReflected;
+    }
+
+    public Matrix4f getNormViewMatrix() {
+        if (!reflected) {
+            return normViewMatrix;
+        }
+
+        return normViewMatrixReflected;
     }
 
     public Matrix4f getProjectionMatrix() {
@@ -173,5 +169,25 @@ public abstract class Camera {
 
     public Matrix4f getPrevViewProjectionMatrix() {
         return prevViewProjectionMatrix;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public Vector3f getViewingDirection() {
+        return viewingDirection;
+    }
+
+    public Vector3f getUp() {
+        return up;
+    }
+
+    public ViewFrustum getViewFrustum() {
+        return viewFrustum;
+    }
+
+    public ViewFrustum getViewFrustumReflected() {
+        return viewFrustumReflected;
     }
 }

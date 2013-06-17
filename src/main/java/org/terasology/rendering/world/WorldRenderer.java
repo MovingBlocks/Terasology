@@ -128,6 +128,7 @@ public final class WorldRenderer {
     /* RENDERING */
     private final LinkedList<Chunk> renderQueueChunksOpaque = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksOpaqueShadow = Lists.newLinkedList();
+    private final LinkedList<Chunk> renderQueueChunksOpaqueReflection = Lists.newLinkedList();
     private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaBlend = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
     private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaReject = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
 
@@ -535,6 +536,10 @@ public final class WorldRenderer {
                         c.setAnimated(false);
                 }
 
+                if (isChunkVisibleReflection(c)) {
+                    renderQueueChunksOpaqueReflection.add(c);
+                }
+
                 // Process all chunks in the area, not only the visible ones
                 if (processChunkUpdates && processChunkUpdate(c)) {
                     processedChunks++;
@@ -667,6 +672,8 @@ public final class WorldRenderer {
 
             PerformanceMonitor.endActivity();
         }
+
+        activeCamera.updatePrevViewProjectionMatrix();
     }
 
     public void renderWorld(Camera camera) {
@@ -771,8 +778,8 @@ public final class WorldRenderer {
         if (config.getRendering().isReflectiveWater()) {
             camera.lookThrough();
 
-            for (Chunk c : renderQueueChunksOpaque)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.REFLECTION);
+            while (renderQueueChunksOpaqueReflection.size() > 0)
+                renderChunk(renderQueueChunksOpaqueReflection.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.REFLECTION);
         }
 
         PerformanceMonitor.endActivity();
@@ -1107,6 +1114,10 @@ public final class WorldRenderer {
 
     public boolean isChunkVisible(Camera cam, Chunk c) {
         return cam.getViewFrustum().intersects(c.getAABB());
+    }
+
+    public boolean isChunkVisibleReflection(Chunk c) {
+        return activeCamera.getViewFrustumReflected().intersects(c.getAABB());
     }
 
     public boolean isChunkVisibleLight(Chunk c) {

@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.cameras;
 
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.TeraMath;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Simple default camera.
@@ -35,18 +35,18 @@ public class PerspectiveCamera extends Camera {
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(projectionMatrix));
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(getProjectionMatrix()));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(viewMatrix));
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(getViewMatrix()));
     }
 
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(normViewMatrix));
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(getNormViewMatrix()));
     }
 
     public void update(float deltaT) {
@@ -59,12 +59,10 @@ public class PerspectiveCamera extends Camera {
     }
 
     public void updateMatrices(float fov) {
-        prevViewProjectionMatrix.set(viewProjectionMatrix);
-
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
                 && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
-                && lastFov == fov) {
+                && cachedFov == fov) {
             return;
         }
 
@@ -79,6 +77,16 @@ public class PerspectiveCamera extends Camera {
 
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x + right.x, up.y + right.y, up.z + right.z);
 
+        Matrix4f reflectionMatrix = new Matrix4f();
+        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
+        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
+        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f,1.0f);
+        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
@@ -87,7 +95,7 @@ public class PerspectiveCamera extends Camera {
         cachedViewigDirection.set(getViewingDirection());
         cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
         cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
-        lastFov = fov;
+        cachedFov = fov;
 
         updateFrustum();
     }

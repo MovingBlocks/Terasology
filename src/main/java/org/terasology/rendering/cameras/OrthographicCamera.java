@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.TeraMath;
+import org.terasology.model.structures.ViewFrustum;
 
 import javax.vecmath.Matrix4f;
 
@@ -85,5 +86,9 @@ public class OrthographicCamera extends Camera {
         cachedViewigDirection.set(getViewingDirection());
 
         updateFrustum();
+    }
+
+    public ViewFrustum getViewFrustumReflected() {
+        throw new RuntimeException("Not yet implemented!");
     }
 }

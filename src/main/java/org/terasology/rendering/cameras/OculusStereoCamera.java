@@ -18,6 +18,7 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.model.structures.ViewFrustum;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -40,8 +41,49 @@ public class OculusStereoCamera extends Camera {
     protected Matrix4f viewMatrixLeftEye = new Matrix4f();
     protected Matrix4f viewMatrixRightEye = new Matrix4f();
 
+    protected Matrix4f viewMatrixReflectedLeftEye = new Matrix4f();
+    protected Matrix4f viewMatrixReflectedRightEye = new Matrix4f();
+
+    protected ViewFrustum viewFrustumLeftEye = new ViewFrustum();
+    protected ViewFrustum viewFrustumRightEye = new ViewFrustum();
+    protected ViewFrustum viewFrustumReflectedLeftEye = new ViewFrustum();
+    protected ViewFrustum viewFrustumReflectedRightEye = new ViewFrustum();
+
     protected Matrix4f viewProjectionMatrixLeftEye = new Matrix4f();
     protected Matrix4f viewProjectionMatrixRightEye = new Matrix4f();
+
+    public void updateFrustum() {
+        super.updateFrustum();
+
+        viewFrustumLeftEye.updateFrustum(TeraMath.matrixToBuffer(viewMatrixLeftEye), TeraMath.matrixToBuffer(projectionMatrixLeftEye));
+        viewFrustumRightEye.updateFrustum(TeraMath.matrixToBuffer(viewMatrixRightEye), TeraMath.matrixToBuffer(projectionMatrixRightEye));
+        viewFrustumReflectedLeftEye.updateFrustum(TeraMath.matrixToBuffer(viewMatrixReflectedLeftEye), TeraMath.matrixToBuffer(projectionMatrixLeftEye));
+        viewFrustumReflectedRightEye.updateFrustum(TeraMath.matrixToBuffer(viewMatrixReflectedRightEye), TeraMath.matrixToBuffer(projectionMatrixRightEye));
+    }
+
+    public ViewFrustum getViewFrustum() {
+        WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
+
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+            return viewFrustumLeftEye;
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+            return viewFrustumRightEye;
+        }
+
+        return null;
+    }
+
+    public ViewFrustum getViewFrustumReflected() {
+        WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
+
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+            return viewFrustumReflectedLeftEye;
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+            return viewFrustumReflectedRightEye;
+        }
+
+        return null;
+    }
 
     public Matrix4f getViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
@@ -59,9 +101,15 @@ public class OculusStereoCamera extends Camera {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
         if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
-            return viewMatrixLeftEye;
+            if (!reflected) {
+                return viewMatrixLeftEye;
+            }
+            return viewMatrixReflectedLeftEye;
         } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
-            return viewMatrixRightEye;
+            if (!reflected) {
+                return viewMatrixRightEye;
+            }
+            return viewMatrixReflectedRightEye;
         }
 
         return null;
@@ -133,6 +181,16 @@ public class OculusStereoCamera extends Camera {
         viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
+        Matrix4f reflectionMatrix = new Matrix4f();
+        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
+        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
+        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f,1.0f);
+        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+
         final float halfIPD = OculusVrHelper.getInterpupillaryDistance() * 0.5f;
 
         Matrix4f viewTranslationLeftEye = new Matrix4f();
@@ -147,6 +205,9 @@ public class OculusStereoCamera extends Camera {
 
         viewMatrixLeftEye.mul(viewMatrix, viewTranslationLeftEye);
         viewMatrixRightEye.mul(viewMatrix, viewTranslationRightEye);
+
+        viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
+        viewMatrixReflectedRightEye.mul(viewMatrixReflected, viewTranslationRightEye);
 
         viewProjectionMatrixLeftEye = TeraMath.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = TeraMath.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
