@@ -136,7 +136,14 @@ public final class ChunkTessellator {
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             // Vertices double to account for light info
-            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].flags.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
+            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(
+                    mesh._vertexElements[j].vertices.size() * 4 /* POSITION */
+                    + mesh._vertexElements[j].tex.size() * 4 /* TEX0 (UV0 and flags) */
+                    + mesh._vertexElements[j].tex.size() * 4 /* TEX1 (lighting data) */
+                    + mesh._vertexElements[j].flags.size() * 4 /* FLAGS */
+                    + mesh._vertexElements[j].color.size() * 4 /* COLOR */
+                    + mesh._vertexElements[j].normals.size() * 4 /* NORMALS */
+            );
 
             int cTex = 0;
             int cColor = 0;
@@ -145,18 +152,23 @@ public final class ChunkTessellator {
 
                 Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
 
+                /* POSITION */
                 mesh._vertexElements[j].finalVertices.putFloat(vertexPos.x);
                 mesh._vertexElements[j].finalVertices.putFloat(vertexPos.y);
                 mesh._vertexElements[j].finalVertices.putFloat(vertexPos.z);
 
+                /* UV0 / TEX DATA 0 */
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 1));
+
+                /* FLAGS */
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].flags.get(cFlags));
 
                 float[] result = new float[3];
                 Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i+1), mesh._vertexElements[j].normals.get(i+2));
                 calcLightingValuesForVertexPos(worldView, vertexPos, result, normal);
 
+                /* LIGHTING DATA / TEX DATA 1 */
                 mesh._vertexElements[j].finalVertices.putFloat(result[0]);
                 mesh._vertexElements[j].finalVertices.putFloat(result[1]);
                 mesh._vertexElements[j].finalVertices.putFloat(result[2]);
@@ -167,8 +179,10 @@ public final class ChunkTessellator {
                         mesh._vertexElements[j].color.get(cColor + 2),
                         mesh._vertexElements[j].color.get(cColor) + 3);
 
+                /* PACKED PACKED COLOR */
                 mesh._vertexElements[j].finalVertices.putInt(packedColor);
 
+                /* NORMALS */
                 mesh._vertexElements[j].finalVertices.putFloat(normal.x);
                 mesh._vertexElements[j].finalVertices.putFloat(normal.y);
                 mesh._vertexElements[j].finalVertices.putFloat(normal.z);

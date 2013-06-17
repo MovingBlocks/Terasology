@@ -103,12 +103,18 @@ public class ChunkMesh {
     }
 
     /* CONST */
-    private static final int STRIDE = (3 + 3 + 3 + 3 + 1) * 4;
-    private static final int OFFSET_VERTEX = 0;
-    private static final int OFFSET_TEX_0 = (3 * 4);
-    private static final int OFFSET_TEX_1 = ((3 + 3) * 4);
-    private static final int OFFSET_COLOR = ((3 + 3 + 3) * 4);
-    private static final int OFFSET_NORMAL = ((3 + 3 + 3 + 1) * 4);
+    public static final int SIZE_VERTEX = 3;
+    public static final int SIZE_TEX0 = 3;
+    public static final int SIZE_TEX1 = 3;
+    public static final int SIZE_COLOR = 1;
+    public static final int SIZE_NORMAL = 3;
+
+    public static final int OFFSET_VERTEX = 0;
+    public static final int OFFSET_TEX_0 = OFFSET_VERTEX + SIZE_VERTEX * 4;
+    public static final int OFFSET_TEX_1 = OFFSET_TEX_0 + SIZE_TEX0 * 4;
+    public static final int OFFSET_COLOR = OFFSET_TEX_1 + SIZE_TEX1 * 4;
+    public static final int OFFSET_NORMAL = OFFSET_COLOR + SIZE_COLOR * 4;
+    public static final int STRIDE = OFFSET_NORMAL + SIZE_NORMAL * 4;
 
     /* VERTEX DATA */
     private final int[] _vertexBuffers = new int[4];
@@ -203,15 +209,15 @@ public class ChunkMesh {
                 GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, _idxBuffers[id]);
                 GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, _vertexBuffers[id]);
 
-                glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
+                glVertexPointer(SIZE_VERTEX, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
 
                 GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-                glTexCoordPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
+                glTexCoordPointer(SIZE_TEX0, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
 
                 GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-                glTexCoordPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
+                glTexCoordPointer(SIZE_TEX1, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
 
-                glColorPointer(4, GL11.GL_UNSIGNED_BYTE, STRIDE, OFFSET_COLOR);
+                glColorPointer(SIZE_COLOR*4, GL11.GL_UNSIGNED_BYTE, STRIDE, OFFSET_COLOR);
 
                 glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
 
