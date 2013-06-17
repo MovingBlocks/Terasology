@@ -21,10 +21,7 @@ import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.math.Direction;
-import org.terasology.math.Region3i;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.*;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldBiomeProvider;
@@ -164,10 +161,13 @@ public final class ChunkTessellator {
                 mesh._vertexElements[j].finalVertices.putFloat(result[1]);
                 mesh._vertexElements[j].finalVertices.putFloat(result[2]);
 
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 1));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 2));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 3));
+                final int packedColor = TeraMath.packColor(
+                        mesh._vertexElements[j].color.get(cColor),
+                        mesh._vertexElements[j].color.get(cColor + 1),
+                        mesh._vertexElements[j].color.get(cColor + 2),
+                        mesh._vertexElements[j].color.get(cColor) + 3);
+
+                mesh._vertexElements[j].finalVertices.putInt(packedColor);
 
                 mesh._vertexElements[j].finalVertices.putFloat(normal.x);
                 mesh._vertexElements[j].finalVertices.putFloat(normal.y);
