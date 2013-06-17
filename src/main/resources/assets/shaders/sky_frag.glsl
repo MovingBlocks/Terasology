@@ -31,6 +31,8 @@ uniform float moonExponent;
 const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 #define HIGHLIGHT_BLEND_START 0.1
+#define SUN_HIGHLIGHT_INTENSITY_FACTOR 16.0
+#define MOON_HIGHLIGHT_INTENSITY_FACTOR 2.0
 
 void main () {
     vec3 v = normalize (position.xyz);
@@ -41,7 +43,7 @@ void main () {
 
     float sunHighlight = 0.0;
     if (lDotV >= 0.0 && l.y >= 0.0) {
-       sunHighlight = pow(lDotV, sunExponent) * 16.0;
+       sunHighlight = pow(lDotV, sunExponent) * SUN_HIGHLIGHT_INTENSITY_FACTOR;
     }
     if (l.y < HIGHLIGHT_BLEND_START && l.y >= 0.0) {
        sunHighlight *= 1.0 - (HIGHLIGHT_BLEND_START - l.y) / HIGHLIGHT_BLEND_START;
@@ -49,7 +51,7 @@ void main () {
 
     float moonHighlight = 0.0;
     if (negLDotV >= 0.0 && -l.y >= 0.0) {
-       moonHighlight = pow(negLDotV, moonExponent);
+       moonHighlight = pow(negLDotV, moonExponent) * MOON_HIGHLIGHT_INTENSITY_FACTOR;
     }
     if (-l.y < HIGHLIGHT_BLEND_START && -l.y >= 0.0) {
        moonHighlight *= 1.0 - (HIGHLIGHT_BLEND_START + l.y) / HIGHLIGHT_BLEND_START;
