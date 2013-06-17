@@ -40,8 +40,6 @@ void main() {
     float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r;
     vec4 normalsOpaque = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
     vec4 colorTransparent = texture2D(texSceneTransparent, gl_TexCoord[0].xy);
-    float depthTransparent = texture2D(texSceneTransparentDepth, gl_TexCoord[0].xy).r;
-    vec4 normalsTransparent = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy);
 
 #ifdef SSAO
     float ssao = texture2D(texSsao, gl_TexCoord[0].xy).x;
@@ -54,29 +52,10 @@ void main() {
 #endif
 
     vec4 color = vec4(0.0);
-    vec4 normals = vec4(0.0);
+    vec4 normals = normalsOpaque;
 
-    // Combine transparent and opaque RTs
-    if (depthTransparent < depthOpaque) {
-        // TODO: Fix alpha blending...
-        //float fade = 1.0 - colorTransparent.a;
-        float fade = 0.0;
-        // Detect water in the transparent RT...
-        if (normalsTransparent.a > 0.99) {
-            // ... and fade out at the shore
-            float linDepthOpaque = linDepth(depthOpaque);
-            float linDepthTransparent = linDepth(depthTransparent);
-
-            float depthDiff = linDepthOpaque - linDepthTransparent;
-            fade = clamp((shoreEnd - depthDiff) / (shoreEnd - shoreStart), 0.0, 1.0);
-        }
-
-        normals = mix(normalsTransparent, normalsOpaque, fade);
-        color = mix(colorTransparent, colorOpaque, fade);
-    } else {
-        normals = normalsOpaque;
-        color = colorOpaque;
-    }
+    float fade = clamp(1.0 - colorTransparent.a, 0.0, 1.0);
+    color = mix(colorTransparent, colorOpaque, fade);
 
     gl_FragData[0].rgba = color.rgba;
     gl_FragData[1].rgba = normals.rgba;

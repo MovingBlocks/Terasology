@@ -155,29 +155,67 @@ public class BlockEntitySystem implements EventHandlerSystem {
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
 
-        EntityRef particlesEntity = entityManager.create();
-        particlesEntity.addComponent(new LocationComponent(blockComp.getPosition().toVector3f()));
+        Block block = worldProvider.getBlock(blockComp.getPosition());
 
-        BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
-        particleEffect.spawnCount = 64;
-        particleEffect.blockType = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
-        particleEffect.initialVelocityRange.set(4, 4, 4);
-        particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
-        particleEffect.destroyEntityOnCompletion = true;
-        particleEffect.minSize = 0.05f;
-        particleEffect.maxSize = 0.1f;
-        particleEffect.minLifespan = 1f;
-        particleEffect.maxLifespan = 1.5f;
-        particleEffect.targetVelocity.set(0, -5, 0);
-        particleEffect.acceleration.set(2f, 2f, 2f);
-        particleEffect.collideWithBlocks = true;
-        particlesEntity.addComponent(particleEffect);
+        EntityRef blockParticlesEntity = entityManager.create();
+        blockParticlesEntity.addComponent(new LocationComponent(blockComp.getPosition().toVector3f()));
+        BlockParticleEffectComponent blockParticleEffect = createDefaultBlockParticleEffect(block);
+        blockParticlesEntity.addComponent(blockParticleEffect);
+
+        if (block.isDebrisOnDestroy()) {
+            EntityRef smokeParticlesEntity = entityManager.create();
+            smokeParticlesEntity.addComponent(new LocationComponent(blockComp.getPosition().toVector3f()));
+            BlockParticleEffectComponent particleEffect = createDustParticleEffect();
+            smokeParticlesEntity.addComponent(particleEffect);
+        }
 
         // TODO: Don't play this if destroyed?
         // TODO: Configurable via block definition
         audioManager.playSound(Assets.getSound("engine:Dig"), 1.0f);
     }
 
+    private BlockParticleEffectComponent createDefaultBlockParticleEffect(Block block) {
+        BlockParticleEffectComponent blockParticleEffect = new BlockParticleEffectComponent();
+        blockParticleEffect.spawnCount = 64;
+        blockParticleEffect.blockType = block.getBlockFamily();
+        blockParticleEffect.initialVelocityRange.set(4, 4, 4);
+        blockParticleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
+        blockParticleEffect.destroyEntityOnCompletion = true;
+        blockParticleEffect.minSize = 0.05f;
+        blockParticleEffect.maxSize = 0.1f;
+        blockParticleEffect.minLifespan = 1f;
+        blockParticleEffect.maxLifespan = 1.5f;
+        blockParticleEffect.targetVelocity.set(0, -5, 0);
+        blockParticleEffect.acceleration.set(2f, 2f, 2f);
+        blockParticleEffect.collideWithBlocks = true;
+        blockParticleEffect.randBlockTexDisplacement = true;
+
+
+        return blockParticleEffect;
+    }
+
+    private BlockParticleEffectComponent createDustParticleEffect() {
+        BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
+        particleEffect.spawnCount = 64;
+        particleEffect.initialVelocityRange.set(4, 4, 4);
+        particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
+        particleEffect.destroyEntityOnCompletion = true;
+        particleEffect.minSize = 0.25f;
+        particleEffect.maxSize = 1f;
+        particleEffect.minLifespan = 1f;
+        particleEffect.maxLifespan = 1.5f;
+        particleEffect.targetVelocity.set(0, 2, 0);
+        particleEffect.acceleration.set(2f, 2f, 2f);
+        particleEffect.collideWithBlocks = true;
+        particleEffect.texture = Assets.getTexture("engine:fx_smoke");
+        particleEffect.blendMode = BlockParticleEffectComponent.ParticleBlendMode.ADD;
+        particleEffect.color.w = 0.5f;
+        particleEffect.color.x = 216.0f / 255.0f;
+        particleEffect.color.y = 199.0f / 255.0f;
+        particleEffect.color.z = 158.0f / 255.0f;
+
+        return particleEffect;
+    }
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onReplaceAroundBlocks(BlockChangedEvent event, EntityRef entity) {

@@ -673,7 +673,9 @@ public final class WorldRenderer {
         if (config.getSystem().isDebugRenderWireframe())
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque(true);
+        DefaultRenderingProcess.getInstance().clear();
+        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
+
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render Sky");
         camera.lookThroughNormalized();
@@ -715,8 +717,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
-        DefaultRenderingProcess.getInstance().beginRenderSceneTransparent(true);
-
+        DefaultRenderingProcess.getInstance().beginRenderSceneTransparent();
 
         PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
 
@@ -732,6 +733,9 @@ public final class WorldRenderer {
             renderChunk(renderQueueChunksSortedAlphaBlend.poll(), ChunkMesh.RENDER_PHASE.ALPHA_BLEND, camera, ChunkRenderMode.DEFAULT);
         }
 
+        if (headUnderWater)
+            glEnable(GL11.GL_CULL_FACE);
+
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
@@ -743,7 +747,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
 
         DefaultRenderingProcess.getInstance().endRenderSceneTransparent();
-        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque(false);
+        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
 
         PerformanceMonitor.startActivity("Render Overlays");
 
@@ -752,9 +756,6 @@ public final class WorldRenderer {
         }
 
         PerformanceMonitor.endActivity();
-
-        if (headUnderWater)
-            glEnable(GL11.GL_CULL_FACE);
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 

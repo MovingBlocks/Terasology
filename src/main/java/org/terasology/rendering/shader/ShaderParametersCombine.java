@@ -63,14 +63,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneTransparent.bindTexture();
             program.setInt("texSceneTransparent", texId++);
-
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneTransparent.bindDepthTexture();
-            program.setInt("texSceneTransparentDepth", texId++);
-
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneTransparent.bindNormalsTexture();
-            program.setInt("texSceneTransparentNormals", texId++);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
