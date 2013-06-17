@@ -16,16 +16,9 @@
 package org.terasology.config;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.world.chunks.perBlockStorage.TeraArray;
-import org.terasology.world.chunks.perBlockStorage.TeraArrays;
-import org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit;
-import org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -40,11 +33,8 @@ import com.google.gson.JsonSerializer;
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
  */
-@SuppressWarnings("rawtypes")
 public final class AdvancedConfig {
     
-    private static final Logger logger = LoggerFactory.getLogger(AdvancedConfig.class);
-
     private String blocksFactory, sunlightFactory, lightFactory, extraFactory;
     private boolean chunkDeflationEnabled, chunkDeflationLoggingEnabled;
     private boolean advancedMonitoringEnabled, advancedMonitorVisibleAtStartup;
@@ -55,22 +45,8 @@ public final class AdvancedConfig {
         return blocksFactory;
     }
     
-    public TeraArray.Factory getBlocksFactory() {
-        return requireTeraArrayFactory(blocksFactory);
-    }
-    
     public AdvancedConfig setBlocksFactory(String factory) {
-        checkContainsTeraArrayFactory(factory);
         blocksFactory = factory;
-        return this;
-    }
-    
-    public AdvancedConfig setBlocksFactoryDontThrow(String factory) {
-        if (containsTeraArrayFactory(factory)) {
-            blocksFactory = factory;
-        } else {
-            logger.warn("TeraArray factory does not exist: '{}'", factory);
-        }
         return this;
     }
     
@@ -78,22 +54,8 @@ public final class AdvancedConfig {
         return sunlightFactory;
     }
     
-    public TeraArray.Factory getSunlightFactory() {
-        return requireTeraArrayFactory(sunlightFactory);
-    }
-    
     public AdvancedConfig setSunlightFactory(String factory) {
-        checkContainsTeraArrayFactory(factory);
         sunlightFactory = factory;
-        return this;
-    }
-    
-    public AdvancedConfig setSunlightFactoryDontThrow(String factory) {
-        if (containsTeraArrayFactory(factory)) {
-            sunlightFactory = factory;
-        } else {
-            logger.warn("TeraArray factory does not exist: '{}'", factory);
-        }
         return this;
     }
     
@@ -101,22 +63,8 @@ public final class AdvancedConfig {
         return lightFactory;
     }
     
-    public TeraArray.Factory getLightFactory() {
-        return requireTeraArrayFactory(lightFactory);
-    }
-    
     public AdvancedConfig setLightFactory(String factory) {
-        checkContainsTeraArrayFactory(factory);
         lightFactory = factory;
-        return this;
-    }
-    
-    public AdvancedConfig setLightFactoryDontThrow(String factory) {
-        if (containsTeraArrayFactory(factory)) {
-            lightFactory = factory;
-        } else {
-            logger.warn("TeraArray factory does not exist: '{}'", factory);
-        }
         return this;
     }
     
@@ -124,22 +72,8 @@ public final class AdvancedConfig {
         return extraFactory;
     }
     
-    public TeraArray.Factory getExtraFactory() {
-        return requireTeraArrayFactory(extraFactory);
-    }
-    
     public AdvancedConfig setExtraFactory(String factory) {
-        checkContainsTeraArrayFactory(factory);
         extraFactory = factory;
-        return this;
-    }
-    
-    public AdvancedConfig setExtraFactoryDontThrow(String factory) {
-        if (containsTeraArrayFactory(factory)) {
-            extraFactory = factory;
-        } else {
-            logger.warn("TeraArray factory does not exist: '{}'", factory);
-        }
         return this;
     }
     
@@ -182,14 +116,14 @@ public final class AdvancedConfig {
 
     public static AdvancedConfig createDefault() {
         return new AdvancedConfig()
-            .setBlocksFactory(TeraDenseArray16Bit.class.getName())
-            .setSunlightFactory(TeraDenseArray8Bit.class.getName())
-            .setLightFactory(TeraDenseArray8Bit.class.getName())
-            .setExtraFactory(TeraDenseArray8Bit.class.getName())
-            .setChunkDeflationEnabled(true)
-            .setChunkDeflationLoggingEnabled(false)
-            .setAdvancedMonitoringEnabled(false)
-            .setAdvancedMonitorVisibleAtStartup(false);
+        .setBlocksFactory(PerBlockStorageManager.DefaultBlockStorageFactory)
+        .setSunlightFactory(PerBlockStorageManager.DefaultSunlightStorageFactory)
+        .setLightFactory(PerBlockStorageManager.DefaultLightStorageFactory)
+        .setExtraFactory(PerBlockStorageManager.DefaultExtraStorageFactory)
+        .setChunkDeflationEnabled(true)
+        .setChunkDeflationLoggingEnabled(false)
+        .setAdvancedMonitoringEnabled(false)
+        .setAdvancedMonitorVisibleAtStartup(false);
     }
 
     public static class Handler implements JsonSerializer<AdvancedConfig>, JsonDeserializer<AdvancedConfig> {
@@ -200,30 +134,22 @@ public final class AdvancedConfig {
 
             AdvancedConfig config = AdvancedConfig.createDefault();
             JsonObject input = json.getAsJsonObject();
-            if (input.has("blocksFactory")) {
-                config.setBlocksFactoryDontThrow(input.get("blocksFactory").getAsString());
-            }
-            if (input.has("sunlightFactory")) {
-                config.setSunlightFactoryDontThrow(input.get("sunlightFactory").getAsString());
-            }
-            if (input.has("lightFactory")) {
-                config.setLightFactoryDontThrow(input.get("lightFactory").getAsString());
-            }
-            if (input.has("extraFactory")) {
-                config.setExtraFactoryDontThrow(input.get("extraFactory").getAsString());
-            }
-            if (input.has("chunkDeflationEnabled")) {
+            if (input.has("blocksFactory")) 
+                config.setBlocksFactory(input.get("blocksFactory").getAsString());
+            if (input.has("sunlightFactory")) 
+                config.setSunlightFactory(input.get("sunlightFactory").getAsString());
+            if (input.has("lightFactory")) 
+                config.setLightFactory(input.get("lightFactory").getAsString());
+            if (input.has("extraFactory")) 
+                config.setExtraFactory(input.get("extraFactory").getAsString());
+            if (input.has("chunkDeflationEnabled"))
                 config.setChunkDeflationEnabled(input.get("chunkDeflationEnabled").getAsBoolean());
-            }
-            if (input.has("chunkDeflationLoggingEnabled")) {
+            if (input.has("chunkDeflationLoggingEnabled"))
                 config.setChunkDeflationLoggingEnabled(input.get("chunkDeflationLoggingEnabled").getAsBoolean());
-            }
-            if (input.has("advancedMonitoringEnabled")) {
+            if (input.has("advancedMonitoringEnabled"))
                 config.setAdvancedMonitoringEnabled(input.get("advancedMonitoringEnabled").getAsBoolean());
-            }
-            if (input.has("advancedMonitorVisibleAtStartup")) {
+            if (input.has("advancedMonitorVisibleAtStartup"))
                 config.setAdvancedMonitorVisibleAtStartup(input.get("advancedMonitorVisibleAtStartup").getAsBoolean());
-            }
             return config;
         }
 
@@ -240,39 +166,5 @@ public final class AdvancedConfig {
             result.addProperty("advancedMonitorVisibleAtStartup", src.advancedMonitorVisibleAtStartup);
             return result;
         }
-        
-    }
-    
-    public static TeraArray.Factory getTeraArrayFactory(String factory) {
-        Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
-        final TeraArrays.Entry entry = TeraArrays.getInstance().getEntry(factory);
-        if (entry != null) {
-            return entry.factory;
-        }
-        return null;
-    }
-    
-    public static TeraArray.Factory requireTeraArrayFactory(String factory) {
-        Preconditions.checkNotNull(factory, "Parameter 'factory' must no be null");
-        return Preconditions.checkNotNull(getTeraArrayFactory(factory), "Factory does not exist: '" + factory + "'");
-    }
-    
-    public static void checkContainsTeraArrayFactory(String factory) {
-        Preconditions.checkNotNull(factory, "Parameter 'factory' must not be null");
-        Preconditions.checkState(containsTeraArrayFactory(factory), "Factory does not exist: '" + factory + "'");
-    }
-    
-    public static boolean containsTeraArrayFactory(String factory) {
-        return factory != null && getTeraArrayFactory(factory) != null;
-    }
-    
-    public static String[] getTeraArrayFactories() {
-        final TeraArrays.Entry[] entries = TeraArrays.getInstance().getCoreArrayEntries();
-        final String[] factories = new String[entries.length];
-        for (int i = 0; i < entries.length; i++) {
-            factories[i] = entries[i].arrayClassName;
-        }
-        Arrays.sort(factories);
-        return factories;
     }
 }

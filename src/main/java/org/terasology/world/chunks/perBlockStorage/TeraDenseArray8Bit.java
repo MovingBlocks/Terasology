@@ -29,6 +29,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray8Bit> {
 
         @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.DenseArray8Bit;
+        }
+
+        @Override
         public boolean canHandle(Class<?> clazz) {
             return TeraDenseArray8Bit.class.equals(clazz);
         }
@@ -47,21 +52,6 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         @Override
         public String getId() {
             return "8-bit-dense";
-        }
-        
-        @Override
-        public Class<TeraDenseArray8Bit> getArrayClass() {
-            return TeraDenseArray8Bit.class;
-        }
-
-        @Override
-        public Type getProtobufType() {
-            return ChunksProtobuf.Type.DenseArray8Bit;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
         }
         
         @Override

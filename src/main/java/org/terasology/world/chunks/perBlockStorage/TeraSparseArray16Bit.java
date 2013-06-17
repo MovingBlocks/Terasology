@@ -43,6 +43,11 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
             sbuffer.get(row, 0, length);
             buffer.position(buffer.position() + length * 2);
         }
+
+        @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.SparseArray16Bit;
+        }
         
         @Override
         public boolean canHandle(Class<?> clazz) {
@@ -118,21 +123,6 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         @Override
         public String getId() {
             return "16-bit-sparse";
-        }
-        
-        @Override
-        public Class<TeraSparseArray16Bit> getArrayClass() {
-            return TeraSparseArray16Bit.class;
-        }
-
-        @Override
-        public Type getProtobufType() {
-            return ChunksProtobuf.Type.SparseArray16Bit;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
         }
         
         @Override

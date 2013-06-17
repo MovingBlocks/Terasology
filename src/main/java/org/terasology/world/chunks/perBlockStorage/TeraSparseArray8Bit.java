@@ -37,6 +37,11 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray8Bit> {
 
         @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.SparseArray8Bit;
+        }
+
+        @Override
         public boolean canHandle(Class<?> clazz) {
             return TeraSparseArray8Bit.class.equals(clazz);
         }
@@ -54,21 +59,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
             return "8-bit-sparse";
         }
         
-        @Override
-        public Class<TeraSparseArray8Bit> getArrayClass() {
-            return TeraSparseArray8Bit.class;
-        }
-
-        @Override
-        public Type getProtobufType() {
-            return ChunksProtobuf.Type.SparseArray8Bit;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-       
         @Override
         public TeraSparseArray8Bit create() {
             return new TeraSparseArray8Bit();

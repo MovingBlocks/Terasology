@@ -16,10 +16,8 @@
 
 package org.terasology.logic.mod;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,6 +30,7 @@ public class ModInfo {
     private String displayName;
     private String description;
     private Set<String> dependencies = Sets.newLinkedHashSet();
+    private Set<String> perBlockStorageExtensions = Sets.newLinkedHashSet();
 
     public String getId() {
         return id;
@@ -62,5 +61,11 @@ public class ModInfo {
             dependencies = Sets.newLinkedHashSet();
         }
         return dependencies;
+    }
+    
+    public Set<String> getPerBlockStorageExtensions() {
+        if (perBlockStorageExtensions == null)
+            perBlockStorageExtensions = Sets.newLinkedHashSet();
+        return perBlockStorageExtensions;
     }
 }

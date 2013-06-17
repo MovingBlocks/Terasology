@@ -31,6 +31,11 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
     public static class SerializationHandler extends TeraArray.BasicSerializationHandler<TeraDenseArray16Bit> {
 
         @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.DenseArray16Bit;
+        }
+        
+        @Override
         public boolean canHandle(Class<?> clazz) {
             return TeraDenseArray16Bit.class.equals(clazz);
         }
@@ -76,21 +81,6 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         @Override
         public String getId() {
             return "16-bit-dense";
-        }
-        
-        @Override
-        public Class<TeraDenseArray16Bit> getArrayClass() {
-            return TeraDenseArray16Bit.class;
-        }
-
-        @Override
-        public Type getProtobufType() {
-            return ChunksProtobuf.Type.DenseArray16Bit;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
         }
         
         @Override

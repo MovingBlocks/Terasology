@@ -32,8 +32,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 import org.terasology.world.chunks.perBlockStorage.TeraArray;
-import org.terasology.world.chunks.perBlockStorage.TeraArrays;
 import org.terasology.world.chunks.perBlockStorage.TeraDenseArray4Bit;
 import org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit;
 import org.terasology.world.liquid.LiquidData;
@@ -99,11 +99,11 @@ public class Chunk {
 
     public Chunk(int x, int y, int z) {
         this.pos.set(x, y, z);
-        final Chunks c = Chunks.getInstance();
-        this.blockData = c.getBlockDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        this.sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        this.lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        this.extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        final PerBlockStorageManager manager = CoreRegistry.get(PerBlockStorageManager.class);
+        this.blockData = manager.createBlockStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        this.sunlightData = manager.createSunlightStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        this.lightData = manager.createLightStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        this.extraData = manager.createExtraStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.dirty = true;
         ChunkMonitor.fireChunkCreated(this);
     }
@@ -143,17 +143,22 @@ public class Chunk {
      */
     public static class ProtobufHandler implements org.terasology.io.ProtobufHandler<Chunk, ChunksProtobuf.Chunk> {
 
+        private final PerBlockStorageManager manager;
+        
+        public ProtobufHandler(PerBlockStorageManager manager) {
+            this.manager = Preconditions.checkNotNull(manager, "The parameter 'manager' must not be null");
+        }
+        
         @Override
         public ChunksProtobuf.Chunk encode(Chunk chunk) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-            final TeraArrays t = TeraArrays.getInstance();
             final ChunksProtobuf.Chunk.Builder b = ChunksProtobuf.Chunk.newBuilder()
                     .setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
                     .setState(chunk.chunkState.id)
-                    .setBlockData(t.encode(chunk.blockData))
-                    .setSunlightData(t.encode(chunk.sunlightData))
-                    .setLightData(t.encode(chunk.lightData))
-                    .setExtraData(t.encode(chunk.extraData));
+                    .setBlockData(manager.encode(chunk.blockData))
+                    .setSunlightData(manager.encode(chunk.sunlightData))
+                    .setLightData(manager.encode(chunk.lightData))
+                    .setExtraData(manager.encode(chunk.extraData));
             return b.build();
         }
 
@@ -194,11 +199,10 @@ public class Chunk {
             if (!message.hasExtraData()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing extra data.");
             }
-            final TeraArrays t = TeraArrays.getInstance();
-            final TeraArray blockData = t.decode(message.getBlockData());
-            final TeraArray sunlightData = t.decode(message.getSunlightData());
-            final TeraArray lightData = t.decode(message.getLightData());
-            final TeraArray extraData = t.decode(message.getExtraData());
+            final TeraArray blockData = manager.decode(message.getBlockData());
+            final TeraArray sunlightData = manager.decode(message.getSunlightData());
+            final TeraArray lightData = manager.decode(message.getLightData());
+            final TeraArray extraData = manager.decode(message.getExtraData());
             return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
         }
 

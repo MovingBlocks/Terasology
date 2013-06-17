@@ -76,6 +76,11 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray4Bit> {
 
         @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.SparseArray4Bit;
+        }
+
+        @Override
         public boolean canHandle(Class<?> clazz) {
             return TeraSparseArray4Bit.class.equals(clazz);
         }
@@ -91,21 +96,6 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         @Override
         public String getId() {
             return "4-bit-sparse";
-        }
-        
-        @Override
-        public Class<TeraSparseArray4Bit> getArrayClass() {
-            return TeraSparseArray4Bit.class;
-        }
-
-        @Override
-        public Type getProtobufType() {
-            return ChunksProtobuf.Type.SparseArray4Bit;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
         }
         
         @Override
