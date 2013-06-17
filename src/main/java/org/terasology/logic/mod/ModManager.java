@@ -18,6 +18,7 @@ package org.terasology.logic.mod;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import org.reflections.Reflections;
@@ -43,6 +44,7 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -237,5 +239,13 @@ public class ModManager {
             }
         }
         return activeMods;
+    }
+    
+    public Iterable<String> getActivePerBlockStorageExtensions() {
+        final Set<String> activeExtensions = Sets.newLinkedHashSet();
+        for (Mod mod : mods.values()) 
+            if (mod.isEnabled())
+                activeExtensions.addAll(mod.getModInfo().getPerBlockStorageExtensions());
+        return activeExtensions;
     }
 }

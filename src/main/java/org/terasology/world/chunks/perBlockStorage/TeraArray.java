@@ -61,12 +61,6 @@ public abstract class TeraArray implements Externalizable {
 
         public String getId();
         
-        public Class<T> getArrayClass();
-        
-        public ChunksProtobuf.Type getProtobufType();
-
-        public SerializationHandler<T> createSerializationHandler();
-        
         public T create();
         
         public T create(int sizeX, int sizeY, int sizeZ);
@@ -82,6 +76,8 @@ public abstract class TeraArray implements Externalizable {
      * @see org.terasology.world.chunks.perBlockStorage.TeraArray.BasicSerializationHandler
      */
     public static interface SerializationHandler<T extends TeraArray> extends org.terasology.io.SerializationHandler<T> {
+        
+        public ChunksProtobuf.Type getProtobufType();
         
         public int computeMinimumBufferSize(T array);
 

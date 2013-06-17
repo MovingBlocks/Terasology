@@ -29,6 +29,11 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
     public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray4Bit> {
 
         @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.DenseArray4Bit;
+        }
+
+        @Override
         public boolean canHandle(Class<?> clazz) {
             return TeraDenseArray4Bit.class.equals(clazz);
         }
@@ -47,21 +52,6 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         @Override
         public String getId() {
             return "4-bit-dense";
-        }
-        
-        @Override
-        public Class<TeraDenseArray4Bit> getArrayClass() {
-            return TeraDenseArray4Bit.class;
-        }
-
-        @Override
-        public Type getProtobufType() {
-            return ChunksProtobuf.Type.DenseArray4Bit;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
         }
         
         @Override
