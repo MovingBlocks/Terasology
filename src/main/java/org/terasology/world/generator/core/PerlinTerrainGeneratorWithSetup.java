@@ -35,8 +35,9 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.config.Config;
 
 /*
- * @author Immortius
- * adapted for map gen setup
+ * Terasology's legacy map generator (modifiable version). Still rocks!
+ *
+ * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
  */
 public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
 

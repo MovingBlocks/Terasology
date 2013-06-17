@@ -123,7 +123,7 @@ public class BlockDamageRenderer implements RenderSystem {
         glPushMatrix();
         glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
 
-        float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 10.0f) * 0.0625f;
+        float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 9.0f) * 0.0625f;
 
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();

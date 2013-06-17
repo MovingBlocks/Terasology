@@ -19,7 +19,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.Texture;
 
@@ -48,10 +48,13 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
         DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        scene.bindDepthTexture();
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        scene.bindNormalsTexture();
+        if (scene != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            scene.bindDepthTexture();
+            GL13.glActiveTexture(GL13.GL_TEXTURE1);
+            scene.bindNormalsTexture();
+        }
+
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
         glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
 
@@ -64,11 +67,13 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         program.setFloat("ssaoFalloff", (Float) ssaoFalloff.getValue());
         program.setFloat("ssaoRad", (Float) ssaoRad.getValue());
 
-        FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-        rtSize.put((float) scene.width).put((float) scene.height);
-        rtSize.flip();
+        if (scene != null) {
+            FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
+            rtSize.put((float) scene.width).put((float) scene.height);
+            rtSize.flip();
 
-        program.setFloat2("renderTargetSize", rtSize);
+            program.setFloat2("renderTargetSize", rtSize);
+        }
     }
 
     @Override

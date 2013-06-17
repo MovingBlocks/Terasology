@@ -16,9 +16,6 @@
 package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,19 +27,15 @@ import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.WorldTimeEventManager;
-import org.terasology.math.AABB;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.*;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
-import org.terasology.rendering.AABBRenderer;
+import org.terasology.rendering.renderer.AABBRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
@@ -69,17 +62,12 @@ import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
-import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -111,6 +99,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
+    public static final int MAX_CHUNK_VBOS = 2304; // 48*48 for the ultra viewing distance heavy
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);
@@ -139,10 +128,10 @@ public final class WorldRenderer {
     /* RENDERING */
     private final LinkedList<Chunk> renderQueueChunksOpaque = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksOpaqueShadow = Lists.newLinkedList();
-    private final PriorityQueue<Chunk> renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaBlend = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaReject = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
 
-    private WorldRenderingStage currentRenderStage = WorldRenderingStage.WRS_DEFAULT;
+    private WorldRenderingStage currentRenderStage = WorldRenderingStage.DEFAULT;
 
     /* HORIZON */
     private final Skysphere skysphere;
@@ -168,15 +157,15 @@ public final class WorldRenderer {
 
     /* ENUMS */
     public enum ChunkRenderMode {
-        CRM_DEFAULT,
-        CRM_REFLECTED,
-        CRM_SHADOW_MAP
+        DEFAULT,
+        REFLECTION,
+        SHADOW_MAP
     }
 
     public enum WorldRenderingStage {
-        WRS_DEFAULT,
-        WRS_OCULUS_LEFT_EYE,
-        WRS_OCULUS_RIGHT_EYE
+        DEFAULT,
+        OCULUS_LEFT_EYE,
+        OCULUS_RIGHT_EYE
     }
 
     private ComponentSystemManager _systemManager;
@@ -294,6 +283,8 @@ public final class WorldRenderer {
         // TODO: This should actually be done based on events from the ChunkProvider on new chunk availability/old chunk removal
         int viewingDistance = config.getRendering().getActiveViewingDistance();
 
+        boolean chunksCurrentlyPending = false;
+
         if (chunkPosX != newChunkPosX || chunkPosZ != newChunkPosZ || force || pendingChunks) {
             // just add all visible chunks
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
@@ -304,7 +295,7 @@ public final class WorldRenderer {
                         if (c != null && c.getChunkState() == ChunkState.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
                             chunksInProximity.add(c);
                         } else {
-                            pendingChunks = true;
+                            chunksCurrentlyPending = true;
                         }
                     }
                 }
@@ -323,6 +314,15 @@ public final class WorldRenderer {
                         for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = chunkProvider.getChunk(x, 0, y);
                             chunksInProximity.remove(c);
+
+                            ChunkMesh[] mesh = c.getMesh();
+                            if (mesh != null) {
+                                // Only keep chunks around the player in the video memory - recreate the VBOs for cached chunks
+                                for (ChunkMesh m : mesh) {
+                                    m.dispose();
+                                }
+                                c.setMesh(null);
+                            }
                         }
                     }
                 }
@@ -336,7 +336,7 @@ public final class WorldRenderer {
                             if (c != null && c.getChunkState() == ChunkState.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
                                 chunksInProximity.add(c);
                             } else {
-                                pendingChunks = true;
+                                chunksCurrentlyPending = true;
                             }
                         }
                     }
@@ -345,7 +345,7 @@ public final class WorldRenderer {
 
             chunkPosX = newChunkPosX;
             chunkPosZ = newChunkPosZ;
-
+            pendingChunks = chunksCurrentlyPending;
 
             Collections.sort(chunksInProximity, new ChunkProximityComparator());
 
@@ -491,11 +491,12 @@ public final class WorldRenderer {
     /**
      * Updates the currently visible chunks (in sight of the player).
      */
-    public void updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
+    public int updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
         statDirtyChunks = 0;
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
 
+        int processedChunks = 0;
         for (int i = 0; i < chunksInProximity.size(); i++) {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
@@ -509,60 +510,63 @@ public final class WorldRenderer {
                 }
             }
 
-            if (isChunkVisible(c) && isChunkValidForRender(c)) {
+            if (isChunkValidForRender(c)) {
+                if (isChunkVisible(c)) {
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
+                        renderQueueChunksOpaque.add(c);
+                    else
+                        statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
-                    renderQueueChunksOpaque.add(c);
-                else
-                    statIgnoredPhases++;
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_BLEND) > 0)
+                        renderQueueChunksSortedAlphaBlend.add(c);
+                    else
+                        statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.WATER_AND_ICE) > 0)
-                    renderQueueChunksSortedWater.add(c);
-                else
-                    statIgnoredPhases++;
+                    if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_REJECT) > 0 && i < MAX_BILLBOARD_CHUNKS)
+                        renderQueueChunksSortedAlphaReject.add(c);
+                    else
+                        statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0 && i < MAX_BILLBOARD_CHUNKS)
-                    renderQueueChunksSortedBillboards.add(c);
-                else
-                    statIgnoredPhases++;
+                    statVisibleChunks++;
 
-                if (processChunkUpdates) {
-                    if (i < MAX_ANIMATED_CHUNKS)
+                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS)
                         c.setAnimated(true);
                     else
                         c.setAnimated(false);
-
-                    if (c.getPendingMesh() != null) {
-                        for (int j = 0; j < c.getPendingMesh().length; j++) {
-                            c.getPendingMesh()[j].generateVBOs();
-                        }
-                        if (c.getMesh() != null) {
-                            for (int j = 0; j < c.getMesh().length; j++) {
-                                c.getMesh()[j].dispose();
-                            }
-                        }
-                        c.setMesh(c.getPendingMesh());
-                        c.setPendingMesh(null);
-                    }
-
-                    if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
-                        statDirtyChunks++;
-                        chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
-                    }
                 }
 
-                statVisibleChunks++;
-            } else if (i > config.getRendering().getMaxChunkVBOs() && processChunkUpdates) {
-                if (mesh != null) {
-                    // Make sure not too many chunk VBOs are available in the video memory at the same time
-                    // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
-                    for (ChunkMesh m : mesh) {
-                        m.dispose();
-                    }
-                    c.setMesh(null);
+                // Process all chunks in the area, not only the visible ones
+                if (processChunkUpdates && processChunkUpdate(c)) {
+                    processedChunks++;
                 }
             }
         }
+
+        return processedChunks;
+    }
+
+    private boolean processChunkUpdate(Chunk c) {
+        if (c.getPendingMesh() != null) {
+            for (int j = 0; j < c.getPendingMesh().length; j++) {
+                c.getPendingMesh()[j].generateVBOs();
+            }
+            if (c.getMesh() != null) {
+                for (int j = 0; j < c.getMesh().length; j++) {
+                    c.getMesh()[j].dispose();
+                }
+            }
+            c.setMesh(c.getPendingMesh());
+            c.setPendingMesh(null);
+        }
+
+        if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
+            statDirtyChunks++;
+            chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UpdateType.DEFAULT);
+
+            return true;
+        }
+
+        return false;
     }
 
     private int triangleCount(ChunkMesh[] mesh, ChunkMesh.RENDER_PHASE type) {
@@ -589,16 +593,16 @@ public final class WorldRenderer {
     public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
 
         switch (stereoRenderState) {
-            case SRS_MONO:
-                currentRenderStage = WorldRenderingStage.WRS_DEFAULT;
+            case MONO:
+                currentRenderStage = WorldRenderingStage.DEFAULT;
                 break;
-            case SRS_OCULUS_LEFT_EYE:
-                currentRenderStage = WorldRenderingStage.WRS_OCULUS_LEFT_EYE;
+            case OCULUS_LEFT_EYE:
+                currentRenderStage = WorldRenderingStage.OCULUS_LEFT_EYE;
                 // Make sure the frustum is up-to-date for each eye
                 activeCamera.updateFrustum();
                 break;
-            case SRS_OCULUS_RIGHT_EYE:
-                currentRenderStage = WorldRenderingStage.WRS_OCULUS_RIGHT_EYE;
+            case OCULUS_RIGHT_EYE:
+                currentRenderStage = WorldRenderingStage.OCULUS_RIGHT_EYE;
                 // Make sure the frustum is up-to-date for each eye
                 activeCamera.updateFrustum();
                 break;
@@ -606,12 +610,22 @@ public final class WorldRenderer {
 
         resetStats();
 
-        if (stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO
-                || stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE) {
+        if (stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO
+                || stereoRenderState == DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE) {
             updateAndQueueVisibleChunks();
         } else {
             // Don't cause havoc in the second pass for the second eye
             updateAndQueueVisibleChunks(false, false);
+        }
+
+        if (config.getRendering().isDynamicShadows()
+                // Only render the shadow map once
+                && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE)) {
+            DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
+            //glCullFace(GL11.GL_FRONT);
+            renderShadowMap(lightCamera);
+            //glCullFace(GL11.GL_BACK);
+            DefaultRenderingProcess.getInstance().endRenderSceneShadowMap();
         }
 
         DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
@@ -622,15 +636,6 @@ public final class WorldRenderer {
         glCullFace(GL11.GL_BACK);
         DefaultRenderingProcess.getInstance().endRenderReflectedScene();
 
-        if (config.getRendering().isDynamicShadows()
-                // Only render the shadow map once
-                && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE)) {
-            DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
-            //glCullFace(GL11.GL_FRONT);
-            renderShadowMap(lightCamera);
-            //glCullFace(GL11.GL_BACK);
-            DefaultRenderingProcess.getInstance().endRenderSceneShadowMap();
-        }
 
         renderWorld(getActiveCamera());
 
@@ -641,7 +646,7 @@ public final class WorldRenderer {
 
         if (activeCamera != null
                 // TODO: First person view is currently not working with OculusVR support enabled
-                && stereoRenderState == DefaultRenderingProcess.StereoRenderState.SRS_MONO
+                && stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO
                 && !config.getSystem().isDebugFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
 
@@ -695,24 +700,25 @@ public final class WorldRenderer {
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         while (renderQueueChunksOpaque.size() > 0)
-            renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.CRM_DEFAULT);
+            renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.DEFAULT);
+
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Render Chunks (Billboards)");
+
+        /*
+         * SECOND RENDER PASS: ALPHA REJECT
+         */
+        while (renderQueueChunksSortedAlphaReject.size() > 0)
+            renderChunk(renderQueueChunksSortedAlphaReject.poll(), ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
 
         PerformanceMonitor.endActivity();
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
         DefaultRenderingProcess.getInstance().beginRenderSceneTransparent(true);
 
-        PerformanceMonitor.startActivity("Render Chunks (Transparent)");
 
-        /*
-         * SECOND RENDER PASS: BILLBOARDS
-         */
-        while (renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, ChunkRenderMode.CRM_DEFAULT);
-
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Render Chunks (Water, Ice)");
+        PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
 
         // Make sure the water surface is rendered if the player is swimming
         if (headUnderWater) {
@@ -720,10 +726,10 @@ public final class WorldRenderer {
         }
 
         /*
-        * THIRD (AND FOURTH) RENDER PASS: WATER AND ICE
+        * THIRD (AND FOURTH) RENDER PASS: ALPHA BLEND
         */
-        while (renderQueueChunksSortedWater.size() > 0) {
-            renderChunk(renderQueueChunksSortedWater.poll(), ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, ChunkRenderMode.CRM_DEFAULT);
+        while (renderQueueChunksSortedAlphaBlend.size() > 0) {
+            renderChunk(renderQueueChunksSortedAlphaBlend.poll(), ChunkMesh.RENDER_PHASE.ALPHA_BLEND, camera, ChunkRenderMode.DEFAULT);
         }
 
         PerformanceMonitor.endActivity();
@@ -765,7 +771,7 @@ public final class WorldRenderer {
             camera.lookThrough();
 
             for (Chunk c : renderQueueChunksOpaque)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.CRM_REFLECTED);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.REFLECTION);
         }
 
         PerformanceMonitor.endActivity();
@@ -777,7 +783,7 @@ public final class WorldRenderer {
         camera.lookThrough();
 
         while (renderQueueChunksOpaqueShadow.size() > 0)
-            renderChunk(renderQueueChunksOpaqueShadow.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.CRM_SHADOW_MAP);
+            renderChunk(renderQueueChunksOpaqueShadow.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.SHADOW_MAP);
 
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderShadows();
@@ -796,14 +802,14 @@ public final class WorldRenderer {
             Vector3d chunkPositionRelToCamera =
                     new Vector3d(chunk.getPos().x * Chunk.SIZE_X - cameraPosition.x, chunk.getPos().y * Chunk.SIZE_Y - cameraPosition.y, chunk.getPos().z * Chunk.SIZE_Z - cameraPosition.z);
 
-            if (mode == ChunkRenderMode.CRM_DEFAULT || mode == ChunkRenderMode.CRM_REFLECTED) {
+            if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
                 shader = ShaderManager.getInstance().getShaderProgram("chunk");
                 shader.enable();
 
-                if (phase == ChunkMesh.RENDER_PHASE.WATER_AND_ICE) {
+                if (phase == ChunkMesh.RENDER_PHASE.ALPHA_BLEND) {
                     // This chunks can actually contain water...
                     shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue());
-                } else if (phase == ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) {
+                } else if (phase == ChunkMesh.RENDER_PHASE.ALPHA_REJECT) {
                     shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
                 } else {
                     shader.setActiveFeatures(0);
@@ -820,13 +826,13 @@ public final class WorldRenderer {
                 shader.setFloat3("chunkPositionWorld", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
                 shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
-                if (mode == ChunkRenderMode.CRM_REFLECTED) {
+                if (mode == ChunkRenderMode.REFLECTION) {
                     shader.setFloat("clip", camera.getClipHeight());
                 } else {
                     shader.setFloat("clip", 0.0f);
                 }
 
-            } else if (mode == ChunkRenderMode.CRM_SHADOW_MAP) {
+            } else if (mode == ChunkRenderMode.SHADOW_MAP) {
                 shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
                 shader.enable();
             }

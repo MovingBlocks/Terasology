@@ -31,10 +31,11 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -89,9 +90,15 @@ public class StateSinglePlayer implements GameState {
             logger.info("Trying to initialize Oculus SDK...");
             TeraOVR.initSDK();
             logger.info("Done!");
-            logger.info("Updaiting Oculus projection parameters from device...");
+            logger.info("Updating Oculus projection parameters from device...");
             OculusVrHelper.updateFromDevice();
             logger.info("Done!");
+        }
+
+        // Show or hide the HUD according to the settings
+        final boolean hudHidden = CoreRegistry.get(Config.class).getSystem().isDebugHudHidden();
+        for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+            element.setVisible(!hudHidden);
         }
     }
 
@@ -156,10 +163,10 @@ public class StateSinglePlayer implements GameState {
 
         if (worldRenderer != null) {
             if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
-                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_MONO);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.MONO);
             } else {
-                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_LEFT_EYE);
-                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.SRS_OCULUS_RIGHT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_RIGHT_EYE);
             }
         }
 

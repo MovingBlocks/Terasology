@@ -29,7 +29,7 @@ import org.terasology.input.binds.InventoryButton;
 import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
 
 /**

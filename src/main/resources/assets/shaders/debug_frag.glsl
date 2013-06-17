@@ -24,6 +24,9 @@ uniform sampler2D texSceneTransparentColor;
 uniform sampler2D texSceneTransparentNormals;
 uniform sampler2D texSceneTransparentDepth;
 
+uniform sampler2D texSobel;
+uniform sampler2D texSSAO;
+
 uniform int debugRenderingStage;
 
 void main(){
@@ -85,7 +88,17 @@ void main(){
             texColor = texture2D(texSceneShadowMap, gl_TexCoord[0].xy);
             color = texColor;
         
-        }
+        } else if (debugRenderingStage == DEBUG_STAGE_SSAO) {
+
+            texColor = texture2D(texSSAO, gl_TexCoord[0].xy);
+            color = texColor;
+
+        }  else if (debugRenderingStage == DEBUG_STAGE_SOBEL) {
+
+            texColor = texture2D(texSobel, gl_TexCoord[0].xy);
+            color = texColor;
+
+       }
 
     gl_FragData[0] = color;
 }

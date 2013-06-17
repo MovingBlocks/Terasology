@@ -46,9 +46,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
             return viewProjectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
             return viewProjectionMatrixRightEye;
         }
 
@@ -58,9 +58,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getViewMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
             return viewMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
             return viewMatrixRightEye;
         }
 
@@ -70,9 +70,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
             return projectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.WRS_OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
             return projectionMatrixRightEye;
         }
 
@@ -108,8 +108,10 @@ public class OculusStereoCamera extends Camera {
     }
 
     public void updateMatrices(float fov) {
+        prevViewProjectionMatrix.set(viewProjectionMatrix);
+
         // Nothing to do...
-        if (previousPosition.equals(getPosition()) && previousViewingDirection.equals(getViewingDirection())) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())) {
             return;
         }
 
@@ -149,13 +151,12 @@ public class OculusStereoCamera extends Camera {
         viewProjectionMatrixLeftEye = TeraMath.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = TeraMath.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
-        prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks
-        previousPosition.set(getPosition());
-        previousViewingDirection.set(getViewingDirection());
+        cachedPosition.set(getPosition());
+        cachedViewigDirection.set(getViewingDirection());
 
         updateFrustum();
     }

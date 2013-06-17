@@ -67,8 +67,10 @@ public class OrthographicCamera extends Camera {
     }
 
     public void updateMatrices(float fov) {
+        prevViewProjectionMatrix.set(viewProjectionMatrix);
+
         // Nothing to do...
-        if (previousPosition.equals(getPosition()) && previousViewingDirection.equals(getViewingDirection())) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())) {
             return;
         }
 
@@ -76,12 +78,11 @@ public class OrthographicCamera extends Camera {
         viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-        prevViewProjectionMatrix = new Matrix4f(viewProjectionMatrix);
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
 
         // Used for dirty checks
-        previousPosition.set(getPosition());
-        previousViewingDirection.set(getViewingDirection());
+        cachedPosition.set(getPosition());
+        cachedViewigDirection.set(getViewingDirection());
 
         updateFrustum();
     }

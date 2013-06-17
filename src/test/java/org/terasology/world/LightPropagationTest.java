@@ -54,11 +54,11 @@ public class LightPropagationTest {
         view = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         propagator = new LightPropagator(view);
 
-        air = BlockManager.getInstance().getBlock((byte) 0);
+        air = BlockManager.getInstance().getBlock((short) 0);
         dirt = new Block();
         dirt.setDisplayName("Dirt");
         dirt.setUri(new BlockUri("engine:dirt"));
-        dirt.setId((byte) 1);
+        dirt.setId((short) 1);
         for (Side side : Side.values()) {
             dirt.setFullSide(side, true);
         }
@@ -66,7 +66,7 @@ public class LightPropagationTest {
         torch = new Block();
         torch.setDisplayName("Torch");
         torch.setUri(new BlockUri("engine:torch"));
-        torch.setId((byte) 2);
+        torch.setId((short) 2);
         torch.setLuminance(Chunk.MAX_LIGHT);
         BlockManager.getInstance().addBlockFamily(new SymmetricFamily(torch.getURI(), torch), true);
 

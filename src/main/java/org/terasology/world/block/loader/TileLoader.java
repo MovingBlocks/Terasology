@@ -35,8 +35,6 @@ import org.terasology.asset.AssetUri;
  */
 public class TileLoader implements AssetLoader<Tile> {
 
-    private static final int TILE_SIZE = 16;
-
     private static final Logger logger = LoggerFactory.getLogger(TileLoader.class);
 
     public TileLoader() {
@@ -45,10 +43,6 @@ public class TileLoader implements AssetLoader<Tile> {
     @Override
     public Tile load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BufferedImage image = ImageIO.read(stream);
-        if (image.getHeight() == TILE_SIZE && image.getWidth() == TILE_SIZE) {
-            return new Tile(uri, image);
-        }
-        logger.error("Invalid tile '{}', tiles must be 16x16", uri);
-        return null;
+        return new Tile(uri, image);
     }
 }

@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.animation;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -57,9 +57,9 @@ public class AnimationRotate extends Animation {
     @Override
     public void renderBegin(){
         if(fbo == null){
-            fbo = DefaultRenderingProcess.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), DefaultRenderingProcess.FBOType.FBOT_DEFAULT, false, false);
+            fbo = DefaultRenderingProcess.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), DefaultRenderingProcess.FBOType.DEFAULT, false, false);
         }else if(fbo.height != Display.getHeight() || fbo.width != Display.getWidth()){
-            fbo = DefaultRenderingProcess.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), DefaultRenderingProcess.FBOType.FBOT_DEFAULT, false, false);
+            fbo = DefaultRenderingProcess.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), DefaultRenderingProcess.FBOType.DEFAULT, false, false);
         }
 
         DefaultRenderingProcess.getInstance().getFBO(id).bind();

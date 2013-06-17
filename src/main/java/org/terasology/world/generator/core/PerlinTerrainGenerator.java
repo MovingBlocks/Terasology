@@ -31,7 +31,9 @@ import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
 /**
- * @author Immortius
+ * Terasology's legacy map generator. Still rocks!
+ *
+ * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
  */
 public class PerlinTerrainGenerator implements ChunkGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;

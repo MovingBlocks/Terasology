@@ -394,7 +394,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
             icon = Icon.get(itemComponent.icon);
         }
 
-        if( icon!=null ){
+        if(icon!=null ){
             glDisable(GL11.GL_CULL_FACE);
             glDepthMask ( false );
             ShaderManager.getInstance().enableDefaultTextured();

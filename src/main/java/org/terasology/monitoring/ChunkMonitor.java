@@ -8,7 +8,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.MiniatureChunk;
+import org.terasology.world.chunks.MiniatureChunk;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkState;
 import org.terasology.world.chunks.provider.ChunkProvider;

@@ -1,4 +1,4 @@
-package org.terasology.rendering;
+package org.terasology.rendering.renderer;
 
 import org.terasology.math.AABB;
 

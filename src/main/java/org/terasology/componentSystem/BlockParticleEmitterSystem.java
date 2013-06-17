@@ -47,7 +47,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -65,7 +64,7 @@ import org.terasology.world.block.management.BlockManager;
 @RegisterComponentSystem(headedOnly = true)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
-    private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
+    private static final float REL_PARTICLE_TEX_SIZE = 0.25f;
 
     @In
     private EntityManager entityManager;
@@ -116,12 +115,15 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     private void spawnParticle(BlockParticleEffectComponent particleEffect) {
+        final float particleTexSize = calcParticleTexSize();
+        final float texOffset = Block.calcRelativeTileSize();
+
         Particle p = new Particle();
         p.lifeRemaining = random.randomPosFloat() * (particleEffect.maxLifespan - particleEffect.maxLifespan) + particleEffect.minLifespan;
         p.velocity.set(particleEffect.initialVelocityRange.x * random.randomFloat(), particleEffect.initialVelocityRange.y * random.randomFloat(), particleEffect.initialVelocityRange.z * random.randomFloat());
         p.size = random.randomPosFloat() * (particleEffect.maxSize - particleEffect.minSize) + particleEffect.minSize;
         p.position.set(particleEffect.spawnRange.x * random.randomFloat(), particleEffect.spawnRange.y * random.randomFloat(), particleEffect.spawnRange.z * random.randomFloat());
-        p.texOffset.set(random.randomPosFloat() * (Block.TEXTURE_OFFSET - TEX_SIZE), random.randomPosFloat() * (Block.TEXTURE_OFFSET - TEX_SIZE));
+        p.texOffset.set(random.randomPosFloat() * (texOffset - particleTexSize), random.randomPosFloat() * (texOffset - particleTexSize));
         //p.texSize.set(TEX_SIZE,TEX_SIZE);
         particleEffect.particles.add(p);
         particleEffect.spawnCount--;
@@ -138,8 +140,9 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f pos = location.getWorldPosition();
             pos.add(particle.position);
-            if (worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).getId() != 0x0)
+            if (worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).getId() != 0x0) {
                 particle.velocity.y = 0;
+            }
         }
     }
 
@@ -178,7 +181,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 applyOrientation();
                 glScalef(particle.size, particle.size, particle.size);
 
-                float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x, worldPos.y + particle.position.y, worldPos.z + particle.position.z));
+                float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
+                    worldPos.y + particle.position.y, worldPos.z + particle.position.z));
                 renderParticle(particle, particleEffect.blockType.getArchetypeBlock().getId(), temperature, humidity, light);
                 glPopMatrix();
             }
@@ -196,17 +200,18 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         // And undo all rotations and scaling
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (i == j)
+                if (i == j) {
                     model.put(i * 4 + j, 1.0f);
-                else
+                } else {
                     model.put(i * 4 + j, 0.0f);
+                }
             }
         }
 
         GL11.glLoadMatrix(model);
     }
 
-    protected void renderParticle(Particle particle, byte blockType, float temperature, float humidity, float light) {
+    protected void renderParticle(Particle particle, short blockType, float temperature, float humidity, float light) {
         int displayList = displayLists.get(BlockManager.getInstance().getBlock(blockType).getBlockFamily());
         if (displayList == 0) {
             displayList = glGenLists(1);
@@ -227,23 +232,29 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         glCallList(displayList);
     }
 
-    private void drawParticle(byte blockType) {
+    private void drawParticle(short blockType) {
         Block b = BlockManager.getInstance().getBlock(blockType);
+
+        final float particleTexSize = calcParticleTexSize();
 
         glBegin(GL_QUADS);
         GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + particleTexSize, b.getTextureOffsetFor(BlockPart.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + particleTexSize, b.getTextureOffsetFor(BlockPart.FRONT).y + particleTexSize);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y + particleTexSize);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 
+    }
+
+    private float calcParticleTexSize() {
+        return Block.calcRelativeTileSize() * REL_PARTICLE_TEX_SIZE;
     }
 
     public void renderOpaque() {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering;
+package org.terasology.rendering.renderer;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Renderer for an AABB.
+ *
  * @author Immortius
  */
 public class AABBRenderer implements BlockOverlayRenderer
