@@ -1,15 +1,15 @@
 {
     "Item" : {
-        "name" : "Diamond Ace",
+        "name" : "Hearts Ace",
         "icon" : "door",
         "renderWithIcon" : true,
-        "stackId" : "lightAndShadow:diamondAce",
+        "stackId" : "lightAndShadow:heartsAce",
         "consumedOnUse" : false,
         "usage" : "ON_BLOCK"
     },
     "Card" : {
-        "topBlockFamily" : "lightAndShadow:diamondAceTop",
-        "bottomBlockFamily" : "lightAndShadow:diamondAceBottom"
+        "topBlockFamily" : "lightAndShadow:heartsAceTop",
+        "bottomBlockFamily" : "lightAndShadow:heartsAceBottom"
     },
     "Health" : {
         "currentHealth" : 64,

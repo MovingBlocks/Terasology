@@ -1,0 +1,20 @@
+{
+    "Item" : {
+        "name" : "Clubs Ace",
+        "icon" : "door",
+        "renderWithIcon" : true,
+        "stackId" : "lightAndShadow:clubsAce",
+        "consumedOnUse" : false,
+        "usage" : "ON_BLOCK"
+    },
+    "Card" : {
+        "topBlockFamily" : "lightAndShadow:clubsAceTop",
+        "bottomBlockFamily" : "lightAndShadow:clubsAceBottom"
+    },
+    "Health" : {
+        "currentHealth" : 64,
+        "maxHealth" : 64,
+        "regenRate" : 4,
+        "waitBeforeRegen" : 1
+    }
+}
