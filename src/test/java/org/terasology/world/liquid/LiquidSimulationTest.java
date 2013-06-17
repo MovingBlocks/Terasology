@@ -16,8 +16,6 @@
 
 package org.terasology.world.liquid;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Region3i;
@@ -28,6 +26,8 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Immortius
@@ -46,11 +46,11 @@ public class LiquidSimulationTest {
 
         view = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1,1,1));
 
-        air = BlockManager.getInstance().getBlock((byte)0);
+        air = BlockManager.getInstance().getBlock((short) 0);
         dirt = new Block();
         dirt.setDisplayName("Dirt");
         dirt.setUri(new BlockUri("engine:dirt"));
-        dirt.setId((byte) 1);
+        dirt.setId((short) 1);
         BlockManager.getInstance().addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt));
 
         for (int x = -Chunk.SIZE_X + 1; x < 2 * Chunk.SIZE_X; ++x) {

@@ -16,8 +16,6 @@
 
 package org.terasology.world.generator;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Region3i;
@@ -31,6 +29,8 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.lighting.InternalLightProcessor;
 
+import static org.junit.Assert.*;
+
 /**
  * @author Immortius
  */
@@ -41,11 +41,11 @@ public class InternalLightGeneratorTest {
 
     @Before
     public void setup() {
-        airBlock = BlockManager.getInstance().getBlock((byte)0);
+        airBlock = BlockManager.getInstance().getBlock((short) 0);
         solidBlock = new Block();
         solidBlock.setDisplayName("Stone");
         solidBlock.setUri(new BlockUri("engine:stone"));
-        solidBlock.setId((byte) 1);
+        solidBlock.setId((short) 1);
         for (Side side : Side.values()) {
             solidBlock.setFullSide(side, true);
         }
