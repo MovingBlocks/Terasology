@@ -36,6 +36,7 @@ public class RenderingConfig {
     private boolean bloom = false;
     private boolean dynamicShadows = false;
     private boolean oculusVrSupport = false;
+    private int maxTextureAtlasResolution = 4096;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -278,5 +279,13 @@ public class RenderingConfig {
             default:
                 return viewDistanceNear;
         }
+    }
+
+    public int getMaxTextureAtlasResolution() {
+        return maxTextureAtlasResolution;
+    }
+
+    public void setMaxTextureAtlasResolution(int maxTextureAtlasResolution) {
+        this.maxTextureAtlasResolution = maxTextureAtlasResolution;
     }
 }

@@ -32,6 +32,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.paths.PathManager;
 import org.terasology.math.Rotation;
@@ -69,7 +70,6 @@ import java.util.Map;
  * @author Immortius
  */
 public class BlockLoader {
-    private static final int MAX_TILES = 256;
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
     private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
@@ -187,6 +187,12 @@ public class BlockLoader {
     }
 
     public void buildAtlas() {
+        // Update the atlas configuration using the given set of tiles
+        for (int index = 0; index < tiles.size(); ++index) {
+            Tile tile = tiles.get(index);
+            updateAtlasConfiguration(tile);
+        }
+
         int numMipMaps = getNumMipmaps();
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
@@ -230,11 +236,7 @@ public class BlockLoader {
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
 
-        if (tiles.size() > MAX_TILES) {
-            logger.error("Too many tiles, culling overflow");
-        }
-
-        for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
+        for (int index = 0; index < tiles.size(); ++index) {
             Tile tile = tiles.get(index);
 
             int posX = (index) % tilesPerDim;
@@ -435,8 +437,6 @@ public class BlockLoader {
     }
 
     private Vector2f calcAtlasPositionForId(int id) {
-        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
-
         int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
         return new Vector2f((id % tilesPerDim) * Block.calcRelativeTileSize(), (id / tilesPerDim) * Block.calcRelativeTileSize());
     }
@@ -540,6 +540,43 @@ public class BlockLoader {
             logger.warn("Unable to resolve block tile '{}'", uri);
         }
         return 0;
+    }
+
+    private void updateAtlasConfiguration(Tile currentTile) {
+        // The atlas is configured using the following constraints...
+        // 1.   The overall tile size is the size of the largest tile loaded
+        // 2.   The atlas will never be larger than 4096*4096 px
+        // 3.   The tile size gets adjusted if the tiles won't fit into the atlas using the overall tile size
+        //      (the tile size gets halved until all tiles will fit into the atlas)
+        // 4.   The size of the atlas is always a power of two - as is the tile size
+        int tileSize = Block.TILE_SIZE;
+        int atlasSize = Block.ATLAS_SIZE;
+
+        if (currentTile.getImage().getWidth() > tileSize) {
+            tileSize = currentTile.getImage().getWidth();
+        }
+
+        int atlasSizePow = 0, count = 0;
+        while (atlasSizePow * atlasSizePow < tiles.size()) {
+            atlasSizePow = (1 << count);
+            count++;
+        }
+
+        atlasSize = atlasSizePow * tileSize;
+
+        final int maxTextureAtlasRes = CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution();
+        if (atlasSize > maxTextureAtlasRes) {
+            atlasSize = maxTextureAtlasRes;
+        }
+
+        int maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+        while (maxTiles < tiles.size()) {
+            tileSize >>= 1;
+            maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+        }
+
+        Block.ATLAS_SIZE = atlasSize;
+        Block.TILE_SIZE = tileSize;
     }
 
     private JsonElement readJson(AssetUri blockDefUri) {

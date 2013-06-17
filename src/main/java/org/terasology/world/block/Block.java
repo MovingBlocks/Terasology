@@ -69,8 +69,8 @@ public class Block {
     private static final EnumMap<BlockPart, Float> DIRECTION_LIT_LEVEL = new EnumMap<BlockPart, Float>(BlockPart.class);
 
     // TODO: Move me some place else - please
-    public static final int ATLAS_SIZE = 256;
-    public static final int TILE_SIZE = 16;
+    public static int ATLAS_SIZE = 256;
+    public static int TILE_SIZE = 16;
 
     /**
      * Different color sources for blocks.
