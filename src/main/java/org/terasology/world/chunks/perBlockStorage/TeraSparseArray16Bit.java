@@ -116,6 +116,11 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     public static class Factory implements TeraArray.Factory<TeraSparseArray16Bit> {
         
         @Override
+        public String getId() {
+            return "16-bit-sparse";
+        }
+        
+        @Override
         public Class<TeraSparseArray16Bit> getArrayClass() {
             return TeraSparseArray16Bit.class;
         }

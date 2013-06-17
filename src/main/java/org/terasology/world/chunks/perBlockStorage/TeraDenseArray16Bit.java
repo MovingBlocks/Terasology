@@ -74,6 +74,11 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
     public static class Factory implements TeraArray.Factory<TeraDenseArray16Bit> {
         
         @Override
+        public String getId() {
+            return "16-bit-dense";
+        }
+        
+        @Override
         public Class<TeraDenseArray16Bit> getArrayClass() {
             return TeraDenseArray16Bit.class;
         }

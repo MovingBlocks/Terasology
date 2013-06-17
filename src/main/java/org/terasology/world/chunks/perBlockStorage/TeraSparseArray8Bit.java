@@ -50,6 +50,11 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public static class Factory implements TeraArray.Factory<TeraSparseArray8Bit> {
         
         @Override
+        public String getId() {
+            return "8-bit-sparse";
+        }
+        
+        @Override
         public Class<TeraSparseArray8Bit> getArrayClass() {
             return TeraSparseArray8Bit.class;
         }
