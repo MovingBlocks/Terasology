@@ -206,7 +206,7 @@ void main(){
         }
     /* MASK GRASS AND APPLY BIOME COLOR */
     } else {
-        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET)));
+        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET_EFFECTS + mod(texCoord.x, TEXTURE_OFFSET_EFFECTS), mod(texCoord.y, TEXTURE_OFFSET_EFFECTS)));
 
         // Only use one channel so the color won't be altered
         if (maskColor.a != 0.0) color.rgb = vec3(color.g) * gl_Color.rgb;

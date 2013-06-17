@@ -47,7 +47,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -65,7 +64,7 @@ import org.terasology.world.block.management.BlockManager;
 @RegisterComponentSystem(headedOnly = true)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
-    private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
+    private static final float REL_PARTICLE_TEX_SIZE = 0.25f;
 
     @In
     private EntityManager entityManager;
@@ -116,12 +115,15 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     private void spawnParticle(BlockParticleEffectComponent particleEffect) {
+        final float particleTexSize = calcParticleTexSize();
+        final float texOffset = Block.calcRelativeTileSize();
+
         Particle p = new Particle();
         p.lifeRemaining = random.randomPosFloat() * (particleEffect.maxLifespan - particleEffect.maxLifespan) + particleEffect.minLifespan;
         p.velocity.set(particleEffect.initialVelocityRange.x * random.randomFloat(), particleEffect.initialVelocityRange.y * random.randomFloat(), particleEffect.initialVelocityRange.z * random.randomFloat());
         p.size = random.randomPosFloat() * (particleEffect.maxSize - particleEffect.minSize) + particleEffect.minSize;
         p.position.set(particleEffect.spawnRange.x * random.randomFloat(), particleEffect.spawnRange.y * random.randomFloat(), particleEffect.spawnRange.z * random.randomFloat());
-        p.texOffset.set(random.randomPosFloat() * (Block.TEXTURE_OFFSET - TEX_SIZE), random.randomPosFloat() * (Block.TEXTURE_OFFSET - TEX_SIZE));
+        p.texOffset.set(random.randomPosFloat() * (texOffset - particleTexSize), random.randomPosFloat() * (texOffset - particleTexSize));
         //p.texSize.set(TEX_SIZE,TEX_SIZE);
         particleEffect.particles.add(p);
         particleEffect.spawnCount--;
@@ -233,20 +235,26 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     private void drawParticle(short blockType) {
         Block b = BlockManager.getInstance().getBlock(blockType);
 
+        final float particleTexSize = calcParticleTexSize();
+
         glBegin(GL_QUADS);
         GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + particleTexSize, b.getTextureOffsetFor(BlockPart.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + particleTexSize, b.getTextureOffsetFor(BlockPart.FRONT).y + particleTexSize);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y + particleTexSize);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 
+    }
+
+    private float calcParticleTexSize() {
+        return Block.calcRelativeTileSize() * REL_PARTICLE_TEX_SIZE;
     }
 
     public void renderOpaque() {

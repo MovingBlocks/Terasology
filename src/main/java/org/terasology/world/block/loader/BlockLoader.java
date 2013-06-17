@@ -41,7 +41,6 @@ import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.*;
@@ -75,10 +74,6 @@ public class BlockLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
 
-    // TODO: for now these are fixed (constant in the chunk shader)
-    private int atlasSize = 256;
-    private int tileSize = 16;
-
     private JsonParser parser;
     private Gson gson;
 
@@ -107,12 +102,8 @@ public class BlockLoader {
         return gson.fromJson(element, type);
     }
 
-    public int getAtlasSize() {
-        return atlasSize;
-    }
-
     public int getNumMipmaps() {
-        return TeraMath.sizeOfPower(tileSize) + 1;
+        return TeraMath.sizeOfPower(Block.TILE_SIZE) + 1;
     }
 
     public LoadBlockDefinitionResults loadBlockDefinitions() {
@@ -222,7 +213,7 @@ public class BlockLoader {
             }
         }
 
-        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = new Texture(data, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
@@ -232,9 +223,9 @@ public class BlockLoader {
     }
 
     private BufferedImage generateAtlas(int mipMapLevel) {
-        int size = atlasSize / (1 << mipMapLevel);
-        int textureSize = tileSize / (1 << mipMapLevel);
-        int tilesPerDim = atlasSize / tileSize;
+        int size = Block.ATLAS_SIZE / (1 << mipMapLevel);
+        int textureSize = Block.TILE_SIZE / (1 << mipMapLevel);
+        int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
 
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
@@ -416,6 +407,8 @@ public class BlockLoader {
     }
 
     private void applyShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             int tileIndex = getTileIndex(tileUris.get(part), shape.getMeshPart(part) != null);
@@ -423,7 +416,7 @@ public class BlockLoader {
             BlockPart targetPart = rot.rotate(part);
             block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
+                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.calcRelativeTileSizeWithOffset()));
                 if (part.isSide()) {
                     block.setFullSide(targetPart.getSide(), shape.isBlockingSide(part.getSide()));
                 }
@@ -433,15 +426,19 @@ public class BlockLoader {
     }
 
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.calcRelativeTileSizeWithOffset()));
         }
     }
 
     private Vector2f calcAtlasPositionForId(int id) {
-        int tilesPerDim = atlasSize / tileSize;
-        return new Vector2f((id % tilesPerDim) * Block.TEXTURE_OFFSET, (id / tilesPerDim) * Block.TEXTURE_OFFSET);
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
+        int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
+        return new Vector2f((id % tilesPerDim) * Block.calcRelativeTileSize(), (id / tilesPerDim) * Block.calcRelativeTileSize());
     }
 
     private Block createRawBlock(BlockDefinition def, String defaultName) {
@@ -575,7 +572,6 @@ public class BlockLoader {
     public BlockDefinition loadBlockDefinition(JsonElement element) {
         return gson.fromJson(element, BlockDefinition.class);
     }
-
     private static class BlockTilesDefinitionHandler implements JsonDeserializer<BlockDefinition.Tiles> {
 
         @Override

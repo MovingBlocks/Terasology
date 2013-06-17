@@ -63,13 +63,14 @@ import static org.lwjgl.opengl.GL11.*;
  */
 // TODO: Make this immutable, add a block builder class
 public class Block {
-    public static final float TEXTURE_OFFSET = 0.0625f;
-    public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
-
     private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this
     private static final EnumMap<BlockPart, Float> DIRECTION_LIT_LEVEL = new EnumMap<BlockPart, Float>(BlockPart.class);
+
+    // TODO: Move me some place else - please
+    public static final int ATLAS_SIZE = 256;
+    public static final int TILE_SIZE = 16;
 
     /**
      * Different color sources for blocks.
@@ -710,4 +711,11 @@ public class Block {
         return uri.toString();
     }
 
+    public static float calcRelativeTileSize() {
+        return 1.0f  / (ATLAS_SIZE / TILE_SIZE);
+    }
+
+    public static float calcRelativeTileSizeWithOffset() {
+        return calcRelativeTileSize() - 0.001f;
+    }
 }

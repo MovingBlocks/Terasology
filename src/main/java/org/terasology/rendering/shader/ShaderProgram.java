@@ -54,8 +54,6 @@ import javax.vecmath.Vector4f;
 public class ShaderProgram {
     private static final Logger logger = LoggerFactory.getLogger(ShaderProgram.class);
 
-    private static final String PreProcessorPreamble = "#version 120\n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + ";\n";
-
     private TIntIntMap fragmentPrograms = new TIntIntHashMap();
     private TIntIntMap vertexPrograms = new TIntIntHashMap();
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
@@ -371,8 +369,14 @@ public class ShaderProgram {
     }
 
     public static StringBuilder createShaderBuilder() {
+        String preProcessorPreamble = "#version 120\n";
+
+        preProcessorPreamble += "float TEXTURE_OFFSET = " + Block.calcRelativeTileSize() + ";\n";
+        // TODO: This shouldn't be hardcoded
+        preProcessorPreamble += "float TEXTURE_OFFSET_EFFECTS = " + 0.0625f + ";\n";
+
         Config config = CoreRegistry.get(Config.class);
-        StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
+        StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
         if (config.getRendering().isAnimateGrass())
             builder.append("#define ANIMATED_GRASS \n");
         if (config.getRendering().isAnimateWater()) {
