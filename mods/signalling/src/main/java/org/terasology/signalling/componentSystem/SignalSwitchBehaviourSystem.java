@@ -14,7 +14,7 @@ import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.math.Vector3i;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -47,7 +47,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     public void update(float delta) {
         Set<Vector3i> toRemoveSignal = Sets.newHashSet(activatedPressurePlates);
 
-        Iterable<EntityRef> players = entityManager.listEntitiesWith(CharacterComponent.class, LocationComponent.class);
+        Iterable<EntityRef> players = entityManager.getEntitiesWith(CharacterComponent.class, LocationComponent.class);
         for (EntityRef player : players) {
             Vector3f playerLocation = player.getComponent(LocationComponent.class).getWorldPosition();
             Vector3i locationBeneathPlayer = new Vector3i(playerLocation.x + 0.5f, playerLocation.y - 0.5f, playerLocation.z + 0.5f);
@@ -115,9 +115,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             Vector3i blockLocation = new Vector3i(entity.getComponent(BlockComponent.class).getPosition());
             Block blockAtLocation = worldProvider.getBlock(blockLocation);
             if (blockAtLocation == lampTurnedOff && consumerStatusComponent.hasSignal) {
-                blockEntityRegistry.setBlockRetainEntity(blockLocation, lampTurnedOn, blockAtLocation);
+                worldProvider.setBlock(blockLocation, lampTurnedOn, blockAtLocation);
             } else if (blockAtLocation == lampTurnedOn && !consumerStatusComponent.hasSignal) {
-                blockEntityRegistry.setBlockRetainEntity(blockLocation, lampTurnedOff, blockAtLocation);
+                worldProvider.setBlock(blockLocation, lampTurnedOff, blockAtLocation);
             }
         }
     }
