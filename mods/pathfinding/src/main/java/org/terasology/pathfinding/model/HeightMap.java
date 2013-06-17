@@ -5,11 +5,14 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.Chunk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
-* @author synopia
-*/
+ * @author synopia
+ */
 public class HeightMap {
     public static final int SIZE_X = Chunk.SIZE_X;
     public static final int SIZE_Y = Chunk.SIZE_Y;
@@ -23,7 +26,7 @@ public class HeightMap {
     public static final int DIR_DOWN  = 6;
     public static final int DIR_LD    = 7;
     public static final int[][] DIRECTIONS = new int[][] {
-            {-1,0}, {-1,-1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}
+        {-1,0}, {-1,-1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}
     };
 
     /* package protected */ HeightMapCell[] cells = new HeightMapCell[SIZE_X*SIZE_Z];
@@ -156,10 +159,18 @@ public class HeightMap {
                 disconnectFromNeighbor(block, x, 0, down, DIR_DOWN);
             }
         }
-        if( left!=null ) left.findContour();
-        if( right!=null ) right.findContour();
-        if( up!=null ) up.findContour();
-        if( down!=null ) down.findContour();
+        if( left!=null ) {
+            left.findContour();
+        }
+        if( right!=null ) {
+            right.findContour();
+        }
+        if( up!=null ) {
+            up.findContour();
+        }
+        if( down!=null ) {
+            down.findContour();
+        }
     }
 
     private void disconnectFromNeighbor(WalkableBlock block, int dx, int dz, HeightMap neighbor, int neighborId) {

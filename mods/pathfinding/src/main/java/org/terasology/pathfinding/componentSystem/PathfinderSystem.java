@@ -4,7 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.WorldComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -19,8 +23,16 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.chunks.ChunkReadyEvent;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author synopia
@@ -140,7 +152,8 @@ public class PathfinderSystem implements EventHandlerSystem, UpdateSubscriberSys
                                     }
                                     pathsValid = true;
                                     float ms = (System.nanoTime() - time) / 1000 / 1000f;
-                                    logger.info("Searching "+count+" pathes took "+ ms +" ms ("+(1000f/count)+" pps), not found="+notFound);
+                                    logger.info("Searching "+count+" pathes took "+ ms +" ms ("
+                                        +(1000f/count)+" pps), not found="+notFound);
                                 }
                             }
                         } catch (InterruptedException e) {

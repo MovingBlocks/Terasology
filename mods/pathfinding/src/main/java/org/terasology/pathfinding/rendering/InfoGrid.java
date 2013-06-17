@@ -7,17 +7,17 @@ import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glEnable;
 
 /**
  * @author synopia
@@ -159,10 +159,11 @@ public class InfoGrid {
         // And undo all rotations and scaling
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (i == j)
+                if (i == j) {
                     model.put(i * 4 + j, 1.0f);
-                else
+                } else {
                     model.put(i * 4 + j, 0.0f);
+                }
             }
         }
 

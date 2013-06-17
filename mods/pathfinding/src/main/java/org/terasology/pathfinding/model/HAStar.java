@@ -2,7 +2,14 @@ package org.terasology.pathfinding.model;
 
 import org.terasology.math.Vector3i;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author synopia
@@ -191,7 +198,8 @@ public class HAStar {
         if( fromNode.block.floor.heightMap.pathCache.hasPath(fromNode.block, toNode.block)) {
             cacheHits ++;
         }
-        localPath = fromNode.block.floor.heightMap.pathCache.findPath(fromNode.block, toNode.block, new PathCache.Callback() {
+        localPath = fromNode.block.floor.heightMap.pathCache.findPath(
+            fromNode.block, toNode.block, new PathCache.Callback() {
             @Override
             public Path run(WalkableBlock from, WalkableBlock to) {
                 localAStar.reset();

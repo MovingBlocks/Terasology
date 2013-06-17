@@ -5,9 +5,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author synopia
  */
@@ -19,7 +16,7 @@ public class WalkableBlockFinder {
     }
 
     public void findWalkableBlocks(HeightMap map) {
-        int airMap[] = new int[HeightMap.SIZE_X*HeightMap.SIZE_Z];
+        int []airMap = new int[HeightMap.SIZE_X*HeightMap.SIZE_Z];
         Vector3i blockPos = new Vector3i();
         map.walkableBlocks.clear();
         Vector3i worldPos = map.worldPos;

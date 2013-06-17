@@ -9,8 +9,8 @@ import java.util.Comparator;
 public class BinaryHeap {
     private static final int DEFAULT_CAPACITY = 1000;
     private static final int DEFAULT_INDEX_SIZE = 1024;
-    private int heap[];
-    private int itemToIndex[];
+    private int []heap;
+    private int []itemToIndex;
     private int size;
     private Comparator<Integer> comparator;
 

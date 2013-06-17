@@ -1,6 +1,9 @@
 package org.terasology.pathfinding.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author synopia
@@ -62,7 +65,7 @@ public class AStar {
 
     @Override
     public String toString() {
-        ArrayList path = new ArrayList();
+        ArrayList<Integer> path = new ArrayList<Integer>();
         getPath(path);
         int id = 0;
         String text = "";

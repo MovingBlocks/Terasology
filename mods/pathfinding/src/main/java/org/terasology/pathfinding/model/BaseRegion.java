@@ -14,17 +14,17 @@ public abstract class BaseRegion<N extends BaseRegion> {
     protected BitMap map;
     protected BitMap contour;
     protected Floor floor;
-    private static boolean[] EDGES;
-    private static int POS_0=1<<0;
-    private static int POS_1=1<<1;
-    private static int POS_2=1<<2;
-    private static int POS_3=1<<3;
-    private static int POS_4=1<<4;
-    private static int POS_5=1<<5;
-    private static int POS_6=1<<6;
-    private static int POS_7=1<<7;
-    private static int POS_8=1<<8;
-    private static int POS_ALL=(1<<9)-1;
+    private static final boolean[] EDGES;
+    private static final int POS_0=1<<0;
+    private static final int POS_1=1<<1;
+    private static final int POS_2=1<<2;
+    private static final int POS_3=1<<3;
+    private static final int POS_4=1<<4;
+    private static final int POS_5=1<<5;
+    private static final int POS_6=1<<6;
+    private static final int POS_7=1<<7;
+    private static final int POS_8=1<<8;
+    private static final int POS_ALL=(1<<9)-1;
 
 
     static {
@@ -60,20 +60,20 @@ public abstract class BaseRegion<N extends BaseRegion> {
         @Override
         public boolean apply(boolean[] input) {
             int mask = 0;
-            if( input[0]) mask+= 1<<0;
-            if( input[1]) mask+= 1<<1;
-            if( input[2]) mask+= 1<<2;
-            if( input[3]) mask+= 1<<3;
-            if( input[4]) mask+= 1<<4;
-            if( input[5]) mask+= 1<<5;
-            if( input[6]) mask+= 1<<6;
-            if( input[7]) mask+= 1<<7;
-            if( input[8]) mask+= 1<<8;
+            if( input[0]) { mask+= 1<<0; }
+            if( input[1]) { mask+= 1<<1; }
+            if( input[2]) { mask+= 1<<2; }
+            if( input[3]) { mask+= 1<<3; }
+            if( input[4]) { mask+= 1<<4; }
+            if( input[5]) { mask+= 1<<5; }
+            if( input[6]) { mask+= 1<<6; }
+            if( input[7]) { mask+= 1<<7; }
+            if( input[8]) { mask+= 1<<8; }
 
             return EDGES[mask];
         }
     }
-    public static EdgeFinder EDGE_KERNEL = new EdgeFinder();
+    public static final EdgeFinder EDGE_KERNEL = new EdgeFinder();
 
     protected BaseRegion( int id ) {
         this.id = id;

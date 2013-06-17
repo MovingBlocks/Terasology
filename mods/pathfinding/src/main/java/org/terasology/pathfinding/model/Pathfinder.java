@@ -4,11 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.pathfinding.rendering.InfoGrid;
 import org.terasology.world.WorldProvider;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 

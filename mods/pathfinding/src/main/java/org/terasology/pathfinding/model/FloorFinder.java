@@ -2,9 +2,15 @@ package org.terasology.pathfinding.model;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.Chunk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author synopia

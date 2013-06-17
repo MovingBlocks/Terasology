@@ -110,12 +110,12 @@ public class BitMap {
         int count = map.cardinality();
         for (int z = 0; z < getHeight(); z++) {
             for (int x = 0; x < getWidth(); x++) {
-                 if( map.get(offset(x, z)) ) {
-                     sb.append("X");
-                     count--;
-                 } else {
-                     sb.append(" ");
-                 }
+                if( map.get(offset(x, z)) ) {
+                    sb.append("X");
+                    count--;
+                } else {
+                    sb.append(" ");
+                }
             }
             if( count==0 ) {
                 break;

@@ -1,7 +1,5 @@
 package org.terasology.pathfinding.model;
 
-import java.util.*;
-
 /**
 * @author synopia
 */

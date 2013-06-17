@@ -1,6 +1,6 @@
 package org.terasology.pathfinding.model;
 
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * @author synopia
