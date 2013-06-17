@@ -35,7 +35,7 @@ import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.logic.inventory.DroppedItemComponent;
+import org.terasology.logic.inventory.PickupComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -185,7 +185,7 @@ public class MeshRenderer implements RenderSystem {
 
     @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
     public void onDestroyMesh(BeforeDeactivateComponent event, EntityRef entity) {
-        if (entity.getComponent(DroppedItemComponent.class) != null) {
+        if (entity.getComponent(PickupComponent.class) != null) {
             return;
         }
         removeMesh(entity);

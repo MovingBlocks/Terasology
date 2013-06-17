@@ -23,6 +23,7 @@ import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
+import org.terasology.world.block.ForceBlockActive;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ import java.util.List;
  *
  * @author Immortius <immortius@gmail.com>
  */
+@ForceBlockActive
 public final class InventoryComponent implements Component, ReplicationCheck {
 
     @Replicate

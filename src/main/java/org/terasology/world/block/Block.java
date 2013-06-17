@@ -164,9 +164,9 @@ public class Block {
     private boolean debrisOnDestroy = true;
 
     // Entity integration
-    private String entityPrefab = "";
-    private BlockEntityMode entityMode = BlockEntityMode.ON_INTERACTION;
-    private EntityRef blockEntity = EntityRef.NULL;
+    private String prefab = "";
+    private boolean keepActive = false;
+    private EntityRef entity = EntityRef.NULL;
 
     // Inventory settings
     private boolean directPickup = false;
@@ -368,31 +368,28 @@ public class Block {
     /**
      * @return The entity prefab for this block
      */
-    public String getEntityPrefab() {
-        return entityPrefab;
+    public String getPrefab() {
+        return prefab;
     }
 
-    public void setEntityPrefab(String value) {
-        entityPrefab = (value == null) ? "" : value;
+    public void setPrefab(String value) {
+        prefab = (value == null) ? "" : value;
     }
 
-    public BlockEntityMode getEntityMode() {
-        if (stackable && entityMode == BlockEntityMode.PERSISTENT) {
-            return BlockEntityMode.WHILE_PLACED;
-        }
-        return entityMode;
+    public boolean isKeepActive() {
+        return keepActive;
     }
 
-    public void setEntityMode(BlockEntityMode entityMode) {
-        this.entityMode = entityMode;
+    public void setKeepActive(boolean keepActive) {
+        this.keepActive = true;
     }
 
     public EntityRef getEntity() {
-        return blockEntity;
+        return entity;
     }
 
     public void setEntity(EntityRef entity) {
-        this.blockEntity = entity;
+        this.entity = entity;
     }
 
     /**

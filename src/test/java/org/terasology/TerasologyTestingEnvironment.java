@@ -33,17 +33,23 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Terasology;
+import org.terasology.engine.Timer;
+import org.terasology.engine.TimerLwjgl;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
 import java.io.File;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
@@ -61,7 +67,9 @@ public abstract class TerasologyTestingEnvironment {
     private static AudioManager audioManager;
     private static CollisionGroupManager collisionGroupManager;
     private static ModManager modManager;
+    private static NetworkSystem networkSystem;
     private ComponentSystemManager componentSystemManager;
+    private Timer mockTimer;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
@@ -90,6 +98,7 @@ public abstract class TerasologyTestingEnvironment {
             AssetType.registerAssetTypes();
             AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
             AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+
         } else {
             CoreRegistry.put(BlockManager.class, blockManager);
             CoreRegistry.put(Config.class, config);
@@ -102,12 +111,17 @@ public abstract class TerasologyTestingEnvironment {
 
     @Before
     public void setup() throws Exception {
-        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class));
+        mockTimer = mock(Timer.class);
+        CoreRegistry.put(Timer.class, mockTimer);
+        networkSystem = new NetworkSystemImpl(mockTimer);
+        CoreRegistry.put(NetworkSystem.class, networkSystem);
+        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
         prefabLoadStep.begin();
         while (!prefabLoadStep.step()) ;
+        CoreRegistry.get(ComponentSystemManager.class).initialise();
     }
 
     public EngineEntityManager getEntityManager() {

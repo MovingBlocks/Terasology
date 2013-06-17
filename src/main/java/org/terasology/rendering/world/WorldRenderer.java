@@ -787,7 +787,7 @@ public final class WorldRenderer {
      */
     public final int maxHeightAt(int x, int z) {
         for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
-            if (worldProvider.getBlock(x, y, z).getId() != 0x0)
+            if (!worldProvider.getBlock(x, y, z).isInvisible())
                 return y;
         }
 

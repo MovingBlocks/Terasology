@@ -58,7 +58,7 @@ public class NetworkEntitySystem implements ComponentSystem {
 
     @Override
     public void initialise() {
-        for (EntityRef entity : entityManager.listEntitiesWith(NetworkComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
             networkSystem.registerNetworkEntity(entity);
         }
     }

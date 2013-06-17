@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block;
+package org.terasology.logic.inventory;
 
-/**
- * @author Immortius
- */
-public enum BlockEntityMode {
-    ON_INTERACTION,
-    WHILE_PLACED,
-    PERSISTENT
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
+
+
+public class PickupComponent implements Component {
+    @Owns
+    public EntityRef itemEntity = EntityRef.NULL;
 }

@@ -19,7 +19,6 @@ package org.terasology.world.block.loader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockPart;
 
 import javax.vecmath.Vector4f;
@@ -91,7 +90,7 @@ public class BlockDefinition {
 
     public static class Entity {
         public String prefab = "";
-        public BlockEntityMode mode = BlockEntityMode.PERSISTENT;
+        public boolean keepActive = false;
     }
 
     public static class Inventory {

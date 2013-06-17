@@ -1,4 +1,4 @@
-package org.terasology.world.block.entity;
+package org.terasology.world.block.typeEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class BlockTypeSystem implements ComponentSystem {
         if (block != null) {
             block.setEntity(entity);
         } else {
-            logger.error("Recieved block type entity with missing block type");
+            logger.error("Received block type entity with missing block type");
         }
     }
 

@@ -8,8 +8,10 @@ import org.terasology.engine.Terasology;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkSystem;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
 
 /**
@@ -30,7 +32,7 @@ public class OwnershipHelperTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = builder.build(modManager);
+        entityManager = builder.build(modManager, mock(NetworkSystem.class));
     }
 
     @Test

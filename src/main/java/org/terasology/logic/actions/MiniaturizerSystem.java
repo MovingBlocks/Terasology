@@ -36,7 +36,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(MiniaturizerComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(MiniaturizerComponent.class)) {
             MiniaturizerComponent min = entity.getComponent(MiniaturizerComponent.class);
 
             if (min.chunkMesh == null && min.miniatureChunk != null) {
@@ -51,7 +51,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
 
     public void renderTransparent() {
 
-        for (EntityRef entity : entityManager.listEntitiesWith(MiniaturizerComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(MiniaturizerComponent.class)) {
             MiniaturizerComponent min = entity.getComponent(MiniaturizerComponent.class);
 
             min.blockGrid.render();

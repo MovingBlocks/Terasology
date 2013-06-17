@@ -18,9 +18,8 @@ package org.terasology.logic.characters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.world.block.entity.DroppedBlockFactory;
-import org.terasology.logic.inventory.DroppedItemFactory;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -47,8 +46,7 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
-import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.BlockComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -187,25 +185,11 @@ public class CharacterSystem implements ComponentSystem {
 
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 
-            BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
-            if (blockItem == null) {
-                DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
-                EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, itemEntity);
-
-                if (!droppedItem.equals(EntityRef.NULL)) {
-                    droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
-                }
-            } else {
-                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), blockItem.blockFamily, 20, blockItem.placedEntity);
-                if (droppedBlock.exists()) {
-                    droppedBlock.send(new ImpulseEvent(new Vector3f(impulse)));
-                    blockItem.placedEntity = EntityRef.NULL;
-                    itemEntity.saveComponent(blockItem);
-                    itemEntity.destroy();
-                }
+            ItemPickupFactory itemPickupFactory = new ItemPickupFactory(entityManager);
+            EntityRef droppedItem = itemPickupFactory.newInstance(new Vector3f(newPosition), 200, itemEntity);
+            if (!droppedItem.equals(EntityRef.NULL)) {
+                droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
             }
-
         }
     }
 

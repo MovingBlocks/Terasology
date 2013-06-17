@@ -75,6 +75,7 @@ public interface EntityManager {
      */
     EntityRef create(Prefab prefab);
 
+    // TODO: Review. Probably better to move these into a static helper
     /**
      * @param prefab
      * @param position
@@ -89,13 +90,14 @@ public interface EntityManager {
      */
     EntityRef create(Prefab prefab, Vector3f position);
 
-    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
-
     /**
-     * @param id
-     * @return Whether the entity in question is currently loaded
+     *
+     * @param prefab
+     * @param position
+     * @param rotation
+     * @return
      */
-    boolean isEntityLoaded(int id);
+    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
 
     /**
      * @param id
@@ -107,6 +109,7 @@ public interface EntityManager {
      * @param other
      * @return A new entity with a copy of each of the other entity's components
      */
+    // TODO: Remove? A little dangerous due to ownership
     EntityRef copy(EntityRef other);
 
     /**
@@ -114,36 +117,37 @@ public interface EntityManager {
      * @param original
      * @return A map of components types to components copied from the target entity.
      */
+    // TODO: Remove? A little dangerous due to ownership
     Map<Class<? extends Component>, Component> copyComponents(EntityRef original);
-
-    /**
-     * @param componentClass
-     * @return The number of entities with this component class
-     */
-    int getComponentCount(Class<? extends Component> componentClass);
 
     /**
      * @return An iterable over all entities
      */
-    Iterable<EntityRef> listEntities();
+    Iterable<EntityRef> getAllEntities();
 
     /**
      * @param componentClasses
      * @return An iterable over all entities with the provided component types.
      */
-    Iterable<EntityRef> listEntitiesWith(Class<? extends Component>... componentClasses);
-
-    <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass);
-
+    Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
     /**
      * @return The event system being used by the entity manager
      */
     EventSystem getEventSystem();
 
+    /**
+     * @return The prefab manager being used by the entity manager
+     */
     PrefabManager getPrefabManager();
 
+    /**
+     * @return The component library being used by the entity manager
+     */
     ComponentLibrary getComponentLibrary();
 
-    int getActiveEntities();
+    /**
+     * @return A count of currently active entities
+     */
+    int getActiveEntityCount();
 }

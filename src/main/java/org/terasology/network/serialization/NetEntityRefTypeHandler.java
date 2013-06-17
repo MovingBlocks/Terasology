@@ -25,7 +25,7 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     public EntityRef deserialize(EntityData.Value value) {
         if (value.getIntegerCount() > 2) {
             Vector3i pos = new Vector3i(value.getInteger(0), value.getInteger(1), value.getInteger(2));
-            return blockEntityRegistry.getOrCreateBlockEntityAt(pos);
+            return blockEntityRegistry.getBlockEntityAt(pos);
         }
         if (value.getIntegerCount() > 0) {
             EntityRef result = new NetEntityRef(value.getInteger(0), networkSystem);
@@ -108,7 +108,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
         }
         for (EntityData.Value blockValue : value.getValueList()) {
             if (blockValue.getIntegerCount() > 2) {
-                result.add(blockEntityRegistry.getOrCreateBlockEntityAt(new Vector3i(blockValue.getInteger(0), blockValue.getInteger(1), blockValue.getInteger(2))));
+                result.add(blockEntityRegistry.getBlockEntityAt(new Vector3i(blockValue.getInteger(0), blockValue.getInteger(1), blockValue.getInteger(2))));
             } else {
                 result.add(EntityRef.NULL);
             }

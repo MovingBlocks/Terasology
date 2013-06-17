@@ -18,12 +18,14 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -45,7 +47,9 @@ public class PojoEventSystemTests {
         entityManager = new PojoEntityManager();
         entityManager.setEntitySystemLibrary(entitySystemLibrary);
         entityManager.setPrefabManager(new PojoPrefabManager(compLibrary));
-        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), mock(NetworkSystem.class));
+        NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem);
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
     }

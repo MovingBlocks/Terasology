@@ -15,10 +15,9 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
+import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.network.ClientComponent;
@@ -26,7 +25,8 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockPickupComponent;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Quat4f;
@@ -55,8 +55,11 @@ public class CoreCommands implements ComponentSystem {
     @In
     private BlockManager blockManager;
 
+    private ItemPickupFactory itemPickupFactory;
+
     @Override
     public void initialise() {
+        itemPickupFactory = new ItemPickupFactory(entityManager);
     }
 
     @Override
@@ -147,24 +150,15 @@ public class CoreCommands implements ComponentSystem {
         offset.scale(3);
         spawnPos.add(offset);
 
-        Block block = blockManager.getBlock(blockName);
+        BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {
             return "";
         }
 
-        Prefab prefab = prefabManager.getPrefab("core:droppedBlock");
-        if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-            EntityRef blockEntity = entityManager.create(prefab, spawnPos);
-            MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
-            BlockPickupComponent blockPickup = blockEntity.getComponent(BlockPickupComponent.class);
-            blockPickup.blockFamily = block.getBlockFamily();
-            blockMesh.mesh = block.getMesh();
-            blockEntity.saveComponent(blockMesh);
-            blockEntity.saveComponent(blockPickup);
-
-            return "Spawned block.";
-        }
-        return "";
+        BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+        EntityRef blockItem = blockItemFactory.newInstance(block);
+        itemPickupFactory.newInstance(spawnPos, 60, blockItem);
+        return "Spawned block.";
     }
 
 }

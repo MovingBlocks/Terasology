@@ -25,12 +25,12 @@ import org.terasology.world.block.Block;
  *
  * @author Immortius
  */
-public class BlockChangedEvent implements Event {
+public class OnChangedBlock implements Event {
     private Block oldType;
     private Block newType;
     private Vector3i blockPosition;
 
-    public BlockChangedEvent(Vector3i pos, Block newType, Block oldType) {
+    public OnChangedBlock(Vector3i pos, Block newType, Block oldType) {
         this.blockPosition = new Vector3i(pos);
         this.oldType = oldType;
         this.newType = newType;

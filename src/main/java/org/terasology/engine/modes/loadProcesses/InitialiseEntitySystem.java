@@ -21,6 +21,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkSystem;
 
 /**
  * @author Immortius
@@ -34,7 +35,7 @@ public class InitialiseEntitySystem implements LoadProcess {
     @Override
     public boolean step() {
         ModManager modManager = CoreRegistry.get(ModManager.class);
-        EngineEntityManager entityManager = new EntitySystemBuilder().build(modManager);
+        EngineEntityManager entityManager = new EntitySystemBuilder().build(modManager, CoreRegistry.get(NetworkSystem.class));
         return true;
     }
 

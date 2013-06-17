@@ -13,21 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// TODO: Move to another package
-package org.terasology.world.block.entity;
+package org.terasology.world.block;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.math.Vector3i;
 import org.terasology.network.Replicate;
-import org.terasology.world.block.family.BlockFamily;
+
+import javax.vecmath.Tuple3i;
 
 /**
- * @author Immortius
+ * Used for entities representing a block in the world
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public class BlockPickupComponent implements Component {
+public final class BlockComponent implements Component {
     @Replicate
-    public BlockFamily blockFamily;
-    @Replicate
-    public EntityRef placedEntity = EntityRef.NULL;
+    private Vector3i position = new Vector3i();
+
+    public BlockComponent() {
+    }
+
+    public BlockComponent(Tuple3i pos) {
+        this.position.set(pos);
+    }
+
+    public Vector3i getPosition() {
+        return position;
+    }
+
+    public void setPosition(Tuple3i pos) {
+        position.set(pos);
+    }
 }

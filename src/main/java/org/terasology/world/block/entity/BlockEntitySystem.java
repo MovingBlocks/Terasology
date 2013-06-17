@@ -18,8 +18,8 @@ package org.terasology.world.block.entity;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -35,10 +35,11 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockEntityMode;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemFactory;
+import org.terasology.world.block.items.OnBlockToItem;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerImpl;
 
 /**
  * Event handler for events affecting block entities
@@ -61,13 +62,13 @@ public class BlockEntitySystem implements ComponentSystem {
     private InventoryManager inventoryManager;
 
     private BlockItemFactory blockItemFactory;
-    private DroppedBlockFactory droppedBlockFactory;
+    private ItemPickupFactory itemPickupFactory;
     private FastRandom random;
 
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-        droppedBlockFactory = new DroppedBlockFactory(entityManager);
+        itemPickupFactory = new ItemPickupFactory(entityManager);
         random = new FastRandom();
     }
 
@@ -77,12 +78,10 @@ public class BlockEntitySystem implements ComponentSystem {
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onDestroyed(NoHealthEvent event, EntityRef entity) {
-        if (worldProvider == null) return;
-
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
-        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir(), oldBlock);
 
+        // TODO: Better handling of "support required" blocks
         Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
         if (upperBlock.isSupportRequired()) {
             worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getAir(), upperBlock);
@@ -91,53 +90,34 @@ public class BlockEntitySystem implements ComponentSystem {
         // TODO: Configurable via block definition
         entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
 
-        if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-            entity.removeComponent(HealthComponent.class);
-            entity.removeComponent(BlockComponent.class);
-        }
+        EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
+        entity.send(new OnBlockToItem(item));
 
-        if ((oldBlock.isDirectPickup()) && event.getInstigator().exists()) {
-            EntityRef item;
-            if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
-            } else {
-                item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
-            }
-
+        if ((oldBlock.isDirectPickup())) {
             if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                // TODO: Fix this - entity needs to be added to lootable block or destroyed
-                item.destroy();
-                EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
-                block.send(new ImpulseEvent(random.randomVector3f(30)));
+                EntityRef pickup = itemPickupFactory.newInstance(blockComp.getPosition().toVector3f(), 20, item);
+                pickup.send(new ImpulseEvent(random.randomVector3f(30)));
             }
         } else {
             /* PHYSICS */
-            EntityRef block;
-            if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20, entity);
-            } else {
-                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
-            }
-            block.send(new ImpulseEvent(random.randomVector3f(30)));
+            EntityRef pickup = itemPickupFactory.newInstance(blockComp.getPosition().toVector3f(), 20, item);
+            pickup.send(new ImpulseEvent(random.randomVector3f(30)));
         }
 
-        if (oldBlock.getEntityMode() != BlockEntityMode.PERSISTENT) {
-            entity.destroy();
-        }
+        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir(), oldBlock);
     }
 
-    // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged?
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = {BlockComponent.class, BlockDamagedComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
-        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-        if (blockComp.temporary) {
-            entity.destroy();
-        }
+        entity.removeComponent(BlockDamagedComponent.class);
     }
 
     @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
+        if (!entity.hasComponent(BlockDamagedComponent.class)) {
+            entity.addComponent(new BlockDamagedComponent());
+        }
     }
 
     @ReceiveEvent(components = {BlockComponent.class})

@@ -16,7 +16,6 @@
 package org.terasology.logic.ai;
 
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.ai.HierarchicalAIComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
@@ -68,7 +67,7 @@ public class HierarchicalAISystem implements ComponentSystem,
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(
+        for (EntityRef entity : entityManager.getEntitiesWith(
                 HierarchicalAIComponent.class, CharacterMovementComponent.class,
                 LocationComponent.class)) {
             LocationComponent location = entity

@@ -24,7 +24,7 @@ import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 
 import java.util.List;
 

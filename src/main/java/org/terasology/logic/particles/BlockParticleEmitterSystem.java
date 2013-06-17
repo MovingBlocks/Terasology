@@ -19,22 +19,22 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
@@ -92,7 +92,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
             Iterator<Particle> iterator = particleEffect.particles.iterator();
             while (iterator.hasNext()) {
@@ -158,7 +158,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 
@@ -182,7 +182,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 glScalef(particle.size, particle.size, particle.size);
 
                 float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x, worldPos.y + particle.position.y, worldPos.z + particle.position.z));
-                renderParticle(particle, particleEffect.blockType.getArchetypeBlock().getId(), temperature, humidity, light);
+                renderParticle(particle, particleEffect.blockType, temperature, humidity, light);
                 glPopMatrix();
             }
             glPopMatrix();
@@ -209,19 +209,19 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         GL11.glLoadMatrix(model);
     }
 
-    protected void renderParticle(Particle particle, byte blockType, float temperature, float humidity, float light) {
-        int displayList = displayLists.get(blockManager.getBlock(blockType).getBlockFamily());
+    protected void renderParticle(Particle particle, BlockFamily blockType, float temperature, float humidity, float light) {
+        int displayList = displayLists.get(blockType);
         if (displayList == 0) {
             displayList = glGenLists(1);
             glNewList(displayList, GL11.GL_COMPILE);
             drawParticle(blockType);
             glEndList();
-            displayLists.put(blockManager.getBlock(blockType).getBlockFamily(), displayList);
+            displayLists.put(blockType, displayList);
         }
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
 
-        Vector4f color = blockManager.getBlock(blockType).calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
+        Vector4f color = blockType.getArchetypeBlock().calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
         shader.setFloat("texOffsetX", particle.texOffset.x);
         shader.setFloat("texOffsetY", particle.texOffset.y);
@@ -230,8 +230,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         glCallList(displayList);
     }
 
-    private void drawParticle(byte blockType) {
-        Block b = blockManager.getBlock(blockType);
+    private void drawParticle(BlockFamily blockType) {
+        Block b = blockType.getArchetypeBlock();
 
         glBegin(GL_QUADS);
         GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y);

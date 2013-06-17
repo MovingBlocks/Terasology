@@ -28,12 +28,12 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.OnChunkLoaded;
@@ -137,7 +137,7 @@ public class LiquidSimulator implements ComponentSystem {
     }
 
     @ReceiveEvent(components = BlockComponent.class)
-    public void blockChanged(BlockChangedEvent event, EntityRef blockEntity) {
+    public void blockChanged(OnChangedBlock event, EntityRef blockEntity) {
         if (!event.getNewType().isLiquid()) {
             LiquidData currentState = world.getLiquid(event.getBlockPosition());
             if (currentState.getDepth() > 0) {

@@ -104,7 +104,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.listEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
             if (skeletalMeshComp.animation != null && skeletalMeshComp.animation.getFrameCount() > 0) {
                 skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
@@ -174,7 +174,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
         glPushMatrix();
         glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
-        for (EntityRef entity : entityManager.listEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             if (skeletalMesh.mesh == null || skeletalMesh.material == null) {
                 continue;

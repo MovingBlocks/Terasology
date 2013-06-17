@@ -112,13 +112,6 @@ public class ClassMetadata<T> {
         return null;
     }
 
-    public T clone(Component component) {
-        if (clazz.isInstance(component)) {
-            return clone((T)component);
-        }
-        return null;
-    }
-
     public int size() {
         return fields.size();
     }

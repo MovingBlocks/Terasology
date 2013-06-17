@@ -13,9 +13,9 @@ import java.util.Map;
 public class EntityBuilder implements ComponentContainer {
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
-    private EntityManager manager;
+    private EngineEntityManager manager;
 
-    public EntityBuilder(EntityManager manager) {
+    public EntityBuilder(EngineEntityManager manager) {
         this.manager = manager;
     }
 
@@ -25,6 +25,10 @@ public class EntityBuilder implements ComponentContainer {
      */
     public EntityRef build() {
         return manager.create(components.values());
+    }
+
+    public EntityRef buildNoEvents() {
+        return manager.createEntityWithoutEvents(components.values());
     }
 
     @Override

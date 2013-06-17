@@ -19,12 +19,14 @@ import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
+import org.terasology.world.block.ForceBlockActive;
 
 import javax.vecmath.Color4f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@ForceBlockActive
 public final class MeshComponent implements Component {
 
     // Temporary render details

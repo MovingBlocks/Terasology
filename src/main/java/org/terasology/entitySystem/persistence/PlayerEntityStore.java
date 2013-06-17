@@ -103,7 +103,7 @@ public class PlayerEntityStore implements EntityStore {
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
             entityStoreBuilder.addEntity(entityData);
             entityStoreBuilder.addEntityName(name);
-            entityManager.removedForStoring(entity);
+            entityManager.deactivateForStorage(entity);
         }
     }
 

@@ -32,7 +32,8 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockRegionComponent;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -93,7 +94,7 @@ public class BlockDamageRenderer implements RenderSystem {
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.listEntitiesWith(HealthComponent.class, BlockComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockDamagedComponent.class, HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth == health.maxHealth) {
                 continue;
@@ -101,7 +102,7 @@ public class BlockDamageRenderer implements RenderSystem {
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             renderHealth(blockComp.getPosition(), health, cameraPosition);
         }
-        for (EntityRef entity : entityManager.listEntitiesWith(BlockRegionComponent.class, HealthComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockRegionComponent.class, HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth == health.maxHealth) {
                 continue;
@@ -140,16 +141,13 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderFirstPerson() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void renderOpaque() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void renderTransparent() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

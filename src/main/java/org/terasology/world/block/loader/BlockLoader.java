@@ -531,8 +531,8 @@ public class BlockLoader {
         block.setDebrisOnDestroy(def.debrisOnDestroy);
 
         if (def.entity != null) {
-            block.setEntityPrefab(def.entity.prefab);
-            block.setEntityMode(def.entity.mode);
+            block.setPrefab(def.entity.prefab);
+            block.setKeepActive(def.entity.keepActive);
         }
 
         if (def.inventory != null) {

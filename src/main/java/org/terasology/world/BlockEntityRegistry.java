@@ -27,84 +27,29 @@ import org.terasology.world.block.Block;
 public interface BlockEntityRegistry {
 
     /**
+     * This method returns the block entity at the given location, but will not produce a temporary entity if
+     * one isn't currently in memory.
      * @param blockPosition
      * @return The block entity for the location if it exists, or the null entity
      */
-    EntityRef getBlockEntityAt(Vector3i blockPosition);
+    EntityRef getExistingBlockEntityAt(Vector3i blockPosition);
 
     /**
      * @param blockPosition
      * @return The block entity for the location, creating it if it doesn't exist
      */
-    EntityRef getOrCreateBlockEntityAt(Vector3i blockPosition);
+    EntityRef getBlockEntityAt(Vector3i blockPosition);
 
     /**
      * @param blockPosition
      * @return The block controller entity for this location, or block entity if it exists.
      */
-    EntityRef getEntityAt(Vector3i blockPosition);
+    EntityRef getExistingEntityAt(Vector3i blockPosition);
 
     /**
      * @param blockPosition
      * @return The block controller entity for this location, or block entity.
      */
-    EntityRef getOrCreateEntityAt(Vector3i blockPosition);
+    EntityRef getEntityAt(Vector3i blockPosition);
 
-    /**
-     * Replaces the entity at the given block position, destroying the old one (if it exists)
-     * The entity will be given block-entity related components.
-     *
-     * @param blockPosition
-     */
-    void replaceEntityAt(Vector3i blockPosition, EntityRef entity);
-
-    /**
-     * Changes the block at the given block position without changing the entity.
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param type
-     * @param oldType
-     * @return Whether the block was successfully replaced.
-     */
-    public boolean setBlockRetainEntity(int x, int y, int z, Block type, Block oldType);
-
-    /**
-     * Changes the block at the given block position without changing the entity.
-     *
-     * @param pos
-     * @param type
-     * @param oldType
-     * @return Whether the block was successfully replaced.
-     */
-    public boolean setBlockRetainEntity(Vector3i pos, Block type, Block oldType);
-
-    /**
-     * Places a block of a specific type at a given position and refreshes the
-     * corresponding light values. Additionally sets the entity for this block position if successful.
-     * Block-entity related components will be added to the entity.
-     *
-     * @param x       The X-coordinate
-     * @param y       The Y-coordinate
-     * @param z       The Z-coordinate
-     * @param type    The type of the block to set
-     * @param oldType The old type of the block
-     * @param entity  T
-     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
-     */
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType, EntityRef entity);
-
-    /**
-     * Places a block of a specific type at a given position and refreshes the
-     * corresponding light values. Additionally sets the entity for this block position if successful.
-     * Block-entity related components will be added to the entity.
-     *
-     * @param pos
-     * @param type    The type of the block to set
-     * @param oldType The old type of the block
-     * @param entity  T
-     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
-     */
-    public boolean setBlock(Vector3i pos, Block type, Block oldType, EntityRef entity);
 }

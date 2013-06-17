@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.world.block;
+package org.terasology.world.block.items;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Region3i;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
+import org.terasology.network.FieldReplicateType;
+import org.terasology.network.Replicate;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius
+ * Combined with ItemComponent, represents a held block
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public class BlockRegionComponent implements Component {
-    public Region3i region = Region3i.EMPTY;
-    public boolean overrideBlockEntities = true;
+public final class BlockItemComponent implements Component {
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public BlockFamily blockFamily;
 
-    public BlockRegionComponent() {
+    public BlockItemComponent() {
     }
 
-    public BlockRegionComponent(Region3i region) {
-        this.region = region;
+    public BlockItemComponent(BlockFamily blockFamily) {
+        this.blockFamily = blockFamily;
     }
 }

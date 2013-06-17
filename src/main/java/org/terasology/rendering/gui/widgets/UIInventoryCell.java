@@ -32,7 +32,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Vector2f;
 

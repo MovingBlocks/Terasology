@@ -10,9 +10,11 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.EntityData;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -32,7 +34,7 @@ public class WorldSerializerTest {
     public void setup() {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(modManager);
+        entityManager = builder.build(modManager, mock(NetworkSystem.class));
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);

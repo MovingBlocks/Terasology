@@ -99,7 +99,7 @@ public class PojoEntityRef extends EntityRef {
     @Override
     public boolean isActive() {
         if (exists()) {
-            return entityManager.isEntityLoaded(id);
+            return entityManager.isEntityActive(id);
         }
         return false;
     }

@@ -21,12 +21,14 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.world.block.ForceBlockActive;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
+@ForceBlockActive
 public class SkeletalMeshComponent implements Component {
     public SkeletalMesh mesh;
     public Material material;

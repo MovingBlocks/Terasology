@@ -20,7 +20,6 @@
 {
     "attachmentAllowed" : false,
     "rotation" : "horizontal",
-    "craftPlace" : false,
     // Graphics
     "tiles" : {
         "sides" : "core:ChestSides",
@@ -28,8 +27,7 @@
         "topBottom" : "core:ChestTopBottom"
     },
     "entity" : {
-        "prefab" : "core:chest",
-        "mode" : "persistent"
+        "prefab" : "core:chest"
     },
     "inventory" : {
         "stackable" : false,

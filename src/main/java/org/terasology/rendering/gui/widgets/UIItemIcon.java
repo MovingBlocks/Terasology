@@ -25,7 +25,7 @@ import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;

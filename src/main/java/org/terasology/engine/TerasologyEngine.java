@@ -323,7 +323,7 @@ public class TerasologyEngine implements GameEngine {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            Mouse.setGrabbed(true);
+            Mouse.setGrabbed(false);
         } catch (LWJGLException e) {
             logger.error("Could not initialize controls.", e);
             System.exit(1);

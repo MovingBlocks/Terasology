@@ -40,8 +40,8 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegionComponent;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.regions.BlockRegionComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;

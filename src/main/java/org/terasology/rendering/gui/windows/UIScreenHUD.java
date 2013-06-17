@@ -195,7 +195,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             Timer timer = CoreRegistry.get(Timer.class);
             debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", timer.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             if (entityManager != null) {
-                debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntities(), cameraTarget.toString()));
+                debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
             }
             debugLine3.setText(String.format("%s, %.2f", CoreRegistry.get(LocalPlayer.class).getPosition(), (character != null) ? character.yaw : 0));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));

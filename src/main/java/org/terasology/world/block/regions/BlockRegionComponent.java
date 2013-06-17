@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.inventory;
+package org.terasology.world.block.regions;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Owns;
+import org.terasology.math.Region3i;
 
+/**
+ * @author Immortius
+ */
+public class BlockRegionComponent implements Component {
+    public Region3i region = Region3i.EMPTY;
+    public boolean overrideBlockEntities = true;
 
-public class DroppedItemComponent implements Component {
-    @Owns
-    public EntityRef itemEntity = EntityRef.NULL;
+    public BlockRegionComponent() {
+    }
+
+    public BlockRegionComponent(Region3i region) {
+        this.region = region;
+    }
 }

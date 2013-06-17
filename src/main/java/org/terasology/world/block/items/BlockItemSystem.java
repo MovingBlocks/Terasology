@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block.entity;
+package org.terasology.world.block.items;
 
 import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
@@ -40,6 +40,7 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
@@ -69,11 +70,6 @@ public class BlockItemSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = BlockItemComponent.class)
-    public void onDestroyed(BeforeDeactivateComponent event, EntityRef entity) {
-        entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
-    }
-
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         if (!event.getTarget().exists()) {
@@ -91,15 +87,14 @@ public class BlockItemSystem implements ComponentSystem {
         placementPos.add(surfaceSide.getVector3i());
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
+            // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
-                    if (blockItem.placedEntity.exists()) {
-                        blockItem.placedEntity = EntityRef.NULL;
-                    }
-                } else {
+                if (!worldProvider.setBlock(placementPos, block, worldProvider.getBlock(placementPos))) {
                     // Something changed the block on another thread, cancel
                     event.consume();
                     return;
+                } else {
+                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
                 }
             }
             event.getInstigator().send(new PlaySoundEvent(event.getInstigator(), Assets.getSound("engine:PlaceBlock"), 0.5f));

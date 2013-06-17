@@ -255,6 +255,19 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     }
 
     @Override
+    public void moveAll(EntityRef fromInventory, EntityRef toInventory) {
+        InventoryComponent fromInventoryComp = fromInventory.getComponent(InventoryComponent.class);
+        if (fromInventoryComp != null) {
+            for (int slot = 0; slot < fromInventoryComp.itemSlots.size(); ++slot) {
+                EntityRef item = getItemInSlot(fromInventory, slot);
+                if (giveItem(toInventory, item)) {
+                    removeItem(fromInventory, item);
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean canTakeItem(EntityRef inventoryEntity, EntityRef item) {
         InventoryComponent inventory = inventoryEntity.getComponent(InventoryComponent.class);
         ItemComponent itemComponent = item.getComponent(ItemComponent.class);

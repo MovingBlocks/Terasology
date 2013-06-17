@@ -27,11 +27,11 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
@@ -107,7 +107,7 @@ public class GrowthSimulator implements ComponentSystem {
     }
 
     @ReceiveEvent(components = BlockComponent.class)
-    public void blockChanged(BlockChangedEvent event, EntityRef blockEntity) {
+    public void blockChanged(OnChangedBlock event, EntityRef blockEntity) {
         if (dirt.equals(event.getNewType())) {
             blockQueue.offer(event.getBlockPosition());
         }
