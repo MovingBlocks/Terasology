@@ -1,5 +1,7 @@
 package org.terasology.world.chunks.perBlockStorage;
 
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.Type;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
@@ -45,6 +47,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         @Override
         public Class<TeraDenseArray8Bit> getArrayClass() {
             return TeraDenseArray8Bit.class;
+        }
+
+        @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.DenseArray8Bit;
         }
 
         @Override
