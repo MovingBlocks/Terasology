@@ -118,7 +118,7 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         }
     }
 
-    public static class Factory implements TeraArray.Factory<TeraSparseArray16Bit> {
+    public static class Factory implements PerBlockStorageFactory<TeraSparseArray16Bit> {
         
         @Override
         public String getId() {
