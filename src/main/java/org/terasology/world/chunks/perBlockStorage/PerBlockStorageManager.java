@@ -2,6 +2,7 @@ package org.terasology.world.chunks.perBlockStorage;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.reflections.Reflections;
@@ -14,9 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.protobuf.ChunksProtobuf;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class PerBlockStorageManager { 
 
@@ -24,6 +27,11 @@ public class PerBlockStorageManager {
     
     private ModManager mods;
     private Reflections engineReflections;
+    
+    private Map<String, TeraArray.Factory<? extends TeraArray>> factoriesById;
+    private Map<ChunksProtobuf.Type, TeraArray.Factory<? extends TeraArray>> factoriesByProtobufType;
+    private Map<String, TeraArray.SerializationHandler<? extends TeraArray>> handlersById;
+    private Map<ChunksProtobuf.Type, TeraArray.SerializationHandler<? extends TeraArray>> handlersByProtobufType;
     
     @SuppressWarnings("unchecked")
     private List<Class<? extends TeraArray.Factory<? extends TeraArray>>> getArrayFactoryClasses(Class<? extends TeraArray> array) {
@@ -38,30 +46,70 @@ public class PerBlockStorageManager {
         return result;
     }
     
-    private void registerTeraArray(String pakkage, Class<? extends TeraArray> array) {
-        Preconditions.checkNotNull(pakkage, "The parameter 'pakkage' must not be null");
+    private void registerTeraArray(Mod mod, Class<? extends TeraArray> array) {
         Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
+        final String pakkage = mod != null ? mod.getModInfo().getId() : "engine";
         if (!Modifier.isAbstract(array.getModifiers())) {
             final List<Class<? extends TeraArray.Factory<? extends TeraArray>>> factoryClasses = getArrayFactoryClasses(array);
-            for (final Class<? extends TeraArray.Factory<? extends TeraArray>> factoryClass : factoryClasses)
-                if (factoryClass != null) {
-                    try {
-                        final TeraArray.Factory<? extends TeraArray> factory = factoryClass.newInstance();
-                        final String arrayId = pakkage + ":" + factory.getId();
-                        logger.info("Registered per block storage type '{}' of class '{}'", arrayId, array.getSimpleName());
-                    } catch (Exception e) {
-                        logger.error("Failed registering per block storage type '{}'", array.getSimpleName(), e);
+            if (factoryClasses.size() == 0) {
+                logger.warn("Discovered invalid per block storage type '{}', no factory discovered, skipping", array.getSimpleName());
+                return;
+            }
+            for (final Class<? extends TeraArray.Factory<? extends TeraArray>> factoryClass : factoryClasses) {
+                try {
+                    final TeraArray.Factory<? extends TeraArray> factory = factoryClass.newInstance();
+                    final TeraArray.SerializationHandler<? extends TeraArray> handler = factory.createSerializationHandler();
+                    final ChunksProtobuf.Type protobufType = factory.getProtobufType();
+                    final String arrayId = pakkage + ":" + factory.getId();
+                    if (handler == null) {
+                        logger.warn("Discovered invalid per block storage type '{}' of class '{}', no serialization handler returned, skipping", arrayId, array.getSimpleName());
+                        continue;
                     }
-                } else
-                    logger.warn("Discovered invalid per block storage type '{}', no factory discovered, skipping", array.getSimpleName());
+                    if (protobufType == null) {
+                        logger.warn("Discovered invalid per block storage type '{}' of class '{}', no protobuf type returned, skipping", arrayId, array.getSimpleName());
+                        continue;
+                    }
+                    if (mod != null && protobufType != ChunksProtobuf.Type.Unknown) {
+                        logger.warn("Discovered invalid per block storage type '{}' of class '{}', mods may not override protobuf types, skipping", arrayId, array.getSimpleName());
+                        continue;
+                    }
+                    if (factoriesByProtobufType.containsKey(protobufType) || handlersByProtobufType.containsKey(protobufType)) {
+                        logger.warn("Discovered duplicate per block storage type '{}' of class '{}' for protobuf type '{}', skipping", arrayId, array.getSimpleName(), protobufType);
+                        continue;
+                    }
+                    if (factoriesById.containsKey(arrayId)) {
+                        logger.warn("Discovered duplicate per block storage type '{}' of class '{}', skipping", arrayId, array.getSimpleName());
+                        continue;
+                    }
+                    factoriesById.put(arrayId, factory);
+                    handlersById.put(arrayId, handler);
+                    if (protobufType != ChunksProtobuf.Type.Unknown) {
+                        factoriesByProtobufType.put(protobufType, factory);
+                        handlersByProtobufType.put(protobufType, handler);
+                        logger.info("Registered per block storage type '{}' of class '{}' with protobuf type '{}'", arrayId, array.getSimpleName(), protobufType);
+                    } else {
+                        if (mod == null)
+                            logger.info("Registered per block storage type '{}' of class '{}'", arrayId, array.getSimpleName(), protobufType);
+                        else 
+                            logger.info("Registered per block storage type '{}' of class '{}' by mod '{}'", arrayId, array.getSimpleName(), protobufType, mod.getModInfo().getDisplayName());
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed registering per block storage type '{}'", array.getSimpleName(), e);
+                }
+            }
         }
     }
 
     private void scanForTeraArrays() {
+        factoriesById = Maps.newHashMap();
+        factoriesByProtobufType = Maps.newHashMap();
+        handlersById = Maps.newHashMap();
+        handlersByProtobufType = Maps.newHashMap();
+        
         // scanning engine for tera arrays
         Set<Class<? extends TeraArray>> teraArrays = engineReflections.getSubTypesOf(TeraArray.class);
         for (final Class<? extends TeraArray> array : teraArrays) 
-            registerTeraArray("engine", array);
+            registerTeraArray(null, array);
 
         // scanning mods for tera arrays
         if (mods != null)
@@ -70,7 +118,7 @@ public class PerBlockStorageManager {
                 if (reflections != null) {
                     teraArrays = reflections.getSubTypesOf(TeraArray.class);
                     for (final Class<? extends TeraArray> array : teraArrays) 
-                        registerTeraArray(mod.getModInfo().getId(), array);
+                        registerTeraArray(mod, array);
                 }
             }
     }
