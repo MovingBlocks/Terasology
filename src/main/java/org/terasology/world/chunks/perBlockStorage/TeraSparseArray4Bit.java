@@ -89,6 +89,11 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     public static class Factory implements TeraArray.Factory<TeraSparseArray4Bit> {
         
         @Override
+        public String getId() {
+            return "4-bit-sparse";
+        }
+        
+        @Override
         public Class<TeraSparseArray4Bit> getArrayClass() {
             return TeraSparseArray4Bit.class;
         }

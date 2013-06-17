@@ -59,6 +59,8 @@ public abstract class TeraArray implements Externalizable {
      */
     public static interface Factory<T extends TeraArray> {
 
+        public String getId();
+        
         public Class<T> getArrayClass();
         
         public ChunksProtobuf.Type getProtobufType();

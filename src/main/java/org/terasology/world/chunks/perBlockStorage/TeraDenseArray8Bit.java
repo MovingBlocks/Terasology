@@ -45,6 +45,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     public static class Factory implements TeraArray.Factory<TeraDenseArray8Bit> {
         
         @Override
+        public String getId() {
+            return "8-bit-dense";
+        }
+        
+        @Override
         public Class<TeraDenseArray8Bit> getArrayClass() {
             return TeraDenseArray8Bit.class;
         }
