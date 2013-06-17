@@ -8,7 +8,7 @@
         <property name="file" value="${samedir}/suppressions.xml"/>
     </module>
 
-    <!-- Checks whether files targetPos with a new line. -->
+    <!-- Checks whether files end with a new line. -->
     <!-- See http://checkstyle.sourceforge.net/config_misc.html#NewlineAtEndOfFile -->
     <module name="NewlineAtEndOfFile">
         <property name="fileExtensions" value="java"/> 
