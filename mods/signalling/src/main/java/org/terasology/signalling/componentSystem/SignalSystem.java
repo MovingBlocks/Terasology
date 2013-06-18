@@ -226,7 +226,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         return new NetworkNode(location, directions);
     }
 
-    /**
+    /*
      * ****************************** Conductor events ********************************
      */
 
@@ -296,7 +296,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalConductors.remove(conductorNode.location);
     }
 
-    /**
+    /*
      * ****************************** Producer events ********************************
      */
 
@@ -385,7 +385,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         producerSignalStrengths.remove(producerNode);
     }
 
-    /**
+    /*
      * ****************************** Consumer events ********************************
      */
 
