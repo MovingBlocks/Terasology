@@ -2,7 +2,6 @@ package org.terasology.world.chunks.perBlockStorage;
 
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,10 +20,10 @@ import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.Chunk;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.protobuf.ByteString;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class PerBlockStorageManager { 
 
     public static final String DefaultBlockStorageFactory = "engine:16-bit-dense";
@@ -40,116 +39,107 @@ public class PerBlockStorageManager {
     private Reflections engineReflections;
     
     private Map<String, FactoryEntry> factoriesById;
-    private Map<Class<? extends TeraArray>, TeraArray.SerializationHandler<? extends TeraArray>> serializersByClass;
-    private Map<String, TeraArray.SerializationHandler<? extends TeraArray>> serializersByClassName;
-    private Map<ChunksProtobuf.Type, TeraArray.SerializationHandler<? extends TeraArray>> serializersByProtobufType;
+    private Map<Class<TeraArray>, TeraArray.SerializationHandler> serializersByClass;
+    private Map<String, TeraArray.SerializationHandler> serializersByClassName;
+    private Map<ChunksProtobuf.Type, TeraArray.SerializationHandler> serializersByProtobufType;
     
-    private PerBlockStorageFactory<TeraArray> blockStorageFactory;
-    private PerBlockStorageFactory<TeraArray> sunlightStorageFactory;
-    private PerBlockStorageFactory<TeraArray> lightStorageFactory;
-    private PerBlockStorageFactory<TeraArray> extraStorageFactory;
+    private PerBlockStorageFactory blockStorageFactory;
+    private PerBlockStorageFactory sunlightStorageFactory;
+    private PerBlockStorageFactory lightStorageFactory;
+    private PerBlockStorageFactory extraStorageFactory;
     
-    @SuppressWarnings("unchecked")
-    private Iterable<Class<? extends PerBlockStorageFactory<? extends TeraArray>>> getArrayFactoryClasses(Class<? extends TeraArray> arrayClass) {
-        Preconditions.checkNotNull(arrayClass, "The parameter 'arrayClass' must not be null");
-        final Class<?>[] classes = arrayClass.getClasses();
-        final List<Class<? extends PerBlockStorageFactory<? extends TeraArray>>> result = Lists.newArrayList();
-        for (Class<?> factoryClass : classes) {
-            if (PerBlockStorageFactory.class.isAssignableFrom(factoryClass) && !Modifier.isAbstract(factoryClass.getModifiers())) {
-                result.add((Class<? extends PerBlockStorageFactory<? extends TeraArray>>) factoryClass);
-            }
+    private void registerSerializerClass(Mod mod, Class<TeraArray.SerializationHandler> serializerClass) {
+        Preconditions.checkNotNull(serializerClass, "The parameter 'serializerClass' must not be null");
+        if (Modifier.isAbstract(serializerClass.getModifiers())) {
+            return;
         }
-        return result;
-    }
-    
-    @SuppressWarnings("unchecked")
-    private Class<? extends TeraArray.SerializationHandler<? extends TeraArray>> getArraySerializerClass(Class<? extends TeraArray> arrayClass) {
-        Preconditions.checkNotNull(arrayClass, "The parameter 'arrayClass' must not be null");
-        final Class<?>[] classes = arrayClass.getClasses();
-        for (Class<?> serializerClass : classes) {
-            if (TeraArray.SerializationHandler.class.isAssignableFrom(serializerClass) && !Modifier.isAbstract(serializerClass.getModifiers())) {
-                return (Class<? extends TeraArray.SerializationHandler<? extends TeraArray>>) serializerClass;
-            }
+        final String byMod = (mod != null) ? " by mod '" + mod.getModInfo().getDisplayName() + "'" : "";
+        final Class<?> enclosingClass = serializerClass.getEnclosingClass();
+        if (enclosingClass == null || !TeraArray.class.isAssignableFrom(enclosingClass)) {
+            logger.warn("Discovered invalid per-block-storage serialization handler '{}'{}, skipping", serializerClass.getName(), byMod);
+            return;
         }
-        return null;
-    }
-    
-    private void registerTeraArray(Mod mod, Class<? extends TeraArray> arrayClass) {
-        Preconditions.checkNotNull(arrayClass, "The parameter 'arrayClass' must not be null");
-        if (!Modifier.isAbstract(arrayClass.getModifiers())) {
-            final Class<? extends TeraArray.SerializationHandler<? extends TeraArray>> serializerClass = getArraySerializerClass(arrayClass);
-            if (serializerClass != null) {
-                try {
-                    final TeraArray.SerializationHandler<? extends TeraArray> serializer = serializerClass.newInstance();
-                    final ChunksProtobuf.Type protobufType = serializer.getProtobufType();
-                    if (protobufType != null && protobufType != ChunksProtobuf.Type.Unknown) {
-                        if (!serializersByProtobufType.containsKey(protobufType)) {
-                            serializersByClass.put(arrayClass, serializer);
-                            serializersByClassName.put(arrayClass.getName(), serializer);
-                            serializersByProtobufType.put(protobufType, serializer);
-                        } else {
-                            logger.error("Failed registering per block storage type '{}' for protobuf type '{}'", arrayClass.getSimpleName(), protobufType);
-                            return;
-                        }
-                    } else {
-                        serializersByClass.put(arrayClass, serializer);
-                        serializersByClassName.put(arrayClass.getName(), serializer);
-                    }
-                } catch (Exception e) {
-                    logger.error("Failed registering per block storage type '{}'", arrayClass.getSimpleName(), e);
-                    return;
-                }
-            } else {
-                logger.error("Failed registering per block storage type '{}', no serialization handler found", arrayClass.getSimpleName());
+        if (Modifier.isAbstract(enclosingClass.getModifiers())) {
+            return;
+        }
+        final Class<TeraArray> arrayClass = (Class<TeraArray>) enclosingClass;
+        final String className = arrayClass.getSimpleName() + "." + serializerClass.getSimpleName();
+        try {
+            final TeraArray.SerializationHandler serializer = serializerClass.newInstance();
+            final ChunksProtobuf.Type protobufType = serializer.getProtobufType();
+            if (protobufType == null || protobufType == ChunksProtobuf.Type.Unknown) {
+                serializersByClass.put(arrayClass, serializer);
+                serializersByClassName.put(arrayClass.getName(), serializer);
+                logger.info("Registered per-block-storage serialization handler of class '{}'{}", className, byMod);
                 return;
             }
-            final String pakkage = mod != null ? mod.getModInfo().getId() : "engine";
-            final Iterable<Class<? extends PerBlockStorageFactory<? extends TeraArray>>> factoryClasses = getArrayFactoryClasses(arrayClass);
-            for (final Class<? extends PerBlockStorageFactory<? extends TeraArray>> factoryClass : factoryClasses) {
-                try {
-                    final PerBlockStorageFactory<? extends TeraArray> factory = factoryClass.newInstance();
-                    final String storageId = pakkage + ":" + factory.getId();
-                    final FactoryEntry entry = new FactoryEntry(mod, storageId, factory);
-                    if (factoriesById.containsKey(storageId)) {
-                        logger.warn("Discovered duplicate per block storage type '{}' of class '{}', skipping", storageId, arrayClass.getSimpleName());
-                        continue;
-                    }
-                    factoriesById.put(storageId, entry);
-                    if (mod == null)
-                        logger.info("Registered per block storage type '{}' of class '{}'", storageId, arrayClass.getSimpleName());
-                    else 
-                        logger.info("Registered per block storage type '{}' of class '{}' by mod '{}'", storageId, arrayClass.getSimpleName(), mod.getModInfo().getDisplayName());
-                } catch (Exception e) {
-                    logger.error("Failed registering per block storage type '{}'", arrayClass.getSimpleName(), e);
-                }
+            if (serializersByProtobufType.containsKey(protobufType)) {
+                logger.warn("Discovered duplicate per-block-storage serialization handler of class '{}' for protobuf type '{}'{}, skipping", className, protobufType, byMod);
+                return;
             }
+            serializersByClass.put(arrayClass, serializer);
+            serializersByClassName.put(arrayClass.getName(), serializer);
+            serializersByProtobufType.put(protobufType, serializer);
+            logger.info("Registered per-block-storage serialization handler of class '{}'{}", className, byMod);
+        } catch (Exception e) {
+            logger.error("Failed registering per-block-storage serialization handler of class '{}'{}", className, byMod, e);
+        }
+    }
+    
+    private void registerFactoryClass(Mod mod, Class<? extends PerBlockStorageFactory> factoryClass) {
+        Preconditions.checkNotNull(factoryClass, "The parameter 'factoryClass' must not be null");
+        if (Modifier.isAbstract(factoryClass.getModifiers())) {
+            return;
+        }
+        final String byMod = (mod != null) ? " by mod '" + mod.getModInfo().getDisplayName() + "'" : "";
+        final String pakkage = mod != null ? mod.getModInfo().getId() : "engine";
+        final Class<?> enclosingClass = factoryClass.getEnclosingClass();
+        final String className = (enclosingClass != null && TeraArray.class.isAssignableFrom(enclosingClass)) ? enclosingClass.getSimpleName() + "." + factoryClass.getSimpleName() : factoryClass.getSimpleName();
+        try {
+            final PerBlockStorageFactory factory = factoryClass.newInstance();
+            final String storageId = pakkage + ":" + factory.getId();
+            if (factoriesById.containsKey(storageId)) {
+                logger.warn("Discovered duplicate per-block-storage factory '{}' of class '{}'{}, skipping", storageId, className, byMod);
+                return;
+            }
+            final FactoryEntry entry = new FactoryEntry(mod, storageId, factory);
+            factoriesById.put(storageId, entry);
+            logger.info("Registered per-block-storage factory '{}' of class '{}'{}", storageId, className, byMod);
+        } catch (Exception e) {
+            logger.error("Failed registering per-block-storage factory of class '{}'{}", className, byMod, e);
         }
     }
 
+    private void scan(Mod mod) {
+        final Reflections reflections = (mod == null) ? engineReflections : mod.getReflections();
+        
+        if (reflections == null)
+            return;
+        
+        Set<Class<? extends PerBlockStorageFactory>> factoryClasses = reflections.getSubTypesOf(PerBlockStorageFactory.class);
+        for (final Class<? extends PerBlockStorageFactory> factoryClass : factoryClasses) 
+            registerFactoryClass(mod, factoryClass);
+
+        Set<Class<? extends TeraArray.SerializationHandler>> serializerClasses = reflections.getSubTypesOf(TeraArray.SerializationHandler.class);
+        for (final Class<? extends TeraArray.SerializationHandler> serializerClass : serializerClasses) 
+            registerSerializerClass(mod, (Class<TeraArray.SerializationHandler>) serializerClass);
+    }
+    
     private void scan() {
         factoriesById = Maps.newHashMap();
         serializersByClass = Maps.newHashMap();
         serializersByClassName = Maps.newHashMap();
         serializersByProtobufType = Maps.newHashMap();
 
-        // scanning engine for tera arrays
-        Set<Class<? extends TeraArray>> teraArrays = engineReflections.getSubTypesOf(TeraArray.class);
-        for (final Class<? extends TeraArray> array : teraArrays) 
-            registerTeraArray(null, array);
+        // scan the engine
+        scan(null);
 
-        // scanning mods for tera arrays
+        // scan all available mods
         if (mods != null)
-            for (final Mod mod : mods.getMods()) {
-                final Reflections reflections = mod.getReflections();
-                if (reflections != null) {
-                    teraArrays = reflections.getSubTypesOf(TeraArray.class);
-                    for (final Class<? extends TeraArray> array : teraArrays) 
-                        registerTeraArray(mod, array);
-                }
-            }
+            for (final Mod mod : mods.getMods()) 
+                scan(mod);
     }
     
-    @SuppressWarnings("rawtypes")
     public static class FactoryEntry {
         
         public final Mod mod;
@@ -232,11 +222,10 @@ public class PerBlockStorageManager {
         return factoriesById.get(Preconditions.checkNotNull(id, "The parameter 'id' must not be null"));
     }
     
-    @SuppressWarnings("unchecked")
-    public PerBlockStorageFactory<TeraArray> getArrayFactory(String id) {
+    public PerBlockStorageFactory getArrayFactory(String id) {
         final FactoryEntry entry = getArrayFactoryEntry(id);
         if (entry != null)
-            return (PerBlockStorageFactory<TeraArray>) entry.factory;
+            return entry.factory;
         return null;
     }
     
@@ -244,22 +233,18 @@ public class PerBlockStorageManager {
         return factoriesById.keySet().toArray(new String[factoriesById.keySet().size()]);
     }
     
-    @SuppressWarnings("rawtypes")
     public TeraArray.SerializationHandler getArrayHandler(Class<? extends TeraArray> arrayClass) {
         return serializersByClass.get(Preconditions.checkNotNull(arrayClass, "The parameter 'arrayClass' must not be null"));
     }
     
-    @SuppressWarnings("rawtypes")
     public TeraArray.SerializationHandler getArrayHandler(String arrayClassName) {
         return serializersByClassName.get(Preconditions.checkNotNull(arrayClassName, "The parameter 'arrayClassName' must not be null"));
     }
     
-    @SuppressWarnings("rawtypes")
     public TeraArray.SerializationHandler getArrayHandler(ChunksProtobuf.Type protobufType) {
         return serializersByProtobufType.get(Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null"));
     }
     
-    @SuppressWarnings("unchecked")
     public ChunksProtobuf.TeraArray encode(TeraArray array) {
         Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
         final TeraArray.SerializationHandler<TeraArray> handler = getArrayHandler(array.getClass());
@@ -275,7 +260,6 @@ public class PerBlockStorageManager {
         return b.build();
     }
     
-    @SuppressWarnings("unchecked")
     public TeraArray decode(ChunksProtobuf.TeraArray message) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
         if (!message.hasType())

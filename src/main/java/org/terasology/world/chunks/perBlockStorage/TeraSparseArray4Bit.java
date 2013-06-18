@@ -91,7 +91,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         }
     }
     
-    public static class Factory implements PerBlockStorageFactory<TeraSparseArray4Bit> {
+    public static class Factory implements PerBlockStorageFactory {
         
         @Override
         public String getId() {
