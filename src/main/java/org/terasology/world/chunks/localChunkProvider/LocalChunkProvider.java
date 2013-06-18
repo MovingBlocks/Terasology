@@ -20,28 +20,42 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TByteObjectMap;
+import gnu.trove.map.hash.TByteObjectHashMap;
+import gnu.trove.procedure.TByteObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.ChunkView;
 import org.terasology.world.RegionalChunkView;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BeforeDeactivateBlocks;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.OnActivatedBlocks;
+import org.terasology.world.block.OnAddedBlocks;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.BeforeChunkUnload;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.OnChunkGenerated;
 import org.terasology.world.chunks.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
+import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
@@ -66,8 +80,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Immortius
  */
 public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvider {
+
     // TODO: Dynamically calculate this
-    private static final int CACHE_SIZE = (int) (2 * Runtime.getRuntime().maxMemory() / 1048576);
+    private static final int CACHE_SIZE = (int) (1.5 * Runtime.getRuntime().maxMemory() / 1048576);
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
 
@@ -81,18 +96,26 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private ConcurrentMap<Vector3i, Chunk> nearCache = Maps.newConcurrentMap();
 
     private final Set<Vector3i> preparingChunks = Sets.newSetFromMap(Maps.<Vector3i, Boolean>newConcurrentMap());
-    private final BlockingQueue<Vector3i> readyChunks = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
 
     private EntityRef worldEntity = EntityRef.NULL;
 
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
+    private BlockManager blockManager;
+    private BlockEntityRegistry registry = null;
+
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
+        blockManager = CoreRegistry.get(BlockManager.class);
         this.farStore = farStore;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
 
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
+    }
+
+    public void setBlockEntityRegistry(BlockEntityRegistry registry) {
+        this.registry = registry;
     }
 
     @Override
@@ -222,18 +245,11 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 }
             }
 
-            if (!readyChunks.isEmpty()) {
-                List<Vector3i> readyChunkPositions = Lists.newArrayListWithExpectedSize(readyChunks.size());
-                readyChunks.drainTo(readyChunkPositions);
-                for (Vector3i readyChunkPos : readyChunkPositions) {
-                    worldEntity.send(new OnChunkLoaded(readyChunkPos));
-                    Chunk chunk = getChunk(readyChunkPos);
-                    for (ChunkRelevanceRegion region : regions.values()) {
-                        region.chunkReady(chunk);
-                    }
-                }
+            List<ReadyChunkInfo> readyChunkPositions = Lists.newArrayListWithExpectedSize(readyChunks.size());
+            readyChunks.drainTo(readyChunkPositions);
+            for (ReadyChunkInfo info : readyChunkPositions) {
+                makeChunkAvailable(info);
             }
-
 
             PerformanceMonitor.startActivity("Review cache size");
             if (nearCache.size() > CACHE_SIZE) {
@@ -254,6 +270,17 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         if (chunk.isLocked()) {
                             continue;
                         }
+                        if (chunk.getChunkState() == Chunk.State.COMPLETE) {
+                            /*TByteObjectMap<TIntList> batchBlockMappings = createBatchBlockEventMappings(chunk);
+                            batchBlockMappings.forEachEntry(new TByteObjectProcedure<TIntList>() {
+                                @Override
+                                public boolean execute(byte id, TIntList positions) {
+                                    blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
+                                    return true;
+                                }
+                            });*/
+                            worldEntity.send(new BeforeChunkUnload(pos));
+                        }
                         chunk.lock();
                         try {
                             farStore.put(chunk);
@@ -265,7 +292,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         for (ChunkRelevanceRegion region : regions.values()) {
                             region.chunkUnloaded(pos);
                         }
-                        worldEntity.send(new BeforeChunkUnload(pos));
                     }
 
                 }
@@ -274,6 +300,89 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         } finally {
             regionLock.readLock().unlock();
         }
+    }
+
+    private void makeChunkAvailable(ReadyChunkInfo readyChunkInfo) {
+        Chunk chunk = getChunk(readyChunkInfo.getPos());
+        if (chunk == null) {
+            return;
+        }
+        chunk.lock();
+        try {
+            if (chunk.isDisposed()) {
+                return;
+            }
+            boolean loaded = chunk.isInitialGenerationComplete();
+            if (!loaded) {
+                chunk.setInitialGenerationComplete();
+                PerformanceMonitor.startActivity("Generating Block Entities");
+                generateBlockEntities(chunk);
+                PerformanceMonitor.endActivity();
+            }
+            // TODO: loadEntities(readyChunkPos);
+
+            if (!loaded) {
+                PerformanceMonitor.startActivity("Sending OnAddedBlocks");
+                readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TByteObjectProcedure<TIntList>() {
+                    @Override
+                    public boolean execute(byte id, TIntList positions) {
+                        blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
+                        return true;
+                    }
+                });
+                PerformanceMonitor.endActivity();
+            }
+
+            PerformanceMonitor.startActivity("Sending OnActivateBlocks");
+            readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TByteObjectProcedure<TIntList>() {
+                @Override
+                public boolean execute(byte id, TIntList positions) {
+                    blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
+                    return true;
+                }
+            });
+            PerformanceMonitor.endActivity();
+
+            if (!loaded) {
+                worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));
+            }
+            worldEntity.send(new OnChunkLoaded(readyChunkInfo.getPos()));
+            for (ChunkRelevanceRegion region : regions.values()) {
+                region.chunkReady(chunk);
+            }
+        } finally {
+            chunk.unlock();
+        }
+    }
+
+    // Generates all non-temporary block entities
+    private void generateBlockEntities(Chunk chunk) {
+        ChunkBlockIterator i = chunk.getBlockIterator();
+        while (i.next()) {
+            if (i.getBlock().isKeepActive()) {
+                registry.getBlockEntityAt(i.getBlockPos());
+            }
+        }
+    }
+
+    private TByteObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
+        TByteObjectMap<TIntList> batchBlockMap = new TByteObjectHashMap<>();
+        for (Block block : blockManager.listRegisteredBlocks()) {
+            if (block.isLifecycleEventsRequired()) {
+                batchBlockMap.put(block.getId(), new TIntArrayList());
+            }
+        }
+
+        ChunkBlockIterator i = chunk.getBlockIterator();
+        while (i.next()) {
+            if (i.getBlock().isLifecycleEventsRequired()) {
+                TIntList positionList = batchBlockMap.get(i.getBlock().getId());
+                positionList.add(i.getBlockPos().x);
+                positionList.add(i.getBlockPos().y);
+                positionList.add(i.getBlockPos().z);
+            }
+        }
+        return batchBlockMap;
     }
 
     @Override
@@ -360,7 +469,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                             if (chunk.getChunkState() == Chunk.State.COMPLETE) {
                                 for (Vector3i adjPos : Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS)) {
                                     if (isChunkReady(adjPos)) {
-                                        readyChunks.offer(adjPos);
+                                        readyChunks.offer(new ReadyChunkInfo(adjPos, createBatchBlockEventMappings(nearCache.get(adjPos))));
                                     }
                                 }
                             }
@@ -388,7 +497,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     @Override
     public void onChunkIsReady(Vector3i position) {
-        readyChunks.offer(position);
+        readyChunks.offer(new ReadyChunkInfo(position, createBatchBlockEventMappings(nearCache.get(position))));
     }
 
     @Override

@@ -36,6 +36,7 @@ import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.world.chunks.internal.ChunkBlockIteratorImpl;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
@@ -125,6 +126,7 @@ public class Chunk implements Externalizable {
     private TeraArray lightData;
     private TeraArray extraData;
 
+    public boolean initialGenerationComplete = false;
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
     private boolean animated;
@@ -280,6 +282,14 @@ public class Chunk implements Externalizable {
         this.chunkState = chunkState;
     }
 
+    public boolean isInitialGenerationComplete() {
+        return initialGenerationComplete;
+    }
+
+    public void setInitialGenerationComplete() {
+        initialGenerationComplete = true;
+    }
+
     public boolean isDirty() {
         return dirty;
     }
@@ -425,6 +435,7 @@ public class Chunk implements Externalizable {
         out.writeObject(sunlightData);
         out.writeObject(lightData);
         out.writeObject(extraData);
+        out.writeBoolean(initialGenerationComplete);
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -437,6 +448,7 @@ public class Chunk implements Externalizable {
         sunlightData = (TeraArray) in.readObject();
         lightData = (TeraArray) in.readObject();
         extraData = (TeraArray) in.readObject();
+        initialGenerationComplete = in.readBoolean();
     }
 
     public void deflate() {
@@ -579,5 +591,9 @@ public class Chunk implements Externalizable {
 
     public int getChunkSizeZ() {
         return SIZE_Z;
+    }
+
+    public ChunkBlockIterator getBlockIterator() {
+        return new ChunkBlockIteratorImpl(blockManager, getChunkWorldPos(), blockData);
     }
 }

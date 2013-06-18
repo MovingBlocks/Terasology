@@ -79,6 +79,7 @@ public class EntityAwareWorldProviderTest {
     private Block blockWithString;
     private Block blockWithDifferentString;
     private Block blockWithRetainedComponent;
+    private Block keepActiveBlock;
 
     @BeforeClass
     public static void commonSetup() {
@@ -117,6 +118,11 @@ public class EntityAwareWorldProviderTest {
         prefabWithRetainedComponent.addComponent(new RetainedOnBlockChangeComponent(3));
         blockWithRetainedComponent.setPrefab("test:prefabWithRetainedComponent");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithRetainedComponent"), blockWithRetainedComponent), true);
+
+        keepActiveBlock = new Block();
+        keepActiveBlock.setKeepActive(true);
+        keepActiveBlock.setPrefab("test:prefabWithString");
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:keepActiveBlock"), keepActiveBlock), true);
 
         worldProvider.initialise();
     }
@@ -217,6 +223,25 @@ public class EntityAwareWorldProviderTest {
         worldProvider.update(1.0f);
         assertTrue(blockEntity.exists());
         assertTrue(blockEntity.isActive());
+    }
+
+
+    @Test
+    public void testEntityCeasesToBeTemporaryIfBlockChangedToKeepActive() {
+        worldProvider.setBlock(0, 0, 0, keepActiveBlock, BlockManager.getAir());
+        worldProvider.update(1.0f);
+        LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
+        worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        assertTrue(checker.receivedEvents.isEmpty());
+    }
+
+    @Test
+    public void testEntityBecomesTemporaryWhenChangedFromAKeepActiveBlock() {
+        worldProvider.setBlock(0, 0, 0, keepActiveBlock, BlockManager.getAir());
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        worldProvider.setBlock(0, 0, 0, BlockManager.getAir(), keepActiveBlock);
+        worldProvider.update(1.0f);
+        assertFalse(blockEntity.isActive());
     }
 
     @Test

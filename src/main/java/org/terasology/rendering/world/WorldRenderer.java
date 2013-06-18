@@ -179,15 +179,10 @@ public final class WorldRenderer {
     /**
      * Initializes a new (local) world for the single player mode.
      *
-     * @param worldInfo Information describing the world
      */
-    public WorldRenderer(WorldInfo worldInfo, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
+    public WorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
         this.chunkProvider = chunkProvider;
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, this.chunkProvider, blockManager));
-        CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
-        CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
-        worldProvider = new WorldProviderWrapper(entityWorldProvider);
+        this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
         chunkTesselator = new ChunkTessellator(worldProvider.getBiomeProvider());
         skysphere = new Skysphere(this);

@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
@@ -28,9 +29,14 @@ import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.WorldProviderCoreImpl;
+import org.terasology.world.WorldProviderWrapper;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.store.ChunkStoreGZip;
@@ -134,9 +140,16 @@ public class InitialiseWorld implements LoadProcess {
         }
 
         // Init. a new world
-        WorldRenderer worldRenderer = new WorldRenderer(worldInfo, new LocalChunkProvider(chunkStore, chunkGeneratorManager), CoreRegistry.get(LocalPlayerSystem.class));
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager));
+        WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
+        CoreRegistry.put(WorldProvider.class, worldProvider);
+        chunkProvider.setBlockEntityRegistry(entityWorldProvider);
+        CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
+        CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
+        WorldRenderer worldRenderer = new WorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
-        CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());

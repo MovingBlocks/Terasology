@@ -6,6 +6,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
@@ -18,17 +19,21 @@ import org.terasology.world.block.management.BlockRegistrationListener;
 public class BlockTypeEntityGenerator implements BlockRegistrationListener {
 
     private EntityManager entityManager;
+    private PrefabManager prefabManager;
     private BlockManager blockManager;
     private Prefab blockTypePrefab;
 
     public BlockTypeEntityGenerator(EntityManager entityManager, BlockManager blockManager) {
         this.entityManager = entityManager;
+        this.prefabManager = entityManager.getPrefabManager();
         this.blockManager = blockManager;
         blockTypePrefab = entityManager.getPrefabManager().getPrefab("engine:blockType");
 
         connectExistingEntities();
         generateForExistingBlocks();
     }
+
+
 
     private void connectExistingEntities() {
         for (EntityRef entity : entityManager.getEntitiesWith(BlockTypeComponent.class)) {
@@ -58,7 +63,7 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
         EntityBuilder builder = entityManager.newBuilder(blockTypePrefab);
         builder.getComponent(BlockTypeComponent.class).block = block;
         // TODO: Copy across settings as necessary
-        Prefab prefab = entityManager.getPrefabManager().getPrefab(block.getPrefab());
+        Prefab prefab = prefabManager.getPrefab(block.getPrefab());
         if (prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 if (!(comp instanceof NetworkComponent)) {

@@ -167,6 +167,7 @@ public class Block {
     private String prefab = "";
     private boolean keepActive = false;
     private EntityRef entity = EntityRef.NULL;
+    private boolean lifecycleEventsRequired = false;
 
     // Inventory settings
     private boolean directPickup = false;
@@ -381,7 +382,7 @@ public class Block {
     }
 
     public void setKeepActive(boolean keepActive) {
-        this.keepActive = true;
+        this.keepActive = keepActive;
     }
 
     public EntityRef getEntity() {
@@ -390,6 +391,14 @@ public class Block {
 
     public void setEntity(EntityRef entity) {
         this.entity = entity;
+    }
+
+    public void setLifecycleEventsRequired(boolean lifecycleEventsRequired) {
+        this.lifecycleEventsRequired = lifecycleEventsRequired;
+    }
+
+    public boolean isLifecycleEventsRequired() {
+        return lifecycleEventsRequired;
     }
 
     /**

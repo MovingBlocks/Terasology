@@ -52,4 +52,9 @@ public interface BlockEntityRegistry {
      */
     EntityRef getEntityAt(Vector3i blockPosition);
 
+    /**
+     * @param blockPos
+     * @return Whether the entity at this position is permanent
+     */
+    boolean hasPermanentBlockEntity(Vector3i blockPos);
 }

@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
@@ -24,8 +25,13 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.WorldProviderCoreImpl;
+import org.terasology.world.WorldProviderWrapper;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
@@ -48,10 +54,16 @@ public class InitialiseRemoteWorld implements LoadProcess {
 
         RemoteChunkProvider chunkProvider = new RemoteChunkProvider();
 
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager));
+        WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
+        CoreRegistry.put(WorldProvider.class, worldProvider);
+        CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
+        CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
+
         // Init. a new world
-        WorldRenderer worldRenderer = new WorldRenderer(worldInfo, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+        WorldRenderer worldRenderer = new WorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
-        CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());

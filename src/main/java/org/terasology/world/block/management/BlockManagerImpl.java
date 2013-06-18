@@ -18,6 +18,7 @@ package org.terasology.world.block.management;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
@@ -39,6 +40,7 @@ import org.terasology.world.block.loader.FreeformFamily;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -408,5 +410,10 @@ public class BlockManagerImpl extends BlockManager {
     @Override
     public boolean hasBlockFamily(BlockUri uri) {
         return registeredFamilyByUri.containsKey(uri) || availableFamilies.containsKey(uri) || freeformBlockUris.contains(uri);
+    }
+
+    @Override
+    public Iterable<Block> listRegisteredBlocks() {
+        return ImmutableList.copyOf(blocksById.valueCollection());
     }
 }
