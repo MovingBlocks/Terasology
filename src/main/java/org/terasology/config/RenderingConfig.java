@@ -13,10 +13,6 @@ public class RenderingConfig {
     private int windowWidth = 1280;
     private int windowHeight = 720;
     private boolean fullscreen = false;
-    private int viewDistanceNear = 8;
-    private int viewDistanceModerate = 16;
-    private int viewDistanceFar = 32;
-    private int viewDistanceUltra = 48;
     private int activeViewDistanceMode = 0;
     private boolean flickeringLight = false;
     private boolean animateGrass = false;
@@ -78,38 +74,6 @@ public class RenderingConfig {
 
     public void setFullscreen(boolean fullscreen) {
         this.fullscreen = fullscreen;
-    }
-
-    public int getViewDistanceNear() {
-        return viewDistanceNear;
-    }
-
-    public void setViewDistanceNear(int viewDistanceNear) {
-        this.viewDistanceNear = viewDistanceNear;
-    }
-
-    public int getViewDistanceModerate() {
-        return viewDistanceModerate;
-    }
-
-    public void setViewDistanceModerate(int viewDistanceModerate) {
-        this.viewDistanceModerate = viewDistanceModerate;
-    }
-
-    public int getViewDistanceFar() {
-        return viewDistanceFar;
-    }
-
-    public void setViewDistanceFar(int viewDistanceFar) {
-        this.viewDistanceFar = viewDistanceFar;
-    }
-
-    public int getViewDistanceUltra() {
-        return viewDistanceUltra;
-    }
-
-    public void setViewDistanceUltra(int viewDistanceUltra) {
-        this.viewDistanceUltra = viewDistanceUltra;
     }
 
     public int getActiveViewDistanceMode() {
@@ -273,13 +237,13 @@ public class RenderingConfig {
     public int getActiveViewingDistance() {
         switch (activeViewDistanceMode) {
             case 1:
-                return viewDistanceModerate;
+                return 16;
             case 2:
-                return viewDistanceFar;
+                return 32;
             case 3:
-                return viewDistanceUltra;
+                return 64;
             default:
-                return viewDistanceNear;
+                return 8;
         }
     }
 
