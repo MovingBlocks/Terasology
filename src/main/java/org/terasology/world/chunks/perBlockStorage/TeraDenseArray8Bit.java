@@ -47,7 +47,7 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         }
     }
     
-    public static class Factory implements PerBlockStorageFactory<TeraDenseArray8Bit> {
+    public static class Factory implements PerBlockStorageFactory {
         
         @Override
         public String getId() {

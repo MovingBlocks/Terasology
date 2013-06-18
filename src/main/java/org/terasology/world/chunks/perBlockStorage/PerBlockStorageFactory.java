@@ -8,12 +8,12 @@ package org.terasology.world.chunks.perBlockStorage;
  * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.Factory
  *
  */
-public interface PerBlockStorageFactory<T extends TeraArray> {
+public interface PerBlockStorageFactory {
 
     public String getId();
     
-    public T create();
+    public TeraArray create();
     
-    public T create(int sizeX, int sizeY, int sizeZ);
+    public TeraArray create(int sizeX, int sizeY, int sizeZ);
     
 }

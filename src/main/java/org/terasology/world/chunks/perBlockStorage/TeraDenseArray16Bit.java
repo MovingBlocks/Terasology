@@ -76,7 +76,7 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         }
     }
     
-    public static class Factory implements PerBlockStorageFactory<TeraDenseArray16Bit> {
+    public static class Factory implements PerBlockStorageFactory {
         
         @Override
         public String getId() {
