@@ -1,4 +1,4 @@
 rootProject.name = 'Terasology'
 include 'mods:funnyBlocks', 'mods:fences', 'mods:core', 'mods:minerals', 'mods:miniion', 'mods:soils', 'mods:test', 'mods:books',
         'mods:potions', 'mods:portals', 'mods:morelights', 'mods:dynamicBlocks', 'mods:hunger', 'mods:grammarSystem', 'mods:craft',
-        'mods:cakelie', 'mods:oreominions', 'mods:plants', 'mods:blockNetwork', 'mods:signalling', 'mods:lightAndShadow', 'mods:adventure'
+        'mods:cakelie', 'mods:oreominions', 'mods:plants', 'mods:blockNetwork', 'mods:signalling', 'mods:lightAndShadow', 'mods:pathfinding'

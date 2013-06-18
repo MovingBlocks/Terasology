@@ -1,0 +1,6 @@
+{
+    "entity" : {
+        "prefab" : "pathfinding:StartBlock",
+        "mode" : "persistent"
+    }
+}

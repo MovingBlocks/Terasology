@@ -43,6 +43,7 @@ import org.terasology.world.generator.core.FloraGenerator;
 import org.terasology.world.generator.core.ForestGenerator;
 import org.terasology.world.generator.core.MultiTerrainGenerator;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.generator.core.PathfinderTestGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 import org.terasology.world.generator.core.PerlinTerrainGeneratorWithSetup;
 import org.terasology.rendering.gui.framework.events.SelectionListener;
@@ -130,7 +131,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         chunkGeneratorLabel.setVisible(true);
 
-        chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
+        chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 5f*12f));
         item = new UIListItem("Perlin", 0);
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
@@ -151,6 +152,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
         chunkGenerator.addItem(item);
+        item = new UIListItem("Pathfinder Test World", 4);
+        item.setTextColor(Color.black);
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
+        chunkGenerator.addItem(item);
         chunkGenerator.select(0);
         chunkGenerator.setVisible(true);
         chunkGenerator.addSelectionListener(new SelectionListener() {
@@ -166,6 +171,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     }else if(chunkGenerator.getSelectionIndex() == 3){ //multiworld
                         mapSetupButton.setVisible(false);
                     }else if(chunkGenerator.getSelectionIndex() == 4){ //heightmap
+                        mapSetupButton.setVisible(false);
+                    }else if(chunkGenerator.getSelectionIndex() == 5){ //pathfinder
                         mapSetupButton.setVisible(false);
                     }
                 }
@@ -304,6 +311,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
                         chunkList.add(ForestGenerator.class.getName());
+                        break;
+
+                    // Pathfinder Test World
+                    case 5:
+                        chunkList.add(PathfinderTestGenerator.class.getName());
                         break;
 
                     // Really shouldn't get here unless there's a bug, so crash :-)
