@@ -170,7 +170,6 @@ public class LiquidSimulator implements ComponentSystem {
         LiquidData current = view.getLiquid(blockPos);
         LiquidData newState = calcStateFor(blockPos, view);
         if (!newState.equals(current)) {
-            view.lock();
             try {
                 if (view.isValidView() && world.setLiquid(blockPos, newState, current)) {
                     if (newState.getDepth() > 0) {
@@ -329,11 +328,17 @@ public class LiquidSimulator implements ComponentSystem {
             ChunkView view = world.getLocalView(chunkPos);
             if (view != null) {
                 for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(Chunk.SIZE_X + 2, Chunk.SIZE_Y, Chunk.SIZE_Z + 2))) {
-                    LiquidData state = view.getLiquid(pos);
-                    LiquidData newState = calcStateFor(pos, view);
-                    if (!newState.equals(state)) {
-                        blockQueue.offer(new SimulateBlock(view.toWorldPos(pos), 0));
+                    view.lock();
+                    try {
+                        LiquidData state = view.getLiquid(pos);
+                        LiquidData newState = calcStateFor(pos, view);
+                        if (!newState.equals(state)) {
+                            blockQueue.offer(new SimulateBlock(view.toWorldPos(pos), 0));
+                        }
+                    } finally {
+                        view.unlock();
                     }
+
                 }
             }
         }

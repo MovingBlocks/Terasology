@@ -14,8 +14,8 @@ import org.terasology.world.block.Block;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class BlockTypeSystem implements ComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(BlockTypeSystem.class);
+public class BlockTypeClientSystem implements ComponentSystem {
+    private static final Logger logger = LoggerFactory.getLogger(BlockTypeClientSystem.class);
 
     @Override
     public void initialise() {

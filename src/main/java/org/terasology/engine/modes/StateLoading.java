@@ -37,6 +37,7 @@ import org.terasology.engine.modes.loadProcesses.JoinServer;
 import org.terasology.engine.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
+import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
 import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.engine.modes.loadProcesses.RegisterMods;
@@ -121,6 +122,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseEntitySystem());
         loadProcesses.add(new LoadPrefabs());
+        loadProcesses.add(new ProcessBlockPrefabs());
         loadProcesses.add(new RegisterInputSystem());
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
@@ -138,6 +140,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseEntitySystem());
         loadProcesses.add(new LoadPrefabs());
+        loadProcesses.add(new ProcessBlockPrefabs());
         loadProcesses.add(new RegisterInputSystem());
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());

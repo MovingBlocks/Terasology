@@ -164,4 +164,6 @@ public abstract class BlockManager {
      * @return Whether the uri corresponds to a block family.
      */
     public abstract boolean hasBlockFamily(BlockUri uri);
+
+    public abstract Iterable<Block> listRegisteredBlocks();
 }

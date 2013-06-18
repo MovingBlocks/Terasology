@@ -100,6 +100,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
             if (super.setBlock(x, y, z, type, oldType)) {
+                if (type.isKeepActive()) {
+                    temporaryBlockEntities.remove(blockEntity);
+                } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
+                    temporaryBlockEntities.add(blockEntity);
+                }
                 EntityRef regionEntity = blockRegionLookup.get(pos);
                 if (regionEntity != null) {
                     regionEntity.send(new OnChangedBlock(pos, type, oldType));
@@ -272,6 +277,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             return getBlockEntityAt(blockPosition);
         }
         return entity;
+    }
+
+    @Override
+    public boolean hasPermanentBlockEntity(Vector3i blockPos) {
+        return blockEntityLookup.containsKey(blockPos) && !temporaryBlockEntities.contains(blockPos);
     }
 
     @ReceiveEvent(components = {BlockComponent.class})

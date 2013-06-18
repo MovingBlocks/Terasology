@@ -111,11 +111,13 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     @Override
     public final int get(int x, int y, int z) {
 //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-        if (inflated == null)
+        if (inflated == null) {
             return fill;
+        }
         byte[] row = inflated[y];
-        if (row != null)
+        if (row != null) {
             return row[pos(x, z)];
+        }
         return deflated[y];
     }
 
@@ -158,9 +160,9 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         if (value == expected) return true;
         if (inflated == null) {
             int old = fill;
-            if (old == value)
+            if (old == value) {
                 return true;
-            else {
+            } else {
                 this.inflated = new byte[getSizeY()][];
                 this.deflated = new byte[getSizeY()];
                 Arrays.fill(deflated, fill);
