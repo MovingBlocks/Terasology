@@ -66,6 +66,10 @@ public class PerBlockStorageManager {
         final String className = arrayClass.getSimpleName() + "." + serializerClass.getSimpleName();
         try {
             final TeraArray.SerializationHandler serializer = serializerClass.newInstance();
+            if (serializersByClass.containsKey(arrayClass) || serializersByClassName.containsKey(arrayClass.getName())) {
+                logger.warn("Discovered duplicate per-block-storage serialization handler for tera array class '{}'{}, skipping", arrayClass.getSimpleName(), byMod);
+                return;
+            }
             final ChunksProtobuf.Type protobufType = serializer.getProtobufType();
             if (protobufType == null || protobufType == ChunksProtobuf.Type.Unknown) {
                 serializersByClass.put(arrayClass, serializer);
