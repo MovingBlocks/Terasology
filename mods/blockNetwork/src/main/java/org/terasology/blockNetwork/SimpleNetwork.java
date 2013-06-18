@@ -181,6 +181,11 @@ public class SimpleNetwork implements Network {
 
     @Override
     public int getDistance(NetworkNode from, NetworkNode to) {
+        TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
+        final Integer cachedDistance = distanceCache.get(nodePair);
+        if (cachedDistance != null)
+            return cachedDistance;
+
         if ((!hasNetworkingNode(from) && !hasLeafNode(from))
                 || (!hasNetworkingNode(to) && !hasLeafNode(to)))
             throw new IllegalArgumentException("Cannot test nodes not in network");
@@ -224,6 +229,12 @@ public class SimpleNetwork implements Network {
     public boolean isInDistance(int distance, NetworkNode from, NetworkNode to) {
         if (distance < 0)
             throw new IllegalArgumentException("distance must be >= 0");
+
+        TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
+        final Integer cachedDistance = distanceCache.get(nodePair);
+        if (cachedDistance != null)
+            return cachedDistance<=distance;
+
         if ((!hasNetworkingNode(from) && !hasLeafNode(from))
                 || (!hasNetworkingNode(to) && !hasLeafNode(to)))
             throw new IllegalArgumentException("Cannot test nodes not in network");
@@ -249,9 +260,7 @@ public class SimpleNetwork implements Network {
 
             for (NetworkNode nodeToTest : networkingNodesToTest) {
                 if (SimpleNetwork.areNodesConnecting(nodeToTest, to)) {
-                    distanceCache.put(
-                            new TwoNetworkNodes(from, to),
-                            distanceSearched);
+                    distanceCache.put(nodePair, distanceSearched);
                     return true;
                 }
                 visitedNodes.add(nodeToTest);
