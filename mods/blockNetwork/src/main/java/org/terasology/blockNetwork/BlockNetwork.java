@@ -42,6 +42,13 @@ public class BlockNetwork {
         }
     }
 
+    public void addNetworkingBlocks(Collection<NetworkNode> networkNodes) {
+        // No major optimization possible here
+        for (NetworkNode networkNode : networkNodes) {
+            addNetworkingBlock(networkNode);
+        }
+    }
+
     private void validateNoNetworkingOverlap(NetworkNode networkNode) {
         for (NetworkNode nodeAtSamePosition : networkingNodes.get(networkNode.location)) {
             if ((nodeAtSamePosition.connectionSides & networkNode.connectionSides) > 0)
@@ -145,6 +152,13 @@ public class BlockNetwork {
         }
     }
 
+    public void addLeafBlocks(Collection<NetworkNode> networkNodes) {
+        // No optimizations can be made here
+        for (NetworkNode networkNode : networkNodes) {
+            addLeafBlock(networkNode);
+        }
+    }
+
     public void updateNetworkingBlock(NetworkNode oldNode, NetworkNode newNode) {
         removeNetworkingBlock(oldNode);
         addNetworkingBlock(newNode);
@@ -189,6 +203,49 @@ public class BlockNetwork {
         }
     }
 
+    public void removeNetworkingBlocks(Collection<NetworkNode> networkNodes) {
+        if (networkNodes.size() == 0)
+            return;
+        // This performance improvement is needed until the split detection (above) is improved, after that it can be
+        // removed
+        validateNotMutating();
+        mutating = true;
+        try {
+            Set<SimpleNetwork> affectedNetworks = Sets.newHashSet();
+            for (NetworkNode networkNode : networkNodes) {
+                final SimpleNetwork networkWithBlock = findNetworkWithNetworkingBlock(networkNode);
+                if (networkWithBlock == null)
+                    throw new IllegalStateException("Trying to remove a networking block that doesn't belong to any network");
+
+                affectedNetworks.add(networkWithBlock);
+                networkingNodes.remove(networkNode.location, networkNode);
+            }
+
+            List<Set<NetworkNode>> listOfNodesFromModifiedNetworks = Lists.newLinkedList();
+            for (SimpleNetwork networkWithBlock : affectedNetworks) {
+                Set<NetworkNode> leafNodes = Sets.newHashSet(networkWithBlock.getLeafNodes());
+                Set<NetworkNode> networkingNodes = Sets.newHashSet(networkWithBlock.getNetworkingNodes());
+
+                networkWithBlock.removeAllLeafNodes();
+                notifyLeafNodesAdded(networkWithBlock, leafNodes);
+                networkWithBlock.removeAllNetworkingNodes();
+                notifyNetworkingNodesRemoved(networkWithBlock, Collections.unmodifiableSet(networkingNodes));
+
+                networks.remove(networkWithBlock);
+                notifyNetworkRemoved(networkWithBlock);
+            }
+
+            for (Set<NetworkNode> networkingNodesInModifiedNetwork : listOfNodesFromModifiedNetworks) {
+                for (NetworkNode networkingNode : networkingNodesInModifiedNetwork) {
+                    if (!networkNodes.contains(networkingNode))
+                        addNetworkingBlockInternal(networkingNode);
+                }
+            }
+        } finally {
+            mutating = false;
+        }
+    }
+
     public void removeLeafBlock(NetworkNode networkNode) {
         validateNotMutating();
         mutating = true;
@@ -212,6 +269,13 @@ public class BlockNetwork {
             }
         } finally {
             mutating = false;
+        }
+    }
+
+    public void removeLeafBlocks(Collection<NetworkNode> networkNodes) {
+        // No optimization can be made here
+        for (NetworkNode networkNode : networkNodes) {
+            removeLeafBlock(networkNode);
         }
     }
 
