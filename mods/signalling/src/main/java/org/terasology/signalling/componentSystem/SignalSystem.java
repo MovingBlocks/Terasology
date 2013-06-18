@@ -22,7 +22,9 @@ import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.OnActivatedBlocks;
 
 import java.util.Collection;
 import java.util.Map;
@@ -232,10 +234,30 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      */
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
+    public void prefabConductorLoaded(OnActivatedBlocks event, EntityRef blockType) {
+        byte connectingOnSides = blockType.getComponent(SignalConductorComponent.class).connectionSides;
+        // TODO Improvements can be made if BlockNetwork allows adding multiple nodes in one call
+        for (Vector3i location : event)
+            addConductor(connectingOnSides, location);
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
+    public void prefabConductorUnloaded(BeforeDeactivateBlocks event, EntityRef blockType) {
+        byte connectingOnSides = blockType.getComponent(SignalConductorComponent.class).connectionSides;
+        // TODO Improvements can be made if BlockNetwork allows removing multiple nodes in one call
+        for (Vector3i location : event)
+            removeConductor(connectingOnSides, location);
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
     public void conductorAdded(OnActivatedComponent event, EntityRef block) {
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
         final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
+        addConductor(connectingOnSides, location);
+    }
+
+    private void addConductor(byte connectingOnSides, Vector3i location) {
         final NetworkNode conductorNode = toNode(location, connectingOnSides);
 
         signalConductors.put(location, conductorNode);
@@ -263,6 +285,10 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
         final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
+        removeConductor(connectingOnSides, location);
+    }
+
+    private void removeConductor(byte connectingOnSides, Vector3i location) {
         signalConductors.remove(location);
         signalNetwork.removeNetworkingBlock(toNode(location, connectingOnSides));
     }
@@ -272,15 +298,38 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      */
 
     @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
+    public void prefabProducerLoaded(OnActivatedBlocks event, EntityRef blockType) {
+        final SignalProducerComponent producerComponent = blockType.getComponent(SignalProducerComponent.class);
+        byte connectingOnSides = producerComponent.connectionSides;
+        int signalStrength = producerComponent.signalStrength;
+        // TODO Improvements can be made if BlockNetwork allows adding multiple nodes in one call
+        for (Vector3i location : event)
+            addProducer(connectingOnSides, location, signalStrength);
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
+    public void prefabProducerUnloaded(BeforeDeactivateBlocks event, EntityRef blockType) {
+        byte connectingOnSides = blockType.getComponent(SignalProducerComponent.class).connectionSides;
+        // TODO Improvements can be made if BlockNetwork allows removing multiple nodes in one call
+        for (Vector3i location : event)
+            removeProducer(connectingOnSides, location);
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
     public void producerAdded(OnActivatedComponent event, EntityRef block) {
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         final SignalProducerComponent producerComponent = block.getComponent(SignalProducerComponent.class);
+        final int signalStrength = producerComponent.signalStrength;
         byte connectingOnSides = producerComponent.connectionSides;
 
+        addProducer(connectingOnSides, location, signalStrength);
+    }
+
+    private void addProducer(byte connectingOnSides, Vector3i location, int signalStrength) {
         final NetworkNode producerNode = toNode(location, connectingOnSides);
 
         signalProducers.put(location, producerNode);
-        producerSignalStrengths.put(producerNode, producerComponent.signalStrength);
+        producerSignalStrengths.put(producerNode, signalStrength);
         signalNetwork.addLeafBlock(producerNode);
     }
 
@@ -315,6 +364,10 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalProducerComponent.class).connectionSides;
 
+        removeProducer(connectingOnSides, location);
+    }
+
+    private void removeProducer(byte connectingOnSides, Vector3i location) {
         final NetworkNode producer = toNode(location, connectingOnSides);
         signalNetwork.removeLeafBlock(producer);
         signalProducers.remove(location);
@@ -326,10 +379,30 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      */
 
     @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
+    public void prefabConsumerLoaded(OnActivatedBlocks event, EntityRef blockType) {
+        byte connectingOnSides = blockType.getComponent(SignalConsumerComponent.class).connectionSides;
+        // TODO Improvements can be made if BlockNetwork allows adding multiple nodes in one call
+        for (Vector3i location : event)
+            addConsumer(connectingOnSides, location);
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
+    public void prefabConsumerUnloaded(BeforeDeactivateBlocks event, EntityRef blockType) {
+        byte connectingOnSides = blockType.getComponent(SignalConsumerComponent.class).connectionSides;
+        // TODO Improvements can be made if BlockNetwork allows removing multiple nodes in one call
+        for (Vector3i location : event)
+            removeConsumer(connectingOnSides, location);
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
     public void consumerAdded(OnActivatedComponent event, EntityRef block) {
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
+        addConsumer(connectingOnSides, location);
+    }
+
+    private void addConsumer(byte connectingOnSides, Vector3i location) {
         NetworkNode consumerNode = toNode(location, connectingOnSides);
 
         signalConsumers.put(location, consumerNode);
@@ -362,6 +435,10 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
+        removeConsumer(connectingOnSides, location);
+    }
+
+    private void removeConsumer(byte connectingOnSides, Vector3i location) {
         final NetworkNode consumer = toNode(location, connectingOnSides);
         signalNetwork.removeLeafBlock(consumer);
         signalConsumers.remove(location);
