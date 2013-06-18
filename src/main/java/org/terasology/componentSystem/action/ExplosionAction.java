@@ -19,7 +19,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.In;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.utilities.ParticleEffectHelper;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -30,7 +30,6 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
@@ -49,6 +48,9 @@ public class ExplosionAction implements EventHandlerSystem {
 
     @In
     private BlockEntityRegistry blockEntityRegistry;
+
+    @In
+    private EntityManager entityManager;
 
     private FastRandom random = new FastRandom();
     private DroppedBlockFactory droppedBlockFactory;
@@ -84,6 +86,8 @@ public class ExplosionAction implements EventHandlerSystem {
         if (origin == null) {
             return;
         }
+
+        ParticleEffectHelper.spawnParticleEffect(origin, ParticleEffectHelper.createSmokeExplosionParticleEffect());
 
         Vector3i blockPos = new Vector3i();
         for (int i = 0; i < 256; i++) {

@@ -26,6 +26,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.ParticleEffectHelper;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -38,12 +39,16 @@ import org.terasology.world.block.management.BlockManager;
 public class TunnelAction implements EventHandlerSystem {
 
     private static int MAX_DESTROYED_BLOCKS = 100;
+    private static int MAX_PARTICLE_EFFECTS = 4;
 
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysics physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
     private DroppedBlockFactory droppedBlockFactory;
+
+    @In
+    private EntityManager entityManager;
 
     @Override
     public void initialise() {
@@ -64,6 +69,8 @@ public class TunnelAction implements EventHandlerSystem {
         Vector3f origin = new Vector3f(event.getOrigin());
         Vector3i blockPos = new Vector3i();
 
+
+        int maxParticleEffects = MAX_PARTICLE_EFFECTS;
         int blockCounter = MAX_DESTROYED_BLOCKS;
         for (int s = 4; s <= 10000; s += 30) {
             origin.add(dir);
@@ -89,6 +96,10 @@ public class TunnelAction implements EventHandlerSystem {
                         continue;
 
                     if (currentBlock.isDestructible()) {
+                        if (maxParticleEffects > 0) {
+                            ParticleEffectHelper.spawnParticleEffect(target, ParticleEffectHelper.createSmokeExplosionParticleEffect());
+                        }
+
                         worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
 
                         EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
@@ -99,6 +110,7 @@ public class TunnelAction implements EventHandlerSystem {
                             block.send(new ImpulseEvent(impulse));
                         }
 
+                        maxParticleEffects--;
                         blockCounter--;
                     }
 
