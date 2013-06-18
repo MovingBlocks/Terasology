@@ -52,6 +52,7 @@ public abstract class Camera {
     protected Matrix4f viewProjectionMatrix = new Matrix4f();
     protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
     protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f reflectionMatrix = new Matrix4f();
 
     protected Matrix4f viewMatrixReflected = new Matrix4f();
     protected Matrix4f normViewMatrixReflected = new Matrix4f();
@@ -71,7 +72,6 @@ public abstract class Camera {
         loadProjectionMatrix();
         loadModelViewMatrix();
     }
-
 
     /**
      * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like bobbing) .

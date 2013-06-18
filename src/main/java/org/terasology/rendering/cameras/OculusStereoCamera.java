@@ -52,6 +52,11 @@ public class OculusStereoCamera extends Camera {
     protected Matrix4f viewProjectionMatrixLeftEye = new Matrix4f();
     protected Matrix4f viewProjectionMatrixRightEye = new Matrix4f();
 
+    protected  Matrix4f projTranslationLeftEye = new Matrix4f();
+    protected  Matrix4f projTranslationRightEye = new Matrix4f();
+    protected  Matrix4f viewTranslationLeftEye = new Matrix4f();
+    protected  Matrix4f viewTranslationRightEye = new Matrix4f();
+
     public void updateFrustum() {
         super.updateFrustum();
 
@@ -165,14 +170,10 @@ public class OculusStereoCamera extends Camera {
 
         projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), 0.1f, 5000.0f);
 
-        Matrix4f projTranslationLeftEye = new Matrix4f();
         projTranslationLeftEye.setIdentity();
-
         projTranslationLeftEye.setTranslation(new Vector3f(OculusVrHelper.getProjectionCenterOffset(), 0.0f, 0.0f));
 
-        Matrix4f projTranslationRightEye = new Matrix4f();
         projTranslationRightEye.setIdentity();
-
         projTranslationRightEye.setTranslation(new Vector3f(-OculusVrHelper.getProjectionCenterOffset(), 0.0f, 0.0f));
 
         projectionMatrixLeftEye.mul(projTranslationLeftEye, projectionMatrix);
@@ -181,7 +182,6 @@ public class OculusStereoCamera extends Camera {
         viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-        Matrix4f reflectionMatrix = new Matrix4f();
         reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
         reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
         reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -193,14 +193,10 @@ public class OculusStereoCamera extends Camera {
 
         final float halfIPD = OculusVrHelper.getInterpupillaryDistance() * 0.5f;
 
-        Matrix4f viewTranslationLeftEye = new Matrix4f();
         viewTranslationLeftEye.setIdentity();
-
         viewTranslationLeftEye.setTranslation(new Vector3f(halfIPD, 0.0f, 0.0f));
 
-        Matrix4f viewTranslationRightEye = new Matrix4f();
         viewTranslationRightEye.setIdentity();
-
         viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
 
         viewMatrixLeftEye.mul(viewMatrix, viewTranslationLeftEye);

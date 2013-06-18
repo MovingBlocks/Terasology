@@ -33,6 +33,8 @@ public class PerspectiveCamera extends Camera {
     private float bobbingRotationOffsetFactor, bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor, cachedBobbingVerticalOffsetFactor;
 
+    private Vector3f tempRightVector = new Vector3f();
+
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(getProjectionMatrix()));
@@ -66,18 +68,16 @@ public class PerspectiveCamera extends Camera {
             return;
         }
 
-        Vector3f right = new Vector3f();
-        right.cross(viewingDirection, up);
-        right.scale(bobbingRotationOffsetFactor);
+        tempRightVector.cross(viewingDirection, up);
+        tempRightVector.scale(bobbingRotationOffsetFactor);
 
         projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(fov, 0.1f, 5000.0f);
 
         viewMatrix = TeraMath.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + right.x, up.y + right.y, up.z + right.z);
+                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x + right.x, up.y + right.y, up.z + right.z);
+        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        Matrix4f reflectionMatrix = new Matrix4f();
         reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
         reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
         reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
