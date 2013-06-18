@@ -74,18 +74,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * The world of Terasology. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -708,8 +697,9 @@ public final class WorldRenderer {
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
-        while (renderQueueChunksOpaque.size() > 0)
+        while (renderQueueChunksOpaque.size() > 0) {
             renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.DEFAULT);
+        }
 
         PerformanceMonitor.endActivity();
 
@@ -718,8 +708,9 @@ public final class WorldRenderer {
         /*
          * SECOND RENDER PASS: ALPHA REJECT
          */
-        while (renderQueueChunksSortedAlphaReject.size() > 0)
+        while (renderQueueChunksSortedAlphaReject.size() > 0) {
             renderChunk(renderQueueChunksSortedAlphaReject.poll(), ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
+        }
 
         PerformanceMonitor.endActivity();
 
@@ -734,7 +725,7 @@ public final class WorldRenderer {
         }
 
         /*
-        * THIRD (AND FOURTH) RENDER PASS: ALPHA BLEND
+        * THIRD RENDER PASS: ALPHA BLEND
         */
         while (renderQueueChunksSortedAlphaBlend.size() > 0) {
             renderChunk(renderQueueChunksSortedAlphaBlend.poll(), ChunkMesh.RENDER_PHASE.ALPHA_BLEND, camera, ChunkRenderMode.DEFAULT);
@@ -754,6 +745,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
 
         DefaultRenderingProcess.getInstance().endRenderSceneTransparent();
+
         DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
 
         PerformanceMonitor.startActivity("Render Overlays");
@@ -766,8 +758,9 @@ public final class WorldRenderer {
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 
-        if (config.getSystem().isDebugRenderWireframe())
+        if (config.getSystem().isDebugRenderWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
     }
 
     public void renderWorldReflection(Camera camera) {
@@ -845,8 +838,9 @@ public final class WorldRenderer {
                 shader.enable();
             }
 
-            if (shader == null)
+            if (shader == null) {
                 return;
+            }
 
             GL11.glPushMatrix();
 

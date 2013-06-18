@@ -69,7 +69,6 @@ public class TunnelAction implements EventHandlerSystem {
         Vector3f origin = new Vector3f(event.getOrigin());
         Vector3i blockPos = new Vector3i();
 
-
         int maxParticleEffects = MAX_PARTICLE_EFFECTS;
         int blockCounter = MAX_DESTROYED_BLOCKS;
         for (int s = 4; s <= 10000; s += 30) {
@@ -114,13 +113,16 @@ public class TunnelAction implements EventHandlerSystem {
                         blockCounter--;
                     }
 
-                    if (blockCounter <= 0)
+                    if (blockCounter <= 0) {
                         return;
+                    }
                 }
             }
         }
-        //If no blocks were destroyed, cancel the event
-        if(blockCounter == MAX_DESTROYED_BLOCKS)
+
+        // If no blocks were destroyed, cancel the event
+        if (blockCounter == MAX_DESTROYED_BLOCKS) {
             event.cancel();
+        }
     }
 }

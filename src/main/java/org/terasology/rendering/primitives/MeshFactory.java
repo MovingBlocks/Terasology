@@ -21,6 +21,7 @@ import javax.vecmath.Vector4f;
 
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.world.block.Block;
 
 public class MeshFactory {
 
@@ -38,12 +39,12 @@ public class MeshFactory {
     private MeshFactory() {
     }
 
-    public Mesh generateItemMesh(String simpleuri, int posX, int posY) {
-        return generateItemMesh(simpleuri, posX, posY, 0, false, null);
+    public Mesh generateItemMesh(String uri, int posX, int posY) {
+        return generateItemMesh(uri, posX, posY, 128, false, null);
     }
 
-    public Mesh generateItemMesh(String simpleuri, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
-        Texture tex = Assets.getTexture(simpleuri);
+    public Mesh generateItemMesh(String uri, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
+        Texture tex = Assets.getTexture(uri);
         ByteBuffer buffer = tex.getImageData(0);
 
         posX *= 16;
@@ -59,9 +60,10 @@ public class MeshFactory {
                 int a = buffer.get((posY + y) * stride + (posX + x) * 4 + 3) & 255;
 
                 if (a > alphaLimit) {
-                    TessellatorHelper.addBlockMesh(tessellator, new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
+                    TessellatorHelper.addBlockMesh(tessellator, new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f),
+                            2f * Block.calcRelativeTileSize(), 1.0f, 0.5f, 2f * Block.calcRelativeTileSize() * x - 0.5f, 2.0f * Block.calcRelativeTileSize() * (15 - y) - 1.0f, 0f);
 
-                    if(withContour){
+                    if (withContour) {
                         int newX = 0;
                         int newY = 0;
                         int newA = 0;
@@ -104,7 +106,8 @@ public class MeshFactory {
                             }
 
                             if(newA < alphaLimit){
-                                TessellatorHelper.addBlockMesh(tessellator, new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * newX - 1f / 2f, 2f * 0.0625f * (16 - newY) - 1f, 0f);
+                                TessellatorHelper.addBlockMesh(tessellator, new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w),
+                                        2f * Block.calcRelativeTileSize(), 1.0f, 0.5f, 2f * Block.calcRelativeTileSize() * x - 0.5f, 2.0f * Block.calcRelativeTileSize() * (15 - y) - 1.0f, 0f);
                             }
                         }
                     }
