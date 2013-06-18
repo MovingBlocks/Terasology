@@ -11,7 +11,7 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public abstract class BlockLifecycleEvent implements Event, Iterable<Vector3i> {
+public abstract class BlockLifecycleEvent implements Event {
     private TIntList positions;
     private BlockEntityRegistry registry;
 
@@ -20,12 +20,16 @@ public abstract class BlockLifecycleEvent implements Event, Iterable<Vector3i> {
         this.positions = positions;
     }
 
-    @Override
-    public Iterator<Vector3i> iterator() {
-        return new BlockPositionIterator(positions, registry);
+    public Iterable<Vector3i> getBlockPositions() {
+        return new Iterable<Vector3i>() {
+            @Override
+            public Iterator<Vector3i> iterator() {
+                return new BlockPositionIterator(positions, registry);
+            }
+        };
     }
 
-    public int size() {
+    public int blockCount() {
         return positions.size();
     }
 }
