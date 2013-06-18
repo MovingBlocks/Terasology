@@ -88,7 +88,6 @@ import static org.lwjgl.opengl.GL11.*;
 public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
-    public static final int MAX_CHUNK_VBOS = 2304; // 48*48 for the ultra viewing distance heavy
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);
@@ -105,8 +104,11 @@ public final class WorldRenderer {
 
     /* CAMERAS */
     private Camera localPlayerCamera = null;
-    private Camera lightCamera = new OrthographicCamera(-500f, 500f, 500f, -500f);
     private Camera activeCamera = null;
+
+    /* SHADOW MAPPING */
+    private static final int SHADOW_FRUSTUM_BOUNDS = 500;
+    private Camera lightCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     /* CHUNKS */
     private ChunkTessellator chunkTessellator;
@@ -118,8 +120,8 @@ public final class WorldRenderer {
     private final LinkedList<Chunk> renderQueueChunksOpaque = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksOpaqueShadow = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksOpaqueReflection = Lists.newLinkedList();
+    private final LinkedList<Chunk> renderQueueChunksAlphaReject = new LinkedList<Chunk>();
     private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaBlend = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaReject = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
 
     private WorldRenderingStage currentRenderStage = WorldRenderingStage.DEFAULT;
 
@@ -491,7 +493,8 @@ public final class WorldRenderer {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
 
-            if (config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
+            if (i < config.getRendering().getMaxChunksUsedForShadowMapping()
+                    && config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
                 if (isChunkVisibleLight(c) && isChunkValidForRender(c)) {
                     if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
                         renderQueueChunksOpaqueShadow.add(c);
@@ -513,7 +516,7 @@ public final class WorldRenderer {
                         statIgnoredPhases++;
 
                     if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_REJECT) > 0 && i < MAX_BILLBOARD_CHUNKS)
-                        renderQueueChunksSortedAlphaReject.add(c);
+                        renderQueueChunksAlphaReject.add(c);
                     else
                         statIgnoredPhases++;
 
@@ -708,8 +711,8 @@ public final class WorldRenderer {
         /*
          * SECOND RENDER PASS: ALPHA REJECT
          */
-        while (renderQueueChunksSortedAlphaReject.size() > 0) {
-            renderChunk(renderQueueChunksSortedAlphaReject.poll(), ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueueChunksAlphaReject.size() > 0) {
+            renderChunk(renderQueueChunksAlphaReject.poll(), ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
         }
 
         PerformanceMonitor.endActivity();
@@ -916,11 +919,16 @@ public final class WorldRenderer {
     }
 
     public void positionLightCamera() {
-        int lightPosX = calcCamChunkOffsetX() * Chunk.CHUNK_SIZE.x;
-        int lightPosZ = calcCamChunkOffsetZ() * Chunk.CHUNK_SIZE.z;
-
         // Shadows are rendered around the player so...
-        Vector3f lightPosition = new Vector3f(lightPosX, 0.0f, lightPosZ);
+        Vector3f lightPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z);
+
+        // Project the camera position to light space and make sure it is only moved in texel steps (avoids flickering when moving the camera)
+        float texelSize = 1.0f / config.getRendering().getShadowMapResolution();
+        texelSize *= 2.0f;
+
+        lightCamera.getViewProjectionMatrix().transform(lightPosition);
+        lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
+        lightCamera.getInverseViewProjectionMatrix().transform(lightPosition);
 
         // ... we position our new camera at the position of the player and move it
         // quite a bit into the direction of the sun (our main light).
@@ -931,8 +939,8 @@ public final class WorldRenderer {
 
         Vector3f sunPosition = new Vector3f(sunDirection);
         sunPosition.scale(500f);
-
         lightPosition.add(sunPosition);
+
         lightCamera.getPosition().set(lightPosition);
 
         // and adjust it to look from the sun direction into the direction of our player

@@ -55,6 +55,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private static DefaultRenderingProcess _instance = null;
 
+    /* PROPERTIES */
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
     private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
@@ -68,9 +69,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private Property overallBlurFactor = new Property("overallBlurFactor", 1.0f, 0.0f, 16.0f);
 
+    /* HDR */
     private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
 
+    /* RTs */
     private int rtFullWidth;
     private int rtFullHeight;
     private int rtHalfWidth;
@@ -85,7 +88,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int overwriteRtWidth = 0;
     private int overwriteRtHeight = 0;
 
-
+    /* VARIOUS */
     private boolean takeScreenshot = false;
 
     private int displayListQuad = -1;
@@ -304,7 +307,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
         attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
 
-        createFBO("sceneShadowMap", 1024, 1024, FBOType.NO_COLOR, true, false);
+        createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
         createFBO("sceneCombined", rtFullWidth, rtFullHeight, FBOType.HDR, true, true);
 

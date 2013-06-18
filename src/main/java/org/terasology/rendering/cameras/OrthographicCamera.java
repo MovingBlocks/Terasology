@@ -80,6 +80,7 @@ public class OrthographicCamera extends Camera {
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks
         cachedPosition.set(getPosition());

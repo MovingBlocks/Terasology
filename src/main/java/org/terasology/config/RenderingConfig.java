@@ -37,6 +37,8 @@ public class RenderingConfig {
     private boolean dynamicShadows = false;
     private boolean oculusVrSupport = false;
     private int maxTextureAtlasResolution = 4096;
+    private int maxChunksUsedForShadowMapping = 1024;
+    private int shadowMapResolution = 1024;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -287,5 +289,21 @@ public class RenderingConfig {
 
     public void setMaxTextureAtlasResolution(int maxTextureAtlasResolution) {
         this.maxTextureAtlasResolution = maxTextureAtlasResolution;
+    }
+
+    public int getMaxChunksUsedForShadowMapping() {
+        return maxChunksUsedForShadowMapping;
+    }
+
+    public void setMaxChunksUsedForShadowMapping(int maxChunksUsedForShadowMapping) {
+        this.maxChunksUsedForShadowMapping = maxChunksUsedForShadowMapping;
+    }
+
+    public int getShadowMapResolution() {
+        return shadowMapResolution;
+    }
+
+    public void setShadowMapResolution(int shadowMapResolution) {
+        this.shadowMapResolution = shadowMapResolution;
     }
 }
