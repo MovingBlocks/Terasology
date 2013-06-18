@@ -64,6 +64,7 @@ public class UIDialogMods extends UIDialog {
         this.modConfig = new ModConfig();
         this.originalModConfig = modConfig;
         this.modConfig.copy(modConfig);
+        this.setEnableScrolling(false);
         populateModList();
         setTitle("Select Mods...");
 
@@ -112,7 +113,7 @@ public class UIDialogMods extends UIDialog {
         modList.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(final UIDisplayElement element, final int button) {
-                if (!((Mod)modList.getSelection().getValue()).getModInfo().getId().equals("core")) {
+                if (!((Mod) modList.getSelection().getValue()).getModInfo().getId().equals("core")) {
                     toggleSelectedModActivation();
                 }
             }
@@ -170,8 +171,6 @@ public class UIDialogMods extends UIDialog {
             }
         }
     }
-
-
 
     @Override
     protected void createDialogArea(UIDisplayContainer parent) {
@@ -231,7 +230,6 @@ public class UIDialogMods extends UIDialog {
 
         addDisplayElement(modPanel);
         addDisplayElement(detailPanel);
-
     }
 
     @Override
