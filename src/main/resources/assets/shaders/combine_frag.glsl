@@ -51,13 +51,10 @@ void main() {
     colorOpaque.rgb = (1.0 - outline) * colorOpaque.rgb + outline * vec3(OUTLINE_COLOR);
 #endif
 
-    vec4 color = vec4(0.0);
-    vec4 normals = normalsOpaque;
-
     float fade = clamp(1.0 - colorTransparent.a, 0.0, 1.0);
-    color = mix(colorTransparent, colorOpaque, fade);
+    vec4 color = mix(colorTransparent, colorOpaque, fade);
 
     gl_FragData[0].rgba = color.rgba;
-    gl_FragData[1].rgba = normals.rgba;
+    gl_FragData[1].rgba = normalsOpaque.rgba;
     gl_FragDepth = depthOpaque;
 }
