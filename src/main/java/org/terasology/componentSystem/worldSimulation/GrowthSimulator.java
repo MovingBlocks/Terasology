@@ -127,14 +127,17 @@ public class GrowthSimulator implements EventHandlerSystem {
                 Vector3i adjPos = new Vector3i(event.getBlockPosition());
                 adjPos.add(side.getVector3i());
                 if (dirt.equals(world.getBlock(adjPos))) {
-                    blockQueue.offer(event.getBlockPosition());
+                    blockQueue.offer(adjPos);
                 }
             }
         }
     }
 
     public boolean simulate(Vector3i blockPos) {
-        if (dirt.equals(world.getBlock(blockPos)) && world.getSunlight(new Vector3i(blockPos.x, blockPos.y + 1, blockPos.z)) == Chunk.MAX_LIGHT) {
+        final byte sunlight = world.getSunlight(new Vector3i(blockPos.x, blockPos.y + 1, blockPos.z));
+        final boolean isDirt = dirt.equals(world.getBlock(blockPos));
+
+        if (isDirt && sunlight == Chunk.MAX_LIGHT) {
             WorldBiomeProvider.Biome biome = world.getBiomeProvider().getBiomeAt(blockPos.x, blockPos.z);
 
             if (biome.isVegetationFriendly()) {
