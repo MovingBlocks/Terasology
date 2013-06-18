@@ -493,7 +493,7 @@ public final class WorldRenderer {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
 
-            if (i < config.getRendering().getMaxChunksUsedForShadowMapping()
+            if (i < TeraMath.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024)
                     && config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
                 if (isChunkVisibleLight(c) && isChunkValidForRender(c)) {
                     if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
@@ -938,7 +938,7 @@ public final class WorldRenderer {
         Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
 
         Vector3f sunPosition = new Vector3f(sunDirection);
-        sunPosition.scale(500f);
+        sunPosition.scale(200.0f);
         lightPosition.add(sunPosition);
 
         lightCamera.getPosition().set(lightPosition);
