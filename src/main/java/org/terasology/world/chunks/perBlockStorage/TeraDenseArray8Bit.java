@@ -2,9 +2,6 @@ package org.terasology.world.chunks.perBlockStorage;
 
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.ChunksProtobuf.Type;
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -25,17 +22,74 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     protected final int rowSize() {
         return getSizeXZ();
     }
+    
+    public static class Deflator implements TeraArray.Deflator<TeraDenseArray8Bit> {
+
+        protected final static int DEFLATE_MINIMUM_8BIT = 16;
+
+       /*  
+        *  8-bit variant
+        *  =============
+        *  
+        *  dense chunk  : 4 + 12 + 65536                                                   = 65552
+        *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + 256) × 256)       = 69920
+        *  difference   : 69920 - 65552                                                    =  4368
+        *  min. deflate : 4368 / (12 + 256)                                                =    16.3
+        *  
+        */
+        @Override
+        public TeraArray deflate(TeraDenseArray8Bit array) {
+            final int sizeX = array.getSizeX();
+            final int sizeY = array.getSizeY();
+            final int sizeZ = array.getSizeZ();
+            final int rowSize = array.getSizeXZ();
+            final byte[] data = array.data;
+            final byte[][] inflated = new byte[sizeY][];
+            final byte[] deflated = new byte[sizeY];
+            int packed = 0;
+            for (int y = 0; y < sizeY; y++) {
+                final int start = y * rowSize;
+                final byte first = data[start];
+                boolean packable = true;
+                for (int i = 1; i < rowSize; i++) {
+                    if (data[start + i] != first) {
+                        packable = false;
+                        break;
+                    }
+                }
+                if (packable) {
+                    deflated[y] = first;
+                    ++packed;
+                } else {
+                    byte[] tmp = new byte[rowSize];
+                    System.arraycopy(data, start, tmp, 0, rowSize);
+                    inflated[y] = tmp;
+                }
+            }
+            if (packed == sizeY) {
+                final byte first = deflated[0];
+                boolean packable = true;
+                for (int i = 1; i < sizeY; i++) {
+                    if (deflated[i] != first) {
+                        packable = false;
+                        break;
+                    }
+                }
+                if (packable)
+                    return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, first);
+            }
+            if (packed > DEFLATE_MINIMUM_8BIT) {
+                return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
+            }
+            return null;
+        }
+    }
 
     public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray8Bit> {
 
         @Override
         public Type getProtobufType() {
             return ChunksProtobuf.Type.DenseArray8Bit;
-        }
-
-        @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraDenseArray8Bit.class.equals(clazz);
         }
 
         @Override
@@ -47,16 +101,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         }
     }
     
-    public static class Factory implements PerBlockStorageFactory {
+    public static class Factory implements TeraArray.Factory {
         
         @Override
         public String getId() {
             return "8-bit-dense";
-        }
-        
-        @Override
-        public TeraDenseArray8Bit create() {
-            return new TeraDenseArray8Bit();
         }
         
         @Override
@@ -65,10 +114,6 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         }
     }
     
-    public TeraDenseArray8Bit() {
-        super();
-    }
-
     public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ);
     }
@@ -82,26 +127,18 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public TeraArray deflate(TeraVisitingDeflator deflator) {
-        return Preconditions.checkNotNull(deflator).deflateDenseArray8Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
-    }
-
-    @Override
     public int getElementSizeInBits() {
         return 8;
     }
 
     @Override
     public final int get(int x, int y, int z) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         int pos = pos(x, y, z);
         return data[pos];
     }
 
     @Override
     public final int set(int x, int y, int z, int value) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
         int pos = pos(x, y, z);
         int old = data[pos];
         data[pos] = (byte) value;
@@ -110,9 +147,6 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 
     @Override
     public final boolean set(int x, int y, int z, int value, int expected) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
-//        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
         int pos = pos(x, y, z);
         int old = data[pos];
         if (old == expected) {
@@ -121,5 +155,4 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         }
         return false;
     }
-
 }

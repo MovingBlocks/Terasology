@@ -123,6 +123,8 @@ public class UIMenuConfigAdvanced extends UIWindow {
         comp.addDisplayElement(chunkConfig);
         comp.addDisplayElement(monitoringConfig);
         
+        comp.orderDisplayElementTop(chunkConfig);
+        
         return comp;
     }
     
@@ -254,7 +256,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                manager.loadAdvancedConfig(config);
+                manager.loadConfig(config);
                 getGUIManager().openWindow("config");
             }
         });

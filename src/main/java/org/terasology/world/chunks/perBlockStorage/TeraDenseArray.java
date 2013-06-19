@@ -11,10 +11,6 @@ import com.google.common.base.Preconditions;
  */
 public abstract class TeraDenseArray extends TeraArray {
 
-    protected TeraDenseArray() {
-        super();
-    }
-
     protected TeraDenseArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
         super(sizeX, sizeY, sizeZ, initialize);
     }

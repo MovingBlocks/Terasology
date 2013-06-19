@@ -19,7 +19,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.AdvancedConfig;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.AABB;
@@ -30,16 +29,11 @@ import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.chunks.deflate.TeraDeflator;
-import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 import org.terasology.world.chunks.perBlockStorage.TeraArray;
-import org.terasology.world.chunks.perBlockStorage.TeraDenseArray4Bit;
-import org.terasology.world.chunks.perBlockStorage.TeraDenseArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
-import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -135,6 +129,41 @@ public class Chunk {
         ChunkMonitor.fireChunkCreated(this);
     }
 
+    /**
+     * Deflator implements chunk runtime compression.
+     * @author Manuel Brotz <manu.brotz@gmx.ch>
+     */
+    public static class Deflator {
+        
+        private final PerBlockStorageManager manager;
+        
+        public Deflator(PerBlockStorageManager manager) {
+            this.manager = Preconditions.checkNotNull(manager, "The parameter 'manager' must not be null");
+        }
+        
+        public void deflate(Chunk chunk) {
+            chunk.lock();
+            try {
+                final boolean loggingEnabled = manager.isChunkDeflationLoggingEnabled();
+                long bytesBefore = 0;
+                if (loggingEnabled) 
+                    bytesBefore = chunk.getEstimatedMemoryConsumptionInBytes();
+                chunk.blockData = manager.deflate(chunk.blockData);
+                chunk.sunlightData = manager.deflate(chunk.sunlightData);
+                chunk.lightData = manager.deflate(chunk.lightData);
+                chunk.extraData = manager.deflate(chunk.extraData);
+                if (loggingEnabled) {
+                    long bytesAfter = chunk.getEstimatedMemoryConsumptionInBytes();
+                    long bytesSaved = bytesBefore - bytesAfter;
+                    double percentSaved = Math.round((100.0 / bytesBefore * bytesSaved) * 100.0) / 100.0;
+                    logger.info("Runtime chunk compression {}: {} % saved (bytes saved = {}, compressed size = {}, uncompressed size = {})", chunk.pos, percentSaved, bytesSaved, bytesAfter, bytesBefore);
+                }
+            } finally {
+                chunk.unlock();
+            }
+        }
+    }
+    
     /**
      * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
      *
@@ -315,7 +344,6 @@ public class Chunk {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= 15);
         return sunlightData.set(x, y, z, amount) != amount;
     }
 
@@ -332,7 +360,6 @@ public class Chunk {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= 15);
         return lightData.set(x, y, z, amount) != amount;
     }
 
@@ -406,86 +433,86 @@ public class Chunk {
         return aabb;
     }
 
-    private static DecimalFormat fpercent = new DecimalFormat("0.##");
-    private static DecimalFormat fsize = new DecimalFormat("#,###");
-
-    public void deflate() {
-        if (getChunkState() != ChunkState.COMPLETE) {
-            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is " +
-                "now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
-        }
-        lock();
-        try {
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
-            final TeraDeflator def = new TeraStandardDeflator();
-
-            if (config.isChunkDeflationLoggingEnabled()) {
-                int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
-                int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
-                int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-                int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
-                int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
-
-                blockData = def.deflate(blockData);
-                sunlightData = def.deflate(sunlightData);
-                lightData = def.deflate(lightData);
-                extraData = def.deflate(extraData);
-
-                int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
-                int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
-                int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
-                int liquidReduced = extraData.getEstimatedMemoryConsumptionInBytes();
-                int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
-
-                double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
-                double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
-                double lightPercent = 100d - (100d / lightSize * lightReduced);
-                double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
-                double totalPercent = 100d - (100d / totalSize * totalReduced);
-
-                ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
-                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, " +
-                    "total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, " +
-                    "light-deflated-by=%s%%, liquid-deflated-by=%s%%",
-                    pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced),
-                    fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent),
-                    fpercent.format(lightPercent), fpercent.format(liquidPercent)));
-
-            } else {
-                final int oldSize = getEstimatedMemoryConsumptionInBytes();
-                
-                blockData = def.deflate(blockData);
-                sunlightData = def.deflate(sunlightData);
-                lightData = def.deflate(lightData);
-                extraData = def.deflate(extraData);
-                
-                ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
-            }
-        } finally {
-            unlock();
-        }
-    }
-
-    @Deprecated
-    public void inflate() {
-        lock();
-        try {
-            if (!(blockData instanceof TeraDenseArray8Bit)) {
-                blockData = new TeraDenseArray8Bit(blockData);
-            }
-            if (!(sunlightData instanceof TeraDenseArray4Bit)) {
-                sunlightData = new TeraDenseArray4Bit(sunlightData);
-            }
-            if (!(lightData instanceof TeraDenseArray4Bit)) {
-                lightData = new TeraDenseArray4Bit(lightData);
-            }
-            if (!(extraData instanceof TeraDenseArray4Bit)) {
-                extraData = new TeraDenseArray4Bit(extraData);
-            }
-        } finally {
-            unlock();
-        }
-    }
+//    private static DecimalFormat fpercent = new DecimalFormat("0.##");
+//    private static DecimalFormat fsize = new DecimalFormat("#,###");
+//
+//    public void deflate() {
+//        if (getChunkState() != ChunkState.COMPLETE) {
+//            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is " +
+//                "now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
+//        }
+//        lock();
+//        try {
+//            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
+//            final TeraDeflator def = new TeraStandardDeflator();
+//
+//            if (config.isChunkDeflationLoggingEnabled()) {
+//                int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
+//                int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
+//                int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
+//                int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
+//                int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
+//
+//                blockData = def.deflate(blockData);
+//                sunlightData = def.deflate(sunlightData);
+//                lightData = def.deflate(lightData);
+//                extraData = def.deflate(extraData);
+//
+//                int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
+//                int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
+//                int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
+//                int liquidReduced = extraData.getEstimatedMemoryConsumptionInBytes();
+//                int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
+//
+//                double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
+//                double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
+//                double lightPercent = 100d - (100d / lightSize * lightReduced);
+//                double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
+//                double totalPercent = 100d - (100d / totalSize * totalReduced);
+//
+//                ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
+//                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, " +
+//                    "total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, " +
+//                    "light-deflated-by=%s%%, liquid-deflated-by=%s%%",
+//                    pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced),
+//                    fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent),
+//                    fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+//
+//            } else {
+//                final int oldSize = getEstimatedMemoryConsumptionInBytes();
+//                
+//                blockData = def.deflate(blockData);
+//                sunlightData = def.deflate(sunlightData);
+//                lightData = def.deflate(lightData);
+//                extraData = def.deflate(extraData);
+//                
+//                ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
+//            }
+//        } finally {
+//            unlock();
+//        }
+//    }
+//
+//    @Deprecated
+//    public void inflate() {
+//        lock();
+//        try {
+//            if (!(blockData instanceof TeraDenseArray8Bit)) {
+//                blockData = new TeraDenseArray8Bit(blockData);
+//            }
+//            if (!(sunlightData instanceof TeraDenseArray4Bit)) {
+//                sunlightData = new TeraDenseArray4Bit(sunlightData);
+//            }
+//            if (!(lightData instanceof TeraDenseArray4Bit)) {
+//                lightData = new TeraDenseArray4Bit(lightData);
+//            }
+//            if (!(extraData instanceof TeraDenseArray4Bit)) {
+//                extraData = new TeraDenseArray4Bit(extraData);
+//            }
+//        } finally {
+//            unlock();
+//        }
+//    }
 
     @Override
     public String toString() {

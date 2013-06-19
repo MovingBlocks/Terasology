@@ -15,11 +15,9 @@ public abstract class BenchmarkTeraArraySerialization extends Benchmark {
     public final TeraArray.SerializationHandler handler;
     public final TeraArray array;
     
-    @SuppressWarnings("unchecked")
     public BenchmarkTeraArraySerialization(TeraArray.SerializationHandler handler, TeraArray array) {
         this.handler = Preconditions.checkNotNull(handler);
         this.array = Preconditions.checkNotNull(array);
-        Preconditions.checkArgument(handler.canHandle(array.getClass()), "The supplied serialization handler is incompatible to the supplied array");
     }
 
     @Override
