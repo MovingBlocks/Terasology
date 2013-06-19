@@ -18,9 +18,6 @@ package org.terasology.logic.mod;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -35,8 +32,6 @@ import org.terasology.game.paths.PathManager;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -44,7 +39,6 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -125,7 +119,6 @@ public class ModManager {
      */
     public void refresh() {
         mods.clear();
-        Gson gson = new Gson();
         for (File modPath : PathManager.getInstance().getModPaths()) {
 
             // Directories first (they should override zips)
@@ -138,7 +131,7 @@ public class ModManager {
                 File modInfoFile = new File(modFile, "mod.txt");
                 if (modInfoFile.exists()) {
                     try {
-                        ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
+                        ModInfo modInfo = ModInfo.load(modInfoFile);
                         if (!mods.containsKey(modInfo.getId())) {
                             File assetLocation = new File(modFile, ASSETS_SUBDIRECTORY);
                             File overridesLocation = new File(modFile, OVERRIDES_SUBDIRECTORY);
@@ -149,9 +142,7 @@ public class ModManager {
                         } else {
                             logger.info("Discovered duplicate mod: {}, skipping", modInfo.getDisplayName());
                         }
-                    } catch (FileNotFoundException e) {
-                        logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
-                    } catch (JsonIOException e) {
+                    } catch (IOException e) {
                         logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                     }
                 }
@@ -166,22 +157,24 @@ public class ModManager {
             })) {
                 try {
                     ZipFile zipFile = new ZipFile(modFile);
-                    ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
-                    if (modInfoEntry != null) {
-                        try {
-                            ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
-                            if (!mods.containsKey(modInfo.getId())) {
-                                Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
-                                mods.put(modInfo.getId(), mod);
-                                logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
-                            } else {
-                                logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
+                    try {
+                        ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
+                        if (modInfoEntry != null) {
+                            try {
+                                ModInfo modInfo = ModInfo.load(new InputStreamReader(zipFile.getInputStream(modInfoEntry)));
+                                if (!mods.containsKey(modInfo.getId())) {
+                                    Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
+                                    mods.put(modInfo.getId(), mod);
+                                    logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
+                                } else {
+                                    logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
+                                }
+                            } catch (IOException e) {
+                                logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                             }
-                        } catch (FileNotFoundException e) {
-                            logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
-                        } catch (JsonIOException e) {
-                            logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                         }
+                    } finally {
+                        zipFile.close();
                     }
                 } catch (IOException e) {
                     logger.error("Invalid mod file: {}", modFile, e);
@@ -239,13 +232,5 @@ public class ModManager {
             }
         }
         return activeMods;
-    }
-    
-    public Iterable<String> getActivePerBlockStorageExtensions() {
-        final Set<String> activeExtensions = Sets.newLinkedHashSet();
-        for (Mod mod : mods.values()) 
-            if (mod.isEnabled())
-                activeExtensions.addAll(mod.getModInfo().getPerBlockStorageExtensions());
-        return activeExtensions;
     }
 }
