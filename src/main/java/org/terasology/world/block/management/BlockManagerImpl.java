@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
@@ -40,7 +39,6 @@ import org.terasology.world.block.loader.FreeformFamily;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -131,7 +129,7 @@ public class BlockManagerImpl extends BlockManager {
         if (nextId >= MAX_ID) {
             return UNKNOWN_ID;
         }
-        return (byte)nextId++;
+        return (byte) nextId++;
     }
 
     public void subscribe(BlockRegistrationListener listener) {
@@ -153,7 +151,7 @@ public class BlockManagerImpl extends BlockManager {
             for (Block block : family.getBlocks()) {
                 Integer id = registration.get(block.getURI().toString());
                 if (id != null) {
-                    block.setId((byte)id.intValue());
+                    block.setId((byte) id.intValue());
                 } else {
                     logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri);
                     block.setId(UNKNOWN_ID);
@@ -166,7 +164,7 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     public void buildAtlas() {
-        blockLoader.buildAtlas();
+        blockLoader.getAtlasBuilder().buildAtlas();
     }
 
     /**
@@ -185,7 +183,7 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     @VisibleForTesting
-    public void addFreeformBlockFamily(BlockUri family, String... categories) {
+    public void addFreeformBlockFamily(BlockUri family, Iterable<String> categories) {
         freeformBlockUris.add(family);
         for (String category : categories) {
             categoryLookup.put(category, family);

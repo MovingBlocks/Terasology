@@ -38,8 +38,8 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
      * @param blocks     The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      * @param categories The set of categories this block family belongs to
      */
-    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, String... categories) {
-        super(uri, Arrays.asList(categories));
+    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
+        super(uri, categories);
         for (Side side : Side.horizontalSides()) {
             Block block = blocks.get(side);
             if (block == null) {

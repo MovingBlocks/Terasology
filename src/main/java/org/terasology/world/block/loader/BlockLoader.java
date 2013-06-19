@@ -26,54 +26,38 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.AlignToSurfaceFamily;
+import org.terasology.world.block.family.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyFactory;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -81,15 +65,10 @@ import java.util.Map;
  *
  * @author Immortius
  */
-public class BlockLoader {
-    private static final int MAX_TILES = 256;
+public class BlockLoader implements BlockBuilderHelper {
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
     private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
-
-    // TODO: for now these are fixed (constant in the chunk shader)
-    private int atlasSize = 256;
-    private int tileSize = 16;
 
     private JsonParser parser;
     private Gson gson;
@@ -98,8 +77,7 @@ public class BlockLoader {
     private BlockShape loweredShape;
     private BlockShape trimmedLoweredShape;
 
-    private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
-    private List<Tile> tiles = Lists.newArrayList();
+    private WorldAtlasBuilder atlasBuilder = new WorldAtlasBuilder();
 
     public BlockLoader() {
         parser = new JsonParser();
@@ -115,16 +93,10 @@ public class BlockLoader {
         trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
     }
 
-    public int getAtlasSize() {
-        return atlasSize;
-    }
-
-    public int getNumMipmaps() {
-        return TeraMath.sizeOfPower(tileSize) + 1;
-    }
-
     public LoadBlockDefinitionResults loadBlockDefinitions() {
         logger.info("Loading Blocks...");
+        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
+
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
         for (AssetUri blockDefUri : Assets.list(AssetType.BLOCK_DEFINITION)) {
             try {
@@ -138,45 +110,52 @@ public class BlockLoader {
                     }
                     logger.debug("Loading {}", blockDefUri);
 
-                    BlockDefinition blockDef = loadBlockDefinition(inheritData(blockDefUri, blockDefJson));
+                    BlockDefinition blockDef = createBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
                     if (isShapelessBlockFamily(blockDef)) {
-                        indexTile(getDefaultTile(blockDef, blockDefUri), true);
-                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
+                        atlasBuilder.addToAtlas(getDefaultTile(blockDef, blockDefUri));
+                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockDef.categories));
                     } else {
                         if (blockDef.liquid) {
-                            blockDef.rotation = BlockDefinition.RotationType.NONE;
+                            blockDef.rotation = null;
                             blockDef.shapes.clear();
                             blockDef.shape = trimmedLoweredShape.getURI().getSimpleString();
                         }
 
                         if (blockDef.shapes.isEmpty()) {
-                            switch (blockDef.rotation) {
-                                case ALIGNTOSURFACE:
-                                    result.families.add(processAlignToSurfaceFamily(blockDefUri, blockDefJson));
-                                    break;
-                                case HORIZONTAL:
-                                    result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
-                                    break;
-
-                                default:
-                                    result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
-                                    break;
+                            BlockFamilyFactory familyFactory = blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation);
+                            if (familyFactory == null) {
+                                logger.error("Invalid rotation '{}', reverting to symmetric");
+                                result.families.add(new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), constructSingleBlock(blockDefUri, blockDef), blockDef.categories));
+                            } else {
+                                result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
                             }
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
                         }
                     }
-
                 }
-            } catch (JsonParseException e) {
-                logger.error("Failed to load block '{}'", blockDefUri, e);
-            } catch (NullPointerException e) {
+            } catch (JsonParseException | NullPointerException e) {
                 logger.error("Failed to load block '{}'", blockDefUri, e);
             }
         }
         result.shapelessDefinitions.addAll(loadAutoBlocks());
         return result;
+    }
+
+    public WorldAtlasBuilder getAtlasBuilder() {
+        return atlasBuilder;
+    }
+
+    @Override
+    public BlockDefinition getBlockDefinitionForSection(JsonObject json, String sectionName) {
+        if (json.has(sectionName) && json.get(sectionName).isJsonObject()) {
+            JsonObject sectionJson = json.getAsJsonObject(sectionName);
+            json.remove(sectionName);
+            JsonMergeUtil.mergeOnto(json, sectionJson);
+            return createBlockDefinition(sectionJson);
+        }
+        return null;
     }
 
     public BlockFamily loadWithShape(BlockUri uri) {
@@ -197,77 +176,18 @@ public class BlockLoader {
             // An auto-block
             def = new BlockDefinition();
         } else {
-            def = loadBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
+            def = createBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
         }
 
         def.shape = (shape.getURI().getSimpleString());
         if (shape.isCollisionSymmetric()) {
             Block block = constructSingleBlock(blockDefUri, def);
-            return new SymmetricFamily(uri, block, getCategories(def));
+            return new SymmetricFamily(uri, block, def.categories);
         } else {
             Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
             constructHorizontalBlocks(blockDefUri, def, blockMap);
-            return new HorizontalBlockFamily(uri, blockMap, getCategories(def));
+            return new HorizontalBlockFamily(uri, blockMap, def.categories);
         }
-    }
-
-    public void buildAtlas() {
-        int numMipMaps = getNumMipmaps();
-        ByteBuffer[] data = new ByteBuffer[numMipMaps];
-        for (int i = 0; i < numMipMaps; ++i) {
-            BufferedImage image = generateAtlas(i);
-            if (i == 0) {
-                try {
-                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles.png"));
-                } catch (IOException e) {
-                    logger.warn("Failed to write atlas");
-                }
-            }
-
-            // TODO: Read data directly from image buffer into texture
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(image, "png", bos);
-                PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
-                ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
-                buf.flip();
-                data[i] = buf;
-            } catch (IOException e) {
-                logger.error("Failed to create atlas texture");
-            }
-        }
-
-        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
-        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
-        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
-        terrainMat.setTexture("textureAtlas", terrainTex);
-        terrainMat.setFloat3("colorOffset", 1, 1, 1);
-        terrainMat.setInt("textured", 1);
-        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMat);
-    }
-
-    private BufferedImage generateAtlas(int mipMapLevel) {
-        int size = atlasSize / (1 << mipMapLevel);
-        int textureSize = tileSize / (1 << mipMapLevel);
-        int tilesPerDim = atlasSize / tileSize;
-
-        BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = result.getGraphics();
-
-        if (tiles.size() > MAX_TILES) {
-            logger.error("Too many tiles, culling overflow");
-        }
-
-        for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
-            Tile tile = tiles.get(index);
-
-            int posX = (index) % tilesPerDim;
-            int posY = (index) / tilesPerDim;
-            g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
-        }
-
-        return result;
     }
 
     private List<FreeformFamily> loadAutoBlocks() {
@@ -278,18 +198,17 @@ public class BlockLoader {
                 logger.debug("Loading auto block {}", blockTileUri);
                 BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
                 result.add(new FreeformFamily(uri));
-                getTileIndex(blockTileUri, true);
+                atlasBuilder.addToAtlas(blockTileUri);
             }
         }
         return result;
     }
 
     private boolean isShapelessBlockFamily(BlockDefinition blockDef) {
-        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation == BlockDefinition.RotationType.NONE && !blockDef.liquid && blockDef.tiles == null;
+        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation == null && !blockDef.liquid && blockDef.tiles == null;
     }
 
     private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
-
         JsonObject parentObj = blockDefJson;
         while (parentObj.has("basedOn")) {
             AssetUri parentUri = new AssetUri(AssetType.BLOCK_DEFINITION, parentObj.get("basedOn").getAsString());
@@ -301,7 +220,7 @@ public class BlockLoader {
                 break;
             }
             JsonObject parent = readJson(parentUri).getAsJsonObject();
-            mergeJsonInto(parent, blockDefJson);
+            JsonMergeUtil.mergeOnto(parent, blockDefJson);
             parentObj = parent;
         }
         return blockDefJson;
@@ -322,69 +241,20 @@ public class BlockLoader {
                 blockDef.shape = shapeString;
                 if (shape.isCollisionSymmetric()) {
                     Block block = constructSingleBlock(blockDefUri, blockDef);
-                    result.add(new SymmetricFamily(familyUri, block, getCategories(blockDef)));
+                    result.add(new SymmetricFamily(familyUri, block, blockDef.categories));
                 } else {
                     Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
                     constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-                    result.add(new HorizontalBlockFamily(familyUri, blockMap, getCategories(blockDef)));
+                    result.add(new HorizontalBlockFamily(familyUri, blockMap, blockDef.categories));
                 }
             }
         }
         return result;
     }
 
-    private BlockFamily processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        String[] categories = new String[0];
-        if (blockDefJson.has("top")) {
-            JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
-            blockDefJson.remove("top");
-            mergeJsonInto(blockDefJson, topDefJson);
-            BlockDefinition topDef = loadBlockDefinition(topDefJson);
-            Block block = constructSingleBlock(blockDefUri, topDef);
-            block.setDirection(Side.TOP);
-            blockMap.put(Side.TOP, block);
-            categories = getCategories(topDef);
-        }
-        if (blockDefJson.has("sides")) {
-            JsonObject sideDefJson = blockDefJson.getAsJsonObject("sides");
-            blockDefJson.remove("sides");
-            mergeJsonInto(blockDefJson, sideDefJson);
-            BlockDefinition sideDef = loadBlockDefinition(sideDefJson);
-            constructHorizontalBlocks(blockDefUri, sideDef, blockMap);
-            categories = getCategories(sideDef);
-        }
-        if (blockDefJson.has("bottom")) {
-            JsonObject bottomDefJson = blockDefJson.getAsJsonObject("bottom");
-            blockDefJson.remove("bottom");
-            mergeJsonInto(blockDefJson, bottomDefJson);
-            BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
-            Block block = constructSingleBlock(blockDefUri, bottomDef);
-            block.setDirection(Side.BOTTOM);
-            blockMap.put(Side.BOTTOM, block);
-            categories = getCategories(bottomDef);
-        }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
-    }
-
-    private void mergeJsonInto(JsonObject from, JsonObject to) {
-        for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
-            if (entry.getValue().isJsonObject()) {
-                if (!to.has(entry.getKey())) {
-                    to.add(entry.getKey(), entry.getValue());
-                }
-            } else {
-                if (!to.has(entry.getKey())) {
-                    to.add(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    private BlockFamily processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Block block = constructSingleBlock(blockDefUri, blockDef);
-
-        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block, getCategories(blockDef));
+    @Override
+    public Block constructSimpleBlock(AssetUri blockDefUri, BlockDefinition blockDefinition) {
+        return constructSingleBlock(blockDefUri, blockDefinition);
     }
 
     private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
@@ -408,11 +278,11 @@ public class BlockLoader {
         return block;
     }
 
-    private BlockFamily processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, getCategories(blockDef));
+    @Override
+    public Map<Side, Block> constructHorizontalRotatedBlocks(AssetUri blockDefUri, BlockDefinition blockDefinition) {
+        Map<Side, Block> result = Maps.newHashMap();
+        constructHorizontalBlocks(blockDefUri, blockDefinition, result);
+        return result;
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
@@ -479,8 +349,7 @@ public class BlockLoader {
     private void applyShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
-            int tileIndex = getTileIndex(tileUris.get(part), shape.getMeshPart(part) != null);
-            Vector2f atlasPos = calcAtlasPositionForId(tileIndex);
+            Vector2f atlasPos = atlasBuilder.getTexCoords(tileUris.get(part), shape.getMeshPart(part) != null);
             BlockPart targetPart = rot.rotate(part);
             block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
@@ -496,13 +365,8 @@ public class BlockLoader {
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(atlasBuilder.getTexCoords(tileUris.get(part), true), Block.TEXTURE_OFFSET_WIDTH));
         }
-    }
-
-    private Vector2f calcAtlasPositionForId(int id) {
-        int tilesPerDim = atlasSize / tileSize;
-        return new Vector2f((id % tilesPerDim) * Block.TEXTURE_OFFSET, (id / tilesPerDim) * Block.TEXTURE_OFFSET);
     }
 
     private Block createRawBlock(BlockDefinition def, String defaultName) {
@@ -563,36 +427,12 @@ public class BlockLoader {
         return tileUris;
     }
 
-    private String[] getCategories(BlockDefinition def) {
-        return def.categories.toArray(new String[def.categories.size()]);
-    }
-
     private AssetUri getDefaultTile(BlockDefinition blockDef, AssetUri uri) {
         String defaultName = uri.getSimpleString();
         if (!blockDef.tile.isEmpty()) {
             defaultName = blockDef.tile;
         }
         return new AssetUri(AssetType.BLOCK_TILE, defaultName);
-    }
-
-    private int getTileIndex(AssetUri uri, boolean warnOnError) {
-        if (tileIndexes.containsKey(uri)) {
-            return tileIndexes.get(uri);
-        }
-        return indexTile(uri, warnOnError);
-    }
-
-    private int indexTile(AssetUri uri, boolean warnOnError) {
-        Tile tile = (Tile) AssetManager.tryLoad(uri);
-        if (tile != null) {
-            int index = tiles.size();
-            tiles.add(tile);
-            tileIndexes.put(uri, index);
-            return index;
-        } else if (warnOnError) {
-            logger.warn("Unable to resolve block tile '{}'", uri);
-        }
-        return 0;
     }
 
     private JsonElement readJson(AssetUri blockDefUri) {
@@ -622,7 +462,7 @@ public class BlockLoader {
         return null;
     }
 
-    private BlockDefinition loadBlockDefinition(JsonElement element) {
+    private BlockDefinition createBlockDefinition(JsonElement element) {
         return gson.fromJson(element, BlockDefinition.class);
     }
 
@@ -717,44 +557,6 @@ public class BlockLoader {
         }
     }
 
-    public static class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory {
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-            Class<T> rawType = (Class<T>) type.getRawType();
-            if (!rawType.isEnum()) {
-                return null;
-            }
-
-            final Map<String, T> lowercaseToConstant = Maps.newHashMap();
-            for (T constant : rawType.getEnumConstants()) {
-                lowercaseToConstant.put(toLowercase(constant), constant);
-            }
-
-            return new TypeAdapter<T>() {
-                @Override
-                public void write(JsonWriter out, T value) throws IOException {
-                    if (value == null) {
-                        out.nullValue();
-                    } else {
-                        out.value(toLowercase(value));
-                    }
-                }
-
-                @Override
-                public T read(JsonReader reader) throws IOException {
-                    if (reader.peek() == JsonToken.NULL) {
-                        reader.nextNull();
-                        return null;
-                    } else {
-                        return lowercaseToConstant.get(toLowercase(reader.nextString()));
-                    }
-                }
-            };
-        }
-
-        private String toLowercase(Object o) {
-            return o.toString().toLowerCase(Locale.ENGLISH);
-        }
-    }
 
     public static class LoadBlockDefinitionResults {
         public List<BlockFamily> families = Lists.newArrayList();

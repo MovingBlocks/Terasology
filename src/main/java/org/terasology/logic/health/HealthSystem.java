@@ -99,12 +99,12 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
         health.timeSinceLastDamage = 0;
         health.currentHealth -= damageAmount;
+        entity.saveComponent(health);
         if (health.currentHealth <= 0) {
             entity.send(new NoHealthEvent(instigator, health.maxHealth));
         } else {
             entity.send(new HealthChangedEvent(instigator, health.currentHealth, health.maxHealth));
         }
-        entity.saveComponent(health);
     }
 
     private void applyHealing(EntityRef entity, HealthComponent health, int healAmount, EntityRef instigator) {
@@ -112,13 +112,14 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
             return;
         }
         health.currentHealth += healAmount;
+        entity.saveComponent(health);
         if (health.currentHealth >= health.maxHealth) {
             health.currentHealth = health.maxHealth;
             entity.send(new FullHealthEvent(instigator, health.maxHealth));
         } else {
             entity.send(new HealthChangedEvent(instigator, health.currentHealth, health.maxHealth));
         }
-        entity.saveComponent(health);
+
     }
 
     // Debug commands

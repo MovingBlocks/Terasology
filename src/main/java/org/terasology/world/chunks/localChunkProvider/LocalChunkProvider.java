@@ -275,7 +275,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                             batchBlockMappings.forEachEntry(new TByteObjectProcedure<TIntList>() {
                                 @Override
                                 public boolean execute(byte id, TIntList positions) {
-                                    blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
+                                    if (positions.size() > 0) {
+                                        blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
+                                    }
                                     return true;
                                 }
                             });*/
@@ -326,7 +328,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TByteObjectProcedure<TIntList>() {
                     @Override
                     public boolean execute(byte id, TIntList positions) {
-                        blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
+                        if (positions.size() > 0) {
+                            blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
+                        }
                         return true;
                     }
                 });
@@ -337,7 +341,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TByteObjectProcedure<TIntList>() {
                 @Override
                 public boolean execute(byte id, TIntList positions) {
-                    blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
+                    if (positions.size() > 0) {
+                        blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
+                    }
                     return true;
                 }
             });
