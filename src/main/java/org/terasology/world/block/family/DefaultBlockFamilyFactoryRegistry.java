@@ -18,8 +18,9 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegi
 
     @Override
     public BlockFamilyFactory getBlockFamilyFactory(String blockFamilyFactoryId) {
-        if (blockFamilyFactoryId == null)
+        if (blockFamilyFactoryId == null) {
             return defaultBlockFamilyFactory;
+        }
         return registryMap.get(blockFamilyFactoryId.toLowerCase());
     }
 }

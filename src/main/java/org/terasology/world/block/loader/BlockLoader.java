@@ -26,12 +26,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -41,6 +35,7 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
@@ -48,6 +43,7 @@ import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
@@ -62,7 +58,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -115,7 +110,7 @@ public class BlockLoader implements BlockBuilderHelper {
                     }
                     logger.debug("Loading {}", blockDefUri);
 
-                    BlockDefinition blockDef = loadBlockDefinition(inheritData(blockDefUri, blockDefJson));
+                    BlockDefinition blockDef = createBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
                     if (isShapelessBlockFamily(blockDef)) {
                         atlasBuilder.addToAtlas(getDefaultTile(blockDef, blockDefUri));
@@ -128,17 +123,28 @@ public class BlockLoader implements BlockBuilderHelper {
                         }
 
                         if (blockDef.shapes.isEmpty()) {
-                            result.families.add(blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation).
-                                    createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
+                            BlockFamilyFactory familyFactory = blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation);
+                            if (familyFactory == null) {
+                                logger.error("Invalid rotation '{}', reverting to symmetric");
+                                result.families.add(new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), constructSingleBlock(blockDefUri, blockDef), blockDef.categories));
+                            } else {
+                                Map<String, BlockDefinition> blockDefinitionMap = Maps.newHashMap();
+                                for (String section : familyFactory.supportedExtraBlockDefinitionSections()) {
+                                    if (blockDefJson.has(section) && blockDefJson.get(section).isJsonObject()) {
+                                        JsonObject sectionJson = blockDefJson.getAsJsonObject(section);
+                                        blockDefJson.remove(section);
+                                        JsonMergeUtil.mergeOnto(blockDefJson, sectionJson);
+                                        blockDefinitionMap.put(section, createBlockDefinition(sectionJson));
+                                    }
+                                }
+                                result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefinitionMap, blockDefJson));
+                            }
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
                         }
                     }
-
                 }
-            } catch (JsonParseException e) {
-                logger.error("Failed to load block '{}'", blockDefUri, e);
-            } catch (NullPointerException e) {
+            } catch (JsonParseException | NullPointerException e) {
                 logger.error("Failed to load block '{}'", blockDefUri, e);
             }
         }
@@ -168,7 +174,7 @@ public class BlockLoader implements BlockBuilderHelper {
             // An auto-block
             def = new BlockDefinition();
         } else {
-            def = loadBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
+            def = createBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
         }
 
         def.shape = (shape.getURI().getSimpleString());
@@ -454,12 +460,7 @@ public class BlockLoader implements BlockBuilderHelper {
         return null;
     }
 
-    @Override
-    public BlockDefinition createBlockDefinition(JsonElement element) {
-        return loadBlockDefinition(element);
-    }
-
-    private BlockDefinition loadBlockDefinition(JsonElement element) {
+    private BlockDefinition createBlockDefinition(JsonElement element) {
         return gson.fromJson(element, BlockDefinition.class);
     }
 
@@ -554,44 +555,6 @@ public class BlockLoader implements BlockBuilderHelper {
         }
     }
 
-    public static class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory {
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-            Class<T> rawType = (Class<T>) type.getRawType();
-            if (!rawType.isEnum()) {
-                return null;
-            }
-
-            final Map<String, T> lowercaseToConstant = Maps.newHashMap();
-            for (T constant : rawType.getEnumConstants()) {
-                lowercaseToConstant.put(toLowercase(constant), constant);
-            }
-
-            return new TypeAdapter<T>() {
-                @Override
-                public void write(JsonWriter out, T value) throws IOException {
-                    if (value == null) {
-                        out.nullValue();
-                    } else {
-                        out.value(toLowercase(value));
-                    }
-                }
-
-                @Override
-                public T read(JsonReader reader) throws IOException {
-                    if (reader.peek() == JsonToken.NULL) {
-                        reader.nextNull();
-                        return null;
-                    } else {
-                        return lowercaseToConstant.get(toLowercase(reader.nextString()));
-                    }
-                }
-            };
-        }
-
-        private String toLowercase(Object o) {
-            return o.toString().toLowerCase(Locale.ENGLISH);
-        }
-    }
 
     public static class LoadBlockDefinitionResults {
         public List<BlockFamily> families = Lists.newArrayList();

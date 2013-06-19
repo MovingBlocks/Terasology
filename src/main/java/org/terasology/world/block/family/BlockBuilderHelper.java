@@ -14,6 +14,4 @@ public interface BlockBuilderHelper {
 
     public Map<Side, Block> constructHorizontalRotatedBlocks(AssetUri blockDefUri, BlockDefinition blockDefinition);
 
-    public BlockDefinition createBlockDefinition(JsonElement element);
-
 }
