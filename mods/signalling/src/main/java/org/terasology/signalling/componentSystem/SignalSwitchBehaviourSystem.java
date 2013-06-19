@@ -11,6 +11,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.signalling.components.SignalConsumerStatusComponent;
 import org.terasology.signalling.components.SignalProducerComponent;
+import org.terasology.signalling.components.SignalTransformerHasSignalComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -100,11 +101,20 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         Vector3i blockLocation = new Vector3i(entity.getComponent(BlockComponent.class).getPosition());
         Block blockAtLocation = worldProvider.getBlock(blockLocation);
         if (blockAtLocation == signalTransformer) {
-            int result = producerComponent.signalStrength + 1;
-            if (result == 11)
-                result = 0;
-            producerComponent.signalStrength = result;
-            entity.saveComponent(producerComponent);
+            signalTransformerActivated(entity, producerComponent);
+        }
+    }
+
+    private void signalTransformerActivated(EntityRef entity, SignalProducerComponent producerComponent) {
+        int result = producerComponent.signalStrength + 1;
+        if (result == 11)
+            result = 0;
+        producerComponent.signalStrength = result;
+        entity.saveComponent(producerComponent);
+        if (producerComponent.signalStrength == 1) {
+            entity.saveComponent(new SignalTransformerHasSignalComponent());
+        } else if (producerComponent.signalStrength == 0) {
+            entity.removeComponent(SignalTransformerHasSignalComponent.class);
         }
     }
 
