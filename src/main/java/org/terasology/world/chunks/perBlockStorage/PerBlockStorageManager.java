@@ -34,19 +34,24 @@ public class PerBlockStorageManager {
     private static final Logger logger = LoggerFactory.getLogger(PerBlockStorageManager.class);
     
     private Chunk.ProtobufHandler chunkHandler;
+    private Chunk.Deflator chunkDeflator;
 
     private ModManager mods;
     private Reflections engineReflections;
     
     private Map<String, FactoryEntry> factoriesById;
+    private Map<Class<TeraArray>, TeraArray.Deflator> deflatorsByClass;
     private Map<Class<TeraArray>, TeraArray.SerializationHandler> serializersByClass;
     private Map<String, TeraArray.SerializationHandler> serializersByClassName;
     private Map<ChunksProtobuf.Type, TeraArray.SerializationHandler> serializersByProtobufType;
     
-    private PerBlockStorageFactory blockStorageFactory;
-    private PerBlockStorageFactory sunlightStorageFactory;
-    private PerBlockStorageFactory lightStorageFactory;
-    private PerBlockStorageFactory extraStorageFactory;
+    private TeraArray.Factory blockStorageFactory;
+    private TeraArray.Factory sunlightStorageFactory;
+    private TeraArray.Factory lightStorageFactory;
+    private TeraArray.Factory extraStorageFactory;
+    
+    private boolean chunkDeflationEnabled = true;
+    private boolean chunkDeflationLoggingEnabled = false;
     
     private void registerSerializerClass(Mod mod, Class<TeraArray.SerializationHandler> serializerClass) {
         Preconditions.checkNotNull(serializerClass, "The parameter 'serializerClass' must not be null");
@@ -64,12 +69,12 @@ public class PerBlockStorageManager {
         }
         final Class<TeraArray> arrayClass = (Class<TeraArray>) enclosingClass;
         final String className = arrayClass.getSimpleName() + "." + serializerClass.getSimpleName();
+        if (serializersByClass.containsKey(arrayClass) || serializersByClassName.containsKey(arrayClass.getName())) {
+            logger.warn("Discovered duplicate per-block-storage serialization handler '{}'{}, skipping", className, byMod);
+            return;
+        }
         try {
             final TeraArray.SerializationHandler serializer = serializerClass.newInstance();
-            if (serializersByClass.containsKey(arrayClass) || serializersByClassName.containsKey(arrayClass.getName())) {
-                logger.warn("Discovered duplicate per-block-storage serialization handler for tera array class '{}'{}, skipping", arrayClass.getSimpleName(), byMod);
-                return;
-            }
             final ChunksProtobuf.Type protobufType = serializer.getProtobufType();
             if (protobufType == null || protobufType == ChunksProtobuf.Type.Unknown) {
                 serializersByClass.put(arrayClass, serializer);
@@ -90,7 +95,7 @@ public class PerBlockStorageManager {
         }
     }
     
-    private void registerFactoryClass(Mod mod, Class<? extends PerBlockStorageFactory> factoryClass) {
+    private void registerFactoryClass(Mod mod, Class<? extends TeraArray.Factory> factoryClass) {
         Preconditions.checkNotNull(factoryClass, "The parameter 'factoryClass' must not be null");
         if (Modifier.isAbstract(factoryClass.getModifiers())) {
             return;
@@ -100,7 +105,7 @@ public class PerBlockStorageManager {
         final Class<?> enclosingClass = factoryClass.getEnclosingClass();
         final String className = (enclosingClass != null && TeraArray.class.isAssignableFrom(enclosingClass)) ? enclosingClass.getSimpleName() + "." + factoryClass.getSimpleName() : factoryClass.getSimpleName();
         try {
-            final PerBlockStorageFactory factory = factoryClass.newInstance();
+            final TeraArray.Factory factory = factoryClass.newInstance();
             final String storageId = pakkage + ":" + factory.getId();
             if (factoriesById.containsKey(storageId)) {
                 logger.warn("Discovered duplicate per-block-storage factory '{}' of class '{}'{}, skipping", storageId, className, byMod);
@@ -114,15 +119,48 @@ public class PerBlockStorageManager {
         }
     }
 
+    private void registerDeflatorClass(Mod mod, Class<? extends TeraArray.Deflator> deflatorClass) {
+        Preconditions.checkNotNull(deflatorClass, "The parameter 'deflatorClass' must not be null");
+        if (Modifier.isAbstract(deflatorClass.getModifiers())) {
+            return;
+        }
+        final String byMod = (mod != null) ? " by mod '" + mod.getModInfo().getDisplayName() + "'" : "";
+        final Class<?> enclosingClass = deflatorClass.getEnclosingClass();
+        if (enclosingClass == null || !TeraArray.class.isAssignableFrom(enclosingClass)) {
+            logger.warn("Discovered invalid per-block-storage deflator '{}'{}, skipping", deflatorClass.getName(), byMod);
+            return;
+        }
+        if (Modifier.isAbstract(enclosingClass.getModifiers())) {
+            return;
+        }
+        final Class<TeraArray> arrayClass = (Class<TeraArray>) enclosingClass;
+        final String className = arrayClass.getSimpleName() + "." + deflatorClass.getSimpleName();
+        if (deflatorsByClass.containsKey(arrayClass)) {
+            logger.warn("Discovered duplicate per-block-storage deflator '{}'{}, skipping", className, byMod);
+            return;
+        }
+        try {
+            final TeraArray.Deflator deflator = deflatorClass.newInstance();
+            deflatorsByClass.put(arrayClass, deflator);
+            logger.info("Registered per-block-storage deflator of class '{}'{}", className, byMod);
+        } catch (Exception e) {
+            logger.error("Failed registering per-block-storage deflator of class '{}'{}", className, byMod, e);
+        }
+    }
+
     private void scan(Mod mod) {
         final Reflections reflections = (mod == null) ? engineReflections : mod.getReflections();
         
         if (reflections == null)
             return;
         
-        Set<Class<? extends PerBlockStorageFactory>> factoryClasses = reflections.getSubTypesOf(PerBlockStorageFactory.class);
-        for (final Class<? extends PerBlockStorageFactory> factoryClass : factoryClasses) 
+        Set<Class<? extends TeraArray.Factory>> factoryClasses = reflections.getSubTypesOf(TeraArray.Factory.class);
+        for (final Class<? extends TeraArray.Factory> factoryClass : factoryClasses) 
             registerFactoryClass(mod, factoryClass);
+
+        Set<Class<? extends TeraArray.Deflator>> deflatorClasses = reflections.getSubTypesOf(TeraArray.Deflator.class);
+        for (final Class<? extends TeraArray.Deflator> deflatorClass : deflatorClasses) 
+            registerDeflatorClass(mod, deflatorClass);
 
         Set<Class<? extends TeraArray.SerializationHandler>> serializerClasses = reflections.getSubTypesOf(TeraArray.SerializationHandler.class);
         for (final Class<? extends TeraArray.SerializationHandler> serializerClass : serializerClasses) 
@@ -130,14 +168,8 @@ public class PerBlockStorageManager {
     }
     
     private void scan() {
-        factoriesById = Maps.newHashMap();
-        serializersByClass = Maps.newHashMap();
-        serializersByClassName = Maps.newHashMap();
-        serializersByProtobufType = Maps.newHashMap();
-
         // scan the engine
         scan(null);
-
         // scan all available mods
         if (mods != null)
             for (final Mod mod : mods.getMods()) 
@@ -148,12 +180,28 @@ public class PerBlockStorageManager {
         
         public final Mod mod;
         public final String id;
-        public final PerBlockStorageFactory factory;
+        public final TeraArray.Factory factory;
         
-        public FactoryEntry(Mod mod, String id, PerBlockStorageFactory factory) {
+        public FactoryEntry(Mod mod, String id, TeraArray.Factory factory) {
             this.mod = mod;
             this.id = Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
             this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory must not be null");
+        }
+    }
+    
+    public static class ExtensionEntry {
+        
+        public final Mod mod;
+        public final String extensionId;
+        public final String factoryId;
+        public final TeraArray.Factory factory;
+        
+        public ExtensionEntry(Mod mod, String extensionId, FactoryEntry factoryEntry) {
+            this.mod = Preconditions.checkNotNull(mod, "The parameter 'mod' must not be null");
+            this.extensionId = Preconditions.checkNotNull(extensionId, "The parameter 'extensionId' must not be null");
+            Preconditions.checkNotNull(factoryEntry, "The parameter 'factoryEntry' must not be null");
+            this.factoryId = factoryEntry.id;
+            this.factory = factoryEntry.factory;
         }
     }
     
@@ -186,8 +234,14 @@ public class PerBlockStorageManager {
     
     public void refresh() {
         chunkHandler = new Chunk.ProtobufHandler(this);
+        chunkDeflator = new Chunk.Deflator(this);
+        factoriesById = Maps.newHashMap();
+        deflatorsByClass = Maps.newHashMap();
+        serializersByClass = Maps.newHashMap();
+        serializersByClassName = Maps.newHashMap();
+        serializersByProtobufType = Maps.newHashMap();
         if (getEngineReflections() == null) {
-            logger.error("Unable to scan for available per block storage types.");
+            logger.error("Unable to scan for available per-block-storage types.");
             return;
         }
         scan();
@@ -203,22 +257,29 @@ public class PerBlockStorageManager {
             lightStorageFactory = getArrayFactory(DefaultLightStorageFactory);
         if (extraStorageFactory == null || force)
             extraStorageFactory = getArrayFactory(DefaultExtraStorageFactory);
+        if (force) {
+            chunkDeflationEnabled = true;
+            chunkDeflationLoggingEnabled = false;
+        }
     }
     
-    public void loadAdvancedConfig(AdvancedConfig config) {
-        Preconditions.checkNotNull(config, "The parameter 'config' must not be null");
-        blockStorageFactory = getArrayFactory(config.getBlocksFactoryName());
-        if (blockStorageFactory == null) 
-            config.setBlocksFactory(DefaultBlockStorageFactory);
-        sunlightStorageFactory = getArrayFactory(config.getSunlightFactoryName());
-        if (sunlightStorageFactory == null) 
-            config.setSunlightFactory(DefaultSunlightStorageFactory);
-        lightStorageFactory = getArrayFactory(config.getLightFactoryName());
-        if (lightStorageFactory == null) 
-            config.setLightFactory(DefaultLightStorageFactory);
-        extraStorageFactory = getArrayFactory(config.getExtraFactoryName());
-        if (extraStorageFactory == null) 
-            config.setExtraFactory(DefaultExtraStorageFactory);
+    public void loadConfig(AdvancedConfig config) {
+        if (config != null) {
+            blockStorageFactory = getArrayFactory(config.getBlocksFactoryName());
+            if (blockStorageFactory == null) 
+                config.setBlocksFactory(DefaultBlockStorageFactory);
+            sunlightStorageFactory = getArrayFactory(config.getSunlightFactoryName());
+            if (sunlightStorageFactory == null) 
+                config.setSunlightFactory(DefaultSunlightStorageFactory);
+            lightStorageFactory = getArrayFactory(config.getLightFactoryName());
+            if (lightStorageFactory == null) 
+                config.setLightFactory(DefaultLightStorageFactory);
+            extraStorageFactory = getArrayFactory(config.getExtraFactoryName());
+            if (extraStorageFactory == null) 
+                config.setExtraFactory(DefaultExtraStorageFactory);
+            chunkDeflationEnabled = config.isChunkDeflationEnabled();
+            chunkDeflationLoggingEnabled = config.isChunkDeflationLoggingEnabled();
+        }
         loadDefaultConfig(false);
     }
     
@@ -226,7 +287,7 @@ public class PerBlockStorageManager {
         return factoriesById.get(Preconditions.checkNotNull(id, "The parameter 'id' must not be null"));
     }
     
-    public PerBlockStorageFactory getArrayFactory(String id) {
+    public TeraArray.Factory getArrayFactory(String id) {
         final FactoryEntry entry = getArrayFactoryEntry(id);
         if (entry != null)
             return entry.factory;
@@ -293,6 +354,26 @@ public class PerBlockStorageManager {
     
     public Chunk decode(ChunksProtobuf.Chunk message) {
         return chunkHandler.decode(message);
+    }
+    
+    public TeraArray deflate(TeraArray array) {
+        Preconditions.checkNotNull(array, "The parameter 'input' must not be null");
+        final TeraArray.Deflator deflator = deflatorsByClass.get(array.getClass());
+        if (deflator != null)
+            return deflator.deflate(array);
+        return array;
+    }
+    
+    public boolean isChunkDeflationEnabled() {
+        return chunkDeflationEnabled;
+    }
+    
+    public boolean isChunkDeflationLoggingEnabled() {
+        return chunkDeflationLoggingEnabled;
+    }
+    
+    public void deflate(Chunk chunk) {
+        chunkDeflator.deflate(chunk);
     }
     
     public TeraArray createBlockStorage(int sizeX, int sizeY, int sizeZ) {

@@ -422,7 +422,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
         final PerBlockStorageManager perBlockStorageManager = new PerBlockStorageManager();
-        perBlockStorageManager.loadAdvancedConfig(config.getAdvanced());
+        perBlockStorageManager.loadConfig(config.getAdvanced());
         CoreRegistry.put(PerBlockStorageManager.class, perBlockStorageManager);
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
 
