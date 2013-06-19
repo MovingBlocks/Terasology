@@ -11,13 +11,13 @@ import org.terasology.world.block.loader.BlockDefinition;
 import java.util.Map;
 
 @RegisterBlockFamilyFactory("horizontal")
-public class HorizontalBlockFamilyFactory extends AbstractBlockFamilyFactory {
-    @Override
-    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition mainDefinition, Map<String, BlockDefinition> extraDefinitions, JsonObject blockDefJson) {
-        Map<Side, Block> blockMap = Maps.newHashMap();
-        blockMap.putAll(blockBuilder.constructHorizontalRotatedBlocks(blockDefUri, mainDefinition));
+public class HorizontalBlockFamilyFactory implements BlockFamilyFactory {
 
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, mainDefinition.categories);
+    @Override
+    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
+        Map<Side, Block> blockMap = Maps.newHashMap();
+        blockMap.putAll(blockBuilder.constructHorizontalRotatedBlocks(blockDefUri, blockDefinition));
+        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
     }
 
 }

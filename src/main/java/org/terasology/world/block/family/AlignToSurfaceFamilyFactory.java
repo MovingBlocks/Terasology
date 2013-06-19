@@ -13,38 +13,32 @@ import java.util.List;
 import java.util.Map;
 
 @RegisterBlockFamilyFactory("alignToSurface")
-public class AlignToSurfaceFamilyFactory extends AbstractBlockFamilyFactory {
+public class AlignToSurfaceFamilyFactory implements BlockFamilyFactory {
 
     private static final String TOP = "top";
     private static final String SIDES = "sides";
     private static final String BOTTOM = "bottom";
 
-    private static final List<String> SECTIONS = ImmutableList.of(TOP, SIDES, BOTTOM);
-
     @Override
-    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition mainDefinition, Map<String, BlockDefinition> extraDefinitions, JsonObject blockDefJson) {
+    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        if (extraDefinitions.containsKey(TOP)) {
-            BlockDefinition topDef = extraDefinitions.get(TOP);
+        BlockDefinition topDef = blockBuilder.getBlockDefinitionForSection(blockDefJson, TOP);
+        if (topDef != null) {
             Block block = blockBuilder.constructSimpleBlock(blockDefUri, topDef);
             block.setDirection(Side.TOP);
             blockMap.put(Side.TOP, block);
         }
-        if (extraDefinitions.containsKey(SIDES)) {
-            BlockDefinition sideDef = extraDefinitions.get(SIDES);
+        BlockDefinition sideDef = blockBuilder.getBlockDefinitionForSection(blockDefJson, SIDES);
+        if (sideDef != null) {
             blockMap.putAll(blockBuilder.constructHorizontalRotatedBlocks(blockDefUri, sideDef));
         }
-        if (extraDefinitions.containsKey(BOTTOM)) {
-            BlockDefinition bottomDef = extraDefinitions.get(BOTTOM);
+        BlockDefinition bottomDef = blockBuilder.getBlockDefinitionForSection(blockDefJson, BOTTOM);
+        if (bottomDef != null) {
             Block block = blockBuilder.constructSimpleBlock(blockDefUri, bottomDef);
             block.setDirection(Side.BOTTOM);
             blockMap.put(Side.BOTTOM, block);
         }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, mainDefinition.categories);
+        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
     }
 
-    @Override
-    public Iterable<String> supportedExtraBlockDefinitionSections() {
-        return SECTIONS;
-    }
 }

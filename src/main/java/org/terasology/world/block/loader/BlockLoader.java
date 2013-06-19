@@ -128,16 +128,7 @@ public class BlockLoader implements BlockBuilderHelper {
                                 logger.error("Invalid rotation '{}', reverting to symmetric");
                                 result.families.add(new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), constructSingleBlock(blockDefUri, blockDef), blockDef.categories));
                             } else {
-                                Map<String, BlockDefinition> blockDefinitionMap = Maps.newHashMap();
-                                for (String section : familyFactory.supportedExtraBlockDefinitionSections()) {
-                                    if (blockDefJson.has(section) && blockDefJson.get(section).isJsonObject()) {
-                                        JsonObject sectionJson = blockDefJson.getAsJsonObject(section);
-                                        blockDefJson.remove(section);
-                                        JsonMergeUtil.mergeOnto(blockDefJson, sectionJson);
-                                        blockDefinitionMap.put(section, createBlockDefinition(sectionJson));
-                                    }
-                                }
-                                result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefinitionMap, blockDefJson));
+                                result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
                             }
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
@@ -154,6 +145,17 @@ public class BlockLoader implements BlockBuilderHelper {
 
     public WorldAtlasBuilder getAtlasBuilder() {
         return atlasBuilder;
+    }
+
+    @Override
+    public BlockDefinition getBlockDefinitionForSection(JsonObject json, String sectionName) {
+        if (json.has(sectionName) && json.get(sectionName).isJsonObject()) {
+            JsonObject sectionJson = json.getAsJsonObject(sectionName);
+            json.remove(sectionName);
+            JsonMergeUtil.mergeOnto(json, sectionJson);
+            return createBlockDefinition(sectionJson);
+        }
+        return null;
     }
 
     public BlockFamily loadWithShape(BlockUri uri) {
