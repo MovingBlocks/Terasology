@@ -164,7 +164,7 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     public void buildAtlas() {
-        blockLoader.buildAtlas();
+        blockLoader.getAtlasBuilder().buildAtlas();
     }
 
     /**
