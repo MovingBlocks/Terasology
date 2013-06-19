@@ -50,8 +50,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Chunk {
     protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
 
-    public static final long serialVersionUID = 79881925217704826L;
-
     /* PUBLIC CONSTANT VALUES */
     public static final int SIZE_X = 16;
     public static final int SIZE_Y = 256;
@@ -432,87 +430,6 @@ public class Chunk {
 
         return aabb;
     }
-
-//    private static DecimalFormat fpercent = new DecimalFormat("0.##");
-//    private static DecimalFormat fsize = new DecimalFormat("#,###");
-//
-//    public void deflate() {
-//        if (getChunkState() != ChunkState.COMPLETE) {
-//            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is " +
-//                "now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
-//        }
-//        lock();
-//        try {
-//            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
-//            final TeraDeflator def = new TeraStandardDeflator();
-//
-//            if (config.isChunkDeflationLoggingEnabled()) {
-//                int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
-//                int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
-//                int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-//                int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
-//                int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
-//
-//                blockData = def.deflate(blockData);
-//                sunlightData = def.deflate(sunlightData);
-//                lightData = def.deflate(lightData);
-//                extraData = def.deflate(extraData);
-//
-//                int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
-//                int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
-//                int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
-//                int liquidReduced = extraData.getEstimatedMemoryConsumptionInBytes();
-//                int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
-//
-//                double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
-//                double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
-//                double lightPercent = 100d - (100d / lightSize * lightReduced);
-//                double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
-//                double totalPercent = 100d - (100d / totalSize * totalReduced);
-//
-//                ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
-//                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, " +
-//                    "total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, " +
-//                    "light-deflated-by=%s%%, liquid-deflated-by=%s%%",
-//                    pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced),
-//                    fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent),
-//                    fpercent.format(lightPercent), fpercent.format(liquidPercent)));
-//
-//            } else {
-//                final int oldSize = getEstimatedMemoryConsumptionInBytes();
-//                
-//                blockData = def.deflate(blockData);
-//                sunlightData = def.deflate(sunlightData);
-//                lightData = def.deflate(lightData);
-//                extraData = def.deflate(extraData);
-//                
-//                ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
-//            }
-//        } finally {
-//            unlock();
-//        }
-//    }
-//
-//    @Deprecated
-//    public void inflate() {
-//        lock();
-//        try {
-//            if (!(blockData instanceof TeraDenseArray8Bit)) {
-//                blockData = new TeraDenseArray8Bit(blockData);
-//            }
-//            if (!(sunlightData instanceof TeraDenseArray4Bit)) {
-//                sunlightData = new TeraDenseArray4Bit(sunlightData);
-//            }
-//            if (!(lightData instanceof TeraDenseArray4Bit)) {
-//                lightData = new TeraDenseArray4Bit(lightData);
-//            }
-//            if (!(extraData instanceof TeraDenseArray4Bit)) {
-//                extraData = new TeraDenseArray4Bit(extraData);
-//            }
-//        } finally {
-//            unlock();
-//        }
-//    }
 
     @Override
     public String toString() {
