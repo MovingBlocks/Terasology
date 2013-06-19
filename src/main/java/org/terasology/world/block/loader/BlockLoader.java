@@ -41,6 +41,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -51,10 +52,7 @@ import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.AlignToSurfaceFamily;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.HorizontalBlockFamily;
-import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.family.*;
 import org.terasology.world.block.shapes.BlockShape;
 
 import javax.imageio.ImageIO;
@@ -81,7 +79,7 @@ import java.util.Map;
  *
  * @author Immortius
  */
-public class BlockLoader {
+public class BlockLoader implements BlockBuilderHelper {
     private static final int MAX_TILES = 256;
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
@@ -125,6 +123,8 @@ public class BlockLoader {
 
     public LoadBlockDefinitionResults loadBlockDefinitions() {
         logger.info("Loading Blocks...");
+        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
+
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
         for (AssetUri blockDefUri : Assets.list(AssetType.BLOCK_DEFINITION)) {
             try {
@@ -145,24 +145,14 @@ public class BlockLoader {
                         result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
                     } else {
                         if (blockDef.liquid) {
-                            blockDef.rotation = BlockDefinition.RotationType.NONE;
+                            blockDef.rotation = null;
                             blockDef.shapes.clear();
                             blockDef.shape = trimmedLoweredShape.getURI().getSimpleString();
                         }
 
                         if (blockDef.shapes.isEmpty()) {
-                            switch (blockDef.rotation) {
-                                case ALIGNTOSURFACE:
-                                    result.families.add(processAlignToSurfaceFamily(blockDefUri, blockDefJson));
-                                    break;
-                                case HORIZONTAL:
-                                    result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
-                                    break;
-
-                                default:
-                                    result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
-                                    break;
-                            }
+                            result.families.add(blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation).
+                                    createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
                         }
@@ -285,7 +275,7 @@ public class BlockLoader {
     }
 
     private boolean isShapelessBlockFamily(BlockDefinition blockDef) {
-        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation == BlockDefinition.RotationType.NONE && !blockDef.liquid && blockDef.tiles == null;
+        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation == null && !blockDef.liquid && blockDef.tiles == null;
     }
 
     private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
@@ -333,40 +323,6 @@ public class BlockLoader {
         return result;
     }
 
-    private BlockFamily processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        String[] categories = new String[0];
-        if (blockDefJson.has("top")) {
-            JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
-            blockDefJson.remove("top");
-            mergeJsonInto(blockDefJson, topDefJson);
-            BlockDefinition topDef = loadBlockDefinition(topDefJson);
-            Block block = constructSingleBlock(blockDefUri, topDef);
-            block.setDirection(Side.TOP);
-            blockMap.put(Side.TOP, block);
-            categories = getCategories(topDef);
-        }
-        if (blockDefJson.has("sides")) {
-            JsonObject sideDefJson = blockDefJson.getAsJsonObject("sides");
-            blockDefJson.remove("sides");
-            mergeJsonInto(blockDefJson, sideDefJson);
-            BlockDefinition sideDef = loadBlockDefinition(sideDefJson);
-            constructHorizontalBlocks(blockDefUri, sideDef, blockMap);
-            categories = getCategories(sideDef);
-        }
-        if (blockDefJson.has("bottom")) {
-            JsonObject bottomDefJson = blockDefJson.getAsJsonObject("bottom");
-            blockDefJson.remove("bottom");
-            mergeJsonInto(blockDefJson, bottomDefJson);
-            BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
-            Block block = constructSingleBlock(blockDefUri, bottomDef);
-            block.setDirection(Side.BOTTOM);
-            blockMap.put(Side.BOTTOM, block);
-            categories = getCategories(bottomDef);
-        }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
-    }
-
     private void mergeJsonInto(JsonObject from, JsonObject to) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
@@ -381,10 +337,9 @@ public class BlockLoader {
         }
     }
 
-    private BlockFamily processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Block block = constructSingleBlock(blockDefUri, blockDef);
-
-        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block, getCategories(blockDef));
+    @Override
+    public Block constructSimpleBlock(AssetUri blockDefUri, BlockDefinition blockDefinition) {
+        return constructSingleBlock(blockDefUri, blockDefinition);
     }
 
     private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
@@ -408,11 +363,11 @@ public class BlockLoader {
         return block;
     }
 
-    private BlockFamily processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, getCategories(blockDef));
+    @Override
+    public Map<Side, Block> constructHorizontalRotatedBlocks(AssetUri blockDefUri, BlockDefinition blockDefinition) {
+        Map<Side, Block> result = Maps.newHashMap();
+        constructHorizontalBlocks(blockDefUri, blockDefinition, result);
+        return result;
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
@@ -620,6 +575,11 @@ public class BlockLoader {
             }
         }
         return null;
+    }
+
+    @Override
+    public BlockDefinition createBlockDefinition(JsonElement element) {
+        return loadBlockDefinition(element);
     }
 
     private BlockDefinition loadBlockDefinition(JsonElement element) {
