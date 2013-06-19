@@ -21,12 +21,9 @@ import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.math.Direction;
-import org.terasology.math.Region3i;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.*;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.world.MiniatureChunk;
+import org.terasology.world.chunks.MiniatureChunk;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
@@ -42,7 +39,7 @@ import com.google.common.base.Stopwatch;
  */
 public final class ChunkTessellator {
 
-    private static int _statVertexArrayUpdateCount = 0;
+    private static int statVertexArrayUpdateCount = 0;
 
     private WorldBiomeProvider biomeProvider;
 
@@ -99,7 +96,7 @@ public final class ChunkTessellator {
         watch.stop();
         mesh.timeToGenerateOptimizedBuffers = (int) watch.elapsedMillis();
         
-        _statVertexArrayUpdateCount++;
+        statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();
         
@@ -128,7 +125,7 @@ public final class ChunkTessellator {
         }
 
         generateOptimizedBuffers(localWorldView, mesh);
-        _statVertexArrayUpdateCount++;
+        statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();
         return mesh;
@@ -137,51 +134,68 @@ public final class ChunkTessellator {
     private void generateOptimizedBuffers(WorldView worldView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
-        for (int j = 0; j < mesh._vertexElements.length; j++) {
+        for (int j = 0; j < mesh.vertexElements.length; j++) {
             // Vertices double to account for light info
-            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].flags.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
+            mesh.vertexElements[j].finalVertices = BufferUtils.createByteBuffer(
+                    mesh.vertexElements[j].vertices.size() * 4 /* POSITION */
+                    + mesh.vertexElements[j].tex.size() * 4 /* TEX0 (UV0 and flags) */
+                    + mesh.vertexElements[j].tex.size() * 4 /* TEX1 (lighting data) */
+                    + mesh.vertexElements[j].flags.size() * 4 /* FLAGS */
+                    + mesh.vertexElements[j].color.size() * 4 /* COLOR */
+                    + mesh.vertexElements[j].normals.size() * 4 /* NORMALS */
+            );
 
             int cTex = 0;
             int cColor = 0;
             int cFlags = 0;
-            for (int i = 0; i < mesh._vertexElements[j].vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
+            for (int i = 0; i < mesh.vertexElements[j].vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
 
-                Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
+                Vector3f vertexPos = new Vector3f(mesh.vertexElements[j].vertices.get(i), mesh.vertexElements[j].vertices.get(i + 1), mesh.vertexElements[j].vertices.get(i + 2));
 
-                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.x);
-                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.y);
-                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.z);
+                /* POSITION */
+                mesh.vertexElements[j].finalVertices.putFloat(vertexPos.x);
+                mesh.vertexElements[j].finalVertices.putFloat(vertexPos.y);
+                mesh.vertexElements[j].finalVertices.putFloat(vertexPos.z);
 
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 1));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].flags.get(cFlags));
+                /* UV0 / TEX DATA 0 */
+                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].tex.get(cTex));
+                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].tex.get(cTex + 1));
+
+                /* FLAGS */
+                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].flags.get(cFlags));
 
                 float[] result = new float[3];
-                Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i+1), mesh._vertexElements[j].normals.get(i+2));
+                Vector3f normal = new Vector3f(mesh.vertexElements[j].normals.get(i), mesh.vertexElements[j].normals.get(i+1), mesh.vertexElements[j].normals.get(i+2));
                 calcLightingValuesForVertexPos(worldView, vertexPos, result, normal);
 
-                mesh._vertexElements[j].finalVertices.putFloat(result[0]);
-                mesh._vertexElements[j].finalVertices.putFloat(result[1]);
-                mesh._vertexElements[j].finalVertices.putFloat(result[2]);
+                /* LIGHTING DATA / TEX DATA 1 */
+                mesh.vertexElements[j].finalVertices.putFloat(result[0]);
+                mesh.vertexElements[j].finalVertices.putFloat(result[1]);
+                mesh.vertexElements[j].finalVertices.putFloat(result[2]);
 
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 1));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 2));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 3));
+                final int packedColor = TeraMath.packColor(
+                        mesh.vertexElements[j].color.get(cColor),
+                        mesh.vertexElements[j].color.get(cColor + 1),
+                        mesh.vertexElements[j].color.get(cColor + 2),
+                        mesh.vertexElements[j].color.get(cColor) + 3);
 
-                mesh._vertexElements[j].finalVertices.putFloat(normal.x);
-                mesh._vertexElements[j].finalVertices.putFloat(normal.y);
-                mesh._vertexElements[j].finalVertices.putFloat(normal.z);
+                /* PACKED PACKED COLOR */
+                mesh.vertexElements[j].finalVertices.putInt(packedColor);
+
+                /* NORMALS */
+                mesh.vertexElements[j].finalVertices.putFloat(normal.x);
+                mesh.vertexElements[j].finalVertices.putFloat(normal.y);
+                mesh.vertexElements[j].finalVertices.putFloat(normal.z);
             }
 
-            mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
-            TIntIterator indexIterator = mesh._vertexElements[j].indices.iterator();
+            mesh.vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh.vertexElements[j].indices.size());
+            TIntIterator indexIterator = mesh.vertexElements[j].indices.iterator();
             while (indexIterator.hasNext()) {
-                mesh._vertexElements[j].finalIndices.put(indexIterator.next());
+                mesh.vertexElements[j].finalIndices.put(indexIterator.next());
             }
 
-            mesh._vertexElements[j].finalVertices.flip();
-            mesh._vertexElements[j].finalIndices.flip();
+            mesh.vertexElements[j].finalVertices.flip();
+            mesh.vertexElements[j].finalIndices.flip();
         }
         PerformanceMonitor.endActivity();
     }
@@ -393,6 +407,6 @@ public final class ChunkTessellator {
     }
 
     public static int getVertexArrayUpdateCount() {
-        return _statVertexArrayUpdateCount;
+        return statVertexArrayUpdateCount;
     }
 }

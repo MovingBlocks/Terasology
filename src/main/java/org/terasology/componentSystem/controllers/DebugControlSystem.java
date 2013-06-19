@@ -120,11 +120,15 @@ public class DebugControlSystem implements EventHandlerSystem {
 
         switch (event.getKey()) {
             case Keyboard.KEY_H:
-                for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                    element.setVisible(!element.isVisible());
-                }
+                // Make sure both are either visible or hidden
+                final boolean hide = !(config.getSystem().isDebugHudHidden() && config.getSystem().isDebugFirstPersonElementsHidden());
 
-                config.getSystem().setDebugFirstPersonElementsHidden(!config.getSystem().isDebugFirstPersonElementsHidden());
+                config.getSystem().setDebugHudHidden(hide);
+                config.getSystem().setDebugFirstPersonElementsHidden(hide);
+
+                for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+                    element.setVisible(!hide);
+                }
 
                 event.consume();
                 break;

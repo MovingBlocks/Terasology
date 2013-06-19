@@ -24,6 +24,9 @@ uniform sampler2D texSceneTransparentColor;
 uniform sampler2D texSceneTransparentNormals;
 uniform sampler2D texSceneTransparentDepth;
 
+uniform sampler2D texSobel;
+uniform sampler2D texSSAO;
+
 uniform int debugRenderingStage;
 
 void main(){
@@ -61,31 +64,22 @@ void main(){
             texColor = texture2D(texSceneTransparentColor, gl_TexCoord[0].xy);
             color = texColor;
         
-        } else if (debugRenderingStage ==  DEBUG_STAGE_TRANSPARENT_NORMALS) {
-        
-            texColor = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy);
-            color.xyz = texColor.xyz;
-            color.a = 1.0;
-        
-        } else if (debugRenderingStage == DEBUG_STAGE_TRANSPARENT_DEPTH) {
-        
-            texColor = texture2D(texSceneTransparentDepth, gl_TexCoord[0].xy);
-            float linDepth = linDepth(texColor.x);
-            color.xyz = vec3(linDepth);
-            color.a = 1.0;
-        
-        } else if (debugRenderingStage == DEBUG_STAGE_TRANSPARENT_NORMALS_ALPHA) {
-        
-            texColor = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy);
-            color.xyz = vec3(texColor.a);
-            color.a = 1.0;
-        
         } else if (debugRenderingStage == DEBUG_STAGE_SHADOW_MAP) {
         
             texColor = texture2D(texSceneShadowMap, gl_TexCoord[0].xy);
             color = texColor;
         
-        }
+        } else if (debugRenderingStage == DEBUG_STAGE_SSAO) {
+
+            texColor = texture2D(texSSAO, gl_TexCoord[0].xy);
+            color = texColor;
+
+        }  else if (debugRenderingStage == DEBUG_STAGE_SOBEL) {
+
+            texColor = texture2D(texSobel, gl_TexCoord[0].xy);
+            color = texColor;
+
+       }
 
     gl_FragData[0] = color;
 }

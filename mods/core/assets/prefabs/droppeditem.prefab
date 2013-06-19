@@ -3,14 +3,14 @@
         "scale" : 0.3
     },
     "BoxShape" : {
-        "extents" : [1, 1, 1]
-    },
-    "DroppedItemType": {
+        "extents" : [1, 1, 0.1]
     },
     "RigidBody" : {
-        "mass" : 1000f,
+        "mass" : 1f,
         "collisionGroup" : "engine:debris",
         "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
+    },
+    "DroppedItemType": {
     },
     "Mesh" : {
     },

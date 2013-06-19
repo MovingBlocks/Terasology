@@ -1,41 +1,48 @@
-# Ignore project stuff
-/*.iml
-/*.ipr
-/*.iws
-/.idea
+# Ignore Gradle
+/.gradle/
+/build/
+
+# Ignore IntelliJ IDEA
+/out/
+/Terasology.iml
+/Terasology.ipr
+/Terasology.iws
+
+# Ignore Eclipse
+/.checkstyle
 /.classpath
 /.project
-/.settings
+/.settings/
+/bin/
+
+# Ignore OS generated files
+*.directory
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
 
 # Ignore output stuff
 *.log
-/.checkstyle
-/.gradle
-/SAVED_WORLDS
-/worlds
-/screenshots
-/screens
-/logs
-/out
-/target
-/build
+/SAVED_WORLDS/
+/worlds/
+/screenshots/
+/screens/
+/logs/
+/dev/
 config.cfg
 entityDump.txt
 
 # Ignore natives (extracted to project root during setup)
-natives
-
-# Ignore linuxy stuff
-*.directory
-*~
+/natives/
 
 # Ignore project stuff, output, etc for mods
-/mods/*/classes
-/mods/*/testClasses
-/mods/*/build
+/mods/*/classes/
+/mods/*/testClasses/
+/mods/*/build/
 /mods/*/.*
-
-# ???
-/bin
-/dev
-.DS_Store

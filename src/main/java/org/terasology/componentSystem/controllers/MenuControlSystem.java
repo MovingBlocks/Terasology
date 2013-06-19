@@ -29,8 +29,8 @@ import org.terasology.input.binds.InventoryButton;
 import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius
@@ -80,7 +80,7 @@ public class MenuControlSystem implements EventHandlerSystem {
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey()) {
             case Keyboard.KEY_F12:
-                CoreRegistry.get(WorldRenderer.class).printScreen();
+                DefaultRenderingProcess.getInstance().takeScreenshot();
                 break;
         }
     }

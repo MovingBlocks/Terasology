@@ -30,7 +30,7 @@ void main() {
 
     if (lightDirDotViewDir > 0.0) {
         vec2 textCoo = gl_TexCoord[0].xy;
-        vec2 deltaTextCoord = vec2( textCoo.xy - lightScreenPos.xy);
+        vec2 deltaTextCoord = vec2(textCoo.xy - lightScreenPos.xy);
 
         deltaTextCoord *= (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density;
 

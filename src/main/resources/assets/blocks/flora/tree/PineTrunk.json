@@ -16,6 +16,7 @@
 
 {
     "hardness" : 6,
+    "categories" : ["wood"],
     "tiles" : {
         "topBottom" : "engine:OakTrunk",
         "sides" : "engine:PineBark"

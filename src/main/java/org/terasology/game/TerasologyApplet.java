@@ -17,16 +17,11 @@ package org.terasology.game;
 
 import java.applet.Applet;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.game.paths.PathManager;
 
@@ -36,13 +31,13 @@ import org.terasology.game.paths.PathManager;
  */
 @SuppressWarnings("serial")
 public final class TerasologyApplet extends Applet {
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyApplet.class);
     private TerasologyEngine engine;
     private Thread gameThread;
 
     @Override
     public void init() {
         super.init();
+        PathManager.getInstance().useDefaultHomePath();
         obtainMods();
         startGame();
     }
@@ -50,8 +45,6 @@ public final class TerasologyApplet extends Applet {
     private void obtainMods() {
         String[] mods = getParameter("mods").split(",");
         String modsPath = getParameter("mods_path") + "mods/";
-        //int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
-        //String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
         for (String mod : mods) {
             try {
                 URL url = new URL(modsPath + mod);
@@ -62,12 +55,8 @@ public final class TerasologyApplet extends Applet {
                     readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
                 }
                 fos.close();
-            } catch (MalformedURLException e) {
-                logger.error("Unable to obtain mod '{}'", mod, e);
-            } catch (FileNotFoundException e) {
-                logger.error("Unable to obtain mod '{}'", mod, e);
-            } catch (IOException e) {
-                logger.error("Unable to obtain mod '{}'", mod, e);
+            } catch (Exception e) {
+                throw new RuntimeException("Failure in obtainMods' run for mod " + mod, e);
             }
         }
     }
@@ -77,12 +66,11 @@ public final class TerasologyApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    PathManager.getInstance().useDefaultHomePath();
                     engine = new TerasologyEngine();
                     engine.run(new StateMainMenu());
                     engine.dispose();
                 } catch (Exception e) {
-                    logger.error(e.toString(), e);
+                    throw new RuntimeException("Failure in startGame's run", e);
                 }
             }
         };
@@ -102,12 +90,14 @@ public final class TerasologyApplet extends Applet {
 
     @Override
     public void destroy() {
-        if (engine != null)
+        if (engine != null) {
             engine.shutdown();
+        }
+
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            logger.error("Failed to cleanly shut down engine");
+            throw new RuntimeException("Failed to cleanly shut down engine", e);
         }
 
         super.destroy();

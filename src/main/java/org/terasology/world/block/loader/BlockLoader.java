@@ -32,6 +32,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.paths.PathManager;
 import org.terasology.math.Rotation;
@@ -41,7 +42,6 @@ import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.*;
@@ -70,14 +70,9 @@ import java.util.Map;
  * @author Immortius
  */
 public class BlockLoader {
-    private static final int MAX_TILES = 256;
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
     private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
-
-    // TODO: for now these are fixed (constant in the chunk shader)
-    private int atlasSize = 256;
-    private int tileSize = 16;
 
     private JsonParser parser;
     private Gson gson;
@@ -107,12 +102,8 @@ public class BlockLoader {
         return gson.fromJson(element, type);
     }
 
-    public int getAtlasSize() {
-        return atlasSize;
-    }
-
     public int getNumMipmaps() {
-        return TeraMath.sizeOfPower(tileSize) + 1;
+        return TeraMath.sizeOfPower(Block.TILE_SIZE) + 1;
     }
 
     public LoadBlockDefinitionResults loadBlockDefinitions() {
@@ -196,6 +187,12 @@ public class BlockLoader {
     }
 
     public void buildAtlas() {
+        // Update the atlas configuration using the given set of tiles
+        for (int index = 0; index < tiles.size(); ++index) {
+            Tile tile = tiles.get(index);
+            updateAtlasConfiguration(tile);
+        }
+
         int numMipMaps = getNumMipmaps();
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
@@ -222,7 +219,7 @@ public class BlockLoader {
             }
         }
 
-        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = new Texture(data, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
@@ -232,18 +229,14 @@ public class BlockLoader {
     }
 
     private BufferedImage generateAtlas(int mipMapLevel) {
-        int size = atlasSize / (1 << mipMapLevel);
-        int textureSize = tileSize / (1 << mipMapLevel);
-        int tilesPerDim = atlasSize / tileSize;
+        int size = Block.ATLAS_SIZE / (1 << mipMapLevel);
+        int textureSize = Block.TILE_SIZE / (1 << mipMapLevel);
+        int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
 
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
 
-        if (tiles.size() > MAX_TILES) {
-            logger.error("Too many tiles, culling overflow");
-        }
-
-        for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
+        for (int index = 0; index < tiles.size(); ++index) {
             Tile tile = tiles.get(index);
 
             int posX = (index) % tilesPerDim;
@@ -416,6 +409,8 @@ public class BlockLoader {
     }
 
     private void applyShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             int tileIndex = getTileIndex(tileUris.get(part), shape.getMeshPart(part) != null);
@@ -423,7 +418,7 @@ public class BlockLoader {
             BlockPart targetPart = rot.rotate(part);
             block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
+                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.calcRelativeTileSizeWithOffset()));
                 if (part.isSide()) {
                     block.setFullSide(targetPart.getSide(), shape.isBlockingSide(part.getSide()));
                 }
@@ -433,15 +428,17 @@ public class BlockLoader {
     }
 
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.calcRelativeTileSizeWithOffset()));
         }
     }
 
     private Vector2f calcAtlasPositionForId(int id) {
-        int tilesPerDim = atlasSize / tileSize;
-        return new Vector2f((id % tilesPerDim) * Block.TEXTURE_OFFSET, (id / tilesPerDim) * Block.TEXTURE_OFFSET);
+        int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
+        return new Vector2f((id % tilesPerDim) * Block.calcRelativeTileSize(), (id / tilesPerDim) * Block.calcRelativeTileSize());
     }
 
     private Block createRawBlock(BlockDefinition def, String defaultName) {
@@ -545,6 +542,43 @@ public class BlockLoader {
         return 0;
     }
 
+    private void updateAtlasConfiguration(Tile currentTile) {
+        // The atlas is configured using the following constraints...
+        // 1.   The overall tile size is the size of the largest tile loaded
+        // 2.   The atlas will never be larger than 4096*4096 px
+        // 3.   The tile size gets adjusted if the tiles won't fit into the atlas using the overall tile size
+        //      (the tile size gets halved until all tiles will fit into the atlas)
+        // 4.   The size of the atlas is always a power of two - as is the tile size
+        int tileSize = Block.TILE_SIZE;
+        int atlasSize = Block.ATLAS_SIZE;
+
+        if (currentTile.getImage().getWidth() > tileSize) {
+            tileSize = currentTile.getImage().getWidth();
+        }
+
+        int atlasSizePow = 0, count = 0;
+        while (atlasSizePow * atlasSizePow < tiles.size()) {
+            atlasSizePow = (1 << count);
+            count++;
+        }
+
+        atlasSize = atlasSizePow * tileSize;
+
+        final int maxTextureAtlasRes = CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution();
+        if (atlasSize > maxTextureAtlasRes) {
+            atlasSize = maxTextureAtlasRes;
+        }
+
+        int maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+        while (maxTiles < tiles.size()) {
+            tileSize >>= 1;
+            maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+        }
+
+        Block.ATLAS_SIZE = atlasSize;
+        Block.TILE_SIZE = tileSize;
+    }
+
     private JsonElement readJson(AssetUri blockDefUri) {
         InputStream stream = null;
         try {
@@ -575,7 +609,6 @@ public class BlockLoader {
     public BlockDefinition loadBlockDefinition(JsonElement element) {
         return gson.fromJson(element, BlockDefinition.class);
     }
-
     private static class BlockTilesDefinitionHandler implements JsonDeserializer<BlockDefinition.Tiles> {
 
         @Override

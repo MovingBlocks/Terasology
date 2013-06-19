@@ -125,44 +125,48 @@ void main(){
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
 #ifdef FEATURE_TRANSPARENT_PASS
-    if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        if (!swimming) {
-            if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
-                vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
-                vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+    vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
-                vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-                normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
-                normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
+    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
+        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
+            vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+            vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
 
-                normalWater.xy += normalOffset;
-                normalWater = normalize(normalWater);
+            vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+            normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+            normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
 
-                vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
+            normalWater.xy += normalOffset;
+            normalWater = normalize(normalWater);
 
-                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
-                vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+            vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
-                /* FRESNEL */
+            /* FRESNEL */
+            if (!swimming) {
                 float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
                 color = mix(refractionColor * (1.0 - waterTint) +  waterTint * vec4(WATER_TINT), reflectionColor * (1.0 - waterTint) + waterTint * vec4(WATER_TINT), f);
-
-                isOceanWater = true;
-                isWater = true;
             } else {
-                texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
-                texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-                texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
-
-                color = vec4(texture2D(textureWater, texCoord.xy).xyz, 1.0);
+                color = refractionColor * (1.0 - waterTint) +  waterTint * vec4(WATER_TINT);
             }
+
+            isOceanWater = true;
+            isWater = true;
         } else {
-            color = vec4(texture2D(textureAtlas, texCoord.xy).xyz, 1.0) * vec4(WATER_COLOR_SWIMMING);
+            texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+            texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
+            texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
+
+            vec4 albedoColor = texture2D(textureWater, texCoord.xy).rgba;
+            vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
+
+            color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
+            color.a = 1.0;
         }
     /* LAVA */
     } else
 #endif
-    if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
+    if (checkFlag(BLOCK_HINT_LAVA, blockHint)) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
@@ -170,7 +174,17 @@ void main(){
         color = texture2D(textureLava, texCoord.xy);
     /* APPLY DEFAULT TEXTURE FROM ATLAS */
     } else {
+
+#ifdef FEATURE_TRANSPARENT_PASS
+        vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
+        vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
+
+        // TODO: Add support for actual refraction here
+        color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
+        color.a = 1.0;
+#else
         color = texture2D(textureAtlas, texCoord.xy);
+#endif
 
 #if defined FEATURE_ALPHA_REJECT
         if (color.a < 0.5) {
@@ -192,7 +206,7 @@ void main(){
         }
     /* MASK GRASS AND APPLY BIOME COLOR */
     } else {
-        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET)));
+        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET_EFFECTS + mod(texCoord.x, TEXTURE_OFFSET_EFFECTS), mod(texCoord.y, TEXTURE_OFFSET_EFFECTS)));
 
         // Only use one channel so the color won't be altered
         if (maskColor.a != 0.0) color.rgb = vec3(color.g) * gl_Color.rgb;

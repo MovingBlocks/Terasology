@@ -22,6 +22,7 @@
  */
 {
     "hardness" : 6,
+    "categories" : ["wood"],
 
     // Graphics
     "tiles" : {

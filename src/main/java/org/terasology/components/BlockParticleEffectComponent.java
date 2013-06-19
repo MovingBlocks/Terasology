@@ -20,20 +20,34 @@ import java.util.List;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.world.block.family.BlockFamily;
 
 import com.google.common.collect.Lists;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-// TODO: Generalise for non-block particles?
 public final class BlockParticleEffectComponent implements Component {
-    public BlockFamily blockType;
+
+    public enum ParticleBlendMode {
+        OPAQUE,
+        ADD
+    }
+
+    // Can be null for non-block particles
+    public BlockFamily blockType = null;
+    // If no texture is specified, the default block texture atlas is used
+    public Texture texture = null;
+
     public int spawnCount = 16;
     public boolean destroyEntityOnCompletion;
+    public Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    public ParticleBlendMode blendMode = ParticleBlendMode.OPAQUE;
 
     // Initial conditions
     public Vector3f spawnRange = new Vector3f();
@@ -42,6 +56,9 @@ public final class BlockParticleEffectComponent implements Component {
     public float maxSize = 1.0f;
     public float minLifespan = 0.0f;
     public float maxLifespan = 1.0f;
+
+    public boolean randBlockTexDisplacement = false;
+    public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
 
     // Lifetime conditions
     public Vector3f targetVelocity = new Vector3f();
@@ -56,7 +73,8 @@ public final class BlockParticleEffectComponent implements Component {
         public float size = 1.0f;
         public float lifeRemaining = 1.0f;
         public Vector2f texOffset = new Vector2f(0, 0);
-        //public Vector2f texSize = new Vector2f(1,1);
+        public Vector2f texSize = new Vector2f(1, 1);
+        public Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         public Particle clone() {
             Particle particle = new Particle();
@@ -65,7 +83,7 @@ public final class BlockParticleEffectComponent implements Component {
             particle.size = size;
             particle.lifeRemaining = lifeRemaining;
             particle.texOffset.set(texOffset);
-            //particle.texSize.set(texSize);
+            particle.texSize.set(texSize);
             return particle;
         }
     }

@@ -15,13 +15,10 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.DefaultRenderingProcess;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
 /**
  * Shader parameters for the Debug shader program.
@@ -35,32 +32,32 @@ public class ShaderParametersDebug extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
+        DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
         program.setInt("texSceneShadowMap", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaqueColor", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindNormalsTexture();
+        DefaultRenderingProcess.getInstance().bindFboNormalsTexture("sceneOpaque");
         program.setInt("texSceneOpaqueNormals", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindDepthTexture();
+        DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneOpaque");
         program.setInt("texSceneOpaqueDepth", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneTransparent").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneTransparent");
         program.setInt("texSceneTransparentColor", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneTransparent").bindNormalsTexture();
-        program.setInt("texSceneTransparentNormals", texId++);
+        DefaultRenderingProcess.getInstance().bindFboTexture("ssaoBlurred1");
+        program.setInt("texSSAO", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneTransparent").bindDepthTexture();
-        program.setInt("texSceneTransparentDepth", texId++);
+        DefaultRenderingProcess.getInstance().bindFboTexture("sobel");
+        program.setInt("texSobel", texId++);
 
         program.setInt("debugRenderingStage", CoreRegistry.get(Config.class).getSystem().getDebugRenderingStage());
     }

@@ -38,6 +38,7 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.ParticleEffectHelper;
 import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.BlockEntityRegistry;
@@ -155,29 +156,18 @@ public class BlockEntitySystem implements EventHandlerSystem {
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
 
-        EntityRef particlesEntity = entityManager.create();
-        particlesEntity.addComponent(new LocationComponent(blockComp.getPosition().toVector3f()));
+        Block block = worldProvider.getBlock(blockComp.getPosition());
 
-        BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
-        particleEffect.spawnCount = 64;
-        particleEffect.blockType = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
-        particleEffect.initialVelocityRange.set(4, 4, 4);
-        particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
-        particleEffect.destroyEntityOnCompletion = true;
-        particleEffect.minSize = 0.05f;
-        particleEffect.maxSize = 0.1f;
-        particleEffect.minLifespan = 1f;
-        particleEffect.maxLifespan = 1.5f;
-        particleEffect.targetVelocity.set(0, -5, 0);
-        particleEffect.acceleration.set(2f, 2f, 2f);
-        particleEffect.collideWithBlocks = true;
-        particlesEntity.addComponent(particleEffect);
+        ParticleEffectHelper.spawnParticleEffect(blockComp.getPosition().toVector3f(), ParticleEffectHelper.createDefaultBlockParticleEffect(block));
+
+        if (block.isDebrisOnDestroy()) {
+            ParticleEffectHelper.spawnParticleEffect(blockComp.getPosition().toVector3f(), ParticleEffectHelper.createDustParticleEffect());
+        }
 
         // TODO: Don't play this if destroyed?
         // TODO: Configurable via block definition
         audioManager.playSound(Assets.getSound("engine:Dig"), 1.0f);
     }
-
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onReplaceAroundBlocks(BlockChangedEvent event, EntityRef entity) {

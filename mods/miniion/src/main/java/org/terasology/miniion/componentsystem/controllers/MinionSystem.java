@@ -21,13 +21,11 @@ import java.util.List;
 import java.util.Random;
 
 import org.terasology.asset.Assets;
-import org.terasology.components.LocalPlayerComponent;
 
 import org.terasology.rendering.logic.*;
 import org.terasology.world.block.*;
 import org.terasology.entityFactory.*;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.events.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
@@ -131,11 +129,11 @@ public class MinionSystem implements EventHandlerSystem {
 	public void onBlockDropped(BlockDroppedEvent event, EntityRef entity) {
 		if (entity.hasComponent(MinionComponent.class)) {
 			EntityRef item;
-			if (event.getoldBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
-				item = blockItemFactory.newInstance(event.getoldBlock()
+			if (event.getOldBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
+				item = blockItemFactory.newInstance(event.getOldBlock()
 						.getBlockFamily(), entity);
 			} else {
-				item = blockItemFactory.newInstance(event.getoldBlock()
+				item = blockItemFactory.newInstance(event.getOldBlock()
 						.getBlockFamily());
 			}
 			entity.send(new ReceiveItemEvent(item));

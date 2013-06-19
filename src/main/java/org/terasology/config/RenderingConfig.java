@@ -13,12 +13,7 @@ public class RenderingConfig {
     private int windowWidth = 1280;
     private int windowHeight = 720;
     private boolean fullscreen = false;
-    private int viewDistanceNear = 8;
-    private int viewDistanceModerate = 16;
-    private int viewDistanceFar = 32;
-    private int viewDistanceUltra = 48;
     private int activeViewDistanceMode = 0;
-    private int maxChunkVBOs = 512;
     private boolean flickeringLight = false;
     private boolean animateGrass = false;
     private boolean animateWater = false;
@@ -36,6 +31,10 @@ public class RenderingConfig {
     private boolean eyeAdaptation = true;
     private boolean bloom = false;
     private boolean dynamicShadows = false;
+    private boolean oculusVrSupport = false;
+    private int maxTextureAtlasResolution = 4096;
+    private int maxChunksUsedForShadowMapping = 1024;
+    private int shadowMapResolution = 1024;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -77,38 +76,6 @@ public class RenderingConfig {
         this.fullscreen = fullscreen;
     }
 
-    public int getViewDistanceNear() {
-        return viewDistanceNear;
-    }
-
-    public void setViewDistanceNear(int viewDistanceNear) {
-        this.viewDistanceNear = viewDistanceNear;
-    }
-
-    public int getViewDistanceModerate() {
-        return viewDistanceModerate;
-    }
-
-    public void setViewDistanceModerate(int viewDistanceModerate) {
-        this.viewDistanceModerate = viewDistanceModerate;
-    }
-
-    public int getViewDistanceFar() {
-        return viewDistanceFar;
-    }
-
-    public void setViewDistanceFar(int viewDistanceFar) {
-        this.viewDistanceFar = viewDistanceFar;
-    }
-
-    public int getViewDistanceUltra() {
-        return viewDistanceUltra;
-    }
-
-    public void setViewDistanceUltra(int viewDistanceUltra) {
-        this.viewDistanceUltra = viewDistanceUltra;
-    }
-
     public int getActiveViewDistanceMode() {
         return activeViewDistanceMode;
     }
@@ -117,20 +84,10 @@ public class RenderingConfig {
         this.activeViewDistanceMode = activeViewDistanceMode;
         // TODO: Remove this, switch to a property change listener
 
-        int chunksToLoad = getActiveViewingDistance() * getActiveViewingDistance();
-        setMaxChunkVBOs(chunksToLoad >= 512 ? 512 : chunksToLoad);
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         if (worldRenderer != null) {
             worldRenderer.changeViewDistance(getActiveViewingDistance());
         }
-    }
-
-    public int getMaxChunkVBOs() {
-        return maxChunkVBOs;
-    }
-
-    public void setMaxChunkVBOs(int maxChunkVBOs) {
-        this.maxChunkVBOs = maxChunkVBOs;
     }
 
     public boolean isFlickeringLight() {
@@ -214,7 +171,7 @@ public class RenderingConfig {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur;
+        return motionBlur && !oculusVrSupport;
     }
 
     public void setMotionBlur(boolean motionBlur) {
@@ -269,16 +226,48 @@ public class RenderingConfig {
         this.bloom = bloom;
     }
 
+    public boolean isOculusVrSupport() {
+        return oculusVrSupport;
+    }
+
+    public void setOculusVrSupport(boolean oculusVrSupport) {
+        this.oculusVrSupport = oculusVrSupport;
+    }
+
     public int getActiveViewingDistance() {
         switch (activeViewDistanceMode) {
             case 1:
-                return viewDistanceModerate;
+                return 16;
             case 2:
-                return viewDistanceFar;
+                return 32;
             case 3:
-                return viewDistanceUltra;
+                return 64;
             default:
-                return viewDistanceNear;
+                return 8;
         }
+    }
+
+    public int getMaxTextureAtlasResolution() {
+        return maxTextureAtlasResolution;
+    }
+
+    public void setMaxTextureAtlasResolution(int maxTextureAtlasResolution) {
+        this.maxTextureAtlasResolution = maxTextureAtlasResolution;
+    }
+
+    public int getMaxChunksUsedForShadowMapping() {
+        return maxChunksUsedForShadowMapping;
+    }
+
+    public void setMaxChunksUsedForShadowMapping(int maxChunksUsedForShadowMapping) {
+        this.maxChunksUsedForShadowMapping = maxChunksUsedForShadowMapping;
+    }
+
+    public int getShadowMapResolution() {
+        return shadowMapResolution;
+    }
+
+    public void setShadowMapResolution(int shadowMapResolution) {
+        this.shadowMapResolution = shadowMapResolution;
     }
 }

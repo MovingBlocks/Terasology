@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -23,13 +22,12 @@ import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import java.nio.FloatBuffer;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -44,9 +42,10 @@ public class ShaderParametersPost extends ShaderParametersBase {
     FastRandom rand = new FastRandom();
 
     Texture vignetteTexture = Assets.getTexture("engine:vignette");
-    Texture noiseTexture = Assets.getTexture("engine:noise");
 
-    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
+    Texture filmGrainNoiseTexture = Assets.getTexture("engine:noise");
+    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.025f, 0.0f, 1.0f);
+
     Property blurStart = new Property("blurStart", 0.1f, 0.0f, 1.0f);
     Property blurLength = new Property("blurLength", 0.1f, 0.0f, 1.0f);
 
@@ -56,15 +55,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         LocalPlayerSystem localPlayerSystem = CoreRegistry.get(LocalPlayerSystem.class);
 
-        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
-
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneToneMapped");
         program.setInt("texScene", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().getFBO("sceneBloom1").bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom1");
         program.setInt("texBloom", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
@@ -84,22 +81,24 @@ public class ShaderParametersPost extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
         program.setInt("texVignette", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneCombined.bindDepthTexture();
-        program.setInt("texDepth", texId++);
+        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
 
-        if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
+        if (sceneCombined != null) {
+
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
-            program.setInt("texNoise", texId++);
-            program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
-            program.setFloat("noiseOffset", rand.randomPosFloat());
+            sceneCombined.bindDepthTexture();
+            program.setInt("texDepth", texId++);
 
-            FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-            rtSize.put((float) sceneCombined.width).put((float) sceneCombined.height);
-            rtSize.flip();
+            if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
+                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+                glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
+                program.setInt("texNoise", texId++);
+                program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
+                program.setFloat("noiseOffset", rand.randomPosFloat());
 
-            program.setFloat2("renderTargetSize", rtSize);
+                program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight());
+                program.setFloat2("renderTargetSize", sceneCombined.width, sceneCombined.height);
+            }
         }
 
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();

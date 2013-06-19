@@ -15,14 +15,13 @@
  */
 package org.terasology.rendering.cameras;
 
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.TeraMath;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Simple default camera.
@@ -31,24 +30,25 @@ import org.terasology.math.TeraMath;
  */
 public class PerspectiveCamera extends Camera {
 
-    private float _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0f;
+    private float bobbingRotationOffsetFactor, bobbingVerticalOffsetFactor;
+    private float cachedBobbingRotationOffsetFactor, cachedBobbingVerticalOffsetFactor;
+
+    private Vector3f tempRightVector = new Vector3f();
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_projectionMatrix));
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(getProjectionMatrix()));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_viewMatrix));
-        _viewFrustum.updateFrustum();
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(getViewMatrix()));
     }
 
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToBuffer(_normViewMatrix));
-        _viewFrustum.updateFrustum();
+        GL11.glLoadMatrix(TeraMath.matrixToBuffer(getNormViewMatrix()));
     }
 
     public void update(float deltaT) {
@@ -57,30 +57,54 @@ public class PerspectiveCamera extends Camera {
     }
 
     public void updateMatrices() {
-        updateMatrices(_activeFov);
+        updateMatrices(activeFov);
     }
 
-    public void updateMatrices(float overrideFov) {
-        Vector3f right = new Vector3f();
-        right.cross(_viewingDirection, _up);
-        right.scale(_bobbingRotationOffsetFactor);
+    public void updateMatrices(float fov) {
+        // Nothing to do...
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+                && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
+                && cachedFov == fov) {
+            return;
+        }
 
-        _projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(overrideFov, 0.1f, 5000.0f);
+        tempRightVector.cross(viewingDirection, up);
+        tempRightVector.scale(bobbingRotationOffsetFactor);
 
-        _viewMatrix = TeraMath.createViewMatrix(0f, _bobbingVerticalOffsetFactor * 2.0f, 0f, _viewingDirection.x, _viewingDirection.y + _bobbingVerticalOffsetFactor * 2.0f,
-                _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
-        _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(fov, 0.1f, 5000.0f);
 
-        _prevViewProjectionMatrix = new Matrix4f(_viewProjectionMatrix);
-        _viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(_viewMatrix, _projectionMatrix);
-        _inverseViewProjectionMatrix.invert(_viewProjectionMatrix);
+        viewMatrix = TeraMath.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+
+        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+
+        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
+        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
+        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f,1.0f);
+        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+
+        viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+
+        // Used for dirty checks
+        cachedPosition.set(getPosition());
+        cachedViewigDirection.set(getViewingDirection());
+        cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
+        cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
+        cachedFov = fov;
+
+        updateFrustum();
     }
 
     public void setBobbingRotationOffsetFactor(float f) {
-        _bobbingRotationOffsetFactor = f;
+        bobbingRotationOffsetFactor = f;
     }
 
     public void setBobbingVerticalOffsetFactor(float f) {
-        _bobbingVerticalOffsetFactor = f;
+        bobbingVerticalOffsetFactor = f;
     }
 }

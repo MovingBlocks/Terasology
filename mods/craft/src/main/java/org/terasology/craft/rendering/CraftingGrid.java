@@ -4,8 +4,8 @@ import org.terasology.craft.components.actions.CraftingActionComponent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.math.AABB;
-import org.terasology.rendering.AABBRenderer;
-import org.terasology.rendering.BlockOverlayRenderer;
+import org.terasology.rendering.renderer.AABBRenderer;
+import org.terasology.rendering.renderer.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 

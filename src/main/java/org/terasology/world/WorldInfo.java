@@ -41,7 +41,7 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time = 0;
-    private Map<String, Byte> blockIdMap = Maps.newHashMap();
+    private Map<String, Short> blockIdMap = Maps.newHashMap();
     private String[] chunkGenerators = new String[]{};
     private String gameType = null;
     private ModConfig modConfiguration = new ModConfig();
@@ -121,11 +121,11 @@ public class WorldInfo {
         return gameType;
     }
 
-    public Map<String, Byte> getBlockIdMap() {
+    public Map<String, Short> getBlockIdMap() {
         return blockIdMap;
     }
 
-    public void setBlockIdMap(Map<String, Byte> blockIdMap) {
+    public void setBlockIdMap(Map<String, Short> blockIdMap) {
         this.blockIdMap = blockIdMap;
     }
 
