@@ -48,6 +48,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -142,7 +143,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
                     if (isShapelessBlockFamily(blockDef)) {
                         indexTile(getDefaultTile(blockDef, blockDefUri), true);
-                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
+                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockDef.categories));
                     } else {
                         if (blockDef.liquid) {
                             blockDef.rotation = null;
@@ -193,11 +194,11 @@ public class BlockLoader implements BlockBuilderHelper {
         def.shape = (shape.getURI().getSimpleString());
         if (shape.isCollisionSymmetric()) {
             Block block = constructSingleBlock(blockDefUri, def);
-            return new SymmetricFamily(uri, block, getCategories(def));
+            return new SymmetricFamily(uri, block, def.categories);
         } else {
             Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
             constructHorizontalBlocks(blockDefUri, def, blockMap);
-            return new HorizontalBlockFamily(uri, blockMap, getCategories(def));
+            return new HorizontalBlockFamily(uri, blockMap, def.categories);
         }
     }
 
@@ -279,7 +280,6 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
-
         JsonObject parentObj = blockDefJson;
         while (parentObj.has("basedOn")) {
             AssetUri parentUri = new AssetUri(AssetType.BLOCK_DEFINITION, parentObj.get("basedOn").getAsString());
@@ -291,7 +291,7 @@ public class BlockLoader implements BlockBuilderHelper {
                 break;
             }
             JsonObject parent = readJson(parentUri).getAsJsonObject();
-            mergeJsonInto(parent, blockDefJson);
+            JsonMergeUtil.mergeOnto(parent, blockDefJson);
             parentObj = parent;
         }
         return blockDefJson;
@@ -312,29 +312,15 @@ public class BlockLoader implements BlockBuilderHelper {
                 blockDef.shape = shapeString;
                 if (shape.isCollisionSymmetric()) {
                     Block block = constructSingleBlock(blockDefUri, blockDef);
-                    result.add(new SymmetricFamily(familyUri, block, getCategories(blockDef)));
+                    result.add(new SymmetricFamily(familyUri, block, blockDef.categories));
                 } else {
                     Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
                     constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-                    result.add(new HorizontalBlockFamily(familyUri, blockMap, getCategories(blockDef)));
+                    result.add(new HorizontalBlockFamily(familyUri, blockMap, blockDef.categories));
                 }
             }
         }
         return result;
-    }
-
-    private void mergeJsonInto(JsonObject from, JsonObject to) {
-        for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
-            if (entry.getValue().isJsonObject()) {
-                if (!to.has(entry.getKey())) {
-                    to.add(entry.getKey(), entry.getValue());
-                }
-            } else {
-                if (!to.has(entry.getKey())) {
-                    to.add(entry.getKey(), entry.getValue());
-                }
-            }
-        }
     }
 
     @Override
@@ -516,10 +502,6 @@ public class BlockLoader implements BlockBuilderHelper {
             }
         }
         return tileUris;
-    }
-
-    private String[] getCategories(BlockDefinition def) {
-        return def.categories.toArray(new String[def.categories.size()]);
     }
 
     private AssetUri getDefaultTile(BlockDefinition blockDef, AssetUri uri) {

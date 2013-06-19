@@ -17,10 +17,6 @@ public class HorizontalBlockFamilyFactory implements BlockFamilyFactory {
         Map<Side, Block> blockMap = Maps.newHashMap();
         blockMap.putAll(blockBuilder.constructHorizontalRotatedBlocks(blockDefUri, blockDef));
 
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, getCategories(blockDef));
-    }
-
-    private String[] getCategories(BlockDefinition def) {
-        return def.categories.toArray(new String[def.categories.size()]);
+        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, blockDef.categories);
     }
 }

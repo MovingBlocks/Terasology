@@ -35,8 +35,8 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
      * @param uri    The uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, String... categories) {
-        super(uri, Arrays.asList(categories));
+    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
+        super(uri, categories);
         for (Side side : Side.values()) {
             Block block = blocks.get(side);
             if (block != null) {

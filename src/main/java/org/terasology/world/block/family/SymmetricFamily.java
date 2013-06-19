@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
@@ -30,8 +31,12 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     private Block block;
 
-    public SymmetricFamily(BlockUri uri, Block block, String... categories) {
-        super(uri, Arrays.asList(categories));
+    public SymmetricFamily(BlockUri uri, Block block) {
+        this(uri, block, NullIterator.<String>newInstance());
+    }
+
+    public SymmetricFamily(BlockUri uri, Block block, Iterable<String> categories) {
+        super(uri, categories);
         this.block = block;
         block.setBlockFamily(this);
         block.setUri(uri);
