@@ -104,31 +104,31 @@ public class ModInfo {
     
     public static class PerBlockStorageExtensionInfo {
         
-        private final String extensionId;
-        private final String factoryId;
+        private final String id;
+        private final String factory;
         
         private PerBlockStorageExtensionInfo(JsonObject info) {
-            if (info.has("extensionId"))
-                extensionId = info.get("extensionId").getAsString().trim();
+            if (info.has("id"))
+                id = info.get("id").getAsString().trim();
             else
-                extensionId = "";
-            if (info.has("factoryId"))
-                factoryId = info.get("factoryId").getAsString().trim();
+                id = "";
+            if (info.has("factory"))
+                factory = info.get("factory").getAsString().trim();
             else
-                factoryId = "";
+                factory = "";
         }
         
-        public PerBlockStorageExtensionInfo(String extensionId, String factoryId) {
-            this.extensionId = Preconditions.checkNotNull(extensionId, "The parameter 'extensionId' must not be null");
-            this.factoryId = Preconditions.checkNotNull(factoryId, "The parameter 'factoryId' must not be null");
+        public PerBlockStorageExtensionInfo(String id, String factory) {
+            this.id = Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
+            this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
         }
         
-        public String getExtensionId() {
-            return extensionId;
+        public String getId() {
+            return id;
         }
         
-        public String getFactoryId() {
-            return factoryId;
+        public String getFactory() {
+            return factory;
         }
         
         public static Map<String, PerBlockStorageExtensionInfo> load(String modDisplayName, JsonArray array) {
@@ -137,19 +137,19 @@ public class ModInfo {
             for (final JsonElement elem : array) {
                 if (elem.isJsonObject()) {
                     final PerBlockStorageExtensionInfo info = new PerBlockStorageExtensionInfo((JsonObject) elem);
-                    if (info.getExtensionId().isEmpty()) {
-                        logger.warn("Discovered invalid per-block-storage extension for mod {}, skipping", modDisplayName);
+                    if (info.getId().isEmpty()) {
+                        logger.warn("Discovered invalid per-block-storage extension for mod '{}', skipping", modDisplayName);
                         continue;
                     }
-                    if (info.getFactoryId().isEmpty()) {
-                        logger.warn("Discovered invalid per-block-storage extension '{}' for mod {}, skipping", info.getExtensionId(), modDisplayName);
+                    if (info.getFactory().isEmpty()) {
+                        logger.warn("Discovered invalid per-block-storage extension '{}' for mod '{}', skipping", info.getId(), modDisplayName);
                         continue;
                     }
-                    if (map.containsKey(info.getExtensionId())) {
-                        logger.warn("Discovered duplicate per-block-storage extension '{}' for mod {}, skipping", info.getExtensionId(), modDisplayName);
+                    if (map.containsKey(info.getId())) {
+                        logger.warn("Discovered duplicate per-block-storage extension '{}' for mod '{}', skipping", info.getId(), modDisplayName);
                         continue;
                     }
-                    map.put(info.getExtensionId(), info);
+                    map.put(info.getId(), info);
                 }
             }
             if (map.size() == 0)
