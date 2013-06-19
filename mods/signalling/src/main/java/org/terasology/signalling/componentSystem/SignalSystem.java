@@ -230,11 +230,11 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      * ****************************** Conductor events ********************************
      */
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
+    @ReceiveEvent(components = {SignalConductorComponent.class})
     public void prefabConductorLoaded(OnActivatedBlocks event, EntityRef blockType) {
         byte connectingOnSides = blockType.getComponent(SignalConductorComponent.class).connectionSides;
         Set<NetworkNode> conductorNodes = Sets.newHashSet();
-        for (Vector3i location : event) {
+        for (Vector3i location : event.getBlockPositions()) {
             final NetworkNode conductorNode = toNode(location, connectingOnSides);
             conductorNodes.add(conductorNode);
 
@@ -243,12 +243,12 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalNetwork.addNetworkingBlocks(conductorNodes);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalConductorComponent.class})
+    @ReceiveEvent(components = {SignalConductorComponent.class})
     public void prefabConductorUnloaded(BeforeDeactivateBlocks event, EntityRef blockType) {
         byte connectingOnSides = blockType.getComponent(SignalConductorComponent.class).connectionSides;
         Set<NetworkNode> conductorNodes = Sets.newHashSet();
         // Quite messy due to the order of operations, need to check if the order is important
-        for (Vector3i location : event) {
+        for (Vector3i location : event.getBlockPositions()) {
             final NetworkNode conductorNode = toNode(location, connectingOnSides);
             conductorNodes.add(conductorNode);
         }
@@ -300,13 +300,13 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      * ****************************** Producer events ********************************
      */
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
+    @ReceiveEvent(components = {SignalProducerComponent.class})
     public void prefabProducerLoaded(OnActivatedBlocks event, EntityRef blockType) {
         final SignalProducerComponent producerComponent = blockType.getComponent(SignalProducerComponent.class);
         byte connectingOnSides = producerComponent.connectionSides;
         int signalStrength = producerComponent.signalStrength;
         Set<NetworkNode> producerNodes = Sets.newHashSet();
-        for (Vector3i location : event) {
+        for (Vector3i location : event.getBlockPositions()) {
             final NetworkNode producerNode = toNode(location, connectingOnSides);
 
             signalProducers.put(producerNode.location, producerNode);
@@ -316,12 +316,12 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalNetwork.addLeafBlocks(producerNodes);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
+    @ReceiveEvent(components = {SignalProducerComponent.class})
     public void prefabProducerUnloaded(BeforeDeactivateBlocks event, EntityRef blockType) {
         byte connectingOnSides = blockType.getComponent(SignalProducerComponent.class).connectionSides;
         // Quite messy due to the order of operations, need to check if the order is important
         Set<NetworkNode> producerNodes = Sets.newHashSet();
-        for (Vector3i location : event) {
+        for (Vector3i location : event.getBlockPositions()) {
             final NetworkNode producerNode = toNode(location, connectingOnSides);
             producerNodes.add(producerNode);
         }
@@ -389,11 +389,11 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
      * ****************************** Consumer events ********************************
      */
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
+    @ReceiveEvent(components = {SignalConsumerComponent.class})
     public void prefabConsumerLoaded(OnActivatedBlocks event, EntityRef blockType) {
         byte connectingOnSides = blockType.getComponent(SignalConsumerComponent.class).connectionSides;
         Set<NetworkNode> consumerNodes = Sets.newHashSet();
-        for (Vector3i location : event) {
+        for (Vector3i location : event.getBlockPositions()) {
             NetworkNode consumerNode = toNode(location, connectingOnSides);
 
             signalConsumers.put(consumerNode.location, consumerNode);
@@ -403,13 +403,13 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalNetwork.addLeafBlocks(consumerNodes);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalConsumerComponent.class})
+    @ReceiveEvent(components = {SignalConsumerComponent.class})
     public void prefabConsumerUnloaded(BeforeDeactivateBlocks event, EntityRef blockType) {
         byte connectingOnSides = blockType.getComponent(SignalConsumerComponent.class).connectionSides;
         Set<NetworkNode> consumerNodes = Sets.newHashSet();
 
         // Quite messy due to the order of operations, need to check if the order is important
-        for (Vector3i location : event) {
+        for (Vector3i location : event.getBlockPositions()) {
             NetworkNode consumerNode = toNode(location, connectingOnSides);
             consumerNodes.add(consumerNode);
         }

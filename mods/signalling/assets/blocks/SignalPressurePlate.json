@@ -1,7 +1,7 @@
 {
     "displayName": "Signal Pressure Plate",
     "entity" : {
-        "prefab" : "signalling:PressurePlate",
+        "prefab" : "signalling:SignalPressurePlate",
         "mode" : "persistent"
     }
 }

@@ -83,8 +83,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     @Override
     public void initialise() {
         final BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        lampTurnedOff = blockManager.getBlock("signalling:SignalLamp");
-        lampTurnedOn = blockManager.getBlock("signalling:SignalLampLighted");
+        lampTurnedOff = blockManager.getBlock("signalling:SignalLampOff");
+        lampTurnedOn = blockManager.getBlock("signalling:SignalLampOn");
         signalTransformer = blockManager.getBlock("signalling:SignalTransformer");
         signalPressurePlate = blockManager.getBlock("signalling:SignalPressurePlate");
     }
