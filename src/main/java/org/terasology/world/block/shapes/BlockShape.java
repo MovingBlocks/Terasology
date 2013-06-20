@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.shapes;
 
+import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 import org.terasology.asset.Asset;
@@ -26,6 +27,7 @@ import org.terasology.world.block.BlockPart;
 
 import javax.vecmath.Vector3f;
 import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.
@@ -36,8 +38,8 @@ public class BlockShape implements Asset {
     private AssetUri uri;
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
-    private EnumMap<Rotation, CollisionShape> collisionShape = Maps.newEnumMap(Rotation.class);
-    private EnumMap<Rotation, Vector3f> collisionOffset = Maps.newEnumMap(Rotation.class);
+    private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
+    private Map<Rotation, Vector3f> collisionOffset = Maps.newHashMap();
     private boolean collisionSymmetric = false;
 
     public BlockShape() {
@@ -79,14 +81,20 @@ public class BlockShape implements Asset {
         if (isCollisionSymmetric()) {
             return collisionShape.get(Rotation.NONE);
         }
-        return collisionShape.get(rot);
+        CollisionShape result = collisionShape.get(rot);
+        if (result == null)
+            return new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+        return result;
     }
 
     public Vector3f getCollisionOffset(Rotation rot) {
         if (isCollisionSymmetric()) {
             return collisionOffset.get(Rotation.NONE);
         }
-        return collisionOffset.get(rot);
+        Vector3f result = collisionOffset.get(rot);
+        if (result == null)
+            return new Vector3f();
+        return result;
     }
 
     public void setMeshPart(BlockPart part, BlockMeshPart mesh) {

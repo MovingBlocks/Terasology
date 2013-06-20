@@ -51,7 +51,9 @@ public interface BlockFamily {
      * @param attachmentSide The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param direction      A secondary direction after the attachment side that determines the facing of the block.   @return The appropriate block
      */
-    Block getBlockFor(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
+    Block getBlockUponPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
+
+    Block getBlockUponNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock);
 
     /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours

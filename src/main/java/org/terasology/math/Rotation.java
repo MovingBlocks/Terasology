@@ -18,6 +18,7 @@ package org.terasology.math;
 import org.terasology.world.block.BlockPart;
 
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
@@ -70,17 +71,33 @@ public abstract class Rotation {
         }
     };
 
+    public static Rotation constructTempRotation(final Matrix3f transformation) {
+        Quat4f quaternion = new Quat4f();
+        quaternion.set(transformation);
+        return new Rotation(quaternion) {
+            @Override
+            public Side rotate(Side side) {
+                Vector3f directionVector = side.getVector3i().toVector3f();
+                transformation.transform(directionVector);
+                return Side.inDirection(directionVector);
+            }
+
+            @Override
+            public AABB rotate(AABB aabb) {
+                Vector3f transformedCenter = new Vector3f();
+                transformation.transform(aabb.getCenter(), transformedCenter);
+                Vector3f transformedExtent = new Vector3f();
+                transformation.transform(aabb.getExtents(), transformedExtent);
+                return AABB.createCenterExtent(transformedCenter,
+                        new Vector3f(TeraMath.fastAbs(transformedExtent.x), TeraMath.fastAbs(transformedExtent.y), TeraMath.fastAbs(transformedExtent.z)));
+            }
+        };
+    }
+
     private static Rotation[] horizontalRotations = new Rotation[]{NONE, HORIZONTAL_CLOCKWISE, HORIZONTAL_180, HORIZONTAL_ANTI_CLOCKWISE};
-    private static Rotation[] allPossibleRotations = new Rotation[] {
-            
-    };
 
     public static Rotation[] horizontalRotations() {
         return horizontalRotations;
-    }
-
-    public static Rotation[] allPossibleRotations() {
-        return allPossibleRotations;
     }
 
     private Quat4f quat4f;

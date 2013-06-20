@@ -22,6 +22,10 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
         this.connectionCondition = connectionCondition;
         this.archetypeBlock = archetypeBlock;
         this.blocks = blocks;
+
+        for (Block block : blocks.values()) {
+            block.setBlockFamily(this);
+        }
     }
 
     @Override
@@ -30,7 +34,18 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockFor(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockUponPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+        byte connections = 0;
+        for (Direction connectDirection : Direction.values()) {
+            if (connectionCondition.isConnectingTo(location, connectDirection, worldProvider, blockEntityRegistry)) {
+                connections += DirectionsUtil.getDirection(connectDirection);
+            }
+        }
+        return blocks.get(connections);
+    }
+
+    @Override
+    public Block getBlockUponNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
         byte connections = 0;
         for (Direction connectDirection : Direction.values()) {
             if (connectionCondition.isConnectingTo(location, connectDirection, worldProvider, blockEntityRegistry)) {

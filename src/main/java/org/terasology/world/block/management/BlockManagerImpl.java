@@ -185,9 +185,10 @@ public class BlockManagerImpl extends BlockManager {
     @VisibleForTesting
     public void addFreeformBlockFamily(BlockUri family, Iterable<String> categories) {
         freeformBlockUris.add(family);
-        for (String category : categories) {
-            categoryLookup.put(category, family);
-        }
+        if (categories != null)
+            for (String category : categories) {
+                categoryLookup.put(category, family);
+            }
     }
 
     @VisibleForTesting
