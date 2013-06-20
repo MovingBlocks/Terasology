@@ -33,7 +33,7 @@ public class PerBlockStorageManager {
     
     private static final Logger logger = LoggerFactory.getLogger(PerBlockStorageManager.class);
     
-    private Chunk.ProtobufHandler chunkHandler;
+    private Chunk.ProtobufHandler chunkProtobufHandler;
     private Chunk.Deflator chunkDeflator;
 
     private ModManager mods;
@@ -233,7 +233,7 @@ public class PerBlockStorageManager {
     }
     
     public void refresh() {
-        chunkHandler = new Chunk.ProtobufHandler(this);
+        chunkProtobufHandler = new Chunk.ProtobufHandler(this);
         chunkDeflator = new Chunk.Deflator(this);
         factoriesById = Maps.newHashMap();
         deflatorsByClass = Maps.newHashMap();
@@ -349,11 +349,11 @@ public class PerBlockStorageManager {
     }
     
     public ChunksProtobuf.Chunk encode(Chunk chunk) {
-        return chunkHandler.encode(chunk);
+        return chunkProtobufHandler.encode(chunk);
     }
     
     public Chunk decode(ChunksProtobuf.Chunk message) {
-        return chunkHandler.decode(message);
+        return chunkProtobufHandler.decode(message);
     }
     
     public TeraArray deflate(TeraArray array) {
