@@ -17,6 +17,8 @@ package org.terasology.world.chunks;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -26,6 +28,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.ModData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -34,6 +37,9 @@ import org.terasology.world.chunks.perBlockStorage.TeraArray;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
+
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -75,6 +81,7 @@ public class Chunk {
     private TeraArray sunlightData;
     private TeraArray lightData;
     private TeraArray extraData;
+    private Map<String, TeraArray> extensionData;
 
     private boolean dirty;
     private boolean animated;
@@ -96,6 +103,7 @@ public class Chunk {
         this.sunlightData = manager.createSunlightStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.lightData = manager.createLightStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.extraData = manager.createExtraStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        this.extensionData = Maps.newConcurrentMap();
         this.dirty = true;
         ChunkMonitor.fireChunkCreated(this);
     }
@@ -105,25 +113,33 @@ public class Chunk {
     }
 
     public Chunk(Chunk other) {
-        pos.set(other.pos);
-        blockData = other.blockData.copy();
-        sunlightData = other.sunlightData.copy();
-        lightData = other.lightData.copy();
-        extraData = other.extraData.copy();
-        chunkState = other.chunkState;
-        dirty = true;
+        this.pos.set(other.pos);
+        this.blockData = other.blockData.copy();
+        this.sunlightData = other.sunlightData.copy();
+        this.lightData = other.lightData.copy();
+        this.extraData = other.extraData.copy();
+        this.chunkState = other.chunkState;
+        this.extensionData = Maps.newConcurrentMap();
+        for (Map.Entry<String, TeraArray> e : other.extensionData.entrySet()) {
+            this.extensionData.put(e.getKey(), e.getValue().copy());
+        }
+        this.dirty = true;
         ChunkMonitor.fireChunkCreated(this);
     }
 
     public Chunk(Vector3i pos, ChunkState chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light,
-                 TeraArray liquid) {
+                 TeraArray liquid, Map<String, TeraArray> extensionData) {
         this.pos.set(Preconditions.checkNotNull(pos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.sunlightData = Preconditions.checkNotNull(sunlight);
         this.lightData = Preconditions.checkNotNull(light);
         this.extraData = Preconditions.checkNotNull(liquid);
         this.chunkState = Preconditions.checkNotNull(chunkState);
-        dirty = true;
+        if (extensionData == null)
+            this.extensionData = Maps.newConcurrentMap();
+        else
+            this.extensionData = extensionData;
+        this.dirty = true;
         ChunkMonitor.fireChunkCreated(this);
     }
 
@@ -150,6 +166,13 @@ public class Chunk {
                 chunk.sunlightData = manager.deflate(chunk.sunlightData);
                 chunk.lightData = manager.deflate(chunk.lightData);
                 chunk.extraData = manager.deflate(chunk.extraData);
+                if (chunk.extensionData.size() > 0) {
+                    final Map<String, TeraArray> deflatedExtensions = Maps.newConcurrentMap();
+                    for (final Map.Entry<String, TeraArray> extension : chunk.extensionData.entrySet()) {
+                        deflatedExtensions.put(extension.getKey(), manager.deflate(extension.getValue()));
+                    }
+                    chunk.extensionData = deflatedExtensions;
+                }
                 if (loggingEnabled) {
                     long bytesAfter = chunk.getEstimatedMemoryConsumptionInBytes();
                     long bytesSaved = bytesBefore - bytesAfter;
@@ -179,13 +202,19 @@ public class Chunk {
         @Override
         public ChunksProtobuf.Chunk encode(Chunk chunk) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-            final ChunksProtobuf.Chunk.Builder b = ChunksProtobuf.Chunk.newBuilder()
-                    .setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
-                    .setState(chunk.chunkState.id)
-                    .setBlockData(manager.encode(chunk.blockData))
-                    .setSunlightData(manager.encode(chunk.sunlightData))
-                    .setLightData(manager.encode(chunk.lightData))
-                    .setExtraData(manager.encode(chunk.extraData));
+            final ChunksProtobuf.Chunk.Builder b = ChunksProtobuf.Chunk.newBuilder();
+            b.setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
+            .setState(chunk.chunkState.id)
+            .setBlockData(manager.encode(chunk.blockData))
+            .setSunlightData(manager.encode(chunk.sunlightData))
+            .setLightData(manager.encode(chunk.lightData))
+            .setExtraData(manager.encode(chunk.extraData));
+            for (Map.Entry<String, TeraArray> e : chunk.extensionData.entrySet()) {
+                final ChunksProtobuf.ModData.Builder mb = ChunksProtobuf.ModData.newBuilder();
+                mb.setData(manager.encode(e.getValue()))
+                .setId(e.getKey());
+                b.addModData(mb);
+            }
             return b.build();
         }
 
@@ -230,7 +259,18 @@ public class Chunk {
             final TeraArray sunlightData = manager.decode(message.getSunlightData());
             final TeraArray lightData = manager.decode(message.getLightData());
             final TeraArray extraData = manager.decode(message.getExtraData());
-            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
+            final Map<String, TeraArray> extensionData = Maps.newConcurrentMap();
+            final List<ModData> modDataList = message.getModDataList();
+            if (modDataList != null)
+                for (ModData modData : modDataList) {
+                    if (!modData.hasId() || modData.getId().trim().isEmpty())
+                        throw new IllegalArgumentException("Illformed protobuf message. Missing mod data id.");
+                    if (!modData.hasData())
+                        throw new IllegalArgumentException("Illformed protobuf message. Missing mod data.");
+                    final TeraArray data = manager.decode(modData.getData());
+                    extensionData.put(modData.getId(), data);
+                }
+            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData, extensionData);
         }
 
         @Override
@@ -286,8 +326,11 @@ public class Chunk {
     }
 
     public int getEstimatedMemoryConsumptionInBytes() {
-        return blockData.getEstimatedMemoryConsumptionInBytes() + sunlightData.getEstimatedMemoryConsumptionInBytes()
+        int size = blockData.getEstimatedMemoryConsumptionInBytes() + sunlightData.getEstimatedMemoryConsumptionInBytes()
             + lightData.getEstimatedMemoryConsumptionInBytes() + extraData.getEstimatedMemoryConsumptionInBytes();
+        for (final TeraArray ext : extensionData.values())
+            size += ext.getEstimatedMemoryConsumptionInBytes();
+        return size;
     }
 
     public Block getBlock(Vector3i pos) {
