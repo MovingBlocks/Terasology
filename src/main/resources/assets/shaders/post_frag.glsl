@@ -30,6 +30,7 @@ uniform float blurLength;
 
 #ifdef VIGNETTE
 uniform sampler2D texVignette;
+uniform vec3 inLiquidTint;
 #endif
 
 #ifdef FILM_GRAIN
@@ -126,7 +127,8 @@ void main() {
         finalColor.rgb *= vig;
     } else {
         finalColor.rgb *= vig * vig * vig;
-        finalColor.rgb *= vec3(0.1, 0.2, 0.2);
+        //finalColor.rgb *= vec3(0.1, 0.2, 0.2);
+        finalColor.rgb *= inLiquidTint;
     }
 #endif
 

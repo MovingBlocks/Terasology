@@ -956,6 +956,12 @@ public final class WorldRenderer {
         return block.isLiquid();
     }
 
+    public Vector3f getTint() {
+        Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
+        return block.getTint();
+    }
+
     /**
      * Updates the tick variable that animation is based on
      */

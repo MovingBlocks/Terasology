@@ -28,6 +28,8 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
+import javax.vecmath.Vector3f;
+
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -53,6 +55,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
+        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         LocalPlayerSystem localPlayerSystem = CoreRegistry.get(LocalPlayerSystem.class);
 
         int texId = 0;
@@ -80,6 +83,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
         program.setInt("texVignette", texId++);
+        Vector3f tint = worldRenderer.getTint();
+        program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z);
 
         DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
 

@@ -19,6 +19,7 @@ package org.terasology.world.block.loader;
 import java.util.EnumMap;
 import java.util.List;
 
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import org.terasology.world.block.BlockAdjacentType;
@@ -56,6 +57,8 @@ public class BlockDefinition {
     public List<String> acceptedToConnectBlocks = Lists.newArrayList();
 
     public byte luminance = 0;
+
+    public Vector3f tint = new Vector3f(0f, 0f, 0f);
 
     public List<String> categories = Lists.newArrayList();
 
