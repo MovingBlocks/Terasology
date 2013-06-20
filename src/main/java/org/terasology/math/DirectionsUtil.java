@@ -1,4 +1,4 @@
-package org.terasology.blockNetwork;
+package org.terasology.math;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

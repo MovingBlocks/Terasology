@@ -1,6 +1,7 @@
 package org.terasology.blockNetwork;
 
 import org.terasology.math.Direction;
+import org.terasology.math.DirectionsUtil;
 import org.terasology.math.Vector3i;
 
 /**

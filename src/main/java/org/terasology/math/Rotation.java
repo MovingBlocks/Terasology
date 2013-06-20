@@ -24,8 +24,8 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public enum Rotation {
-    NONE(getQuaternionForHorizRot(0)) {
+public abstract class Rotation {
+    public static final Rotation NONE = new Rotation(getQuaternionForYAxisRot(0)) {
         @Override
         public Side rotate(Side side) {
             return side;
@@ -35,8 +35,8 @@ public enum Rotation {
         public AABB rotate(AABB aabb) {
             return aabb;
         }
-    },
-    HORIZONTAL_CLOCKWISE(getQuaternionForHorizRot(1)) {
+    };
+    public static final Rotation HORIZONTAL_CLOCKWISE = new Rotation(getQuaternionForYAxisRot(1)) {
         @Override
         public Side rotate(Side side) {
             return side.rotateClockwise(1);
@@ -44,10 +44,10 @@ public enum Rotation {
 
         @Override
         public AABB rotate(AABB aabb) {
-            return rotateHorizontalAABB(aabb, 1);
+            return rotateYAxisAABB(aabb, 1);
         }
-    },
-    HORIZONTAL_180(getQuaternionForHorizRot(2)) {
+    };
+    public static final Rotation HORIZONTAL_180 = new Rotation(getQuaternionForYAxisRot(2)) {
         @Override
         public Side rotate(Side side) {
             return side.rotateClockwise(2);
@@ -55,10 +55,10 @@ public enum Rotation {
 
         @Override
         public AABB rotate(AABB aabb) {
-            return rotateHorizontalAABB(aabb, 2);
+            return rotateYAxisAABB(aabb, 2);
         }
-    },
-    HORIZONTAL_ANTI_CLOCKWISE(getQuaternionForHorizRot(3)) {
+    };
+    public static final Rotation HORIZONTAL_ANTI_CLOCKWISE = new Rotation(getQuaternionForYAxisRot(3)) {
         @Override
         public Side rotate(Side side) {
             return side.rotateClockwise(3);
@@ -66,14 +66,21 @@ public enum Rotation {
 
         @Override
         public AABB rotate(AABB aabb) {
-            return rotateHorizontalAABB(aabb, 3);
+            return rotateYAxisAABB(aabb, 3);
         }
     };
 
     private static Rotation[] horizontalRotations = new Rotation[]{NONE, HORIZONTAL_CLOCKWISE, HORIZONTAL_180, HORIZONTAL_ANTI_CLOCKWISE};
+    private static Rotation[] allPossibleRotations = new Rotation[] {
+            
+    };
 
     public static Rotation[] horizontalRotations() {
         return horizontalRotations;
+    }
+
+    public static Rotation[] allPossibleRotations() {
+        return allPossibleRotations;
     }
 
     private Quat4f quat4f;
@@ -97,13 +104,13 @@ public enum Rotation {
         return quat4f;
     }
 
-    private static Quat4f getQuaternionForHorizRot(int steps) {
+    private static Quat4f getQuaternionForYAxisRot(int steps) {
         Quat4f rotation = new Quat4f();
         rotation.set(new AxisAngle4f(new Vector3f(0, -1, 0), (float) (0.5f * Math.PI * steps)));
         return rotation;
     }
 
-    private static AABB rotateHorizontalAABB(AABB collider, int clockwiseSteps) {
+    private static AABB rotateYAxisAABB(AABB collider, int clockwiseSteps) {
         if (clockwiseSteps < 0) {
             clockwiseSteps = -clockwiseSteps + 2;
         }

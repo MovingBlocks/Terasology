@@ -17,6 +17,9 @@ package org.terasology.world.block.family;
 
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
@@ -43,7 +46,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockFor(Side attachmentSide, Side direction) {
+    public Block getBlockFor(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
         return block;
     }
 

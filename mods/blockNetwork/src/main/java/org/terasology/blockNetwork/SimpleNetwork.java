@@ -5,7 +5,7 @@ import org.terasology.math.Direction;
 import java.util.*;
 
 import com.google.common.collect.*;
-import org.terasology.math.Vector3i;
+import org.terasology.math.DirectionsUtil;
 
 /**
  * Represents one network of nodes, where each nodes is somehow connected to another within the network.

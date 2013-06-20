@@ -3,10 +3,9 @@ package org.terasology.blockNetwork;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Direction;
+import org.terasology.math.DirectionsUtil;
 import org.terasology.math.Vector3i;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Multimap;
