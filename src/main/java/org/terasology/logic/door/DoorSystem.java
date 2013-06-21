@@ -38,6 +38,7 @@ import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.regions.BlockRegionComponent;
@@ -55,6 +56,8 @@ public class DoorSystem implements ComponentSystem {
 
     @In
     private WorldProvider worldProvider;
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
     @In
     private EntityManager entityManager;
     @In
@@ -132,8 +135,8 @@ public class DoorSystem implements ComponentSystem {
             closedSide = attachSide.rotateClockwise(1);
         }
 
-        worldProvider.setBlock(bottomBlockPos, door.bottomBlockFamily.getBlockFor(closedSide, Side.TOP), bottomBlock);
-        worldProvider.setBlock(topBlockPos, door.topBlockFamily.getBlockFor(closedSide, Side.TOP), topBlock);
+        worldProvider.setBlock(bottomBlockPos, door.bottomBlockFamily.getBlockUponPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP), bottomBlock);
+        worldProvider.setBlock(topBlockPos, door.topBlockFamily.getBlockUponPlacement(worldProvider, blockEntityRegistry, topBlockPos, closedSide, Side.TOP), topBlock);
 
         EntityRef newDoor = entityManager.copy(entity);
         newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
@@ -186,8 +189,8 @@ public class DoorSystem implements ComponentSystem {
         Side oldSide = (door.isOpen) ? door.openSide : door.closedSide;
         Side newSide = (door.isOpen) ? door.closedSide : door.openSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
-        worldProvider.setBlock(regionComp.region.min(), door.bottomBlockFamily.getBlockFor(newSide, Side.TOP), door.bottomBlockFamily.getBlockFor(oldSide, Side.TOP));
-        worldProvider.setBlock(regionComp.region.max(), door.topBlockFamily.getBlockFor(newSide, Side.TOP), door.topBlockFamily.getBlockFor(oldSide, Side.TOP));
+        worldProvider.setBlock(regionComp.region.min(), door.bottomBlockFamily.getBlockUponPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP), door.bottomBlockFamily.getBlockUponPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), oldSide, Side.TOP));
+        worldProvider.setBlock(regionComp.region.max(), door.topBlockFamily.getBlockUponPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP), door.topBlockFamily.getBlockUponPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), oldSide, Side.TOP));
         Sound sound = (door.isOpen) ? door.closeSound : door.openSound;
         if (sound != null) {
             LocationComponent loc = entity.getComponent(LocationComponent.class);

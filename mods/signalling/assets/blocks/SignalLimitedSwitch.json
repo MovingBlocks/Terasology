@@ -1,0 +1,7 @@
+{
+    "displayName": "Signal Limited Emitter",
+    "entity" : {
+        "prefab" : "signalling:SignalLimitedSwitch",
+        "mode" : "persistent"
+    }
+}
