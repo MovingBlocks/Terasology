@@ -35,6 +35,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.ChunkView;
 import org.terasology.world.RegionalChunkView;
@@ -89,6 +90,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private ChunkStore farStore;
 
     private ChunkGenerationPipeline pipeline;
+    private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
     private ChunkGeneratorManager generator;
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
@@ -97,6 +99,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private final Set<Vector3i> preparingChunks = Sets.newSetFromMap(Maps.<Vector3i, Boolean>newConcurrentMap());
     private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<TByteObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
 
     private EntityRef worldEntity = EntityRef.NULL;
 
@@ -110,6 +113,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         this.farStore = farStore;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
+        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster(8);
 
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
     }
@@ -226,81 +230,106 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public void update() {
         regionLock.readLock().lock();
         try {
-            for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
-                chunkRelevanceRegion.update();
-                if (chunkRelevanceRegion.isDirty()) {
-                    boolean produceChunks = false;
-                    for (Vector3i pos : chunkRelevanceRegion.getNeededChunks()) {
-                        Chunk chunk = nearCache.get(pos);
-                        if (chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE) {
-                            chunkRelevanceRegion.chunkReady(chunk);
-                        } else {
-                            produceChunks = true;
-                        }
-                    }
-                    if (produceChunks) {
-                        pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2)));
-                    }
-                    chunkRelevanceRegion.setUpToDate();
-                }
-            }
-
-            List<ReadyChunkInfo> readyChunkPositions = Lists.newArrayListWithExpectedSize(readyChunks.size());
-            readyChunks.drainTo(readyChunkPositions);
-            for (ReadyChunkInfo info : readyChunkPositions) {
-                makeChunkAvailable(info);
-            }
-
-            PerformanceMonitor.startActivity("Review cache size");
-            if (nearCache.size() > CACHE_SIZE) {
-                logger.debug("Compacting cache");
-                Iterator<Vector3i> iterator = nearCache.keySet().iterator();
-                while (iterator.hasNext()) {
-                    Vector3i pos = iterator.next();
-                    boolean keep = false;
-                    for (ChunkRelevanceRegion region : regions.values()) {
-                        if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
-                            keep = true;
-                            break;
-                        }
-                    }
-                    if (!keep) {
-                        // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
-                        Chunk chunk = nearCache.get(pos);
-                        if (chunk.isLocked()) {
-                            continue;
-                        }
-                        if (chunk.getChunkState() == Chunk.State.COMPLETE) {
-                            /*TByteObjectMap<TIntList> batchBlockMappings = createBatchBlockEventMappings(chunk);
-                            batchBlockMappings.forEachEntry(new TByteObjectProcedure<TIntList>() {
-                                @Override
-                                public boolean execute(byte id, TIntList positions) {
-                                    if (positions.size() > 0) {
-                                        blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
-                                    }
-                                    return true;
-                                }
-                            });*/
-                            worldEntity.send(new BeforeChunkUnload(pos));
-                        }
-                        chunk.lock();
-                        try {
-                            farStore.put(chunk);
-                            iterator.remove();
-                            chunk.dispose();
-                        } finally {
-                            chunk.unlock();
-                        }
-                        for (ChunkRelevanceRegion region : regions.values()) {
-                            region.chunkUnloaded(pos);
-                        }
-                    }
-
-                }
-            }
-            PerformanceMonitor.endActivity();
+            updateRelevance();
+            makeChunksAvailable();
+            checkForUnload();
+            deactivateBlocks();
         } finally {
             regionLock.readLock().unlock();
+        }
+    }
+
+    private void makeChunksAvailable() {
+        List<ReadyChunkInfo> readyChunkPositions = Lists.newArrayListWithExpectedSize(readyChunks.size());
+        readyChunks.drainTo(readyChunkPositions);
+        for (ReadyChunkInfo info : readyChunkPositions) {
+            makeChunkAvailable(info);
+        }
+    }
+
+    private void deactivateBlocks() {
+        List<TByteObjectMap<TIntList>> deactivatedBlockSets = Lists.newArrayListWithExpectedSize(deactivateBlocksQueue.size());
+        deactivateBlocksQueue.drainTo(deactivatedBlockSets);
+        for (TByteObjectMap<TIntList> deactivatedBlockSet : deactivatedBlockSets) {
+            deactivatedBlockSet.forEachEntry(new TByteObjectProcedure<TIntList>() {
+                @Override
+                public boolean execute(byte id, TIntList positions) {
+                    if (positions.size() > 0) {
+                        blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
+                    }
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void checkForUnload() {
+        PerformanceMonitor.startActivity("Review cache size");
+        if (nearCache.size() > CACHE_SIZE) {
+            logger.debug("Compacting cache");
+            Iterator<Vector3i> iterator = nearCache.keySet().iterator();
+            while (iterator.hasNext()) {
+                Vector3i pos = iterator.next();
+                boolean keep = false;
+                for (ChunkRelevanceRegion region : regions.values()) {
+                    if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
+                        keep = true;
+                        break;
+                    }
+                }
+                if (!keep) {
+                    // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
+                    Chunk chunk = nearCache.get(pos);
+                    if (chunk.isLocked()) {
+                        continue;
+                    }
+                    chunk.lock();
+                    try {
+                        if (chunk.getChunkState() == Chunk.State.COMPLETE) {
+                            worldEntity.send(new BeforeChunkUnload(pos));
+                            for (ChunkRelevanceRegion region : regions.values()) {
+                                region.chunkUnloaded(pos);
+                            }
+                        }
+
+                        chunk.dispose();
+                        farStore.put(chunk);
+
+                        try {
+                            unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
+                        } catch (InterruptedException e) {
+                            logger.error("Failed to enqueue unload request for {}", chunk.getPos(), e);
+                        }
+                        iterator.remove();
+                    } finally {
+                        chunk.unlock();
+                    }
+
+                }
+
+            }
+        }
+        PerformanceMonitor.endActivity();
+    }
+
+    private void updateRelevance() {
+        for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
+            chunkRelevanceRegion.update();
+            if (chunkRelevanceRegion.isDirty()) {
+                boolean produceChunks = false;
+                for (Vector3i pos : chunkRelevanceRegion.getNeededChunks()) {
+                    Chunk chunk = nearCache.get(pos);
+                    if (chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE) {
+                        chunkRelevanceRegion.chunkReady(chunk);
+                    } else {
+                        produceChunks = true;
+                    }
+                }
+                if (produceChunks) {
+                    pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2)));
+                }
+                chunkRelevanceRegion.setUpToDate();
+            }
         }
     }
 
@@ -371,6 +400,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
     }
 
+    void gatherBlockPositionsForDeactivate(Chunk chunk) {
+        try {
+            deactivateBlocksQueue.put(createBatchBlockEventMappings(chunk));
+        } catch (InterruptedException e) {
+            logger.error("Failed to queue deactivation of blocks for {}", chunk.getPos());
+        }
+    }
+
     private TByteObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
         TByteObjectMap<TIntList> batchBlockMap = new TByteObjectHashMap<>();
         for (Block block : blockManager.listRegisteredBlocks()) {
@@ -408,6 +445,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     @Override
     public void dispose() {
         pipeline.shutdown();
+        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest());
 
         for (Chunk chunk : nearCache.values()) {
             farStore.put(chunk);
