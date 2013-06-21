@@ -31,5 +31,6 @@
     "targetable" : false,
     "penetrable" : true,
     "shadowCasting" : false,
-    "replacementAllowed" : true
+    "replacementAllowed" : true,
+    "tint" : [ 0.3, 0.2, 0.2 ]
 }
