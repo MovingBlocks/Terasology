@@ -23,6 +23,10 @@ public class DirectionsUtil {
         directionBits.put(Direction.BACKWARD, (byte) 32);
     }
 
+    public static byte getReverse(byte directions) {
+        return (byte) ((directions / 8) + ((directions % 8) * 8));
+    }
+
     public static byte getDirections(Set<Direction> directions) {
         byte result = 0;
         for (Direction direction : directions)
