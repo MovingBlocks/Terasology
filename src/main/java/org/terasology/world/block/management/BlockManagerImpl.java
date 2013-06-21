@@ -24,6 +24,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.TByteObjectMap;
+import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
@@ -43,6 +45,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Immortius
@@ -61,12 +65,33 @@ public class BlockManagerImpl extends BlockManager {
     private final Set<BlockUri> freeformBlockUris = Sets.newHashSet();
     private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
     private final Map<BlockUri, BlockFamily> availableFamilies = Maps.newHashMap();
-    private final Map<BlockUri, BlockFamily> registeredFamilyByUri = Maps.newHashMapWithExpectedSize(128);
 
-    /* Blocks */
-    private final Map<BlockUri, Block> blocksByUri = Maps.newHashMapWithExpectedSize(256);
-    private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<>(256);
-    private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<>(256);
+    private static class RegisteredState {
+        private final Map<BlockUri, BlockFamily> registeredFamilyByUri;
+
+        /* Blocks */
+        private final Map<BlockUri, Block> blocksByUri;
+        private final TByteObjectMap<Block> blocksById;
+        private final TObjectByteMap<BlockUri> idByUri;
+
+        public RegisteredState() {
+            this.registeredFamilyByUri = Maps.newHashMap();
+            this.blocksByUri = Maps.newHashMap();
+            this.blocksById = new TByteObjectHashMap<>();
+            this.idByUri = new TObjectByteHashMap<>();
+        }
+
+        public RegisteredState(RegisteredState oldState) {
+            this.registeredFamilyByUri = Maps.newHashMap(oldState.registeredFamilyByUri);
+            this.blocksByUri = Maps.newHashMap(oldState.blocksByUri);
+            this.blocksById = new TByteObjectHashMap<>(oldState.blocksById);
+            this.idByUri = new TObjectByteHashMap<>(oldState.idByUri);
+        }
+    }
+
+    private ReentrantLock lock = new ReentrantLock();
+
+    private AtomicReference<RegisteredState> registeredBlockInfo = new AtomicReference<>(new RegisteredState());
 
     private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
 
@@ -193,24 +218,31 @@ public class BlockManagerImpl extends BlockManager {
     @VisibleForTesting
     protected void registerFamily(BlockFamily family) {
         logger.info("Registered {}", family);
-        registeredFamilyByUri.put(family.getURI(), family);
-        for (Block block : family.getBlocks()) {
-            registerBlock(block);
+        lock.lock();
+        try {
+            RegisteredState newState = new RegisteredState(registeredBlockInfo.get());
+            newState.registeredFamilyByUri.put(family.getURI(), family);
+            for (Block block : family.getBlocks()) {
+                registerBlock(block, newState);
+            }
+            registeredBlockInfo.set(newState);
+        } finally {
+            lock.unlock();
         }
         for (BlockRegistrationListener listener : listeners) {
             listener.onBlockFamilyRegistered(family);
         }
     }
 
-    private void registerBlock(Block block) {
+    private void registerBlock(Block block, RegisteredState newState) {
         if (block.getId() != UNKNOWN_ID) {
             logger.info("Registered Block {} with id {}", block, block.getId());
-            blocksById.put(block.getId(), block);
-            idByUri.put(block.getURI(), block.getId());
+            newState.blocksById.put(block.getId(), block);
+            newState.idByUri.put(block.getURI(), block.getId());
         } else {
             logger.info("Failed to register block {} - no id", block, block.getId());
         }
-        blocksByUri.put(block.getURI(), block);
+        newState.blocksByUri.put(block.getURI(), block);
     }
 
     /**
@@ -242,8 +274,8 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public Map<String, Byte> getBlockIdMap() {
-        Map<String, Byte> result = Maps.newHashMapWithExpectedSize(idByUri.size());
-        TObjectByteIterator<BlockUri> iterator = idByUri.iterator();
+        Map<String, Byte> result = Maps.newHashMapWithExpectedSize(registeredBlockInfo.get().idByUri.size());
+        TObjectByteIterator<BlockUri> iterator = registeredBlockInfo.get().idByUri.iterator();
         while (iterator.hasNext()) {
             iterator.advance();
             result.put(iterator.key().toString(), iterator.value());
@@ -268,7 +300,7 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public BlockFamily getBlockFamily(BlockUri uri) {
-        BlockFamily family = registeredFamilyByUri.get(uri);
+        BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
         if (family == null && generateNewIds) {
             if (isFreeformFamily(uri.getRootFamilyUri())) {
                 family = blockLoader.loadWithShape(uri);
@@ -276,10 +308,15 @@ public class BlockManagerImpl extends BlockManager {
                 family = getAvailableBlockFamily(uri);
             }
             if (family != null) {
-                for (Block block : family.getBlocks()) {
-                    block.setId(getNextId());
+                lock.lock();
+                try {
+                    for (Block block : family.getBlocks()) {
+                        block.setId(getNextId());
+                    }
+                    registerFamily(family);
+                } finally {
+                    lock.unlock();
                 }
-                registerFamily(family);
             }
         }
         return family;
@@ -292,7 +329,7 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public Block getBlock(BlockUri uri) {
-        Block block = blocksByUri.get(uri);
+        Block block = registeredBlockInfo.get().blocksByUri.get(uri);
         if (block == null) {
             // Check if partially registered by getting the block family
             BlockFamily family = getBlockFamily(uri.getFamilyUri());
@@ -300,7 +337,7 @@ public class BlockManagerImpl extends BlockManager {
                 block = family.getBlockFor(uri);
             }
             if (block == null) {
-                return blocksById.get((byte) 0);
+                return getAir();
             }
         }
         return block;
@@ -308,21 +345,21 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public Block getBlock(byte id) {
-        Block result = blocksById.get(id);
+        Block result = registeredBlockInfo.get().blocksById.get(id);
         if (result == null) {
-            return blocksById.get((byte) 0);
+            return getAir();
         }
         return result;
     }
 
     @Override
     public Iterable<BlockUri> listRegisteredBlockUris() {
-        return registeredFamilyByUri.keySet();
+        return registeredBlockInfo.get().registeredFamilyByUri.keySet();
     }
 
     @Override
     public Iterable<BlockFamily> listRegisteredBlockFamilies() {
-        return registeredFamilyByUri.values();
+        return registeredBlockInfo.get().registeredFamilyByUri.values();
     }
 
     @Override
@@ -352,7 +389,7 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public int getBlockFamilyCount() {
-        return registeredFamilyByUri.size();
+        return registeredBlockInfo.get().registeredFamilyByUri.size();
     }
 
     @Override
@@ -360,7 +397,7 @@ public class BlockManagerImpl extends BlockManager {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(NUM_WAVING_TEXTURES * 2);
 
         int counter = 0;
-        for (BlockFamily b : registeredFamilyByUri.values()) {
+        for (BlockFamily b : registeredBlockInfo.get().registeredFamilyByUri.values()) {
             if (b.getArchetypeBlock().isWaving()) {
                 // TODO: Don't use random block part
                 Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
@@ -402,11 +439,11 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public boolean hasBlockFamily(BlockUri uri) {
-        return registeredFamilyByUri.containsKey(uri) || availableFamilies.containsKey(uri) || freeformBlockUris.contains(uri);
+        return registeredBlockInfo.get().registeredFamilyByUri.containsKey(uri) || availableFamilies.containsKey(uri) || freeformBlockUris.contains(uri);
     }
 
     @Override
     public Iterable<Block> listRegisteredBlocks() {
-        return ImmutableList.copyOf(blocksById.valueCollection());
+        return ImmutableList.copyOf(registeredBlockInfo.get().blocksById.valueCollection());
     }
 }
