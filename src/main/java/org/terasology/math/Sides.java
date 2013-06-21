@@ -2,6 +2,10 @@ package org.terasology.math;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.TObjectByteMap;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.procedure.TObjectByteProcedure;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,7 +15,7 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class Sides {
-    private static Map<Side, Byte> sideBits = Maps.newHashMap();
+    private static TObjectByteMap<Side> sideBits = new TObjectByteHashMap<Side>();
 
     static {
         sideBits.put(Side.TOP, (byte) 1);
@@ -48,12 +52,18 @@ public class Sides {
         return sideBits.get(side);
     }
 
-    public static Collection<Side> getSides(byte sidesBit) {
-        Set<Side> result = Sets.newHashSet();
-        for (Map.Entry<Side, Byte> aSideBit : sideBits.entrySet()) {
-            if ((aSideBit.getValue() & sidesBit) > 0)
-                result.add(aSideBit.getKey());
-        }
+    public static Collection<Side> getSides(final byte sidesBit) {
+        final Set<Side> result = Sets.newHashSet();
+        sideBits.forEachEntry(
+                new TObjectByteProcedure<Side>() {
+                    @Override
+                    public boolean execute(Side a, byte b) {
+                        if ((b & sidesBit) > 0)
+                            result.add(a);
+
+                        return true;
+                    }
+                });
 
         return result;
     }
