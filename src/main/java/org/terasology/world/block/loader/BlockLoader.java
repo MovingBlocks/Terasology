@@ -40,6 +40,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.utilities.gson.Vector3fHandler;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -49,6 +50,7 @@ import org.terasology.world.block.shapes.BlockShape;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -91,6 +93,7 @@ public class BlockLoader {
                 .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
                 .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
                 .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
+                .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
                 .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
                 .create();
         cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
@@ -457,6 +460,7 @@ public class BlockLoader {
         block.setShadowCasting(def.shadowCasting);
         block.setWaving(def.waving);
         block.setLuminance(def.luminance);
+        block.setTint(def.tint);
         block.setCraftPlace(def.craftPlace);
         block.setConnectToAllBlocks(def.connectToAllBlock);
         block.setCheckHeightDiff(def.checkHeightDiff);
