@@ -3,7 +3,8 @@ package org.terasology.blockNetwork;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Direction;
-import org.terasology.math.DirectionsUtil;
+import org.terasology.math.Side;
+import org.terasology.math.Sides;
 import org.terasology.math.Vector3i;
 
 import java.util.Set;
@@ -25,7 +26,7 @@ public class BlockNetworkTest {
         listener = new TestListener();
         blockNetwork.addTopologyListener(listener);
         blockNetwork.addTopologyListener(new ValidatingListener());
-        allDirections = DirectionsUtil.addDirection((byte) 0, Direction.UP, Direction.LEFT, Direction.FORWARD, Direction.DOWN, Direction.RIGHT, Direction.BACKWARD);
+        allDirections = 63;
     }
 
     private NetworkNode toNode(Vector3i location, byte directions) {
@@ -159,8 +160,8 @@ public class BlockNetworkTest {
     @Test
     public void addTwoOverlappingCrossingNetworkingNodes() {
         Vector3i location = new Vector3i(0, 0, 0);
-        blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.LEFT, Direction.RIGHT));
-        blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.FORWARD, Direction.BACKWARD));
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT));
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK));
 
         assertEquals(2, blockNetwork.getNetworks().size());
     }
@@ -168,9 +169,9 @@ public class BlockNetworkTest {
     @Test
     public void tryAddingOverlappingConnectionsNetworkingNodes() {
         Vector3i location = new Vector3i(0, 0, 0);
-        blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.LEFT, Direction.RIGHT));
+        blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.RIGHT, Side.LEFT));
         try {
-            blockNetwork.addNetworkingBlock(new NetworkNode(location, Direction.FORWARD, Direction.BACKWARD, Direction.LEFT));
+            blockNetwork.addNetworkingBlock(new NetworkNode(location, Side.FRONT, Side.BACK, Side.RIGHT));
             fail("Expected IllegalStateException");
         } catch (IllegalStateException exp) {
             // expected
@@ -180,9 +181,9 @@ public class BlockNetworkTest {
     @Test
     public void cablesInTheSameBlockCanConnectAndHaveCorrectDistance() {
         Vector3i location = new Vector3i(0, 0, 0);
-        final NetworkNode leftRight = new NetworkNode(location, Direction.LEFT, Direction.RIGHT);
+        final NetworkNode leftRight = new NetworkNode(location, Side.RIGHT, Side.LEFT);
         blockNetwork.addNetworkingBlock(leftRight);
-        final NetworkNode frontBack = new NetworkNode(location, Direction.FORWARD, Direction.BACKWARD);
+        final NetworkNode frontBack = new NetworkNode(location, Side.FRONT, Side.BACK);
         blockNetwork.addNetworkingBlock(frontBack);
 
         blockNetwork.addNetworkingBlock(new NetworkNode(new Vector3i(0, 0, 1), allDirections));

@@ -11,6 +11,7 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Direction;
+import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
@@ -44,9 +45,9 @@ public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
-        for (Direction direction : Direction.values()) {
+        for (Side side : Side.values()) {
             Vector3i neighborLocation = new Vector3i(event.getBlockPosition());
-            neighborLocation.add(direction.getVector3i());
+            neighborLocation.add(side.getVector3i());
             Block neighborBlock = worldProvider.getBlock(neighborLocation);
             Block neighborBlockAfterUpdate = neighborBlock.getBlockFamily().getBlockUponNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
             if (neighborBlock != neighborBlockAfterUpdate) {

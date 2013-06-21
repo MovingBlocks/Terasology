@@ -5,7 +5,8 @@ import org.terasology.math.Direction;
 import java.util.*;
 
 import com.google.common.collect.*;
-import org.terasology.math.DirectionsUtil;
+import org.terasology.math.Side;
+import org.terasology.math.Sides;
 
 /**
  * Represents one network of nodes, where each nodes is somehow connected to another within the network.
@@ -124,9 +125,9 @@ public class SimpleNetwork implements Network {
     }
 
     public static boolean areNodesConnecting(NetworkNode node1, NetworkNode node2) {
-        for (Direction direction : DirectionsUtil.getDirections(node1.connectionSides)) {
-            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(direction);
-            if (node2.location.equals(possibleConnectedLocation) && DirectionsUtil.hasDirection(node2.connectionSides, direction.reverse()))
+        for (Side side : Sides.getSides(node1.connectionSides)) {
+            final ImmutableBlockLocation possibleConnectedLocation = node1.location.move(side);
+            if (node2.location.equals(possibleConnectedLocation) && Sides.hasSide(node2.connectionSides, side.reverse()))
                 return true;
         }
         return false;
@@ -159,10 +160,10 @@ public class SimpleNetwork implements Network {
     }
 
     private boolean canConnectToNetworkingNode(NetworkNode networkNode) {
-        for (Direction connectingOnSide : DirectionsUtil.getDirections(networkNode.connectionSides)) {
+        for (Side connectingOnSide : Sides.getSides(networkNode.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = networkNode.location.move(connectingOnSide);
             for (NetworkNode possibleConnectedNode : networkingNodes.get(possibleConnectionLocation)) {
-                if (DirectionsUtil.hasDirection(possibleConnectedNode.connectionSides, connectingOnSide.reverse()))
+                if (Sides.hasSide(possibleConnectedNode.connectionSides, connectingOnSide.reverse()))
                     return true;
             }
         }
@@ -295,10 +296,10 @@ public class SimpleNetwork implements Network {
 //    }
 
     private void listConnectedNotVisitedNetworkingNodes(Set<NetworkNode> visitedNodes, NetworkNode location, Collection<NetworkNode> result) {
-        for (Direction connectingOnSide : DirectionsUtil.getDirections(location.connectionSides)) {
+        for (Side connectingOnSide : Sides.getSides(location.connectionSides)) {
             final ImmutableBlockLocation possibleConnectionLocation = location.location.move(connectingOnSide);
             for (NetworkNode possibleConnection : networkingNodes.get(possibleConnectionLocation)) {
-                if (!visitedNodes.contains(possibleConnection) && DirectionsUtil.hasDirection(possibleConnection.connectionSides, connectingOnSide.reverse()))
+                if (!visitedNodes.contains(possibleConnection) && Sides.hasSide(possibleConnection.connectionSides, connectingOnSide.reverse()))
                     result.add(possibleConnection);
             }
         }

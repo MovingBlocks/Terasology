@@ -1,7 +1,7 @@
 package org.terasology.world.block.family;
 
-import org.terasology.math.Direction;
-import org.terasology.math.DirectionsUtil;
+import gnu.trove.map.TByteObjectMap;
+import org.terasology.math.Sides;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
@@ -15,15 +15,15 @@ import java.util.Map;
 public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     private ConnectionCondition connectionCondition;
     private Block archetypeBlock;
-    private Map<Byte, Block> blocks;
+    private TByteObjectMap<Block> blocks;
 
-    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri, List<String> categories, Block archetypeBlock, Map<Byte, Block> blocks) {
+    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri, List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks) {
         super(blockUri, categories);
         this.connectionCondition = connectionCondition;
         this.archetypeBlock = archetypeBlock;
         this.blocks = blocks;
 
-        for (Block block : blocks.values()) {
+        for (Block block : blocks.valueCollection()) {
             block.setBlockFamily(this);
         }
     }
@@ -36,9 +36,9 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     @Override
     public Block getBlockUponPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
-        for (Direction connectDirection : Direction.values()) {
-            if (connectionCondition.isConnectingTo(location, connectDirection, worldProvider, blockEntityRegistry)) {
-                connections += DirectionsUtil.getDirection(connectDirection);
+        for (Side connectSide : Side.values()) {
+            if (connectionCondition.isConnectingTo(location, connectSide, worldProvider, blockEntityRegistry)) {
+                connections += Sides.getSide(connectSide);
             }
         }
         return blocks.get(connections);
@@ -47,9 +47,9 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     @Override
     public Block getBlockUponNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
         byte connections = 0;
-        for (Direction connectDirection : Direction.values()) {
-            if (connectionCondition.isConnectingTo(location, connectDirection, worldProvider, blockEntityRegistry)) {
-                connections += DirectionsUtil.getDirection(connectDirection);
+        for (Side connectSide : Side.values()) {
+            if (connectionCondition.isConnectingTo(location, connectSide, worldProvider, blockEntityRegistry)) {
+                connections += Sides.getSide(connectSide);
             }
         }
         return blocks.get(connections);
@@ -70,6 +70,6 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
 
     @Override
     public Iterable<Block> getBlocks() {
-        return blocks.values();
+        return blocks.valueCollection();
     }
 }

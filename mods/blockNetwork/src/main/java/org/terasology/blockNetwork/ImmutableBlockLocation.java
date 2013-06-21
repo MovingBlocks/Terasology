@@ -1,6 +1,7 @@
 package org.terasology.blockNetwork;
 
 import org.terasology.math.Direction;
+import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 
 public class ImmutableBlockLocation {
@@ -18,8 +19,8 @@ public class ImmutableBlockLocation {
         this.z = z;
     }
 
-    public ImmutableBlockLocation move(Direction direction) {
-        final Vector3i directionVector = direction.getVector3i();
+    public ImmutableBlockLocation move(Side side) {
+        final Vector3i directionVector = side.getVector3i();
         return new ImmutableBlockLocation(x+directionVector.x, y+directionVector.y, z+directionVector.z);
     }
 

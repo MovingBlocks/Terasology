@@ -3,7 +3,8 @@ package org.terasology.blockNetwork;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Direction;
-import org.terasology.math.DirectionsUtil;
+import org.terasology.math.Side;
+import org.terasology.math.Sides;
 import org.terasology.math.Vector3i;
 
 import static org.junit.Assert.*;
@@ -16,12 +17,12 @@ public class SimpleNetworkTest {
     @Before
     public void setup() {
         network = new SimpleNetwork();
-        allDirections = DirectionsUtil.addDirection((byte) 0, Direction.UP, Direction.LEFT, Direction.FORWARD, Direction.DOWN, Direction.RIGHT, Direction.BACKWARD);
-        upOnly = DirectionsUtil.addDirection((byte) 0, Direction.UP);
+        allDirections = 63;
+        upOnly = Sides.addSide((byte) 0, Side.TOP);
     }
 
-    private NetworkNode toNode(Vector3i location, byte directions) {
-        return new NetworkNode(location, directions);
+    private NetworkNode toNode(Vector3i location, byte sides) {
+        return new NetworkNode(location, sides);
     }
 
     @Test
