@@ -39,6 +39,7 @@ import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
+import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.chunks.store.ChunkStoreGZip;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
@@ -142,6 +143,7 @@ public class InitialiseWorld implements LoadProcess {
         // Init. a new world
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
+        CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         CoreRegistry.put(WorldProvider.class, worldProvider);
