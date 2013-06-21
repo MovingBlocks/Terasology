@@ -19,42 +19,42 @@ import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 @RegisterBlockFamilyFactory("cable")
 public class SignalCableBlockFamilyFactory extends ConnectToSixSidesFamilyFactory {
     public SignalCableBlockFamilyFactory() {
-        super(
-                new ConnectionCondition() {
-                    @Override
-                    public boolean isConnectingTo(Vector3i blockLocation, Direction connectDirection, WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry) {
-                        Vector3i neighborLocation = new Vector3i(blockLocation);
-                        neighborLocation.add(connectDirection.getVector3i());
-                        final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(blockLocation);
-
-                        final SignalConductorComponent conductorComponent = blockEntity.getComponent(SignalConductorComponent.class);
-                        byte cableConnections = conductorComponent.connectionSides;
-                        // Cable cannot be connected to that side
-                        if (!DirectionsUtil.hasDirection(cableConnections, connectDirection))
-                            return false;
-
-                        EntityRef neighborEntity = blockEntityRegistry.getBlockEntityAt(neighborLocation);
-                        return blockEntity != null && neighborEntity != null &&
-                                connectsToNeighbor(connectDirection, neighborEntity);
-                    }
-                });
+        super(new SignalCableConnectionCondition());
     }
 
-    private static boolean connectsToNeighbor(Direction connectDirection, EntityRef neighborEntity) {
-        final Direction oppositeDirection = connectDirection.reverse();
+    private static class SignalCableConnectionCondition implements ConnectionCondition {
+        @Override
+        public boolean isConnectingTo(Vector3i blockLocation, Direction connectDirection, WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry) {
+            Vector3i neighborLocation = new Vector3i(blockLocation);
+            neighborLocation.add(connectDirection.getVector3i());
+            final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(blockLocation);
 
-        final SignalConductorComponent neighborConductorComponent = neighborEntity.getComponent(SignalConductorComponent.class);
-        if (neighborConductorComponent != null && DirectionsUtil.hasDirection(neighborConductorComponent.connectionSides, oppositeDirection))
-            return true;
+            final SignalConductorComponent conductorComponent = blockEntity.getComponent(SignalConductorComponent.class);
+            byte cableConnections = conductorComponent.connectionSides;
+            // Cable cannot be connected to that side
+            if (!DirectionsUtil.hasDirection(cableConnections, connectDirection))
+                return false;
 
-        final SignalConsumerComponent neighborConsumerComponent = neighborEntity.getComponent(SignalConsumerComponent.class);
-        if (neighborConsumerComponent != null && DirectionsUtil.hasDirection(neighborConsumerComponent.connectionSides, oppositeDirection))
-            return true;
+            EntityRef neighborEntity = blockEntityRegistry.getBlockEntityAt(neighborLocation);
+            return neighborEntity != null && connectsToNeighbor(connectDirection, neighborEntity);
+        }
 
-        final SignalProducerComponent neighborProducerComponent = neighborEntity.getComponent(SignalProducerComponent.class);
-        if (neighborProducerComponent != null && DirectionsUtil.hasDirection(neighborProducerComponent.connectionSides, oppositeDirection))
-            return true;
+        private boolean connectsToNeighbor(Direction connectDirection, EntityRef neighborEntity) {
+            final Direction oppositeDirection = connectDirection.reverse();
 
-        return false;
+            final SignalConductorComponent neighborConductorComponent = neighborEntity.getComponent(SignalConductorComponent.class);
+            if (neighborConductorComponent != null && DirectionsUtil.hasDirection(neighborConductorComponent.connectionSides, oppositeDirection))
+                return true;
+
+            final SignalConsumerComponent neighborConsumerComponent = neighborEntity.getComponent(SignalConsumerComponent.class);
+            if (neighborConsumerComponent != null && DirectionsUtil.hasDirection(neighborConsumerComponent.connectionSides, oppositeDirection))
+                return true;
+
+            final SignalProducerComponent neighborProducerComponent = neighborEntity.getComponent(SignalProducerComponent.class);
+            if (neighborProducerComponent != null && DirectionsUtil.hasDirection(neighborProducerComponent.connectionSides, oppositeDirection))
+                return true;
+
+            return false;
+        }
     }
 }
