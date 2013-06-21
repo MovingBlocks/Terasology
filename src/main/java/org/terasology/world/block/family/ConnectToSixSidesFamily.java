@@ -16,12 +16,14 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     private ConnectionCondition connectionCondition;
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;
+    private byte connectionSides;
 
-    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri, List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks) {
+    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri, List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks, byte connectionSides) {
         super(blockUri, categories);
         this.connectionCondition = connectionCondition;
         this.archetypeBlock = archetypeBlock;
         this.blocks = blocks;
+        this.connectionSides = connectionSides;
 
         for (Block block : blocks.valueCollection()) {
             block.setBlockFamily(this);
@@ -36,7 +38,7 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     @Override
     public Block getBlockUponPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
-        for (Side connectSide : Side.values()) {
+        for (Side connectSide : Sides.getSides(connectionSides)) {
             if (connectionCondition.isConnectingTo(location, connectSide, worldProvider, blockEntityRegistry)) {
                 connections += Sides.getSide(connectSide);
             }
@@ -47,7 +49,7 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     @Override
     public Block getBlockUponNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
         byte connections = 0;
-        for (Side connectSide : Side.values()) {
+        for (Side connectSide : Sides.getSides(connectionSides)) {
             if (connectionCondition.isConnectingTo(location, connectSide, worldProvider, blockEntityRegistry)) {
                 connections += Sides.getSide(connectSide);
             }

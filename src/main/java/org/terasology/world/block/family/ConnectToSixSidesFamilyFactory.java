@@ -32,6 +32,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
     public static final String SIX_CONNECTIONS = "all";
 
     private ConnectionCondition connectionCondition;
+    private byte connectionSides;
     private static Matrix3f[] possibleTransformations = new Matrix3f[64];
 
     static {
@@ -59,8 +60,9 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
         }
     }
 
-    protected ConnectToSixSidesFamilyFactory(ConnectionCondition connectionCondition) {
+    protected ConnectToSixSidesFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides) {
         this.connectionCondition = connectionCondition;
+        this.connectionSides = connectionSides;
     }
 
     @Override
@@ -115,7 +117,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
 
         final Block archetypeBlock = blocksForConnections.get(Sides.getSides(Side.RIGHT, Side.LEFT));
         return new ConnectToSixSidesFamily(connectionCondition, blockUri, blockDefinition.categories,
-                archetypeBlock, blocksForConnections);
+                archetypeBlock, blocksForConnections, connectionSides);
     }
 
     private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder, final AssetUri blockDefUri, TByteObjectMap<BlockDefinition>[] basicBlocks) {
@@ -123,6 +125,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
         TByteObjectMap<BlockDefinition> possibleBlockDefinitions = basicBlocks[connectionCount];
         final TByteObjectIterator<BlockDefinition> blockDefinitionIterator = possibleBlockDefinitions.iterator();
         while (blockDefinitionIterator.hasNext()) {
+            blockDefinitionIterator.advance();
             final byte originalConnections = blockDefinitionIterator.key();
             final BlockDefinition blockDefinition = blockDefinitionIterator.value();
             Matrix3f transformation = getTransformationToAchieve(originalConnections, connections);

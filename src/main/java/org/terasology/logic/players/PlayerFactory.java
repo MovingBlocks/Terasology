@@ -105,6 +105,7 @@ public class PlayerFactory {
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
         inventoryManager.giveItem(player, chest);
+        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("signalling:SignalCable"), 50));
 
         return player;
     }

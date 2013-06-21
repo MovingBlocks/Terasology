@@ -1,5 +1,6 @@
 package org.terasology.signalling.blockFamily;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Direction;
 import org.terasology.math.Sides;
@@ -10,6 +11,7 @@ import org.terasology.signalling.components.SignalConsumerComponent;
 import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.family.ConnectToSixSidesFamilyFactory;
 import org.terasology.world.block.family.ConnectionCondition;
 import org.terasology.world.block.family.RegisterBlockFamilyFactory;
@@ -20,7 +22,7 @@ import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 @RegisterBlockFamilyFactory("cable")
 public class SignalCableBlockFamilyFactory extends ConnectToSixSidesFamilyFactory {
     public SignalCableBlockFamilyFactory() {
-        super(new SignalCableConnectionCondition());
+        super(new SignalCableConnectionCondition(), (byte) 63);
     }
 
     private static class SignalCableConnectionCondition implements ConnectionCondition {
@@ -28,13 +30,6 @@ public class SignalCableBlockFamilyFactory extends ConnectToSixSidesFamilyFactor
         public boolean isConnectingTo(Vector3i blockLocation, Side connectSide, WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry) {
             Vector3i neighborLocation = new Vector3i(blockLocation);
             neighborLocation.add(connectSide.getVector3i());
-            final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(blockLocation);
-
-            final SignalConductorComponent conductorComponent = blockEntity.getComponent(SignalConductorComponent.class);
-            byte cableConnections = conductorComponent.connectionSides;
-            // Cable cannot be connected to that side
-            if (!Sides.hasSide(cableConnections, connectSide))
-                return false;
 
             EntityRef neighborEntity = blockEntityRegistry.getBlockEntityAt(neighborLocation);
             return neighborEntity != null && connectsToNeighbor(connectSide, neighborEntity);
