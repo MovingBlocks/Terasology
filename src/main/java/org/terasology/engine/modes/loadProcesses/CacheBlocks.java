@@ -48,6 +48,6 @@ public class CacheBlocks implements LoadProcess {
     public int begin() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         blockFamilyIterator = blockManager.listRegisteredBlockFamilies().iterator();
-        return blockManager.registeredBlockFamiliesCount();
+        return blockManager.getBlockFamilyCount();
     }
 }

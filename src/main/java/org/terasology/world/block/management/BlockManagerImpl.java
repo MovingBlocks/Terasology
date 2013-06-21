@@ -326,11 +326,6 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     @Override
-    public int registeredBlockFamiliesCount() {
-        return registeredFamilyByUri.size();
-    }
-
-    @Override
     public Iterable<BlockUri> listFreeformBlockUris() {
         return freeformBlockUris;
     }

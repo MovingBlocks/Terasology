@@ -110,11 +110,6 @@ public abstract class BlockManager {
     public abstract Iterable<BlockFamily> listRegisteredBlockFamilies();
 
     /**
-     * @return The number of registered block families
-     */
-    public abstract int registeredBlockFamiliesCount();
-
-    /**
      * @return A list of freeform block uris
      */
     public abstract Iterable<BlockUri> listFreeformBlockUris();
