@@ -44,8 +44,7 @@ public class SimpleNetwork implements Network {
     /**
      * Adds a networking node to the network.
      *
-     * @param location          The location of the new node.
-     * @param connectingOnSides Sides on which it can connect nodes.
+     * @param networkNode Definition of the networking node position and connecting sides.
      */
     public void addNetworkingNode(NetworkNode networkNode) {
         if (SANITY_CHECK && !canAddNetworkingNode(networkNode))
@@ -57,8 +56,7 @@ public class SimpleNetwork implements Network {
     /**
      * Adds a leaf node to the network.
      *
-     * @param location          The location of the new node.
-     * @param connectingOnSides Sides on which it can connect nodes.
+     * @param networkNode Definition of the leaf node position and connecting sides.
      */
     public void addLeafNode(NetworkNode networkNode) {
         if (SANITY_CHECK && (!canAddLeafNode(networkNode) || isEmptyNetwork()))
@@ -71,7 +69,7 @@ public class SimpleNetwork implements Network {
      * Returns the network size - a number of nodes it spans. If the same node is added twice with different
      * connecting sides, it is counted twice.
      *
-     * @return
+     * @return The sum of networking nodes and leaf nodes (count).
      */
     @Override
     public int getNetworkSize() {
@@ -81,8 +79,8 @@ public class SimpleNetwork implements Network {
     /**
      * Removes a leaf node from the network. If this removal made the network degenerate, it will return <code>true</code>.
      *
-     * @param location
-     * @param connectingOnSides
+     * @param networkingNode  Definition of the leaf node position and connecting sides.
+     * @return <code>true</code> if the network after the removal is degenerated or empty (no longer valid).
      */
     public boolean removeLeafNode(NetworkNode networkingNode) {
         // Removal of a leaf node cannot split the network, so it's just safe to remove it
@@ -94,10 +92,7 @@ public class SimpleNetwork implements Network {
 
         distanceCache.clear();
 
-        if (isDegeneratedNetwork())
-            return true;
-
-        return isEmptyNetwork();
+        return isDegeneratedNetwork() || isEmptyNetwork();
     }
 
     public void removeAllLeafNodes() {
@@ -136,17 +131,15 @@ public class SimpleNetwork implements Network {
     /**
      * If this network can connect to node at the location specified with the specified connecting sides.
      *
-     * @param location
-     * @param connectingOnSides
-     * @return
+     * @param networkNode Definition of the networking node position and connecting sides.
+     * @return If the networking node can be added to the network (connects to it).
      */
     public boolean canAddNetworkingNode(NetworkNode networkNode) {
         if (isEmptyNetwork())
             return true;
         if (networkingNodes.containsValue(networkNode) || leafNodes.containsValue(networkNode))
             return false;
-        if (canConnectToNetworkingNode(networkNode)) return true;
-        return false;
+        return canConnectToNetworkingNode(networkNode);
     }
 
     public boolean canAddLeafNode(NetworkNode networkNode) {
@@ -155,8 +148,7 @@ public class SimpleNetwork implements Network {
         if (networkingNodes.containsValue(networkNode) || leafNodes.containsValue(networkNode))
             return false;
 
-        if (canConnectToNetworkingNode(networkNode)) return true;
-        return false;
+        return canConnectToNetworkingNode(networkNode);
     }
 
     private boolean canConnectToNetworkingNode(NetworkNode networkNode) {
