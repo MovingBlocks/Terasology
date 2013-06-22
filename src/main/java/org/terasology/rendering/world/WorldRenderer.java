@@ -1032,7 +1032,7 @@ public final class WorldRenderer {
         // quite a bit into the direction of the sun (our main light).
 
         // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
-        float stepSize = 10.0f;
+        float stepSize = 50f;
         Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
 
         Vector3f sunPosition = new Vector3f(sunDirection);
