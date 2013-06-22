@@ -289,7 +289,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
                 }
 
                 renderBackgroundToolTip(worldPos, mainOffset[0], null);
-                renderIconTollTip(worldPos, mainOffset[0], entity);
+                renderIconToolTip(worldPos, mainOffset[0], entity);
                 renderNail(worldPos);
             }
         }else{
@@ -371,7 +371,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
 
     }
 
-    private void renderIconTollTip(Vector3f worldPos, Vector3f offset, EntityRef entity){
+    private void renderIconToolTip(Vector3f worldPos, Vector3f offset, EntityRef entity){
 
         ItemComponent itemComponent  = entity.getComponent(ItemComponent.class);
 

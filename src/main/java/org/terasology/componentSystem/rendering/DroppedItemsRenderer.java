@@ -72,7 +72,7 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
     public void shutdown() {
     }
 
-    private void render(boolean shadows) {
+    private void render() {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -84,24 +84,17 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
 
         ShaderProgram shader;
 
-        if (!shadows) {
-            shader = ShaderManager.getInstance().getShaderProgram("block");
-            shader.setInt("textured", 0);
-            shader.setFloat("light", worldRenderer.getRenderingLightValue());
-        } else {
-            shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
-        }
+        shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue());
+
+        shader.setInt("textured", 0);
+        shader.setFloat("light", worldRenderer.getRenderingLightValue());
 
         shader.enable();
 
         glPushMatrix();
 
-        if (!shadows) {
-            glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        } else {
-            Vector3f lightCamPos = worldRenderer.getLightCamera().getPosition();
-            glTranslated(-lightCamPos.x, -lightCamPos.y, -lightCamPos.z);
-        }
+        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         float[] openglMat = new float[16];
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
@@ -127,13 +120,7 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
             trans.set(matrix);
             AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
-            boolean visible;
-            if (shadows) {
-                visible = worldRenderer.isAABBVisibleLight(aabb);
-            } else {
-                visible = worldRenderer.isAABBVisible(aabb);
-            }
-
+            final boolean visible = worldRenderer.isAABBVisible(aabb);
             if (visible) {
                 glPushMatrix();
                 trans.getOpenGLMatrix(openglMat);
@@ -145,12 +132,15 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
                 glPopMatrix();
             }
         }
+
         glPopMatrix();
+
+        shader.setActiveFeatures(0);
     }
 
     @Override
     public void renderOpaque() {
-        render(false);
+        render();
     }
 
     @Override
@@ -167,6 +157,5 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderShadows() {
-        //render(true);
     }
 }

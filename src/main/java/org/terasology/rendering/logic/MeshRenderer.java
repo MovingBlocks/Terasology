@@ -193,7 +193,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         }
     }
 
-    public void render(boolean shadows) {
+    public void render() {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -205,25 +205,14 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
         glPushMatrix();
 
-        if (!shadows) {
-            glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        } else {
-            Vector3f lightCamPos = worldRenderer.getLightCamera().getPosition();
-            glTranslated(-lightCamPos.x, -lightCamPos.y, -lightCamPos.z);
-        }
+        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         for (Material material : opaqueMesh.keys()) {
             Mesh lastMesh = null;
-            if (!shadows) {
-                material.enable();
-                material.setFloat("light", 1);
+            material.enable();
+            material.setFloat("light", 1);
 
-                material.bindTextures();
-            } else {
-                ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
-                shader.enable();
-
-            }
+            material.bindTextures();
             lastRendered = opaqueMesh.get(material).size();
 
             // Batching
@@ -255,14 +244,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     trans.set(matrix);
                     AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
-                    boolean visible;
-
-                    if (shadows) {
-                        visible = worldRenderer.isAABBVisibleLight(aabb);
-                    } else {
-                        visible = worldRenderer.isAABBVisible(aabb);
-                    }
-
+                    boolean visible = worldRenderer.isAABBVisible(aabb);
                     if (visible) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {
@@ -298,14 +280,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     normTrans.set(matrix);
                     AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
-                    boolean visible;
-
-                    if (shadows) {
-                        visible = worldRenderer.isAABBVisibleLight(aabb);
-                    } else {
-                        visible = worldRenderer.isAABBVisible(aabb);
-                    }
-
+                    final boolean visible = worldRenderer.isAABBVisible(aabb);
                     if (visible) {
                         indexOffset = meshComp.mesh.addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
                     }
@@ -332,7 +307,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderOpaque() {
-        render(false);
+        render();
     }
 
     private void renderBatch(TFloatList vertexData, TIntList indexData) {
@@ -392,6 +367,5 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderShadows() {
-        //render(true);
     }
 }

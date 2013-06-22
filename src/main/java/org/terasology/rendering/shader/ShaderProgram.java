@@ -72,7 +72,7 @@ public class ShaderProgram {
         FEATURE_ALPHA_REJECT(0x02),
         FEATURE_LIGHT_POINT(0x04),
         FEATURE_LIGHT_DIRECTIONAL(0x08),
-        FEATURE_LIGHT_TO_LIGHTBUFFER(0x10),
+        FEATURE_DEFERRED_LIGHTING(0x10),
         FEATURE_ALL(0x20);
 
         private int value;

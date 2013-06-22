@@ -39,11 +39,6 @@ void main(){
     if (color.a < 0.1) {
         discard;
     }
-
-#if !defined (FEATURE_DEFERRED_LIGHTING)
-    color.rgb *= light;
-#endif
-
     if (textured) {
         color.rgb *= colorOffset.rgb;
         gl_FragData[0].rgba = color;
@@ -52,9 +47,5 @@ void main(){
     }
 
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0);
-#if !defined (FEATURE_DEFERRED_LIGHTING)
-    gl_FragData[2].rgba = vec4(1.0, 1.0, 1.0, 0.0);
-#else
     gl_FragData[2].rgba = vec4(light, light, light, 0.0);
-#endif
 }

@@ -692,7 +692,6 @@ public class Block {
             return;
         }
 
-
         if (!isDoubleSided() || !glIsEnabled(GL11.GL_CULL_FACE)) {
             mesh.render();
         } else {

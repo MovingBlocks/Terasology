@@ -224,7 +224,7 @@ public class BlockLoader {
 
         Texture terrainTex = new Texture(data, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
-        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
+        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:blockMaterial"));
         terrainMat.setTexture("textureAtlas", terrainTex);
         terrainMat.setFloat3("colorOffset", 1, 1, 1);
         terrainMat.setInt("textured", 1);

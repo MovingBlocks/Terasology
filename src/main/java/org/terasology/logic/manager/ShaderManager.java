@@ -86,7 +86,8 @@ public class ShaderManager {
                 ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue()
                 | ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
-        createAndStoreShaderProgram("block", new ShaderParametersBlock());
+        createAndStoreShaderProgram("block", new ShaderParametersBlock(),
+                ShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
         createAndStoreShaderProgram("animateOpacity", new ShaderParametersDefault());
         createAndStoreShaderProgram("shadowMap", new ShaderParametersShadowMap());
