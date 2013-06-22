@@ -321,13 +321,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
         createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
-        if(config.getRendering().getScreenshotSize == 1) {
+        if(config.getRendering().getScreenshotSize() == 1) {
                   createFBO("sceneFinal", rtFullWidth *2, rtFullHeight*2, FBOType.DEFAULT, false, false);
-        } elseif(config.getRendering().getScreenshotSize == 2) {
+        } else if(config.getRendering().getScreenshotSize() == 2) {
                   createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
-        } elseif(config.getRendering().getScreenshotSize == 3) {
+        } else if(config.getRendering().getScreenshotSize() == 3) {
                    createFBO("sceneFinal", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
-        } elseif(config.getRendering().getScreenshotSize == 4) {
+        } else if(config.getRendering().getScreenshotSize() == 4) {
           createFBO("sceneFinal", rtQuarterWidth, rtQuarterHeight, FBOType.DEFAULT, false, false);
         }
   

@@ -115,10 +115,6 @@ public class UIDialogSetUpMap extends UIDialog {
     private UISlider DesertGrassDensityFACTOR;
     private UISlider DesertGrassDensityslider= new UISlider(new Vector2f(64f, 32f), 0, 0);
 
-    private UILabel HillsGrassDensityFACTORLabel;
-    private UISlider HillsGrassDensityFACTOR;
-    private UISlider HillsGrassDensityslider = new UISlider(new Vector2f(64f, 32f),0,0);
-
     private UILabel ZOOM_FACTORLabel;
     private UISlider ZOOM_FACTOR;
     private UISlider ZOOM_FACTORslider= new UISlider(new Vector2f(128f, 32f), 0, 0);
@@ -688,49 +684,6 @@ public class UIDialogSetUpMap extends UIDialog {
                 }
             }
         });
-        //private float hillsGrassDensity = 0.25f;
-        range = Math.round(0.25f * 100000f *2f);
-        HillsGrassDensityFACTOR = new UISlider(new Vector2f(64f, 32f), 0, range);
-        HillsGrassDensityFACTOR.setHorizontalAlign(EHorizontalAlign.CENTER);
-        HillsGrassDensityFACTOR.setVisible(true);
-        HillsGrassDensityFACTOR.setMin(1);
-        HillsGrassDensityFACTOR.setMax(range-1);
-        HillsGrassDensityFACTOR.setValue(Math.round(config.getWorldGeneration().getHillsGrassDensity()*100000.0f));
-        HillsGrassDensityFACTOR.setText(String.valueOf( Math.round(config.getWorldGeneration().getHillsGrassDensity()*100000.0f)));
-        HillsGrassDensityFACTOR.addChangedListener(new ChangedListener() {
-            @Override
-            public void changed(UIDisplayElement element) {
-                HillsGrassDensityslider = (UISlider) element;
-                HillsGrassDensityslider.setText(String.valueOf(HillsGrassDensityslider.getValue()));
-                Config config = CoreRegistry.get(Config.class);
-                config.getWorldGeneration().setHillsGrassDensity((float)HillsGrassDensityFACTOR.getValue()/100000f);
-            }
-        });
-        HillsGrassDensityFACTOR.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void leave(UIDisplayElement element) {
-               HillsGrassDensityFACTOR.setBackgroundImage(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
-            }
-
-            @Override
-            public void hover(UIDisplayElement element) {
-
-            }
-
-            @Override
-            public void enter(UIDisplayElement element) {
-                CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:click"), 1.0f);
-               HillsGrassDensityFACTOR.setBackgroundImage(new Vector2f(0f, 30f), new Vector2f(256f, 30f));
-            }
-
-            @Override  //TODO I should just fix UI slider instead of override
-            public void move(UIDisplayElement element) {
-
-                if (HillsGrassDensityFACTOR.isFocused()) {
-                    HillsGrassDensityFACTOR.changeSlider(new Vector2f( Mouse.getX()-UIDialogSetUpMap.this.getPosition().x,Display.getHeight() - Mouse.getY()).x);
-                }
-            }
-        });
 
             ZOOM_FACTOR = new UISlider(new Vector2f(128f, 16f), 0, 100);
             ZOOM_FACTOR.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -938,12 +891,6 @@ public class UIDialogSetUpMap extends UIDialog {
         DesertGrassDensityFACTORLabel.setHorizontalAlign(EHorizontalAlign.CENTER);
         DesertGrassDensityFACTORLabel.setVisible(true);
 
-        HillsGrassDensityFACTORLabel = new UILabel("HillsGrassDensity:");
-        HillsGrassDensityFACTORLabel.setColor(Color.darkGray);
-        HillsGrassDensityFACTORLabel.setSize(new Vector2f(10f,12f));
-        HillsGrassDensityFACTORLabel.setHorizontalAlign(EHorizontalAlign.CENTER);
-        HillsGrassDensityFACTORLabel.setVisible(true);
-
         ZOOM_FACTORLabel = new UILabel("ZOOM FACTOR:");
         ZOOM_FACTORLabel.setColor(Color.darkGray);
         ZOOM_FACTORLabel.setSize(new Vector2f(10f, 12f));
@@ -1015,9 +962,6 @@ public class UIDialogSetUpMap extends UIDialog {
                     if (DesertGrassDensityFACTOR.getValue() > 0) {
                         config.getWorldGeneration().setDesertGrassDensity((float)DesertGrassDensityFACTOR.getValue()/100000f);
                     }
-                    if (HillsGrassDensityFACTOR.getValue() > 0) {
-                        config.getWorldGeneration().setHillsGrassDensity((float)HillsGrassDensityFACTOR.getValue()/100000f);
-                    }
                     if (ZOOM_FACTOR.getValue() > 0) {
                         config.getWorldGeneration().setZOOM_FACTOR((float)ZOOM_FACTOR.getValue()/100000f);
                         TerrainPreviewGenerator.setZOOM_FACTOR((float)ZOOM_FACTOR.getValue());
@@ -1078,9 +1022,6 @@ public class UIDialogSetUpMap extends UIDialog {
                     //private float desertGrassDensity = 0.001f;
                     DesertGrassDensityFACTOR.setValue(Math.round(0.001f*100000f/2f));
                     DesertGrassDensityFACTOR.setText(String.valueOf(Math.round(0.001f*100000f/2f)));
-                    //private float hillsGrassDensity = 0.25f;
-                    HillsGrassDensityFACTOR.setValue(Math.round(0.25f*100000f/2f));
-                    HillsGrassDensityFACTOR.setText(String.valueOf(Math.round(0.25f*100000f/2f)));
                     //ZOOM_FACTOR
                     ZOOM_FACTOR.setValue(8);
                     ZOOM_FACTOR.setText("8");
@@ -1164,9 +1105,6 @@ public class UIDialogSetUpMap extends UIDialog {
         DesertGrassDensityFACTORLabel.setPosition(new Vector2f(offsettwo + offsettwo2 + DesertGrassDensityFACTORLabel.getText().length(), HillDensityFACTOR.getPosition().y + HillDensityFACTOR.getSize().y + offsethorz2));
         DesertGrassDensityFACTOR.setPosition(new Vector2f(offsettwo, plateauAreaFACTORLabel.getPosition().y + plateauAreaFACTORLabel.getSize().y +offsethorz2));
 
-        HillsGrassDensityFACTORLabel.setPosition(new Vector2f(offsettwo + offsettwo2 + HillsGrassDensityFACTORLabel.getText().length(), plateauAreaFACTOR.getPosition().y + plateauAreaFACTOR.getSize().y + offsethorz2));
-        HillsGrassDensityFACTOR.setPosition(new Vector2f(offsettwo, caveDensityFACTORLabel.getPosition().y + caveDensityFACTORLabel.getSize().y + offsethorz2));
-
          ZOOM_FACTORLabel.setPosition(new Vector2f(offsettwo + offsettwo2 + ZOOM_FACTORLabel.getText().length(), caveDensityFACTOR.getPosition().y + caveDensityFACTOR.getSize().y + offsethorz2));
          ZOOM_FACTOR.setPosition(new Vector2f(offsettwo+32, ZOOM_FACTORLabel.getPosition().y + ZOOM_FACTORLabel.getSize().y + offsethorz2));
 
@@ -1227,9 +1165,6 @@ public class UIDialogSetUpMap extends UIDialog {
 
         addDisplayElement(DesertGrassDensityFACTORLabel);
         addDisplayElement(DesertGrassDensityFACTOR);
-
-        addDisplayElement(HillsGrassDensityFACTORLabel);
-        addDisplayElement(HillsGrassDensityFACTOR);
 
         addDisplayElement(ZOOM_FACTORLabel);
         addDisplayElement(ZOOM_FACTOR);

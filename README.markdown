@@ -132,6 +132,7 @@ Soundtrack and Sound Effects
 * Dimlight, Resurface and Other Side composed and produced by Exile.
 * Door Open sound by Pagancow, from FreeSound.org
 * Door Close sound by Fresco, from FreeSound.org
+* Camera Noise sound by JanKoehl, from FreeSound.org
 * Other sound effects created by Exile.
 
 
