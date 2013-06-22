@@ -21,7 +21,6 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.collision.shapes.SphereShape;
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Lists;
@@ -81,6 +80,21 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
 
     private class BlockShapeHandler implements JsonDeserializer<BlockShape> {
 
+        public static final String PITCH_SYMMETRIC = "pitchSymmetric";
+        public static final String YAW_SYMMETRIC = "yawSymmetric";
+        public static final String ROLL_SYMMETRIC = "rollSymmetric";
+        public static final String SYMMETRIC = "symmetric";
+        public static final String CONVEX_HULL = "convexHull";
+        public static final String COLLIDERS = "colliders";
+        public static final String COLLISION = "collision";
+        public static final String FULL_SIDE = "fullSide";
+        public static final String TYPE = "type";
+        public static final String AABB = "AABB";
+        public static final String SPHERE = "Sphere";
+        public static final String POSITION = "position";
+        public static final String EXTENTS = "extents";
+        public static final String RADIUS = "radius";
+
         @Override
         public BlockShape deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             BlockShape shape = new BlockShape();
@@ -90,14 +104,14 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
                 if (shapeObj.has(part.toString().toLowerCase(Locale.ENGLISH))) {
                     JsonObject meshObj = shapeObj.getAsJsonObject(part.toString().toLowerCase(Locale.ENGLISH));
                     shape.setMeshPart(part, (BlockMeshPart) context.deserialize(meshObj, BlockMeshPart.class));
-                    if (part.isSide() && meshObj.has("fullSide")) {
-                        shape.setBlockingSide(part.getSide(), meshObj.get("fullSide").getAsBoolean());
+                    if (part.isSide() && meshObj.has(FULL_SIDE)) {
+                        shape.setBlockingSide(part.getSide(), meshObj.get(FULL_SIDE).getAsBoolean());
                     }
                 }
             }
 
-            if (shapeObj.has("collision") && shapeObj.get("collision").isJsonObject()) {
-                JsonObject collisionInfo = shapeObj.get("collision").getAsJsonObject();
+            if (shapeObj.has(COLLISION) && shapeObj.get(COLLISION).isJsonObject()) {
+                JsonObject collisionInfo = shapeObj.get(COLLISION).getAsJsonObject();
                 processCollision(context, shape, collisionInfo);
             } else {
                 shape.setCollisionShape(CUBE_SHAPE);
@@ -107,15 +121,26 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
         }
 
         private void processCollision(JsonDeserializationContext context, BlockShape shape, JsonObject collisionInfo) {
-            if (collisionInfo.has("symmetric") && collisionInfo.get("symmetric").isJsonPrimitive() && collisionInfo.get("symmetric").getAsJsonPrimitive().isBoolean()) {
-                shape.setCollisionSymmetric(collisionInfo.get("symmetric").getAsBoolean());
+            if (collisionInfo.has(PITCH_SYMMETRIC) && collisionInfo.get(PITCH_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(PITCH_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+                shape.setPitchSymmetric(collisionInfo.get(PITCH_SYMMETRIC).getAsBoolean());
             }
-            if (collisionInfo.has("convexHull") && collisionInfo.get("convexHull").isJsonPrimitive() && collisionInfo.get("convexHull").getAsJsonPrimitive().isBoolean()) {
+            if (collisionInfo.has(YAW_SYMMETRIC) && collisionInfo.get(YAW_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(YAW_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+                shape.setYawSymmetric(collisionInfo.get(YAW_SYMMETRIC).getAsBoolean());
+            }
+            if (collisionInfo.has(ROLL_SYMMETRIC) && collisionInfo.get(ROLL_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(ROLL_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+                shape.setRollSymmetric(collisionInfo.get(ROLL_SYMMETRIC).getAsBoolean());
+            }
+
+            if (collisionInfo.has(SYMMETRIC) && collisionInfo.get(SYMMETRIC).isJsonPrimitive() && collisionInfo.get(SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+                shape.setCollisionSymmetric(collisionInfo.get(SYMMETRIC).getAsBoolean());
+            }
+
+            if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive() && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
                 ObjectArrayList<Vector3f> verts = buildVertList(shape);
                 ConvexHullShape convexHull = new ConvexHullShape(verts);
                 shape.setCollisionShape(convexHull);
-            } else if (collisionInfo.has("colliders") && collisionInfo.get("colliders").isJsonArray() && collisionInfo.get("colliders").getAsJsonArray().size() > 0) {
-                JsonArray colliderArray = collisionInfo.get("colliders").getAsJsonArray();
+            } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray() && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
+                JsonArray colliderArray = collisionInfo.get(COLLIDERS).getAsJsonArray();
                 processColliders(context, colliderArray, shape);
             } else {
                 shape.setCollisionShape(CUBE_SHAPE);
@@ -142,11 +167,11 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             for (JsonElement elem : colliderArray) {
                 if (elem.isJsonObject()) {
                     JsonObject colliderObj = elem.getAsJsonObject();
-                    if (colliderObj.has("type") && colliderObj.get("type").isJsonPrimitive() && colliderObj.getAsJsonPrimitive("type").isString()) {
-                        String type = colliderObj.get("type").getAsString();
-                        if ("AABB".equals(type)) {
+                    if (colliderObj.has(TYPE) && colliderObj.get(TYPE).isJsonPrimitive() && colliderObj.getAsJsonPrimitive(TYPE).isString()) {
+                        String type = colliderObj.get(TYPE).getAsString();
+                        if (AABB.equals(type)) {
                             colliders.add(processAABBShape(context, colliderObj));
-                        } else if ("Sphere".equals(type)) {
+                        } else if (SPHERE.equals(type)) {
                             colliders.add(processSphereShape(context, colliderObj));
                         }
                     }
@@ -161,7 +186,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
                 shape.setCollisionOffset(colliders.get(0).offset);
             } else {
                 shape.setCollisionShape(CUBE_SHAPE);
-                shape.setCollisionOffset(new Vector3f(0,0,0));
+                shape.setCollisionOffset(new Vector3f(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }
         }
@@ -177,8 +202,8 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
         }
 
         private ColliderInfo processAABBShape(JsonDeserializationContext context, JsonObject colliderDef) {
-            Vector3f offset = context.deserialize(colliderDef.get("position"), Vector3f.class);
-            Vector3f extent = context.deserialize(colliderDef.get("extents"), Vector3f.class);
+            Vector3f offset = context.deserialize(colliderDef.get(POSITION), Vector3f.class);
+            Vector3f extent = context.deserialize(colliderDef.get(EXTENTS), Vector3f.class);
             if (offset == null) throw new JsonParseException("AABB Collider missing position");
             if (extent == null) throw new JsonParseException("AABB Collider missing extents");
             extent.absolute();
@@ -187,8 +212,8 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {
-            Vector3f offset = context.deserialize(colliderDef.get("position"), Vector3f.class);
-            float radius = colliderDef.get("radius").getAsFloat();
+            Vector3f offset = context.deserialize(colliderDef.get(POSITION), Vector3f.class);
+            float radius = colliderDef.get(RADIUS).getAsFloat();
             if (offset == null) throw new JsonParseException("Sphere Collider missing position");
 
             return new ColliderInfo(offset, new SphereShape(radius));

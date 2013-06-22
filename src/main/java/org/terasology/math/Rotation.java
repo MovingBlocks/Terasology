@@ -102,6 +102,18 @@ public class Rotation {
         this.roll = roll;
     }
 
+    public Yaw getYaw() {
+        return yaw;
+    }
+
+    public Pitch getPitch() {
+        return pitch;
+    }
+
+    public Roll getRoll() {
+        return roll;
+    }
+
     public Quat4f getQuat4f() {
         Quat4f rotation = new Quat4f();
         QuaternionUtil.setEuler(rotation, yaw.getRadians(), pitch.getRadians(), roll.getRadians());
