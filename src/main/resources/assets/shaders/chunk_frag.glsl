@@ -20,11 +20,6 @@
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
 
-#define TORCH_WATER_SPEC 8.0
-#define TORCH_WATER_DIFF 0.7
-#define TORCH_BLOCK_SPEC 0.7
-#define TORCH_BLOCK_DIFF 1.0
-
 #define WATER_AMB 0.25
 #define WATER_SPEC 4.0
 #define WATER_DIFF 0.75
@@ -59,8 +54,6 @@ varying float isUpside;
 varying float distance;
 
 uniform vec4 lightingSettingsFrag;
-#define torchSpecExp lightingSettingsFrag.x
-#define torchWaterSpecExp lightingSettingsFrag.y
 #define waterSpecExp lightingSettingsFrag.z
 
 uniform vec3 skyInscatteringColor;
@@ -124,48 +117,8 @@ void main(){
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
-#ifdef FEATURE_TRANSPARENT_PASS
-    vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
+#if !defined (FEATURE_TRANSPARENT_PASS)
 
-    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
-        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
-            vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
-            vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
-
-            vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-            normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
-            normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
-
-            normalWater.xy += normalOffset;
-            normalWater = normalize(normalWater);
-
-            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
-            vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
-
-            /* FRESNEL */
-            if (!swimming) {
-                float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
-                color = mix(refractionColor * (1.0 - waterTint) +  waterTint * vec4(WATER_TINT), reflectionColor * (1.0 - waterTint) + waterTint * vec4(WATER_TINT), f);
-            } else {
-                color = refractionColor * (1.0 - waterTint) +  waterTint * vec4(WATER_TINT);
-            }
-
-            isOceanWater = true;
-            isWater = true;
-        } else {
-            texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
-            texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-            texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
-
-            vec4 albedoColor = texture2D(textureWater, texCoord.xy).rgba;
-            vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
-
-            color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
-            color.a = 1.0;
-        }
-    /* LAVA */
-    } else
-#endif
     if (checkFlag(BLOCK_HINT_LAVA, blockHint)) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
@@ -174,17 +127,7 @@ void main(){
         color = texture2D(textureLava, texCoord.xy);
     /* APPLY DEFAULT TEXTURE FROM ATLAS */
     } else {
-
-#ifdef FEATURE_TRANSPARENT_PASS
-        vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
-        vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
-
-        // TODO: Add support for actual refraction here
-        color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
-        color.a = 1.0;
-#else
         color = texture2D(textureAtlas, texCoord.xy);
-#endif
 
 #if defined FEATURE_ALPHA_REJECT
         if (color.a < 0.5) {
@@ -211,6 +154,7 @@ void main(){
         // Only use one channel so the color won't be altered
         if (maskColor.a != 0.0) color.rgb = vec3(color.g) * gl_Color.rgb;
     }
+#endif
 
     // Calculate daylight lighting value
     float daylightValue = gl_TexCoord[1].x;
@@ -244,20 +188,6 @@ void main(){
     }
 #endif
 
-    float torchlight = 0.0;
-
-    /* CALCULATE TORCHLIGHT */
-    if (carryingTorch > 0.99) {
-#ifdef FEATURE_TRANSPARENT_PASS
-        if (isWater)
-            torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchWaterSpecExp), vertexViewPos.xyz);
-        else
-#endif
-            torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
-            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchSpecExp), vertexViewPos.xyz);
-    }
-
     vec3 daylightColorValue;
 
     /* CREATE THE DAYLIGHT LIGHTING MIX */
@@ -280,17 +210,73 @@ void main(){
 
     // Calculate the final block light brightness
     float blockBrightness = expLightValue(blocklightValue);
-
-    torchlight -= flickeringLightOffset * torchlight;
-
-    blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickeringLightOffset * blocklightValue;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
+    vec3 finalLightValue = max(daylightColorValue, blocklightColorValue);
+#ifdef FEATURE_TRANSPARENT_PASS
     // Apply the final lighting mix
-    color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;
+    color.xyz *= finalLightValue * occlusionValue;
+
+    vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
+
+    // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
+    // The water tint has still to be adjusted adjusted though...
+    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
+        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
+            vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+            vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+
+            vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+            normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+            normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
+
+            normalWater.xy += normalOffset;
+            normalWater = normalize(normalWater);
+
+            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+            vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+
+            vec4 litWaterTint = vec4(WATER_TINT) * vec4(finalLightValue.x, finalLightValue.y, finalLightValue.z, 1.0);
+
+            /* FRESNEL */
+            if (!swimming) {
+                float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
+                color = mix(refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint,
+                    reflectionColor * (1.0 - waterTint) + waterTint * litWaterTint, f);
+            } else {
+                color = refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
+            }
+
+            isOceanWater = true;
+            isWater = true;
+        } else {
+            texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+            texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
+            texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
+
+            vec4 albedoColor = texture2D(textureWater, texCoord.xy).rgba;
+            albedoColor.rgb *= finalLightValue;
+
+            vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
+
+            color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
+            color.a = 1.0;
+        }
+    } else {
+        vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
+        vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
+        albedoColor.rgb *= finalLightValue;
+
+        // TODO: Add support for actual refraction here
+        color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
+        color.a = 1.0;
+    }
+#else
+    gl_FragData[2].rgba = vec4(finalLightValue.r, finalLightValue.g, finalLightValue.b, 0.0);
+#endif
 
 #if defined (DYNAMIC_SHADOWS)
     color.xyz *= shadowTerm;
@@ -301,7 +287,14 @@ void main(){
     vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
     color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
+#if defined (FEATURE_TRANSPARENT_PASS)
     gl_FragData[0].rgba = color;
+#else
+    gl_FragData[0].rgb = color.rgb;
+    // Encode occlusion value into the alpha channel
+    gl_FragData[0].a = occlusionValue;
+#endif
+
     gl_FragData[1].rgb = vec3(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5);
 
     // Primitive objects ids... Will be extended later on

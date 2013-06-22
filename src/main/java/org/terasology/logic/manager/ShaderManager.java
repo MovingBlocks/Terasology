@@ -93,6 +93,10 @@ public class ShaderManager {
         createAndStoreShaderProgram("debug", new ShaderParametersDebug());
         //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
         createAndStoreShaderProgram("ocDistortion", new ShaderParametersOcDistortion());
+        createAndStoreShaderProgram("lightBufferPass", new ShaderParametersLightBufferPass());
+        createAndStoreShaderProgram("lightGeometryPass", new ShaderParametersLightGeometryPass(),
+                ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue()
+                | ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
     }
 
     public void enableMaterial(Material material) {

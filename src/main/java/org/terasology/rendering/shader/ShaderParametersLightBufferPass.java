@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.shader;
 
-uniform sampler2D textureAtlas;
+import org.terasology.editor.properties.Property;
 
-uniform float light = 1.0;
-uniform vec2 texOffset = vec2(0.0, 0.0);
-uniform vec2 texScale = vec2(1.0, 1.0);
+import java.util.List;
 
-uniform vec4 colorOffset = vec4(1.0, 1.0, 1.0, 1.0);
+/**
+ * Shader parameters for the LightBufferPass shader program.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ */
+public class ShaderParametersLightBufferPass extends ShaderParametersBase {
+    @Override
+    public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+    }
 
-varying vec3 normal;
-varying vec4 vertexViewPos;
-
-void main(){
-    vec4 color = texture2D(textureAtlas, gl_TexCoord[0].xy * texScale.xy + texOffset.xy);
-
-    if (color.a < 0.01)
-        discard;
-
-    // Particles are currently renderer using forward shading
-    color.rgb *= light;
-
-    gl_FragData[0].a = color.a * colorOffset.a;
-    gl_FragData[0].rgb = color.rgb * colorOffset.rgb * gl_FragData[0].a;
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+    }
 }

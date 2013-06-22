@@ -173,6 +173,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         public int depthTextureId = 0;
         public int depthRboId = 0;
         public int normalsTextureId = 0;
+        public int lightBufferTextureId = 0;
 
         public int width = 0;
         public int height = 0;
@@ -195,6 +196,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         public void bindNormalsTexture() {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
+        }
+
+        public void bindLightBufferTexture() {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
         }
 
         public void unbindTexture() {
@@ -299,17 +304,20 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         FBO scene = getFBO("sceneOpaque");
         final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
 
-        if (!recreate)
+        if (!recreate) {
             return;
+        }
 
-        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true);
+        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true);
+        createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true);
 
         createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
         attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
 
-        createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
+        createFBO("sceneReflected", rtHalfWidth, rtHalfHeight, FBOType.HDR, true, true, true);
+        createFBO("sceneReflectedPingPong", rtHalfWidth, rtHalfHeight, FBOType.HDR, true, true, true);
 
-        createFBO("sceneCombined", rtFullWidth, rtFullHeight, FBOType.HDR, true, true);
+        createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
         createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
         createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
@@ -322,8 +330,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         createFBO("ssaoBlurred1", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
 
         createFBO("lightShafts", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
-
-        createFBO("sceneReflected", rtHalfWidth, rtHalfHeight, FBOType.HDR, true, false);
 
         createFBO("sceneHighPass", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
         createFBO("sceneBloom0", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
@@ -363,7 +369,19 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         return true;
     }
 
+    public FBO createFBO(String title, int width, int height, FBOType type) {
+        return createFBO(title, width, height, type, false, false, false);
+    }
+
+    public FBO createFBO(String title, int width, int height, FBOType type, boolean depth) {
+        return createFBO(title, width, height, type, depth, false, false);
+    }
+
     public FBO createFBO(String title, int width, int height, FBOType type, boolean depth, boolean normals) {
+        return createFBO(title, width, height, type, depth, normals, false);
+    }
+
+    public FBO createFBO(String title, int width, int height, FBOType type, boolean depth, boolean normals, boolean lightBuffer) {
         // Make sure to delete the existing FBO before creating a new one
         deleteFBO(title);
 
@@ -372,25 +390,57 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         fbo.width = width;
         fbo.height = height;
 
-        // Create the color target texture
-        fbo.textureId = GL11.glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.textureId);
-
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        // Create the FBO
+        fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
 
         if (type != FBOType.NO_COLOR) {
+            fbo.textureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.textureId);
+
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
             if (type == FBOType.HDR) {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
             } else {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
             }
+
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
+        }
+
+        if (normals) {
+            fbo.normalsTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsTextureId);
+
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsTextureId, 0);
+        }
+
+        if (lightBuffer) {
+            fbo.lightBufferTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId);
+
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
         }
 
         if (depth) {
-            // Generate the depth texture
             fbo.depthTextureId = GL11.glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthTextureId);
 
@@ -401,56 +451,30 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (java.nio.ByteBuffer) null);
 
-            // Create depth render buffer object
             fbo.depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthRboId);
             EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
-        }
 
-        if (normals) {
-            // Generate the normals texture
-            fbo.normalsTextureId = GL11.glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsTextureId);
-
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
-        }
-
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-
-        // Create the FBO
-        fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
-
-        if (type != FBOType.NO_COLOR) {
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
-        }
-
-        if (depth) {
-            // Generate the depth render buffer and depth map texture
             EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthRboId);
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthTextureId, 0);
         }
 
-        if (normals) {
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsTextureId, 0);
-        }
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(2);
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
         if (type != FBOType.NO_COLOR) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
         }
         if (normals) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
         }
+        if (lightBuffer) {
+            bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
+        }
         bufferIds.flip();
         if (bufferIds.limit() == 0) {
-            if (depth && type == FBOType.NO_COLOR) {
+            if (type == FBOType.NO_COLOR) {
                 GL11.glReadBuffer(GL11.GL_NONE);
             } else {
                 GL11.glReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
@@ -587,6 +611,36 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         unbindFbo("sceneOpaque");
     }
 
+    public void beginRenderLightGeometry() {
+        bindFbo("sceneOpaque");
+
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glCullFace(GL_FRONT);
+
+        glDrawBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
+    }
+
+    public void endRenderLightGeometry() {
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
+        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
+        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
+        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
+        bufferIds.flip();
+
+        GL20.glDrawBuffers(bufferIds);
+
+        unbindFbo("sceneOpaque");
+
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+        glCullFace(GL_BACK);
+
+        applyLightBufferPass("sceneOpaque");
+    }
+
     public void beginRenderSceneTransparent() {
         bindFbo("sceneTransparent");
     }
@@ -610,6 +664,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void endRenderReflectedScene() {
         unbindFbo("sceneReflected");
+
+        applyLightBufferPass("sceneReflected");
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
@@ -783,15 +839,57 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private void generateCombinedScene() {
         ShaderManager.getInstance().enableShader("combine");
 
-        bindFbo("sceneCombined");
+        bindFbo("sceneOpaquePingPong");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        unbindFbo("sceneCombined");
+        unbindFbo("sceneOpaquePingPong");
+
+        flipPingPongFbo("sceneOpaque");
+        attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
     }
 
+    private void applyLightBufferPass(String target) {
+        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightBufferPass");
+        program.enable();
+
+        DefaultRenderingProcess.FBO targetFbo = DefaultRenderingProcess.getInstance().getFBO(target);
+
+        int texId = 0;
+        if (targetFbo != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            targetFbo.bindTexture();
+            program.setInt("texSceneOpaque", texId++);
+
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            targetFbo.bindDepthTexture();
+            program.setInt("texSceneOpaqueDepth", texId++);
+
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            targetFbo.bindNormalsTexture();
+            program.setInt("texSceneOpaqueNormals", texId++);
+
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            targetFbo.bindLightBufferTexture();
+            program.setInt("texSceneOpaqueLightBuffer", texId++);
+        }
+
+        bindFbo(target+"PingPong");
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullscreenQuad();
+
+        unbindFbo(target + "PingPong");
+
+        flipPingPongFbo(target);
+
+        if (target.equals("sceneOpaque")) {
+            attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
+        }
+    }
 
     private void generateToneMappedScene() {
         ShaderManager.getInstance().enableShader("hdr");
@@ -1223,6 +1321,30 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         logger.error("Failed to bind FBO normals texture since the requested FBO could not be found!");
         return false;
+    }
+
+    public boolean bindFboLightBufferTexture(String title) {
+        FBO fbo = null;
+
+        if ((fbo = FBOs.get(title)) != null) {
+            fbo.bindLightBufferTexture();
+            return true;
+        }
+
+        logger.error("Failed to bind FBO texture since the requested FBO could not be found!");
+        return false;
+    }
+
+    public void flipPingPongFbo(String title) {
+        FBO fbo1 = getFBO(title);
+        FBO fbo2 = getFBO(title + "PingPong");
+
+        if (fbo1 == null || fbo2 == null) {
+            return;
+        }
+
+        FBOs.put(title, fbo2);
+        FBOs.put(title+"PingPong", fbo1);
     }
 
     @Override

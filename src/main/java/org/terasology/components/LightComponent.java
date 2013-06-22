@@ -17,8 +17,29 @@ package org.terasology.components;
 
 import org.terasology.entitySystem.Component;
 
+import javax.vecmath.Vector3f;
+
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class LightComponent implements Component {
+
+    public enum LightType {
+        POINT,
+        DIRECTIONAL
+    }
+
+    public Vector3f lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
+    public Vector3f lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
+
+    public float lightDiffuseIntensity = 0.5f;
+    public float lightSpecularIntensity = 1.0f;
+    public float lightAmbientIntensity = 0.5f;
+
+    public float lightSpecularPower = 4.0f;
+    public float lightAttenuationRange = 16.0f;
+    public float lightAttenuationFalloff = 0.8f;
+
+    public LightType lightType = LightType.POINT;
+
 }

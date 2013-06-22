@@ -23,11 +23,15 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.components.LightComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -62,17 +66,14 @@ import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -121,7 +122,7 @@ public final class WorldRenderer {
     private final LinkedList<Chunk> renderQueueChunksOpaqueShadow = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksOpaqueReflection = Lists.newLinkedList();
     private final LinkedList<Chunk> renderQueueChunksAlphaReject = new LinkedList<Chunk>();
-    private final PriorityQueue<Chunk> renderQueueChunksSortedAlphaBlend = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+    private final LinkedList<Chunk> renderQueueChunksAlphaBlend = new LinkedList<Chunk>();
 
     private WorldRenderingStage currentRenderStage = WorldRenderingStage.DEFAULT;
 
@@ -377,6 +378,36 @@ public final class WorldRenderer {
         }
     }
 
+    private static class ChunkAlphaBlendComparator implements Comparator<Chunk> {
+
+        @Override
+        public int compare(Chunk o1, Chunk o2) {
+            double distance = distanceToCamera(o1);
+            double distance2 = distanceToCamera(o2);
+
+            if (o1 == null) {
+                return 1;
+            } else if (o2 == null) {
+                return -1;
+            }
+
+            if (distance == distance2)
+                return 0;
+
+            return distance2 > distance ? 1 : -1;
+        }
+
+        private float distanceToCamera(Chunk chunk) {
+            Vector3f result = new Vector3f((chunk.getPos().x + 0.5f) * Chunk.SIZE_X, 0, (chunk.getPos().z + 0.5f) * Chunk.SIZE_Z);
+
+            Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            result.x -= cameraPos.x;
+            result.z -= cameraPos.z;
+
+            return result.length();
+        }
+    }
+
     private Vector3f getPlayerPosition() {
         if (player != null) {
             return player.getPosition();
@@ -511,7 +542,7 @@ public final class WorldRenderer {
                         statIgnoredPhases++;
 
                     if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_BLEND) > 0)
-                        renderQueueChunksSortedAlphaBlend.add(c);
+                        renderQueueChunksAlphaBlend.add(c);
                     else
                         statIgnoredPhases++;
 
@@ -633,7 +664,6 @@ public final class WorldRenderer {
         glCullFace(GL11.GL_BACK);
         DefaultRenderingProcess.getInstance().endRenderReflectedScene();
 
-
         renderWorld(getActiveCamera());
 
         /* RENDER THE FINAL POST-PROCESSED SCENE */
@@ -668,7 +698,7 @@ public final class WorldRenderer {
         activeCamera.updatePrevViewProjectionMatrix();
     }
 
-    public void renderWorld(Camera camera) {
+    private void renderWorld(Camera camera) {
         if (config.getSystem().isDebugRenderWireframe())
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -718,6 +748,36 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
+
+        /*
+         * LIGHT GEOMETRY PASS
+         */
+        PerformanceMonitor.startActivity("Render Light Geometry");
+        DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
+
+        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightGeometryPass");
+        program.enable();
+
+        Matrix4f modelMatrix = new Matrix4f();
+        modelMatrix.setIdentity();
+
+        program.setMatrix4("viewMatrix", camera.getViewMatrix());
+        program.setMatrix4("projMatrix", camera.getProjectionMatrix());
+        program.setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix());
+        program.setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
+
+        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        // TODO: Add culling for light components
+        for (EntityRef entity : entityManager.iteratorEntities(LocationComponent.class, LightComponent.class)) {
+            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+            LightComponent lightComponent = entity.getComponent(LightComponent.class);
+
+            renderLightComponent(lightComponent, locationComponent.getWorldPosition(), program, camera, modelMatrix);
+        }
+
+        DefaultRenderingProcess.getInstance().endRenderLightGeometry();
+        PerformanceMonitor.endActivity();
+
         DefaultRenderingProcess.getInstance().beginRenderSceneTransparent();
 
         PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
@@ -730,8 +790,8 @@ public final class WorldRenderer {
         /*
         * THIRD RENDER PASS: ALPHA BLEND
         */
-        while (renderQueueChunksSortedAlphaBlend.size() > 0) {
-            renderChunk(renderQueueChunksSortedAlphaBlend.poll(), ChunkMesh.RENDER_PHASE.ALPHA_BLEND, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueueChunksAlphaBlend.size() > 0) {
+            renderChunk(renderQueueChunksAlphaBlend.poll(), ChunkMesh.RENDER_PHASE.ALPHA_BLEND, camera, ChunkRenderMode.DEFAULT);
         }
 
         if (headUnderWater)
@@ -766,7 +826,45 @@ public final class WorldRenderer {
         }
     }
 
-    public void renderWorldReflection(Camera camera) {
+    private void renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, ShaderProgram program, Camera camera, Matrix4f modelMatrix) {
+        if (lightComponent.lightType == LightComponent.LightType.POINT) {
+            program.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
+        } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
+            program.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+        }
+
+        Vector3f worldPosition = new Vector3f();
+        worldPosition.sub(lightWorldPosition, activeCamera.getPosition());
+
+        Vector3f lightViewPosition = new Vector3f();
+        camera.getViewMatrix().transform(worldPosition, lightViewPosition);
+
+        program.setFloat3("lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z);
+
+        modelMatrix.setTranslation(worldPosition);
+        modelMatrix.setScale(lightComponent.lightAttenuationRange);
+        program.setMatrix4("modelMatrix", modelMatrix);
+
+        program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z);
+        program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z);
+
+        program.setFloat("lightAmbientIntensity", lightComponent.lightAmbientIntensity);
+        program.setFloat("lightDiffuseIntensity", lightComponent.lightDiffuseIntensity);
+        program.setFloat("lightSpecularIntensity", lightComponent.lightSpecularIntensity);
+        program.setFloat("lightSpecularPower", lightComponent.lightSpecularPower);
+
+        if (lightComponent.lightType == LightComponent.LightType.POINT) {
+            program.setFloat("lightAttenuationRange", lightComponent.lightAttenuationRange);
+            program.setFloat("lightAttenuationFalloff", lightComponent.lightAttenuationFalloff);
+
+            LightGeometryHelper.renderSphereGeometry();
+        } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
+            // Directional lights cover all pixels on the screen
+            DefaultRenderingProcess.getInstance().renderFullscreenQuad();
+        }
+    }
+
+    private void renderWorldReflection(Camera camera) {
         PerformanceMonitor.startActivity("Render World (Reflection)");
         camera.lookThroughNormalized();
         skysphere.render();
@@ -781,7 +879,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    public void renderShadowMap(Camera camera) {
+    private void renderShadowMap(Camera camera) {
         PerformanceMonitor.startActivity("Render World (Shadow Map)");
 
         camera.lookThrough();

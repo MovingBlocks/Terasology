@@ -58,10 +58,6 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
             program.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z);
         }
 
-        if (localPlayer != null) {
-            program.setFloat("carryingTorch", localPlayer.isCarryingTorch() ? 1.0f : 0.0f);
-        }
-
         if (worldProvider != null) {
             program.setFloat("time", worldProvider.getTimeInDays());
         }

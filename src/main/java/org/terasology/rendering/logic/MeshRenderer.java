@@ -218,11 +218,6 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                 material.enable();
                 material.setFloat("light", 1);
 
-                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                if (localPlayer != null) {
-                    material.setFloat("carryingTorch", localPlayer.isCarryingTorch() ? 1.0f : 0.0f);
-                }
-
                 material.bindTextures();
             } else {
                 ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
@@ -333,39 +328,6 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         }
 
         glPopMatrix();
-
-        /*for (EntityRef entity : manager.iteratorEntities(MeshComponent.class)) {
-            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-            if (meshComp.renderType != MeshComponent.RenderType.Normal || meshComp.mesh == null) continue;
-
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null) continue;
-
-
-
-            Quat4f worldRot = location.getWorldRotation();
-            Vector3f worldPos = location.getWorldPosition();
-            float worldScale = location.getWorldScale();
-            AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
-
-            if (worldRenderer.isAABBVisible(aabb)) {
-                glPushMatrix();
-
-                glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-                AxisAngle4f rot = new AxisAngle4f();
-                rot.set(location.getWorldRotation());
-                glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
-                glScalef(worldScale, worldScale, worldScale);
-
-                meshComp.material.enable();
-                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
-                meshComp.material.setInt("carryingTorch", carryingTorch ? 1 : 0);
-                meshComp.material.bindTextures();
-                meshComp.mesh.render();
-
-                glPopMatrix();
-            }
-        }*/
     }
 
     @Override

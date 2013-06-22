@@ -18,6 +18,7 @@ package org.terasology.entityFactory;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.components.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;
@@ -26,6 +27,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.physics.RigidBodyComponent;
 import org.terasology.world.block.family.BlockFamily;
@@ -35,6 +37,7 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class DroppedBlockFactory {
     private EntityManager entityManager;
+    FastRandom rand = new FastRandom();
 
     public DroppedBlockFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -68,6 +71,18 @@ public class DroppedBlockFactory {
             RigidBodyComponent rigidBody = blockEntity.getComponent(RigidBodyComponent.class);
             rigidBody.mass = blockFamily.getArchetypeBlock().getMass();
             blockEntity.saveComponent(rigidBody);
+
+            if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
+                LightComponent lightComponent = new LightComponent();
+
+                Vector3f randColor = new Vector3f(rand.randomPosFloat(), rand.randomPosFloat(), rand.randomPosFloat());
+                lightComponent.lightColorDiffuse.set(randColor);
+                lightComponent.lightColorAmbient.set(randColor);
+
+                blockEntity.addComponent(lightComponent);
+                blockEntity.saveComponent(lightComponent);
+            }
+
             return blockEntity;
         }
         return EntityRef.NULL;

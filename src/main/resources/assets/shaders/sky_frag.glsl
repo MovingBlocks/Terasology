@@ -72,4 +72,7 @@ void main () {
 
     gl_FragData[0].rgba = skyColor.rgba;
     gl_FragData[1].rgba = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // The sky is always fully lit
+    gl_FragData[2].rgba = vec4(1.0, 1.0, 1.0, 0.0);
 }

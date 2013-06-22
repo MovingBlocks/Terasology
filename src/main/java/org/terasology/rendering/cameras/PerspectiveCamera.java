@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.cameras;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
@@ -88,6 +87,8 @@ public class PerspectiveCamera extends Camera {
         normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
 
         viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+
+        inverseProjectionMatrix.invert(projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks

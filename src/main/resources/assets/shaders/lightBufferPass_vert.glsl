@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-uniform sampler2D textureAtlas;
-
-uniform float light = 1.0;
-uniform vec2 texOffset = vec2(0.0, 0.0);
-uniform vec2 texScale = vec2(1.0, 1.0);
-
-uniform vec4 colorOffset = vec4(1.0, 1.0, 1.0, 1.0);
-
-varying vec3 normal;
-varying vec4 vertexViewPos;
-
-void main(){
-    vec4 color = texture2D(textureAtlas, gl_TexCoord[0].xy * texScale.xy + texOffset.xy);
-
-    if (color.a < 0.01)
-        discard;
-
-    // Particles are currently renderer using forward shading
-    color.rgb *= light;
-
-    gl_FragData[0].a = color.a * colorOffset.a;
-    gl_FragData[0].rgb = color.rgb * colorOffset.rgb * gl_FragData[0].a;
+void main()
+{
+	gl_Position = ftransform();
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_FrontColor = gl_Color;
 }

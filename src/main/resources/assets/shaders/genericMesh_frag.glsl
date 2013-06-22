@@ -32,15 +32,9 @@ void main(){
         color = vec4(1,1,1,1);
     }
 
-    float torchlight = 0.0;
-
-    // Apply torchlight
-    if (carryingTorch > 0.99)
-        torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexViewPos.xyz)), vertexViewPos.xyz);
-
     // Apply light
     float lightValue = expLightValue(light);
-    color.rgb *= lightValue + torchlight;
+    color.rgb *= lightValue;
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

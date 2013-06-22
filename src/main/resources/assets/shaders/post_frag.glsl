@@ -53,7 +53,7 @@ void main() {
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
-    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
 
 #ifndef NO_BLUR
     float depthLin = linDepthVDist(currentDepth);

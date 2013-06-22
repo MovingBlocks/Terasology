@@ -45,5 +45,4 @@ public class MiniaturizerComponent implements Component {
         renderPosition = null;
         miniatureChunk = null;
     }
-
 }

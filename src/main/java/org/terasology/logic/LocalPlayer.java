@@ -74,16 +74,6 @@ public class LocalPlayer {
         return location.getWorldRotation();
     }
 
-    public boolean isCarryingTorch() {
-
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
-        if (inventory == null || localPlayer == null)
-            return false;
-
-        return inventory.itemSlots.get(localPlayer.selectedTool).hasComponent(LightComponent.class);
-    }
-
     public EntityRef getEntity() {
         return entity;
     }

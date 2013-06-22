@@ -61,9 +61,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
     Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 5.0f);
 
-    Property torchWaterSpecExp = new Property("torchWaterSpecExp", 30.0f, 0.0f, 64.0f);
     Property waterSpecExp = new Property("waterSpecExp", 512.0f, 0.0f, 1024.0f);
-    Property torchSpecExp = new Property("torchSpecExp", 32.0f, 0.0f, 64.0f);
 
     Property shadowIntens = new Property("shadowIntens", 0.5f, 0.0f, 1.0f);
     Property shadowMapBias = new Property("shadowMapBias", 0.01f, 0.0f, 0.1f);
@@ -122,8 +120,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         }
 
         Vector4f lightingSettingsFrag = new Vector4f();
-        lightingSettingsFrag.x = (Float) torchSpecExp.getValue();
-        lightingSettingsFrag.y = (Float) torchWaterSpecExp.getValue();
         lightingSettingsFrag.z = (Float) waterSpecExp.getValue();
         program.setFloat4("lightingSettingsFrag", lightingSettingsFrag);
 
@@ -180,8 +176,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(waveSizeFalloff);
         properties.add(waveSpeed);
         properties.add(waveSpeedFalloff);
-        properties.add(torchSpecExp);
-        properties.add(torchWaterSpecExp);
         properties.add(waterSpecExp);
         properties.add(waterNormalBias);
         properties.add(waterFresnelBias);

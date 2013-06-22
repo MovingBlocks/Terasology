@@ -42,7 +42,7 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
+        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);

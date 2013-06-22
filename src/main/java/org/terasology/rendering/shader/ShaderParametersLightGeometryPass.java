@@ -16,31 +16,24 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
-import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
 import java.util.List;
 
 /**
- * Shader parameters for the Combine shader program.
+ * Shader parameters for the LightBufferPass shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersCombine extends ShaderParametersBase {
-
-    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.01f, 0.001f, 0.1f);
-    private Property outlineThickness = new Property("outlineThickness", 1.0f);
-
+public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        int texId = 0;
-
         DefaultRenderingProcess.FBO sceneOpaque = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
+        int texId = 0;
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindTexture();
@@ -58,34 +51,9 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             sceneOpaque.bindLightBufferTexture();
             program.setInt("texSceneOpaqueLightBuffer", texId++);
         }
-
-        DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
-
-        if (sceneTransparent != null) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneTransparent.bindTexture();
-            program.setInt("texSceneTransparent", texId++);
-        }
-
-        if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("ssaoBlurred1");
-            program.setInt("texSsao", texId++);
-        }
-
-        if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("sobel");
-            program.setInt("texEdges", texId++);
-
-            program.setFloat("outlineDepthThreshold", (Float) outlineDepthThreshold.getValue());
-            program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
-        }
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
-        properties.add(outlineThickness);
-        properties.add(outlineDepthThreshold);
     }
 }

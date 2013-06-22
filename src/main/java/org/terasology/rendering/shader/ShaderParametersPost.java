@@ -86,7 +86,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         Vector3f tint = worldRenderer.getTint();
         program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z);
 
-        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
+        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (sceneCombined != null) {
 

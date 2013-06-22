@@ -23,9 +23,6 @@ import org.terasology.model.structures.ViewFrustum;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 /**
  * Camera base class.
  *
@@ -47,6 +44,7 @@ public abstract class Camera {
 
     /* MATRICES */
     protected Matrix4f projectionMatrix = new Matrix4f();
+    protected Matrix4f inverseProjectionMatrix = new Matrix4f();
     protected Matrix4f normViewMatrix = new Matrix4f();
     protected Matrix4f viewMatrix = new Matrix4f();
     protected Matrix4f viewProjectionMatrix = new Matrix4f();
@@ -161,6 +159,10 @@ public abstract class Camera {
 
     public Matrix4f getViewProjectionMatrix() {
         return viewProjectionMatrix;
+    }
+
+    public Matrix4f getInverseProjectionMatrix() {
+        return inverseProjectionMatrix;
     }
 
     public Matrix4f getInverseViewProjectionMatrix() {
