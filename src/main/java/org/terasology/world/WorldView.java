@@ -69,19 +69,21 @@ public class WorldView {
 
     public static WorldView createWorldView(Region3i region, Vector3i offset, String extensionId, ChunkProvider chunkProvider) {
         Chunk[] chunks = new Chunk[region.size().x * region.size().z];
-        TeraArray[] extensions = new TeraArray[region.size().x * region.size().z];
+        TeraArray[] extensions = (extensionId == null) ? null : new TeraArray[region.size().x * region.size().z];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkProvider.getChunk(chunkPos);
             if (chunk == null) {
                 return null;
             }
-            TeraArray extension = chunk.getStorageExtension(extensionId);
-            if (extension == null) {
-                return null;
-            }
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
             chunks[index] = chunk;
-            extensions[index] = extension;
+            if (extensionId != null) {
+                TeraArray extension = chunk.getStorageExtension(extensionId);
+                if (extension == null) {
+                    return null;
+                }
+                extensions[index] = extension;
+            }
         }
         return new WorldView(chunks, extensions, region, offset);
     }
