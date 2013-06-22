@@ -1,7 +1,6 @@
 {
     "displayName": "Signal Emitter",
     "entity" : {
-        "prefab" : "signalling:SignalSwitch",
-        "mode" : "persistent"
+        "prefab" : "signalling:SignalSwitch"
     }
 }

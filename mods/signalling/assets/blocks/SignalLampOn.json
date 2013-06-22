@@ -1,5 +1,5 @@
 {
-    "luminance": 30,
+    "luminance": 15,
     "inventory" : {
         "pickupFamily" : "signalling:SignalLampOff"
     },

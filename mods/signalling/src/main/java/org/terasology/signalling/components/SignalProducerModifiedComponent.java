@@ -7,5 +7,5 @@ import org.terasology.world.block.ForceBlockActive;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @ForceBlockActive
-public class SignalTransformerHasSignalComponent implements Component {
+public class SignalProducerModifiedComponent implements Component {
 }
