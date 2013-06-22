@@ -49,6 +49,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
@@ -175,10 +176,9 @@ public class Block {
 
     /* Mesh */
     private Mesh mesh;
-    private EnumMap<BlockPart, BlockMeshPart> meshPart = new EnumMap<BlockPart, BlockMeshPart>(BlockPart.class);
+    private BlockAppearance primaryAppearance = new BlockAppearance();
     // TODO: Remove once liquids have nicer generation
     private EnumMap<Side, BlockMeshPart> loweredLiquidMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
-    private EnumMap<BlockPart, Vector2f> textureAtlasPos = new EnumMap<BlockPart, Vector2f>(BlockPart.class);
 
     /* Collision */
     private CollisionShape collisionShape;
@@ -192,7 +192,6 @@ public class Block {
         for (BlockPart part : BlockPart.values()) {
             colorSource.put(part, ColorSource.DEFAULT);
             colorOffset.put(part, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-            setTextureAtlasPos(part, new Vector2f(0.0f, 0.0f));
         }
     }
 
@@ -505,12 +504,16 @@ public class Block {
         }
     }
 
-    public BlockMeshPart getMeshPart(BlockPart part) {
-        return meshPart.get(part);
+    public BlockAppearance getPrimaryAppearance() {
+        return primaryAppearance;
     }
 
-    public void setMeshPart(BlockPart part, BlockMeshPart mesh) {
-        meshPart.put(part, mesh);
+    public BlockAppearance getAppearance(Map<Side, Block> adjacentBlocks) {
+        return primaryAppearance;
+    }
+
+    public void setPrimaryAppearance(BlockAppearance appearence) {
+        this.primaryAppearance = appearence;
     }
 
     public Mesh getMesh() {
@@ -526,35 +529,6 @@ public class Block {
 
     public void setLoweredLiquidMesh(Side side, BlockMeshPart meshPart) {
         loweredLiquidMesh.put(side, meshPart);
-    }
-
-    public Vector2f getTextureAtlasPos(BlockPart part) {
-        return textureAtlasPos.get(part);
-    }
-
-    public void setTextureAtlasPos(BlockPart part, Vector2f atlasPos) {
-        textureAtlasPos.put(part, atlasPos);
-    }
-
-    public void setTextureAtlasPos(Vector2f atlasPos) {
-        for (BlockPart part : BlockPart.values()) {
-            textureAtlasPos.put(part, atlasPos);
-        }
-    }
-
-    /**
-     * Retrieves the texture atlas offset for a given block type and a specific
-     * part.
-     *
-     * @param part The part of the block
-     * @return The texture offset
-     */
-    public Vector2f getTextureOffsetFor(BlockPart part) {
-        Vector2f pos = getTextureAtlasPos(part);
-        if (pos != null) {
-            return new Vector2f(pos);
-        }
-        return new Vector2f();
     }
 
     /**
@@ -649,7 +623,7 @@ public class Block {
     private void generateMesh() {
         Tessellator tessellator = new Tessellator();
         for (BlockPart dir : BlockPart.values()) {
-            BlockMeshPart part = meshPart.get(dir);
+            BlockMeshPart part = primaryAppearance.getPart(dir);
             if (part != null) {
                 float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
                 tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));

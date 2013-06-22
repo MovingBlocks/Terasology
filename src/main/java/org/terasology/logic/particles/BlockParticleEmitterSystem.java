@@ -234,16 +234,16 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         Block b = blockType.getArchetypeBlock();
 
         glBegin(GL_QUADS);
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y);
+        GL11.glTexCoord2f(b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).x, b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y);
+        GL11.glTexCoord2f(b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).x + TEX_SIZE, b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).x + TEX_SIZE, b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).x, b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 

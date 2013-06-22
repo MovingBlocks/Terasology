@@ -400,7 +400,7 @@ public class BlockManagerImpl extends BlockManager {
         for (BlockFamily b : registeredBlockInfo.get().registeredFamilyByUri.values()) {
             if (b.getArchetypeBlock().isWaving()) {
                 // TODO: Don't use random block part
-                Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
+                Vector2f pos = b.getArchetypeBlock().getPrimaryAppearance().getTextureAtlasPos(BlockPart.TOP);
                 buffer.put(pos.x);
                 buffer.put(pos.y);
                 counter++;
@@ -428,7 +428,7 @@ public class BlockManagerImpl extends BlockManager {
 
         if (!block.isInvisible()) {
             // TODO: Don't use random block part
-            Vector2f position = block.getTextureAtlasPos(BlockPart.LEFT);
+            Vector2f position = block.getPrimaryAppearance().getTextureAtlasPos(BlockPart.LEFT);
             buffer.put(position.x);
             buffer.put(position.y);
         }

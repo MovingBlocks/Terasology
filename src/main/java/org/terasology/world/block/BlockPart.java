@@ -16,6 +16,7 @@
 
 package org.terasology.world.block;
 
+import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 
 import java.util.EnumMap;
@@ -73,5 +74,12 @@ public enum BlockPart {
 
     public Side getSide() {
         return side;
+    }
+
+    public BlockPart rotate(Rotation rot) {
+        if (isSide()) {
+            return BlockPart.fromSide(rot.rotate(getSide()));
+        }
+        return this;
     }
 }

@@ -39,6 +39,7 @@ import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockBuilderHelper;
@@ -47,6 +48,7 @@ import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.shapes.BlockShape;
 
 import javax.vecmath.*;
@@ -263,7 +265,9 @@ public class BlockLoader implements BlockBuilderHelper {
         BlockShape shape = getShape(blockDef);
 
         Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-        applyShape(block, shape, tileUris, Rotation.none());
+        block.setPrimaryAppearance(createAppearance(shape, tileUris, Rotation.none()));
+        setBlockFullSides(block, shape, Rotation.none());
+        block.setCollision(shape.getCollisionOffset(Rotation.none()), shape.getCollisionShape(Rotation.none()));
 
         for (BlockPart part : BlockPart.values()) {
             block.setColorSource(part, colorSourceMap.get(part));
@@ -293,7 +297,9 @@ public class BlockLoader implements BlockBuilderHelper {
 
         Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
         block.setDirection(rotation.rotate(Side.FRONT));
-        applyShape(block, shape, tileUris, rotation);
+        block.setPrimaryAppearance(createAppearance(shape, tileUris, rotation));
+        setBlockFullSides(block, shape, rotation);
+        block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
 
         for (BlockPart part : BlockPart.values()) {
             block.setColorSource(part, colorSourceMap.get(part));
@@ -304,22 +310,8 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
-        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
-        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
-        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
-        BlockShape shape = getShape(blockDef);
-
         for (Rotation rot : Rotation.horizontalRotations()) {
-            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-            block.setDirection(rot.rotate(Side.FRONT));
-            applyShape(block, shape, tileUris, rot);
-
-            for (BlockPart part : BlockPart.values()) {
-                block.setColorSource(part, colorSourceMap.get(part));
-                block.setColorOffset(part, colorOffsetsMap.get(part));
-            }
-
-            blockMap.put(rot.rotate(Side.FRONT), block);
+            blockMap.put(rot.rotate(Side.FRONT), constructTransformedBlock(blockDefUri, blockDef, rot));
         }
     }
 
@@ -364,25 +356,26 @@ public class BlockLoader implements BlockBuilderHelper {
         return shape;
     }
 
-    private void applyShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
+    private BlockAppearance createAppearance(BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
+        Map<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
+        Map<BlockPart, Vector2f> textureAtlasPositions = Maps.newEnumMap(BlockPart.class);
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos = atlasBuilder.getTexCoords(tileUris.get(part), shape.getMeshPart(part) != null);
-            BlockPart targetPart;
-            if (part.getSide() != null) {
-                targetPart = BlockPart.fromSide(rot.rotate(part.getSide()));
-            } else {
-                targetPart = part;
-            }
-            block.setTextureAtlasPos(targetPart, atlasPos);
+            BlockPart targetPart = part.rotate(rot);
+            textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
-                if (part.isSide()) {
-                    block.setFullSide(targetPart.getSide(), shape.isBlockingSide(part.getSide()));
-                }
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
             }
         }
-        block.setCollision(shape.getCollisionOffset(rot), shape.getCollisionShape(rot));
+        return new BlockAppearance(meshParts, textureAtlasPositions);
+    }
+
+    private void setBlockFullSides(Block block, BlockShape shape, Rotation rot) {
+        for (Side side : Side.values()) {
+            BlockPart targetPart = BlockPart.fromSide(rot.rotate(side));
+            block.setFullSide(targetPart.getSide(), shape.isBlockingSide(side));
+        }
     }
 
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {

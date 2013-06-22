@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
+import com.google.common.collect.Maps;
 import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.math.Direction;
@@ -27,11 +28,13 @@ import org.terasology.world.MiniatureChunk;
 import org.terasology.world.RegionalChunkView;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.util.Map;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -237,15 +240,17 @@ public final class ChunkTessellator {
 
         double resultAmbientOcclusion = (Math.pow(0.40, occCounter) + Math.pow(0.80, occCounterBillboard)) / 2.0;
 
-        if (counterLight == 0)
+        if (counterLight == 0) {
             output[0] = 0;
-        else
+        } else {
             output[0] = resultLight / counterLight / 15f;
+        }
 
-        if (counterBlockLight == 0)
+        if (counterBlockLight == 0) {
             output[1] = 0;
-        else
+        } else {
             output[1] = resultBlockLight / counterBlockLight / 15f;
+        }
 
         output[2] = (float) resultAmbientOcclusion;
         PerformanceMonitor.endActivity();
@@ -253,6 +258,15 @@ public final class ChunkTessellator {
 
     private void generateBlockVertices(ChunkView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
         Block block = view.getBlock(x, y, z);
+
+        Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
+        for (Side side : Side.values()) {
+            Vector3i offset = side.getVector3i();
+            Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
+            adjacentBlocks.put(side, blockToCheck);
+        }
+
+        BlockAppearance blockAppearance = block.getAppearance(adjacentBlocks);
 
         /*
          * Determine the render process.
@@ -267,17 +281,15 @@ public final class ChunkTessellator {
         if (block.isDoubleSided())
             renderType = ChunkMesh.RENDER_TYPE.BILLBOARD;
 
-        if (block.getMeshPart(BlockPart.CENTER) != null) {
+        if (blockAppearance.getPart(BlockPart.CENTER) != null) {
             Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, temp, hum);
-            block.getMeshPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
         }
 
         boolean[] drawDir = new boolean[6];
 
         for (Side side : Side.values()) {
-            Vector3i offset = side.getVector3i();
-            Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
-            drawDir[side.ordinal()] = isSideVisibleForBlockTypes(blockToCheck, block, side);
+            drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), block, side);
         }
 
         if (y == 0) {
@@ -286,22 +298,21 @@ public final class ChunkTessellator {
 
         // If the block is lowered, some more faces may have to be drawn
         if (block.isLiquid()) {
+            Block bottomBlock = adjacentBlocks.get(Side.BOTTOM);
             // Draw horizontal sides if visible from below
             for (Side side : Side.horizontalSides()) {
                 Vector3i offset = side.getVector3i();
                 Block adjacentBelow = view.getBlock(x + offset.x, y - 1, z + offset.z);
-                Block adjacent = view.getBlock(x + offset.x, y, z + offset.z);
-                Block below = view.getBlock(x, y - 1, z);
+                Block adjacent = adjacentBlocks.get(side);
 
-                drawDir[side.ordinal()] |= (isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(below, adjacent, side.reverse()));
+                drawDir[side.ordinal()] |= (blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
             }
 
             // Draw the top if below a non-lowered block
             // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
-            Block blockToCheck = view.getBlock(x, y + 1, z);
+            Block blockToCheck = adjacentBlocks.get(Side.TOP);
             drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
-            Block bottomBlock = view.getBlock(x, y - 1, z);
             if (bottomBlock.isLiquid() || bottomBlock.isInvisible()) {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
@@ -316,7 +327,7 @@ public final class ChunkTessellator {
         for (Side dir : Side.values()) {
             if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
-                block.getMeshPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+                blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
             }
         }
     }
@@ -329,8 +340,6 @@ public final class ChunkTessellator {
      * @return True if the side is visible for the given block types
      */
     private boolean isSideVisibleForBlockTypes(Block blockToCheck, Block currentBlock, Side side) {
-        if (currentBlock.getMeshPart(BlockPart.fromSide(side)) == null) return false;
-
         // Liquids can be transparent but there should be no visible adjacent faces
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
 
