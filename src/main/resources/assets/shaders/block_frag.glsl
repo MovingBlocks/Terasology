@@ -52,5 +52,5 @@ void main(){
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0);
 
     // Currently not used
-    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
+    gl_FragData[2].rgba = vec4(1.0, 1.0, 1.0, 0.0);
 }
