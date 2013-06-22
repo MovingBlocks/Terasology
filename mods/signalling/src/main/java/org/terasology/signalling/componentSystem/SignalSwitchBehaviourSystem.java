@@ -11,7 +11,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.signalling.components.SignalConsumerStatusComponent;
 import org.terasology.signalling.components.SignalProducerComponent;
-import org.terasology.signalling.components.SignalTransformerHasSignalComponent;
+import org.terasology.signalling.components.SignalProducerModifiedComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -28,7 +28,7 @@ import com.google.common.collect.Sets;
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-@RegisterSystem(value=RegisterMode.AUTHORITY)
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     @In
     private WorldProvider worldProvider;
@@ -43,6 +43,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private Block lampTurnedOn;
     private Block signalTransformer;
     private Block signalPressurePlate;
+    private Block signalSwitch;
+    private Block signalLimitedSwitch;
 
     @Override
     public void update(float delta) {
@@ -60,6 +62,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                     if (signalProducer.signalStrength == 0) {
                         signalProducer.signalStrength = -1;
                         entityBeneathPlayer.saveComponent(signalProducer);
+                        entityBeneathPlayer.saveComponent(new SignalProducerModifiedComponent());
                         activatedPressurePlates.add(locationBeneathPlayer);
                     } else {
                         toRemoveSignal.remove(locationBeneathPlayer);
@@ -75,6 +78,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                 if (signalProducer.signalStrength == -1) {
                     signalProducer.signalStrength = 0;
                     entityBeneathPlayer.saveComponent(signalProducer);
+                    entityBeneathPlayer.removeComponent(SignalProducerModifiedComponent.class);
                     activatedPressurePlates.remove(pressurePlateLocation);
                 }
             }
@@ -88,6 +92,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         lampTurnedOn = blockManager.getBlock("signalling:SignalLampOn");
         signalTransformer = blockManager.getBlock("signalling:SignalTransformer");
         signalPressurePlate = blockManager.getBlock("signalling:SignalPressurePlate");
+        signalSwitch = blockManager.getBlock("signalling:SignalSwitch");
+        signalLimitedSwitch = blockManager.getBlock("signalling:SignalLimitedSwitch");
     }
 
     @Override
@@ -102,6 +108,31 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         Block blockAtLocation = worldProvider.getBlock(blockLocation);
         if (blockAtLocation == signalTransformer) {
             signalTransformerActivated(entity, producerComponent);
+        } else if (blockAtLocation == signalSwitch) {
+            signalSwitchActivated(entity, producerComponent);
+        } else if (blockAtLocation == signalLimitedSwitch) {
+            signalLimitedSwitchActivated(entity, producerComponent);
+        }
+    }
+
+    private void signalLimitedSwitchActivated(EntityRef entity, SignalProducerComponent producerComponent) {
+        switchFlipped(5, entity, producerComponent);
+    }
+
+    private void signalSwitchActivated(EntityRef entity, SignalProducerComponent producerComponent) {
+        switchFlipped(-1, entity, producerComponent);
+    }
+
+    private void switchFlipped(int onSignalStrength, EntityRef entity, SignalProducerComponent producerComponent) {
+        int currentSignalStrength = producerComponent.signalStrength;
+        if (currentSignalStrength == 0) {
+            producerComponent.signalStrength= onSignalStrength;
+            entity.saveComponent(producerComponent);
+            entity.saveComponent(new SignalProducerModifiedComponent());
+        } else {
+            producerComponent.signalStrength=0;
+            entity.saveComponent(producerComponent);
+            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
@@ -112,9 +143,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         producerComponent.signalStrength = result;
         entity.saveComponent(producerComponent);
         if (producerComponent.signalStrength == 1) {
-            entity.saveComponent(new SignalTransformerHasSignalComponent());
+            entity.saveComponent(new SignalProducerModifiedComponent());
         } else if (producerComponent.signalStrength == 0) {
-            entity.removeComponent(SignalTransformerHasSignalComponent.class);
+            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
