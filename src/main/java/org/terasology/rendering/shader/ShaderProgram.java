@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
@@ -71,7 +72,8 @@ public class ShaderProgram {
         FEATURE_ALPHA_REJECT(0x02),
         FEATURE_LIGHT_POINT(0x04),
         FEATURE_LIGHT_DIRECTIONAL(0x08),
-        FEATURE_ALL(0x10);
+        FEATURE_LIGHT_TO_LIGHTBUFFER(0x10),
+        FEATURE_ALL(0x20);
 
         private int value;
         private ShaderProgramFeatures(int value) {
@@ -118,10 +120,16 @@ public class ShaderProgram {
         int counter = 1;
         compileShaderProgram(0);
 
+        TIntArrayList compiledPermutations = new TIntArrayList();
+
         for (int i=1; i<ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
             // Compile all selected features for this shader...
-            if ((i & availableFeatures) > 0) {
+
+            int maskedHash = (i & availableFeatures);
+            if (maskedHash > 0 && !compiledPermutations.contains(maskedHash)) {
                 compileShaderProgram(i);
+                compiledPermutations.add(maskedHash);
+
                 counter++;
             }
         }
