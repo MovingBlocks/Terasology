@@ -1,4 +1,4 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
 
 /**
@@ -8,10 +8,6 @@ package org.terasology.world.chunks.blockdata;
  *
  */
 public abstract class TeraSparseArray extends TeraArray {
-
-    protected TeraSparseArray() {
-        super();
-    }
 
     protected TeraSparseArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
         super(sizeX, sizeY, sizeZ, initialize);

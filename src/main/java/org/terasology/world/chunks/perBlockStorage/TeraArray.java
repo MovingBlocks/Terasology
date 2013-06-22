@@ -1,13 +1,9 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
+import org.terasology.protobuf.ChunksProtobuf;
 
 import com.google.common.base.Preconditions;
 
@@ -18,24 +14,20 @@ import com.google.common.base.Preconditions;
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
  */
-public abstract class TeraArray implements Externalizable {
+public abstract class TeraArray {
 
     private int sizeX, sizeY, sizeZ, sizeXZ, sizeXZHalf, sizeXYZ, sizeXYZHalf;
 
-    protected final void writeExternalHeader(ObjectOutput out) throws IOException {
-        out.writeInt(sizeX);
-        out.writeInt(sizeY);
-        out.writeInt(sizeZ); 
+    protected final int getSizeXZ() {
+        return sizeXZ;
+    }
+    
+    protected final int getSizeXZHalf() {
+        return sizeXZHalf;
     }
 
-    protected final void readExternalHeader(ObjectInput in) throws IOException {
-        sizeX = in.readInt();
-        sizeY = in.readInt();
-        sizeZ = in.readInt();
-        sizeXZ = sizeX * sizeZ;
-        sizeXZHalf = sizeXZ / 2;
-        sizeXYZ = sizeY * sizeXZ;
-        sizeXYZHalf = sizeXYZ / 2;
+    protected final int getSizeXYZHalf() {
+        return sizeXYZHalf;
     }
     
     protected final int pos(int x, int y, int z) {
@@ -49,34 +41,45 @@ public abstract class TeraArray implements Externalizable {
     protected abstract void initialize();
     
     /**
-     * This is the interface for tera array factories. Every tera array is required to implement a factory.
-     * It should be implemented as a static subclass of the corresponding tera array class and it should be called Factory.
-     *  
+     * This is the interface for tera array runtime compression. Every tera array is required to implement a deflator.
+     * It must be implemented as a static subclass of the corresponding tera array class, otherwise the PerBlockStorageManager
+     * will not detect it.
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
-     *
      */
-    public static interface Factory<T extends TeraArray> {
-
-        public Class<T> getArrayClass();
-
-        public SerializationHandler<T> createSerializationHandler();
+    public static interface Deflator<T extends TeraArray> {
         
-        public T create();
-        
-        public T create(int sizeX, int sizeY, int sizeZ);
+        public TeraArray deflate(T array);
         
     }
+    
+    /**
+     * This is the interface for tera array factories. Every tera array is required to implement a factory.
+     *  
+     * @author Manuel Brotz <manu.brotz@gmx.ch>
+     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.Factory
+     *
+     */
+    public interface Factory {
 
+        public String getId();
+        
+        public TeraArray create(int sizeX, int sizeY, int sizeZ);
+        
+    }
+    
     /**
      * This is the interface for serialization handlers for tera arrays. Every tera array is required to implement
-     * a serialization handler. It is recommended to subclass {@link org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
-     * instead of using this interface directly. It should be implemented as a static subclass of the corresponding tera array class. 
+     * a serialization handler. It is recommended to subclass {@link org.terasology.world.chunks.perBlockStorage.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
+     * instead of using this interface directly.
+     * It must be implemented as a static subclass of the corresponding tera array class, otherwise the PerBlockStorageManager
+     * will not detect it.
      * 
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler
+     * @see org.terasology.world.chunks.perBlockStorage.TeraArray.BasicSerializationHandler
      */
-    public static interface SerializationHandler<T extends TeraArray> extends org.terasology.io.SerializationHandler<T> {
+    public static interface SerializationHandler<T extends TeraArray> {
+        
+        public ChunksProtobuf.Type getProtobufType();
         
         public int computeMinimumBufferSize(T array);
 
@@ -88,11 +91,12 @@ public abstract class TeraArray implements Externalizable {
 
     /**
      * Extending this class is the recommended way to implement serialization handlers for tera arrays.
-     * Tera arrays should implement their serialization handlers as a static subclass called SerializationHandler.
+     * It must be implemented as a static subclass of the corresponding tera array class, otherwise the PerBlockStorageManager
+     * will not detect it.
      * 
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.SerializationHandler
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
+     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.SerializationHandler
+     * @see org.terasology.world.chunks.perBlockStorage.TeraDenseArray16Bit.Factory
      *
      */
     protected static abstract class BasicSerializationHandler<T extends TeraArray> implements SerializationHandler<T> {
@@ -112,7 +116,6 @@ public abstract class TeraArray implements Externalizable {
         @Override
         public final ByteBuffer serialize(T array, ByteBuffer buffer) {
             Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
-            Preconditions.checkArgument(canHandle(array.getClass()), "Unable to handle the supplied array (" + array.getClass().getName() + ")");
             if (buffer == null) {
                 buffer = ByteBuffer.allocateDirect(computeMinimumBufferSize(array));
             }
@@ -139,8 +142,6 @@ public abstract class TeraArray implements Externalizable {
         }
     }
     
-    protected TeraArray() {}
-
     protected TeraArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
         Preconditions.checkArgument(sizeX > 0);
         Preconditions.checkArgument(sizeY > 0);
@@ -169,20 +170,8 @@ public abstract class TeraArray implements Externalizable {
         return sizeZ;
     }
 
-    public final int getSizeXZ() {
-        return sizeXZ;
-    }
-    
-    public final int getSizeXZHalf() {
-        return sizeXZHalf;
-    }
-
     public final int getSizeXYZ() {
         return sizeXYZ;
-    }
-    
-    public final int getSizeXYZHalf() {
-        return sizeXYZHalf;
     }
 
     public final boolean contains(int x, int y, int z) {
@@ -198,8 +187,6 @@ public abstract class TeraArray implements Externalizable {
 
     public abstract TeraArray copy();
     
-    public abstract TeraArray deflate(TeraVisitingDeflator deflator);
-
     public abstract int getEstimatedMemoryConsumptionInBytes();
     
     public abstract int getElementSizeInBits();

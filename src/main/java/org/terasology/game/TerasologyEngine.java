@@ -46,6 +46,7 @@ import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.version.TerasologyGameVersionInfo;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -420,6 +421,9 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
+        final PerBlockStorageManager perBlockStorageManager = new PerBlockStorageManager();
+        perBlockStorageManager.loadConfig(config.getAdvanced());
+        CoreRegistry.put(PerBlockStorageManager.class, perBlockStorageManager);
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
 
         AssetType.registerAssetTypes();

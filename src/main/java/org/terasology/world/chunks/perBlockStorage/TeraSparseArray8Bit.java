@@ -1,10 +1,9 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
 import java.util.Arrays;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
-
-import com.google.common.base.Preconditions;
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.Type;
 
 
 /**
@@ -35,8 +34,8 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray8Bit> {
 
         @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraSparseArray8Bit.class.equals(clazz);
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.SparseArray8Bit;
         }
 
         @Override
@@ -45,31 +44,17 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         }
     }
 
-    public static class Factory implements TeraArray.Factory<TeraSparseArray8Bit> {
+    public static class Factory implements TeraArray.Factory {
         
         @Override
-        public Class<TeraSparseArray8Bit> getArrayClass() {
-            return TeraSparseArray8Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-       
-        @Override
-        public TeraSparseArray8Bit create() {
-            return new TeraSparseArray8Bit();
+        public String getId() {
+            return "8-bit-sparse";
         }
         
         @Override
         public TeraSparseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
         }
-    }
-
-    public TeraSparseArray8Bit() {
-        super();
     }
 
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ) {
@@ -85,18 +70,12 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public TeraArray deflate(TeraVisitingDeflator deflator) {
-        return Preconditions.checkNotNull(deflator).deflateSparseArray8Bit(inflated, deflated, fill, rowSize(), getSizeX(), getSizeY(), getSizeZ());
-    }
-
-    @Override
     public int getElementSizeInBits() {
         return 8;
     }
 
     @Override
     public final int get(int x, int y, int z) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         if (inflated == null) 
             return fill;
         byte[] row = inflated[y];
@@ -107,8 +86,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public final int set(int x, int y, int z, int value) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
         if (inflated == null) {
             int old = fill;
             if (old == value)
@@ -138,9 +115,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public final boolean set(int x, int y, int z, int value, int expected) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
-//        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
         if (value == expected) return true;
         if (inflated == null) {
             int old = fill;
@@ -171,5 +145,4 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         }
         return false;
     }
-
 }

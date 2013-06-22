@@ -22,6 +22,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
 import org.terasology.world.chunks.provider.ChunkProvider;
 import org.terasology.world.liquid.LiquidData;
 
@@ -34,26 +35,59 @@ public class WorldView {
     private Region3i chunkRegion;
     private Region3i blockRegion;
     private Chunk[] chunks;
+    private TeraArray[] extensions;
 
     private Vector3i chunkPower;
-    private Vector3i chunkSize;
     private Vector3i chunkFilterSize;
 
-    public static WorldView createLocalView(Vector3i pos, ChunkProvider chunkProvider) {
+    public static WorldView createLocalView(Vector3i pos, String extensionId, ChunkProvider chunkProvider) {
         Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
-        return createWorldView(region, Vector3i.one(), chunkProvider);
+        return createWorldView(region, Vector3i.one(), extensionId, chunkProvider);
+    }
+    
+    public static WorldView createLocalView(Vector3i pos, ChunkProvider chunkProvider) {
+        return createLocalView(pos, null, chunkProvider);
+    }
+
+    public static WorldView createSubviewAroundBlock(Vector3i pos, int extent, String extensionId, ChunkProvider chunkProvider) {
+        Region3i region = TeraMath.getChunkRegionAroundBlockPos(pos, extent);
+        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), extensionId, chunkProvider);
     }
 
     public static WorldView createSubviewAroundBlock(Vector3i pos, int extent, ChunkProvider chunkProvider) {
-        Region3i region = TeraMath.getChunkRegionAroundBlockPos(pos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
+        return createSubviewAroundBlock(pos, extent, null, chunkProvider);
+    }
+
+    public static WorldView createSubviewAroundChunk(Vector3i chunkPos, String extensionId, ChunkProvider chunkProvider) {
+        Region3i region = Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1));
+        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), extensionId, chunkProvider);
     }
 
     public static WorldView createSubviewAroundChunk(Vector3i chunkPos, ChunkProvider chunkProvider) {
-        Region3i region = Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1));
-        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
+        return createSubviewAroundChunk(chunkPos, null, chunkProvider);
     }
 
+    public static WorldView createWorldView(Region3i region, Vector3i offset, String extensionId, ChunkProvider chunkProvider) {
+        Chunk[] chunks = new Chunk[region.size().x * region.size().z];
+        TeraArray[] extensions = (extensionId == null) ? null : new TeraArray[region.size().x * region.size().z];
+        for (Vector3i chunkPos : region) {
+            Chunk chunk = chunkProvider.getChunk(chunkPos);
+            if (chunk == null) {
+                return null;
+            }
+            int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
+            chunks[index] = chunk;
+            if (extensionId != null) {
+                TeraArray extension = chunk.getStorageExtension(extensionId);
+                if (extension == null) {
+                    return null;
+                }
+                extensions[index] = extension;
+            }
+        }
+        return new WorldView(chunks, extensions, region, offset);
+    }
+    
     public static WorldView createWorldView(Region3i region, Vector3i offset, ChunkProvider chunkProvider) {
         Chunk[] chunks = new Chunk[region.size().x * region.size().z];
         for (Vector3i chunkPos : region) {
@@ -66,12 +100,17 @@ public class WorldView {
         }
         return new WorldView(chunks, region, offset);
     }
-
-    public WorldView(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
+    
+    public WorldView(Chunk[] chunks, TeraArray[] extensions, Region3i chunkRegion, Vector3i offset) {
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
         this.offset = offset;
+        this.extensions = extensions;
         setChunkSize(new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z));
+    }
+    
+    public WorldView(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
+        this(chunks, null, chunkRegion, offset);
     }
 
     public Region3i getChunkRegion() {
@@ -189,6 +228,39 @@ public class WorldView {
             chunks[chunkIndex].setLight(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
         }
     }
+    
+    public int getExtension(int blockX, int blockY, int blockZ) {
+        if (extensions == null) {
+            throw new IllegalStateException("No per-block-storage extension available");
+        }
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return 0;
+        }
+        final int index = relChunkIndex(blockX, blockY, blockZ);
+        return extensions[index].get(blockX, blockY, blockZ);
+    }
+    
+    public int setExtension(int blockX, int blockY, int blockZ, int value) {
+        if (extensions == null) {
+            throw new IllegalStateException("No per-block-storage extension available");
+        }
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return 0;
+        }
+        final int index = relChunkIndex(blockX, blockY, blockZ);
+        return extensions[index].set(blockX, blockY, blockZ, value);
+    }
+
+    public boolean setExtension(int blockX, int blockY, int blockZ, int value, int expected) {
+        if (extensions == null) {
+            throw new IllegalStateException("No per-block-storage extension available");
+        }
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return false;
+        }
+        final int index = relChunkIndex(blockX, blockY, blockZ);
+        return extensions[index].set(blockX, blockY, blockZ, value, expected);
+    }
 
     public void setDirtyAround(Vector3i blockPos) {
         for (Vector3i pos : TeraMath.getChunkRegionAroundBlockPos(blockPos, 1)) {
@@ -236,7 +308,6 @@ public class WorldView {
     }
 
     public void setChunkSize(Vector3i chunkSize) {
-        this.chunkSize = chunkSize;
         this.chunkFilterSize = new Vector3i(TeraMath.ceilPowerOfTwo(chunkSize.x) - 1, 0, TeraMath.ceilPowerOfTwo(chunkSize.z) - 1);
         this.chunkPower = new Vector3i(TeraMath.sizeOfPower(chunkSize.x), 0, TeraMath.sizeOfPower(chunkSize.z));
 

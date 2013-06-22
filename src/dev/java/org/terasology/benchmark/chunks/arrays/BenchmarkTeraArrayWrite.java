@@ -1,7 +1,7 @@
 package org.terasology.benchmark.chunks.arrays;
 
 import org.terasology.benchmark.BenchmarkResult;
-import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
 
 /**
  * BenchmarkTeraArrayWrite implements a simple write performance benchmark for tera arrays.

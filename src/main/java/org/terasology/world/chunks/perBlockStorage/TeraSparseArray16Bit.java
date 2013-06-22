@@ -1,13 +1,11 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.Type;
 
 import com.google.common.base.Preconditions;
 
@@ -41,12 +39,12 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
             sbuffer.get(row, 0, length);
             buffer.position(buffer.position() + length * 2);
         }
-        
-        @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraSparseArray16Bit.class.equals(clazz);
-        }
 
+        @Override
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.SparseArray16Bit;
+        }
+        
         @Override
         protected int internalComputeMinimumBufferSize(TeraSparseArray16Bit array) {
             final short[][] inf = array.inflated;
@@ -111,31 +109,17 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         }
     }
 
-    public static class Factory implements TeraArray.Factory<TeraSparseArray16Bit> {
+    public static class Factory implements TeraArray.Factory {
         
         @Override
-        public Class<TeraSparseArray16Bit> getArrayClass() {
-            return TeraSparseArray16Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-        
-        @Override
-        public TeraSparseArray16Bit create() {
-            return new TeraSparseArray16Bit();
+        public String getId() {
+            return "16-bit-sparse";
         }
         
         @Override
         public TeraSparseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
         }
-    }
-
-    public TeraSparseArray16Bit() {
-        super();
     }
 
     public TeraSparseArray16Bit(int sizeX, int sizeY, int sizeZ) {
@@ -169,11 +153,6 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         }
         System.arraycopy(deflated, 0, def, 0, getSizeY());
         return new TeraSparseArray16Bit(getSizeX(), getSizeY(), getSizeZ(), inf, def);
-    }
-
-    @Override
-    public TeraArray deflate(TeraVisitingDeflator deflator) {
-        return Preconditions.checkNotNull(deflator).deflateSparseArray16Bit(inflated, deflated, fill, getSizeXZ(), getSizeX(), getSizeY(), getSizeZ());
     }
 
     @Override
@@ -264,21 +243,4 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         }
         return false;
     }
-
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        writeExternalHeader(out);
-        out.writeObject(inflated);
-        out.writeObject(deflated);
-        out.writeShort(fill);
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        readExternalHeader(in);
-        inflated = (short[][]) in.readObject();
-        deflated = (short[]) in.readObject();
-        fill = in.readShort();
-    }
-
 }
