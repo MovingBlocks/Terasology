@@ -118,6 +118,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float eyeFocusDistance;
     private CollisionGroup[] eyeFocusFilter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
+    private float torchlightIntensity = 0.0f;
+
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -162,12 +164,21 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         // Update the light component if the player is carrying a torch
         if (localPlayer.isCarryingTorch()) {
-            lightComponent.lightDiffuseIntensity = 1.0f;
-            lightComponent.lightAmbientIntensity = 1.0f;
+            if (torchlightIntensity < 1.0f) {
+                torchlightIntensity += delta * 2.0f;
+            } else {
+                torchlightIntensity = 1.0f;
+            }
         } else {
-            lightComponent.lightDiffuseIntensity = 0.0f;
-            lightComponent.lightAmbientIntensity = 0.0f;
+            if (torchlightIntensity > 0.0f) {
+                torchlightIntensity -= delta * 2.0f;
+            } else {
+                torchlightIntensity = 0.0f;
+            }
         }
+
+        lightComponent.lightDiffuseIntensity = torchlightIntensity;
+        lightComponent.lightAmbientIntensity = torchlightIntensity;
 
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
