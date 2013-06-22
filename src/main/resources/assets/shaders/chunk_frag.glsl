@@ -16,9 +16,12 @@
 
 #define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
 #define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
-#define NIGHT_BRIGHTNESS 0.05
+#define NIGHT_BRIGHTNESS 0.01
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
+
+#define BLOCK_LIGHT_DAYLIGHT_FACTOR 1.0
+#define BLOCK_LIGHT_FACTOR 4.0
 
 #define WATER_AMB 0.25
 #define WATER_SPEC 4.0
@@ -179,7 +182,6 @@ void main(){
     float daylightScaledValue = daylight * daylightValue;
 
     // Calculate blocklight lighting value
-    float blocklightDayIntensity = 1.0 - daylightScaledValue;
     float blocklightValue = gl_TexCoord[1].y;
 
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
@@ -224,10 +226,10 @@ void main(){
     daylightColorValue.xyz *= ambientTint;
 
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
+    daylightColorValue.xyz *= expLightValue(daylightScaledValue) + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
 
     // Calculate the final block light brightness
-    float blockBrightness = expLightValue(blocklightValue);
+    float blockBrightness = expBlockLightValue(blocklightValue) * BLOCK_LIGHT_FACTOR;
     blockBrightness -= flickeringLightOffset * blocklightValue;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it

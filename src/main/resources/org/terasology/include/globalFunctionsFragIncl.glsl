@@ -70,9 +70,14 @@ vec4 srgbToLinear(vec4 color) {
     return vec4(color.rgb * color.rgb, color.a);
 }
 
+float expBlockLightValue(float light) {
+	float lightScaled = (1.0 - light) * 16.0;
+	return pow(0.96, lightScaled) * light;
+}
+
 float expLightValue(float light) {
 	float lightScaled = (1.0 - light) * 16.0;
-	return pow(0.5, lightScaled);
+	return pow(0.8, lightScaled) * light;
 }
 
 float expOccValue(float light) {
