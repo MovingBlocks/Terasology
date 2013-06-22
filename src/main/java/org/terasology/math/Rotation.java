@@ -132,4 +132,7 @@ public class Rotation {
         return Objects.hashCode(yaw, pitch, roll);
     }
 
+    public static Iterable<Rotation> values() {
+        return rotations.valueCollection();
+    }
 }

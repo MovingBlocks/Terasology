@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.shapes;
 
+import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 import org.terasology.asset.Asset;
@@ -80,14 +81,22 @@ public class BlockShape implements Asset {
         if (isCollisionSymmetric()) {
             return collisionShape.get(Rotation.none());
         }
-        return collisionShape.get(rot);
+        CollisionShape result = collisionShape.get(rot);
+        if (result == null) {
+            return new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+        }
+        return result;
     }
 
     public Vector3f getCollisionOffset(Rotation rot) {
         if (isCollisionSymmetric()) {
             return collisionOffset.get(Rotation.none());
         }
-        return collisionOffset.get(rot);
+        Vector3f result = collisionOffset.get(rot);
+        if (result == null) {
+            return new Vector3f();
+        }
+        return result;
     }
 
     public void setMeshPart(BlockPart part, BlockMeshPart mesh) {
