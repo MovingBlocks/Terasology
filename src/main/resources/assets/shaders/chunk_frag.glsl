@@ -25,7 +25,7 @@
 #define WATER_DIFF 0.75
 
 #define BLOCK_DIFF 0.75
-#define BLOCK_AMB 1.0
+#define BLOCK_AMB 2.0
 
 #if defined (DYNAMIC_SHADOWS)
 uniform vec4 shadowSettingsFrag;
@@ -103,9 +103,28 @@ void main(){
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
 
 #ifdef FEATURE_TRANSPARENT_PASS
+    vec2 normalOffset;
     vec3 normalWater = waterNormalViewSpace;
-    bool isOceanWater = false;
     bool isWater = false;
+    bool isOceanWater = false;
+
+    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
+        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
+            vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+            vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+
+            normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+            normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+            normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
+
+            normalWater.xy += normalOffset;
+            normalWater = normalize(normalWater);
+
+            isOceanWater = true;
+        }
+
+        isWater = true;
+    }
 #endif
 
     vec3 sunVecViewAdjusted = sunVecView;
@@ -118,7 +137,6 @@ void main(){
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
 #if !defined (FEATURE_TRANSPARENT_PASS)
-
     if (checkFlag(BLOCK_HINT_LAVA, blockHint)) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
@@ -168,7 +186,7 @@ void main(){
     float diffuseLighting;
 
 #ifdef FEATURE_TRANSPARENT_PASS
-    if (isWater) {
+    if (isOceanWater) {
         diffuseLighting = calcLambLight(normalWater, sunVecViewAdjusted);
     } else
 #endif
@@ -192,7 +210,7 @@ void main(){
 
     /* CREATE THE DAYLIGHT LIGHTING MIX */
 #ifdef FEATURE_TRANSPARENT_PASS
-    if (isWater) {
+    if (isOceanWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting * WATER_DIFF + WATER_AMB);
         color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
@@ -224,18 +242,7 @@ void main(){
 
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
-    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
-        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
-            vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
-            vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
-
-            vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-            normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
-            normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
-
-            normalWater.xy += normalOffset;
-            normalWater = normalize(normalWater);
-
+     if (isWater && isOceanWater) {
             vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
             vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
@@ -244,15 +251,12 @@ void main(){
             /* FRESNEL */
             if (!swimming) {
                 float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
-                color = mix(refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint,
+                color += mix(refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint,
                     reflectionColor * (1.0 - waterTint) + waterTint * litWaterTint, f);
             } else {
-                color = refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
+                color += refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
             }
-
-            isOceanWater = true;
-            isWater = true;
-        } else {
+     } else if (isWater) {
             texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
             texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
             texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
@@ -262,17 +266,14 @@ void main(){
 
             vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
 
-            color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
-            color.a = 1.0;
-        }
+            color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
     } else {
         vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
         vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
         albedoColor.rgb *= finalLightValue;
 
         // TODO: Add support for actual refraction here
-        color.rgb = mix(refractionColor, albedoColor.rgb, albedoColor.a);
-        color.a = 1.0;
+        color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
     }
 #else
     gl_FragData[2].rgba = vec4(finalLightValue.r, finalLightValue.g, finalLightValue.b, 0.0);

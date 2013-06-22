@@ -15,7 +15,7 @@
  */
 
 uniform sampler2D tex;
-uniform float highPassThreshold = 1.25;
+uniform float highPassThreshold;
 
 void main() {
     vec4 color = texture2D(tex, gl_TexCoord[0].xy);

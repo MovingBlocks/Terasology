@@ -65,7 +65,10 @@ void main() {
     }
 
 #if defined (FEATURE_LIGHT_POINT)
-    float attenuation = clamp(1.0 - pow(lightDist / lightAttenuationRange, lightAttenuationFalloff), 0.0, 1.0);
+
+    float distFactor = lightDist / lightAttenuationRange;
+    float damping = 1.0 - pow(distFactor, lightAttenuationFalloff);
+    float attenuation = clamp(damping, 0.0, 1.0);
 
     specular *= attenuation;
     color *= attenuation;

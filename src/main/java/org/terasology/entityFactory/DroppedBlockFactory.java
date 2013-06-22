@@ -37,7 +37,7 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class DroppedBlockFactory {
     private EntityManager entityManager;
-    FastRandom rand = new FastRandom();
+    private static final FastRandom rand = new FastRandom();
 
     public DroppedBlockFactory(EntityManager entityManager) {
         this.entityManager = entityManager;

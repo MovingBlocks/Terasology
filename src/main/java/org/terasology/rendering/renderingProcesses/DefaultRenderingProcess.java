@@ -59,7 +59,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
     private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
-    private Property hdrMinExposure = new Property("hdrMinExposure", 0.5f, 0.0f, 10.0f);
+    private Property hdrMinExposure = new Property("hdrMinExposure", 1.0f, 0.0f, 10.0f);
     private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.5f, 0.0f, 4.0f);
     private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.05f, 0.0f, 0.5f);
 
@@ -76,12 +76,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     /* RTs */
     private int rtFullWidth;
     private int rtFullHeight;
-    private int rtHalfWidth;
-    private int rtHalfHeight;
-    private int rtQuarterWidth;
-    private int rtQuarterHeight;
-    private int rtHalfQuarterWidth;
-    private int rtHalfQuarterHeight;
+    private int rtWidth2, rtHeight2;
+    private int rtWidth4, rtHeight4;
+    private int rtWidth8, rtHeight8;
+    private int rtWidth16, rtHeight16;
 
     private final int screenshotRtWidth = 1024;
     private final int screenshotRtHeight = 780;
@@ -294,12 +292,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             }
         }
 
-        rtHalfWidth = rtFullWidth / 2;
-        rtHalfHeight = rtFullHeight / 2;
-        rtQuarterWidth = rtHalfWidth / 2;
-        rtQuarterHeight = rtHalfHeight / 2;
-        rtHalfQuarterWidth = rtQuarterWidth / 2;
-        rtHalfQuarterHeight = rtQuarterHeight / 2;
+        rtWidth2 = rtFullWidth / 2;
+        rtHeight2 = rtFullHeight / 2;
+        rtWidth4 = rtWidth2 / 2;
+        rtHeight4 = rtHeight2 / 2;
+        rtWidth8 = rtWidth4 / 2;
+        rtHeight8 = rtHeight4 / 2;
+        rtWidth16 = rtHeight8 / 2;
+        rtHeight16 = rtWidth8 / 2;
 
         FBO scene = getFBO("sceneOpaque");
         final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
@@ -314,8 +314,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
         attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
 
-        createFBO("sceneReflected", rtHalfWidth, rtHalfHeight, FBOType.HDR, true, true, true);
-        createFBO("sceneReflectedPingPong", rtHalfWidth, rtHalfHeight, FBOType.HDR, true, true, true);
+        createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true, true, true);
+        createFBO("sceneReflectedPingPong", rtWidth2, rtHeight2, FBOType.DEFAULT, true, true, true);
 
         createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
@@ -325,18 +325,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("ssao", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
-        createFBO("ssaoBlurred0", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
-        createFBO("ssaoBlurred1", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        createFBO("ssao", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("ssaoBlurred0", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("ssaoBlurred1", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
 
-        createFBO("lightShafts", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneHighPass", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
-        createFBO("sceneBloom0", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
-        createFBO("sceneBloom1", rtHalfQuarterWidth, rtHalfQuarterHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneHighPass", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("sceneBloom0", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
+        createFBO("sceneBloom1", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneBlur0", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
-        createFBO("sceneBlur1", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -435,7 +435,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+            if (type == FBOType.HDR) {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+            } else {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+            }
 
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
         }
