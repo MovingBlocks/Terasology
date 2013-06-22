@@ -24,7 +24,7 @@
 #define BLOCK_LIGHT_FACTOR 4.0
 
 #define WATER_AMB 0.25
-#define WATER_SPEC 4.0
+#define WATER_SPEC 1.0
 #define WATER_DIFF 0.75
 
 #define BLOCK_DIFF 0.75
@@ -215,7 +215,6 @@ void main(){
     if (isOceanWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting * WATER_DIFF + WATER_AMB);
-        color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
     } else
 #endif
     {
@@ -236,6 +235,7 @@ void main(){
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
     vec3 finalLightValue = max(daylightColorValue, blocklightColorValue);
+
 #ifdef FEATURE_TRANSPARENT_PASS
     // Apply the final lighting mix
     color.xyz *= finalLightValue * occlusionValue;
@@ -245,6 +245,8 @@ void main(){
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
      if (isWater && isOceanWater) {
+            color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
+
             vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
             vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
