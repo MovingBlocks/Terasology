@@ -1,5 +1,7 @@
 package org.terasology.signalling.componentSystem;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -30,6 +32,8 @@ import com.google.common.collect.Sets;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
+
     @In
     private WorldProvider worldProvider;
     @In
@@ -45,6 +49,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private Block signalPressurePlate;
     private Block signalSwitch;
     private Block signalLimitedSwitch;
+
+    private Block signalOrGate;
+    private Block signalAndGate;
+    private Block signalXorGate;
 
     @Override
     public void update(float delta) {
@@ -94,6 +102,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         signalPressurePlate = blockManager.getBlock("signalling:SignalPressurePlate");
         signalSwitch = blockManager.getBlock("signalling:SignalSwitch");
         signalLimitedSwitch = blockManager.getBlock("signalling:SignalLimitedSwitch");
+        signalOrGate = blockManager.getBlock("signalling:SignalOrGate");
+        signalAndGate = blockManager.getBlock("signalling:SignalAndGate");
+        signalXorGate = blockManager.getBlock("signalling:SignalXorGate");
     }
 
     @Override
@@ -156,9 +167,24 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             Vector3i blockLocation = new Vector3i(entity.getComponent(BlockComponent.class).getPosition());
             Block blockAtLocation = worldProvider.getBlock(blockLocation);
             if (blockAtLocation == lampTurnedOff && consumerStatusComponent.hasSignal) {
+                logger.info("Lamp turning on");
                 worldProvider.setBlock(blockLocation, lampTurnedOn, blockAtLocation);
             } else if (blockAtLocation == lampTurnedOn && !consumerStatusComponent.hasSignal) {
+                logger.info("Lamp turning off");
                 worldProvider.setBlock(blockLocation, lampTurnedOff, blockAtLocation);
+            } else if (blockAtLocation == signalOrGate || blockAtLocation == signalAndGate
+                    || blockAtLocation == signalXorGate) {
+                SignalProducerComponent producerComponent = entity.getComponent(SignalProducerComponent.class);
+                logger.info("Gate has signal: "+consumerStatusComponent.hasSignal);
+                if (consumerStatusComponent.hasSignal) {
+                    producerComponent.signalStrength=-1;
+                    entity.saveComponent(producerComponent);
+                    entity.saveComponent(new SignalProducerModifiedComponent());
+                } else {
+                    producerComponent.signalStrength=0;
+                    entity.saveComponent(producerComponent);
+                    entity.removeComponent(SignalProducerModifiedComponent.class);
+                }
             }
         }
     }

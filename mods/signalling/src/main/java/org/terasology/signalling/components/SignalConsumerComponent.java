@@ -9,6 +9,6 @@ public class SignalConsumerComponent implements Component {
     public SignalConsumerComponent.Mode mode = Mode.AT_LEAST_ONE;
 
     public enum Mode {
-        AT_LEAST_ONE, ALL_CONNECTED
+        AT_LEAST_ONE, ALL_CONNECTED, EXACTLY_ONE
     }
 }

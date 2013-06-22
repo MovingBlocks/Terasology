@@ -1,0 +1,6 @@
+{
+    "displayName": "Signal AND Gate",
+    "entity" : {
+        "prefab" : "signalling:SignalAndGate"
+    }
+}
