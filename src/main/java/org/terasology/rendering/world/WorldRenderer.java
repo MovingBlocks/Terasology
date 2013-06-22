@@ -1049,7 +1049,13 @@ public final class WorldRenderer {
     }
 
     public boolean isUnderWater() {
-        Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+
+        // Compensate for waves
+        if (config.getRendering().isAnimateWater()) {
+            cameraPos.y += 0.5f;
+        }
+
         Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
         return block.isLiquid();
     }
