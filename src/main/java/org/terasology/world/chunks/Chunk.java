@@ -99,11 +99,13 @@ public class Chunk {
     public Chunk(int x, int y, int z) {
         this.pos.set(x, y, z);
         final PerBlockStorageManager manager = CoreRegistry.get(PerBlockStorageManager.class);
+        Preconditions.checkNotNull(manager, "Unable to obtain per-block-storage manager");
         this.blockData = manager.createBlockStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.sunlightData = manager.createSunlightStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.lightData = manager.createLightStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.extraData = manager.createExtraStorage(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         this.extensionData = Maps.newConcurrentMap();
+        manager.allocateStorageExtensions(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ(), extensionData);
         this.dirty = true;
         ChunkMonitor.fireChunkCreated(this);
     }
@@ -425,6 +427,11 @@ public class Chunk {
 
     public LiquidData getLiquid(int x, int y, int z) {
         return new LiquidData((byte) extraData.get(x, y, z));
+    }
+    
+    public TeraArray getStorageExtension(String id) {
+        Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
+        return extensionData.get(id);
     }
 
     public Vector3i getChunkWorldPos() {

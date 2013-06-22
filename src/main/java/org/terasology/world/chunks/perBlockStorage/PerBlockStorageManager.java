@@ -2,6 +2,8 @@ package org.terasology.world.chunks.perBlockStorage;
 
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,11 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.AdvancedConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModInfo;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.Chunk;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.protobuf.ByteString;
 
@@ -49,6 +53,7 @@ public class PerBlockStorageManager {
     private TeraArray.Factory sunlightStorageFactory;
     private TeraArray.Factory lightStorageFactory;
     private TeraArray.Factory extraStorageFactory;
+    private List<ExtensionEntry> activeStorageExtensions;
     
     private boolean chunkDeflationEnabled = true;
     private boolean chunkDeflationLoggingEnabled = false;
@@ -192,16 +197,15 @@ public class PerBlockStorageManager {
     public static class ExtensionEntry {
         
         public final Mod mod;
-        public final String extensionId;
-        public final String factoryId;
+        public final ModInfo.StorageExtension info;
         public final TeraArray.Factory factory;
+        public final String storageId;
         
-        public ExtensionEntry(Mod mod, String extensionId, FactoryEntry factoryEntry) {
+        public ExtensionEntry(Mod mod, ModInfo.StorageExtension info, TeraArray.Factory factory) {
             this.mod = Preconditions.checkNotNull(mod, "The parameter 'mod' must not be null");
-            this.extensionId = Preconditions.checkNotNull(extensionId, "The parameter 'extensionId' must not be null");
-            Preconditions.checkNotNull(factoryEntry, "The parameter 'factoryEntry' must not be null");
-            this.factoryId = factoryEntry.id;
-            this.factory = factoryEntry.factory;
+            this.info = Preconditions.checkNotNull(info, "The parameter 'info' must not be null");
+            this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
+            this.storageId = mod.getModInfo().getId() + ":" + info.getId();
         }
     }
     
@@ -232,6 +236,10 @@ public class PerBlockStorageManager {
         return engineReflections;
     }
     
+    /**
+     * Scans the engine and all mods.
+     * <b>Note:</b> Must not be called when the game is running, because it drops all registered storage extensions.
+     */
     public void refresh() {
         chunkProtobufHandler = new Chunk.ProtobufHandler(this);
         chunkDeflator = new Chunk.Deflator(this);
@@ -240,6 +248,7 @@ public class PerBlockStorageManager {
         serializersByClass = Maps.newHashMap();
         serializersByClassName = Maps.newHashMap();
         serializersByProtobufType = Maps.newHashMap();
+        activeStorageExtensions = Lists.newLinkedList();
         if (getEngineReflections() == null) {
             logger.error("Unable to scan for available per-block-storage types.");
             return;
@@ -394,5 +403,40 @@ public class PerBlockStorageManager {
     public TeraArray createExtraStorage(int sizeX, int sizeY, int sizeZ) {
         Preconditions.checkState(extraStorageFactory != null, "Unable to create extra storage.");
         return extraStorageFactory.create(sizeX, sizeY, sizeZ);
+    }
+    
+    public void registerStorageExtensions(Mod mod) {
+        removeStorageExtensions(mod);
+        final ModInfo info = Preconditions.checkNotNull(mod, "The parameter 'mod' must not be null").getModInfo();
+        for (final ModInfo.StorageExtension extInfo : info.getPerBlockStorageExtensions().values()) {
+            final TeraArray.Factory factory = getArrayFactory(extInfo.getFactory());
+            if (factory == null) {
+                logger.warn("Failed registering per-block-storage extension '{}' by mod '{}', unknown factory '{}', skipping", extInfo.getId(), info.getDisplayName(), extInfo.getFactory());
+                continue;
+            }
+            final ExtensionEntry ext = new ExtensionEntry(mod, extInfo, factory);
+            activeStorageExtensions.add(ext);
+        }
+    }
+    
+    public void removeStorageExtensions(Mod mod) {
+        Preconditions.checkNotNull(mod, "The parameter 'mod' must not be null");
+        final String modId = mod.getModInfo().getId();
+        final Iterator<ExtensionEntry> it = activeStorageExtensions.iterator();
+        while (it.hasNext()) {
+            final ExtensionEntry ext = it.next();
+            if (modId.equals(ext.mod.getModInfo().getId())) {
+                it.remove();
+            }
+        }
+    }
+    
+    public void allocateStorageExtensions(int sizeX, int sizeY, int sizeZ, Map<String, TeraArray> output) {
+        Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
+        for (final ExtensionEntry ext : activeStorageExtensions) {
+            if (!output.containsKey(ext.storageId)) {
+                output.put(ext.storageId, ext.factory.create(sizeX, sizeY, sizeZ));
+            }
+        }
     }
 }
