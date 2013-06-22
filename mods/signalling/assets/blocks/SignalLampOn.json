@@ -1,0 +1,9 @@
+{
+    "luminance": 30,
+    "inventory" : {
+        "pickupFamily" : "signalling:SignalLampOff"
+    },
+    "entity" : {
+        "prefab" : "signalling:SignalLampOn"
+    }
+}

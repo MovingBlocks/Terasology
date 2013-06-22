@@ -1,0 +1,7 @@
+{
+    "displayName": "Signal Transformer",
+    "entity" : {
+        "prefab" : "signalling:SignalTransformer",
+        "mode" : "persistent"
+    }
+}

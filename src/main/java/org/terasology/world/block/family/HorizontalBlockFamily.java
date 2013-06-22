@@ -17,10 +17,12 @@ package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -52,12 +54,17 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockFor(Side attachmentSide, Side direction) {
+    public Block getBlockUponPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
         if (attachmentSide.isHorizontal()) {
             return blocks.get(attachmentSide);
         }
         return blocks.get(direction);
 
+    }
+
+    @Override
+    public Block getBlockUponNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
+        return oldBlock;
     }
 
     @Override

@@ -49,8 +49,7 @@ import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -283,6 +282,25 @@ public class BlockLoader implements BlockBuilderHelper {
         Map<Side, Block> result = Maps.newHashMap();
         constructHorizontalBlocks(blockDefUri, blockDefinition, result);
         return result;
+    }
+
+    @Override
+    public Block constructTransformedBlock(AssetUri blockDefUri, BlockDefinition blockDef, Rotation rotation) {
+        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
+        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
+        BlockShape shape = getShape(blockDef);
+
+        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+        block.setDirection(rotation.rotate(Side.FRONT));
+        applyShape(block, shape, tileUris, rotation);
+
+        for (BlockPart part : BlockPart.values()) {
+            block.setColorSource(part, colorSourceMap.get(part));
+            block.setColorOffset(part, colorOffsetsMap.get(part));
+        }
+
+        return block;
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {

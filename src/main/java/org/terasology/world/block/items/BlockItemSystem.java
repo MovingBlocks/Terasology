@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -81,10 +80,12 @@ public class BlockItemSystem implements ComponentSystem {
         BlockFamily type = blockItem.blockFamily;
         Side surfaceSide = Side.inDirection(event.getHitNormal());
         Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
-        Block block = type.getBlockFor(surfaceSide, secondaryDirection);
+        
         Vector3i targetBlock = event.getTarget().getComponent(BlockComponent.class).getPosition();
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
+        
+        Block block = type.getBlockUponPlacement(worldProvider, blockEntityRegistry, placementPos, surfaceSide, secondaryDirection);
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
