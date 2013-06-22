@@ -15,31 +15,41 @@
  */
 package org.terasology.math;
 
+import com.google.common.collect.Maps;
+
 import javax.vecmath.Vector3f;
 import java.util.EnumMap;
 
 /**
- * The six sides of a block and a slew of related utility
+ * The six sides of a block and a slew of related utility.
+ *
+ * Note that the FRONT of the block faces towards the player - this means Left and Right are a player's right and left.
+ * See Direction for an enumeration of directions in terms of the player's perspective.
  *
  * @author Immortius <immortius@gmail.com>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public enum Side {
-    TOP(Vector3i.up(), false),
-    LEFT(new Vector3i(-1, 0, 0), true),
-    RIGHT(new Vector3i(1, 0, 0), true),
-    FRONT(new Vector3i(0, 0, -1), true),
-    BACK(new Vector3i(0, 0, 1), true),
-    BOTTOM(Vector3i.down(), false);
+    TOP(Vector3i.up(), true, false, true),
+    LEFT(new Vector3i(-1, 0, 0), false, true, true),
+    RIGHT(new Vector3i(1, 0, 0), false, true, true),
+    FRONT(new Vector3i(0, 0, -1), true, true, false),
+    BACK(new Vector3i(0, 0, 1), true, true, false),
+    BOTTOM(Vector3i.down(), true, false, true);
 
     private static EnumMap<Side, Side> reverseMap;
     private static Side[] horizontalSides;
-    private static EnumMap<Side, Side> clockwiseSide;
-    private static EnumMap<Side, Side> antiClockwiseSide;
+    private static EnumMap<Side, Side> clockwiseYawSide;
+    private static EnumMap<Side, Side> anticlockwiseYawSide;
+    private static EnumMap<Side, Side> clockwisePitchSide;
+    private static EnumMap<Side, Side> anticlockwisePitchSide;
+    private static EnumMap<Side, Side> clockwiseRollSide;
+    private static EnumMap<Side, Side> anticlockwiseRollSide;
+    private static EnumMap<Side, Direction> conversionMap;
 
     static {
-        reverseMap = new EnumMap<Side, Side>(Side.class);
+        reverseMap = new EnumMap<>(Side.class);
         reverseMap.put(TOP, BOTTOM);
         reverseMap.put(LEFT, RIGHT);
         reverseMap.put(RIGHT, LEFT);
@@ -47,21 +57,46 @@ public enum Side {
         reverseMap.put(BACK, FRONT);
         reverseMap.put(BOTTOM, TOP);
 
-        clockwiseSide = new EnumMap<Side, Side>(Side.class);
-        clockwiseSide.put(Side.FRONT, Side.RIGHT);
-        clockwiseSide.put(Side.RIGHT, Side.BACK);
-        clockwiseSide.put(Side.BACK, Side.LEFT);
-        clockwiseSide.put(Side.LEFT, Side.FRONT);
-        clockwiseSide.put(Side.TOP, Side.TOP);
-        clockwiseSide.put(Side.BOTTOM, Side.BOTTOM);
+        conversionMap = new EnumMap<>(Side.class);
+        conversionMap.put(TOP, Direction.UP);
+        conversionMap.put(BOTTOM, Direction.DOWN);
+        conversionMap.put(BACK, Direction.FORWARD);
+        conversionMap.put(FRONT, Direction.BACKWARD);
+        conversionMap.put(RIGHT, Direction.LEFT);
+        conversionMap.put(LEFT, Direction.RIGHT);
 
-        antiClockwiseSide = new EnumMap<Side, Side>(Side.class);
-        antiClockwiseSide.put(Side.FRONT, Side.LEFT);
-        antiClockwiseSide.put(Side.RIGHT, Side.FRONT);
-        antiClockwiseSide.put(Side.BACK, Side.RIGHT);
-        antiClockwiseSide.put(Side.LEFT, Side.BACK);
-        antiClockwiseSide.put(Side.TOP, Side.TOP);
-        antiClockwiseSide.put(Side.BOTTOM, Side.BOTTOM);
+        clockwiseYawSide = new EnumMap<>(Side.class);
+        anticlockwiseYawSide = new EnumMap<>(Side.class);
+        clockwiseYawSide.put(Side.FRONT, Side.LEFT);
+        anticlockwiseYawSide.put(Side.FRONT, Side.RIGHT);
+        clockwiseYawSide.put(Side.RIGHT, Side.FRONT);
+        anticlockwiseYawSide.put(Side.RIGHT, Side.BACK);
+        clockwiseYawSide.put(Side.BACK, Side.RIGHT);
+        anticlockwiseYawSide.put(Side.BACK, Side.LEFT);
+        clockwiseYawSide.put(Side.LEFT, Side.BACK);
+        anticlockwiseYawSide.put(Side.LEFT, Side.FRONT);
+
+        clockwisePitchSide = Maps.newEnumMap(Side.class);
+        anticlockwisePitchSide = Maps.newEnumMap(Side.class);
+        clockwisePitchSide.put(Side.FRONT, Side.TOP);
+        anticlockwisePitchSide.put(Side.FRONT, Side.BOTTOM);
+        clockwisePitchSide.put(Side.BOTTOM, Side.FRONT);
+        anticlockwisePitchSide.put(Side.BOTTOM, Side.BACK);
+        clockwisePitchSide.put(Side.BACK, Side.BOTTOM);
+        anticlockwisePitchSide.put(Side.BACK, Side.TOP);
+        clockwisePitchSide.put(Side.TOP, Side.BACK);
+        anticlockwisePitchSide.put(Side.TOP, Side.FRONT);
+
+        clockwiseRollSide = Maps.newEnumMap(Side.class);
+        anticlockwiseRollSide = Maps.newEnumMap(Side.class);
+        clockwiseRollSide.put(Side.TOP, Side.LEFT);
+        anticlockwiseRollSide.put(Side.TOP, Side.RIGHT);
+        clockwiseRollSide.put(Side.LEFT, Side.BOTTOM);
+        anticlockwiseRollSide.put(Side.LEFT, Side.TOP);
+        clockwiseRollSide.put(Side.BOTTOM, Side.RIGHT);
+        anticlockwiseRollSide.put(Side.BOTTOM, Side.LEFT);
+        clockwiseRollSide.put(Side.RIGHT, Side.TOP);
+        anticlockwiseRollSide.put(Side.RIGHT, Side.BOTTOM);
 
         horizontalSides = new Side[]{LEFT, RIGHT, FRONT, BACK};
     }
@@ -122,11 +157,15 @@ public enum Side {
     }
 
     private Vector3i vector3iDir;
-    private boolean horizontal;
+    private boolean canYaw;
+    private boolean canPitch;
+    private boolean canRoll;
 
-    Side(Vector3i vector3i, boolean horizontal) {
+    Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
         this.vector3iDir = vector3i;
-        this.horizontal = horizontal;
+        this.canPitch = canPitch;
+        this.canYaw = canYaw;
+        this.canRoll = canRoll;
     }
 
     /**
@@ -140,7 +179,7 @@ public enum Side {
      * @return Whether this is one of the horizontal directions.
      */
     public boolean isHorizontal() {
-        return horizontal;
+        return canYaw;
     }
 
     /**
@@ -150,22 +189,67 @@ public enum Side {
         return reverseMap.get(this);
     }
 
-    public Side rotateClockwise(int steps) {
-        if (!isHorizontal()) return this;
+    public Side yawClockwise(int steps) {
+        if (!canYaw) {
+            return this;
+        }
         if (steps < 0) {
             steps = -steps + 2;
         }
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return clockwiseSide.get(this);
+                return clockwiseYawSide.get(this);
             case 2:
                 return reverseMap.get(this);
             case 3:
-                return antiClockwiseSide.get(this);
+                return anticlockwiseYawSide.get(this);
             default:
                 return this;
         }
     }
 
+    public Side pitchClockwise(int steps) {
+        if (!canPitch) {
+            return this;
+        }
+        if (steps < 0) {
+            steps = -steps + 2;
+        }
+        steps = steps % 4;
+        switch (steps) {
+            case 1:
+                return clockwisePitchSide.get(this);
+            case 2:
+                return reverseMap.get(this);
+            case 3:
+                return anticlockwisePitchSide.get(this);
+            default:
+                return this;
+        }
+    }
+
+    public Direction toDirection() {
+        return conversionMap.get(this);
+    }
+
+    public Side rollClockwise(int steps) {
+        if (!canRoll) {
+            return this;
+        }
+        if (steps < 0) {
+            steps = -steps + 2;
+        }
+        steps = steps % 4;
+        switch (steps) {
+            case 1:
+                return clockwiseRollSide.get(this);
+            case 2:
+                return reverseMap.get(this);
+            case 3:
+                return anticlockwiseRollSide.get(this);
+            default:
+                return this;
+        }
+    }
 }

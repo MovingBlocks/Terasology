@@ -26,6 +26,7 @@ import org.terasology.world.block.BlockPart;
 
 import javax.vecmath.Vector3f;
 import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.
@@ -36,8 +37,8 @@ public class BlockShape implements Asset {
     private AssetUri uri;
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
-    private EnumMap<Rotation, CollisionShape> collisionShape = Maps.newEnumMap(Rotation.class);
-    private EnumMap<Rotation, Vector3f> collisionOffset = Maps.newEnumMap(Rotation.class);
+    private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
+    private Map<Rotation, Vector3f> collisionOffset = Maps.newHashMap();
     private boolean collisionSymmetric = false;
 
     public BlockShape() {
@@ -68,23 +69,23 @@ public class BlockShape implements Asset {
     }
 
     public CollisionShape getCollisionShape() {
-        return collisionShape.get(Rotation.NONE);
+        return collisionShape.get(Rotation.none());
     }
 
     public Vector3f getCollisionOffset() {
-        return collisionOffset.get(Rotation.NONE);
+        return collisionOffset.get(Rotation.none());
     }
 
     public CollisionShape getCollisionShape(Rotation rot) {
         if (isCollisionSymmetric()) {
-            return collisionShape.get(Rotation.NONE);
+            return collisionShape.get(Rotation.none());
         }
         return collisionShape.get(rot);
     }
 
     public Vector3f getCollisionOffset(Rotation rot) {
         if (isCollisionSymmetric()) {
-            return collisionOffset.get(Rotation.NONE);
+            return collisionOffset.get(Rotation.none());
         }
         return collisionOffset.get(rot);
     }
@@ -98,11 +99,11 @@ public class BlockShape implements Asset {
     }
 
     public void setCollisionOffset(Vector3f offset) {
-        collisionOffset.get(Rotation.NONE).set(offset);
+        collisionOffset.get(Rotation.none()).set(offset);
     }
 
     public void setCollisionShape(CollisionShape shape) {
-        collisionShape.put(Rotation.NONE, shape);
+        collisionShape.put(Rotation.none(), shape);
     }
 
     public void setCollisionOffset(Rotation rot, Vector3f offset) {

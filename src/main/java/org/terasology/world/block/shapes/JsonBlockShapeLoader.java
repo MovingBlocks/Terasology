@@ -128,7 +128,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             } else if (collisionInfo.has("colliders") && collisionInfo.get("colliders").isJsonArray() && collisionInfo.get("colliders").getAsJsonArray().size() > 0) {
                 JsonArray colliderArray = collisionInfo.get("colliders").getAsJsonArray();
                 if (shape.isCollisionSymmetric()) {
-                    ColliderInfo info = processColliders(context, colliderArray, Rotation.NONE);
+                    ColliderInfo info = processColliders(context, colliderArray, Rotation.none());
                     shape.setCollisionShape(info.collisionShape);
                     shape.setCollisionOffset(info.offset);
                 } else {
@@ -217,7 +217,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             CompoundShape collisionShape = new CompoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(new Matrix4f(Rotation.NONE.getQuat4f(), collider.offset, 1.0f));
+                Transform transform = new Transform(new Matrix4f(Rotation.none().getQuat4f(), collider.offset, 1.0f));
                 collisionShape.addChildShape(transform, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);

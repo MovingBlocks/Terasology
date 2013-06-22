@@ -129,7 +129,7 @@ public class DoorSystem implements ComponentSystem {
 
         Side closedSide = facingDir.reverse();
         if (closedSide == attachSide || closedSide.reverse() == attachSide) {
-            closedSide = attachSide.rotateClockwise(1);
+            closedSide = attachSide.yawClockwise(1);
         }
 
         worldProvider.setBlock(bottomBlockPos, door.bottomBlockFamily.getBlockFor(closedSide, Side.TOP), bottomBlock);
@@ -159,13 +159,13 @@ public class DoorSystem implements ComponentSystem {
             }
         }
         if (attachSide == null) {
-            Side clockwise = facingDir.rotateClockwise(1);
+            Side clockwise = facingDir.yawClockwise(1);
             if (canAttachTo(topBlockPos, clockwise) && canAttachTo(bottomBlockPos, clockwise)) {
                 attachSide = clockwise;
             }
         }
         if (attachSide == null) {
-            Side anticlockwise = facingDir.rotateClockwise(-1);
+            Side anticlockwise = facingDir.yawClockwise(-1);
             if (canAttachTo(topBlockPos, anticlockwise) && canAttachTo(bottomBlockPos, anticlockwise)) {
                 attachSide = anticlockwise;
             }

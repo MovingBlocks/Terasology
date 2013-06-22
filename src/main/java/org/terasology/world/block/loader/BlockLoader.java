@@ -264,7 +264,7 @@ public class BlockLoader implements BlockBuilderHelper {
         BlockShape shape = getShape(blockDef);
 
         Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-        applyShape(block, shape, tileUris, Rotation.NONE);
+        applyShape(block, shape, tileUris, Rotation.none());
 
         for (BlockPart part : BlockPart.values()) {
             block.setColorSource(part, colorSourceMap.get(part));
@@ -350,7 +350,12 @@ public class BlockLoader implements BlockBuilderHelper {
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos = atlasBuilder.getTexCoords(tileUris.get(part), shape.getMeshPart(part) != null);
-            BlockPart targetPart = rot.rotate(part);
+            BlockPart targetPart;
+            if (part.getSide() != null) {
+                targetPart = BlockPart.fromSide(rot.rotate(part.getSide()));
+            } else {
+                targetPart = part;
+            }
             block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
                 block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
@@ -365,7 +370,7 @@ public class BlockLoader implements BlockBuilderHelper {
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(atlasBuilder.getTexCoords(tileUris.get(part), true), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.none().getQuat4f()).mapTexCoords(atlasBuilder.getTexCoords(tileUris.get(part), true), Block.TEXTURE_OFFSET_WIDTH));
         }
     }
 

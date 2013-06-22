@@ -15,110 +15,121 @@
  */
 package org.terasology.math;
 
-import org.terasology.world.block.BlockPart;
+import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import gnu.trove.map.TByteObjectMap;
+import gnu.trove.map.hash.TByteObjectHashMap;
 
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
+ * Rotation provides easy access to 90 degree increments of rotations - intended for block-related rotations.
+ *
+ * Uses the fly weight pattern to cache the 64 combinations of rotation.
+ *
  * @author Immortius <immortius@gmail.com>
  */
-public enum Rotation {
-    NONE(getQuaternionForHorizRot(0)) {
-        @Override
-        public Side rotate(Side side) {
-            return side;
-        }
+public class Rotation {
 
-        @Override
-        public AABB rotate(AABB aabb) {
-            return aabb;
-        }
-    },
-    HORIZONTAL_CLOCKWISE(getQuaternionForHorizRot(1)) {
-        @Override
-        public Side rotate(Side side) {
-            return side.rotateClockwise(1);
-        }
+    private static final TByteObjectMap<Rotation> rotations;
+    private static final ImmutableList<Rotation> horizontal;
 
-        @Override
-        public AABB rotate(AABB aabb) {
-            return rotateHorizontalAABB(aabb, 1);
-        }
-    },
-    HORIZONTAL_180(getQuaternionForHorizRot(2)) {
-        @Override
-        public Side rotate(Side side) {
-            return side.rotateClockwise(2);
-        }
-
-        @Override
-        public AABB rotate(AABB aabb) {
-            return rotateHorizontalAABB(aabb, 2);
-        }
-    },
-    HORIZONTAL_ANTI_CLOCKWISE(getQuaternionForHorizRot(3)) {
-        @Override
-        public Side rotate(Side side) {
-            return side.rotateClockwise(3);
-        }
-
-        @Override
-        public AABB rotate(AABB aabb) {
-            return rotateHorizontalAABB(aabb, 3);
-        }
-    };
-
-    private static Rotation[] horizontalRotations = new Rotation[]{NONE, HORIZONTAL_CLOCKWISE, HORIZONTAL_180, HORIZONTAL_ANTI_CLOCKWISE};
-
-    public static Rotation[] horizontalRotations() {
-        return horizontalRotations;
+    public static Rotation none() {
+        return rotations.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE));
     }
 
-    private Quat4f quat4f;
-
-    public abstract Side rotate(Side side);
-
-    public BlockPart rotate(BlockPart part) {
-        if (part.isSide()) {
-            return BlockPart.fromSide(rotate(part.getSide()));
-        }
-        return part;
+    public static Rotation rotate(Pitch pitch) {
+        return rotations.get(indexFor(Yaw.NONE, pitch, Roll.NONE));
     }
 
-    public abstract AABB rotate(AABB aabb);
+    public static Rotation rotate(Yaw yaw) {
+        return rotations.get(indexFor(yaw, Pitch.NONE, Roll.NONE));
+    }
 
-    private Rotation(Quat4f quat4f) {
-        this.quat4f = quat4f;
+    public static Rotation rotate(Roll roll) {
+        return rotations.get(indexFor(Yaw.NONE, Pitch.NONE, roll));
+    }
+
+    public static Rotation rotate(Yaw yaw, Pitch pitch) {
+        return rotations.get(indexFor(yaw, pitch, Roll.NONE));
+    }
+
+    public static Rotation rotate (Pitch pitch, Roll roll) {
+        return rotations.get(indexFor(Yaw.NONE, pitch, roll));
+    }
+
+    public static Rotation rotate(Yaw yaw, Roll roll) {
+        return rotations.get(indexFor(yaw, Pitch.NONE, roll));
+    }
+
+    public static Rotation rotate(Yaw yaw, Pitch pitch, Roll roll) {
+        return rotations.get(indexFor(yaw, pitch, roll));
+    }
+
+    public static List<Rotation> horizontalRotations() {
+        return horizontal;
+    }
+
+    static {
+        rotations = new TByteObjectHashMap<>();
+        for (Pitch pitch : Pitch.values()) {
+            for (Yaw yaw : Yaw.values()) {
+                for (Roll roll : Roll.values()) {
+                    rotations.put(indexFor(yaw, pitch, roll), new Rotation(yaw, pitch, roll));
+                }
+            }
+        }
+        horizontal = ImmutableList.of(
+                rotations.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE)),
+                rotations.get(indexFor(Yaw.CLOCKWISE_90, Pitch.NONE, Roll.NONE)),
+                rotations.get(indexFor(Yaw.CLOCKWISE_180, Pitch.NONE, Roll.NONE)),
+                rotations.get(indexFor(Yaw.CLOCKWISE_270, Pitch.NONE, Roll.NONE)));
+    }
+
+    private static byte indexFor(Yaw yaw, Pitch pitch, Roll roll) {
+        return (byte) ((yaw.getIndex() << 4) + (pitch.getIndex() << 2) + roll.getIndex());
+    }
+
+    private Yaw yaw;
+    private Pitch pitch;
+    private Roll roll;
+
+    private Rotation(Yaw yaw, Pitch pitch, Roll roll) {
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.roll = roll;
     }
 
     public Quat4f getQuat4f() {
-        return quat4f;
-    }
-
-    private static Quat4f getQuaternionForHorizRot(int steps) {
         Quat4f rotation = new Quat4f();
-        rotation.set(new AxisAngle4f(new Vector3f(0, -1, 0), (float) (0.5f * Math.PI * steps)));
+        QuaternionUtil.setEuler(rotation, yaw.getRadians(), pitch.getRadians(), roll.getRadians());
         return rotation;
     }
 
-    private static AABB rotateHorizontalAABB(AABB collider, int clockwiseSteps) {
-        if (clockwiseSteps < 0) {
-            clockwiseSteps = -clockwiseSteps + 2;
-        }
-        clockwiseSteps = clockwiseSteps % 4;
-        Vector3f center = collider.getCenter();
-        Vector3f extents = collider.getExtents();
-        switch (clockwiseSteps) {
-            case 1:
-                return AABB.createCenterExtent(new Vector3f(-center.z, center.y, center.x), new Vector3f(extents.z, extents.y, extents.x));
-            case 2:
-                return AABB.createCenterExtent(new Vector3f(-center.x, center.y, -center.z), extents);
-            case 3:
-                return AABB.createCenterExtent(new Vector3f(center.z, center.y, -center.x), new Vector3f(extents.z, extents.y, extents.x));
-            default:
-                return collider;
-        }
+    public Side rotate(Side side) {
+        side = side.rollClockwise(roll.getIncrements());
+        side = side.pitchClockwise(pitch.getIncrements());
+        side = side.yawClockwise(yaw.getIncrements());
+        return side;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof Rotation) {
+            Rotation other = (Rotation) obj;
+            return yaw == other.yaw && pitch == other.pitch && roll == other.roll;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(yaw, pitch, roll);
+    }
+
 }
