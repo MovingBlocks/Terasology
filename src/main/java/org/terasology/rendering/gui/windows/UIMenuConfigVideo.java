@@ -52,6 +52,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton bobbingButton;
     private final UIStateButton fullscreenButton;
     private final UIStateButton outlineButton;
+    private final UIStateButton screenshotSizeButton;
     private final UIButton backToConfigMenuButton;
 
     private final Config config = CoreRegistry.get(Config.class);
@@ -198,6 +199,32 @@ public class UIMenuConfigVideo extends UIWindow {
         bobbingButton.setPosition(new Vector2f(-bobbingButton.getSize().x / 2f - 10f, 300f + 3 * 40f));
         bobbingButton.setVisible(true);
 
+        screenshotSizeButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction screenshotSizeStateAction = new StateButtonAction() {
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton) element;
+                if(button.getState() == 0)
+                {
+                   config.getRendering().setScreenshotSize(1);
+                } else if(button.getState() == 1) {
+                    config.getRendering().setScreenshotSize(2);
+                } else if(button.getState() == 2) {
+                    config.getRendering().setScreenshotSize(3);
+                } else if(button.getState() == 3) {
+                    config.getRendering().setScreenshotSize(4);
+                }
+            }
+        };
+        screenshotSizeButton.addState("Size: Super",screenshotSizeStateAction);
+        screenshotSizeButton.addState("Size: Normal", screenshotSizeStateAction);
+        screenshotSizeButton.addState("Size: Half", screenshotSizeStateAction);
+        screenshotSizeButton.addState("Size: Thumbnail", screenshotSizeStateAction);
+        screenshotSizeButton.addClickListener(clickAction);
+        screenshotSizeButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        screenshotSizeButton.setPosition(new Vector2f(-screenshotSizeButton.getSize().x / 2f - 10f, 300f + 4 * 40f));
+        screenshotSizeButton.setVisible(true);
+
         animateGrassButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction animateGrassStateAction = new StateButtonAction() {
             @Override
@@ -304,6 +331,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(reflectiveWaterButton);
         addDisplayElement(blurIntensityButton);
         addDisplayElement(bobbingButton);
+        addDisplayElement(screenshotSizeButton);
         addDisplayElement(backToConfigMenuButton);
         addDisplayElement(fullscreenButton);
         addDisplayElement(outlineButton);
@@ -353,6 +381,17 @@ public class UIMenuConfigVideo extends UIWindow {
             outlineButton.setState(1);
         } else {
             outlineButton.setState(0);
+        }
+        if(config.getRendering().getScreenshotSize() == 1) {
+            screenshotSizeButton.setState(0);
+        } else if(config.getRendering().getScreenshotSize() == 2) {
+            screenshotSizeButton.setState(1);
+        } else if(config.getRendering().getScreenshotSize() == 3) {
+            screenshotSizeButton.setState(2);
+        } else if(config.getRendering().getScreenshotSize() == 4) {
+            screenshotSizeButton.setState(3);
+        } else {
+            screenshotSizeButton.setState(1);
         }
     }
 }

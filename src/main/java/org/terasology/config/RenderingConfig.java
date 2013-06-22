@@ -10,8 +10,8 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class RenderingConfig {
     private PixelFormat pixelFormat = new PixelFormat().withDepthBits(24);
-    private int windowWidth = 1280;
-    private int windowHeight = 720;
+    public static int windowWidth = 1280;
+    public static int windowHeight = 720;
     private boolean fullscreen = false;
     private int activeViewDistanceMode = 0;
     private boolean flickeringLight = false;
@@ -35,6 +35,7 @@ public class RenderingConfig {
     private int maxTextureAtlasResolution = 4096;
     private int maxChunksUsedForShadowMapping = 1024;
     private int shadowMapResolution = 1024;
+    private int screenshotSize = 2;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -269,5 +270,11 @@ public class RenderingConfig {
 
     public void setShadowMapResolution(int shadowMapResolution) {
         this.shadowMapResolution = shadowMapResolution;
+    }
+    public int getScreenshotSize() {
+        return screenshotSize;
+    }
+    public void setScreenshotSize(int screenshotSize)  {
+        this.screenshotSize = screenshotSize;
     }
 }
