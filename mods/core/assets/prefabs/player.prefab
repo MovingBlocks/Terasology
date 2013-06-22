@@ -43,6 +43,13 @@
         "diveVolume" : 0.5,
         "landingVolume" : 0.25
     },
+    "Light" : {
+        "lightDiffuseIntensity" : 0.0,
+        "lightSpecularIntensity" : 0.0,
+        "lightAmbientIntensity" : 0.0,
+        "lightColorAmbient" : [1.0, 0.6, 0.6],
+        "lightColorDiffuse" : [1.0, 0.6, 0.6]
+    },
     "Inventory" : {
         "itemSlots": [
               0,0,0,0,0,0,0,0,0,0,

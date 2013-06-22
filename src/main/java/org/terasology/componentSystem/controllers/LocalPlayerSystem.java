@@ -18,11 +18,7 @@ package org.terasology.componentSystem.controllers;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.components.*;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entityFactory.DroppedBlockFactory;
@@ -162,6 +158,17 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
 
         EntityRef entity = localPlayer.getEntity();
+        LightComponent lightComponent = entity.getComponent(LightComponent.class);
+
+        // Update the light component if the player is carrying a torch
+        if (localPlayer.isCarryingTorch()) {
+            lightComponent.lightDiffuseIntensity = 1.0f;
+            lightComponent.lightAmbientIntensity = 1.0f;
+        } else {
+            lightComponent.lightDiffuseIntensity = 0.0f;
+            lightComponent.lightAmbientIntensity = 0.0f;
+        }
+
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);

@@ -45,7 +45,10 @@ public class LocalPlayer {
     }
 
     public boolean isValid() {
-        return entity.exists() && entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
+        return entity.exists() && entity.hasComponent(LocationComponent.class)
+                && entity.hasComponent(LocalPlayerComponent.class)
+                && entity.hasComponent(PlayerComponent.class)
+                && entity.hasComponent(LightComponent.class);
     }
 
     public Vector3f getPosition() {
@@ -72,6 +75,16 @@ public class LocalPlayer {
             return new Quat4f(0, 0, 0, 1);
         }
         return location.getWorldRotation();
+    }
+
+    public boolean isCarryingTorch() {
+
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        if (inventory == null || localPlayer == null)
+            return false;
+
+        return inventory.itemSlots.get(localPlayer.selectedTool).hasComponent(LightComponent.class);
     }
 
     public EntityRef getEntity() {
