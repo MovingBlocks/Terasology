@@ -27,7 +27,6 @@ import org.terasology.utilities.ReflectionUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -63,7 +62,7 @@ public final class FieldMetadata {
     }
 
     private boolean isCollectionOf(Class<?> targetType, Field field) {
-        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == EntityRef.class);
+        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == targetType);
     }
 
     public Object deserialize(EntityData.Value value) {
@@ -75,10 +74,6 @@ public final class FieldMetadata {
         if (deserializedValue != null) {
             setValue(target, deserializedValue);
         }
-    }
-
-    public Object copy(Object field) {
-        return serializationHandler.copy(field);
     }
 
     public String getName() {
@@ -103,12 +98,15 @@ public final class FieldMetadata {
                 return getter.invoke(obj);
             }
             return field.get(obj);
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during access of {} from {}", field.getName(), obj.getClass(), e);
-        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             logger.error("Exception during access of {} from {}", field.getName(), obj.getClass(), e);
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object getCopyOfValue(Object obj) {
+        return serializationHandler.copy(getValue(obj));
     }
 
     public void setValue(Object target, Object value) {
@@ -118,9 +116,7 @@ public final class FieldMetadata {
             } else {
                 field.set(target, value);
             }
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during setting of {} from {}", field.getName(), target.getClass(), e);
-        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             logger.error("Exception during setting of {} from {}", field.getName(), target.getClass(), e);
         }
     }
@@ -159,7 +155,7 @@ public final class FieldMetadata {
         return result;
     }
 
-    private Method findMethod(Class type, String methodName, Class<?>... parameters) {
+    private Method findMethod(Class<?> type, String methodName, Class<?>... parameters) {
         try {
             return type.getMethod(methodName, parameters);
         } catch (NoSuchMethodException nsme) {
@@ -173,13 +169,15 @@ public final class FieldMetadata {
      * <p/>
      * This is provided for performance, to avoid obtaining the same value twice via reflection.
      *
-     * @param rawValue
-     * @return
+     * @param rawValue The value to serialize
+     * @return The serialized value
      */
+    @SuppressWarnings("unchecked")
     public EntityData.Value serializeValue(Object rawValue) {
         return serializationHandler.serialize(rawValue);
     }
 
+    @SuppressWarnings("unchecked")
     public EntityData.Value serialize(Object container) {
         Object rawValue = getValue(container);
         if (rawValue != null) {
@@ -191,8 +189,8 @@ public final class FieldMetadata {
     /**
      * Serializes the field for the given object
      *
-     * @param container
-     * @return
+     * @param container The object containing this field
+     * @return The Name-Value pair holding this field
      */
     public EntityData.NameValue serializeNameValue(Object container, boolean usingFieldIds) {
         Object rawValue = getValue(container);

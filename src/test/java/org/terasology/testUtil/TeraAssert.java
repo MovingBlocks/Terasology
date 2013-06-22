@@ -19,12 +19,12 @@ import java.util.List;
 public final class TeraAssert {
     private TeraAssert() {}
 
-    public static void assertEqualsContent(Collection expected, Collection actual) {
+    public static <T> void assertEqualsContent(Collection<? extends T> expected, Collection<? extends T> actual) {
         if (expected == null) {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            List copyActual = Lists.newArrayList(actual);
+            List<? extends T> copyActual = Lists.newArrayList(actual);
             for (Object obj : expected) {
                 assertTrue("Missing element: " + obj, copyActual.remove(obj));
             }

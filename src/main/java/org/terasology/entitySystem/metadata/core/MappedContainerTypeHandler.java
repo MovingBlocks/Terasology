@@ -78,7 +78,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
             try {
                 T result = clazz.newInstance();
                 for (FieldMetadata field : fields.values()) {
-                    field.setValue(result, field.copy(field.getValue(value)));
+                    field.setValue(result, field.getCopyOfValue(value));
                 }
                 return result;
             } catch (InstantiationException e) {
