@@ -11,6 +11,7 @@ public class WorldGenerationConfig {
     private float snowGrassDensity = 0.001f;
     private float mountainGrassDensity = 0.2f;
     private float desertGrassDensity = 0.001f;
+    private float hillsGrassDensity = 0.25f;
 
     private String defaultSeed = "sGfJeVcSeYxDwArXwDlOfUaTnGgRfGzA";
     private float ZOOM_FACTOR = 8f;
@@ -33,11 +34,16 @@ public class WorldGenerationConfig {
     public float getForestGrassDensity() {
         return forestGrassDensity;
     }
-
     public void setForestGrassDensity(float forestGrassDensity) {
         this.forestGrassDensity = forestGrassDensity;
     }
-
+    public float getHillsGrassDensity() {
+        return hillsGrassDensity;
+    }
+    public void setHillsGrassDensity(float hillsGrassDensity)
+    {
+        this.hillsGrassDensity = hillsGrassDensity;
+    }
     public float getPlainsGrassDensity() {
         return plainsGrassDensity;
     }

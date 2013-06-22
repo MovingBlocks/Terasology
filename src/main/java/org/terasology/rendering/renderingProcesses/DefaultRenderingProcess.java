@@ -321,7 +321,16 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
         createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
-        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
+        if(config.getRendering().getScreenshotSize == 1) {
+                  createFBO("sceneFinal", rtFullWidth *2, rtFullHeight*2, FBOType.DEFAULT, false, false);
+        } elseif(config.getRendering().getScreenshotSize == 2) {
+                  createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
+        } elseif(config.getRendering().getScreenshotSize == 3) {
+                   createFBO("sceneFinal", rtHalfWidth, rtHalfHeight, FBOType.DEFAULT, false, false);
+        } elseif(config.getRendering().getScreenshotSize == 4) {
+          createFBO("sceneFinal", rtQuarterWidth, rtQuarterHeight, FBOType.DEFAULT, false, false);
+        }
+  
 
         createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
 
@@ -1221,7 +1230,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                 final String fileName = "Terasology-" + sdf.format(cal.getTime()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + ".png";
                 File file = new File( PathManager.getInstance().getScreenshotPath(), fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
-
                 for (int x = 0; x < fboSceneFinal.width; x++)
                     for (int y = 0; y < fboSceneFinal.height; y++) {
                         int i = (x + fboSceneFinal.width * y) * 4;

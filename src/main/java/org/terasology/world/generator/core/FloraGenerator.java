@@ -104,6 +104,9 @@ public class FloraGenerator implements ChunkGenerator {
                 case DESERT:
                     grassProb = 1.0 - config.getDesertGrassDensity();
                     break;
+                case HILLS:
+                    grassProb = 1.0 - config.getHillsGrassDensity();
+                    break;
             }
 
             if (grassRand > grassProb) {

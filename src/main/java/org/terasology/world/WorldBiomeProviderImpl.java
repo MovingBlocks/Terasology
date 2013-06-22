@@ -63,11 +63,12 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
             return Biome.SNOW;
         } else if (humidity >= 0.2 && humidity <= 0.6 && temp < 0.5) {
             return Biome.MOUNTAINS;
+        }  else if(temp >= 0 && humidity <= 0.5) {
+        return Biome.HILLS;
         }
 
         return Biome.FOREST;
     }
-
     @Override
     public Biome getBiomeAt(float x, float z) {
         return getBiomeAt(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(z + 0.5f));
