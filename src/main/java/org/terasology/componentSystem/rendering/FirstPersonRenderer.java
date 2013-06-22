@@ -187,7 +187,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
         Block activeBlock = blockFamily.getArchetypeBlock();
-        Vector3f playerPos = localPlayer.getPosition();
+        //Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
@@ -214,7 +214,14 @@ public class FirstPersonRenderer implements RenderSystem {
         glTranslatef(0f, 0.1f, 0f);
         glScalef(0.75f, 0.75f, 0.75f);
 
-        activeBlock.renderWithLightValue(worldRenderer.getRenderingLightValue());
+        float lightValue = worldRenderer.getRenderingLightValue();
+
+        //  Blocks with a luminance > 0.0 shouldn't be affected by block light
+        if (blockFamily.getArchetypeBlock().getLuminance() > 0.0) {
+            lightValue = 1.0f;
+        }
+
+        activeBlock.renderWithLightValue(lightValue);
 
         glPopMatrix();
 
