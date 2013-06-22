@@ -50,7 +50,7 @@ public class ModInfo {
     private final String description;
     private final String author;
     private final Set<String> dependencies;
-    private final Map<String, PerBlockStorageExtensionInfo> perBlockStorageExtensions;
+    private final Map<String, StorageExtension> perBlockStorageExtensions;
 
     private ModInfo(JsonObject input) {
         if (input.has("id"))
@@ -82,12 +82,12 @@ public class ModInfo {
         } else
             this.dependencies = null;
         if (input.has("perBlockStorageExtensions") && input.get("perBlockStorageExtensions").isJsonArray())
-            this.perBlockStorageExtensions = PerBlockStorageExtensionInfo.load(displayName.isEmpty() ? id : displayName, input.get("perBlockStorageExtensions").getAsJsonArray());
+            this.perBlockStorageExtensions = StorageExtension.load(displayName.isEmpty() ? id : displayName, input.get("perBlockStorageExtensions").getAsJsonArray());
         else
             this.perBlockStorageExtensions = null;
     }
     
-    public ModInfo(String id, String displayName, String description, String author, Iterable<String> dependencies, Map<String, PerBlockStorageExtensionInfo> perBlockStorageExtensions) {
+    public ModInfo(String id, String displayName, String description, String author, Iterable<String> dependencies, Map<String, StorageExtension> perBlockStorageExtensions) {
         this.id = Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
         this.displayName = Preconditions.checkNotNull(displayName, "The parameter 'displayName' must not be null");
         this.description = Preconditions.checkNotNull(description, "The parameter 'description' must not be null");
@@ -102,12 +102,12 @@ public class ModInfo {
             this.perBlockStorageExtensions = null;
     }
     
-    public static class PerBlockStorageExtensionInfo {
+    public static class StorageExtension {
         
         private final String id;
         private final String factory;
         
-        private PerBlockStorageExtensionInfo(JsonObject info) {
+        private StorageExtension(JsonObject info) {
             if (info.has("id"))
                 id = info.get("id").getAsString().trim();
             else
@@ -118,7 +118,7 @@ public class ModInfo {
                 factory = "";
         }
         
-        public PerBlockStorageExtensionInfo(String id, String factory) {
+        public StorageExtension(String id, String factory) {
             this.id = Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
             this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
         }
@@ -131,12 +131,12 @@ public class ModInfo {
             return factory;
         }
         
-        public static Map<String, PerBlockStorageExtensionInfo> load(String modDisplayName, JsonArray array) {
+        public static Map<String, StorageExtension> load(String modDisplayName, JsonArray array) {
             Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
-            final Map<String, PerBlockStorageExtensionInfo> map = Maps.newHashMap();
+            final Map<String, StorageExtension> map = Maps.newHashMap();
             for (final JsonElement elem : array) {
                 if (elem.isJsonObject()) {
-                    final PerBlockStorageExtensionInfo info = new PerBlockStorageExtensionInfo((JsonObject) elem);
+                    final StorageExtension info = new StorageExtension((JsonObject) elem);
                     if (info.getId().isEmpty()) {
                         logger.warn("Discovered invalid per-block-storage extension for mod '{}', skipping", modDisplayName);
                         continue;
@@ -180,7 +180,7 @@ public class ModInfo {
         return Sets.newLinkedHashSet(dependencies);
     }
     
-    public Map<String, PerBlockStorageExtensionInfo> getPerBlockStorageExtensions() {
+    public Map<String, StorageExtension> getPerBlockStorageExtensions() {
         if (perBlockStorageExtensions == null)
             return Maps.newHashMap();
         return Maps.newHashMap(perBlockStorageExtensions);
