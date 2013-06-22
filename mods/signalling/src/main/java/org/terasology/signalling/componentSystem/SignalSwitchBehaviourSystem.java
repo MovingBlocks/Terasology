@@ -53,6 +53,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private Block signalOrGate;
     private Block signalAndGate;
     private Block signalXorGate;
+    private Block signalNandGate;
 
     @Override
     public void update(float delta) {
@@ -105,6 +106,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         signalOrGate = blockManager.getBlock("signalling:SignalOrGate");
         signalAndGate = blockManager.getBlock("signalling:SignalAndGate");
         signalXorGate = blockManager.getBlock("signalling:SignalXorGate");
+        signalNandGate = blockManager.getBlock("signalling:SignalNandGate");
     }
 
     @Override
@@ -182,6 +184,18 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                     entity.saveComponent(new SignalProducerModifiedComponent());
                 } else {
                     producerComponent.signalStrength=0;
+                    entity.saveComponent(producerComponent);
+                    entity.removeComponent(SignalProducerModifiedComponent.class);
+                }
+            } else if (blockAtLocation == signalNandGate) {
+                SignalProducerComponent producerComponent = entity.getComponent(SignalProducerComponent.class);
+                logger.info("Gate has signal: "+consumerStatusComponent.hasSignal);
+                if (consumerStatusComponent.hasSignal) {
+                    producerComponent.signalStrength=0;
+                    entity.saveComponent(producerComponent);
+                    entity.saveComponent(new SignalProducerModifiedComponent());
+                } else {
+                    producerComponent.signalStrength=-1;
                     entity.saveComponent(producerComponent);
                     entity.removeComponent(SignalProducerModifiedComponent.class);
                 }

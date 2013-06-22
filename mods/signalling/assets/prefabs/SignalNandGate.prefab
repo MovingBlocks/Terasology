@@ -1,0 +1,13 @@
+{
+    "SignalProducer": {
+        "connectionSides": 4,
+        "signalStrength": -1
+    },
+    "SignalConsumer": {
+        "connectionSides": 59,
+        "mode": "ALL_CONNECTED"
+    },
+    "SignalConsumerStatus": {
+        "hasSignal": false
+    }
+}

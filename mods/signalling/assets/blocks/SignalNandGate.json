@@ -1,0 +1,6 @@
+{
+    "displayName": "Signal NAND Gate",
+    "entity" : {
+        "prefab" : "signalling:SignalNandGate"
+    }
+}
