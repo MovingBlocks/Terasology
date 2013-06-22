@@ -20,13 +20,14 @@ package org.terasology.rendering.gui.dialogs;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
+import org.newdawn.slick.opengl.PNGDecoder;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-
-import java.io.ByteArrayOutputStream;
-
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -36,25 +37,15 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.widgets.*;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.world.TerrainPreviewGenerator;
-
 import org.terasology.world.generator.core.PerlinTerrainGeneratorWithSetup;
-import org.terasology.rendering.gui.widgets.UIButton;
-import org.terasology.rendering.gui.widgets.UILabel;
-import org.terasology.rendering.gui.widgets.UISlider;
-import org.terasology.rendering.gui.widgets.UIDialog;
-import org.newdawn.slick.opengl.PNGDecoder;
-import java.io.ByteArrayInputStream;
-
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 
 
 /*
@@ -650,7 +641,7 @@ public class UIDialogSetUpMap extends UIDialog {
             }
         });
 
-        //private float desertGrassDensity = 0.001f;
+        //private float hillsGrassDensity = 0.001f;
         range = Math.round(0.001f * 100000f *2f);
         DesertGrassDensityFACTOR = new UISlider(new Vector2f(64f, 32f), 0, range);
         DesertGrassDensityFACTOR.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -693,7 +684,6 @@ public class UIDialogSetUpMap extends UIDialog {
                 }
             }
         });
-
 
             ZOOM_FACTOR = new UISlider(new Vector2f(128f, 16f), 0, 100);
             ZOOM_FACTOR.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -1115,8 +1105,8 @@ public class UIDialogSetUpMap extends UIDialog {
         DesertGrassDensityFACTORLabel.setPosition(new Vector2f(offsettwo + offsettwo2 + DesertGrassDensityFACTORLabel.getText().length(), HillDensityFACTOR.getPosition().y + HillDensityFACTOR.getSize().y + offsethorz2));
         DesertGrassDensityFACTOR.setPosition(new Vector2f(offsettwo, plateauAreaFACTORLabel.getPosition().y + plateauAreaFACTORLabel.getSize().y +offsethorz2));
 
-         ZOOM_FACTORLabel.setPosition(new Vector2f(offsettwo + offsettwo2 + ZOOM_FACTORLabel.getText().length(), plateauAreaFACTOR.getPosition().y + plateauAreaFACTOR.getSize().y + offsethorz2));
-         ZOOM_FACTOR.setPosition(new Vector2f(offsettwo+32, caveDensityFACTORLabel.getPosition().y + caveDensityFACTORLabel.getSize().y + offsethorz2));
+         ZOOM_FACTORLabel.setPosition(new Vector2f(offsettwo + offsettwo2 + ZOOM_FACTORLabel.getText().length(), caveDensityFACTOR.getPosition().y + caveDensityFACTOR.getSize().y + offsethorz2));
+         ZOOM_FACTOR.setPosition(new Vector2f(offsettwo+32, ZOOM_FACTORLabel.getPosition().y + ZOOM_FACTORLabel.getSize().y + offsethorz2));
 
 //Third Column
         SAMPLE_RATE_3D_HORLabel.setPosition(new Vector2f(offsetthird + offsetthird2 + SAMPLE_RATE_3D_HORLabel.getText().length(), offsethorz));

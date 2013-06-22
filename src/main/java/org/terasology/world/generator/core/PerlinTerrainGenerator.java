@@ -16,10 +16,6 @@
 
 package org.terasology.world.generator.core;
 
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
@@ -29,6 +25,9 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+
+import javax.vecmath.Vector2f;
+import java.util.Map;
 
 /**
  * Terasology's legacy map generator. Still rocks!

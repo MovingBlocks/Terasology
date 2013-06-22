@@ -1,23 +1,5 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- 
 package org.terasology.world.generator.core;
 
-import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
@@ -31,17 +13,12 @@ import org.terasology.world.liquid.LiquidType;
 import javax.vecmath.Vector2f;
 import java.util.Map;
 
-/*
- * Terasology's legacy map generator (modifiable version). Still rocks!
- *
- * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
+/**
+ * @author Julien "NowNewStart" Gelmar <master@nownewstart.net>
  */
-public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
-
-    public static int SAMPLE_RATE_3D_HOR = 4;
-    public static int SAMPLE_RATE_3D_VERT = 4;
-
-    private double calcBaseTerrainFACTOR, calcOceanTerrainFACTOR, calcRiverTerrainFACTOR, calcMountainFACTOR, calcHillDensityFACTOR, plateauAreaFACTOR, caveDensityFACTOR;
+public class HillsTerrainGenerator implements ChunkGenerator {
+    private static final int SAMPLE_RATE_3D_HOR = 4;
+    private static final int SAMPLE_RATE_3D_VERT = 4;
 
     private PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen8;
     private WorldBiomeProvider biomeProvider;
@@ -72,16 +49,6 @@ public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
             _pGen5 = new PerlinNoise(seed.hashCode() + 4);
             _pGen8 = new PerlinNoise(seed.hashCode() + 7);
         }
-            Config config = CoreRegistry.get(Config.class);
-
-            calcBaseTerrainFACTOR = config.getWorldGeneration().getBaseTerrainFACTOR()/100;
-            calcOceanTerrainFACTOR = config.getWorldGeneration().getOceanTerrainFACTOR()/100;
-            calcRiverTerrainFACTOR = config.getWorldGeneration().getRiverTerrainFACTOR()/100;
-            calcMountainFACTOR = config.getWorldGeneration().getMountainFACTOR()/100;
-            calcHillDensityFACTOR = config.getWorldGeneration().getHillDensityFACTOR()/100;
-            plateauAreaFACTOR = config.getWorldGeneration().getplateauAreaFACTOR()/100;
-            caveDensityFACTOR = config.getWorldGeneration().getcaveDensityFACTOR()/100;
-
     }
 
     @Override
@@ -139,7 +106,7 @@ public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
 
                     if ((dens >= 0 && dens < 32)) {
 
-                        // Some block was set...   `
+                        // Some block was set...
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
@@ -224,6 +191,19 @@ public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
                 }
 
                 break;
+            case HILLS:
+                if(y >= 28 && y <= 34)  {
+                    c.setBlock(x,y,z,sand);
+                } else if(depth == 0 && y > 32 && y < 128) {
+                    c.setBlock(x,y,z,grass);
+                } else if(depth <= 0 && y >= 64) {
+                    c.setBlock(x,y,z, grass);
+                } else if(depth <= 0 && y < 32) {
+                    c.setBlock(x,y,z,stone);
+                } else{
+                    c.setBlock(x,y,z, dirt);
+                }
+                break;
         }
     }
 
@@ -257,32 +237,28 @@ public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
         double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
         int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
-
-        double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea * plateauAreaFACTOR);
+        double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
 
         return -y + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0) * flatten;
     }
 
     private double calcBaseTerrain(double x, double z) {
-
-        return TeraMath.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0 * calcBaseTerrainFACTOR);
+        return TeraMath.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
     }
 
     private double calcOceanTerrain(double x, double z) {
-
-        return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0 * calcOceanTerrainFACTOR);
+        return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
     }
 
     private double calcRiverTerrain(double x, double z) {
-
-        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0 * calcRiverTerrainFACTOR);
+        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
     }
 
     private double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
         x1 = x * 0.002;y1 = y * 0.001; z1 = z * 0.002;
 
-        double result = _pGen4.fBm(x1, y1, z1)  * calcMountainFACTOR;
+        double result = _pGen4.fBm(x1, y1, z1);
         return result > 0.0 ? result : 0;
     }
 
@@ -290,13 +266,12 @@ public class PerlinTerrainGeneratorWithSetup implements ChunkGenerator {
         double x1, y1, z1;
         x1 = x * 0.008; y1 = y * 0.006; z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 , y1, z1)* calcHillDensityFACTOR - 0.1 ;
+        double result = _pGen5.fBm(x1, y1, z1) - 0.1;
         return result > 0.0 ? result : 0;
     }
 
     private double calcCaveDensity(double x, double y, double z) {
-
-        return _pGen8.fBm(x * 0.02 , y * 0.02 , z * 0.02) * caveDensityFACTOR;
+        return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
     }
 
     @Override
