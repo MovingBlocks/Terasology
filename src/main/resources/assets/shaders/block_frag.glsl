@@ -40,6 +40,8 @@ void main(){
         discard;
     }
 
+    color.rgb *= light;
+
     if (textured) {
         color.rgb *= colorOffset.rgb;
         gl_FragData[0].rgba = color;
@@ -48,5 +50,4 @@ void main(){
     }
 
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0);
-    gl_FragData[2].rgba = vec4(light, light, light, 0.0);
 }
