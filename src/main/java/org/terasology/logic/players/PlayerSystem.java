@@ -29,6 +29,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
@@ -118,6 +119,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             worldRenderer.getChunkProvider().updateRelevanceEntity(clientEntity, distance);
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
+            playerCharacter.send(new OnPlayerSpawnedEvent());
         }
     }
 
