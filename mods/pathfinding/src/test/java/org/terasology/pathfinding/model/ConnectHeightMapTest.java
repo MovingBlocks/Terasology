@@ -3,15 +3,12 @@ package org.terasology.pathfinding.model;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.core.PathfinderTestGenerator;
+import org.terasology.pathfinding.PathfinderTestGenerator;
 
 import java.util.HashSet;
 import java.util.Set;

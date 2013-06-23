@@ -1,6 +1,8 @@
 package org.terasology.config;
 
 
+import org.terasology.world.generator.MapGeneratorUri;
+
 /**
  * @author Immortius
  */
@@ -21,6 +23,8 @@ public class WorldGenerationConfig {
     private float  HillDensityFACTOR = 50.0f;
     private float  plateauAreaFACTOR = 50.0f;
     private float  caveDensityFACTOR = 50.0f;
+
+    private MapGeneratorUri defaultMapGenerator = new MapGeneratorUri("core:perlin-setup");
 
     public String getWorldTitle() {
         return worldTitle;
@@ -140,4 +144,11 @@ public class WorldGenerationConfig {
         this.caveDensityFACTOR = caveDensityFACTOR;
     }
 
+    public MapGeneratorUri getDefaultMapGenerator() {
+        return defaultMapGenerator;
+    }
+
+    public void setDefaultMapGenerator(MapGeneratorUri defaultMapGenerator) {
+        this.defaultMapGenerator = defaultMapGenerator;
+    }
 }

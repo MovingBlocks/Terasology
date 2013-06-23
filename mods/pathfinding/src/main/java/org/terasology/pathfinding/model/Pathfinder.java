@@ -55,8 +55,8 @@ public class Pathfinder {
             long time = System.nanoTime();
             heightMap = new HeightMap(world, chunkPos);
             heightMap.update();
-            logger.info("Update chunk " + chunkPos + " took " + ((System.nanoTime() - time) / 1000 / 1000f) + " ms");
-            logger.info("Found " + heightMap);
+//            logger.info("Update chunk " + chunkPos + " took " + ((System.nanoTime() - time) / 1000 / 1000f) + " ms");
+//            logger.info("Found " + heightMap);
             heightMaps.put(chunkPos, heightMap);
             heightMap.connectNeighborMaps(getNeighbor(chunkPos, -1, 0), getNeighbor(chunkPos, 0, -1), getNeighbor(chunkPos, 1,0), getNeighbor(chunkPos, 0,1));
         }

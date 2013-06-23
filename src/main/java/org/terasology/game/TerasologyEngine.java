@@ -46,6 +46,7 @@ import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.version.TerasologyGameVersionInfo;
+import org.terasology.world.generator.MapGeneratorManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -421,6 +422,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+        CoreRegistry.put(MapGeneratorManager.class, new MapGeneratorManager());
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));

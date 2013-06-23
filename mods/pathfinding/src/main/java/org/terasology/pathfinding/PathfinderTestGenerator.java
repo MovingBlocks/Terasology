@@ -1,9 +1,7 @@
-package org.terasology.world.generator.core;
+package org.terasology.pathfinding;
 
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
@@ -11,6 +9,8 @@ import org.terasology.world.generator.ChunkGenerator;
 import java.util.Map;
 
 /**
+ * Generates chunk with flat areas, marks for chunk borders and stairs, connecting multiple floors.
+ *
  * @author synopia
  */
 public class PathfinderTestGenerator implements ChunkGenerator {

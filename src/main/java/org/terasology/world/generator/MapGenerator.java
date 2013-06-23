@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.world.generator.core;
+package org.terasology.world.generator;
 
 import java.util.List;
 
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
@@ -27,18 +28,21 @@ import org.terasology.world.generator.BaseChunkGenerator;
 /**
  * @author Immortius
  */
-public interface ChunkGeneratorManager {
+public interface MapGenerator {
+    String name();
+    MapGeneratorUri uri();
 
-    List<BaseChunkGenerator> getBaseChunkGenerators();
+    void setup();
 
     void setWorldSeed(String seed);
 
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 
-    void registerChunkGenerator(BaseChunkGenerator generator);
-
     Chunk generateChunk(Vector3i pos);
 
     void secondPassChunk(Vector3i chunkPos, WorldView view);
+
+    boolean hasSetup();
+    UIDialog createSetupDialog();
 
 }

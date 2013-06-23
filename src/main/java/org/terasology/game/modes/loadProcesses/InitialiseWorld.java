@@ -31,10 +31,8 @@ import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
-
-import java.util.Arrays;
+import org.terasology.world.generator.MapGenerator;
+import org.terasology.world.generator.MapGeneratorManager;
 
 /**
  * @author Immortius
@@ -64,13 +62,14 @@ public class InitialiseWorld implements LoadProcess {
         logger.info("World seed: \"{}\"", worldInfo.getSeed());
 
         // TODO: Separate WorldRenderer from world handling in general
-        // Init ChunkGeneratorManager
-        ChunkGeneratorManager chunkGeneratorManager = ChunkGeneratorManagerImpl.buildChunkGenerator(Arrays.asList(worldInfo.getChunkGenerators()));
-        chunkGeneratorManager.setWorldSeed(worldInfo.getSeed());
-        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
+        // Init MapGenerator
+        MapGenerator mapGenerator = CoreRegistry.get(MapGeneratorManager.class).getMapGenerator(worldInfo.getMapGeneratorUri());
+        mapGenerator.setWorldSeed(worldInfo.getSeed());
+        mapGenerator.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
+        mapGenerator.setup();
 
         // Init. a new world
-        WorldRenderer worldRenderer = new WorldRenderer(worldInfo, chunkGeneratorManager, CoreRegistry.get(EntityManager.class), CoreRegistry.get(LocalPlayerSystem.class));
+        WorldRenderer worldRenderer = new WorldRenderer(worldInfo, mapGenerator, CoreRegistry.get(EntityManager.class), CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
 
