@@ -21,15 +21,13 @@ import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
-import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
-import org.terasology.game.types.SurvivalType;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.layout.ColumnLayout;
-import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.*;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
@@ -64,6 +62,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UILabel chunkGeneratorLabel;
     private UIComboBox chunkGenerator;
     private UIComboBox typeOfGame;
+    private List<GameType> gameTypes;
     private UILabel typeOfGameLabel;
 
     private ModConfig modConfig;
@@ -144,18 +143,41 @@ public class UIDialogCreateNewWorld extends UIDialog {
         typeOfGameLabel = createLabel("Choose type of game:");
 
         typeOfGame = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2*COMPONENT_HEIGHT));
-        UIListItem item = new UIListItem(new SurvivalType().getName(), new SurvivalType());
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        typeOfGame.addItem(item);
+        gameTypes = CoreRegistry.get(GameTypeManager.class).listItems();
+        int index = 0;
+        int defaultIndex = 0;
+        for (GameType gameType : gameTypes) {
+            UIListItem item = new UIListItem(gameType.name(), index);
+            item.setTextColor(Color.black);
+            item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+            typeOfGame.addItem(item);
+        }
 
-        item = new UIListItem(new FreeStyleType().getName(), new FreeStyleType());
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        typeOfGame.addItem(item);
-        typeOfGame.select(0);
+        typeOfGame.select(defaultIndex);
         typeOfGame.setVisible(true);
+        typeOfGame.addSelectionListener(new SelectionListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                ModConfig gameTypeModConfig = getSelectedGameType().defaultModConfig();
 
+                if( gameTypeModConfig!=null ) {
+                    modConfig.copy(gameTypeModConfig);
+                    modConfig.addMod(CoreRegistry.get(GameTypeManager.class).getMod(getSelectedGameType().uri()));
+                }
+
+                MapGeneratorUri mapGeneratorUri = getSelectedGameType().defaultMapGenerator();
+                if( mapGeneratorUri!=null ) {
+                    int index = 0;
+                    for (MapGenerator generator : mapGenerators) {
+                        if( generator.uri().equals(mapGeneratorUri) ) {
+                            chunkGenerator.select(index);
+                            break;
+                        }
+                        index++;
+                    }
+                }
+            }
+        });
     }
 
     private void createChunkGeneratorInput() {
@@ -176,14 +198,15 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
         chunkGeneratorLabel = createLabel("Choose Map Generator:");
 
-        MapGeneratorManager mapGeneratorManager = CoreRegistry.get(MapGeneratorManager.class);
-        mapGenerators = mapGeneratorManager.listMapGenerators();
+        final MapGeneratorManager mapGeneratorManager = CoreRegistry.get(MapGeneratorManager.class);
+        mapGenerators = mapGeneratorManager.listItems();
         chunkGenerator = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2*COMPONENT_HEIGHT));
         MapGeneratorUri defaultMapGenerator = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultMapGenerator();
         UIListItem item;
         int index = 0;
         int defaultIndex = 0;
         for (MapGenerator mapGenerator : mapGenerators) {
+
             if( mapGenerator.uri().equals(defaultMapGenerator) ) {
                 defaultIndex = index;
             }
@@ -199,8 +222,12 @@ public class UIDialogCreateNewWorld extends UIDialog {
         chunkGenerator.addSelectionListener(new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
-                MapGenerator mapGenerator = mapGenerators.get(chunkGenerator.getSelectionIndex());
-                    mapSetupButton.setVisible(mapGenerator.hasSetup());
+                MapGenerator mapGenerator = getSelectedMapGenerator();
+                mapSetupButton.setVisible(mapGenerator.hasSetup());
+                String mod = mapGeneratorManager.getMod(mapGenerator.uri());
+                if( mod!=null ) {
+                    modConfig.addMod(mod);
+                }
             }
         });
         chunkGenerator.select(defaultIndex);
@@ -220,7 +247,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private void createOkayButton() {
         okButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         okButton.getLabel().setText("Play");
-//        okButton.setPosition(new Vector2f(getSize().x / 2 - okButton.getSize().x - 16f, getSize().y - okButton.getSize().y - 10));
         okButton.setVisible(true);
 
         okButton.addClickListener(new ClickListener() {
@@ -239,8 +265,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     return;
                 }
 
-                CoreRegistry.put(GameType.class, (GameType) typeOfGame.getSelection().getValue());
-
                 //set the world settings
                 if (inputSeed.getText().length() > 0) {
                     config.getWorldGeneration().setDefaultSeed(inputSeed.getText());
@@ -258,9 +282,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 CoreRegistry.get(Config.class).getDefaultModSelection().copy(modConfig);
                 CoreRegistry.get(Config.class).save();
 
+                GameType gameType = getSelectedGameType();
                 MapGenerator mapGenerator = getSelectedMapGenerator();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(config.getWorldGeneration().getWorldTitle(), config.getWorldGeneration().getDefaultSeed(), config.getSystem().getDayNightLengthInMs() / 4, mapGenerator.uri(), CoreRegistry.get(GameType.class).getClass().toString(), modConfig)));
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(config.getWorldGeneration().getWorldTitle(), config.getWorldGeneration().getDefaultSeed(), config.getSystem().getDayNightLengthInMs() / 4, mapGenerator.uri(), gameType.uri(), modConfig)));
             }
         });
     }
@@ -297,6 +322,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private MapGenerator getSelectedMapGenerator() {
         int index = chunkGenerator.getSelectionIndex();
         return mapGenerators.get(index);
+    }
+    private GameType getSelectedGameType() {
+        int index = typeOfGame.getSelectionIndex();
+        return gameTypes.get(index);
     }
 
     private String getWorldName() {

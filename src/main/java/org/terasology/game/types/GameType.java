@@ -16,20 +16,30 @@
 package org.terasology.game.types;
 
 import org.terasology.components.HealthComponent;
+import org.terasology.config.ModConfig;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.world.generator.MapGeneratorUri;
 
-public abstract class GameType {
-    private String name = "";
+/**
+ * A game type.
+ */
+public interface GameType {
+    String name();
+    GameTypeUri uri();
 
-    public String getName(){
-        return name;
-    };
+    /**
+     * Is called when world is initialized
+     */
+    void initialize();
 
-    protected void setName(String name){
-        this.name = name;
-    }
+    /**
+     * @return mod configuration to auto select or null if default
+     */
+    ModConfig defaultModConfig();
 
-    public void onCreateInventoryHook(UIWindow parent){};
-    public void onPlayerDamageHook(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator){};
+    MapGeneratorUri defaultMapGenerator();
+
+    void onCreateInventoryHook(UIWindow parent);
+    void onPlayerDamageHook(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator);
 }

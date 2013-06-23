@@ -2,9 +2,13 @@ package org.terasology.world.generator;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.types.GameType;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModAwareManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.rendering.gui.dialogs.UIDialogSetUpMap;
 import org.terasology.rendering.gui.widgets.UIDialog;
@@ -19,7 +23,7 @@ import java.util.*;
  *
  * @author synopia
  */
-public class MapGeneratorManager {
+public class MapGeneratorManager extends ModAwareManager<MapGenerator, MapGeneratorUri> {
     private static final Logger logger = LoggerFactory.getLogger(MapGeneratorManager.class);
 
     public static class Perlin extends BaseMapGenerator {
@@ -128,46 +132,23 @@ public class MapGeneratorManager {
         }
     }
 
-    private List<MapGenerator> generators = Lists.newArrayList();
-
-    public MapGeneratorManager() {
-        refresh();
+    @Override
+    protected MapGeneratorUri getUri(MapGenerator item) {
+        return item.uri();
     }
 
-    public List<MapGenerator> listMapGenerators() {
-        return generators;
+    @Override
+    protected List<Class> getClasses() {
+        return Arrays.asList((Class) MapGenerator.class, BaseMapGenerator.class);
     }
 
-    public MapGenerator getMapGenerator( MapGeneratorUri uri ) {
-        for (MapGenerator generator : generators) {
-            if( generator.uri().equals(uri) ) {
-                return generator;
-            }
-        }
-        return null;
-    }
-
-    public void refresh() {
-        generators.clear();
-        Set<Class<? extends MapGenerator>> generatorClasses = CoreRegistry.get(ModManager.class).getAllReflections().getSubTypesOf(MapGenerator.class);
-        for (Class<? extends MapGenerator> generatorClass : generatorClasses) {
-            try {
-                if(!generatorClass.isInterface() && !Modifier.isAbstract(generatorClass.getModifiers())) {
-                    MapGenerator mapGenerator = generatorClass.newInstance();
-                    generators.add(mapGenerator);
-                    logger.info("Found map generator "+mapGenerator.uri()+" ("+mapGenerator.name()+")");
-                }
-            } catch (InstantiationException e) {
-                logger.warn("Could not get map generator "+generatorClass.getName());
-            } catch (IllegalAccessException e) {
-                logger.warn("Could not get map generator " + generatorClass.getName());
-            }
-        }
-        Collections.sort(generators, new Comparator<MapGenerator>() {
+    @Override
+    protected Comparator<MapGenerator> getItemComparator() {
+        return new Comparator<MapGenerator>() {
             @Override
-            public int compare(MapGenerator g1, MapGenerator g2) {
-                return g1.name().compareTo(g2.name());
+            public int compare(MapGenerator o1, MapGenerator o2) {
+                return o1.name().compareTo(o2.name());
             }
-        });
+        };
     }
 }

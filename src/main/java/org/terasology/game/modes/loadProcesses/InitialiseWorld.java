@@ -23,6 +23,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
@@ -63,10 +64,13 @@ public class InitialiseWorld implements LoadProcess {
 
         // TODO: Separate WorldRenderer from world handling in general
         // Init MapGenerator
-        MapGenerator mapGenerator = CoreRegistry.get(MapGeneratorManager.class).getMapGenerator(worldInfo.getMapGeneratorUri());
+        MapGenerator mapGenerator = CoreRegistry.get(MapGeneratorManager.class).getItem(worldInfo.getMapGeneratorUri());
         mapGenerator.setWorldSeed(worldInfo.getSeed());
         mapGenerator.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
         mapGenerator.setup();
+
+        CoreRegistry.get(GameTypeManager.class).setActiveGameTypeUri(worldInfo.getGameType());
+        CoreRegistry.get(GameTypeManager.class).getActiveGameType().initialize();
 
         // Init. a new world
         WorldRenderer worldRenderer = new WorldRenderer(worldInfo, mapGenerator, CoreRegistry.get(EntityManager.class), CoreRegistry.get(LocalPlayerSystem.class));

@@ -22,7 +22,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
 import org.terasology.game.types.GameType;
-import org.terasology.game.types.SurvivalType;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -162,12 +162,6 @@ public class UIMenuSingleplayer extends UIWindow {
         try {
             WorldInfo info = (WorldInfo) list.getSelection().getValue();
 
-            try {
-                CoreRegistry.put(GameType.class, (GameType) Class.forName(info.getGameType().substring(6)).newInstance());
-            } catch (Exception e) {
-                CoreRegistry.put(GameType.class, new SurvivalType());
-            }
-
             Config config = CoreRegistry.get(Config.class);
 
             config.getWorldGeneration().setDefaultSeed(info.getSeed());
@@ -216,7 +210,11 @@ public class UIMenuSingleplayer extends UIWindow {
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    String type = ((GameType) Class.forName(info.getGameType().substring(6)).newInstance()).getName();
+                    String type = "unknown";
+                    GameType gameType = CoreRegistry.get(GameTypeManager.class).getGameType(info.getGameType());
+                    if( gameType!=null ) {
+                        type = gameType.name();
+                    }
                     String worldDescription = " (" + type + ")\n" + date.format(world.getKey());
                     UIListItem item = new UIListItem(info.getTitle() + worldDescription, info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
@@ -224,14 +222,7 @@ public class UIMenuSingleplayer extends UIWindow {
                 }
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);
-            } catch (ClassNotFoundException e) {
-                logger.error("Failed reading world data object.", e);
-            } catch (IllegalAccessException e) {
-                logger.error("Failed reading world data object.", e);
-            } catch (InstantiationException e) {
-                logger.error("Failed reading world data object.", e);
             }
-
         }
     }
 

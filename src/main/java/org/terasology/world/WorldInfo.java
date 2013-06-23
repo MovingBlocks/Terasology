@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.types.GameTypeUri;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.generator.MapGeneratorUri;
@@ -46,13 +47,13 @@ public class WorldInfo {
     private long time = 0;
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private MapGeneratorUri mapGeneratorUri = new MapGeneratorUri("core:perlin");
-    private String gameType = null;
+    private GameTypeUri gameTypeUri = null;
     private ModConfig modConfiguration = new ModConfig();
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, MapGeneratorUri mapGeneratorUri, String gameType, ModConfig modConfig) {
+    public WorldInfo(String title, String seed, long time, MapGeneratorUri mapGeneratorUri, GameTypeUri gameTypeUri, ModConfig modConfig) {
         if (title != null) {
             this.title = title;
         }
@@ -63,7 +64,7 @@ public class WorldInfo {
             this.mapGeneratorUri = mapGeneratorUri;
         }
         this.time = time;
-        this.gameType = gameType;
+        this.gameTypeUri = gameTypeUri;
         this.modConfiguration.copy(modConfig);
     }
 
@@ -72,6 +73,7 @@ public class WorldInfo {
         try {
             new GsonBuilder().
                     registerTypeAdapter(MapGeneratorUri.class, new MapGeneratorUri.GsonAdapter()).
+                    registerTypeAdapter(GameTypeUri.class, new GameTypeUri.GsonAdapter()).
                     setPrettyPrinting().create().toJson(worldInfo, writer);
         } finally {
             // JAVA7: better closing support
@@ -84,6 +86,7 @@ public class WorldInfo {
         try {
             WorldInfo result = new GsonBuilder().
                     registerTypeAdapter(MapGeneratorUri.class, new MapGeneratorUri.GsonAdapter()).
+                    registerTypeAdapter(GameTypeUri.class, new GameTypeUri.GsonAdapter()).
                     create().fromJson(reader, WorldInfo.class);
             if (result.modConfiguration.size() == 0) {
                 for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {
@@ -124,8 +127,8 @@ public class WorldInfo {
         this.time = time;
     }
 
-    public String getGameType() {
-        return gameType;
+    public GameTypeUri getGameType() {
+        return gameTypeUri;
     }
 
     public Map<String, Short> getBlockIdMap() {
