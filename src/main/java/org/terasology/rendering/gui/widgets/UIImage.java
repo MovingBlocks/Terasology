@@ -143,7 +143,7 @@ public class UIImage extends UIDisplayContainer {
                 origin = new Vector2f(0f, 0f);
             }
 
-            textureOrigin = new Vector2f(origin.x / (float) texture.getWidth(), origin.y / (float) texture.getHeight());
+            textureOrigin.set(origin.x / (float) texture.getWidth(), origin.y / (float) texture.getHeight());
         }
     }
 
@@ -167,7 +167,7 @@ public class UIImage extends UIDisplayContainer {
                 size = new Vector2f(texture.getWidth(), texture.getHeight());
             }
 
-            textureSize = new Vector2f(size.x / (float) texture.getWidth(), size.y / (float) texture.getHeight());
+            textureSize.set(size.x / (float) texture.getWidth(), size.y / (float) texture.getHeight());
         }
     }
 

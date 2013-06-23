@@ -73,10 +73,9 @@ public class AssetManager {
     }
 
     public void addAssetTemporary(AssetUri uri, Asset asset) {
+        assetCache.put(uri, asset);
         // TODO - most of our assets cause crashes when disposed at the moment
-        /*
-        Asset old = assetCache.put(uri, asset);
-        if (old != null) {
+        /* if (old != null) {
             // old.dispose();
         } */
     }

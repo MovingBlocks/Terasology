@@ -178,8 +178,7 @@ public class ModManager {
                     return pathname.isFile() && (pathname.getName().endsWith(".zip") || pathname.getName().endsWith(".jar"));
                 }
             })) {
-                try {
-                    ZipFile zipFile = new ZipFile(modFile);
+                try (ZipFile zipFile = new ZipFile(modFile)){
                     ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
                     if (modInfoEntry != null) {
                         try {
@@ -228,6 +227,7 @@ public class ModManager {
         for (Mod mod : getActiveMods()) {
             mod.setActiveClassLoader(activeModClassLoader);
         }
+        // We don't submit any urls as we don't want to scan (going to merge in from previous scans)
         activeModReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModClassLoader));
         activeModReflections.merge(getEngineReflections());
         for (Mod mod : getActiveMods()) {

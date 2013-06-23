@@ -103,16 +103,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public boolean isChunkReady(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
-        if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
-            return false;
-        }
-        for (Vector3i adjPos : Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.LOCAL_REGION_EXTENTS)) {
-            Chunk adjChunk = chunkCache.get(adjPos);
-            if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) == -1) {
-                return false;
-            }
-        }
-        return true;
+        return chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE;
     }
 
     @Override

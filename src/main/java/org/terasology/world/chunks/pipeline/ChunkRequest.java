@@ -195,19 +195,12 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
                 }
             }
             logger.debug("Now complete {}", pos);
-            chunk.setChunkState(Chunk.State.COMPLETE);
             AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
             if (config.isChunkDeflationEnabled()) {
-                pipeline.doTask(new DeflateChunkTask(pipeline, pos, provider));
+                chunk.deflate();
             }
-            if (provider.isChunkReady(pos)) {
-                provider.onChunkIsReady(pos);
-            }
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
-                if (provider.isChunkReady(adjPos)) {
-                    provider.onChunkIsReady(adjPos);
-                }
-            }
+            chunk.setChunkState(Chunk.State.COMPLETE);
+            provider.onChunkIsReady(pos);
         }
     }
 
