@@ -14,9 +14,10 @@ import javax.vecmath.Vector2f;
 import java.util.Map;
 
 /**
- * Terasology's legacy map generator. Still rocks!
+ * Terasology's legacy map generator with the new Hills Biome. Still rocks!
  *
  * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
+ * @author Julien Gelmar <master@nownewstart.net>
  */
 public class HillsTerrainGenerator implements ChunkGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
