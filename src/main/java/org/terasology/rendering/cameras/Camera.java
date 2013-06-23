@@ -35,6 +35,10 @@ public abstract class Camera {
     protected final Vector3f up = new Vector3f(0, 1, 0);
     protected final Vector3f viewingDirection = new Vector3f(1, 0, 0);
 
+    protected float zNear = 0.1f;
+    // TODO: This is too large, but many properties have to be adjusted if it changes
+    protected float zFar = 5000.0f;
+
     protected float targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
     protected float activeFov = targetFov / 4f;
 
@@ -58,7 +62,7 @@ public abstract class Camera {
     /* USED FOR DIRTY CHECKS */
     protected Vector3f cachedPosition = new Vector3f();
     protected Vector3f cachedViewigDirection = new Vector3f();
-    protected float cachedFov = 0.0f;
+    protected float cachedFov = 0.0f, cachedZNear = 0.0f, cachedZFar = 0.0f;
 
     /* ETC */
     protected boolean reflected = false;
@@ -191,5 +195,21 @@ public abstract class Camera {
 
     public ViewFrustum getViewFrustumReflected() {
         return viewFrustumReflected;
+    }
+
+    public float getzNear() {
+        return zNear;
+    }
+
+    public void setzNear(float zNear) {
+        this.zNear = zNear;
+    }
+
+    public float getzFar() {
+        return zFar;
+    }
+
+    public void setzFar(float zFar) {
+        this.zFar = zFar;
     }
 }

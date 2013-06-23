@@ -51,7 +51,7 @@ void main() {
     // Sky inscattering using down-sampled sky band texture
     vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
 
-    float d = abs(linDepthVDist(depthOpaque));
+    float d = abs(linDepthViewingDistance(depthOpaque));
     float fogValue = clamp(((skyInscatteringLength - d) / (skyInscatteringLength - skyInscatteringThreshold)) * skyInscatteringStrength, 0.0, 1.0);
 
     // No scattering in the sky please - otherwise we end up with an ugly blurred sky

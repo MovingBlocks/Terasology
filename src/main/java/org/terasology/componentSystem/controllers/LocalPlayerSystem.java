@@ -153,7 +153,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             if (eyeFocusDistance == Float.MAX_VALUE) {
                 eyeFocusDistance = playerToTargetRay.length();
             } else {
-                eyeFocusDistance = TeraMath.lerpf(eyeFocusDistance, playerToTargetRay.length(), 0.1f);
+                eyeFocusDistance = TeraMath.lerpf(eyeFocusDistance, playerToTargetRay.length(), delta * 20.0f);
             }
         } else {
             eyeFocusDistance = Float.MAX_VALUE;

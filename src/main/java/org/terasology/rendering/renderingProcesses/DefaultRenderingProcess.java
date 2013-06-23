@@ -67,7 +67,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private Property ssaoBlurRadius = new Property("ssaoBlurRadius", 8.0f, 0.0f, 64.0f);
 
-    private Property overallBlurFactor = new Property("overallBlurFactor", 1.0f, 0.0f, 16.0f);
+    private Property overallBlurFactor = new Property("overallBlurFactor", 1.75f, 0.0f, 16.0f);
 
     /* HDR */
     private float currentExposure = 2.0f;

@@ -40,6 +40,8 @@ public class OrthographicCamera extends Camera {
         this.bottom = bottom;
         this.left = left;
         this.right = right;
+        this.zNear = -1000.0f;
+        this.zFar = 1000.0f;
     }
 
     public void loadProjectionMatrix() {
@@ -71,11 +73,12 @@ public class OrthographicCamera extends Camera {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+                && cachedZFar == zFar && cachedZNear == zNear) {
             return;
         }
 
-        projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -1000.0f, 1000.0f);
+        projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
         viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
@@ -85,6 +88,8 @@ public class OrthographicCamera extends Camera {
         // Used for dirty checks
         cachedPosition.set(getPosition());
         cachedViewigDirection.set(getViewingDirection());
+        cachedZFar = zFar;
+        cachedZNear = zNear;
 
         updateFrustum();
     }

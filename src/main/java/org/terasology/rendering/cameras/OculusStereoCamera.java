@@ -164,11 +164,12 @@ public class OculusStereoCamera extends Camera {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+                && cachedZFar == zFar && cachedZNear == zNear) {
             return;
         }
 
-        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), 0.1f, 5000.0f);
+        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), zNear, zFar);
 
         projTranslationLeftEye.setIdentity();
         projTranslationLeftEye.setTranslation(new Vector3f(OculusVrHelper.getProjectionCenterOffset(), 0.0f, 0.0f));
@@ -214,6 +215,8 @@ public class OculusStereoCamera extends Camera {
         // Used for dirty checks
         cachedPosition.set(getPosition());
         cachedViewigDirection.set(getViewingDirection());
+        cachedZFar = zFar;
+        cachedZNear = zNear;
 
         updateFrustum();
     }

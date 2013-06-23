@@ -63,14 +63,15 @@ public class PerspectiveCamera extends Camera {
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
                 && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
-                && cachedFov == fov) {
+                && cachedFov == fov
+                && cachedZFar == getzFar() && cachedZNear == getzNear()) {
             return;
         }
 
         tempRightVector.cross(viewingDirection, up);
         tempRightVector.scale(bobbingRotationOffsetFactor);
 
-        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(fov, 0.1f, 5000.0f);
+        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
 
         viewMatrix = TeraMath.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
                 viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
@@ -97,6 +98,8 @@ public class PerspectiveCamera extends Camera {
         cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
         cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
         cachedFov = fov;
+        cachedZNear = getzNear();
+        cachedZFar = getzFar();
 
         updateFrustum();
     }

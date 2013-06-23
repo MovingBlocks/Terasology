@@ -34,8 +34,8 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.01f, 0.001f, 0.1f);
     private Property outlineThickness = new Property("outlineThickness", 1.0f);
 
-    Property skyInscatteringLength = new Property("skyInscatteringLength", 0.2f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.64f, 0.0f, 1.0f);
+    Property skyInscatteringLength = new Property("skyInscatteringLength", 0.25f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.3f, 0.0f, 1.0f);
     Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 1.0f, 0.0f, 1.0f);
 
     @Override

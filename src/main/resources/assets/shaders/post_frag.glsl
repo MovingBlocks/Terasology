@@ -56,7 +56,7 @@ void main() {
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
 
 #ifndef NO_BLUR
-    float depthLin = linDepthVDist(currentDepth);
+    float depthLin = linDepthViewingDistance(currentDepth);
     float blur = 0.0;
 
     float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;

@@ -52,6 +52,7 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
             if (worldRenderer.getActiveCamera() != null) {
                 Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
                 program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z);
+                program.setFloat3("cameraParameters", worldRenderer.getActiveCamera().getzNear(), worldRenderer.getActiveCamera().getzFar(), 0.0f);
             }
 
             Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(false);
