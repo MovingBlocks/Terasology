@@ -57,7 +57,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboLightBufferTexture("sceneOpaque");
             program.setInt("texDebug", texId++);
-        }else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_TRANSPARENT_COLOR.ordinal()) {
+        } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_TRANSPARENT_COLOR.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("sceneTransparent");
             program.setInt("texDebug", texId++);
@@ -85,6 +85,10 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_HIGH_PASS.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("sceneHighPass");
+            program.setInt("texDebug", texId++);
+        } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_SKY_BAND.ordinal()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
             program.setInt("texDebug", texId++);
         }
 

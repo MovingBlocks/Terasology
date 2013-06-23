@@ -40,10 +40,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
-    Property skyInscatteringLength = new Property("skyInscatteringLength", 1.0f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.075f, 0.0f, 1.0f);
-    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.60f, 0.0f, 1.0f);
-
     Property waveIntens = new Property("waveIntens", 1.0f, 0.0f, 2.0f);
     Property waveIntensFalloff = new Property("waveIntensFalloff", 0.88f, 0.0f, 2.0f);
     Property waveSize = new Property("waveSize", 0.24f, 0.0f, 2.0f);
@@ -123,23 +119,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         lightingSettingsFrag.z = (Float) waterSpecExp.getValue();
         program.setFloat4("lightingSettingsFrag", lightingSettingsFrag);
 
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-
-        if (worldProvider != null && worldRenderer != null) {
-            Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(false);
-
-            Vector3d zenithColor = ShaderParametersSky.getAllWeatherZenith(sunDirection.y, (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
-            program.setFloat3("skyInscatteringColor", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
-
-            Vector4f skyInscatteringSettingsFrag = new Vector4f();
-            skyInscatteringSettingsFrag.x = (Float) worldRenderer.getSkysphere().getColorExp().getValue();
-            skyInscatteringSettingsFrag.y = (Float) skyInscatteringStrength.getValue();
-            skyInscatteringSettingsFrag.z = (Float) skyInscatteringLength.getValue();
-            skyInscatteringSettingsFrag.w = (Float) skyInscatteringThreshold.getValue();
-            program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag);
-        }
-
         Vector4f waterSettingsFrag = new Vector4f();
         waterSettingsFrag.x = (Float) waterNormalBias.getValue();
         waterSettingsFrag.y = (Float) waterRefraction.getValue();
@@ -167,9 +146,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
-        properties.add(skyInscatteringLength);
-        properties.add(skyInscatteringStrength);
-        properties.add(skyInscatteringThreshold);
         properties.add(waveIntens);
         properties.add(waveIntensFalloff);
         properties.add(waveSize);

@@ -20,6 +20,13 @@ uniform sampler2D texSceneOpaqueNormals;
 uniform sampler2D texSceneOpaqueLightBuffer;
 uniform sampler2D texSceneTransparent;
 
+uniform vec4 skyInscatteringSettingsFrag;
+#define skyInscatteringStrength skyInscatteringSettingsFrag.y
+#define skyInscatteringLength skyInscatteringSettingsFrag.z
+#define skyInscatteringThreshold skyInscatteringSettingsFrag.w
+
+uniform sampler2D texSceneSkyBand;
+
 #ifdef SSAO
 uniform sampler2D texSsao;
 #endif
@@ -34,20 +41,32 @@ uniform float outlineThickness;
 
 void main() {
     vec4 colorOpaque = texture2D(texSceneOpaque, gl_TexCoord[0].xy);
-    float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r;
+    float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r * 2.0 - 1.0;
     vec4 normalsOpaque = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
     vec4 colorTransparent = texture2D(texSceneTransparent, gl_TexCoord[0].xy);
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
 
     // TODO: Move SSAO and outline stuff to LightBufferPass so it is available for refraction
 
+    // Sky inscattering using down-sampled sky band texture
+    vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
+
+    float d = abs(linDepthVDist(depthOpaque));
+    float fogValue = clamp(((skyInscatteringLength - d) / (skyInscatteringLength - skyInscatteringThreshold)) * skyInscatteringStrength, 0.0, 1.0);
+
+    // No scattering in the sky please - otherwise we end up with an ugly blurred sky
+    if (depthOpaque < 1.0) {
+        colorOpaque = mix(colorOpaque, vec4(skyInscatteringColor, 1.0), fogValue);
+        colorTransparent = mix(colorTransparent, vec4(skyInscatteringColor, 1.0), fogValue);
+    }
+
 #ifdef SSAO
     float ssao = texture2D(texSsao, gl_TexCoord[0].xy).x;
-    colorOpaque *= vec4(ssao, ssao, ssao, 1.0);
+    colorOpaque.rgb *= mix(vec3(ssao), vec3(1.0, 1.0, 1.0), fogValue);
 #endif
 
 #ifdef OUTLINE
-    float outline = step(outlineDepthThreshold, texture2D(texEdges, gl_TexCoord[0].xy).x) * outlineThickness;
+    float outline = step(outlineDepthThreshold, texture2D(texEdges, gl_TexCoord[0].xy).x) * outlineThickness * (1.0 - fogValue);
     colorOpaque.rgb = (1.0 - outline) * colorOpaque.rgb + outline * vec3(OUTLINE_COLOR);
 #endif
 

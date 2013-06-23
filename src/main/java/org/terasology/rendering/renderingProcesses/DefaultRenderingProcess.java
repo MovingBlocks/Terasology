@@ -337,6 +337,9 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
         createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+
+        createFBO("sceneSkyBand0", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
+        createFBO("sceneSkyBand1", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -690,6 +693,16 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
+    public void beginRenderSceneSkyBand() {
+    }
+
+    public void endRenderSceneSkyBand() {
+        generateSkyBand(0);
+        generateSkyBand(1);
+
+        bindFbo("sceneOpaque");
+    }
+
     public void renderScene() {
         renderScene(StereoRenderState.MONO);
     }
@@ -895,6 +908,35 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
     }
 
+    private void generateSkyBand(int id) {
+        FBO skyBand = getFBO("sceneSkyBand"+id);
+
+        if (skyBand == null) {
+            return;
+        }
+
+        skyBand.bind();
+
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+
+        shader.enable();
+        shader.setFloat("radius", 32.0f);
+
+        if (id == 0) {
+            bindFboTexture("sceneOpaque");
+        } else {
+            bindFboTexture("sceneSkyBand" + (id - 1));
+        }
+
+        glViewport(0, 0, skyBand.width, skyBand.height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullscreenQuad();
+
+        skyBand.unbind();
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
+    }
+
     private void generateToneMappedScene() {
         ShaderManager.getInstance().enableShader("hdr");
 
@@ -1054,9 +1096,9 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            getFBO("sceneToneMapped").bindTexture();
+            bindFboTexture("sceneToneMapped");
         } else {
-            getFBO("sceneBlur" + (id - 1)).bindTexture();
+            bindFboTexture("sceneBlur" + (id - 1));
         }
 
         renderFullscreenQuad();

@@ -36,8 +36,6 @@ varying float flickeringLightOffset;
 varying float isUpside;
 varying float blockHint;
 
-varying float distance;
-
 uniform float blockScale = 1.0;
 uniform vec3 chunkPositionWorld;
 
@@ -175,7 +173,5 @@ void main()
 #endif
 
     vertexProjPos = gl_ProjectionMatrix * vertexViewPos;
-    distance = length(vertexViewPos);
-
     gl_Position = vertexProjPos;
 }

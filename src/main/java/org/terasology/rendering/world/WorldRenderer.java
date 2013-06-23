@@ -707,8 +707,10 @@ public final class WorldRenderer {
 
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render Sky");
+        DefaultRenderingProcess.getInstance().beginRenderSceneSkyBand();
         camera.lookThroughNormalized();
         skysphere.render();
+        DefaultRenderingProcess.getInstance().endRenderSceneSkyBand();
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */

@@ -21,6 +21,7 @@ import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
+import javax.vecmath.Vector4f;
 import java.util.List;
 
 /**
@@ -32,6 +33,10 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
     private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.01f, 0.001f, 0.1f);
     private Property outlineThickness = new Property("outlineThickness", 1.0f);
+
+    Property skyInscatteringLength = new Property("skyInscatteringLength", 0.2f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.64f, 0.0f, 1.0f);
+    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 1.0f, 0.0f, 1.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -81,10 +86,23 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setFloat("outlineDepthThreshold", (Float) outlineDepthThreshold.getValue());
             program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
         }
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
+        program.setInt("texSceneSkyBand", texId++);
+
+        Vector4f skyInscatteringSettingsFrag = new Vector4f();
+        skyInscatteringSettingsFrag.y = (Float) skyInscatteringStrength.getValue();
+        skyInscatteringSettingsFrag.z = (Float) skyInscatteringLength.getValue();
+        skyInscatteringSettingsFrag.w = (Float) skyInscatteringThreshold.getValue();
+        program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag);
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
+        properties.add(skyInscatteringLength);
+        properties.add(skyInscatteringStrength);
+        properties.add(skyInscatteringThreshold);
         properties.add(outlineThickness);
         properties.add(outlineDepthThreshold);
     }

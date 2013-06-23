@@ -54,18 +54,8 @@ varying float flickeringLightOffset;
 varying float blockHint;
 varying float isUpside;
 
-varying float distance;
-
 uniform vec4 lightingSettingsFrag;
 #define waterSpecExp lightingSettingsFrag.z
-
-uniform vec3 skyInscatteringColor;
-
-uniform vec4 skyInscatteringSettingsFrag;
-#define skyInscatteringExponent skyInscatteringSettingsFrag.x
-#define skyInscatteringStrength skyInscatteringSettingsFrag.y
-#define skyInscatteringLength skyInscatteringSettingsFrag.z
-#define skyInscatteringThreshold skyInscatteringSettingsFrag.w
 
 #ifdef FEATURE_TRANSPARENT_PASS
 uniform vec4 waterSettingsFrag;
@@ -104,6 +94,7 @@ void main(){
     vec2 texCoord = gl_TexCoord[0].xy;
 
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
+    vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
 
 #ifdef FEATURE_TRANSPARENT_PASS
     vec2 normalOffset;
@@ -240,8 +231,6 @@ void main(){
     // Apply the final lighting mix
     color.xyz *= finalLightValue * occlusionValue;
 
-    vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
-
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
      if (isWater && isOceanWater) {
@@ -286,11 +275,6 @@ void main(){
 #if defined (DYNAMIC_SHADOWS)
     color.xyz *= shadowTerm;
 #endif
-
-    float finalFogStart = skyInscatteringThreshold * viewingDistance;
-    float fogValue = clamp((distance - finalFogStart) / (skyInscatteringLength * viewingDistance + finalFogStart), 0.0, skyInscatteringStrength);
-    vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
-    color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
 #if defined (FEATURE_TRANSPARENT_PASS)
     gl_FragData[0].rgba = color;
