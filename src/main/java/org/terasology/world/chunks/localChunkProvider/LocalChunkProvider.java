@@ -511,13 +511,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                             }
                             preparingChunks.remove(getPosition());
                             if (chunk.getChunkState() == Chunk.State.COMPLETE) {
-                                for (Vector3i adjPos : Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS)) {
-                                    if (isChunkReady(adjPos)) {
-                                        readyChunks.offer(new ReadyChunkInfo(adjPos, createBatchBlockEventMappings(nearCache.get(adjPos))));
-                                    }
-                                }
+                                readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk)));
+                            } else {
+                                pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
                             }
-                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
                         }
                     });
                 } else {
@@ -550,16 +547,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private boolean isChunkReady(Chunk chunk) {
-        if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
-            return false;
-        }
-        for (Vector3i adjPos : Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.LOCAL_REGION_EXTENTS)) {
-            Chunk adjChunk = nearCache.get(adjPos);
-            if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) == -1) {
-                return false;
-            }
-        }
-        return true;
+        return chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE;
     }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
