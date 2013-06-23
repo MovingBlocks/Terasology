@@ -94,13 +94,14 @@ public class UIMenuConfigVideo extends UIWindow {
                 UIStateButton button = (UIStateButton) element;
                 switch (button.getState()) {
                     case 0:
-                        config.getRendering().setFlickeringLight(false);
+                        config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
                         config.getRendering().setEyeAdaptation(true);
+                        config.getRendering().setFilmGrain(true);
+
                         config.getRendering().setBloom(false);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
-                        config.getRendering().setFilmGrain(true);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
                         config.getRendering().setDynamicShadows(false);
@@ -109,10 +110,11 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
                         config.getRendering().setEyeAdaptation(true);
-                        config.getRendering().setBloom(true);
-                        config.getRendering().setMotionBlur(false);
-                        config.getRendering().setSsao(false);
                         config.getRendering().setFilmGrain(true);
+                        config.getRendering().setBloom(true);
+
+                        config.getRendering().setSsao(false);
+                        config.getRendering().setMotionBlur(false);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
                         config.getRendering().setDynamicShadows(false);
@@ -121,11 +123,12 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
                         config.getRendering().setEyeAdaptation(true);
+                        config.getRendering().setFilmGrain(true);
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
-                        config.getRendering().setFilmGrain(true);
                         config.getRendering().setLightShafts(true);
+
                         config.getRendering().setAnimateWater(false);
                         config.getRendering().setDynamicShadows(false);
                         break;
@@ -133,10 +136,10 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
                         config.getRendering().setEyeAdaptation(true);
+                        config.getRendering().setFilmGrain(true);
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
-                        config.getRendering().setFilmGrain(true);
                         config.getRendering().setLightShafts(true);
                         config.getRendering().setAnimateWater(true);
                         config.getRendering().setDynamicShadows(true);

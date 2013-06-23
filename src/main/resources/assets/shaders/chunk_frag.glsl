@@ -97,7 +97,7 @@ void main(){
     vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
 
 #ifdef FEATURE_TRANSPARENT_PASS
-    vec2 normalOffset;
+    vec2 normalWaterOffset;
     vec3 normalWater = waterNormalViewSpace;
     bool isWater = false;
     bool isOceanWater = false;
@@ -107,11 +107,11 @@ void main(){
             vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
             vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
 
-            normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-            normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
-            normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
+            normalWaterOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+            normalWaterOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+            normalWaterOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
 
-            normalWater.xy += normalOffset;
+            normalWater.xy += normalWaterOffset;
             normalWater = normalize(normalWater);
 
             isOceanWater = true;
@@ -125,8 +125,9 @@ void main(){
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
     // Now featuring linear interpolation to make the transition smoother... :-)
-    if (daylight < 0.1)
+    if (daylight < 0.1) {
         sunVecViewAdjusted = mix(sunVecViewAdjusted * -1.0, sunVecViewAdjusted, daylight / 0.1);
+     }
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -236,8 +237,8 @@ void main(){
      if (isWater && isOceanWater) {
             color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
 
-            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
-            vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
+            vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
 
             vec4 litWaterTint = vec4(WATER_TINT) * vec4(finalLightValue.x, finalLightValue.y, finalLightValue.z, 1.0);
 

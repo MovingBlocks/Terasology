@@ -21,25 +21,9 @@ uniform mat4 lightViewProjMatrix;
 varying vec4 vertexLightProjPos;
 #endif
 
-varying vec3 normal;
-varying vec4 vertexWorldPos;
-varying vec4 vertexViewPos;
-varying vec4 vertexProjPos;
-
 #ifdef FEATURE_TRANSPARENT_PASS
 varying vec3 waterNormalViewSpace;
 #endif
-
-varying vec3 sunVecView;
-
-varying float flickeringLightOffset;
-varying float isUpside;
-varying float blockHint;
-
-uniform float blockScale = 1.0;
-uniform vec3 chunkPositionWorld;
-
-uniform bool animated;
 
 #if defined (ANIMATED_WATER) && defined (FEATURE_TRANSPARENT_PASS)
 const vec3 normalDiffOffset   = vec3(-1.0, 0.0, 1.0);
@@ -80,7 +64,9 @@ float calcWaterHeightAtOffset(vec2 worldPos) {
     float intens = waveIntens;
     float timeFactor = waveSpeed;
     for (int i=0; i<OCEAN_OCTAVES; ++i) {
-        height += (smoothTriangleWave(timeToTick(time, timeFactor) + worldPos.x * waveDirections[i].x * size + worldPos.y * waveDirections[i].y * size) * 2.0 - 1.0) * intens;
+        height += (smoothTriangleWave(timeToTick(time, timeFactor) + worldPos.x * waveDirections[i].x
+            * size + worldPos.y * waveDirections[i].y * size) * 2.0 - 1.0) * intens;
+
         size *= waveSizeFalloff;
         intens *= waveIntensFalloff;
         timeFactor *= waveSpeedFalloff;
@@ -102,6 +88,22 @@ vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
     return vec4(cross(va,vb), s11);
 }
 #endif
+
+varying vec3 normal;
+varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
+varying vec4 vertexProjPos;
+
+varying vec3 sunVecView;
+
+varying float flickeringLightOffset;
+varying float isUpside;
+varying float blockHint;
+
+uniform float blockScale = 1.0;
+uniform vec3 chunkPositionWorld;
+
+uniform bool animated;
 
 void main()
 {
@@ -127,10 +129,11 @@ void main()
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
 
+
 #ifdef FLICKERING_LIGHT
-	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 64.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 32.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 16.0;
+	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5 )) / 4.0;
+	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 2.0;
+	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917);
 #else
 	flickeringLightOffset = 0.0;
 #endif
