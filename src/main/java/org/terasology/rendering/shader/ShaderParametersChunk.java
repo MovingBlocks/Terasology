@@ -69,6 +69,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         Texture water = Assets.getTexture("engine:custom_water_still");
         Texture lava = Assets.getTexture("engine:custom_lava_still");
         Texture waterNormal = Assets.getTexture("engine:water_normal");
+        Texture stoneNormal = Assets.getTexture("engine:stone_normal");
         Texture effects = Assets.getTexture("engine:effects");
 
         if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
@@ -97,6 +98,9 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, stoneNormal.getId());
+        program.setInt("textureStoneNormal", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

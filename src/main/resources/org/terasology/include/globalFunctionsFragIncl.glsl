@@ -54,7 +54,13 @@ float tonemapReinhard(float brightMax, float exposure) {
 }
 
 float calcLambLight(vec3 normal, vec3 lightVec) {
-    return dot(normal, lightVec);
+    float diffuse = dot(normal, lightVec);
+
+    if (diffuse < 0.0) {
+        return 0.0;
+    }
+
+    return diffuse;
 }
 
 float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
@@ -128,4 +134,9 @@ vec3 reconstructViewPos(float depth, vec2 texCoord, mat4 paramInvProjMatrix) {
     vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
     vec4 viewSpacePos = paramInvProjMatrix * screenSpacePos;
     return viewSpacePos.xyz / viewSpacePos.w;
+}
+
+vec2 normalizeAtlasTexCoord(vec2 atlasTexCoord) {
+    return vec2(mod(atlasTexCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET),
+                mod(atlasTexCoord.y, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET));
 }

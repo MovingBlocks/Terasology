@@ -89,21 +89,30 @@ vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
 }
 #endif
 
+#if defined (FLICKERING_LIGHT)
+varying float flickeringLightOffset;
+#endif
+
+#if defined (NORMAL_MAPPING)
+varying vec3 worldSpaceNormal;
+varying mat3 normalMatrix;
+#endif
+
+uniform float blockScale = 1.0;
+uniform vec3 chunkPositionWorld;
+
+uniform bool animated;
+
 varying vec3 normal;
+
 varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
 
 varying vec3 sunVecView;
 
-varying float flickeringLightOffset;
 varying float isUpside;
 varying float blockHint;
-
-uniform float blockScale = 1.0;
-uniform vec3 chunkPositionWorld;
-
-uniform bool animated;
 
 void main()
 {
@@ -126,12 +135,17 @@ void main()
 
 	isUpside = (gl_Normal.y > 0.9) ? 1.0 : 0.0;
 
+#if defined (NORMAL_MAPPING)
+    normalMatrix = gl_NormalMatrix;
+    worldSpaceNormal = gl_Normal;
+#endif
+
     normal = gl_NormalMatrix * gl_Normal;
+
     gl_FrontColor = gl_Color;
 
-
 #ifdef FLICKERING_LIGHT
-	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5 )) / 4.0;
+	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 4.0;
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 2.0;
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917);
 #else

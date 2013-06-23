@@ -35,6 +35,7 @@ public class RenderingConfig {
     private int maxTextureAtlasResolution = 4096;
     private int maxChunksUsedForShadowMapping = 1024;
     private int shadowMapResolution = 1024;
+    private boolean normalMapping = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -269,5 +270,13 @@ public class RenderingConfig {
 
     public void setShadowMapResolution(int shadowMapResolution) {
         this.shadowMapResolution = shadowMapResolution;
+    }
+
+    public boolean isNormalMapping() {
+        return normalMapping;
+    }
+
+    public void setNormalMapping(boolean normalMapping) {
+        this.normalMapping = normalMapping;
     }
 }

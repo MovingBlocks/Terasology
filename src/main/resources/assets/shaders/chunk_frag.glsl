@@ -39,23 +39,9 @@ uniform sampler2D texSceneShadowMap;
 varying vec4 vertexLightProjPos;
 #endif
 
-varying vec4 vertexWorldPos;
-varying vec4 vertexViewPos;
-varying vec4 vertexProjPos;
-varying vec3 normal;
-
 #ifdef FEATURE_TRANSPARENT_PASS
 varying vec3 waterNormalViewSpace;
 #endif
-
-varying vec3 sunVecView;
-
-varying float flickeringLightOffset;
-varying float blockHint;
-varying float isUpside;
-
-uniform vec4 lightingSettingsFrag;
-#define waterSpecExp lightingSettingsFrag.z
 
 #ifdef FEATURE_TRANSPARENT_PASS
 uniform vec4 waterSettingsFrag;
@@ -66,24 +52,47 @@ uniform vec4 waterSettingsFrag;
 
 uniform vec4 alternativeWaterSettingsFrag;
 #define waterTint alternativeWaterSettingsFrag.x
+uniform vec4 lightingSettingsFrag;
+#define waterSpecExp lightingSettingsFrag.z
 
 uniform sampler2D textureWaterRefraction;
-#endif
-
-#ifdef FEATURE_TRANSPARENT_PASS
-uniform sampler2D textureWaterNormal;
 uniform sampler2D textureWaterReflection;
 uniform sampler2D texSceneOpaque;
+uniform sampler2D textureWaterNormal;
 #endif
 
-uniform sampler2D textureAtlas;
+#if defined (NORMAL_MAPPING)
+varying vec3 worldSpaceNormal;
+varying mat3 normalMatrix;
+
+// TODO: Texture is just for testing purposes
+uniform sampler2D textureStoneNormal;
+#endif
+
+#if defined (FLICKERING_LIGHT)
+varying float flickeringLightOffset;
+#endif
+
+varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
+varying vec4 vertexProjPos;
+varying vec3 sunVecView;
+
+varying vec3 normal;
+
+varying float blockHint;
+varying float isUpside;
+
 uniform sampler2D textureWater;
 uniform sampler2D textureLava;
+
+uniform sampler2D textureAtlas;
 uniform sampler2D textureEffects;
 
 uniform float clip;
 
-void main(){
+void main() {
+
 // Only necessary for opaque objects
 #if !defined (FEATURE_TRANSPARENT_PASS)
 	if (clip > 0.001 && vertexWorldPos.y < clip) {
@@ -95,6 +104,20 @@ void main(){
 
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
     vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
+    vec3 normalOpaque = normal;
+
+#if defined (NORMAL_MAPPING)
+    vec2 normalizedTexCoord = normalizeAtlasTexCoord(texCoord);
+    normalOpaque = texture2D(textureStoneNormal, normalizedTexCoord).xyz * 2.0 - 1.0;
+
+    // Simplified tangent basis - because we can! Voxels and blocks are great
+    normalOpaque.xyz = vec3(worldSpaceNormal.x, normalOpaque.x, normalOpaque.y) * abs(worldSpaceNormal.xxx)
+        + vec3(normalOpaque.y, worldSpaceNormal.y, normalOpaque.x) * abs(worldSpaceNormal.yyy)
+        + vec3(normalOpaque.x, normalOpaque.y, worldSpaceNormal.z) * abs(worldSpaceNormal.zzz);
+
+    // Costly, but necessary...
+    normalOpaque = normalMatrix * normalOpaque.xyz;
+#endif
 
 #ifdef FEATURE_TRANSPARENT_PASS
     vec2 normalWaterOffset;
@@ -185,7 +208,7 @@ void main(){
     } else
 #endif
     {
-        diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
+        diffuseLighting = calcLambLight(normalOpaque, sunVecViewAdjusted);
     }
 
 #if defined (DYNAMIC_SHADOWS)
@@ -285,7 +308,11 @@ void main(){
     gl_FragData[0].a = occlusionValue;
 #endif
 
-    gl_FragData[1].rgb = vec3(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5);
+#if !defined (FEATURE_TRANSPARENT_PASS)
+    gl_FragData[1].rgb = vec3(normalOpaque.x / 2.0 + 0.5, normalOpaque.y / 2.0 + 0.5, normalOpaque.z / 2.0 + 0.5);
+#else
+    gl_FragData[1].rgb = vec3(normalWater.x / 2.0 + 0.5, normalWater.y / 2.0 + 0.5, normalWater.z / 2.0 + 0.5);
+#endif
 
     // Primitive objects ids... Will be extended later on
 #ifdef FEATURE_TRANSPARENT_PASS

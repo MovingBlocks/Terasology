@@ -32,6 +32,12 @@ void main(){
         color.xyz = vec3(linDepth);
         color.a = 1.0;
 
+    } else if (debugRenderingStage == DEBUG_STAGE_OPAQUE_NORMALS) {
+
+        texColor = texture2D(texDebug, gl_TexCoord[0].xy);
+        color.xyz = texColor.xyz * 2.0 - 1.0;
+        color.a = 1.0;
+
     } else if (debugRenderingStage == DEBUG_STAGE_OPAQUE_LIGHT_BUFFER) {
 
         texColor = texture2D(texDebug, gl_TexCoord[0].xy);

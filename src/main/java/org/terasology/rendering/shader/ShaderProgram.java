@@ -412,6 +412,8 @@ public class ShaderProgram {
             builder.append("#define LIGHT_SHAFTS \n");
         if (config.getRendering().isDynamicShadows())
             builder.append("#define DYNAMIC_SHADOWS \n");
+        if (config.getRendering().isNormalMapping())
+            builder.append("#define NORMAL_MAPPING \n");
 
         // BG: Add the enums for the debug rendering stages
         for (int i=0; i<SystemConfig.DebugRenderingStages.values().length; ++i) {

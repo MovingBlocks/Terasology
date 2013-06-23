@@ -46,7 +46,7 @@ void main() {
     vec3 normal = normalize(texture2D(texSceneOpaqueNormals, projectedPos.xy).rgb * 2.0 - 1.0);
     float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
 
-    // TODO: Costly - would be nice to you view frustum ray method at this point
+    // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
     vec3 viewSpacePos = reconstructViewPos(depth, projectedPos, invProjMatrix);
 
     vec3 color = lightColorAmbient * lightAmbientIntensity;
@@ -60,12 +60,9 @@ void main() {
 
     float specular = lightSpecularIntensity * specTerm;
 
-    if (lambTerm > 0) {
-        color += lightColorDiffuse * lightDiffuseIntensity * lambTerm;
-    }
+    color += lightColorDiffuse * lightDiffuseIntensity * lambTerm;
 
 #if defined (FEATURE_LIGHT_POINT)
-
     float distFactor = lightDist / lightAttenuationRange;
     float damping = 1.0 - pow(distFactor, lightAttenuationFalloff);
     float attenuation = clamp(damping, 0.0, 1.0);
