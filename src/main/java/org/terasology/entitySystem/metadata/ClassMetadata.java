@@ -99,7 +99,7 @@ public class ClassMetadata<T> {
         try {
             T result = constructor.newInstance();
             for (FieldMetadata field : fields.values()) {
-                field.setValue(result, field.copy(field.getValue(component)));
+                field.setValue(result, field.getCopyOfValue(component));
             }
             return result;
         } catch (InstantiationException e) {

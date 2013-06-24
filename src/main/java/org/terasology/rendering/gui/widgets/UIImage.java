@@ -127,10 +127,9 @@ public class UIImage extends UIDisplayContainer {
      * Get the texture origin.
      *
      * @return Returns the texture origin.
-     * @deprecated Actually this method is not deprecated. But use setTextureOrigin to set the origin instead!
      */
     public Vector2f getTextureOrigin() {
-        return textureOrigin;
+        return new Vector2f(textureOrigin);
     }
 
     /**
@@ -144,7 +143,7 @@ public class UIImage extends UIDisplayContainer {
                 origin = new Vector2f(0f, 0f);
             }
 
-            textureOrigin = new Vector2f(origin.x / (float) texture.getWidth(), origin.y / (float) texture.getHeight());
+            textureOrigin.set(origin.x / (float) texture.getWidth(), origin.y / (float) texture.getHeight());
         }
     }
 
@@ -152,10 +151,9 @@ public class UIImage extends UIDisplayContainer {
      * Get the texture size.
      *
      * @return Returns the texture size.
-     * @deprecated Actually this method is not deprecated. But use setTextureSize to set the size instead! (deprecated tag will be removed in the future)
      */
     public Vector2f getTextureSize() {
-        return textureSize;
+        return new Vector2f(textureSize);
     }
 
     /**
@@ -169,7 +167,7 @@ public class UIImage extends UIDisplayContainer {
                 size = new Vector2f(texture.getWidth(), texture.getHeight());
             }
 
-            textureSize = new Vector2f(size.x / (float) texture.getWidth(), size.y / (float) texture.getHeight());
+            textureSize.set(size.x / (float) texture.getWidth(), size.y / (float) texture.getHeight());
         }
     }
 

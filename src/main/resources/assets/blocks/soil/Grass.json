@@ -33,23 +33,4 @@
     "colorSources" : {
         "bottom" : "default"
     }
-
-    // TODO
-    // Plant stuff! Helps guide growth and if "evolve" is present a maxed plant may transform type
-    // Grass grows from 0 (dirt/non-existent) to 1 (grass block), may rarely grow again and evolve
-    /*plant {
-        growth {
-            //blocks = "Dirt"     // Where can it possibly grow - this is default so not needed
-            factor = 0.25       // How frequent / likely growth is
-            weight = -0.95      // Growth factor impact with sustained growth (likelihood to continue)
-            increment = 1       // How much growth when growing (if this ever makes sense)
-            max = 1             // Cap for maximum maturity (before evolving, if possible)
-
-            // Available options to evolve into
-            evolve {
-                targets = ["TallGrass", "YellowFlower", "RedFlower"]    // Possible evolutions
-                weights = [85, 10, 5]                                    // Likelihood of each
-            }
-        }
-    }*/
 }

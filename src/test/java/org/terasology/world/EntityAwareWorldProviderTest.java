@@ -75,7 +75,6 @@ public class EntityAwareWorldProviderTest {
     private BlockManagerImpl blockManager;
     private WorldProviderCoreStub worldStub;
 
-    private Block simpleBlock;
     private Block blockWithString;
     private Block blockWithDifferentString;
     private Block blockWithRetainedComponent;
@@ -97,9 +96,6 @@ public class EntityAwareWorldProviderTest {
         PrefabManager prefabManager = entityManager.getPrefabManager();
         worldStub = new WorldProviderCoreStub(BlockManager.getAir());
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
-
-        simpleBlock = new Block();
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:simpeBlock"), simpleBlock), true);
 
         blockWithString = new Block();
         Prefab prefabWithString = prefabManager.createPrefab("test:prefabWithString");
