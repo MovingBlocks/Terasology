@@ -43,7 +43,7 @@ public class ScrewdriverSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {ScrewdriverComponent.class})
-    public void turnGate(ActivateEvent event, EntityRef screwdriver) {
+    public void rotateGate(ActivateEvent event, EntityRef screwdriver) {
         final EntityRef target = event.getTarget();
         if (target.hasComponent(SignalGateComponent.class)) {
             final Vector3i targetLocation = new Vector3i(event.getTargetLocation());
