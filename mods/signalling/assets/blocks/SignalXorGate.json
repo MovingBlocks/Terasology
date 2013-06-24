@@ -2,7 +2,7 @@
     "displayName": "Signal XOR Gate",
     "rotation": "oneCrucialSide",
     "tiles": {
-        "all":"signalling:SignalAndGate",
+        "all":"signalling:SignalXorGate",
         "front":"signalling:SignalSwitch"
     },
     "entity" : {

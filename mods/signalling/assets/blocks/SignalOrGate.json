@@ -2,7 +2,7 @@
     "displayName": "Signal OR Gate",
     "rotation": "oneCrucialSide",
     "tiles": {
-        "all":"signalling:SignalAndGate",
+        "all":"signalling:SignalOrGate",
         "front":"signalling:SignalSwitch"
     },
     "entity" : {

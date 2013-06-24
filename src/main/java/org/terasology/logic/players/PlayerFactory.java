@@ -98,11 +98,13 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        inventoryManager.giveItem(player, entityManager.create("signalling:Screwdriver"));
-        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("signalling:SignalOrGate"), 10));
-        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("signalling:SignalCable"), 50));
-        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("signalling:SignalLampOff"), 50));
-        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("signalling:SignalSwitch"), 50));
+        inventoryManager.giveItem(player, entityManager.create("core:pickaxe"));
+        inventoryManager.giveItem(player, entityManager.create("core:axe"));
+        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("engine:Torch"), 99));
+        inventoryManager.giveItem(player, entityManager.create("core:explodeTool"));
+        inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
+        inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
+        inventoryManager.giveItem(player, chest);
 
         return player;
     }
