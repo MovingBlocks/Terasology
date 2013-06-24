@@ -1,0 +1,11 @@
+{
+    "displayName": "Signal On Delay Timer",
+    "rotation": "oneCrucialSide",
+    "tiles": {
+        "all":"signalling:SignalOnDelayTimer",
+        "front":"signalling:SignalSwitch"
+    },
+    "entity" : {
+        "prefab" : "signalling:SignalOnDelayTimer"
+    }
+}
