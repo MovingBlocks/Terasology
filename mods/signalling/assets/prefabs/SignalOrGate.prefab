@@ -1,4 +1,5 @@
 {
+    "SignalGate": {},
     "SignalProducer": {
         "connectionSides": 4,
         "signalStrength": 0
