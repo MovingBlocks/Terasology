@@ -127,10 +127,9 @@ public class UIImage extends UIDisplayContainer {
      * Get the texture origin.
      *
      * @return Returns the texture origin.
-     * @deprecated Actually this method is not deprecated. But use setTextureOrigin to set the origin instead!
      */
     public Vector2f getTextureOrigin() {
-        return textureOrigin;
+        return new Vector2f(textureOrigin);
     }
 
     /**
@@ -152,10 +151,9 @@ public class UIImage extends UIDisplayContainer {
      * Get the texture size.
      *
      * @return Returns the texture size.
-     * @deprecated Actually this method is not deprecated. But use setTextureSize to set the size instead! (deprecated tag will be removed in the future)
      */
     public Vector2f getTextureSize() {
-        return textureSize;
+        return new Vector2f(textureSize);
     }
 
     /**

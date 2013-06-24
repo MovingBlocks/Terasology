@@ -286,7 +286,6 @@ task run(type:JavaExec) {
     main = mainClassName
     classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
-    // TODO jvmArgs needed?
 }
 
 task deleteSavedWorldsSubfolders(type: Delete) {

@@ -256,8 +256,9 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         };
     }
 
+    @SafeVarargs
     @Override
-    public Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
+    public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
         if (componentClasses.length == 0) {
             return getAllEntities();
         }

@@ -142,13 +142,13 @@ public class Shader implements Asset {
         GL20.glAttachShader(shaderProgram, fragmentProgram);
         GL20.glAttachShader(shaderProgram, vertexProgram);
         GL20.glLinkProgram(shaderProgram);
-        if (GL20.glGetProgram(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
+        if (GL20.glGetProgrami(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
             logger.error("Failed to link shader {}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_LINK_STATUS));
             GL20.glDeleteProgram(shaderProgram);
             return 0;
         }
         GL20.glValidateProgram(shaderProgram);
-        if (GL20.glGetProgram(shaderProgram, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
+        if (GL20.glGetProgrami(shaderProgram, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
             logger.error("Failed to validate shader {}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_VALIDATE_STATUS));
             GL20.glDeleteProgram(shaderProgram);
             return 0;

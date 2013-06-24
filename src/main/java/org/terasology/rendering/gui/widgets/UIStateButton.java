@@ -26,7 +26,6 @@ import java.util.LinkedList;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         <p/>
  *         TODO integrate into UIButton
- * @deprecated
  */
 public class UIStateButton extends UIButton {
     private final LinkedList<ButtonState> states = new LinkedList<ButtonState>();
