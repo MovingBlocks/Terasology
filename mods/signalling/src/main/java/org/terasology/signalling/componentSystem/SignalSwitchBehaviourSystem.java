@@ -25,6 +25,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 
 import javax.vecmath.Vector3f;
+import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private BlockEntityRegistry blockEntityRegistry;
 
     private Set<Vector3i> activatedPressurePlates = Sets.newHashSet();
-    private PriorityQueue<BlockAtLocationDelayedAction> delayedActions = new PriorityQueue<BlockAtLocationDelayedAction>();
+    private PriorityQueue<BlockAtLocationDelayedAction> delayedActions = new PriorityQueue<BlockAtLocationDelayedAction>(11, new ExecutionTimeOrdering());
 
     private Block lampTurnedOff;
     private Block lampTurnedOn;
@@ -244,12 +245,14 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
     public void addedDelayedAction(OnAddedComponent event, EntityRef block) {
-
+        final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
+        final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
+        delayedActions.add(new BlockAtLocationDelayedAction(location, executeTime));
     }
 
     @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
     public void removedDelayedAction(BeforeRemoveComponent event, EntityRef block) {
-
+        
     }
 
     private void signalChangedForNormalGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
@@ -293,9 +296,14 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         }
     }
 
-    private class BlockAtLocationDelayedAction implements Comparable<BlockAtLocationDelayedAction> {
+    private class BlockAtLocationDelayedAction {
         private long executeTime;
         private ImmutableBlockLocation blockLocation;
+
+        private BlockAtLocationDelayedAction(Vector3i location, long executeTime) {
+            this.blockLocation = new ImmutableBlockLocation(location);
+            this.executeTime = executeTime;
+        }
 
         @Override
         public boolean equals(Object o) {
@@ -317,15 +325,12 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             result = 31 * result + (blockLocation != null ? blockLocation.hashCode() : 0);
             return result;
         }
+    }
 
+    private class ExecutionTimeOrdering implements Comparator<BlockAtLocationDelayedAction> {
         @Override
-        public int compareTo(BlockAtLocationDelayedAction o) {
-            if (executeTime < o.executeTime)
-                return -1;
-            else if (executeTime > o.executeTime)
-                return 1;
-            else
-                return 0;
+        public int compare(BlockAtLocationDelayedAction o1, BlockAtLocationDelayedAction o2) {
+            return Long.valueOf(o1.executeTime).compareTo(o2.executeTime);
         }
     }
 }
