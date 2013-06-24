@@ -105,6 +105,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                 if (signalProducer != null) {
                     if (signalProducer.signalStrength == 0) {
                         startProducingSignal(entityBeneathPlayer, -1);
+                        entityBeneathPlayer.saveComponent(new SignalProducerModifiedComponent());
                         activatedPressurePlates.add(locationBeneathPlayer);
                     } else {
                         toRemoveSignal.remove(locationBeneathPlayer);
@@ -118,6 +119,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             SignalProducerComponent signalProducer = pressurePlate.getComponent(SignalProducerComponent.class);
             if (signalProducer != null) {
                 stopProducingSignal(pressurePlate);
+                pressurePlate.removeComponent(SignalProducerModifiedComponent.class);
                 activatedPressurePlates.remove(pressurePlateLocation);
             }
         }
@@ -173,8 +175,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         int currentSignalStrength = producerComponent.signalStrength;
         if (currentSignalStrength == 0) {
             startProducingSignal(entity, onSignalStrength);
+            entity.saveComponent(new SignalProducerModifiedComponent());
         } else {
             stopProducingSignal(entity);
+            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
@@ -184,8 +188,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             result = 0;
         if (result > 0) {
             startProducingSignal(entity, result);
+            entity.saveComponent(new SignalProducerModifiedComponent());
         } else {
             stopProducingSignal(entity);
+            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
@@ -269,7 +275,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (producer.signalStrength == 0) {
             producer.signalStrength = signalStrength;
             entity.saveComponent(producer);
-            entity.addComponent(new SignalProducerModifiedComponent());
         }
     }
 
@@ -278,7 +283,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (producer.signalStrength != 0) {
             producer.signalStrength = 0;
             entity.saveComponent(producer);
-            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
@@ -288,11 +292,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (consumerStatusComponent.hasSignal) {
             producerComponent.signalStrength = 0;
             entity.saveComponent(producerComponent);
-            entity.saveComponent(new SignalProducerModifiedComponent());
         } else {
             producerComponent.signalStrength = -1;
             entity.saveComponent(producerComponent);
-            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 

@@ -6,6 +6,6 @@
         "front":"signalling:SignalSwitch"
     },
     "entity" : {
-        "prefab" : "signalling:SignalOnDelayTimer"
+        "prefab" : "signalling:SignalOnDelayGate"
     }
 }
