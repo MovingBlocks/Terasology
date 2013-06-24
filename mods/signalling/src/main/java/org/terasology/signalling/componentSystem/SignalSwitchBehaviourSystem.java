@@ -71,9 +71,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private void handleDelayedActionsEvents() {
         long worldTime = worldProvider.getTime();
+        logger.info("Time in handle delayed actions: "+worldTime);
         BlockAtLocationDelayedAction action;
         while ((action = delayedActions.peek()) != null
-                && action.executeTime >= worldTime) {
+                && action.executeTime <= worldTime) {
             action = delayedActions.poll();
 
             final Vector3i actionLocation = action.blockLocation.toVector3i();
@@ -240,6 +241,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (consumerStatusComponent.hasSignal) {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
+            logger.info("Time at scheduling delayed action: "+worldProvider.getTime());
             delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
             entity.saveComponent(delayedAction);
         } else {
@@ -258,7 +260,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
     public void removedDelayedAction(BeforeRemoveComponent event, EntityRef block) {
-        
+        final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
+        final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
+        delayedActions.remove(new BlockAtLocationDelayedAction(location, executeTime));
     }
 
     private void signalChangedForNormalGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {

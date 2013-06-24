@@ -1,7 +1,7 @@
 {
     "SignalGate": {},
     "SignalTimeDelay": {
-        "delaySetting": 1000
+        "delaySetting": 10000
     },
     "SignalProducer": {
         "connectionSides": 4,
