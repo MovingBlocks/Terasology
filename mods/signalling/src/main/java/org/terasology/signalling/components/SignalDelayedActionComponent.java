@@ -4,5 +4,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.world.block.ForceBlockActive;
 
 @ForceBlockActive
-public class SignalGateComponent implements Component {
+public class SignalDelayedActionComponent implements Component {
+    public long executeTime;
 }

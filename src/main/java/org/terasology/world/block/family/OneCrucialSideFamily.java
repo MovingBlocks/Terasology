@@ -38,7 +38,7 @@ public class OneCrucialSideFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
-        return crucialSideBlocks.get(attachmentSide);
+        return crucialSideBlocks.get(Side.FRONT);
     }
 
     @Override

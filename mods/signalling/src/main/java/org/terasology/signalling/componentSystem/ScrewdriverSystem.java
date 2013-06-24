@@ -54,22 +54,20 @@ public class ScrewdriverSystem implements ComponentSystem {
                 final Side currentSide = gateBlockFamily.getBlockSide(block);
                 final Side newSide = sideOrder.get(currentSide);
                 if (worldProvider.setBlock(targetLocation, gateBlockFamily.getBlockForSide(newSide), block)) {
-                    if (newSide != Side.FRONT) {
-                        final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
-                        final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);
-                        gateEntity.removeComponent(SignalProducerComponent.class);
-                        final SignalConsumerComponent signalConsumer = gateEntity.getComponent(SignalConsumerComponent.class);
-                        gateEntity.removeComponent(SignalConsumerComponent.class);
+                    final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
+                    final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);
+                    gateEntity.removeComponent(SignalProducerComponent.class);
+                    final SignalConsumerComponent signalConsumer = gateEntity.getComponent(SignalConsumerComponent.class);
+                    gateEntity.removeComponent(SignalConsumerComponent.class);
 
-                        final byte newSideBit = SideBitFlag.getSide(newSide);
-                        signalProducer.connectionSides = newSideBit;
-                        signalConsumer.connectionSides = (byte) (63 - newSideBit);
+                    final byte newSideBit = SideBitFlag.getSide(newSide);
+                    signalProducer.connectionSides = newSideBit;
+                    signalConsumer.connectionSides = (byte) (63 - newSideBit);
 
-                        gateEntity.saveComponent(signalProducer);
-                        gateEntity.saveComponent(signalConsumer);
+                    gateEntity.saveComponent(signalProducer);
+                    gateEntity.saveComponent(signalConsumer);
 
-                        gateEntity.saveComponent(new SignalProducerModifiedComponent());
-                    }
+                    gateEntity.saveComponent(new SignalProducerModifiedComponent());
                 }
             }
         }

@@ -39,4 +39,9 @@ public class NetworkNode {
         result = 31 * result + (int) connectionSides;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return location.toVector3i().toString()+" "+connectionSides;
+    }
 }

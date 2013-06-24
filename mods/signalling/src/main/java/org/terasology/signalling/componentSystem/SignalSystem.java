@@ -395,6 +395,9 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void producerUpdated(OnChangedComponent event, EntityRef block) {
         logger.info("Producer updated: "+block.getParentPrefab());
         if (block.hasComponent(BlockComponent.class)) {
+            for (Component component : block.iterateComponents()) {
+                logger.info("Producer component: "+component.getClass().getName());
+            }
             Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
             ImmutableBlockLocation blockLocation = new ImmutableBlockLocation(location);
             final SignalProducerComponent producerComponent = block.getComponent(SignalProducerComponent.class);
@@ -481,6 +484,10 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     @ReceiveEvent(components = {SignalConsumerComponent.class})
     public void consumerUpdated(OnChangedComponent event, EntityRef block) {
         if (block.hasComponent(BlockComponent.class)) {
+            for (Component component : block.iterateComponents()) {
+                logger.info("Consumer component: "+component.getClass().getName());
+            }
+
             Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
             ImmutableBlockLocation blockLocation = new ImmutableBlockLocation(location);
             final SignalConsumerComponent consumerComponent = block.getComponent(SignalConsumerComponent.class);
