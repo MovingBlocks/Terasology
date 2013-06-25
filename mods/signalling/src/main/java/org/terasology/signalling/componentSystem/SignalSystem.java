@@ -80,6 +80,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalProducers = Maps.newHashMap();
         signalConsumers = Maps.newHashMap();
         signalConductors = Maps.newHashMap();
+        System.out.println("Initialized SignalSystem");
     }
 
     @Override
@@ -91,7 +92,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     private long lastUpdate;
-    private long delay = 100;
+    private long delay = 0;
 
     @Override
     public void update(float delta) {
@@ -198,8 +199,12 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         // Check for infinite signal strength (-1), if there - it powers whole network
         final Collection<NetworkNode> producers = producersInNetwork.get(network);
         for (NetworkNode producer : producers) {
-            final int signalStrength = producerSignalStrengths.get(producer);
-            if (signalStrength == -1) return new NetworkSignals(network.getLeafSidesInNetwork(consumerNode), (byte) 0);
+            // consumer cannot power itself
+            if (!producer.location.equals(consumerNode.location)) {
+                final int signalStrength = producerSignalStrengths.get(producer);
+                if (signalStrength == -1)
+                    return new NetworkSignals(network.getLeafSidesInNetwork(consumerNode), (byte) 0);
+            }
         }
 
         byte sidesInNetwork = network.getLeafSidesInNetwork(consumerNode);
@@ -216,10 +221,13 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     private boolean hasSignalInNetworkOnSide(Network network, NetworkNode consumerNode, Collection<NetworkNode> producers, Side sideInNetwork) {
-        for (NetworkNode producerLocation : producers) {
-            final int signalStrength = producerSignalStrengths.get(producerLocation);
-            if (network.isInDistanceWithSide(signalStrength, producerLocation, consumerNode, sideInNetwork))
-                return true;
+        for (NetworkNode producer : producers) {
+            // consumer cannot power itself
+            if (!producer.location.equals(consumerNode.location)) {
+                final int signalStrength = producerSignalStrengths.get(producer);
+                if (network.isInDistanceWithSide(signalStrength, producer, consumerNode, sideInNetwork))
+                    return true;
+            }
         }
         return false;
     }
