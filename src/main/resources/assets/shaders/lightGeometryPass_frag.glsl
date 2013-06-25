@@ -26,8 +26,8 @@ uniform sampler2D texSceneOpaqueNormals;
 uniform vec3 lightColorDiffuse = vec3(1.0, 0.0, 0.0);
 uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
 
-uniform float lightDiffuseIntensity = 1;
-uniform float lightAmbientIntensity = 1;
+uniform float lightDiffuseIntensity = 1.0;
+uniform float lightAmbientIntensity = 1.0;
 uniform float lightSpecularIntensity = 0.0;
 uniform float lightSpecularPower = 16.0;
 uniform float lightAttenuationRange = 1.0;
