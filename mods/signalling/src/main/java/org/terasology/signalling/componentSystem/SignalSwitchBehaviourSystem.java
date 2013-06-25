@@ -240,7 +240,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (consumerStatusComponent.hasSignal) {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
-            logger.debug("Time at scheduling delayed action: "+worldProvider.getTime());
             delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
             entity.saveComponent(delayedAction);
         } else {

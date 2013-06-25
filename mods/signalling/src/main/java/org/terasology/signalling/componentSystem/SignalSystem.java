@@ -21,6 +21,7 @@ import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.BlockComponent;
@@ -90,12 +91,12 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     private long lastUpdate;
-    private static long SIGNAL_NETWORK_DELAY =100;
+    private long delay = 100;
 
     @Override
     public void update(float delta) {
         long worldTime = worldProvider.getTime();
-        if (worldTime > lastUpdate + SIGNAL_NETWORK_DELAY) {
+        if (worldTime > lastUpdate + delay) {
             lastUpdate = worldTime;
 
             // Mark all networks affected by the producer signal change
