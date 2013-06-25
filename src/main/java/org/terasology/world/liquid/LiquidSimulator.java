@@ -302,7 +302,7 @@ public class LiquidSimulator implements ComponentSystem {
         public void run() {
             if (world.getTime() < waitForTime) {
                 blockQueue.offer(this);
-            } else if (world.isBlockActive(blockPos)) {
+            } else if (world.isBlockRelevant(blockPos)) {
                 ChunkView view = world.getWorldViewAround(TeraMath.calcChunkPos(blockPos));
                 if (view != null && view.isValidView()) {
                     simulate(blockPos, view);

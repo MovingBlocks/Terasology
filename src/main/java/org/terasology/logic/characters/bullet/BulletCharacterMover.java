@@ -97,7 +97,7 @@ public class BulletCharacterMover implements CharacterMover {
 
         CharacterStateEvent result = new CharacterStateEvent(initial);
         result.setSequenceNumber(input.getSequenceNumber());
-        if (worldProvider.isBlockActive(initial.getPosition())) {
+        if (worldProvider.isBlockRelevant(initial.getPosition())) {
             updatePosition(characterMovementComponent, result, input, entity);
             if (result.getMode() != MovementMode.GHOSTING) {
                 checkSwimming(characterMovementComponent, result);

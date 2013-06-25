@@ -63,7 +63,7 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
             Vector3f worldPos = location.getWorldPosition();
 
             // Skip this AI if not in a loaded chunk
-            if (!worldProvider.isBlockActive(worldPos)) {
+            if (!worldProvider.isBlockRelevant(worldPos)) {
                 continue;
             }
             SimpleAIComponent ai = entity.getComponent(SimpleAIComponent.class);

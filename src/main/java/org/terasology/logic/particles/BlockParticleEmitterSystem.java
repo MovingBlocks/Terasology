@@ -162,7 +162,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 
-            if (!worldProvider.isBlockActive(worldPos)) {
+            if (!worldProvider.isBlockRelevant(worldPos)) {
                 continue;
             }
             float temperature = worldProvider.getBiomeProvider().getTemperatureAt((int) worldPos.x, (int) worldPos.z);
