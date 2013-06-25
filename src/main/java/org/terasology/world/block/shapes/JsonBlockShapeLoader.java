@@ -132,7 +132,9 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             }
 
             if (collisionInfo.has(SYMMETRIC) && collisionInfo.get(SYMMETRIC).isJsonPrimitive() && collisionInfo.get(SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
-                shape.setCollisionSymmetric(collisionInfo.get(SYMMETRIC).getAsBoolean());
+                if (collisionInfo.get(SYMMETRIC).getAsBoolean()) {
+                    shape.setCollisionSymmetric(true);
+                }
             }
 
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive() && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
