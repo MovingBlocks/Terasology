@@ -120,19 +120,20 @@ void main() {
     vec2 normalMapTexCoord = normalizeAtlasTexCoord(texCoord);
 
 # if defined (PARALLAX_MAPPING)
-    // Calculate tangent frame on the fly
-    vec3 dp1 = dFdx( vertexProjPos.xyz );
-    vec3 dp2 = dFdy( vertexProjPos.xyz );
-    vec2 duv1 = dFdx( gl_TexCoord[0].xy );
-    vec2 duv2 = dFdy( gl_TexCoord[0].xy );
+    // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
+    // the tangent for each vertex in the chunk VBO might be not the best idea either.
+    vec3 dp1 = dFdx(vertexProjPos.xyz);
+    vec3 dp2 = dFdy(vertexProjPos.xyz);
+    vec2 duv1 = dFdx(gl_TexCoord[0].xy);
+    vec2 duv2 = dFdy(gl_TexCoord[0].xy);
 
-    vec3 dp2perp = cross( dp2, normal );
-    vec3 dp1perp = cross( normal, dp1 );
+    vec3 dp2perp = cross(dp2, normal);
+    vec3 dp1perp = cross(normal, dp1);
     vec3 tangent = dp2perp * duv1.x + dp1perp * duv2.x;
     vec3 binormal = dp2perp * duv1.y + dp1perp * duv2.y;
 
-    float invmax = inversesqrt( max( dot(tangent,tangent), dot(binormal,binormal) ) );
-    mat3 tbn = mat3( tangent * invmax, binormal * invmax, normal );
+    float invMax = inversesqrt(max(dot(tangent,tangent), dot(binormal,binormal)));
+    mat3 tbn = mat3( tangent * invMax, binormal * invMax, normal );
 
     vec3 eyeTangentSpace = tbn * vertexViewPos.xyz;
 
