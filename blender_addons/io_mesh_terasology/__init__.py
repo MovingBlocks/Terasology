@@ -69,6 +69,21 @@ bpy.types.Scene.teraCollisionSymmetric = BoolProperty(
 	description="Whether the collision is symmetric for all rotations of the block",
 	default = False)
 	
+bpy.types.Scene.teraCollisionSymmetricX = BoolProperty(
+	name="Is Symmetric Around X",
+	description="Whether the block is symmetric when rotating around X (in Blender)",
+	default = False)
+
+bpy.types.Scene.teraCollisionSymmetricY = BoolProperty(
+	name="Is Symmetric Around Y",
+	description="Whether the block is symmetric when rotating around Y (in Blender)",
+	default = False)	
+	
+bpy.types.Scene.teraCollisionSymmetricZ = BoolProperty(
+	name="Is Symmetric Around Z",
+	description="Whether the block is symmetric when rotating around Z (in Blender)",
+	default = False)
+	
 bpy.types.Scene.teraBillboardNormals = BoolProperty(
 	name="Use Billboard Normals",
 	description="Are normals set up for billboards (pointing up)",
@@ -100,6 +115,9 @@ class TeraScenePropUIPanel(bpy.types.Panel):
 		layout.prop(scene, 'teraAuthor')
 		layout.prop(scene, 'teraCollisionType')
 		layout.prop(scene, 'teraCollisionSymmetric')
+		layout.prop(scene, 'teraCollisionSymmetricX')
+		layout.prop(scene, 'teraCollisionSymmetricY')
+		layout.prop(scene, 'teraCollisionSymmetricZ')
 		layout.prop(scene, 'teraBillboardNormals')
 				
 class TeraObjectPropUIPanel(bpy.types.Panel):
