@@ -44,6 +44,8 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
@@ -70,6 +72,7 @@ public abstract class TerasologyTestingEnvironment {
     private static NetworkSystem networkSystem;
     private ComponentSystemManager componentSystemManager;
     private Timer mockTimer;
+    private static BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
@@ -77,7 +80,8 @@ public abstract class TerasologyTestingEnvironment {
         if (!setup) {
             setup = true;
             bindLwjgl();
-            blockManager = new BlockManagerImpl();
+            blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
+            blockManager = new BlockManagerImpl(blockFamilyFactoryRegistry);
             CoreRegistry.put(BlockManager.class, blockManager);
 
             config = new Config();
@@ -116,6 +120,7 @@ public abstract class TerasologyTestingEnvironment {
         networkSystem = new NetworkSystemImpl(mockTimer);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
+
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();

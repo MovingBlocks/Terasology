@@ -28,14 +28,6 @@ import java.util.Collection;
 public interface PrefabManager {
 
     /**
-     * Creates a Prefab if it doesn't already exist and registers it in a prefab table, then returns it.
-     *
-     * @param name The name the Prefab should be given or already exists under
-     * @return The created or already existing Prefab
-     */
-    Prefab createPrefab(String name);
-
-    /**
      * Returns the named Prefab or null if it doesn't exist.
      *
      * @param name The name of the desired Prefab
@@ -74,10 +66,4 @@ public interface PrefabManager {
      */
     Collection<Prefab> listPrefabs(Class<? extends Component> withComponent);
 
-    /**
-     * Removes a named Prefab from the storage table. No action if it doesn't exist.
-     *
-     * @param name Name of the Prefab to remove
-     */
-    void removePrefab(String name);
 }

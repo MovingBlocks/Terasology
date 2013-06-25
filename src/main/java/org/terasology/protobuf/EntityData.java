@@ -6845,19 +6845,19 @@ public final class EntityData {
     org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
         int index);
 
-    // repeated int32 parent_index = 3 [packed = true];
+    // repeated int32 deprecated = 3 [packed = true];
     /**
-     * <code>repeated int32 parent_index = 3 [packed = true];</code>
+     * <code>repeated int32 deprecated = 3 [packed = true];</code>
      */
-    java.util.List<java.lang.Integer> getParentIndexList();
+    java.util.List<java.lang.Integer> getDeprecatedList();
     /**
-     * <code>repeated int32 parent_index = 3 [packed = true];</code>
+     * <code>repeated int32 deprecated = 3 [packed = true];</code>
      */
-    int getParentIndexCount();
+    int getDeprecatedCount();
     /**
-     * <code>repeated int32 parent_index = 3 [packed = true];</code>
+     * <code>repeated int32 deprecated = 3 [packed = true];</code>
      */
-    int getParentIndex(int index);
+    int getDeprecated(int index);
 
     // optional bool persisted = 4 [default = true];
     /**
@@ -6868,6 +6868,26 @@ public final class EntityData {
      * <code>optional bool persisted = 4 [default = true];</code>
      */
     boolean getPersisted();
+
+    // repeated string removedComponent = 5;
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    java.util.List<java.lang.String>
+    getRemovedComponentList();
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    int getRemovedComponentCount();
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    java.lang.String getRemovedComponent(int index);
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getRemovedComponentBytes(int index);
 
     // optional string name = 15;
     /**
@@ -6884,25 +6904,20 @@ public final class EntityData {
     com.google.protobuf.ByteString
         getNameBytes();
 
-    // repeated string parent_name = 16;
+    // optional string parent_name = 16;
     /**
-     * <code>repeated string parent_name = 16;</code>
+     * <code>optional string parent_name = 16;</code>
      */
-    java.util.List<java.lang.String>
-    getParentNameList();
+    boolean hasParentName();
     /**
-     * <code>repeated string parent_name = 16;</code>
+     * <code>optional string parent_name = 16;</code>
      */
-    int getParentNameCount();
+    java.lang.String getParentName();
     /**
-     * <code>repeated string parent_name = 16;</code>
-     */
-    java.lang.String getParentName(int index);
-    /**
-     * <code>repeated string parent_name = 16;</code>
+     * <code>optional string parent_name = 16;</code>
      */
     com.google.protobuf.ByteString
-        getParentNameBytes(int index);
+        getParentNameBytes();
   }
   /**
    * Protobuf type {@code Prefab}
@@ -6970,21 +6985,21 @@ public final class EntityData {
             }
             case 24: {
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-                parentIndex_ = new java.util.ArrayList<java.lang.Integer>();
+                deprecated_ = new java.util.ArrayList<java.lang.Integer>();
                 mutable_bitField0_ |= 0x00000004;
               }
-              parentIndex_.add(input.readInt32());
+              deprecated_.add(input.readInt32());
               break;
             }
             case 26: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004) && input.getBytesUntilLimit() > 0) {
-                parentIndex_ = new java.util.ArrayList<java.lang.Integer>();
+                deprecated_ = new java.util.ArrayList<java.lang.Integer>();
                 mutable_bitField0_ |= 0x00000004;
               }
               while (input.getBytesUntilLimit() > 0) {
-                parentIndex_.add(input.readInt32());
+                deprecated_.add(input.readInt32());
               }
               input.popLimit(limit);
               break;
@@ -6994,17 +7009,22 @@ public final class EntityData {
               persisted_ = input.readBool();
               break;
             }
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                removedComponent_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000010;
+              }
+              removedComponent_.add(input.readBytes());
+              break;
+            }
             case 122: {
               bitField0_ |= 0x00000004;
               name_ = input.readBytes();
               break;
             }
             case 130: {
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
-                parentName_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00000020;
-              }
-              parentName_.add(input.readBytes());
+              bitField0_ |= 0x00000008;
+              parentName_ = input.readBytes();
               break;
             }
           }
@@ -7019,10 +7039,10 @@ public final class EntityData {
           component_ = java.util.Collections.unmodifiableList(component_);
         }
         if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-          parentIndex_ = java.util.Collections.unmodifiableList(parentIndex_);
+          deprecated_ = java.util.Collections.unmodifiableList(deprecated_);
         }
-        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
-          parentName_ = new com.google.protobuf.UnmodifiableLazyStringList(parentName_);
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+          removedComponent_ = new com.google.protobuf.UnmodifiableLazyStringList(removedComponent_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -7108,29 +7128,29 @@ public final class EntityData {
       return component_.get(index);
     }
 
-    // repeated int32 parent_index = 3 [packed = true];
-    public static final int PARENT_INDEX_FIELD_NUMBER = 3;
-    private java.util.List<java.lang.Integer> parentIndex_;
+    // repeated int32 deprecated = 3 [packed = true];
+    public static final int DEPRECATED_FIELD_NUMBER = 3;
+    private java.util.List<java.lang.Integer> deprecated_;
     /**
-     * <code>repeated int32 parent_index = 3 [packed = true];</code>
+     * <code>repeated int32 deprecated = 3 [packed = true];</code>
      */
     public java.util.List<java.lang.Integer>
-        getParentIndexList() {
-      return parentIndex_;
+        getDeprecatedList() {
+      return deprecated_;
     }
     /**
-     * <code>repeated int32 parent_index = 3 [packed = true];</code>
+     * <code>repeated int32 deprecated = 3 [packed = true];</code>
      */
-    public int getParentIndexCount() {
-      return parentIndex_.size();
+    public int getDeprecatedCount() {
+      return deprecated_.size();
     }
     /**
-     * <code>repeated int32 parent_index = 3 [packed = true];</code>
+     * <code>repeated int32 deprecated = 3 [packed = true];</code>
      */
-    public int getParentIndex(int index) {
-      return parentIndex_.get(index);
+    public int getDeprecated(int index) {
+      return deprecated_.get(index);
     }
-    private int parentIndexMemoizedSerializedSize = -1;
+    private int deprecatedMemoizedSerializedSize = -1;
 
     // optional bool persisted = 4 [default = true];
     public static final int PERSISTED_FIELD_NUMBER = 4;
@@ -7146,6 +7166,36 @@ public final class EntityData {
      */
     public boolean getPersisted() {
       return persisted_;
+    }
+
+    // repeated string removedComponent = 5;
+    public static final int REMOVEDCOMPONENT_FIELD_NUMBER = 5;
+    private com.google.protobuf.LazyStringList removedComponent_;
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    public java.util.List<java.lang.String>
+        getRemovedComponentList() {
+      return removedComponent_;
+    }
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    public int getRemovedComponentCount() {
+      return removedComponent_.size();
+    }
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    public java.lang.String getRemovedComponent(int index) {
+      return removedComponent_.get(index);
+    }
+    /**
+     * <code>repeated string removedComponent = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getRemovedComponentBytes(int index) {
+      return removedComponent_.getByteString(index);
     }
 
     // optional string name = 15;
@@ -7191,43 +7241,57 @@ public final class EntityData {
       }
     }
 
-    // repeated string parent_name = 16;
+    // optional string parent_name = 16;
     public static final int PARENT_NAME_FIELD_NUMBER = 16;
-    private com.google.protobuf.LazyStringList parentName_;
+    private java.lang.Object parentName_;
     /**
-     * <code>repeated string parent_name = 16;</code>
+     * <code>optional string parent_name = 16;</code>
      */
-    public java.util.List<java.lang.String>
-        getParentNameList() {
-      return parentName_;
+    public boolean hasParentName() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>repeated string parent_name = 16;</code>
+     * <code>optional string parent_name = 16;</code>
      */
-    public int getParentNameCount() {
-      return parentName_.size();
+    public java.lang.String getParentName() {
+      java.lang.Object ref = parentName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          parentName_ = s;
+        }
+        return s;
+      }
     }
     /**
-     * <code>repeated string parent_name = 16;</code>
-     */
-    public java.lang.String getParentName(int index) {
-      return parentName_.get(index);
-    }
-    /**
-     * <code>repeated string parent_name = 16;</code>
+     * <code>optional string parent_name = 16;</code>
      */
     public com.google.protobuf.ByteString
-        getParentNameBytes(int index) {
-      return parentName_.getByteString(index);
+        getParentNameBytes() {
+      java.lang.Object ref = parentName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        parentName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private void initFields() {
       nameIndex_ = 0;
       component_ = java.util.Collections.emptyList();
-      parentIndex_ = java.util.Collections.emptyList();
+      deprecated_ = java.util.Collections.emptyList();
       persisted_ = true;
+      removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       name_ = "";
-      parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      parentName_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -7260,21 +7324,24 @@ public final class EntityData {
       for (int i = 0; i < component_.size(); i++) {
         output.writeMessage(2, component_.get(i));
       }
-      if (getParentIndexList().size() > 0) {
+      if (getDeprecatedList().size() > 0) {
         output.writeRawVarint32(26);
-        output.writeRawVarint32(parentIndexMemoizedSerializedSize);
+        output.writeRawVarint32(deprecatedMemoizedSerializedSize);
       }
-      for (int i = 0; i < parentIndex_.size(); i++) {
-        output.writeInt32NoTag(parentIndex_.get(i));
+      for (int i = 0; i < deprecated_.size(); i++) {
+        output.writeInt32NoTag(deprecated_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBool(4, persisted_);
       }
+      for (int i = 0; i < removedComponent_.size(); i++) {
+        output.writeBytes(5, removedComponent_.getByteString(i));
+      }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(15, getNameBytes());
       }
-      for (int i = 0; i < parentName_.size(); i++) {
-        output.writeBytes(16, parentName_.getByteString(i));
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(16, getParentNameBytes());
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -7296,34 +7363,38 @@ public final class EntityData {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < parentIndex_.size(); i++) {
+        for (int i = 0; i < deprecated_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(parentIndex_.get(i));
+            .computeInt32SizeNoTag(deprecated_.get(i));
         }
         size += dataSize;
-        if (!getParentIndexList().isEmpty()) {
+        if (!getDeprecatedList().isEmpty()) {
           size += 1;
           size += com.google.protobuf.CodedOutputStream
               .computeInt32SizeNoTag(dataSize);
         }
-        parentIndexMemoizedSerializedSize = dataSize;
+        deprecatedMemoizedSerializedSize = dataSize;
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(4, persisted_);
       }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < removedComponent_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(removedComponent_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getRemovedComponentList().size();
+      }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(15, getNameBytes());
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < parentName_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(parentName_.getByteString(i));
-        }
-        size += dataSize;
-        size += 2 * getParentNameList().size();
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(16, getParentNameBytes());
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -7451,14 +7522,16 @@ public final class EntityData {
         } else {
           componentBuilder_.clear();
         }
-        parentIndex_ = java.util.Collections.emptyList();
+        deprecated_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000004);
         persisted_ = true;
         bitField0_ = (bitField0_ & ~0x00000008);
-        name_ = "";
+        removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000010);
-        parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        name_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
+        parentName_ = "";
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -7501,22 +7574,26 @@ public final class EntityData {
           result.component_ = componentBuilder_.build();
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          parentIndex_ = java.util.Collections.unmodifiableList(parentIndex_);
+          deprecated_ = java.util.Collections.unmodifiableList(deprecated_);
           bitField0_ = (bitField0_ & ~0x00000004);
         }
-        result.parentIndex_ = parentIndex_;
+        result.deprecated_ = deprecated_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000002;
         }
         result.persisted_ = persisted_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          removedComponent_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              removedComponent_);
+          bitField0_ = (bitField0_ & ~0x00000010);
+        }
+        result.removedComponent_ = removedComponent_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000004;
         }
         result.name_ = name_;
-        if (((bitField0_ & 0x00000020) == 0x00000020)) {
-          parentName_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              parentName_);
-          bitField0_ = (bitField0_ & ~0x00000020);
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000008;
         }
         result.parentName_ = parentName_;
         result.bitField0_ = to_bitField0_;
@@ -7564,32 +7641,37 @@ public final class EntityData {
             }
           }
         }
-        if (!other.parentIndex_.isEmpty()) {
-          if (parentIndex_.isEmpty()) {
-            parentIndex_ = other.parentIndex_;
+        if (!other.deprecated_.isEmpty()) {
+          if (deprecated_.isEmpty()) {
+            deprecated_ = other.deprecated_;
             bitField0_ = (bitField0_ & ~0x00000004);
           } else {
-            ensureParentIndexIsMutable();
-            parentIndex_.addAll(other.parentIndex_);
+            ensureDeprecatedIsMutable();
+            deprecated_.addAll(other.deprecated_);
           }
           onChanged();
         }
         if (other.hasPersisted()) {
           setPersisted(other.getPersisted());
         }
+        if (!other.removedComponent_.isEmpty()) {
+          if (removedComponent_.isEmpty()) {
+            removedComponent_ = other.removedComponent_;
+            bitField0_ = (bitField0_ & ~0x00000010);
+          } else {
+            ensureRemovedComponentIsMutable();
+            removedComponent_.addAll(other.removedComponent_);
+          }
+          onChanged();
+        }
         if (other.hasName()) {
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000020;
           name_ = other.name_;
           onChanged();
         }
-        if (!other.parentName_.isEmpty()) {
-          if (parentName_.isEmpty()) {
-            parentName_ = other.parentName_;
-            bitField0_ = (bitField0_ & ~0x00000020);
-          } else {
-            ensureParentNameIsMutable();
-            parentName_.addAll(other.parentName_);
-          }
+        if (other.hasParentName()) {
+          bitField0_ |= 0x00000040;
+          parentName_ = other.parentName_;
           onChanged();
         }
         this.mergeExtensionFields(other);
@@ -7903,67 +7985,67 @@ public final class EntityData {
         return componentBuilder_;
       }
 
-      // repeated int32 parent_index = 3 [packed = true];
-      private java.util.List<java.lang.Integer> parentIndex_ = java.util.Collections.emptyList();
-      private void ensureParentIndexIsMutable() {
+      // repeated int32 deprecated = 3 [packed = true];
+      private java.util.List<java.lang.Integer> deprecated_ = java.util.Collections.emptyList();
+      private void ensureDeprecatedIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          parentIndex_ = new java.util.ArrayList<java.lang.Integer>(parentIndex_);
+          deprecated_ = new java.util.ArrayList<java.lang.Integer>(deprecated_);
           bitField0_ |= 0x00000004;
          }
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
       public java.util.List<java.lang.Integer>
-          getParentIndexList() {
-        return java.util.Collections.unmodifiableList(parentIndex_);
+          getDeprecatedList() {
+        return java.util.Collections.unmodifiableList(deprecated_);
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
-      public int getParentIndexCount() {
-        return parentIndex_.size();
+      public int getDeprecatedCount() {
+        return deprecated_.size();
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
-      public int getParentIndex(int index) {
-        return parentIndex_.get(index);
+      public int getDeprecated(int index) {
+        return deprecated_.get(index);
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
-      public Builder setParentIndex(
+      public Builder setDeprecated(
           int index, int value) {
-        ensureParentIndexIsMutable();
-        parentIndex_.set(index, value);
+        ensureDeprecatedIsMutable();
+        deprecated_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
-      public Builder addParentIndex(int value) {
-        ensureParentIndexIsMutable();
-        parentIndex_.add(value);
+      public Builder addDeprecated(int value) {
+        ensureDeprecatedIsMutable();
+        deprecated_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
-      public Builder addAllParentIndex(
+      public Builder addAllDeprecated(
           java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureParentIndexIsMutable();
-        super.addAll(values, parentIndex_);
+        ensureDeprecatedIsMutable();
+        super.addAll(values, deprecated_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 parent_index = 3 [packed = true];</code>
+       * <code>repeated int32 deprecated = 3 [packed = true];</code>
        */
-      public Builder clearParentIndex() {
-        parentIndex_ = java.util.Collections.emptyList();
+      public Builder clearDeprecated() {
+        deprecated_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
@@ -8002,13 +8084,106 @@ public final class EntityData {
         return this;
       }
 
+      // repeated string removedComponent = 5;
+      private com.google.protobuf.LazyStringList removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureRemovedComponentIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          removedComponent_ = new com.google.protobuf.LazyStringArrayList(removedComponent_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public java.util.List<java.lang.String>
+          getRemovedComponentList() {
+        return java.util.Collections.unmodifiableList(removedComponent_);
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public int getRemovedComponentCount() {
+        return removedComponent_.size();
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public java.lang.String getRemovedComponent(int index) {
+        return removedComponent_.get(index);
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getRemovedComponentBytes(int index) {
+        return removedComponent_.getByteString(index);
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public Builder setRemovedComponent(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRemovedComponentIsMutable();
+        removedComponent_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public Builder addRemovedComponent(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRemovedComponentIsMutable();
+        removedComponent_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public Builder addAllRemovedComponent(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureRemovedComponentIsMutable();
+        super.addAll(values, removedComponent_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public Builder clearRemovedComponent() {
+        removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string removedComponent = 5;</code>
+       */
+      public Builder addRemovedComponentBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRemovedComponentIsMutable();
+        removedComponent_.add(value);
+        onChanged();
+        return this;
+      }
+
       // optional string name = 15;
       private java.lang.Object name_ = "";
       /**
        * <code>optional string name = 15;</code>
        */
       public boolean hasName() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional string name = 15;</code>
@@ -8048,7 +8223,7 @@ public final class EntityData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000010;
+  bitField0_ |= 0x00000020;
         name_ = value;
         onChanged();
         return this;
@@ -8057,7 +8232,7 @@ public final class EntityData {
        * <code>optional string name = 15;</code>
        */
       public Builder clearName() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         name_ = getDefaultInstance().getName();
         onChanged();
         return this;
@@ -8070,101 +8245,82 @@ public final class EntityData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000010;
+  bitField0_ |= 0x00000020;
         name_ = value;
         onChanged();
         return this;
       }
 
-      // repeated string parent_name = 16;
-      private com.google.protobuf.LazyStringList parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureParentNameIsMutable() {
-        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
-          parentName_ = new com.google.protobuf.LazyStringArrayList(parentName_);
-          bitField0_ |= 0x00000020;
-         }
-      }
+      // optional string parent_name = 16;
+      private java.lang.Object parentName_ = "";
       /**
-       * <code>repeated string parent_name = 16;</code>
+       * <code>optional string parent_name = 16;</code>
        */
-      public java.util.List<java.lang.String>
-          getParentNameList() {
-        return java.util.Collections.unmodifiableList(parentName_);
+      public boolean hasParentName() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>repeated string parent_name = 16;</code>
+       * <code>optional string parent_name = 16;</code>
        */
-      public int getParentNameCount() {
-        return parentName_.size();
+      public java.lang.String getParentName() {
+        java.lang.Object ref = parentName_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          parentName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>repeated string parent_name = 16;</code>
-       */
-      public java.lang.String getParentName(int index) {
-        return parentName_.get(index);
-      }
-      /**
-       * <code>repeated string parent_name = 16;</code>
+       * <code>optional string parent_name = 16;</code>
        */
       public com.google.protobuf.ByteString
-          getParentNameBytes(int index) {
-        return parentName_.getByteString(index);
+          getParentNameBytes() {
+        java.lang.Object ref = parentName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          parentName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
       }
       /**
-       * <code>repeated string parent_name = 16;</code>
+       * <code>optional string parent_name = 16;</code>
        */
       public Builder setParentName(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureParentNameIsMutable();
-        parentName_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string parent_name = 16;</code>
-       */
-      public Builder addParentName(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureParentNameIsMutable();
-        parentName_.add(value);
+  bitField0_ |= 0x00000040;
+        parentName_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string parent_name = 16;</code>
-       */
-      public Builder addAllParentName(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureParentNameIsMutable();
-        super.addAll(values, parentName_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string parent_name = 16;</code>
+       * <code>optional string parent_name = 16;</code>
        */
       public Builder clearParentName() {
-        parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
+        parentName_ = getDefaultInstance().getParentName();
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string parent_name = 16;</code>
+       * <code>optional string parent_name = 16;</code>
        */
-      public Builder addParentNameBytes(
+      public Builder setParentNameBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureParentNameIsMutable();
-        parentName_.add(value);
+  bitField0_ |= 0x00000040;
+        parentName_ = value;
         onChanged();
         return this;
       }
@@ -13261,25 +13417,26 @@ public final class EntityData {
       "eldCounts\030\003 \001(\014\022\020\n\010fieldIds\030\004 \001(\014\022\032\n\nfie" +
       "ldValue\030\005 \003(\0132\006.Value\022\034\n\020removedComponen" +
       "t\030\006 \003(\005B\002\020\001\022\027\n\017parentPrefabUri\030\020 \001(\t*\t\010\210" +
-      "\'\020\200\200\200\200\002\"\234\001\n\006Prefab\022\022\n\nname_index\030\001 \001(\005\022\035" +
-      "\n\tcomponent\030\002 \003(\0132\n.Component\022\030\n\014parent_",
-      "index\030\003 \003(\005B\002\020\001\022\027\n\tpersisted\030\004 \001(\010:\004true" +
-      "\022\014\n\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \003(\t*\t\010\210\'" +
-      "\020\200\200\200\200\002\"N\n\005Event\022\014\n\004type\030\001 \001(\005\022\020\n\010fieldId" +
-      "s\030\002 \001(\014\022\032\n\nfieldValue\030\003 \003(\0132\006.Value*\t\010\210\'" +
-      "\020\200\200\200\200\002\"\226\001\n\021PlayerEntityStore\022\033\n\005store\030\001 " +
-      "\001(\0132\014.EntityStore\022\025\n\rcharacterPosX\030\017 \001(\002" +
-      "\022\025\n\rcharacterPosY\030\020 \001(\002\022\025\n\rcharacterPosZ" +
-      "\030\021 \001(\002\022\024\n\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"" +
-      "^\n\013EntityStore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022" +
-      "\022\n\nentityName\030\002 \003(\t\022\027\n\017component_class\030\003",
-      " \003(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\005World\022\027\n\006entity\030\001 \003(" +
-      "\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022#\n\014p" +
-      "ackedEntity\030\003 \003(\0132\r.PackedEntity\022\027\n\017comp" +
-      "onent_class\030\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(" +
-      "\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013prefab" +
-      "_name\030\022 \003(\t*\t\010\210\'\020\200\200\200\200\002B\'\n\027org.terasology" +
-      ".protobufB\nEntityDataH\001"
+      "\'\020\200\200\200\200\002\"\264\001\n\006Prefab\022\022\n\nname_index\030\001 \001(\005\022\035" +
+      "\n\tcomponent\030\002 \003(\0132\n.Component\022\026\n\ndepreca",
+      "ted\030\003 \003(\005B\002\020\001\022\027\n\tpersisted\030\004 \001(\010:\004true\022\030" +
+      "\n\020removedComponent\030\005 \003(\t\022\014\n\004name\030\017 \001(\t\022\023" +
+      "\n\013parent_name\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"N\n\005Event\022" +
+      "\014\n\004type\030\001 \001(\005\022\020\n\010fieldIds\030\002 \001(\014\022\032\n\nfield" +
+      "Value\030\003 \003(\0132\006.Value*\t\010\210\'\020\200\200\200\200\002\"\226\001\n\021Playe" +
+      "rEntityStore\022\033\n\005store\030\001 \001(\0132\014.EntityStor" +
+      "e\022\025\n\rcharacterPosX\030\017 \001(\002\022\025\n\rcharacterPos" +
+      "Y\030\020 \001(\002\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n\014hasCha" +
+      "racter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"^\n\013EntityStore\022\027" +
+      "\n\006entity\030\001 \003(\0132\007.Entity\022\022\n\nentityName\030\002 ",
+      "\003(\t\022\027\n\017component_class\030\003 \003(\t*\t\010\210\'\020\200\200\200\200\002\"" +
+      "\314\001\n\005World\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006pr" +
+      "efab\030\002 \003(\0132\007.Prefab\022#\n\014packedEntity\030\003 \003(" +
+      "\0132\r.PackedEntity\022\027\n\017component_class\030\017 \003(" +
+      "\t\022\026\n\016next_entity_id\030\020 \001(\005\022\033\n\017freed_entit" +
+      "y_id\030\021 \003(\005B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*\t\010\210\'" +
+      "\020\200\200\200\200\002B\'\n\027org.terasology.protobufB\nEntit" +
+      "yDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -13321,7 +13478,7 @@ public final class EntityData {
           internal_static_Prefab_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Prefab_descriptor,
-              new java.lang.String[] { "NameIndex", "Component", "ParentIndex", "Persisted", "Name", "ParentName", });
+              new java.lang.String[] { "NameIndex", "Component", "Deprecated", "Persisted", "RemovedComponent", "Name", "ParentName", });
           internal_static_Event_descriptor =
             getDescriptor().getMessageTypes().get(6);
           internal_static_Event_fieldAccessorTable = new

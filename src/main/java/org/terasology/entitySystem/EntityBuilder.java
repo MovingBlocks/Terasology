@@ -10,7 +10,7 @@ import java.util.Map;
  * for components being added or modified before it is fully set up.
  * @author Immortius
  */
-public class EntityBuilder implements ComponentContainer {
+public class EntityBuilder implements MutableComponentContainer {
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
     private EngineEntityManager manager;

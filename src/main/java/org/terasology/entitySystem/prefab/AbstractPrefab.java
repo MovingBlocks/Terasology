@@ -16,39 +16,45 @@
 package org.terasology.entitySystem.prefab;
 
 import com.google.common.base.Objects;
+import org.terasology.asset.AssetUri;
 
 /**
  * @todo javadoc
  */
 public abstract class AbstractPrefab implements Prefab {
 
-    private String name;
+    private AssetUri uri;
 
-    protected AbstractPrefab(String name) {
-        this.name = name;
+    protected AbstractPrefab(AssetUri uri) {
+        this.uri = uri;
     }
 
+    @Override
     public String getName() {
-        return name;
+        return uri.getSimpleString();
+    }
+
+    @Override
+    public AssetUri getURI() {
+        return uri;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof Prefab) {
-            return Objects.equal(name, ((Prefab) o).getName());
+            return Objects.equal(uri, ((Prefab) o).getURI());
         }
-
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name);
+        return Objects.hashCode(uri);
     }
 
     @Override
     public String toString() {
-        return "Prefab(" + name + "){ components: " + this.iterateOwnedComponents() + ", parents: " + this.getParents() + " }";
+        return "Prefab(" + uri + "){ components: " + this.iterateComponents() + ", parent: " + this.getParent() + " }";
     }
 }

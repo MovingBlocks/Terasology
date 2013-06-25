@@ -76,8 +76,7 @@ public class StateMainMenu implements GameState {
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), CoreRegistry.get(NetworkSystem.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
 
-        guiManager = new GUIManager();
-        CoreRegistry.put(GUIManager.class, guiManager);
+        guiManager = CoreRegistry.get(GUIManager.class);
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
@@ -114,6 +113,7 @@ public class StateMainMenu implements GameState {
         guiManager.closeAllWindows();
 
         entityManager.clear();
+        CoreRegistry.clear();
     }
 
     private void playBackgroundMusic() {

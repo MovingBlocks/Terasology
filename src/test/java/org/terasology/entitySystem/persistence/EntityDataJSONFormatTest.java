@@ -249,21 +249,14 @@ public class EntityDataJSONFormatTest {
 
     @Test
     public void testPersistPrefabName() throws Exception {
-        prefabBuilder.setName("PrefabName");
+        prefabBuilder.setName("test:PrefabName");
         worldBuilder.addPrefab(prefabBuilder);
         assertPersist(worldBuilder);
     }
 
     @Test
     public void testPersistPrefabParent() throws Exception {
-        prefabBuilder.addParentName("PrefabName");
-        worldBuilder.addPrefab(prefabBuilder);
-        assertPersist(worldBuilder);
-    }
-
-    @Test
-    public void testPersistPrefabParents() throws Exception {
-        prefabBuilder.addParentName("PrefabName").addParentName("Prefab2");
+        prefabBuilder.setParentName("test:PrefabName");
         worldBuilder.addPrefab(prefabBuilder);
         assertPersist(worldBuilder);
     }

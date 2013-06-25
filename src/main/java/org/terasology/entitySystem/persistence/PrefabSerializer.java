@@ -16,10 +16,15 @@
 
 package org.terasology.entitySystem.persistence;
 
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.internal.PojoPrefab;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -41,12 +46,12 @@ import java.util.Map;
 public class PrefabSerializer {
     private static final Logger logger = LoggerFactory.getLogger(PrefabSerializer.class);
 
-    private PrefabManager prefabManager;
     private ComponentSerializer componentSerializer;
+    private ComponentLibrary componentLibrary;
 
-    public PrefabSerializer(PrefabManager prefabManager, ComponentLibrary componentLibrary) {
-        this.prefabManager = prefabManager;
-        componentSerializer = new ComponentSerializer(componentLibrary);
+    public PrefabSerializer(ComponentLibrary componentLibrary) {
+        this.componentLibrary = componentLibrary;
+        this.componentSerializer = new ComponentSerializer(componentLibrary);
     }
 
     /**
@@ -73,15 +78,27 @@ public class PrefabSerializer {
     public EntityData.Prefab serialize(Prefab prefab) {
         EntityData.Prefab.Builder prefabData = EntityData.Prefab.newBuilder();
         prefabData.setName(prefab.getName());
-        for (Prefab parent : prefab.getParents()) {
-            prefabData.addParentName(parent.getName());
+        if (prefab.getParent() != null) {
+            prefabData.setParentName(prefab.getParent().getName());
         }
         prefabData.setPersisted(prefab.isPersisted());
 
-        for (Component component : prefab.iterateOwnedComponents()) {
-            EntityData.Component componentData = componentSerializer.serialize(component);
-            if (componentData != null) {
-                prefabData.addComponent(componentData);
+        // Delta off the parent
+        for (Component component : prefab.iterateComponents()) {
+            if (prefab.getParent() != null && prefab.getParent().hasComponent(component.getClass())) {
+                EntityData.Component serializedComponent = componentSerializer.serialize(prefab.getParent().getComponent(component.getClass()), component);
+                if (serializedComponent != null) {
+                    prefabData.addComponent(serializedComponent);
+                }
+            } else {
+                prefabData.addComponent(componentSerializer.serialize(component));
+            }
+        }
+        if (prefab.getParent() != null) {
+            for (Component parentComp : prefab.getParent().iterateComponents()) {
+                if (!prefab.hasComponent(parentComp.getClass())) {
+                    prefabData.addRemovedComponent(componentLibrary.getMetadata(parentComp).getName());
+                }
             }
         }
         return prefabData.build();
@@ -95,59 +112,44 @@ public class PrefabSerializer {
      * @return The deserialized prefab
      */
     public Prefab deserialize(EntityData.Prefab prefabData, AssetUri uri) {
-        String name = uri.getSimpleString();
-
-        Prefab prefab = prefabManager.createPrefab(name);
-        prefab.setPersisted(prefabData.getPersisted());
-        for (String parentName : prefabData.getParentNameList()) {
-            int packageSplit = parentName.indexOf(':');
-            if (packageSplit == -1) {
-                parentName = uri.getPackage() + ":" + parentName;
-            }
-            Prefab parent = prefabManager.getPrefab(parentName);
-
-            if (parent == null) {
-                logger.error("Missing parent prefab (need to fix parent serialization)");
-            } else {
-                prefab.addParent(parent);
+        boolean persisted = (prefabData.hasPersisted()) ? prefabData.getPersisted() : true;
+        Prefab parent = null;
+        if (prefabData.hasParentName()) {
+            AssetUri parentUri = new AssetUri(AssetType.PREFAB, prefabData.getParentName());
+            if (parentUri.isValid()) {
+                parent = Assets.get(parentUri, Prefab.class);
             }
         }
 
-        for (EntityData.Component componentData : prefabData.getComponentList()) {
-            Component component = componentSerializer.deserialize(componentData);
-            if (component != null) {
-                prefab.addComponent(component);
+        Map<Class<? extends Component>, Component> componentMap = Maps.newHashMap();
+        if (parent != null) {
+            for (Component comp : parent.iterateComponents()) {
+                componentMap.put(comp.getClass(), componentLibrary.copy(comp));
             }
         }
-
-        return prefab;
-    }
-
-    /**
-     * @param prefabData
-     * @return The deserialized prefab, or null if deserialization failed.
-     */
-    public Prefab deserialize(EntityData.Prefab prefabData) {
-        if (!prefabData.hasName() || prefabData.getName().isEmpty()) {
-            logger.error("Prefab missing name");
-            return null;
-        }
-        Prefab prefab = prefabManager.createPrefab(prefabData.getName());
-        for (String parentName : prefabData.getParentNameList()) {
-            Prefab parent = prefabManager.getPrefab(parentName);
-            if (parent == null) {
-                logger.error("Missing parent prefab (need to fix parent serialization)");
-            } else {
-                prefab.addParent(parent);
+        for (String removedComponent : prefabData.getRemovedComponentList()) {
+            ComponentMetadata<?> metadata = componentLibrary.getMetadata(removedComponent);
+            if (metadata != null) {
+                componentMap.remove(metadata.getType());
             }
         }
         for (EntityData.Component componentData : prefabData.getComponentList()) {
-            Component component = componentSerializer.deserialize(componentData);
-            if (component != null) {
-                prefab.addComponent(component);
+            ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentData.getType());
+            if (metadata != null) {
+                Component existing = componentMap.get(metadata.getType());
+                if (existing != null) {
+                    componentSerializer.deserializeOnto(existing, componentData);
+                } else {
+                    Component newComponent = componentSerializer.deserialize(componentData);
+                    if (newComponent != null) {
+                        componentMap.put(newComponent.getClass(), newComponent);
+                    }
+                }
             }
         }
-        return prefab;
+
+        return new PojoPrefab(uri, componentMap, parent, persisted);
     }
+
 
 }

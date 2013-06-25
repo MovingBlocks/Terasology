@@ -53,4 +53,7 @@ public class KeyEvent extends ButtonEvent {
         this.key = key;
     }
 
+    public void reset() {
+        reset(0.0f);
+    }
 }

@@ -6,6 +6,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
@@ -21,7 +22,7 @@ public class ChunkTest {
 
     @Before
     public void setup() {
-        blockManager = new BlockManagerImpl();
+        blockManager = new BlockManagerImpl(new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         chunk = new Chunk(new Vector3i(0, 0, 0));
     }

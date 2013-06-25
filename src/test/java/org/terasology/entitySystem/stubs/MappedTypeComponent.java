@@ -17,11 +17,14 @@
 package org.terasology.entitySystem.stubs;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.MappedContainer;
 
 /**
  * @author Immortius
  */
 public class MappedTypeComponent implements Component {
+
+    @MappedContainer
     public static class InnerType {
         public static final int staticValue = 2;
     }

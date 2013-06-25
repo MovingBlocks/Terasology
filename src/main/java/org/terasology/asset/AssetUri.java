@@ -30,22 +30,28 @@ public final class AssetUri implements Comparable<AssetUri> {
     private AssetType type;
     private String packageName = "";
     private String assetName = "";
+    private String normalisedPackageName = "";
+    private String normalisedAssetName = "";
 
     public AssetUri() {
     }
 
     public AssetUri(AssetType type, String packageName, String assetName) {
         this.type = type;
-        this.packageName = packageName.toLowerCase(Locale.ENGLISH);
-        this.assetName = assetName.toLowerCase(Locale.ENGLISH);
+        this.packageName = packageName;
+        this.normalisedPackageName = packageName.toLowerCase(Locale.ENGLISH);
+        this.assetName = assetName;
+        this.normalisedAssetName = assetName.toLowerCase(Locale.ENGLISH);
     }
 
     public AssetUri(AssetType type, String simpleUri) {
         this.type = type;
-        String[] split = simpleUri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SEPARATOR, 2);
+        String[] split = simpleUri.split(PACKAGE_SEPARATOR, 2);
         if (split.length > 1) {
             packageName = split[0];
             assetName = split[1];
+            normalisedPackageName = split[0].toLowerCase(Locale.ENGLISH);
+            normalisedAssetName = split[1].toLowerCase(Locale.ENGLISH);
         }
     }
 
@@ -58,6 +64,8 @@ public final class AssetUri implements Comparable<AssetUri> {
             if (packageSplit.length > 1) {
                 packageName = packageSplit[0];
                 assetName = packageSplit[1];
+                normalisedPackageName = packageSplit[0].toLowerCase(Locale.ENGLISH);
+                normalisedAssetName = packageSplit[1].toLowerCase(Locale.ENGLISH);
             }
         }
     }
@@ -70,8 +78,16 @@ public final class AssetUri implements Comparable<AssetUri> {
         return packageName;
     }
 
+    public String getNormalisedPackage() {
+        return normalisedPackageName;
+    }
+
     public String getAssetName() {
         return assetName;
+    }
+
+    public String getNormalisedAssetName() {
+        return normalisedAssetName;
     }
 
     public boolean isValid() {
@@ -102,14 +118,14 @@ public final class AssetUri implements Comparable<AssetUri> {
             return true;
         if (obj instanceof AssetUri) {
             AssetUri other = (AssetUri) obj;
-            return Objects.equal(type, other.type) && Objects.equal(packageName, other.packageName) && Objects.equal(assetName, other.assetName);
+            return Objects.equal(type, other.type) && Objects.equal(normalisedPackageName, other.normalisedPackageName) && Objects.equal(normalisedAssetName, other.normalisedAssetName);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, packageName, assetName);
+        return Objects.hashCode(type, normalisedPackageName, normalisedAssetName);
     }
 
     @Override

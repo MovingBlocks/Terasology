@@ -15,12 +15,20 @@
  */
 package org.terasology.entitySystem.persistence;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Queues;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -31,7 +39,12 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.protobuf.EntityData;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
  * Implementation of WorldSerializer for EngineEntityManager.
@@ -39,7 +52,6 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 public class WorldSerializerImpl implements WorldSerializer {
-    private static final Logger logger = LoggerFactory.getLogger(WorldSerializerImpl.class);
 
     private ComponentLibrary componentLibrary;
     private PrefabManager prefabManager;
@@ -52,7 +64,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
-        this.prefabSerializer = new PrefabSerializer(entityManager.getPrefabManager(), entityManager.getComponentLibrary());
+        this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary());
     }
 
     @Override
@@ -101,10 +113,30 @@ public class WorldSerializerImpl implements WorldSerializer {
         entitySerializer.setComponentIdMapping(componentIdTable);
         prefabSerializer.setComponentIdMapping(componentIdTable);
 
+        // Prefabs that still need to be created, by their required parent
+        ListMultimap<String, EntityData.Prefab> pendingPrefabs = ArrayListMultimap.create();
 
         for (EntityData.Prefab prefabData : world.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
-                prefabSerializer.deserialize(prefabData);
+                if (!prefabData.hasParentName()) {
+                    createPrefab(prefabData);
+                }
+                else {
+                    pendingPrefabs.put(prefabData.getParentName(), prefabData);
+                }
+            }
+        }
+
+        while (!pendingPrefabs.isEmpty()) {
+            Iterator<Map.Entry<String, Collection<EntityData.Prefab>>> i = pendingPrefabs.asMap().entrySet().iterator();
+            while (i.hasNext()) {
+                Map.Entry<String, Collection<EntityData.Prefab>> entry = i.next();
+                if (prefabManager.exists(entry.getKey())) {
+                    for (EntityData.Prefab prefabData : entry.getValue()) {
+                        createPrefab(prefabData);
+                    }
+                    i.remove();
+                }
             }
         }
 
@@ -114,6 +146,13 @@ public class WorldSerializerImpl implements WorldSerializer {
 
         entitySerializer.removeComponentIdMapping();
         prefabSerializer.removeComponentIdMapping();
+    }
+
+
+    private void createPrefab(EntityData.Prefab prefabData) {
+        Prefab prefab = prefabSerializer.deserialize(prefabData, new AssetUri(AssetType.PREFAB, prefabData.getName()));
+        AssetManager.getInstance().addAssetTemporary(prefab.getURI(), prefab);
+        prefabManager.registerPrefab(prefab);
     }
 
     private void writeComponentTypeTable(EntityData.World.Builder world) {

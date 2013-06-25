@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.entitySystem.prefab.Prefab;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,6 +145,14 @@ public class AssetManager {
     }
 
     public void clear() {
+        Iterator<Asset> iterator = assetCache.values().iterator();
+        while (iterator.hasNext()) {
+            Asset asset = iterator.next();
+            if (asset instanceof Prefab) {
+                asset.dispose();
+                iterator.remove();
+            }
+        }
         // TODO: Fix disposal
 //        Iterator<Asset> iterator = assetCache.values().iterator();
 //        while (iterator.hasNext()) {
@@ -203,7 +212,7 @@ public class AssetManager {
         if (overrideSource != null) {
             return overrideSource.getOverride(uri);
         } else {
-            AssetSource source = assetSources.get(uri.getPackage());
+            AssetSource source = assetSources.get(uri.getNormalisedPackage());
             if (source != null) {
                 return source.get(uri);
             }

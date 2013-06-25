@@ -26,6 +26,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Provides the mechanism for updating and generating chunks.
@@ -42,7 +43,7 @@ public final class ChunkUpdateManager {
     private static final int MAX_THREADS = CoreRegistry.get(Config.class).getSystem().getMaxThreads();
 
     /* CHUNK UPDATES */
-    private static final Set<Chunk> currentlyProcessedChunks = Sets.newHashSet();
+    private static final Set<Chunk> currentlyProcessedChunks = Sets.newSetFromMap(new ConcurrentHashMap<Chunk, Boolean>());
 
     private final ChunkTessellator tessellator;
     private final WorldProvider worldProvider;
@@ -74,26 +75,40 @@ public final class ChunkUpdateManager {
     private void executeChunkUpdate(final Chunk c) {
         currentlyProcessedChunks.add(c);
 
-        // Create a new thread and start processing
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
-                ChunkView chunkView = worldProvider.getLocalView(c.getPos());
-                if (chunkView != null) {
-                    c.setDirty(false);
-                    for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
-                        newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
-                    }
+        CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider));
+    }
 
-                    c.setPendingMesh(newMeshes);
+    private static class ChunkUpdater implements Runnable {
 
+        private Chunk c;
+        private ChunkTessellator tessellator;
+        private WorldProvider worldProvider;
+
+        public ChunkUpdater(Chunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider) {
+            this.c = chunk;
+            this.tessellator = tessellator;
+            this.worldProvider = worldProvider;
+        }
+
+        @Override
+        public void run() {
+            ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
+            ChunkView chunkView = worldProvider.getLocalView(c.getPos());
+            if (chunkView != null) {
+                c.setDirty(false);
+                for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
+                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
                 }
-                currentlyProcessedChunks.remove(c);
-            }
-        };
 
-        CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", r);
+                c.setPendingMesh(newMeshes);
+
+            }
+            currentlyProcessedChunks.remove(c);
+            // Clean these up because the task executor holds the object in memory.
+            c = null;
+            tessellator = null;
+            worldProvider = null;
+        }
     }
 
 }

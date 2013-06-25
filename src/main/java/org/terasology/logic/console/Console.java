@@ -86,6 +86,12 @@ public class Console {
         }
     }
 
+    public void dispose() {
+        commands.clear();
+        commandLookup.clear();
+        messageHistory.clear();
+    }
+
     /**
      * Adds a message to the console (as a CoreMessageType.CONSOLE message)
      *

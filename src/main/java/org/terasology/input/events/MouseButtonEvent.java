@@ -50,4 +50,7 @@ public class MouseButtonEvent extends ButtonEvent {
         this.button = button;
     }
 
+    public void reset() {
+        reset(0f);
+    }
 }

@@ -190,11 +190,11 @@ public class PackedEntitySerializer {
         }
     }
 
-    public void deserializeOnto(ComponentContainer entity, EntityData.PackedEntity entityData) {
+    public void deserializeOnto(MutableComponentContainer entity, EntityData.PackedEntity entityData) {
         deserializeOnto(entity, entityData, FieldSerializeCheck.NullCheck.<Component>newInstance());
     }
 
-    public void deserializeOnto(ComponentContainer entity, EntityData.PackedEntity entityData, FieldSerializeCheck<Component> fieldCheck) {
+    public void deserializeOnto(MutableComponentContainer entity, EntityData.PackedEntity entityData, FieldSerializeCheck<Component> fieldCheck) {
         int fieldPos = 0;
         for (int componentIndex = 0; componentIndex < entityData.getComponentIdCount(); ++componentIndex) {
             Class<? extends Component> componentClass = idTable.inverse().get((Integer) entityData.getComponentId(componentIndex));

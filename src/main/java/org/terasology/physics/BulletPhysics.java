@@ -81,6 +81,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
     private final BlockEntityRegistry blockEntityRegistry;
     private final CollisionGroupManager collisionGroupManager;
+    private final PhysicsWorldWrapper wrapper;
 
 
     public BulletPhysics(WorldProvider world) {
@@ -96,7 +97,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);
 
-        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
+        wrapper = new PhysicsWorldWrapper(world);
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
 
         Matrix3f rot = new Matrix3f();
@@ -106,6 +107,11 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         RigidBody rigidBody = new RigidBody(blockConsInf);
         rigidBody.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.getCollisionFlags());
         _discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
+    }
+
+    public void dispose() {
+        _discreteDynamicsWorld.destroy();
+        wrapper.dispose();
     }
 
     public DynamicsWorld getWorld() {
