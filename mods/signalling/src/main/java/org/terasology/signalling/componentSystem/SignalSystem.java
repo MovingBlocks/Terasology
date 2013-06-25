@@ -21,6 +21,7 @@ import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.OnActivatedBlocks;
@@ -32,6 +33,9 @@ import java.util.Set;
 @RegisterSystem(value = RegisterMode.AUTHORITY)
 public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyListener {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
+
+    @In
+    private WorldProvider worldProvider;
 
     @In
     private BlockEntityRegistry blockEntityRegistry;
@@ -85,54 +89,62 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalConductors = null;
     }
 
+    private long lastUpdate;
+    private static long SIGNAL_NETWORK_DELAY =100;
+
     @Override
     public void update(float delta) {
-        // Mark all networks affected by the producer signal change
-        for (NetworkNode producerChanges : producersSignalsChanged)
-            networksToRecalculate.addAll(producerNetworks.get(producerChanges));
+        long worldTime = worldProvider.getTime();
+        if (worldTime > lastUpdate + SIGNAL_NETWORK_DELAY) {
+            lastUpdate = worldTime;
 
-        Set<NetworkNode> consumersToEvaluate = Sets.newHashSet();
+            // Mark all networks affected by the producer signal change
+            for (NetworkNode producerChanges : producersSignalsChanged)
+                networksToRecalculate.addAll(producerNetworks.get(producerChanges));
 
-        for (Network network : networksToRecalculate) {
-            if (signalNetwork.isNetworkActive(network)) {
-                Collection<NetworkNode> consumersInNetwork = this.consumersInNetwork.get(network);
-                for (NetworkNode consumerLocation : consumersInNetwork) {
-                    NetworkSignals consumerSignalInNetwork = getConsumerSignalInNetwork(network, consumerLocation);
-                    consumerSignalInNetworks.get(consumerLocation).put(network, consumerSignalInNetwork);
+            Set<NetworkNode> consumersToEvaluate = Sets.newHashSet();
+
+            for (Network network : networksToRecalculate) {
+                if (signalNetwork.isNetworkActive(network)) {
+                    Collection<NetworkNode> consumersInNetwork = this.consumersInNetwork.get(network);
+                    for (NetworkNode consumerLocation : consumersInNetwork) {
+                        NetworkSignals consumerSignalInNetwork = getConsumerSignalInNetwork(network, consumerLocation);
+                        consumerSignalInNetworks.get(consumerLocation).put(network, consumerSignalInNetwork);
+                    }
+                    consumersToEvaluate.addAll(consumersInNetwork);
                 }
-                consumersToEvaluate.addAll(consumersInNetwork);
             }
-        }
 
-        for (NetworkNode modifiedConsumer : consumersToRecalculate) {
-            Collection<Network> networks = consumerNetworks.get(modifiedConsumer);
-            for (Network network : networks) {
-                NetworkSignals consumerSignalInNetwork = getConsumerSignalInNetwork(network, modifiedConsumer);
-                consumerSignalInNetworks.get(modifiedConsumer).put(network, consumerSignalInNetwork);
+            for (NetworkNode modifiedConsumer : consumersToRecalculate) {
+                Collection<Network> networks = consumerNetworks.get(modifiedConsumer);
+                for (Network network : networks) {
+                    NetworkSignals consumerSignalInNetwork = getConsumerSignalInNetwork(network, modifiedConsumer);
+                    consumerSignalInNetworks.get(modifiedConsumer).put(network, consumerSignalInNetwork);
+                }
+                consumersToEvaluate.add(modifiedConsumer);
             }
-            consumersToEvaluate.add(modifiedConsumer);
-        }
 
-        // Clearing the changed states
-        producersSignalsChanged.clear();
-        networksToRecalculate.clear();
-        consumersToRecalculate.clear();
+            // Clearing the changed states
+            producersSignalsChanged.clear();
+            networksToRecalculate.clear();
+            consumersToRecalculate.clear();
 
-        // Send consumer status changes
-        for (NetworkNode consumerToEvaluate : consumersToEvaluate) {
-            if (signalConsumers.containsValue(consumerToEvaluate)) {
-                final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(consumerToEvaluate.location.toVector3i());
-                final SignalConsumerStatusComponent consumerStatusComponent = blockEntity.getComponent(SignalConsumerStatusComponent.class);
-                final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
-                if (consumerComponent != null && consumerStatusComponent != null) {
-                    Map<Network, NetworkSignals> consumerSignals = consumerSignalInNetworks.get(consumerToEvaluate);
-                    boolean newSignal = false;
-                    if (consumerSignals != null)
-                        newSignal = calculateResultSignal(consumerSignals.values(), consumerComponent);
-                    if (newSignal != consumerStatusComponent.hasSignal) {
-                        consumerStatusComponent.hasSignal = newSignal;
-                        blockEntity.saveComponent(consumerStatusComponent);
-                        logger.info("Consumer has signal: " + newSignal);
+            // Send consumer status changes
+            for (NetworkNode consumerToEvaluate : consumersToEvaluate) {
+                if (signalConsumers.containsValue(consumerToEvaluate)) {
+                    final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(consumerToEvaluate.location.toVector3i());
+                    final SignalConsumerStatusComponent consumerStatusComponent = blockEntity.getComponent(SignalConsumerStatusComponent.class);
+                    final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
+                    if (consumerComponent != null && consumerStatusComponent != null) {
+                        Map<Network, NetworkSignals> consumerSignals = consumerSignalInNetworks.get(consumerToEvaluate);
+                        boolean newSignal = false;
+                        if (consumerSignals != null)
+                            newSignal = calculateResultSignal(consumerSignals.values(), consumerComponent);
+                        if (newSignal != consumerStatusComponent.hasSignal) {
+                            consumerStatusComponent.hasSignal = newSignal;
+                            blockEntity.saveComponent(consumerStatusComponent);
+                            logger.debug("Consumer has signal: " + newSignal);
+                        }
                     }
                 }
             }
@@ -217,13 +229,13 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     @Override
     public void networkingNodesAdded(Network network, Set<NetworkNode> networkingNodes) {
-        logger.info("Cable added to network");
+        logger.debug("Cable added to network");
         networksToRecalculate.add(network);
     }
 
     @Override
     public void networkingNodesRemoved(Network network, Set<NetworkNode> networkingNodes) {
-        logger.info("Cable removed from network");
+        logger.debug("Cable removed from network");
         networksToRecalculate.add(network);
     }
 
@@ -231,12 +243,12 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
         for (NetworkNode modifiedLeafNode : leafNodes) {
             if (signalProducers.containsValue(modifiedLeafNode)) {
-                logger.info("Producer added to network");
+                logger.debug("Producer added to network");
                 networksToRecalculate.add(network);
                 producerNetworks.put(modifiedLeafNode, network);
                 producersInNetwork.put(network, modifiedLeafNode);
             } else {
-                logger.info("Consumer added to network");
+                logger.debug("Consumer added to network");
                 consumersToRecalculate.add(modifiedLeafNode);
                 consumerNetworks.put(modifiedLeafNode, network);
                 consumersInNetwork.put(network, modifiedLeafNode);
@@ -248,12 +260,12 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
         for (NetworkNode modifiedLeafNode : leafNodes) {
             if (signalProducers.containsValue(modifiedLeafNode)) {
-                logger.info("Producer removed from network");
+                logger.debug("Producer removed from network");
                 networksToRecalculate.add(network);
                 producerNetworks.remove(modifiedLeafNode, network);
                 producersInNetwork.remove(network, modifiedLeafNode);
             } else {
-                logger.info("Consumer removed from network");
+                logger.debug("Consumer removed from network");
                 consumersToRecalculate.add(modifiedLeafNode);
                 consumerNetworks.remove(modifiedLeafNode, network);
                 consumersInNetwork.remove(network, modifiedLeafNode);
@@ -393,11 +405,8 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     @ReceiveEvent(components = {SignalProducerComponent.class})
     public void producerUpdated(OnChangedComponent event, EntityRef block) {
-        logger.info("Producer updated: "+block.getParentPrefab());
+        logger.debug("Producer updated: " + block.getParentPrefab());
         if (block.hasComponent(BlockComponent.class)) {
-            for (Component component : block.iterateComponents()) {
-                logger.info("Producer component: "+component.getClass().getName());
-            }
             Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
             ImmutableBlockLocation blockLocation = new ImmutableBlockLocation(location);
             final SignalProducerComponent producerComponent = block.getComponent(SignalProducerComponent.class);
@@ -484,10 +493,6 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     @ReceiveEvent(components = {SignalConsumerComponent.class})
     public void consumerUpdated(OnChangedComponent event, EntityRef block) {
         if (block.hasComponent(BlockComponent.class)) {
-            for (Component component : block.iterateComponents()) {
-                logger.info("Consumer component: "+component.getClass().getName());
-            }
-
             Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
             ImmutableBlockLocation blockLocation = new ImmutableBlockLocation(location);
             final SignalConsumerComponent consumerComponent = block.getComponent(SignalConsumerComponent.class);

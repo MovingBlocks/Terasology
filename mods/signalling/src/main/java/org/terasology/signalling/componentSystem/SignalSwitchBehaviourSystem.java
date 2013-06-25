@@ -71,7 +71,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private void handleDelayedActionsEvents() {
         long worldTime = worldProvider.getTime();
-        logger.info("Time in handle delayed actions: "+worldTime);
         BlockAtLocationDelayedAction action;
         while ((action = delayedActions.peek()) != null
                 && action.executeTime <= worldTime) {
@@ -204,10 +203,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             Block block = worldProvider.getBlock(blockLocation);
             BlockFamily blockFamily = block.getBlockFamily();
             if (block == lampTurnedOff && consumerStatusComponent.hasSignal) {
-                logger.info("Lamp turning on");
+                logger.debug("Lamp turning on");
                 worldProvider.setBlock(blockLocation, lampTurnedOn, block);
             } else if (block == lampTurnedOn && !consumerStatusComponent.hasSignal) {
-                logger.info("Lamp turning off");
+                logger.debug("Lamp turning off");
                 worldProvider.setBlock(blockLocation, lampTurnedOff, block);
             } else if (blockFamily == signalOrGate || blockFamily == signalAndGate
                     || blockFamily == signalXorGate) {
@@ -241,7 +240,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (consumerStatusComponent.hasSignal) {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
-            logger.info("Time at scheduling delayed action: "+worldProvider.getTime());
+            logger.debug("Time at scheduling delayed action: "+worldProvider.getTime());
             delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
             entity.saveComponent(delayedAction);
         } else {
@@ -266,7 +265,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     }
 
     private void signalChangedForNormalGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
-        logger.info("Gate has signal: " + consumerStatusComponent.hasSignal);
+        logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
         if (consumerStatusComponent.hasSignal) {
             startProducingSignal(entity, -1);
         } else {
@@ -292,7 +291,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private void signalChangedForNotGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
         SignalProducerComponent producerComponent = entity.getComponent(SignalProducerComponent.class);
-        logger.info("Gate has signal: " + consumerStatusComponent.hasSignal);
+        logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
         if (consumerStatusComponent.hasSignal) {
             producerComponent.signalStrength = 0;
             entity.saveComponent(producerComponent);
