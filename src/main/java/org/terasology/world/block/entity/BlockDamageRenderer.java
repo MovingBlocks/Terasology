@@ -116,7 +116,7 @@ public class BlockDamageRenderer implements RenderSystem {
     }
 
     private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
-        if (!worldProvider.isBlockActive(blockPos)) {
+        if (!worldProvider.isBlockRelevant(blockPos)) {
             return;
         }
 

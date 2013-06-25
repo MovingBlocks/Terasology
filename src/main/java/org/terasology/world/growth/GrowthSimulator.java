@@ -79,7 +79,7 @@ public class GrowthSimulator implements ComponentSystem {
                 while (running.get()) {
                     try {
                         Vector3i blockPos = blockQueue.take();
-                        if (world.isBlockActive(blockPos)) {
+                        if (world.isBlockRelevant(blockPos)) {
                             if (simulate(blockPos)) {
                                 Thread.sleep(5000);
                             }
