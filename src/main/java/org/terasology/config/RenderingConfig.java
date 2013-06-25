@@ -36,6 +36,7 @@ public class RenderingConfig {
     private int maxChunksUsedForShadowMapping = 1024;
     private int shadowMapResolution = 1024;
     private boolean normalMapping = false;
+    private boolean parallaxMapping = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -278,5 +279,13 @@ public class RenderingConfig {
 
     public void setNormalMapping(boolean normalMapping) {
         this.normalMapping = normalMapping;
+    }
+
+    public boolean isParallaxMapping() {
+        return parallaxMapping;
+    }
+
+    public void setParallaxMapping(boolean parallaxMapping) {
+        this.parallaxMapping = parallaxMapping;
     }
 }

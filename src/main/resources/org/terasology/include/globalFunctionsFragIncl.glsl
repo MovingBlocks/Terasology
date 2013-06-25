@@ -38,7 +38,6 @@ uniform vec3 cameraParameters;
 #define zNear cameraParameters.x
 #define zFar cameraParameters.y
 
-
 float linDepth(float depth) {
     return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }

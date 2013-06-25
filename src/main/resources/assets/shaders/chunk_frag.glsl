@@ -67,7 +67,17 @@ varying mat3 normalMatrix;
 
 // TODO: Texture is just for testing purposes
 uniform sampler2D textureStoneNormal;
+
+# if defined (PARALLAX_MAPPING)
+uniform vec4 parallaxProperties;
+#  define parallaxBias parallaxProperties.x
+#  define parallaxScale parallaxProperties.y
+
+// TODO: Texture is just for testing purposes
+uniform sampler2D textureStoneHeight;
+# endif
 #endif
+
 
 #if defined (FLICKERING_LIGHT)
 varying float flickeringLightOffset;
@@ -107,8 +117,31 @@ void main() {
     vec3 normalOpaque = normal;
 
 #if defined (NORMAL_MAPPING)
-    vec2 normalizedTexCoord = normalizeAtlasTexCoord(texCoord);
-    normalOpaque = texture2D(textureStoneNormal, normalizedTexCoord).xyz * 2.0 - 1.0;
+    vec2 normalMapTexCoord = normalizeAtlasTexCoord(texCoord);
+
+# if defined (PARALLAX_MAPPING)
+    // Calculate tangent frame on the fly
+    vec3 dp1 = dFdx( vertexProjPos.xyz );
+    vec3 dp2 = dFdy( vertexProjPos.xyz );
+    vec2 duv1 = dFdx( gl_TexCoord[0].xy );
+    vec2 duv2 = dFdy( gl_TexCoord[0].xy );
+
+    vec3 dp2perp = cross( dp2, normal );
+    vec3 dp1perp = cross( normal, dp1 );
+    vec3 tangent = dp2perp * duv1.x + dp1perp * duv2.x;
+    vec3 binormal = dp2perp * duv1.y + dp1perp * duv2.y;
+
+    float invmax = inversesqrt( max( dot(tangent,tangent), dot(binormal,binormal) ) );
+    mat3 tbn = mat3( tangent * invmax, binormal * invmax, normal );
+
+    vec3 eyeTangentSpace = tbn * vertexViewPos.xyz;
+
+    float height =  parallaxScale * texture2D(textureStoneHeight, normalMapTexCoord).r - parallaxBias;
+	texCoord += (height * normalize(eyeTangentSpace).xy) * TEXTURE_OFFSET;
+	normalMapTexCoord += height * normalize(eyeTangentSpace).xy;
+# endif
+
+    normalOpaque = (texture2D(textureStoneNormal, normalMapTexCoord).xyz * 2.0 - 1.0);
 
     // Simplified tangent basis - because we can! Voxels and blocks are great
     normalOpaque.xyz = vec3(worldSpaceNormal.x, normalOpaque.x, normalOpaque.y) * abs(worldSpaceNormal.xxx)

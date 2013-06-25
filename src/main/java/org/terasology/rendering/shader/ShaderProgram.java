@@ -414,6 +414,8 @@ public class ShaderProgram {
             builder.append("#define DYNAMIC_SHADOWS \n");
         if (config.getRendering().isNormalMapping())
             builder.append("#define NORMAL_MAPPING \n");
+        if (config.getRendering().isParallaxMapping())
+            builder.append("#define PARALLAX_MAPPING \n");
 
         // BG: Add the enums for the debug rendering stages
         for (int i=0; i<SystemConfig.DebugRenderingStages.values().length; ++i) {

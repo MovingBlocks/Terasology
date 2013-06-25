@@ -25,10 +25,7 @@ import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.List;
 
@@ -62,6 +59,9 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property shadowIntens = new Property("shadowIntens", 0.5f, 0.0f, 1.0f);
     Property shadowMapBias = new Property("shadowMapBias", 0.01f, 0.0f, 0.1f);
 
+    Property parallaxBias = new Property("parallaxBias", 0.05f, 0.0f, 0.5f);
+    Property parallaxScale = new Property("parallaxScale", 0.05f, 0.0f, 0.5f);
+
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
@@ -70,6 +70,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         Texture lava = Assets.getTexture("engine:custom_lava_still");
         Texture waterNormal = Assets.getTexture("engine:water_normal");
         Texture stoneNormal = Assets.getTexture("engine:stone_normal");
+        Texture stoneHeight = Assets.getTexture("engine:stone_height");
         Texture effects = Assets.getTexture("engine:effects");
 
         if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
@@ -98,9 +99,18 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, stoneNormal.getId());
-        program.setInt("textureStoneNormal", texId++);
+
+        if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            glBindTexture(GL11.GL_TEXTURE_2D, stoneNormal.getId());
+            program.setInt("textureStoneNormal", texId++);
+
+            if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()) {
+                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+                glBindTexture(GL11.GL_TEXTURE_2D, stoneHeight.getId());
+                program.setInt("textureStoneHeight", texId++);
+            }
+        }
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -145,7 +155,10 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             program.setFloat("waveOverallScale", (Float) waveOverallScale.getValue());
         }
 
-        program.setFloat("blockScale", 1.0f);
+        if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()
+                && CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
+            program.setFloat4("parallaxProperties", (Float) parallaxBias.getValue(), (Float) parallaxScale.getValue(), 0.0f, 0.0f);
+        }
     }
 
     @Override
@@ -166,5 +179,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(shadowIntens);
         properties.add(shadowMapBias);
         properties.add(waterTint);
+        properties.add(parallaxBias);
+        properties.add(parallaxScale);
     }
 }
