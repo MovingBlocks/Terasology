@@ -1,7 +1,7 @@
 <!-- This configuration is used when running from IntelliJ, since it insists on compiling the logback.groovy config and
      removing it from the classpath :/ -->
-<configuration debug="true" scan="true">
-    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+<configuration debug="false" scan="true">
+   <!--<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />-->
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/Terasology.log</file>

@@ -32,10 +32,12 @@ import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.loader.FreeformFamily;
 
@@ -100,13 +102,13 @@ public class BlockManagerImpl extends BlockManager {
     private boolean generateNewIds = false;
     private int nextId = 1;
 
-    public BlockManagerImpl() {
-        this(Lists.<String>newArrayList(), Maps.<String, Byte>newHashMap(), true);
+    public BlockManagerImpl(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+        this(Lists.<String>newArrayList(), Maps.<String, Byte>newHashMap(), true, blockFamilyFactoryRegistry);
     }
 
-    public BlockManagerImpl(List<String> registeredBlockFamilies, Map<String, Byte> knownBlockMappings, boolean generateNewIds) {
+    public BlockManagerImpl(List<String> registeredBlockFamilies, Map<String, Byte> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
-        blockLoader = new BlockLoader();
+        blockLoader = new BlockLoader(blockFamilyFactoryRegistry);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
         for (BlockFamily family : blockDefinitions.families) {
@@ -148,6 +150,10 @@ public class BlockManagerImpl extends BlockManager {
                 logger.error("Family not available: {}", rawFamilyUri);
             }
         }
+    }
+
+    public void dispose() {
+        getAir().setEntity(EntityRef.NULL);
     }
 
     private byte getNextId() {

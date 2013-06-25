@@ -17,10 +17,13 @@
 package org.terasology.world;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.Component;
@@ -30,6 +33,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
@@ -52,6 +56,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
@@ -89,7 +94,7 @@ public class EntityAwareWorldProviderTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl());
+        blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new DefaultBlockFamilyFactoryRegistry()));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = builder.build(modManager, networkSystem);
@@ -98,20 +103,23 @@ public class EntityAwareWorldProviderTest {
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 
         blockWithString = new Block();
-        Prefab prefabWithString = prefabManager.createPrefab("test:prefabWithString");
-        prefabWithString.addComponent(new StringComponent("Test"));
+        Prefab prefabWithString = new PojoPrefab(
+            new AssetUri(AssetType.PREFAB, "test:prefabWithString"), null, true, new StringComponent("Test"));
+        prefabManager.registerPrefab(prefabWithString);
         blockWithString.setPrefab("test:prefabWithString");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithString"), blockWithString), true);
 
         blockWithDifferentString = new Block();
-        Prefab prefabWithDifferentString = prefabManager.createPrefab("test:prefabWithDifferentString");
-        prefabWithDifferentString.addComponent(new StringComponent("Test2"));
+        Prefab prefabWithDifferentString = new PojoPrefab(
+                new AssetUri(AssetType.PREFAB, "test:prefabWithDifferentString"), null, true, new StringComponent("Test2"));
+        prefabManager.registerPrefab(prefabWithDifferentString);
         blockWithDifferentString.setPrefab("test:prefabWithDifferentString");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithDifferentString"), blockWithDifferentString), true);
 
         blockWithRetainedComponent = new Block();
-        Prefab prefabWithRetainedComponent = prefabManager.createPrefab("test:prefabWithRetainedComponent");
-        prefabWithRetainedComponent.addComponent(new RetainedOnBlockChangeComponent(3));
+        Prefab prefabWithRetainedComponent = new PojoPrefab(
+                new AssetUri(AssetType.PREFAB, "test:prefabWithRetainedComponent"), null, true, new RetainedOnBlockChangeComponent(3));
+        prefabManager.registerPrefab(prefabWithRetainedComponent);
         blockWithRetainedComponent.setPrefab("test:prefabWithRetainedComponent");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithRetainedComponent"), blockWithRetainedComponent), true);
 

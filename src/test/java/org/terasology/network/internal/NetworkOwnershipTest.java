@@ -63,7 +63,6 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.put(BlockManager.class, new BlockManagerImpl());
         entityManager.clear();
         client = mock(NetClient.class);
         NetworkComponent clientNetComp = new NetworkComponent();

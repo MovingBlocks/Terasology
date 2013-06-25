@@ -33,8 +33,6 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
         generateForExistingBlocks();
     }
 
-
-
     private void connectExistingEntities() {
         for (EntityRef entity : entityManager.getEntitiesWith(BlockTypeComponent.class)) {
             BlockTypeComponent blockTypeComp = entity.getComponent(BlockTypeComponent.class);
@@ -67,8 +65,7 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
         if (prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 if (!(comp instanceof NetworkComponent)) {
-                    ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
-                    builder.addComponent(metadata.clone(comp));
+                    builder.addComponent(entityManager.getComponentLibrary().copy(comp));
                 }
             }
         }

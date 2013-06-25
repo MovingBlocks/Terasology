@@ -42,6 +42,10 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         return new TeraVoxelInfo(block, block.isTargetable(), !block.isPenetrable(), new Vector3i(x, y, z));
     }
 
+    public void dispose() {
+        world = null;
+    }
+
     private static class TeraVoxelInfo implements VoxelInfo {
 
         private boolean colliding;

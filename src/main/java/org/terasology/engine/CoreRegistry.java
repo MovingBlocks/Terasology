@@ -16,8 +16,11 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
@@ -26,6 +29,7 @@ import java.util.Map;
  */
 public class CoreRegistry {
     private static Map<Class<? extends Object>, Object> store = Maps.newHashMap();
+    private static Set<Class<? extends Object>> permStore = Sets.newHashSet();
 
     /**
      * Registers a core system
@@ -40,12 +44,35 @@ public class CoreRegistry {
     }
 
     /**
+     * Registers a core system
+     *
+     * @param type   The interface which the system fulfils
+     * @param object The system itself
+     * @param <T>
+     */
+    public static <T, U extends T> U putPermanently(Class<T> type, U object) {
+        store.put(type, object);
+        permStore.add(type);
+        return object;
+    }
+
+    /**
      * @param type
      * @param <T>
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
         return type.cast(store.get(type));
+    }
+
+    public static void clear() {
+        Iterator<Map.Entry<Class<?>,Object>> iterator = store.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Class<?>, Object> entry = iterator.next();
+            if (!permStore.contains(entry.getKey())) {
+                iterator.remove();
+            }
+        }
     }
 
     public static <T> void remove(Class<T> type) {

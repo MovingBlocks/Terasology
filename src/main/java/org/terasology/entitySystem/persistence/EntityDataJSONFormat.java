@@ -233,11 +233,14 @@ public class EntityDataJSONFormat {
             if (src.hasName()) {
                 result.addProperty("name", src.getName());
             }
-            if (src.getParentNameCount() > 0) {
-                result.add("parent", context.serialize(src.getParentNameList()));
+            if (src.hasParentName()) {
+                result.addProperty("parent", src.getParentName());
             }
             if (src.hasPersisted()) {
                 result.addProperty("persisted", src.getPersisted());
+            }
+            if (src.getRemovedComponentCount() > 0) {
+                result.add("removedComponents", context.serialize(src.getRemovedComponentList()));
             }
             for (EntityData.Component component : src.getComponentList()) {
                 result.add(component.getType(), context.serialize(component));
@@ -254,14 +257,19 @@ public class EntityDataJSONFormat {
                 String name = entry.getKey().toLowerCase(Locale.ENGLISH);
                 // JAVA7: Make this a switch statement
                 if (name.equals("name")) {
-                    if (entry.getValue().isJsonPrimitive())
+                    if (entry.getValue().isJsonPrimitive()) {
                         prefab.setName(entry.getValue().getAsString());
+                    }
                 } else if (name.equals("parent")) {
                     if (entry.getValue().isJsonPrimitive()) {
-                        prefab.addParentName(entry.getValue().getAsString());
+                        prefab.setParentName(entry.getValue().getAsString());
+                    }
+                } else if (name.equals("removedComponents")) {
+                    if (entry.getValue().isJsonPrimitive()) {
+                        prefab.addRemovedComponent(entry.getValue().getAsString());
                     } else if (entry.getValue().isJsonArray()) {
                         for (JsonElement element : entry.getValue().getAsJsonArray()) {
-                            prefab.addParentName(element.getAsString());
+                            prefab.addRemovedComponent(element.getAsString());
                         }
                     }
                 } else if (name.equals("persisted")) {

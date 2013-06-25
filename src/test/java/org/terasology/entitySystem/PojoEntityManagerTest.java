@@ -1,13 +1,18 @@
 package org.terasology.entitySystem;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.internal.PojoEntityManager;
+import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
@@ -272,8 +277,8 @@ public class PojoEntityManagerTest {
     @Test
     public void prefabCopiedCorrectly() {
         PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
-        Prefab prefab = manager.createPrefab("myprefab");
-        prefab.addComponent(new StringComponent("Test"));
+        Prefab prefab = new PojoPrefab(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), null, true, new StringComponent("Test"));
+        manager.registerPrefab(prefab);
         EntityRef entity1 = entityManager.create(prefab);
         StringComponent comp = entity1.getComponent(StringComponent.class);
         assertEquals("Test", comp.value);
@@ -289,11 +294,10 @@ public class PojoEntityManagerTest {
     @Test
     public void prefabCopiedCorrectly2() {
         PrefabManager prefabManager = entityManager.getPrefabManager();
-        Prefab prefab = prefabManager.createPrefab("myprefab");
-        StringComponent testComponent = new StringComponent();
-        prefab.addComponent(testComponent);
-        EntityRef test1 = entityManager.create("myprefab");
-        EntityRef test2 = entityManager.create("myprefab");
+        Prefab prefab = new PojoPrefab(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), null, true, new StringComponent("Test"));
+        prefabManager.registerPrefab(prefab);
+        EntityRef test1 = entityManager.create("unittest:myprefab");
+        EntityRef test2 = entityManager.create("unittest:myprefab");
         //This returns true because the Objectids are Identical.
         assertFalse(test1.getComponent(StringComponent.class) == (test2.getComponent(StringComponent.class)));
     }
@@ -301,9 +305,8 @@ public class PojoEntityManagerTest {
     @Test
     public void prefabPersistedRetainedCorrectly() {
         PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
-        Prefab prefab = manager.createPrefab("myprefab");
-        prefab.setPersisted(false);
-        prefab.addComponent(new StringComponent("Test"));
+        Prefab prefab = new PojoPrefab(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), null, false, new StringComponent("Test"));
+        manager.registerPrefab(prefab);
         EntityRef entity1 = entityManager.create(prefab);
         assertFalse(entity1.isPersistent());
     }

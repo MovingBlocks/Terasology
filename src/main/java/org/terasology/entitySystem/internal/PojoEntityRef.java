@@ -201,5 +201,6 @@ public class PojoEntityRef extends EntityRef {
 
     void invalidate() {
         id = PojoEntityManager.NULL_ID;
+        entityManager = null;
     }
 }

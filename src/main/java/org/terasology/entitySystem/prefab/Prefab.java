@@ -15,8 +15,11 @@
  */
 package org.terasology.entitySystem.prefab;
 
+import org.terasology.asset.Asset;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
+
+import java.util.List;
 
 /**
  * An entity prefab describes the recipe for creating an entity.
@@ -24,7 +27,7 @@ import org.terasology.entitySystem.ComponentContainer;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Prefab extends ComponentContainer {
+public interface Prefab extends ComponentContainer, Asset {
 
     /**
      * @return The identifier for this prefab
@@ -32,26 +35,14 @@ public interface Prefab extends ComponentContainer {
     public String getName();
 
     /**
-     * Iterate only over OWN components, excluding inheritance.
-     * Required for proper serializing
-     *
-     * @return
-     */
-    public Iterable<Component> iterateOwnedComponents();
-
-    /**
      * Return parents prefabs
      *
      * @return
      */
-    public Iterable<Prefab> getParents();
+    public Prefab getParent();
 
-    public void addParent(Prefab parent);
-
-    public void removeParent(Prefab parent);
+    public List<Prefab> getChildren();
 
     public boolean isPersisted();
-
-    public void setPersisted(boolean persisted);
 
 }

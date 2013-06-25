@@ -101,6 +101,7 @@ public class TerasologyEngine implements GameEngine {
         initTimer(); // Dependent on LWJGL
         initManagers();
         updateInputConfig();
+        CoreRegistry.putPermanently(GUIManager.class, new GUIManager());
         initSecurity();
         initialised = true;
     }
@@ -134,7 +135,7 @@ public class TerasologyEngine implements GameEngine {
             config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
             config.save();
         }
-        CoreRegistry.put(Config.class, config);
+        CoreRegistry.putPermanently(Config.class, config);
     }
 
     private void updateInputConfig() {
@@ -172,7 +173,7 @@ public class TerasologyEngine implements GameEngine {
         changeState(initialState);
         running = true;
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-        CoreRegistry.put(GameEngine.class, this);
+        CoreRegistry.putPermanently(GameEngine.class, this);
 
         mainLoop();
 
@@ -273,7 +274,7 @@ public class TerasologyEngine implements GameEngine {
         } else {
             audioManager = new OpenALManager(config.getAudio());
         }
-        CoreRegistry.put(AudioManager.class, audioManager);
+        CoreRegistry.putPermanently(AudioManager.class, audioManager);
     }
 
     private void initDisplay() {
@@ -331,10 +332,10 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
-        CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
-        CoreRegistry.put(ModManager.class, new ModManager());
-        CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.put(NetworkSystem.class, new NetworkSystemImpl(timer));
+        CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
+        CoreRegistry.putPermanently(ModManager.class, new ModManager());
+        CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
+        CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(timer));
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
@@ -345,7 +346,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void initTimer() {
         timer = new TimerLwjgl();
-        CoreRegistry.put(Timer.class, timer);
+        CoreRegistry.putPermanently(Timer.class, timer);
     }
 
     private void cleanup() {

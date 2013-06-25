@@ -283,7 +283,9 @@ public class InputSystem implements ComponentSystem {
             }
         }
 
-        return event.isConsumed();
+        boolean consumed = event.isConsumed();
+        event.reset();
+        return consumed;
     }
 
     private boolean sendMouseEvent(int button, boolean buttonDown, float delta) {
@@ -308,7 +310,9 @@ public class InputSystem implements ComponentSystem {
                 break;
             }
         }
-        return event.isConsumed();
+        boolean consumed = event.isConsumed();
+        event.reset();
+        return consumed;
     }
 
     private boolean sendMouseWheelEvent(int wheelTurns, float delta) {

@@ -89,6 +89,9 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public void clear() {
+        for (EntityRef entityRef : entityCache.values()) {
+            ((PojoEntityRef)entityRef).invalidate();
+        }
         store.clear();
         nextEntityId = 1;
         loadedIds.clear();

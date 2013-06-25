@@ -155,6 +155,7 @@ public class ComponentSystemManager {
         for (Class<?> sharedSystem : sharedSystems) {
             CoreRegistry.remove(sharedSystem);
         }
+        console = null;
         sharedSystems.clear();
         namedLookup.clear();
         store.clear();

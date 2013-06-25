@@ -16,10 +16,14 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.prefab.PrefabLoader;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 
@@ -35,7 +39,7 @@ public class InitialiseEntitySystem implements LoadProcess {
     @Override
     public boolean step() {
         ModManager modManager = CoreRegistry.get(ModManager.class);
-        EngineEntityManager entityManager = new EntitySystemBuilder().build(modManager, CoreRegistry.get(NetworkSystem.class));
+        new EntitySystemBuilder().build(modManager, CoreRegistry.get(NetworkSystem.class));
         return true;
     }
 
