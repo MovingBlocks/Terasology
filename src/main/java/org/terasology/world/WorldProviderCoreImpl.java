@@ -246,7 +246,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public LiquidData getLiquid(int x, int y, int z) {
         if (y >= Chunk.SIZE_Y || y < 0) {
-            logger.warn("Accessed block outside of the height range");
+            logger.warn("Accessed liquid outside of the height range");
             return new LiquidData();
         }
 
