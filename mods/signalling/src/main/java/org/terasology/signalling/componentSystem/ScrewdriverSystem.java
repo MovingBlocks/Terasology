@@ -67,7 +67,11 @@ public class ScrewdriverSystem implements ComponentSystem {
                     gateEntity.saveComponent(signalProducer);
                     gateEntity.saveComponent(signalConsumer);
 
-                    gateEntity.saveComponent(new SignalProducerModifiedComponent());
+                    if (newSide == Side.FRONT) {
+                        gateEntity.removeComponent(SignalGateRotatedComponent.class);
+                    } else {
+                        gateEntity.addComponent(new SignalGateRotatedComponent());
+                    }
                 }
             }
         }
