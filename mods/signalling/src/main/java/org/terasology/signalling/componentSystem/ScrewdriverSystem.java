@@ -1,5 +1,7 @@
 package org.terasology.signalling.componentSystem;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -21,6 +23,7 @@ import java.util.EnumMap;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ScrewdriverSystem implements ComponentSystem {
+    private static final Logger logger = LoggerFactory.getLogger(ScrewdriverSystem.class);
     @In
     private WorldProvider worldProvider;
     @In
@@ -54,6 +57,7 @@ public class ScrewdriverSystem implements ComponentSystem {
                 final Side currentSide = gateBlockFamily.getBlockSide(block);
                 final Side newSide = sideOrder.get(currentSide);
                 if (worldProvider.setBlock(targetLocation, gateBlockFamily.getBlockForSide(newSide), block)) {
+                    logger.info("Gate rotated");
                     final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
                     final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);
                     gateEntity.removeComponent(SignalProducerComponent.class);
