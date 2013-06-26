@@ -1,5 +1,7 @@
 package org.terasology.signalling.componentSystem;
 
+import gnu.trove.map.TObjectLongMap;
+import gnu.trove.map.hash.TObjectLongHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.blockNetwork.ImmutableBlockLocation;
@@ -36,8 +38,8 @@ import com.google.common.collect.Sets;
 public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
 
-    public static final int GATE_DELAY = 200;
-    public static final int NOT_LOADED_BLOCK_DELAY=500;
+    public static final int GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL = 200;
+    public static final int NOT_LOADED_BLOCK_RETRY_DELAY = 500;
 
     @In
     private WorldProvider worldProvider;
@@ -48,6 +50,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private Set<Vector3i> activatedPressurePlates = Sets.newHashSet();
     private PriorityQueue<BlockAtLocationDelayedAction> delayedActions = new PriorityQueue<BlockAtLocationDelayedAction>(11, new ExecutionTimeOrdering());
+
+    private TObjectLongMap<ImmutableBlockLocation> gateLastSignalChangeTime = new TObjectLongHashMap<>();
 
     private Block lampTurnedOff;
     private Block lampTurnedOn;
@@ -78,25 +82,28 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             action = delayedActions.poll();
 
             final Vector3i actionLocation = action.blockLocation.toVector3i();
-            final Block block = worldProvider.getBlock(actionLocation);
-            final BlockFamily blockFamily = block.getBlockFamily();
+            if (worldProvider.isBlockRelevant(actionLocation)) {
+                final Block block = worldProvider.getBlock(actionLocation);
+                final BlockFamily blockFamily = block.getBlockFamily();
 
-            final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(actionLocation);
+                final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(actionLocation);
 
-            if (blockFamily == signalOnDelayGate) {
-                startProducingSignal(blockEntity, -1);
-            } else if (blockFamily == signalOffDelayGate) {
-                stopProducingSignal(blockEntity);
-            } else if (blockFamily == signalOrGate || blockFamily == signalAndGate
-                    || blockFamily == signalXorGate) {
-                processOutputForNormalGate(blockEntity);
-            } else if (blockFamily == signalNandGate) {
-                processOutputForRevertedGate(blockEntity);
+                if (blockFamily == signalOnDelayGate) {
+                    startProducingSignal(blockEntity, -1);
+                } else if (blockFamily == signalOffDelayGate) {
+                    stopProducingSignal(blockEntity);
+                } else if (blockFamily == signalOrGate || blockFamily == signalAndGate
+                        || blockFamily == signalXorGate) {
+                    processOutputForNormalGate(blockEntity);
+                } else if (blockFamily == signalNandGate) {
+                    processOutputForRevertedGate(blockEntity);
+                }
+
+                blockEntity.removeComponent(SignalDelayedActionComponent.class);
             } else {
-                action.executeTime+=NOT_LOADED_BLOCK_DELAY;
+                action.executeTime += NOT_LOADED_BLOCK_RETRY_DELAY;
                 delayedActions.add(action);
             }
-            blockEntity.removeComponent(SignalDelayedActionComponent.class);
         }
     }
 
@@ -272,7 +279,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
     public void addedDelayedAction(OnActivatedComponent event, EntityRef block) {
-        System.out.println("Activated delayed action: "+block);
         final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
         final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
         delayedActions.add(new BlockAtLocationDelayedAction(location, executeTime));
@@ -288,6 +294,11 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private void signalChangedForNormalGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
         logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
         processOutputForNormalGate(entity);
+    }
+
+    private void signalChangedForNotGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
+        logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
+        processOutputForRevertedGate(entity);
     }
 
     private void startProducingSignal(EntityRef entity, int signalStrength) {
@@ -306,11 +317,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             entity.saveComponent(producer);
             entity.removeComponent(SignalProducerModifiedComponent.class);
         }
-    }
-
-    private void signalChangedForNotGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
-        logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
-        processOutputForRevertedGate(entity);
     }
 
     private class BlockAtLocationDelayedAction {
