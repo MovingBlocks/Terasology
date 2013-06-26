@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
 public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
 
-    public static final int GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL = 200;
+    public static final int GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL = 500;
     public static final int NOT_LOADED_BLOCK_RETRY_DELAY = 500;
 
     @In
