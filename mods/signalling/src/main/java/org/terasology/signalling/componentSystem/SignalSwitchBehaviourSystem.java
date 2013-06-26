@@ -132,6 +132,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private boolean processOutputForNormalGate(EntityRef blockEntity) {
         boolean hasSignal = blockEntity.getComponent(SignalConsumerStatusComponent.class).hasSignal;
+        logger.debug("Processing gate, hasSignal="+hasSignal);
         if (hasSignal) {
             return startProducingSignal(blockEntity, -1);
         } else {
@@ -253,12 +254,12 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         delayedActions.add(new BlockAtLocationDelayedAction(location, executeTime));
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
-    public void removedDelayedAction(BeforeDeactivateComponent event, EntityRef block) {
-        final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
-        final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
-        delayedActions.remove(new BlockAtLocationDelayedAction(location, executeTime));
-    }
+//    @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
+//    public void removedDelayedAction(BeforeDeactivateComponent event, EntityRef block) {
+//        final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
+//        final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
+//        delayedActions.remove(new BlockAtLocationDelayedAction(location, executeTime));
+//    }
 
     @ReceiveEvent(components = {SignalConsumerStatusComponent.class})
     public void consumerModified(OnChangedComponent event, EntityRef entity) {
@@ -275,6 +276,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                 worldProvider.setBlock(blockLocation, lampTurnedOff, block);
             } else if (blockFamily == signalOrGate || blockFamily == signalAndGate
                     || blockFamily == signalXorGate) {
+                logger.debug("Signal changed for gate");
                 signalChangedForNormalGate(entity, consumerStatusComponent);
             } else if (blockFamily == signalNandGate) {
                 signalChangedForNotGate(entity, consumerStatusComponent);
