@@ -371,7 +371,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             for (Component comp : prefab.iterateComponents()) {
                 Component currentComp = entity.getComponent(comp.getClass());
                 if (currentComp == null) {
-                    entity.addComponent(entityManager.getComponentLibrary().getMetadata(comp.getClass()).clone(comp));
+                    entity.addComponent(entityManager.getComponentLibrary().copy(comp));
                 } else {
                     ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                     boolean changed = false;

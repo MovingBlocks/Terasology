@@ -28,7 +28,7 @@ import org.terasology.entitySystem.prefab.Prefab;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public abstract class EntityRef implements ComponentContainer {
+public abstract class EntityRef implements MutableComponentContainer {
 
     public static final NullEntityRef NULL = NullEntityRef.getInstance();
 

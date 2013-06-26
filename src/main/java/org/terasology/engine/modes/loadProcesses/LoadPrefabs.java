@@ -23,6 +23,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabLoader;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
@@ -43,8 +45,8 @@ import java.util.Iterator;
 public class LoadPrefabs implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(LoadPrefabs.class);
 
+    private PrefabManager prefabManager;
     private Iterator<AssetUri> prefabs;
-    private PrefabSerializer prefabSerializer;
 
     @Override
     public String getMessage() {
@@ -54,31 +56,15 @@ public class LoadPrefabs implements LoadProcess {
     @Override
     public boolean step() {
         if (prefabs.hasNext()) {
-            AssetUri prefabURI = prefabs.next();
-            logger.debug("Loading prefab " + prefabURI);
-            // TODO: This should go into some other class?
-            try {
-                InputStream stream = AssetManager.assetStream(prefabURI);
-                if (stream != null) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
-                    stream.close();
-                    if (prefabData != null) {
-                        prefabSerializer.deserialize(prefabData, prefabURI);
-                    }
-                } else {
-                    logger.warn("Failed to load prefab '{}'", prefabURI);
-                }
-            } catch (IOException e) {
-                logger.error("Failed to load prefab '{}'", prefabURI, e);
-            }
+            prefabManager.registerPrefab(Assets.get(prefabs.next(), Prefab.class));
         }
         return !prefabs.hasNext();
     }
 
     @Override
     public int begin() {
-        prefabSerializer = new PrefabSerializer(CoreRegistry.get(PrefabManager.class), CoreRegistry.get(ComponentLibrary.class));
+        AssetManager.getInstance().clear();
+        prefabManager = CoreRegistry.get(PrefabManager.class);
         prefabs = Assets.list(AssetType.PREFAB).iterator();
         return Lists.newArrayList(Assets.list(AssetType.PREFAB)).size();
     }

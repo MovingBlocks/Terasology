@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
+import org.terasology.entitySystem.prefab.PrefabLoader;
 import org.terasology.rendering.assetLoaders.FontLoader;
 import org.terasology.rendering.assetLoaders.GLSLShaderLoader;
 import org.terasology.rendering.assetLoaders.MaterialLoader;
@@ -44,7 +45,7 @@ import java.util.Map;
  * @author Lucas Jenss <public@x3ro.de>
  */
 public enum AssetType {
-    PREFAB("prefab", "prefabs", "prefab", null),
+    PREFAB("prefab", "prefabs", "prefab", new PrefabLoader()),
     SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "json", new JsonBlockShapeLoader()),

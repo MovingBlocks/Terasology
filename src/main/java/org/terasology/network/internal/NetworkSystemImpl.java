@@ -225,6 +225,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         entitySerializer = null;
         clientList.clear();
         netClientList.clear();
+        blockManager = null;
+        ownerLookup.clear();
+        ownedLookup.clear();
+        ownershipHelper = null;
         logger.info("Network shutdown");
     }
 

@@ -501,7 +501,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         if (chunk == null) {
             PerformanceMonitor.startActivity("Check chunk in cache");
             if (preparingChunks.add(chunkPos)) {
-                if (farStore.contains(chunkPos)) {
+                if (nearCache.get(chunkPos) != null) {
+                    // This happens if the chunk is completed right before checking if it is in preparing chunks. Fun.
+                    preparingChunks.remove(chunkPos);
+                } else if (farStore.contains(chunkPos)) {
                     pipeline.doTask(new AbstractChunkTask(pipeline, chunkPos, this) {
                         @Override
                         public void enact() {

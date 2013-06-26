@@ -57,18 +57,6 @@ public class PojoPrefabManager implements PrefabManager {
     /**
      * {@inheritDoc}
      */
-    public Prefab createPrefab(String name) {
-        String normalisedName = normalizeName(name);
-        if (exists(normalisedName)) {
-            return getPrefab(normalisedName);
-        }
-
-        return this.registerPrefab(new PojoPrefab(name, componentLibrary));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public Prefab getPrefab(String name) {
         String normalisedName = normalizeName(name);
         return exists(normalisedName) ? prefabTable.get(normalisedName) : null;

@@ -79,8 +79,9 @@ public class BlockLoader implements BlockBuilderHelper {
     private BlockShape trimmedLoweredShape;
 
     private WorldAtlasBuilder atlasBuilder = new WorldAtlasBuilder();
+    private BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
-    public BlockLoader() {
+    public BlockLoader(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         parser = new JsonParser();
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
@@ -92,11 +93,11 @@ public class BlockLoader implements BlockBuilderHelper {
         cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
         loweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
         trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
+        this.blockFamilyFactoryRegistry = blockFamilyFactoryRegistry;
     }
 
     public LoadBlockDefinitionResults loadBlockDefinitions() {
         logger.info("Loading Blocks...");
-        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
 
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
         for (AssetUri blockDefUri : Assets.list(AssetType.BLOCK_DEFINITION)) {

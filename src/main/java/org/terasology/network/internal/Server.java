@@ -262,7 +262,7 @@ public class Server implements ChunkReadyListener {
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
-            if (worldProvider.isBlockActive(pos)) {
+            if (worldProvider.isBlockRelevant(pos)) {
                 Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
                 worldProvider.setBlockForced(pos, newBlock);
             } else {

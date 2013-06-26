@@ -86,7 +86,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         Iterator<SpawningClientInfo> i = clientsPreparingToSpawn.iterator();
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
-            if (worldRenderer.getWorldProvider().isBlockActive(spawning.position)) {
+            if (worldRenderer.getWorldProvider().isBlockRelevant(spawning.position)) {
                 if (spawning.entityStore == null) {
                     spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
                 } else if (!spawning.entityStore.hasCharacter()) {
@@ -130,7 +130,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         entity.saveComponent(loc);
         worldRenderer.getChunkProvider().addRelevanceEntity(entity, 4, networkSystem.getOwner(entity));
         if (connected.getEntityStore().hasCharacter()) {
-            if (worldRenderer.getWorldProvider().isBlockActive(connected.getEntityStore().getRelevanceLocation())) {
+            if (worldRenderer.getWorldProvider().isBlockRelevant(connected.getEntityStore().getRelevanceLocation())) {
                 restoreCharacter(entity, connected.getEntityStore());
             } else {
                 SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, connected.getEntityStore().getRelevanceLocation(), connected.getEntityStore());

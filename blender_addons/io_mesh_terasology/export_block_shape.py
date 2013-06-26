@@ -55,6 +55,12 @@ def writeAABBCollision(
 	fw(',\n	"collision" : {\n')
 	if scene.teraCollisionSymmetric:
 		fw('		"symmetric" : true,\n')
+	if scene.teraCollisionSymmetricZ:
+		fw('        "yawSymmetric" : true,\n')
+	if scene.teraCollisionSymmetricX:
+		fw('        "pitchSymmetric" : true,\n')
+	if scene.teraCollisionSymmetricY:
+		fw('        "rollSymmetric" : true,\n')
 	fw('		"colliders" : [\n')
 	fw('			{\n')
 	fw('				"type" : "AABB",\n')
@@ -70,6 +76,12 @@ def writeConvexHullCollision(
 	fw(',\n	"collision" : {\n')
 	if scene.teraCollisionSymmetric:
 		fw('		"symmetric" : true,\n')
+	if scene.teraCollisionSymmetricZ:
+		fw('        "yawSymmetric" : true,\n')
+	if scene.teraCollisionSymmetricX:
+		fw('        "pitchSymmetric" : true,\n')
+	if scene.teraCollisionSymmetricY:
+		fw('        "rollSymmetric" : true,\n')
 	fw('		"convexHull" : true\n')
 	fw('	}')
 	
@@ -79,6 +91,12 @@ def writeMeshCollision(
 	fw(',\n	"collision" : {\n')
 	if scene.teraCollisionSymmetric:
 		fw('		"symmetric" : true,\n')
+	if scene.teraCollisionSymmetricZ:
+		fw('        "yawSymmetric" : true,\n')
+	if scene.teraCollisionSymmetricX:
+		fw('        "pitchSymmetric" : true,\n')
+	if scene.teraCollisionSymmetricY:
+		fw('        "rollSymmetric" : true,\n')
 	first = True
 	for object in bpy.data.objects:
 		if object.teraColliderType != '' and object.teraColliderType != 'None':

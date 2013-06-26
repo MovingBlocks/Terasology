@@ -17,6 +17,7 @@
 package org.terasology.asset;
 
 import org.terasology.audio.Sound;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Shader;
@@ -232,4 +233,5 @@ public final class Assets {
     // Private constructor to prevent instantiation (static class)
     private Assets() {
     }
+
 }

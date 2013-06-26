@@ -34,13 +34,13 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
-    public boolean isBlockActive(Vector3i pos) {
+    public boolean isBlockRelevant(Vector3i pos) {
         return core.isBlockRelevant(pos.x, pos.y, pos.z);
     }
 
     @Override
-    public boolean isBlockActive(Vector3f pos) {
-        return isBlockActive(new Vector3i(pos, 0.5f));
+    public boolean isBlockRelevant(Vector3f pos) {
+        return isBlockRelevant(new Vector3i(pos, 0.5f));
     }
 
     @Override

@@ -52,7 +52,6 @@ public class BlockShape implements Asset {
     private CollisionShape baseCollisionShape;
     private Vector3f baseCollisionOffset = new Vector3f();
     private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
-    private boolean collisionSymmetric = false;
     private boolean yawSymmetric = false;
     private boolean pitchSymmetric = false;
     private boolean rollSymmetric = false;
@@ -130,16 +129,13 @@ public class BlockShape implements Asset {
     }
 
     public boolean isCollisionSymmetric() {
-        return collisionSymmetric;
+        return yawSymmetric && pitchSymmetric && rollSymmetric;
     }
 
     public void setCollisionSymmetric(boolean collisionSymmetric) {
-        this.collisionSymmetric = collisionSymmetric;
-        if (collisionSymmetric) {
-            yawSymmetric = true;
-            pitchSymmetric = true;
-            rollSymmetric = true;
-        }
+        yawSymmetric = collisionSymmetric;
+        pitchSymmetric = collisionSymmetric;
+        rollSymmetric = collisionSymmetric;
     }
 
     public boolean isYawSymmetric() {

@@ -90,6 +90,10 @@ public class CircularBuffer<T> implements Iterable<T> {
         return new BufferIterator();
     }
 
+    public void clear() {
+        occupancy = 0;
+    }
+
     private class BufferIterator implements Iterator<T> {
         int index = 0;
 
