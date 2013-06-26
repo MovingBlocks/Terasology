@@ -16,6 +16,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.signalling.components.*;
+import org.terasology.signalling.gui.SetSignalDelayEvent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -203,6 +204,18 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     @Override
     public void shutdown() {
 
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class, SignalTimeDelayComponent.class})
+    public void configureTimeDelay(SetSignalDelayEvent event, EntityRef entity) {
+        SignalTimeDelayComponent timeDelayComponent = entity.getComponent(SignalTimeDelayComponent.class);
+        timeDelayComponent.delaySetting = event.getTime();
+        entity.saveComponent(timeDelayComponent);
+        if (timeDelayComponent.delaySetting== 1000) {
+            entity.removeComponent(SignalTimeDelayModifiedComponent.class);
+        } else {
+            entity.saveComponent(new SignalTimeDelayModifiedComponent());
+        }
     }
 
     @ReceiveEvent(components = {BlockComponent.class, SignalProducerComponent.class})
