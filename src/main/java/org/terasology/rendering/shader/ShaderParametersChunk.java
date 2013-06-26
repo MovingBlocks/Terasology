@@ -66,11 +66,12 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         super.applyParameters(program);
 
         Texture terrain = Assets.getTexture("engine:terrain");
+        Texture terrainNormal = Assets.getTexture("engine:terrainNormal");
+        Texture terrainHeight = Assets.getTexture("engine:terrainHeight");
+
         Texture water = Assets.getTexture("engine:custom_water_still");
         Texture lava = Assets.getTexture("engine:custom_lava_still");
         Texture waterNormal = Assets.getTexture("engine:water_normal");
-        Texture stoneNormal = Assets.getTexture("engine:stone_normal");
-        Texture stoneHeight = Assets.getTexture("engine:stone_height");
         Texture effects = Assets.getTexture("engine:effects");
 
         if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
@@ -102,13 +103,13 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, stoneNormal.getId());
-            program.setInt("textureStoneNormal", texId++);
+            glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.getId());
+            program.setInt("textureAtlasNormal", texId++);
 
             if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                glBindTexture(GL11.GL_TEXTURE_2D, stoneHeight.getId());
-                program.setInt("textureStoneHeight", texId++);
+                glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.getId());
+                program.setInt("textureAtlasHeight", texId++);
             }
         }
 

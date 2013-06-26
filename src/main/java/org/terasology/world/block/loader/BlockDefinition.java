@@ -63,6 +63,9 @@ public class BlockDefinition {
     public List<String> categories = Lists.newArrayList();
 
     public String tile = "";
+    public String tileNormal = "";
+    public String tileHeight = "";
+
     public Tiles tiles;
 
     public Block.ColorSource colorSource = Block.ColorSource.DEFAULT;

@@ -63,10 +63,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
-import java.util.EnumMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author Immortius
@@ -83,8 +81,12 @@ public class BlockLoader {
     private BlockShape loweredShape;
     private BlockShape trimmedLoweredShape;
 
-    private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
-    private List<Tile> tiles = Lists.newArrayList();
+    private Tile tiles[] = new Tile[1024];
+    private Tile tilesNormal[] = new Tile[1024];
+    private Tile tilesHeight[] = new Tile[1024];
+    private int currentMaxTileIndex = 0;
+
+    private TObjectIntMap<AssetUri> tileIndices = new TObjectIntHashMap<AssetUri>();
 
     public BlockLoader() {
         parser = new JsonParser();
@@ -127,7 +129,13 @@ public class BlockLoader {
                     BlockDefinition blockDef = loadBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
                     if (isShapelessBlockFamily(blockDef)) {
-                        indexTile(getDefaultTile(blockDef, blockDefUri), true);
+                        int index = indexTile(getDefaultTile(blockDef, blockDefUri), true);
+
+                        Tile tileNormal = (Tile) AssetManager.tryLoad(getDefaultTileNormal(blockDef, blockDefUri));
+                        tilesNormal[index] = tileNormal;
+                        Tile tileHeight = (Tile) AssetManager.tryLoad(getDefaultTileHeight(blockDef, blockDefUri));
+                        tilesHeight[index] = tileHeight;
+
                         result.shapelessDefinitions.add(new ShapelessFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
                     } else {
                         if (blockDef.liquid) {
@@ -191,39 +199,45 @@ public class BlockLoader {
 
     public void buildAtlas() {
         // Update the atlas configuration using the given set of tiles
-        for (int index = 0; index < tiles.size(); ++index) {
-            Tile tile = tiles.get(index);
-            updateAtlasConfiguration(tile);
+        for (int index = 0; index < currentMaxTileIndex; ++index) {
+            if (tiles[index] != null) {
+                Tile tile = tiles[index];
+                updateAtlasConfiguration(tile);
+            }
         }
 
         int numMipMaps = getNumMipmaps();
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
+        ByteBuffer[] dataNormal = new ByteBuffer[numMipMaps];
+        ByteBuffer[] dataHeight = new ByteBuffer[numMipMaps];
+
         for (int i = 0; i < numMipMaps; ++i) {
-            BufferedImage image = generateAtlas(i);
+            BufferedImage imageDiffuse = generateAtlas(i, tiles);
+            BufferedImage imageNormal = generateAtlas(i, tilesNormal);
+            BufferedImage imageHeight = generateAtlas(i, tilesHeight);
+
             if (i == 0) {
                 try {
-                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles.png"));
+                    ImageIO.write(imageDiffuse, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles.png"));
+                    ImageIO.write(imageNormal, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles_normal.png"));
+                    ImageIO.write(imageHeight, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles_height.png"));
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
                 }
             }
 
-            // TODO: Read data directly from image buffer into texture
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(image, "png", bos);
-                PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
-                ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
-                buf.flip();
-                data[i] = buf;
-            } catch (IOException e) {
-                logger.error("Failed to create atlas texture");
-            }
+            writeImageToBuffer(imageDiffuse, i, data);
+            writeImageToBuffer(imageNormal, i, dataNormal);
+            writeImageToBuffer(imageHeight, i, dataHeight);
         }
 
         Texture terrainTex = new Texture(data, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
+        Texture terrainNormalTex = new Texture(dataNormal, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrainNormal"), terrainNormalTex);
+        Texture terrainHeightTex = new Texture(dataHeight, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrainHeight"), terrainHeightTex);
+
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:blockMaterial"));
         terrainMat.setTexture("textureAtlas", terrainTex);
         terrainMat.setFloat3("colorOffset", 1, 1, 1);
@@ -231,7 +245,22 @@ public class BlockLoader {
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMat);
     }
 
-    private BufferedImage generateAtlas(int mipMapLevel) {
+    private void writeImageToBuffer(BufferedImage image , int mipMapIndex, ByteBuffer[] ouputData) {
+        // TODO: Read data directly from image buffer into texture
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "png", bos);
+            PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
+            ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+            buf.flip();
+            ouputData[mipMapIndex] = buf;
+        } catch (IOException e) {
+            logger.error("Failed to create atlas texture");
+        }
+    }
+
+    private BufferedImage generateAtlas(int mipMapLevel, Tile[] tiles) {
         int size = Block.ATLAS_SIZE / (1 << mipMapLevel);
         int textureSize = Block.TILE_SIZE / (1 << mipMapLevel);
         int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
@@ -239,12 +268,15 @@ public class BlockLoader {
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
 
-        for (int index = 0; index < tiles.size(); ++index) {
-            Tile tile = tiles.get(index);
+        for (int index = 0; index < currentMaxTileIndex; ++index) {
 
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
-            g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+
+            Tile tile = tiles[index];
+            if (tile != null) {
+                g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+            }
         }
 
         return result;
@@ -526,9 +558,25 @@ public class BlockLoader {
         return new AssetUri(AssetType.BLOCK_TILE, defaultName);
     }
 
+    private AssetUri getDefaultTileNormal(BlockDefinition blockDef, AssetUri uri) {
+        String defaultName = uri.getSimpleString()+"Normal";
+        if (!blockDef.tileNormal.isEmpty()) {
+            defaultName = blockDef.tileNormal;
+        }
+        return new AssetUri(AssetType.BLOCK_TILE, defaultName);
+    }
+
+    private AssetUri getDefaultTileHeight(BlockDefinition blockDef, AssetUri uri) {
+        String defaultName = uri.getSimpleString()+"Height";
+        if (!blockDef.tileHeight.isEmpty()) {
+            defaultName = blockDef.tileHeight;
+        }
+        return new AssetUri(AssetType.BLOCK_TILE, defaultName);
+    }
+
     private int getTileIndex(AssetUri uri, boolean warnOnError) {
-        if (tileIndexes.containsKey(uri)) {
-            return tileIndexes.get(uri);
+        if (tileIndices.containsKey(uri)) {
+            return tileIndices.get(uri);
         }
         return indexTile(uri, warnOnError);
     }
@@ -536,14 +584,14 @@ public class BlockLoader {
     private int indexTile(AssetUri uri, boolean warnOnError) {
         Tile tile = (Tile) AssetManager.tryLoad(uri);
         if (tile != null) {
-            int index = tiles.size();
-            tiles.add(tile);
-            tileIndexes.put(uri, index);
+            int index = currentMaxTileIndex++;
+            tiles[index] = tile;
+            tileIndices.put(uri, index);
             return index;
         } else if (warnOnError) {
             logger.warn("Unable to resolve block tile '{}'", uri);
         }
-        return 0;
+        return -1;
     }
 
     private void updateAtlasConfiguration(Tile currentTile) {
@@ -561,7 +609,7 @@ public class BlockLoader {
         }
 
         int atlasSizePow = 0, count = 0;
-        while (atlasSizePow * atlasSizePow < tiles.size()) {
+        while (atlasSizePow * atlasSizePow < currentMaxTileIndex) {
             atlasSizePow = (1 << count);
             count++;
         }
@@ -574,7 +622,7 @@ public class BlockLoader {
         }
 
         int maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
-        while (maxTiles < tiles.size()) {
+        while (maxTiles < currentMaxTileIndex) {
             tileSize >>= 1;
             maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
         }

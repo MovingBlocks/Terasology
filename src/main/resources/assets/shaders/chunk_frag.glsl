@@ -65,16 +65,14 @@ uniform sampler2D textureWaterNormal;
 varying vec3 worldSpaceNormal;
 varying mat3 normalMatrix;
 
-// TODO: Texture is just for testing purposes
-uniform sampler2D textureStoneNormal;
+uniform sampler2D textureAtlasNormal;
 
 # if defined (PARALLAX_MAPPING)
 uniform vec4 parallaxProperties;
 #  define parallaxBias parallaxProperties.x
 #  define parallaxScale parallaxProperties.y
 
-// TODO: Texture is just for testing purposes
-uniform sampler2D textureStoneHeight;
+uniform sampler2D textureAtlasHeight;
 # endif
 #endif
 
@@ -117,8 +115,6 @@ void main() {
     vec3 normalOpaque = normal;
 
 #if defined (NORMAL_MAPPING)
-    vec2 normalMapTexCoord = normalizeAtlasTexCoord(texCoord);
-
 # if defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
@@ -137,12 +133,11 @@ void main() {
 
     vec3 eyeTangentSpace = tbn * vertexViewPos.xyz;
 
-    float height =  parallaxScale * texture2D(textureStoneHeight, normalMapTexCoord).r - parallaxBias;
-	texCoord += (height * normalize(eyeTangentSpace).xy) * TEXTURE_OFFSET;
-	normalMapTexCoord += height * normalize(eyeTangentSpace).xy;
+    float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
+	texCoord += height * normalize(eyeTangentSpace).xy * TEXTURE_OFFSET;
 # endif
 
-    normalOpaque = (texture2D(textureStoneNormal, normalMapTexCoord).xyz * 2.0 - 1.0);
+    normalOpaque = (texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
 
     // Simplified tangent basis - because we can! Voxels and blocks are great
     normalOpaque.xyz = vec3(worldSpaceNormal.x, normalOpaque.x, normalOpaque.y) * abs(worldSpaceNormal.xxx)
@@ -249,7 +244,7 @@ void main() {
     float shadowTerm = 1.0;
 
     vec3 vertexLightPosClipSpace = vertexLightProjPos.xyz / vertexLightProjPos.w;
-    vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5, 0.5) + vec2(0.5);
+    vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5) + vec2(0.5);
     float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
 
     if (shadowMapDepth < vertexLightPosClipSpace.z - shadowMapBias) {
@@ -278,7 +273,9 @@ void main() {
 
     // Calculate the final block light brightness
     float blockBrightness = expBlockLightValue(blocklightValue) * BLOCK_LIGHT_FACTOR;
+#if defined (FLICKERING_LIGHT)
     blockBrightness -= flickeringLightOffset * blocklightValue;
+#endif
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);

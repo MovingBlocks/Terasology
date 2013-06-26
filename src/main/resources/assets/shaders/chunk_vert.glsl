@@ -148,8 +148,6 @@ void main()
 	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 4.0;
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 2.0;
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917);
-#else
-	flickeringLightOffset = 0.0;
 #endif
 
 #if defined (ANIMATED_GRASS) || defined (ANIMATED_WATER)
