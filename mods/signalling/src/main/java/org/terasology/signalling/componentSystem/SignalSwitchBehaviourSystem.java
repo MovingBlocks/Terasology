@@ -35,7 +35,9 @@ import com.google.common.collect.Sets;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
+
     public static final int GATE_DELAY = 200;
+    public static final int NOT_LOADED_BLOCK_DELAY=500;
 
     @In
     private WorldProvider worldProvider;
@@ -80,8 +82,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             final BlockFamily blockFamily = block.getBlockFamily();
 
             final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(actionLocation);
-            System.out.println("Block family: "+blockFamily.getDisplayName());
-            System.out.println("Block entity: "+blockEntity);
 
             if (blockFamily == signalOnDelayGate) {
                 startProducingSignal(blockEntity, -1);
@@ -92,6 +92,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                 processOutputForNormalGate(blockEntity);
             } else if (blockFamily == signalNandGate) {
                 processOutputForRevertedGate(blockEntity);
+            } else {
+                action.executeTime+=NOT_LOADED_BLOCK_DELAY;
+                delayedActions.add(action);
             }
             blockEntity.removeComponent(SignalDelayedActionComponent.class);
         }
@@ -129,7 +132,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                 if (signalProducer != null) {
                     if (signalProducer.signalStrength == 0) {
                         startProducingSignal(entityBeneathPlayer, -1);
-                        entityBeneathPlayer.saveComponent(new SignalProducerModifiedComponent());
                         activatedPressurePlates.add(locationBeneathPlayer);
                     } else {
                         toRemoveSignal.remove(locationBeneathPlayer);
@@ -143,7 +145,6 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             SignalProducerComponent signalProducer = pressurePlate.getComponent(SignalProducerComponent.class);
             if (signalProducer != null) {
                 stopProducingSignal(pressurePlate);
-                pressurePlate.removeComponent(SignalProducerModifiedComponent.class);
                 activatedPressurePlates.remove(pressurePlateLocation);
             }
         }
@@ -199,10 +200,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         int currentSignalStrength = producerComponent.signalStrength;
         if (currentSignalStrength == 0) {
             startProducingSignal(entity, onSignalStrength);
-            entity.saveComponent(new SignalProducerModifiedComponent());
         } else {
             stopProducingSignal(entity);
-            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
@@ -212,10 +211,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             result = 0;
         if (result > 0) {
             startProducingSignal(entity, result);
-            entity.saveComponent(new SignalProducerModifiedComponent());
         } else {
             stopProducingSignal(entity);
-            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
@@ -290,9 +287,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private void signalChangedForNormalGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
         logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
-        SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
-        delayedAction.executeTime = worldProvider.getTime()+ GATE_DELAY;
-        entity.saveComponent(delayedAction);
+        processOutputForNormalGate(entity);
     }
 
     private void startProducingSignal(EntityRef entity, int signalStrength) {
@@ -300,6 +295,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (producer.signalStrength == 0) {
             producer.signalStrength = signalStrength;
             entity.saveComponent(producer);
+            entity.saveComponent(new SignalProducerModifiedComponent());
         }
     }
 
@@ -308,15 +304,13 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (producer.signalStrength != 0) {
             producer.signalStrength = 0;
             entity.saveComponent(producer);
+            entity.removeComponent(SignalProducerModifiedComponent.class);
         }
     }
 
     private void signalChangedForNotGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
-        SignalProducerComponent producerComponent = entity.getComponent(SignalProducerComponent.class);
         logger.debug("Gate has signal: " + consumerStatusComponent.hasSignal);
-        SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
-        delayedAction.executeTime = worldProvider.getTime()+GATE_DELAY;
-        entity.saveComponent(delayedAction);
+        processOutputForRevertedGate(entity);
     }
 
     private class BlockAtLocationDelayedAction {

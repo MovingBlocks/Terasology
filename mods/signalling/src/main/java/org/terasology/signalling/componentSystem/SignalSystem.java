@@ -21,7 +21,6 @@ import org.terasology.signalling.components.SignalProducerComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.BlockComponent;
@@ -92,12 +91,13 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     }
 
     private long lastUpdate;
-    private long delay = 0;
+    private static final long PROCESSING_MINIMUM_INTERVAL = 0;
+    private static final boolean CONSUMER_CAN_POWER_ITSELF = true;
 
     @Override
     public void update(float delta) {
         long worldTime = worldProvider.getTime();
-        if (worldTime > lastUpdate + delay) {
+        if (worldTime > lastUpdate + PROCESSING_MINIMUM_INTERVAL) {
             lastUpdate = worldTime;
 
             // Mark all networks affected by the producer signal change
@@ -199,8 +199,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         // Check for infinite signal strength (-1), if there - it powers whole network
         final Collection<NetworkNode> producers = producersInNetwork.get(network);
         for (NetworkNode producer : producers) {
-            // consumer cannot power itself
-            if (!producer.location.equals(consumerNode.location)) {
+            if (CONSUMER_CAN_POWER_ITSELF || !producer.location.equals(consumerNode.location)) {
                 final int signalStrength = producerSignalStrengths.get(producer);
                 if (signalStrength == -1)
                     return new NetworkSignals(network.getLeafSidesInNetwork(consumerNode), (byte) 0);
@@ -222,8 +221,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     private boolean hasSignalInNetworkOnSide(Network network, NetworkNode consumerNode, Collection<NetworkNode> producers, Side sideInNetwork) {
         for (NetworkNode producer : producers) {
-            // consumer cannot power itself
-            if (!producer.location.equals(consumerNode.location)) {
+            if (CONSUMER_CAN_POWER_ITSELF || !producer.location.equals(consumerNode.location)) {
                 final int signalStrength = producerSignalStrengths.get(producer);
                 if (network.isInDistanceWithSide(signalStrength, producer, consumerNode, sideInNetwork))
                     return true;
