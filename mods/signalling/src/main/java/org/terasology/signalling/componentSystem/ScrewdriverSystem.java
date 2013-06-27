@@ -2,6 +2,7 @@ package org.terasology.signalling.componentSystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -56,26 +57,39 @@ public class ScrewdriverSystem implements ComponentSystem {
                 final OneCrucialSideFamily gateBlockFamily = (OneCrucialSideFamily) blockFamily;
                 final Side currentSide = gateBlockFamily.getBlockSide(block);
                 final Side newSide = sideOrder.get(currentSide);
+
                 if (worldProvider.setBlock(targetLocation, gateBlockFamily.getBlockForSide(newSide), block)) {
-                    logger.info("Gate rotated");
+                    System.out.println("Gate rotated");
                     final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
+
                     final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);
-                    gateEntity.removeComponent(SignalProducerComponent.class);
                     final SignalConsumerComponent signalConsumer = gateEntity.getComponent(SignalConsumerComponent.class);
+
+                    gateEntity.removeComponent(SignalProducerComponent.class);
+                    System.out.println("Removed producer");
                     gateEntity.removeComponent(SignalConsumerComponent.class);
+                    System.out.println("Removed consumer");
 
                     final byte newSideBit = SideBitFlag.getSide(newSide);
                     signalProducer.connectionSides = newSideBit;
                     signalConsumer.connectionSides = (byte) (63 - newSideBit);
 
-                    gateEntity.saveComponent(signalProducer);
-                    gateEntity.saveComponent(signalConsumer);
+                    gateEntity.addComponent(signalProducer);
+                    System.out.println("Added producer");
+                    gateEntity.addComponent(signalConsumer);
+                    System.out.println("Added consumer");
 
-                    if (newSide == Side.FRONT) {
-                        gateEntity.removeComponent(SignalGateRotatedComponent.class);
-                    } else {
+                    if (!gateEntity.hasComponent(SignalGateRotatedComponent.class))
                         gateEntity.addComponent(new SignalGateRotatedComponent());
-                    }
+
+//                    if (newSide != Side.FRONT) {
+//                        if (!gateEntity.hasComponent(SignalGateRotatedComponent.class))
+//                            gateEntity.addComponent(new SignalGateRotatedComponent());
+//                    } else {
+////                        if (gateEntity.hasComponent(SignalGateRotatedComponent.class));
+////                            gateEntity.removeComponent(SignalGateRotatedComponent.class);
+////                        System.out.println("Removed rotation");
+//                    }
                 }
             }
         }
