@@ -19,7 +19,6 @@ varying vec3 eyeVec;
 
 uniform vec3 lightViewPos;
 
-uniform sampler2D texSceneOpaque;
 uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D texSceneOpaqueNormals;
 

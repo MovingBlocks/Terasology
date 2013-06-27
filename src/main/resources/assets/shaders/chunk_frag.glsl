@@ -327,16 +327,20 @@ void main() {
     gl_FragData[2].rgba = vec4(finalLightValue.r, finalLightValue.g, finalLightValue.b, 0.0);
 #endif
 
-#if defined (DYNAMIC_SHADOWS)
-    color.xyz *= shadowTerm;
-#endif
-
 #if defined (FEATURE_TRANSPARENT_PASS)
     gl_FragData[0].rgba = color;
+
+# if defined (DYNAMIC_SHADOWS)
+    color.xyz *= shadowTerm;
+# endif
 #else
     gl_FragData[0].rgb = color.rgb;
     // Encode occlusion value into the alpha channel
     gl_FragData[0].a = occlusionValue;
+
+# if defined (DYNAMIC_SHADOWS)
+    gl_FragData[0].a *= shadowTerm;
+# endif
 #endif
 
 #if !defined (FEATURE_TRANSPARENT_PASS)

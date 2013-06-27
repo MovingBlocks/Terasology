@@ -145,9 +145,9 @@ void main()
     gl_FrontColor = gl_Color;
 
 #ifdef FLICKERING_LIGHT
-	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 4.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 2.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917);
+	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 16.0;
+	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 8.0;
+	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 4.0;
 #endif
 
 #if defined (ANIMATED_GRASS) || defined (ANIMATED_WATER)

@@ -211,10 +211,14 @@ public class BlockLoader {
         ByteBuffer[] dataNormal = new ByteBuffer[numMipMaps];
         ByteBuffer[] dataHeight = new ByteBuffer[numMipMaps];
 
+        final Color unitZColor = new Color(0.5f, 0.5f, 1.0f, 1.0f);
+        final Color transparentColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+        final Color blackColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+
         for (int i = 0; i < numMipMaps; ++i) {
-            BufferedImage imageDiffuse = generateAtlas(i, tiles);
-            BufferedImage imageNormal = generateAtlas(i, tilesNormal);
-            BufferedImage imageHeight = generateAtlas(i, tilesHeight);
+            BufferedImage imageDiffuse = generateAtlas(i, tiles, transparentColor);
+            BufferedImage imageNormal = generateAtlas(i, tilesNormal, unitZColor);
+            BufferedImage imageHeight = generateAtlas(i, tilesHeight, blackColor);
 
             if (i == 0) {
                 try {
@@ -260,13 +264,16 @@ public class BlockLoader {
         }
     }
 
-    private BufferedImage generateAtlas(int mipMapLevel, Tile[] tiles) {
+    private BufferedImage generateAtlas(int mipMapLevel, Tile[] tiles, Color clearColor) {
         int size = Block.ATLAS_SIZE / (1 << mipMapLevel);
         int textureSize = Block.TILE_SIZE / (1 << mipMapLevel);
         int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
 
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
+
+        g.setColor(clearColor);
+        g.fillRect(0, 0, size, size);
 
         for (int index = 0; index < currentMaxTileIndex; ++index) {
 

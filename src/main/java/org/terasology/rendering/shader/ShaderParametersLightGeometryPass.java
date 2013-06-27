@@ -36,10 +36,6 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         int texId = 0;
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindTexture();
-            program.setInt("texSceneOpaque", texId++);
-
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindDepthTexture();
             program.setInt("texSceneOpaqueDepth", texId++);
 
