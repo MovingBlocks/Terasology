@@ -2,6 +2,7 @@ package org.terasology.signalling.componentSystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -56,13 +57,15 @@ public class ScrewdriverSystem implements ComponentSystem {
                 final OneCrucialSideFamily gateBlockFamily = (OneCrucialSideFamily) blockFamily;
                 final Side currentSide = gateBlockFamily.getBlockSide(block);
                 final Side newSide = sideOrder.get(currentSide);
+
                 if (worldProvider.setBlock(targetLocation, gateBlockFamily.getBlockForSide(newSide), block)) {
-                    logger.info("Gate rotated");
                     final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
+
                     final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);
-                    gateEntity.removeComponent(SignalProducerComponent.class);
                     final SignalConsumerComponent signalConsumer = gateEntity.getComponent(SignalConsumerComponent.class);
-                    gateEntity.removeComponent(SignalConsumerComponent.class);
+
+                    signalConsumer.connectionSides = 0;
+                    gateEntity.saveComponent(signalConsumer);
 
                     final byte newSideBit = SideBitFlag.getSide(newSide);
                     signalProducer.connectionSides = newSideBit;
@@ -73,7 +76,7 @@ public class ScrewdriverSystem implements ComponentSystem {
 
                     if (newSide == Side.FRONT) {
                         gateEntity.removeComponent(SignalGateRotatedComponent.class);
-                    } else {
+                    } else if (!gateEntity.hasComponent(SignalGateRotatedComponent.class)) {
                         gateEntity.addComponent(new SignalGateRotatedComponent());
                     }
                 }

@@ -125,6 +125,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
                 blockEntity.removeComponent(SignalDelayedActionComponent.class);
             } else {
+                // TODO Remove this workaround when BlockEntities will be stored with the chunk they belong to
                 action.executeTime += NOT_LOADED_BLOCK_RETRY_DELAY;
                 delayedActions.add(action);
             }
@@ -214,7 +215,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (timeDelayComponent.delaySetting== 1000) {
             entity.removeComponent(SignalTimeDelayModifiedComponent.class);
         } else {
-            entity.saveComponent(new SignalTimeDelayModifiedComponent());
+            entity.addComponent(new SignalTimeDelayModifiedComponent());
         }
     }
 
@@ -311,7 +312,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
             delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
-            entity.saveComponent(delayedAction);
+            entity.addComponent(delayedAction);
         }
     }
 
@@ -321,7 +322,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
             delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
-            entity.saveComponent(delayedAction);
+            entity.addComponent(delayedAction);
         } else {
             // Remove any signal-delayed actions on the entity and turn off signal from it, if it has any
             entity.removeComponent(SignalDelayedActionComponent.class);
@@ -352,7 +353,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                 whenToLookAt = worldProvider.getTime();
             }
             delayedAction.executeTime = whenToLookAt;
-            entity.saveComponent(delayedAction);
+            entity.addComponent(delayedAction);
         }
     }
 
@@ -361,7 +362,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (producer.signalStrength != signalStrength) {
             producer.signalStrength = signalStrength;
             entity.saveComponent(producer);
-            entity.saveComponent(new SignalProducerModifiedComponent());
+            entity.addComponent(new SignalProducerModifiedComponent());
             return true;
         }
         return false;
