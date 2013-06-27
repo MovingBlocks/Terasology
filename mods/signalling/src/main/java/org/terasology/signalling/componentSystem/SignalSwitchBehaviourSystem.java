@@ -267,12 +267,12 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         delayedActions.add(new BlockAtLocationDelayedAction(location, executeTime));
     }
 
-//    @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
-//    public void removedDelayedAction(BeforeDeactivateComponent event, EntityRef block) {
-//        final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
-//        final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
-//        delayedActions.remove(new BlockAtLocationDelayedAction(location, executeTime));
-//    }
+    @ReceiveEvent(components = {BlockComponent.class, SignalDelayedActionComponent.class})
+    public void removedDelayedAction(BeforeDeactivateComponent event, EntityRef block) {
+        final Vector3i location = block.getComponent(BlockComponent.class).getPosition();
+        final long executeTime = block.getComponent(SignalDelayedActionComponent.class).executeTime;
+        delayedActions.remove(new BlockAtLocationDelayedAction(location, executeTime));
+    }
 
     @ReceiveEvent(components = {SignalConsumerStatusComponent.class})
     public void consumerModified(OnChangedComponent event, EntityRef entity) {
