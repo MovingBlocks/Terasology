@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.book;
+package org.terasology.books.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;

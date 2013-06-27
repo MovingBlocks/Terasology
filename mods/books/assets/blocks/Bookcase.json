@@ -27,7 +27,7 @@
         "prefab" : "books:bookcase"
     },
     "inventory" : {
-        "stackable" : false,
-        "directPickup" : true
+        "stackable" : true,
+        "directPickup" : false
     }
 }
