@@ -68,5 +68,8 @@ public class DefaultGenerators {
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, cactus);
+
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.HILLS, redTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.HILLS, oakTree);
     }
 }

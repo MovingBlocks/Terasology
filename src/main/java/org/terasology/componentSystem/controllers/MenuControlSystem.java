@@ -17,20 +17,22 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.input.events.KeyDownEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.input.ButtonState;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.input.binds.PauseButton;
-import org.terasology.game.CoreRegistry;
-import org.terasology.input.ButtonState;
-import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
+import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
 /**
  * @author Immortius
@@ -81,6 +83,7 @@ public class MenuControlSystem implements EventHandlerSystem {
         switch (event.getKey()) {
             case Keyboard.KEY_F12:
                 DefaultRenderingProcess.getInstance().takeScreenshot();
+                CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera"));
                 break;
         }
     }

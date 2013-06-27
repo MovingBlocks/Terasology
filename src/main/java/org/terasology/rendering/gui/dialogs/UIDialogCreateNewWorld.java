@@ -21,32 +21,20 @@ import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
+import org.terasology.game.paths.PathManager;
 import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
-import org.terasology.game.paths.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.widgets.UIButton;
-import org.terasology.rendering.gui.widgets.UIComboBox;
-import org.terasology.rendering.gui.widgets.UIDialog;
-import org.terasology.rendering.gui.widgets.UILabel;
-import org.terasology.rendering.gui.widgets.UIListItem;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
+import org.terasology.rendering.gui.widgets.*;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.core.BasicHMTerrainGenerator;
-import org.terasology.world.generator.core.FlatTerrainGenerator;
-import org.terasology.world.generator.core.FloraGenerator;
-import org.terasology.world.generator.core.ForestGenerator;
-import org.terasology.world.generator.core.MultiTerrainGenerator;
-import org.terasology.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.world.generator.core.PathfinderTestGenerator;
+import org.terasology.world.generator.core.*;
 import org.terasology.world.liquid.LiquidsGenerator;
-import org.terasology.world.generator.core.PerlinTerrainGeneratorWithSetup;
-import org.terasology.rendering.gui.framework.events.SelectionListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -156,6 +144,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
         chunkGenerator.addItem(item);
+        item = new UIListItem("Hills", 5);
+        item.setTextColor(Color.black);
+        item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
+        chunkGenerator.addItem(item);
         chunkGenerator.select(0);
         chunkGenerator.setVisible(true);
         chunkGenerator.addSelectionListener(new SelectionListener() {
@@ -173,6 +165,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     }else if(chunkGenerator.getSelectionIndex() == 4){ //heightmap
                         mapSetupButton.setVisible(false);
                     }else if(chunkGenerator.getSelectionIndex() == 5){ //pathfinder
+                        mapSetupButton.setVisible(false);
+                    }else if(chunkGenerator.getSelectionIndex() == 6){ //hills
                         mapSetupButton.setVisible(false);
                     }
                 }
@@ -317,6 +311,14 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     case 5:
                         chunkList.add(PathfinderTestGenerator.class.getName());
                         break;
+
+                    // Hills Generator
+                    case 6:
+                        chunkList.add(HillsTerrainGenerator.class.getName());
+                        chunkList.add(FloraGenerator.class.getName());
+                        chunkList.add(LiquidsGenerator.class.getName());
+                        chunkList.add(ForestGenerator.class.getName());
+                     break;
 
                     // Really shouldn't get here unless there's a bug, so crash :-)
                     default:
