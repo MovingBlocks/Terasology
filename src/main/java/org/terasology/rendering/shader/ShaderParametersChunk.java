@@ -37,12 +37,12 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
-    Property waveIntens = new Property("waveIntens", 1.0f, 0.0f, 2.0f);
-    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.88f, 0.0f, 2.0f);
-    Property waveSize = new Property("waveSize", 0.24f, 0.0f, 2.0f);
-    Property waveSizeFalloff = new Property("waveSizeFalloff", 0.88f, 0.0f, 2.0f);
-    Property waveSpeed = new Property("waveSpeed", 0.14f, 0.0f, 2.0f);
-    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.75f, 0.0f, 2.0f);
+    Property waveIntens = new Property("waveIntens", 1.5f, 0.0f, 2.0f);
+    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.85f, 0.0f, 2.0f);
+    Property waveSize = new Property("waveSize", 0.1f, 0.0f, 2.0f);
+    Property waveSizeFalloff = new Property("waveSizeFalloff", 1.25f, 0.0f, 2.0f);
+    Property waveSpeed = new Property("waveSpeed", 0.1f, 0.0f, 2.0f);
+    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.95f, 0.0f, 2.0f);
 
     Property waveOverallScale = new Property("waveOverallScale", 1.0f, 0.0f, 2.0f);
 

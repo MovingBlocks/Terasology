@@ -26,8 +26,8 @@ varying vec3 waterNormalViewSpace;
 #endif
 
 #if defined (ANIMATED_WATER) && defined (FEATURE_TRANSPARENT_PASS)
-const vec3 normalDiffOffset   = vec3(-1.0, 0.0, 1.0);
-const vec2 normalDiffSize     = vec2(2.0, 0.0);
+const vec3 normalDiffOffset = vec3(-1.0, 0.0, 1.0);
+const vec2 normalDiffSize = vec2(2.0, 0.0);
 
 uniform float waveIntensFalloff;
 uniform float waveSizeFalloff;

@@ -56,7 +56,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
-    private final UIImage[] _hearts;
+    private final UIImage[] hearts;
     private final UIImage crosshair;
     private final UILabel debugLine1;
     private final UILabel debugLine2;
@@ -86,20 +86,20 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             }
         });
 
-        _hearts = new UIImage[10];
+        hearts = new UIImage[10];
 
         // Create hearts
         for (int i = 0; i < 10; i++) {
-            _hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
-            _hearts[i].setVisible(true);
-            _hearts[i].setTextureSize(new Vector2f(9f, 9f));
-            _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
-            _hearts[i].setSize(new Vector2f(18f, 18f));
-            _hearts[i].setVerticalAlign(EVerticalAlign.BOTTOM);
-            _hearts[i].setHorizontalAlign(EHorizontalAlign.CENTER);
-            _hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
+            hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
+            hearts[i].setVisible(true);
+            hearts[i].setTextureSize(new Vector2f(9f, 9f));
+            hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
+            hearts[i].setSize(new Vector2f(18f, 18f));
+            hearts[i].setVerticalAlign(EVerticalAlign.BOTTOM);
+            hearts[i].setHorizontalAlign(EHorizontalAlign.CENTER);
+            hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
 
-            addDisplayElement(_hearts[i]);
+            addDisplayElement(hearts[i]);
         }
 
         crosshair = new UIImage(Assets.getTexture("engine:gui"));
@@ -159,7 +159,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                 rightGearWheel.getPosition().y - 4f)
         );
 
-
         addDisplayElement(crosshair);
         addDisplayElement(rightGearWheel);
         addDisplayElement(leftGearWheel);
@@ -206,9 +205,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         for (int i = 0; i < 10; i++) {
 
             if (i < healthRatio * 10f)
-                _hearts[i].setVisible(true);
+                hearts[i].setVisible(true);
             else
-                _hearts[i].setVisible(false);
+                hearts[i].setVisible(false);
 
             // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
             //Show Poisoned Status with Green Hearts:
@@ -216,9 +215,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             entityManager = CoreRegistry.get(EntityManager.class);
             for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
                 if (poisoned.poisonDuration >= 1)
-                    _hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
                 else
-                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }
             
             for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
@@ -226,9 +225,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                 CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CuredComponent.class);
                 entityManager = CoreRegistry.get(EntityManager.class);
                 if (cured.cureDuration >= 1)
-                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
                 else
-                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }*/
         }
     }
