@@ -2,7 +2,7 @@
     "displayName": "Signal Off Delay Timer",
     "rotation": "oneCrucialSide",
     "tiles": {
-        "all":"signalling:SignalOffDelayTimer",
+        "all":"signalling:SignalOffDelayGate",
         "front":"signalling:SignalSwitch"
     },
     "entity" : {
