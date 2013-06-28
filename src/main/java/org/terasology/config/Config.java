@@ -31,10 +31,12 @@ import com.google.gson.JsonSerializer;
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.game.types.GameTypeUri;
 import org.terasology.input.Input;
 import org.terasology.game.paths.PathManager;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.MultimapHandler;
+import org.terasology.world.generator.MapGeneratorUri;
 
 import java.io.File;
 import java.io.FileReader;
@@ -134,6 +136,8 @@ public final class Config {
                     .registerTypeAdapter(Input.class, new InputHandler())
                     .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
                     .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
+                    .registerTypeAdapter(MapGeneratorUri.class, new MapGeneratorUri.GsonAdapter())
+                    .registerTypeAdapter(GameTypeUri.class, new GameTypeUri.GsonAdapter())
                     .setPrettyPrinting().create().toJson(config, writer);
         } finally {
             // JAVA7: better closing support
@@ -156,6 +160,8 @@ public final class Config {
                     .registerTypeAdapter(Input.class, new InputHandler())
                     .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
                     .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
+                    .registerTypeAdapter(MapGeneratorUri.class, new MapGeneratorUri.GsonAdapter())
+                    .registerTypeAdapter(GameTypeUri.class, new GameTypeUri.GsonAdapter())
                     .create();
             JsonElement baseConfig = gson.toJsonTree(new Config());
             JsonParser parser = new JsonParser();
