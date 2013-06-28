@@ -17,6 +17,7 @@ package org.terasology.world.block.entity;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -56,7 +57,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterSystem(whenHeadless = false)
+@RegisterSystem(RegisterMode.CLIENT)
 public class BlockDamageRenderer implements RenderSystem {
 
     @In
