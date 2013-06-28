@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.ai;
 
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -24,7 +25,6 @@ import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.players.LocalPlayer;
@@ -43,12 +43,12 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
     private WorldProvider worldProvider;
     private EntityManager entityManager;
     private FastRandom random = new FastRandom();
-    private Timer timer;
+    private Time time;
 
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        timer = CoreRegistry.get(Timer.class);
+        time = CoreRegistry.get(Time.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
     }
 
@@ -83,9 +83,9 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
                     entity.saveComponent(ai);
                 } else {
                     // Random walk
-                    if (CoreRegistry.get(Timer.class).getTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
+                    if (CoreRegistry.get(Time.class).getGameTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
                         ai.movementTarget.set(worldPos.x + random.randomFloat() * 500, worldPos.y, worldPos.z + random.randomFloat() * 500);
-                        ai.lastChangeOfDirectionAt = timer.getTimeInMs();
+                        ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                         ai.followingPlayer = false;
                         entity.saveComponent(ai);
                     }

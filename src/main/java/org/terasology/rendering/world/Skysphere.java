@@ -105,7 +105,7 @@ public class Skysphere {
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(1));
 
-        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTimeInDays() - 90.0);
+        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getWorldTime().getTimeInDays() - 90.0);
         Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(_sunPosAngle), java.lang.Math.sin(_sunPosAngle), 1.0);
         sunNormalise.normalize();
 
@@ -120,7 +120,7 @@ public class Skysphere {
         shader.setInt("texCubeStars", 0);
         shader.setInt("texCubeSky", 1);
         shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
-        shader.setFloat("time", _parent.getWorldProvider().getTimeInDays());
+        shader.setFloat("time", _parent.getWorldProvider().getWorldTime().getTimeInDays());
         shader.setFloat("sunAngle", (float) _sunPosAngle);
         shader.setFloat("turbidity", (float) _turbidity);
         shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);

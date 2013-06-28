@@ -15,20 +15,20 @@
  */
 package org.terasology.logic.ai;
 
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.health.DamageEvent;
-import org.terasology.logic.characters.events.HorizontalCollisionEvent;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.events.HorizontalCollisionEvent;
+import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.FastRandom;
@@ -48,13 +48,13 @@ public class HierarchicalAISystem implements ComponentSystem,
     private WorldProvider worldProvider;
     private EntityManager entityManager;
     private FastRandom random = new FastRandom();
-    private Timer timer;
+    private Time time;
     private boolean idling;
 
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        timer = CoreRegistry.get(Timer.class);
+        time = CoreRegistry.get(Time.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
         idling = false;
     }
@@ -95,14 +95,14 @@ public class HierarchicalAISystem implements ComponentSystem,
                       Vector3f worldPos) {
         HierarchicalAIComponent ai = entity
                 .getComponent(HierarchicalAIComponent.class);
-        long tempTime = CoreRegistry.get(Timer.class).getTimeInMs();
+        long tempTime = CoreRegistry.get(Time.class).getGameTimeInMs();
         //TODO remove next
         long lastAttack = 0;
 
         // skip update if set to skip them
         if (tempTime - ai.lastProgressedUpdateAt < ai.updateFrequency) {
-            ai.lastProgressedUpdateAt = CoreRegistry.get(Timer.class)
-                    .getTimeInMs();
+            ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
+                    .getGameTimeInMs();
             return;
         }
 
@@ -138,7 +138,7 @@ public class HierarchicalAISystem implements ComponentSystem,
                     if (tempTime - lastAttack > ai.damageFrequency) {
                         localPlayer.getCharacterEntity().send(
                                 new DamageEvent(ai.damage, entity));
-                        lastAttack = CoreRegistry.get(Timer.class).getTimeInMs();
+                        lastAttack = CoreRegistry.get(Time.class).getGameTimeInMs();
                     }
                 }
 
@@ -187,8 +187,8 @@ public class HierarchicalAISystem implements ComponentSystem,
                         entity.saveComponent(ai);
                         ai.inDanger = true;
                     }
-                ai.lastChangeOfDangerAt = CoreRegistry.get(Timer.class)
-                        .getTimeInMs();
+                ai.lastChangeOfDangerAt = CoreRegistry.get(Time.class)
+                        .getGameTimeInMs();
             }
         }
 
@@ -211,12 +211,12 @@ public class HierarchicalAISystem implements ComponentSystem,
                                     * random.randomDouble() * ai.hectic));
                     idling = false;
                     // mark idling state changed
-                    ai.lastChangeOfidlingtAt = CoreRegistry.get(Timer.class)
-                            .getTimeInMs();
+                    ai.lastChangeOfidlingtAt = CoreRegistry.get(Time.class)
+                            .getGameTimeInMs();
                 }
                 entity.saveComponent(location);
-                ai.lastProgressedUpdateAt = CoreRegistry.get(Timer.class)
-                        .getTimeInMs();
+                ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
+                        .getGameTimeInMs();
                 return;
 
             }
@@ -230,10 +230,10 @@ public class HierarchicalAISystem implements ComponentSystem,
                 entity.saveComponent(location);
 
                 // mark start idling
-                ai.lastChangeOfMovementAt = CoreRegistry.get(Timer.class)
-                        .getTimeInMs();
-                ai.lastProgressedUpdateAt = CoreRegistry.get(Timer.class)
-                        .getTimeInMs();
+                ai.lastChangeOfMovementAt = CoreRegistry.get(Time.class)
+                        .getGameTimeInMs();
+                ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
+                        .getGameTimeInMs();
                 return;
             }
 
@@ -256,7 +256,7 @@ public class HierarchicalAISystem implements ComponentSystem,
                     ai.movementTarget.set(worldPos.x + random.randomFloat()
                             * 500, worldPos.y,
                             worldPos.z + random.randomFloat() * 500);
-                ai.lastChangeOfDirectionAt = timer.getTimeInMs();
+                ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                 entity.saveComponent(ai);
                 // System.out.print("direction changed\n");
 
@@ -274,7 +274,7 @@ public class HierarchicalAISystem implements ComponentSystem,
         // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");
 
-        ai.lastProgressedUpdateAt = CoreRegistry.get(Timer.class).getTimeInMs();
+        ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class).getGameTimeInMs();
     }
 
     private boolean foodInFront() {

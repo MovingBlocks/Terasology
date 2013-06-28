@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -33,7 +34,6 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
-import org.terasology.engine.Timer;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
@@ -61,7 +61,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
     public static final int MAX_INPUT_UNDERFLOW = 100;
 
     @In
-    private Timer timer;
+    private Time time;
 
     @In
     private BulletPhysics physics;
@@ -83,7 +83,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
     @Override
     public void initialise() {
         characterMover = new BulletCharacterMover(worldProvider);
-        nextSendState = timer.getTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
+        nextSendState = time.getGameTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-        if (input.getDelta() + lastState.getTime() < timer.getTimeInMs() + MAX_INPUT_OVERFLOW) {
+        if (input.getDelta() + lastState.getTime() < time.getGameTimeInMs() + MAX_INPUT_OVERFLOW) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
 
@@ -133,7 +133,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(timer.getTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
@@ -142,18 +142,18 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @Override
     public void update(float delta) {
-        if (nextSendState < timer.getTimeInMs()) {
+        if (nextSendState < time.getGameTimeInMs()) {
             long lastSendTime = nextSendState - TIME_BETWEEN_STATE_REPLICATE;
             for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
                 if (entry.getValue().size() > 0) {
                     CharacterStateEvent state = entry.getValue().getLast();
                     if (state.getTime() >= lastSendTime) {
                         entry.getKey().send(state);
-                    } else if (timer.getTimeInMs() - state.getTime() > MAX_INPUT_UNDERFLOW) {
+                    } else if (time.getGameTimeInMs() - state.getTime() > MAX_INPUT_UNDERFLOW) {
                         // Haven't received input in a while, repeat last input
                         CharacterMoveInputEvent lastInput = lastInputEvent.get(entry.getKey());
                         if (lastInput != null) {
-                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, (int) (timer.getTimeInMs() - state.getTime()));
+                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, (int) (time.getGameTimeInMs() - state.getTime()));
                             onPlayerInput(newInput, entry.getKey());
                         }
                         entry.getKey().send(state);
@@ -162,7 +162,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
             }
             nextSendState += TIME_BETWEEN_STATE_REPLICATE;
         }
-        long renderTime = timer.getTimeInMs() - RENDER_DELAY;
+        long renderTime = time.getGameTimeInMs() - RENDER_DELAY;
         for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
             if (entry.getKey().equals(localPlayer.getCharacterEntity())) {
                 continue;
@@ -205,7 +205,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @Override
     public void restoreToPresent() {
-        long renderTime = timer.getTimeInMs() - RENDER_DELAY;
+        long renderTime = time.getGameTimeInMs() - RENDER_DELAY;
         for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
             setToTime(renderTime, entry.getKey(), entry.getValue());
         }

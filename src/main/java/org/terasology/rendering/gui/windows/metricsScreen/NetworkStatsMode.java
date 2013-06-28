@@ -17,7 +17,7 @@
 package org.terasology.rendering.gui.windows.metricsScreen;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.engine.Time;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.widgets.UILabel;
@@ -29,13 +29,13 @@ import java.util.List;
  */
 final class NetworkStatsMode extends MetricsMode {
     private long lastSecond = 0;
-    private Timer timer;
+    private Time time;
     private NetworkSystem networkSystem;
 
 
     public NetworkStatsMode() {
         super("Network", true, false);
-        timer = CoreRegistry.get(Timer.class);
+        time = CoreRegistry.get(Time.class);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
     }
 
@@ -45,7 +45,7 @@ final class NetworkStatsMode extends MetricsMode {
 
     @Override
     public void updateLines(List<UILabel> lines) {
-        long currentTime = timer.getTimeInMs();
+        long currentTime = time.getGameTimeInMs();
         long currentSecond = currentTime / 1000;
         if (currentSecond - lastSecond > 1) {
             networkSystem.getIncomingBytesDelta();

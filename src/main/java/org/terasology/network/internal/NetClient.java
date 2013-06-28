@@ -29,10 +29,9 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.common.DisplayInformationComponent;
-import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.config.Config;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -42,12 +41,16 @@ import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
+import org.terasology.logic.common.DisplayInformationComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.network.*;
+import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.NetMetricSource;
+import org.terasology.network.NetworkComponent;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
@@ -69,6 +72,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A remote client.
+ *
  * @author Immortius
  */
 public class NetClient extends AbstractClient implements WorldChangeListener {
@@ -77,7 +81,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private Config config = CoreRegistry.get(Config.class);
 
-    private Timer timer;
+    private Time time;
     private NetworkSystemImpl networkSystem;
     private Channel channel;
     private PackedEntitySerializer entitySerializer;
@@ -129,7 +133,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         this.channel = channel;
         metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
-        this.timer = CoreRegistry.get(Timer.class);
+        this.time = CoreRegistry.get(Time.class);
         this.identity = identity;
         CoreRegistry.get(WorldProvider.class).registerListener(this);
     }
@@ -178,7 +182,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     public void update(boolean netTick) {
         if (netTick) {
             NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-            message.setTime(timer.getTimeInMs());
+            message.setTime(time.getGameTimeInMs());
             sendRegisteredBlocks(message);
             sendChunkInvalidations(message);
             sendNewChunks(message);

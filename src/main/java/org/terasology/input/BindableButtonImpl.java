@@ -16,9 +16,9 @@
 package org.terasology.input;
 
 import com.google.common.collect.Lists;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 
@@ -45,7 +45,7 @@ public class BindableButtonImpl implements BindableButton {
     private int repeatTime = 0;
     private long lastActivateTime;
 
-    private Timer timer;
+    private Time time;
 
     /**
      * Creates the button. Package-private, as should be created through the InputSystem
@@ -57,7 +57,7 @@ public class BindableButtonImpl implements BindableButton {
         this.id = id;
         this.displayName = displayName;
         this.buttonEvent = event;
-        timer = CoreRegistry.get(Timer.class);
+        time = CoreRegistry.get(Time.class);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class BindableButtonImpl implements BindableButton {
         if (pressed) {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {
-                lastActivateTime = timer.getTimeInMs();
+                lastActivateTime = time.getGameTimeInMs();
                 if (!keyConsumed) {
                     keyConsumed = triggerOnPress(delta, target);
                 }
@@ -184,7 +184,7 @@ public class BindableButtonImpl implements BindableButton {
     }
 
     void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
-        long time = timer.getTimeInMs();
+        long time = this.time.getGameTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
             lastActivateTime = time;
             if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {

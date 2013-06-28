@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
@@ -77,6 +78,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         super(base);
         mainThread = Thread.currentThread();
         entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
+        CoreRegistry.get(ComponentSystemManager.class).register(getWorldTime());
     }
 
     public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager) {

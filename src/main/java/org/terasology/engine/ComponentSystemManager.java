@@ -98,7 +98,7 @@ public class ComponentSystemManager {
 
     }
 
-    public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
+    public <T extends ComponentSystem> void register(ComponentSystem object) {
         store.add(object);
         if (object instanceof UpdateSubscriberSystem) {
             updateSubscribers.add((UpdateSubscriberSystem) object);
@@ -107,11 +107,15 @@ public class ComponentSystemManager {
             renderSubscribers.add((RenderSystem) object);
         }
         CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler(object);
-        namedLookup.put(name, object);
 
         if (initialised) {
             initialiseSystem(object);
         }
+    }
+
+    public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
+        namedLookup.put(name, object);
+        register(object);
     }
 
     public void initialise() {

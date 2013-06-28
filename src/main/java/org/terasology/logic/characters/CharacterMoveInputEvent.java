@@ -17,7 +17,7 @@
 package org.terasology.logic.characters;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.engine.Time;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
@@ -41,8 +41,8 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     }
 
     public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested) {
-        Timer timer = CoreRegistry.get(Timer.class);
-        this.delta = timer.getDeltaInMs();
+        Time time = CoreRegistry.get(Time.class);
+        this.delta = time.getDeltaInMs();
         this.pitch = pitch;
         this.yaw = yaw;
         this.running = running;
