@@ -23,6 +23,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
@@ -31,10 +32,8 @@ import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
-
-import java.util.Arrays;
+import org.terasology.world.generator.MapGenerator;
+import org.terasology.world.generator.MapGeneratorManager;
 
 /**
  * @author Immortius
@@ -64,13 +63,17 @@ public class InitialiseWorld implements LoadProcess {
         logger.info("World seed: \"{}\"", worldInfo.getSeed());
 
         // TODO: Separate WorldRenderer from world handling in general
-        // Init ChunkGeneratorManager
-        ChunkGeneratorManager chunkGeneratorManager = ChunkGeneratorManagerImpl.buildChunkGenerator(Arrays.asList(worldInfo.getChunkGenerators()));
-        chunkGeneratorManager.setWorldSeed(worldInfo.getSeed());
-        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
+        // Init MapGenerator
+        MapGenerator mapGenerator = CoreRegistry.get(MapGeneratorManager.class).getItem(worldInfo.getMapGeneratorUri());
+        mapGenerator.setWorldSeed(worldInfo.getSeed());
+        mapGenerator.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
+        mapGenerator.setup();
+
+        CoreRegistry.get(GameTypeManager.class).setActiveGameTypeUri(worldInfo.getGameType());
+        CoreRegistry.get(GameTypeManager.class).getActiveGameType().initialize();
 
         // Init. a new world
-        WorldRenderer worldRenderer = new WorldRenderer(worldInfo, chunkGeneratorManager, CoreRegistry.get(EntityManager.class), CoreRegistry.get(LocalPlayerSystem.class));
+        WorldRenderer worldRenderer = new WorldRenderer(worldInfo, mapGenerator, CoreRegistry.get(EntityManager.class), CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
 

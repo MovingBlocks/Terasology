@@ -24,14 +24,12 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.events.DamageEvent;
 import org.terasology.events.HealthChangedEvent;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.hunger.events.*;
-import org.terasology.events.FullHealthEvent;
-import org.terasology.events.NoHealthEvent;
 import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.types.GameType;
+
 
 /**
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
@@ -127,6 +125,6 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     }
     
     private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator) {
-        CoreRegistry.get(GameType.class).onPlayerDamageHook(entity, health, damageAmount, instigator);
+        CoreRegistry.get(GameTypeManager.class).getActiveGameType().onPlayerDamageHook(entity, health, damageAmount, instigator);
     }
 }

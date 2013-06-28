@@ -48,6 +48,7 @@ public class UIComboBox extends UIDisplayContainer {
     private UIText baseInput;
     private UIButton baseButton;
     private UIList baseList;
+    private float listSize;
 
     private boolean opened;
 
@@ -71,11 +72,10 @@ public class UIComboBox extends UIDisplayContainer {
     }
 
     private void initBaseItems(Vector2f size, Vector2f listSize) {
-        setSize(size);
+        this.listSize = listSize.y;
         opened = false;
 
         baseInput = new UIText();
-        baseInput.setSize(size);
         baseInput.setVisible(true);
         baseInput.setDisabled(true);
         baseInput.addMouseButtonListener(new MouseButtonListener() {
@@ -126,7 +126,6 @@ public class UIComboBox extends UIDisplayContainer {
 
         baseButton = new UIButton(new Vector2f(23f, 23f), UIButton.ButtonType.TOGGLE);
         baseButton.setVisible(true);
-        baseButton.setPosition(new Vector2f(size.x - baseButton.getSize().x, size.y / 2 - baseButton.getSize().y / 2));
         baseButton.getLabel().setText("");
         baseButton.setTexture("engine:gui_menu");
         baseButton.setNormalState(new Vector2f(432f, 0f), new Vector2f(18f, 18f));
@@ -141,8 +140,6 @@ public class UIComboBox extends UIDisplayContainer {
         });
 
         baseList = new UIList();
-        baseList.setSize(listSize);
-        baseList.setPosition(new Vector2f(0f, size.y));
         baseList.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         baseList.setBackgroundColor(new Color(255, 255, 255));
         baseList.setVisible(false);
@@ -166,9 +163,33 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
+        setSize(size);
+
         addDisplayElement(baseInput);
         addDisplayElement(baseButton);
         addDisplayElement(baseList);
+    }
+
+    @Override
+    public void setSize(Vector2f size) {
+        super.setSize(size);
+        setChildrenSizes(getSize());
+    }
+
+    @Override
+    public void setSize(String width, String height) {
+        super.setSize(width, height);
+        setChildrenSizes(getSize());
+    }
+
+    private void setChildrenSizes(Vector2f size) {
+        baseInput.setSize(size);
+        baseList.setSize(new Vector2f(size.x, listSize));
+        baseList.setPosition(new Vector2f(0f, size.y));
+
+        Vector2f buttonSize = new Vector2f(size.y+1, size.y+1);
+        baseButton.setSize(buttonSize);
+        baseButton.setPosition(new Vector2f(size.x - buttonSize.x, size.y / 2 - buttonSize.y / 2));
     }
 
     /**

@@ -64,7 +64,7 @@ import org.terasology.world.chunks.provider.ChunkProvider;
 import org.terasology.world.chunks.provider.LocalChunkProvider;
 import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.generator.MapGenerator;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3d;
@@ -204,7 +204,7 @@ public final class WorldRenderer {
      *
      * @param worldInfo Information describing the world
      */
-    public WorldRenderer(WorldInfo worldInfo, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
+    public WorldRenderer(WorldInfo worldInfo, MapGenerator mapGenerator, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         // TODO: Cleaner method for this? Should not be using the world title
         try {
             final long time = System.currentTimeMillis();
@@ -236,7 +236,7 @@ public final class WorldRenderer {
         if (chunkStore == null)
             chunkStore = new ChunkStoreProtobuf();
         
-        chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
+        chunkProvider = new LocalChunkProvider(chunkStore, mapGenerator);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
