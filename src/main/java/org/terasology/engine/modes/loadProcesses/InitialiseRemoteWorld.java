@@ -18,7 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.NetworkSystem;
@@ -27,7 +29,6 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.EntityAwareWorldProvider;
-import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
@@ -38,10 +39,10 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
  * @author Immortius
  */
 public class InitialiseRemoteWorld implements LoadProcess {
-    private WorldInfo worldInfo;
+    private GameManifest gameManifest;
 
-    public InitialiseRemoteWorld(WorldInfo worldInfo) {
-        this.worldInfo = worldInfo;
+    public InitialiseRemoteWorld(GameManifest gameManifest) {
+        this.gameManifest = gameManifest;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class InitialiseRemoteWorld implements LoadProcess {
         RemoteChunkProvider chunkProvider = new RemoteChunkProvider();
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager));
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         CoreRegistry.put(WorldProvider.class, worldProvider);
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
@@ -69,9 +70,6 @@ public class InitialiseRemoteWorld implements LoadProcess {
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
-
-        // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing during loading
-        worldProvider.getWorldTime().setTime(worldInfo.getTime());
 
         CoreRegistry.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
 

@@ -737,10 +737,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void sendServerInfo(NetClient client) {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
+        serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         if (world != null) {
-            serverInfoMessageBuilder.setTime(world.getWorldTime().getTimeInMs());
-            serverInfoMessageBuilder.setWorldName(world.getTitle());
+            NetData.WorldInfo.Builder worldInfoBuilder = NetData.WorldInfo.newBuilder();
+            worldInfoBuilder.setTime(world.getWorldTime().getTimeInMs());
+            worldInfoBuilder.setTitle(world.getTitle());
+            serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }
         for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
             if (!mod.getModInfo().isServersideOnly()) {

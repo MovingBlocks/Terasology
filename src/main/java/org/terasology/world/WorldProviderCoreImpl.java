@@ -27,7 +27,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -52,12 +51,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private WorldBiomeProvider biomeProvider;
     private ChunkProvider chunkProvider;
-    private BlockManager blockManager;
     private WorldTime worldTime;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider, BlockManager blockManager) {
+    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
         if (title == null) {
             title = seed;
         }
@@ -67,14 +65,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkGenerators = chunkGenerators;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
-        this.blockManager = blockManager;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
         worldTime.setTime(time);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider, blockManager);
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider);
     }
 
     @Override
@@ -89,18 +86,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        ModConfig modConfig = new ModConfig();
-        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-            modConfig.addMod(mod.getModInfo().getId());
-        }
-        WorldInfo worldInfo = new WorldInfo(title, seed, worldTime.getTimeInMs(), chunkGenerators, modConfig);
-        List<String> registeredBlockFamilies = Lists.newArrayList();
-        for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
-            registeredBlockFamilies.add(family.getURI().toString());
-        }
-        worldInfo.setRegisteredBlockFamilies(registeredBlockFamilies);
-        worldInfo.setBlockIdMap(blockManager.getBlockIdMap());
-        return worldInfo;
+        return new WorldInfo(title, seed, worldTime.getTimeInMs(), chunkGenerators);
     }
 
     @Override
@@ -139,12 +125,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean setBlocks(BlockUpdate... updates) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        // TODO: Implement
+        return false;
     }
 
     @Override
     public boolean setBlocks(Iterable<BlockUpdate> updates) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        // TODO: Implement
+        return false;
     }
 
     @Override

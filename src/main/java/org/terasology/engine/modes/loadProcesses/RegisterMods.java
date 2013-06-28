@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.WorldInfo;
@@ -28,10 +29,10 @@ import org.terasology.world.WorldInfo;
  */
 public class RegisterMods implements LoadProcess {
 
-    private WorldInfo worldInfo;
+    private GameManifest gameManifest;
 
-    public RegisterMods(WorldInfo worldInfo) {
-        this.worldInfo = worldInfo;
+    public RegisterMods(GameManifest gameManifest) {
+        this.gameManifest = gameManifest;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class RegisterMods implements LoadProcess {
             mod.setEnabled(false);
         }
 
-        for (String modName : worldInfo.getModConfiguration().listMods()) {
+        for (String modName : gameManifest.getModConfiguration().listMods()) {
             Mod mod = modManager.getMod(modName);
             if (mod != null) {
                 mod.setEnabled(true);

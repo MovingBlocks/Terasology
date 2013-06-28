@@ -110,7 +110,7 @@ public abstract class TerasologyTestingEnvironment {
             CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
             CoreRegistry.put(ModManager.class, modManager);
         }
-        PathManager.getInstance().setCurrentWorldTitle("world1");
+        PathManager.getInstance().setCurrentSaveTitle("world1");
     }
 
     @Before

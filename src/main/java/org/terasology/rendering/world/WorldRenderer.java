@@ -30,6 +30,8 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.game.Game;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
@@ -154,9 +156,6 @@ public final class WorldRenderer {
     /* PHYSICS */
     private final BulletPhysics bulletPhysics;
 
-    /* BLOCK GRID */
-    private final BlockGrid blockGrid;
-
     /* STATISTICS */
     private int statDirtyChunks = 0, statVisibleChunks = 0, statIgnoredPhases = 0;
     private int statChunkMeshEmpty, statChunkNotReady, statRenderedTriangles;
@@ -173,7 +172,6 @@ public final class WorldRenderer {
 
     /**
      * Initializes a new (local) world for the single player mode.
-     *
      */
     public WorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
         this.chunkProvider = chunkProvider;
@@ -183,7 +181,6 @@ public final class WorldRenderer {
         skysphere = new Skysphere(this);
         chunkUpdateManager = new ChunkUpdateManager(chunkTesselator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
-        blockGrid = new BlockGrid();
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(defaultCamera);
@@ -826,13 +823,9 @@ public final class WorldRenderer {
      */
     public void dispose(boolean saveWorld) {
         worldProvider.dispose();
+        // TODO: Move this somewhere more sensible
         if (saveWorld) {
-            WorldInfo worldInfo = worldProvider.getWorldInfo();
-            try {
-                WorldInfo.save(new File(PathManager.getInstance().getCurrentWorldPath(), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
-            } catch (IOException e) {
-                logger.error("Failed to save world manifest", e);
-            }
+            CoreRegistry.get(Game.class).save();
         }
 
         audioManager.stopAllSounds();
@@ -956,10 +949,6 @@ public final class WorldRenderer {
 
     public WorldProvider getWorldProvider() {
         return worldProvider;
-    }
-
-    public BlockGrid getBlockGrid() {
-        return blockGrid;
     }
 
     public Skysphere getSkysphere() {
