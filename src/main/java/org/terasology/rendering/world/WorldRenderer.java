@@ -778,7 +778,8 @@ public final class WorldRenderer {
             Vector3f positionViewSpace = new Vector3f();
             positionViewSpace.sub(worldPosition, activeCamera.getPosition());
 
-            boolean doRenderLight = lightComponent.lightRenderingDistance == 0.0f
+            boolean doRenderLight = lightComponent.lightType == LightComponent.LightType.DIRECTIONAL
+                    || lightComponent.lightRenderingDistance == 0.0f
                     || positionViewSpace.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
 
             doRenderLight &= isLightVisible(positionViewSpace, lightComponent);
