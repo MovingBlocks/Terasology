@@ -18,6 +18,7 @@ package org.terasology.logic.players;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -67,7 +68,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterSystem(whenHeadless = false)
+@RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonRenderer implements RenderSystem {
 
     @In

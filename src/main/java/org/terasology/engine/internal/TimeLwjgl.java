@@ -36,6 +36,7 @@ public final class TimeLwjgl implements EngineTime {
     private AtomicLong delta = new AtomicLong(0);
     private float avgDelta = 0;
     private long desynch = 0;
+    private boolean paused = false;
 
     private AtomicLong gameTime = new AtomicLong(0);
 
@@ -64,10 +65,15 @@ public final class TimeLwjgl implements EngineTime {
             desynch -= diff;
         }
 
-        if (updateCycles > 0) {
-            delta.set(newDelta / updateCycles);
+        if (paused) {
+            delta.set(0);
+            return new TimeStepper(1, 0);
+        } else {
+            if (updateCycles > 0) {
+                delta.set(newDelta / updateCycles);
+            }
+            return new TimeStepper(updateCycles, newDelta / updateCycles);
         }
-        return new TimeStepper(updateCycles, newDelta / updateCycles);
     }
 
     private class TimeStepper implements Iterator<Float> {
@@ -124,9 +130,9 @@ public final class TimeLwjgl implements EngineTime {
         return gameTime.get() / 1000f;
     }
 
-
     @Override
     public void setGameTime(long amount) {
+        delta.set(0);
         gameTime.set(amount);
     }
 
@@ -138,5 +144,14 @@ public final class TimeLwjgl implements EngineTime {
     @Override
     public void updateTimeFromServer(long targetTime) {
         desynch = targetTime - getGameTimeInMs();
+    }
+
+    @Override
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 }

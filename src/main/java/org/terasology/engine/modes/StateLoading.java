@@ -52,7 +52,6 @@ import org.terasology.game.GameManifest;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
-import org.terasology.world.WorldInfo;
 
 import java.util.Queue;
 
@@ -101,7 +100,10 @@ public class StateLoading implements GameState {
 
     @Override
     public void init(GameEngine engine) {
-        ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(0);
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        time.setPaused(true);
+        time.setGameTime(0);
+
         CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:
@@ -177,6 +179,8 @@ public class StateLoading implements GameState {
 
     @Override
     public void dispose() {
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        time.setPaused(false);
     }
 
     @Override

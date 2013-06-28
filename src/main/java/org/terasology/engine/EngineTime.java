@@ -33,4 +33,11 @@ public interface EngineTime extends Time {
      */
     void updateTimeFromServer(long targetTime);
 
+    /**
+     * @param pause
+     */
+    void setPaused(boolean pause);
+
+    boolean isPaused();
+
 }

@@ -240,7 +240,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
                 gameManifest.getModConfiguration().copy(modConfig);
 
-                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), 0, chunksListArr);
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), (long) (WorldTime.DAY_LENGTH * 0.025f), chunksListArr);
                 gameManifest.addWorldInfo(worldInfo);
 
                 CoreRegistry.get(GameEngine.class).changeState(new StateLoading(gameManifest, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE))

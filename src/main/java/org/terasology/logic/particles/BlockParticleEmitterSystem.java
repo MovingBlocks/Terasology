@@ -21,6 +21,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -62,7 +63,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 // TODO: Generalise for non-block particles
 // TODO: Dispose display lists
-@RegisterSystem(whenHeadless = false)
+@RegisterSystem(RegisterMode.CLIENT)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
