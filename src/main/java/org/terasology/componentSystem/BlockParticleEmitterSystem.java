@@ -165,7 +165,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         particle.position.z += particle.velocity.z * delta;
     }
 
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
         ShaderManager.getInstance().enableShader("particle");
         glDisable(GL11.GL_CULL_FACE);
 
@@ -195,8 +195,6 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             }
 
             if (particleEffect.blendMode == BlockParticleEffectComponent.ParticleBlendMode.ADD) {
-                glDepthMask(false);
-                glEnable(GL_BLEND);
                 glBlendFunc(GL_ONE, GL_ONE);
             }
 
@@ -207,8 +205,6 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             }
 
             if (particleEffect.blendMode == BlockParticleEffectComponent.ParticleBlendMode.ADD) {
-                glDepthMask(true);
-                glDisable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             }
         }

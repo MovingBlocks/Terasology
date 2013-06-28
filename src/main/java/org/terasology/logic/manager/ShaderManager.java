@@ -83,7 +83,7 @@ public class ShaderManager {
         createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
         createAndStoreShaderProgram("sky", new ShaderParametersSky());
         createAndStoreShaderProgram("chunk", new ShaderParametersChunk(),
-                ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue()
+                ShaderProgram.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue()
                 | ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
         createAndStoreShaderProgram("block", new ShaderParametersBlock(),
@@ -176,6 +176,10 @@ public class ShaderManager {
     public void enableShader(String s) {
         ShaderProgram program = getShaderProgram(s);
         program.enable();
+    }
+
+    public void disableShader() {
+        GL20.glUseProgram(0);
     }
 
     public ShaderProgram getActiveShaderProgram() {

@@ -687,8 +687,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     @Override
-    public void renderTransparent() {
-
+    public void renderAlphaBlend() {
     }
 
     @Override

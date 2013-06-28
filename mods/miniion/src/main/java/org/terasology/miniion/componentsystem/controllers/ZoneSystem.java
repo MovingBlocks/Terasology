@@ -41,7 +41,7 @@ public class ZoneSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
         if (MinionSystem.getNewZone() != null) {
             MinionSystem.getNewZone().render();
         }

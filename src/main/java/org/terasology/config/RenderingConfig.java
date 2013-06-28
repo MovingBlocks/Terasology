@@ -37,6 +37,7 @@ public class RenderingConfig {
     private int shadowMapResolution = 1024;
     private boolean normalMapping = false;
     private boolean parallaxMapping = false;
+    private boolean useZPrePass = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -287,5 +288,14 @@ public class RenderingConfig {
 
     public void setParallaxMapping(boolean parallaxMapping) {
         this.parallaxMapping = parallaxMapping;
+    }
+
+    public boolean isUseZPrePass() {
+        // TODO: Z-Prepass is not working yet due depth precision issues / inconsistencies of the vertex transformations between the passes
+        return false;
+    }
+
+    public void setUseZPrePass(boolean useZPrePass) {
+        this.useZPrePass = useZPrePass;
     }
 }

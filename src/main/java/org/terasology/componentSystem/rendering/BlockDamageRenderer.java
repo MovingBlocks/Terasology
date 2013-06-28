@@ -154,7 +154,7 @@ public class BlockDamageRenderer implements RenderSystem {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

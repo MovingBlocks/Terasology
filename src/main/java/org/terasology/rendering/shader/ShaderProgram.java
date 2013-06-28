@@ -68,7 +68,7 @@ public class ShaderProgram {
     private IShaderParameters parameters;
 
     public enum ShaderProgramFeatures {
-        FEATURE_TRANSPARENT_PASS(0x01),
+        FEATURE_REFRACTIVE_PASS(0x01),
         FEATURE_ALPHA_REJECT(0x02),
         FEATURE_LIGHT_POINT(0x04),
         FEATURE_LIGHT_DIRECTIONAL(0x08),

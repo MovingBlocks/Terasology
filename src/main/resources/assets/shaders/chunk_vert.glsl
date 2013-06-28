@@ -21,11 +21,11 @@ uniform mat4 lightViewProjMatrix;
 varying vec4 vertexLightProjPos;
 #endif
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
 varying vec3 waterNormalViewSpace;
 #endif
 
-#if defined (ANIMATED_WATER) && defined (FEATURE_TRANSPARENT_PASS)
+#if defined (ANIMATED_WATER) && defined (FEATURE_REFRACTIVE_PASS)
 const vec3 normalDiffOffset = vec3(-1.0, 0.0, 1.0);
 const vec2 normalDiffSize = vec2(2.0, 0.0);
 
@@ -171,7 +171,7 @@ void main()
     }
 #endif
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
 # ifdef ANIMATED_WATER
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level

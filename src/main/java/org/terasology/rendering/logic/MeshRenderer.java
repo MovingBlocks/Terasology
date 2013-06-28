@@ -159,7 +159,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");

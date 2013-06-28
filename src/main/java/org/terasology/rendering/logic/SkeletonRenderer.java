@@ -233,7 +233,7 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
     }
 
     @Override

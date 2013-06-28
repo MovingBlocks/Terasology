@@ -39,11 +39,11 @@ uniform sampler2D texSceneShadowMap;
 varying vec4 vertexLightProjPos;
 #endif
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
 varying vec3 waterNormalViewSpace;
 #endif
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
 uniform vec4 waterSettingsFrag;
 #define waterNormalBias waterSettingsFrag.x
 #define waterRefraction waterSettingsFrag.y
@@ -102,7 +102,7 @@ uniform float clip;
 void main() {
 
 // Only necessary for opaque objects
-#if !defined (FEATURE_TRANSPARENT_PASS)
+#if !defined (FEATURE_REFRACTIVE_PASS)
 	if (clip > 0.001 && vertexWorldPos.y < clip) {
         discard;
 	}
@@ -148,7 +148,7 @@ void main() {
     normalOpaque = normalMatrix * normalOpaque.xyz;
 #endif
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
     vec2 normalWaterOffset;
     vec3 normalWater = waterNormalViewSpace;
     bool isWater = false;
@@ -183,7 +183,7 @@ void main() {
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
-#if !defined (FEATURE_TRANSPARENT_PASS)
+#if !defined (FEATURE_REFRACTIVE_PASS)
     if (checkFlag(BLOCK_HINT_LAVA, blockHint)) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
@@ -231,7 +231,7 @@ void main() {
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
     float diffuseLighting;
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
     if (isOceanWater) {
         diffuseLighting = calcLambLight(normalWater, sunVecViewAdjusted);
     } else
@@ -255,7 +255,7 @@ void main() {
     vec3 daylightColorValue;
 
     /* CREATE THE DAYLIGHT LIGHTING MIX */
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
     if (isOceanWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting * WATER_DIFF + WATER_AMB);
@@ -282,7 +282,7 @@ void main() {
 
     vec3 finalLightValue = max(daylightColorValue, blocklightColorValue);
 
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
     // Apply the final lighting mix
     color.xyz *= finalLightValue * occlusionValue;
 
@@ -304,6 +304,8 @@ void main() {
             } else {
                 color += refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
             }
+
+            color.a = 1.0;
      } else if (isWater) {
             texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
             texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
@@ -315,6 +317,7 @@ void main() {
             vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
 
             color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
+            color.a = 1.0;
     } else {
         vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
         vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
@@ -322,12 +325,13 @@ void main() {
 
         // TODO: Add support for actual refraction here
         color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
+        color.a = 1.0;
     }
 #else
     gl_FragData[2].rgba = vec4(finalLightValue.r, finalLightValue.g, finalLightValue.b, 0.0);
 #endif
 
-#if defined (FEATURE_TRANSPARENT_PASS)
+#if defined (FEATURE_REFRACTIVE_PASS)
     gl_FragData[0].rgba = color;
 
 # if defined (DYNAMIC_SHADOWS)
@@ -343,14 +347,14 @@ void main() {
 # endif
 #endif
 
-#if !defined (FEATURE_TRANSPARENT_PASS)
+#if !defined (FEATURE_REFRACTIVE_PASS)
     gl_FragData[1].rgb = vec3(normalOpaque.x / 2.0 + 0.5, normalOpaque.y / 2.0 + 0.5, normalOpaque.z / 2.0 + 0.5);
 #else
     gl_FragData[1].rgb = vec3(normalWater.x / 2.0 + 0.5, normalWater.y / 2.0 + 0.5, normalWater.z / 2.0 + 0.5);
 #endif
 
     // Primitive objects ids... Will be extended later on
-#ifdef FEATURE_TRANSPARENT_PASS
+#ifdef FEATURE_REFRACTIVE_PASS
     if (isOceanWater) {
         gl_FragData[1].a = 1.0f;
     }

@@ -100,7 +100,8 @@ public class ChunkMesh {
     public enum RENDER_PHASE {
         OPAQUE,
         ALPHA_REJECT,
-        ALPHA_BLEND;
+        REFRACTIVE,
+        Z_PRE_PASS
     }
 
     /* CONST */
@@ -248,7 +249,7 @@ public class ChunkMesh {
                 renderVbo(2);
                 glEnable(GL_CULL_FACE);
                 break;
-            case ALPHA_BLEND:
+            case REFRACTIVE:
                 renderVbo(3);
                 break;
         }

@@ -65,7 +65,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
         }
     }
 
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
 
         for (EntityRef entity : entityManager.iteratorEntities(MiniaturizerComponent.class)) {
             MiniaturizerComponent min = entity.getComponent(MiniaturizerComponent.class);
@@ -87,7 +87,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
 
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.OPAQUE);
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.ALPHA_REJECT);
-            min.chunkMesh.render(ChunkMesh.RENDER_PHASE.ALPHA_BLEND);
+            min.chunkMesh.render(ChunkMesh.RENDER_PHASE.REFRACTIVE);
             glPopMatrix();
 
         }

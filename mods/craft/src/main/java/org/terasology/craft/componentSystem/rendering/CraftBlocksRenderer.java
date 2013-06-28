@@ -100,7 +100,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
         Vector3f cubeSize = new Vector3f(0.3f, 0.3f, 0.3f);
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         EntityRef target = CoreRegistry.get(CameraTargetSystem.class).getTarget();

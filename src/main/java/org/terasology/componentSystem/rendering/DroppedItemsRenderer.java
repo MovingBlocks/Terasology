@@ -144,7 +144,7 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
     }
 
     @Override

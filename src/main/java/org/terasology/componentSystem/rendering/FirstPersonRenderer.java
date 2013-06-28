@@ -105,8 +105,7 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     @Override
-    public void renderTransparent() {
-
+    public void renderAlphaBlend() {
     }
 
     @Override

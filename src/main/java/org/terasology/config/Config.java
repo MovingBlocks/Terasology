@@ -193,7 +193,7 @@ public final class Config {
         }
     }
 
-    private static class PixelFormatHandler  implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
+    private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
 
         @Override
         public PixelFormat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

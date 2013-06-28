@@ -621,6 +621,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     public void beginRenderLightGeometry() {
         bindFbo("sceneOpaque");
 
+        // TODO: Use stencil masking technique for lights instead of disabling the depth test
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
