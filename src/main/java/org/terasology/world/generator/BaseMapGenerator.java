@@ -14,86 +14,52 @@
  * limitations under the License.
  */
 
-package org.terasology.world.generator.core;
+package org.terasology.world.generator;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.BaseChunkGenerator;
-import org.terasology.world.generator.ChunkGenerator;
-import org.terasology.world.generator.SecondPassChunkGenerator;
-import org.terasology.world.liquid.LiquidsGenerator;
 
 import com.google.common.collect.Lists;
+import org.terasology.world.generator.core.ForestGenerator;
 
 /**
  * @author Immortius
  */
-public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
-
+public abstract class BaseMapGenerator implements MapGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(BaseMapGenerator.class);
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
     private final List<ChunkGenerator> chunkGenerators = Lists.newArrayList();
     private final List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists.newArrayList();
+    private final MapGeneratorUri uri;
 
-    public ChunkGeneratorManagerImpl() {
+    protected BaseMapGenerator(MapGeneratorUri uri) {
+        this.uri = uri;
     }
 
-    public static ChunkGeneratorManagerImpl getDefaultInstance() {
-        final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-        chunkGeneratorManager.registerChunkGenerator(new PerlinTerrainGenerator());
-        chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
-        chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
-        final ForestGenerator forestGen = new ForestGenerator();
-        new DefaultGenerators(forestGen);
-        chunkGeneratorManager.registerChunkGenerator(forestGen);
-
-        return chunkGeneratorManager;
+    @Override
+    public MapGeneratorUri uri() {
+        return uri;
     }
 
-    public static ChunkGeneratorManagerImpl buildChunkGenerator(List<String> list) {
-        final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+    @Override
+    public boolean hasSetup() {
+        return false;
+    }
 
-        for (String generator : list) {
-            try {
-                BaseChunkGenerator chunkGenerator = null;
-                Class<?>[] classParm = null;
-                Object[] objectParm = null;
-
-                Constructor<?> c = Class.forName(generator).getConstructor(classParm);
-                chunkGenerator = (BaseChunkGenerator) c.newInstance(objectParm);
-
-                if (chunkGenerator instanceof ForestGenerator) {
-                    new DefaultGenerators((ForestGenerator) chunkGenerator);
-                }
-
-                chunkGeneratorManager.registerChunkGenerator(chunkGenerator);
-
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return chunkGeneratorManager;
+    @Override
+    public UIDialog createSetupDialog() {
+        return null;
     }
 
     @Override
@@ -118,7 +84,6 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
         }
     }
 
-    @Override
     public void registerChunkGenerator(final BaseChunkGenerator generator) {
         generator.setWorldBiomeProvider(biomeProvider);
         generator.setWorldSeed(worldSeed);
@@ -128,9 +93,13 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
         if (generator instanceof SecondPassChunkGenerator) {
             secondPassChunkGenerators.add((SecondPassChunkGenerator) generator);
         }
+        // TODO move this code somewhere else
+        if (generator instanceof ForestGenerator) {
+            ForestGenerator forestGenerator = (ForestGenerator) generator;
+            new DefaultGenerators(forestGenerator);
+        }
     }
 
-    @Override
     public List<BaseChunkGenerator> getBaseChunkGenerators() {
         final List<BaseChunkGenerator> baseChunkGenerators = new ArrayList<BaseChunkGenerator>();
         baseChunkGenerators.addAll(chunkGenerators);

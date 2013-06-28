@@ -16,10 +16,13 @@
 package org.terasology.game.types;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
+import org.terasology.config.ModConfig;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -48,11 +51,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class FreeStyleType extends GameType {
-
-    public FreeStyleType(){
-        setName("Free-style");
-    }
+public class FreeStyleType extends BaseGameType {
+    private final static Logger logger = LoggerFactory.getLogger(FreeStyleType.class);
 
     //onCreateInventory
     private List<UIItemCell>      inventoryCells = new ArrayList<UIItemCell>();
@@ -82,6 +82,20 @@ public class FreeStyleType extends GameType {
             }
         }
     };
+
+    public FreeStyleType(){
+        super(new GameTypeUri("core:free-style"));
+    }
+
+    @Override
+    public String name() {
+        return "Free-style";
+    }
+
+    @Override
+    public void initialize() {
+        logger.info(name()+" started");
+    }
 
     @Override
     public void onCreateInventoryHook(UIWindow parent) {

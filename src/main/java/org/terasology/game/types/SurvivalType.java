@@ -15,16 +15,29 @@
  */
 package org.terasology.game.types;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
-public class SurvivalType extends GameType{
+public class SurvivalType extends BaseGameType{
+    private final static Logger logger = LoggerFactory.getLogger(SurvivalType.class);
 
     public SurvivalType(){
-        setName("Survival");
+        super(new GameTypeUri("core:survival"));
+    }
+
+    @Override
+    public String name() {
+        return "Survival";
+    }
+
+    @Override
+    public void initialize() {
+        logger.info(name()+" started");
     }
 
     @Override
@@ -40,4 +53,7 @@ public class SurvivalType extends GameType{
         }
         entity.saveComponent(health);
     }
+
+    @Override
+    public void onCreateInventoryHook(UIWindow parent) {}
 }
