@@ -134,10 +134,10 @@ public class WorldInfo {
     }
 
     public GameTypeUri getGameType() {
-        if( gameType!=null ) {
-            if( gameType.endsWith("FreeStyleType") ) {
+        if (gameType != null) {
+            if (gameType.endsWith("FreeStyleType")) {
                 gameTypeUri = new GameTypeUri("core:free-style");
-            } else if( gameType.endsWith("SurvivalType") ) {
+            } else if (gameType.endsWith("SurvivalType")) {
                 gameTypeUri = new GameTypeUri("core:survival");
             } else {
                 throw new IllegalStateException("Unknown game type (old style): "+gameType );
@@ -177,7 +177,7 @@ public class WorldInfo {
                     break;
                 }
             }
-            if( mapGeneratorUri==null ) {
+            if (mapGeneratorUri == null) {
                 throw new IllegalStateException("Unknown chunk generators: "+ chunkGenerators );
             }
         }

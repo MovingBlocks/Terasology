@@ -150,7 +150,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         int index = 0;
         int defaultIndex = 0;
         for (GameType gameType : gameTypes) {
-            if( gameType.uri().equals(defaultGameType) ) {
+            if (gameType.uri().equals(defaultGameType)) {
                 defaultIndex = index;
             }
             UIListItem item = new UIListItem(gameType.name(), index);
@@ -167,14 +167,14 @@ public class UIDialogCreateNewWorld extends UIDialog {
             public void changed(UIDisplayElement element) {
                 ModConfig gameTypeModConfig = getSelectedGameType().defaultModConfig();
 
-                if( gameTypeModConfig!=null ) {
+                if (gameTypeModConfig != null) {
                     modConfig.copy(gameTypeModConfig);
                     modConfig.addMod(CoreRegistry.get(GameTypeManager.class).getMod(getSelectedGameType().uri()));
-                    if( modButton!=null ) {
+                    if (modButton != null) {
                         modButton.setVisible(false);
                     }
                 } else {
-                    if( modButton!=null ) {
+                    if (modButton != null) {
                         modButton.setVisible(true);
                     }
                 }

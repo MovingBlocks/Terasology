@@ -178,7 +178,7 @@ public final class Config {
     }
 
     private static void merge(JsonObject target, JsonObject from) {
-        for(Map.Entry<String, JsonElement> entry : from.entrySet()) {
+        for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
                 if (target.has(entry.getKey()) && target.get(entry.getKey()).isJsonObject()) {
                     merge(target.get(entry.getKey()).getAsJsonObject(), entry.getValue().getAsJsonObject());
