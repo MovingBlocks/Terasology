@@ -74,7 +74,7 @@ public class ComponentSystemManager {
             }
 
             RegisterSystem registerInfo = system.getAnnotation(RegisterSystem.class);
-            if (registerInfo.value().isValidFor(netMode)) {
+            if (registerInfo.value().isValidFor(netMode, false)) {
                 String id = packageName + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
                 try {

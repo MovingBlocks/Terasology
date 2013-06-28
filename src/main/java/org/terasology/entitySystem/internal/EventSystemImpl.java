@@ -141,7 +141,7 @@ public class EventSystemImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
-                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode())) {
+                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode(), false)) {
                     continue;
                 }
                 method.setAccessible(true);

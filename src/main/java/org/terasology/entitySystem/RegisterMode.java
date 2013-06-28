@@ -22,19 +22,35 @@ import org.terasology.network.NetworkMode;
  * @author Immortius
  */
 public enum RegisterMode {
-    ALWAYS(true, true),
-    AUTHORITY(true, false),
-    CLIENT(false, true);
+    /**
+     * Always
+     */
+    ALWAYS(true, true, true),
+    /**
+     * Only if the application is acting as the authority (single player, listen or dedicated server)
+     */
+    AUTHORITY(true, false, true),
+    /**
+     * Only if the application is hosting a player (single player, remote client or listen server)
+     */
+    CLIENT(true, true, false),
+    /**
+     * Only if the application is a remote client.
+     */
+    REMOTE_CLIENT(false, true, false);
+
 
     private boolean validWhenAuthority;
-    private boolean validWhenClient;
+    private boolean validWhenRemote;
+    private boolean validWhenHeadless;
 
-    private RegisterMode(boolean validWhenAuthority, boolean validWhenClient) {
+    private RegisterMode(boolean validWhenAuthority, boolean validWhenRemote, boolean validWhenHeadless) {
         this.validWhenAuthority = validWhenAuthority;
-        this.validWhenClient = validWhenClient;
+        this.validWhenRemote = validWhenRemote;
+        this.validWhenHeadless = validWhenHeadless;
     }
 
-    public boolean isValidFor(NetworkMode mode) {
-        return (mode.isAuthority()) ? validWhenAuthority : validWhenClient;
+    public boolean isValidFor(NetworkMode mode, boolean headless) {
+        return ((mode.isAuthority()) ? validWhenAuthority : validWhenRemote) && (!headless || validWhenHeadless);
     }
 }

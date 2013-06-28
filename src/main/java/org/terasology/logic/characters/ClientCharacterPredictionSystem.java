@@ -50,7 +50,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-@RegisterSystem(RegisterMode.CLIENT)
+@RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(ClientCharacterPredictionSystem.class);
     private static final int BUFFER_SIZE = 128;
