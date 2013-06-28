@@ -32,9 +32,9 @@ import org.terasology.audio.NullAudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.Terasology;
-import org.terasology.engine.Timer;
-import org.terasology.engine.TimerLwjgl;
+import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.paths.PathManager;
@@ -71,7 +71,7 @@ public abstract class TerasologyTestingEnvironment {
     private static ModManager modManager;
     private static NetworkSystem networkSystem;
     private ComponentSystemManager componentSystemManager;
-    private Timer mockTimer;
+    private EngineTime mockTime;
     private static BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
     @BeforeClass
@@ -115,9 +115,9 @@ public abstract class TerasologyTestingEnvironment {
 
     @Before
     public void setup() throws Exception {
-        mockTimer = mock(Timer.class);
-        CoreRegistry.put(Timer.class, mockTimer);
-        networkSystem = new NetworkSystemImpl(mockTimer);
+        mockTime = mock(EngineTime.class);
+        CoreRegistry.put(Time.class, mockTime);
+        networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
 

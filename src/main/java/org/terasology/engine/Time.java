@@ -16,29 +16,38 @@
 package org.terasology.engine;
 
 /**
+ * The timer manages all time in the game.
+ * <ol>
+ *     <li>Delta time (how long is passing in the current update cycle)</li>
+ *     <li>Game time (how long the world has been played in real time, starting at 0)</li>
+ * </ol>
  * @author Immortius
  */
-public interface Timer {
+public interface Time {
 
-    void tick();
-
+    /**
+     * @return The size of the time change for the current update, in seconds
+     */
     float getDelta();
 
+    /**
+     * @return The size of the time change for the current update in ms
+     */
     long getDeltaInMs();
 
-    double getFps();
-
-    long getRawTimeInMs();
+    /**
+     * @return The current framerate
+     */
+    float getFps();
 
     /**
      * @return Game time in milliseconds. This is synched with the server.
      */
-    long getTimeInMs();
+    long getGameTimeInMs();
 
     /**
-     * Updates the server time. This is used to resynchronise with the server.
-     *
-     * @param ms
+     * @return The current game time, in seconds.
      */
-    void updateServerTime(long ms, boolean immediate);
+    float getGameTime();
+
 }

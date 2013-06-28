@@ -18,18 +18,14 @@ package org.terasology.network;
 
 import com.google.common.collect.Lists;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.internal.NetworkSystemImpl;
 
@@ -56,15 +52,15 @@ public class TestNetwork extends TerasologyTestingEnvironment {
     @Test
     public void testNetwork() throws Exception {
         EngineEntityManager entityManager = getEntityManager();
-        Timer timer = mock(Timer.class);
-        NetworkSystem server = new NetworkSystemImpl(timer);
+        EngineTime time = mock(EngineTime.class);
+        NetworkSystem server = new NetworkSystemImpl(time);
         netSystems.add(server);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
         server.host(7777);
 
         Thread.sleep(500);
 
-        NetworkSystem client = new NetworkSystemImpl(timer);
+        NetworkSystem client = new NetworkSystemImpl(time);
         netSystems.add(client);
         client.join("localhost", 7777);
 
@@ -81,8 +77,8 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         NetworkComponent netComp = new NetworkComponent();
         netComp.setNetworkId(122);
         EntityRef entity = entityManager.create(netComp);
-        Timer timer = mock(Timer.class);
-        NetworkSystem server = new NetworkSystemImpl(timer);
+        EngineTime time = mock(EngineTime.class);
+        NetworkSystem server = new NetworkSystemImpl(time);
         netSystems.add(server);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
         server.host(7777);

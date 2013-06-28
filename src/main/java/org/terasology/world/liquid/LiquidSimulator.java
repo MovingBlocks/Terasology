@@ -144,12 +144,12 @@ public class LiquidSimulator implements ComponentSystem {
                 world.setLiquid(event.getBlockPosition(), new LiquidData(), currentState);
             }
             if (event.getNewType().isPenetrable()) {
-                blockQueue.offer(new SimulateBlock(event.getBlockPosition(), world.getTime() + PROPAGATION_DELAY));
+                blockQueue.offer(new SimulateBlock(event.getBlockPosition(), world.getWorldTime().getTimeInMs() + PROPAGATION_DELAY));
             }
             for (Side side : Side.values()) {
                 Vector3i adjPos = new Vector3i(event.getBlockPosition());
                 adjPos.add(side.getVector3i());
-                blockQueue.offer(new SimulateBlock(adjPos, world.getTime() + PROPAGATION_DELAY));
+                blockQueue.offer(new SimulateBlock(adjPos, world.getWorldTime().getTimeInMs() + PROPAGATION_DELAY));
             }
         } else {
             LiquidData currentState = world.getLiquid(event.getBlockPosition());
@@ -160,7 +160,7 @@ public class LiquidSimulator implements ComponentSystem {
             for (Side side : Side.values()) {
                 Vector3i adjPos = new Vector3i(event.getBlockPosition());
                 adjPos.add(side.getVector3i());
-                blockQueue.offer(new SimulateBlock(adjPos, world.getTime() + PROPAGATION_DELAY));
+                blockQueue.offer(new SimulateBlock(adjPos, world.getWorldTime().getTimeInMs() + PROPAGATION_DELAY));
             }
         }
     }
@@ -300,7 +300,7 @@ public class LiquidSimulator implements ComponentSystem {
 
         @Override
         public void run() {
-            if (world.getTime() < waitForTime) {
+            if (world.getWorldTime().getTimeInMs() < waitForTime) {
                 blockQueue.offer(this);
             } else if (world.isBlockRelevant(blockPos)) {
                 ChunkView view = world.getWorldViewAround(TeraMath.calcChunkPos(blockPos));

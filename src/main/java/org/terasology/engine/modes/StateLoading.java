@@ -21,9 +21,32 @@ import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.Timer;
-import org.terasology.engine.modes.loadProcesses.*;
+import org.terasology.engine.Time;
+import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
+import org.terasology.engine.modes.loadProcesses.CacheBlocks;
+import org.terasology.engine.modes.loadProcesses.CacheTextures;
+import org.terasology.engine.modes.loadProcesses.CreateWorldEntity;
+import org.terasology.engine.modes.loadProcesses.InitialiseBlockTypeEntities;
+import org.terasology.engine.modes.loadProcesses.InitialiseCommandSystem;
+import org.terasology.engine.modes.loadProcesses.InitialiseEntitySystem;
+import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
+import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
+import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
+import org.terasology.engine.modes.loadProcesses.JoinServer;
+import org.terasology.engine.modes.loadProcesses.LoadEntities;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.modes.loadProcesses.PrepareWorld;
+import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
+import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
+import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
+import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
+import org.terasology.engine.modes.loadProcesses.RegisterMods;
+import org.terasology.engine.modes.loadProcesses.RegisterSystems;
+import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
+import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
+import org.terasology.engine.modes.loadProcesses.StartServer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
@@ -76,7 +99,7 @@ public class StateLoading implements GameState {
 
     @Override
     public void init(GameEngine engine) {
-        CoreRegistry.get(Timer.class).updateServerTime(0, true);
+        ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(0);
         switch (netMode) {
             case CLIENT:
                 initClient();

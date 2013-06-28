@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Time;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.Texture;
@@ -46,7 +47,7 @@ public class ShaderParametersChunk implements IShaderParameters {
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        Time time = CoreRegistry.get(Time.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
@@ -76,8 +77,8 @@ public class ShaderParametersChunk implements IShaderParameters {
             program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
         }
 
-        if (worldProvider != null) {
-            program.setFloat("time", worldProvider.getTimeInDays());
+        if (time != null) {
+            program.setFloat("time", worldRenderer.getWorldProvider().getWorldTime().getTimeInDays());
         }
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);

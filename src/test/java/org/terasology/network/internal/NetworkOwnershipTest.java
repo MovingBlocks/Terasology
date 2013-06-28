@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -30,8 +30,6 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerImpl;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -46,7 +44,6 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     private static EngineEntityManager entityManager;
     private NetworkSystemImpl networkSystem;
-    private Timer mockTimer;
     private NetClient client;
     private EntityRef clientEntity;
 
@@ -58,8 +55,8 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     @Before
     public void setup() {
-        mockTimer = mock(Timer.class);
-        networkSystem = new NetworkSystemImpl(mockTimer);
+        EngineTime mockTime = mock(EngineTime.class);
+        networkSystem = new NetworkSystemImpl(mockTime);
 
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());

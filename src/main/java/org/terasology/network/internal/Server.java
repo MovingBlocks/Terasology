@@ -30,7 +30,8 @@ import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -48,8 +49,8 @@ import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
@@ -92,13 +93,13 @@ public class Server implements ChunkReadyListener {
 
     private EntityRef clientEntity = EntityRef.NULL;
 
-    private Timer timer;
+    private EngineTime time;
 
     public Server(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
         metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
-        this.timer = CoreRegistry.get(Timer.class);
+        this.time = (EngineTime) CoreRegistry.get(Time.class);
     }
 
     void connectToEntitySystem(EngineEntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
@@ -136,13 +137,13 @@ public class Server implements ChunkReadyListener {
         if (entityManager != null) {
             if (netTick) {
                 NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-                message.setTime(timer.getTimeInMs());
+                message.setTime(time.getGameTimeInMs());
                 sendEntities(message);
                 sendEvents(message);
                 send(message.build());
             } else if (!queuedOutgoingEvents.isEmpty()) {
                 NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-                message.setTime(timer.getTimeInMs());
+                message.setTime(time.getGameTimeInMs());
                 sendEvents(message);
                 send(message.build());
             }
@@ -179,7 +180,7 @@ public class Server implements ChunkReadyListener {
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
             if (isOwned(entity)) {
-                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, Collections.EMPTY_SET, changedComponents.get(netId), Collections.EMPTY_SET, new ClientComponentFieldCheck());
+                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, Collections.<Class<? extends Component>>emptySet(), changedComponents.get(netId), Collections.<Class<? extends Component>>emptySet(), new ClientComponentFieldCheck());
                 if (entityData != null) {
                     message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
                 }
@@ -209,10 +210,6 @@ public class Server implements ChunkReadyListener {
         }
     }
 
-    void queueEvent(NetData.EventMessage message) {
-        queuedReceivedEvents.offer(message);
-    }
-
     void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
         this.remoteWorldProvider = remoteWorldProvider;
         remoteWorldProvider.subscribe(this);
@@ -224,7 +221,7 @@ public class Server implements ChunkReadyListener {
 
         for (NetData.NetMessage message : messages) {
             if (message.hasTime()) {
-                timer.updateServerTime(message.getTime(), false);
+                time.updateTimeFromServer(message.getTime());
             }
             processBlockRegistrations(message);
             processReceivedChunks(message);
@@ -330,6 +327,7 @@ public class Server implements ChunkReadyListener {
         EntityRef newEntity = entitySerializer.deserialize(message.getEntity());
         if (newEntity == null) {
             logger.error("Received entity is null");
+            return;
         } else if (newEntity.getComponent(NetworkComponent.class) == null) {
             logger.error("Received entity with no NetworkComponent: {}", newEntity);
         } else if (newEntity.getComponent(NetworkComponent.class).getNetworkId() == 0) {

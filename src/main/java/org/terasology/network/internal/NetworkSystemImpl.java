@@ -42,7 +42,7 @@ import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.engine.EngineTime;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityChangeSubscriber;
@@ -117,7 +117,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
 
-    private Timer timer;
+    private EngineTime time;
     private long nextNetworkTick = 0;
 
 
@@ -135,8 +135,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     // Client only
     private Server server;
 
-    public NetworkSystemImpl(Timer timer) {
-        this.timer = timer;
+    public NetworkSystemImpl(EngineTime time) {
+        this.time = time;
         this.config = CoreRegistry.get(Config.class).getNetwork();
     }
 
@@ -159,7 +159,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 allChannels.add(listenChannel);
                 logger.info("Started server");
 
-                nextNetworkTick = timer.getRawTimeInMs();
+                nextNetworkTick = time.getRawTimeInMs();
             } catch (ChannelException e) {
                 if (e.getCause() instanceof BindException) {
                     throw new HostingFailedException("Port already in use (are you already hosting a game?)");
@@ -190,7 +190,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 allChannels.add(connectCheck.getChannel());
                 logger.info("Connected to server");
                 mode = NetworkMode.CLIENT;
-                nextNetworkTick = timer.getRawTimeInMs();
+                nextNetworkTick = time.getRawTimeInMs();
                 return true;
             }
         }
@@ -247,7 +247,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (entityManager != null) {
                 processPendingConnections();
                 processPendingDisconnects();
-                long currentTimer = timer.getRawTimeInMs();
+                long currentTimer = time.getRawTimeInMs();
                 boolean netTick = false;
                 if (currentTimer > nextNetworkTick) {
                     nextNetworkTick += NET_TICK_RATE;
@@ -678,7 +678,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void processRemovedClient(Client client) {
-        netClientList.remove(client);
+        if (client instanceof NetClient) {
+            NetClient netClient = (NetClient) client;
+            netClientList.remove(netClient);
+        }
         clientList.remove(client);
         clientPlayerLookup.remove(client.getEntity());
         logger.info("Client disconnected: " + client.getName());
@@ -736,7 +739,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         if (world != null) {
-            serverInfoMessageBuilder.setTime(world.getTime());
+            serverInfoMessageBuilder.setTime(world.getWorldTime().getTimeInMs());
             serverInfoMessageBuilder.setWorldName(world.getTitle());
         }
         for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
@@ -755,7 +758,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         serializeEventInfo(serverInfoMessageBuilder);
 
         serverInfoMessageBuilder.setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId());
-        client.send(NetData.NetMessage.newBuilder().setTime(timer.getTimeInMs()).setServerInfo(serverInfoMessageBuilder).build());
+        client.send(NetData.NetMessage.newBuilder().setTime(time.getGameTimeInMs()).setServerInfo(serverInfoMessageBuilder).build());
     }
 
     private void serializeEventInfo(NetData.ServerInfoMessage.Builder serverInfoMessageBuilder) {

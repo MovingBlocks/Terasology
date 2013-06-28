@@ -17,11 +17,11 @@ package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.health.HealthComponent;
@@ -192,8 +192,8 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         if (enableDebug) {
             CameraTargetSystem cameraTarget = CoreRegistry.get(CameraTargetSystem.class);
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-            Timer timer = CoreRegistry.get(Timer.class);
-            debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", timer.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
+            Time time = CoreRegistry.get(Time.class);
+            debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             if (entityManager != null) {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
             }

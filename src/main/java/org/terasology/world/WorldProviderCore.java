@@ -18,6 +18,7 @@ package org.terasology.world;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
+import org.terasology.world.time.WorldTime;
 
 /**
  * Provides the basic interface for all world providers.
@@ -31,44 +32,44 @@ public interface WorldProviderCore {
      *
      * @return the title of this world
      */
-    public String getTitle();
+    String getTitle();
 
     /**
      * Returns the seed of this world.
      *
      * @return The seed value
      */
-    public String getSeed();
+    String getSeed();
 
     /**
      * @return General world info
      */
-    public WorldInfo getWorldInfo();
+    WorldInfo getWorldInfo();
 
     /**
      * @return Thw world's biome provider
      */
-    public WorldBiomeProvider getBiomeProvider();
+    WorldBiomeProvider getBiomeProvider();
 
     /**
      * @param listener
      */
-    public void registerListener(WorldChangeListener listener);
+    void registerListener(WorldChangeListener listener);
 
-    public void unregisterListener(WorldChangeListener listener);
+    void unregisterListener(WorldChangeListener listener);
 
     /**
      *
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
-    public ChunkView getLocalView(Vector3i chunkPos);
+    ChunkView getLocalView(Vector3i chunkPos);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    public ChunkView getWorldViewAround(Vector3i chunk);
+    ChunkView getWorldViewAround(Vector3i chunk);
 
 
     /**
@@ -79,7 +80,7 @@ public interface WorldProviderCore {
      * @param z
      * @return Whether the given block is active
      */
-    public boolean isBlockRelevant(int x, int y, int z);
+    boolean isBlockRelevant(int x, int y, int z);
 
     /**
      * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
@@ -87,7 +88,7 @@ public interface WorldProviderCore {
      * @param updates
      * @return Whether the updates succeeded
      */
-    public boolean setBlocks(BlockUpdate... updates);
+    boolean setBlocks(BlockUpdate... updates);
 
     /**
      * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
@@ -95,7 +96,7 @@ public interface WorldProviderCore {
      * @param updates
      * @return Whether the updates succeeded
      */
-    public boolean setBlocks(Iterable<BlockUpdate> updates);
+    boolean setBlocks(Iterable<BlockUpdate> updates);
 
     /**
      * Places a block of a specific type at a given position and refreshes the
@@ -112,7 +113,7 @@ public interface WorldProviderCore {
      * @param oldType The expected type of the block being replaced.
      * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
      */
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType);
+    boolean setBlock(int x, int y, int z, Block type, Block oldType);
 
     /**
      * Places a block of a specific type at a given position and refreshes the
@@ -126,7 +127,7 @@ public interface WorldProviderCore {
      * @param z    The Z-coordinate
      * @param type The type of the block to set
      */
-    public void setBlockForced(int x, int y, int z, Block type);
+    void setBlockForced(int x, int y, int z, Block type);
 
     /**
      * @param x
@@ -136,7 +137,7 @@ public interface WorldProviderCore {
      * @param oldData
      * @return Whether the liquid change was made successfully. Will fail if the current data doesn't match the oldData, or if the underlying chunk is not available
      */
-    public boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData);
+    boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData);
 
     /**
      * Returns the liquid state at the given position.
@@ -146,7 +147,7 @@ public interface WorldProviderCore {
      * @param z The Z-coordinate
      * @return The liquid data of the block
      */
-    public LiquidData getLiquid(int x, int y, int z);
+    LiquidData getLiquid(int x, int y, int z);
 
     /**
      * Returns the block at the given position.
@@ -156,7 +157,7 @@ public interface WorldProviderCore {
      * @param z The Z-coordinate
      * @return The type of the block
      */
-    public Block getBlock(int x, int y, int z);
+    Block getBlock(int x, int y, int z);
 
     /**
      * Returns the light value at the given position.
@@ -166,7 +167,7 @@ public interface WorldProviderCore {
      * @param z The Z-coordinate
      * @return The light value
      */
-    public byte getLight(int x, int y, int z);
+    byte getLight(int x, int y, int z);
 
     /**
      * Returns the sunlight value at the given position
@@ -176,31 +177,15 @@ public interface WorldProviderCore {
      * @param z
      * @return The sunlight value
      */
-    public byte getSunlight(int x, int y, int z);
+    byte getSunlight(int x, int y, int z);
 
-    public byte getTotalLight(int x, int y, int z);
-
-    /**
-     * Returns the current time.
-     *
-     * @return The current time in ms from world creation
-     */
-    public long getTime();
-
-    /**
-     * Sets the current time of the world (in ms).
-     *
-     * @param time The current time
-     */
-    public void setTime(long time);
-
-    public float getTimeInDays();
-
-    public void setTimeInDays(float time);
+    byte getTotalLight(int x, int y, int z);
 
     /**
      * Disposes this world provider.
      */
-    public void dispose();
+    void dispose();
+
+    WorldTime getWorldTime();
 
 }

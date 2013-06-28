@@ -41,6 +41,7 @@ import com.google.common.collect.Maps;
 import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
@@ -53,7 +54,6 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
@@ -82,7 +82,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     private static final float RESYNC_TIME = 0.25f;
 
     @In
-    private Timer timer;
+    private Time time;
 
     @In
     private NetworkSystem networkSystem;
@@ -219,9 +219,9 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         addPendingRigidBodies();
         applyPendingImpulses();
 
-        if (networkSystem.getMode() == NetworkMode.SERVER && timer.getTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
+        if (networkSystem.getMode() == NetworkMode.SERVER && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             sendSyncMessages();
-            lastNetsync = timer.getTimeInMs();
+            lastNetsync = time.getGameTimeInMs();
         }
 
         resynchronize(delta);

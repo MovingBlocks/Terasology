@@ -71,7 +71,7 @@ public class InitialiseRemoteWorld implements LoadProcess {
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
         // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing during loading
-        CoreRegistry.get(WorldProvider.class).setTime(worldInfo.getTime());
+        worldProvider.getWorldTime().setTime(worldInfo.getTime());
 
         CoreRegistry.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
 
