@@ -741,7 +741,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         if (world != null) {
             NetData.WorldInfo.Builder worldInfoBuilder = NetData.WorldInfo.newBuilder();
-            worldInfoBuilder.setTime(world.getWorldTime().getTimeInMs());
+            worldInfoBuilder.setTime(world.getTime().getMilliseconds());
             worldInfoBuilder.setTitle(world.getTitle());
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }

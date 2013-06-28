@@ -58,10 +58,10 @@ public class WorldTimeEventManager {
         for (int i = _worldTimeEvents.size() - 1; i >= 0; i--) {
             final WorldTimeEvent event = _worldTimeEvents.get(i);
 
-            if (event.getExecutionTime() > _parent.getWorldTime().getTimeInDays() % 1.0)
+            if (event.getExecutionTime() > _parent.getTime().getDays() % 1.0)
                 event.setCanFire(true);
 
-            if (event.getExecutionTime() <= _parent.getWorldTime().getTimeInDays() % 1.0 && event.canFire()) {
+            if (event.getExecutionTime() <= _parent.getTime().getDays() % 1.0 && event.canFire()) {
                 event.setCanFire(false);
                 event.execute();
             }

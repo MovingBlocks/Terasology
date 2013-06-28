@@ -24,7 +24,6 @@ import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -78,7 +77,7 @@ public class ShaderParametersChunk implements IShaderParameters {
         }
 
         if (time != null) {
-            program.setFloat("time", worldRenderer.getWorldProvider().getWorldTime().getTimeInDays());
+            program.setFloat("time", worldRenderer.getWorldProvider().getTime().getDays());
         }
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);

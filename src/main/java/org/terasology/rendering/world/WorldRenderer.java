@@ -31,7 +31,6 @@ import org.terasology.engine.Time;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.game.Game;
-import org.terasology.game.GameManifest;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
@@ -53,7 +52,6 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldTimeEvent;
 import org.terasology.world.block.Block;
@@ -919,7 +917,7 @@ public final class WorldRenderer {
 
     @Override
     public String toString() {
-        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), worldProvider.getWorldTime().getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), skysphere.getSunPosAngle(), chunkProvider.size(), statDirtyChunks, statIgnoredPhases, statVisibleChunks, statRenderedTriangles, statChunkMeshEmpty, statChunkNotReady, worldProvider.getSeed(), worldProvider.getTitle());
+        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), worldProvider.getTime().getDays(), PostProcessingRenderer.getInstance().getExposure(), skysphere.getSunPosAngle(), chunkProvider.size(), statDirtyChunks, statIgnoredPhases, statVisibleChunks, statRenderedTriangles, statChunkMeshEmpty, statChunkNotReady, worldProvider.getSeed(), worldProvider.getTitle());
     }
 
     public LocalPlayer getPlayer() {

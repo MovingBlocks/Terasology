@@ -199,7 +199,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
             }
             debugLine3.setText(String.format("%s, %.2f", CoreRegistry.get(LocalPlayer.class).getPosition(), (character != null) ? character.yaw : 0));
-            debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(), CoreRegistry.get(WorldProvider.class).getWorldTime().getTimeInDays()));
+            debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(), CoreRegistry.get(WorldProvider.class).getTime().getDays()));
         }
     }
 

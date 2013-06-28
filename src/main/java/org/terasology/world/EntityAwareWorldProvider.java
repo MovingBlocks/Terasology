@@ -78,7 +78,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         super(base);
         mainThread = Thread.currentThread();
         entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        CoreRegistry.get(ComponentSystemManager.class).register(getWorldTime());
+        CoreRegistry.get(ComponentSystemManager.class).register(getTime());
     }
 
     public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager) {

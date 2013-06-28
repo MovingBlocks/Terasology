@@ -158,7 +158,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public WorldTime getWorldTime() {
+    public WorldTime getTime() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

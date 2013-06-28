@@ -12,18 +12,18 @@ public interface WorldTime extends ComponentSystem {
     /**
      * @return World time in milliseconds.
      */
-    long getTimeInMs();
+    long getMilliseconds();
 
     /**
      * @return World time in seconds
      */
-    float getTime();
+    float getSeconds();
 
     /**
      * World time starts at midnight of the first day being 0, midnight of the second day being 1 and so on.
      * @return World time in days
      */
-    float getTimeInDays();
+    float getDays();
 
     /**
      * The world time progresses at a different rate to game time, generally faster.
@@ -35,11 +35,11 @@ public interface WorldTime extends ComponentSystem {
      * Immediately updates the world time
      * @param time
      */
-    void setTime(long time);
+    void setMilliseconds(long time);
 
     /**
      * Sets the world time in terms of days
      * @param timeInDays
      */
-    void setTimeInDays(float timeInDays);
+    void setDays(float timeInDays);
 }

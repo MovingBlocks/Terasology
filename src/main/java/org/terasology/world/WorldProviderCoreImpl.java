@@ -19,10 +19,7 @@ package org.terasology.world;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -67,7 +64,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkProvider = chunkProvider;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
-        worldTime.setTime(time);
+        worldTime.setMilliseconds(time);
     }
 
     public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
@@ -86,7 +83,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return new WorldInfo(title, seed, worldTime.getTimeInMs(), chunkGenerators);
+        return new WorldInfo(title, seed, worldTime.getMilliseconds(), chunkGenerators);
     }
 
     @Override
@@ -320,7 +317,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public WorldTime getWorldTime() {
+    public WorldTime getTime() {
         return worldTime;
     }
 }

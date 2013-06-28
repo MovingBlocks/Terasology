@@ -69,7 +69,7 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setFloat("viewingDistance", config.getRendering().getActiveViewingDistance() * 8.0f);
 
 //        WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
-//        float timeInDays = renderer.getWorldProvider().getTimeInDays();
+//        float timeInDays = renderer.getWorldProvider().getDays();
 //
 //        // Calculate the fog value based on the daylight value
 //        float fogLinearIntensity = 0.01f;

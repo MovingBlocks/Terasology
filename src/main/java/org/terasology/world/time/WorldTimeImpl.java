@@ -29,17 +29,17 @@ public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
 
 
     @Override
-    public long getTimeInMs() {
+    public long getMilliseconds() {
         return worldTime.get();
     }
 
     @Override
-    public float getTime() {
+    public float getSeconds() {
         return worldTime.get() / 1000f;
     }
 
     @Override
-    public float getTimeInDays() {
+    public float getDays() {
         return MS_TO_DAYS * worldTime.get();
     }
 
@@ -49,14 +49,14 @@ public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
     }
 
     @Override
-    public void setTime(long time) {
+    public void setMilliseconds(long time) {
         // TODO: Send network event to update
         this.worldTime.getAndSet(time);
     }
 
     @Override
-    public void setTimeInDays(float timeInDays) {
-        setTime((long)((double) timeInDays * DAYS_TO_MS));
+    public void setDays(float timeInDays) {
+        setMilliseconds((long) ((double) timeInDays * DAYS_TO_MS));
     }
 
     @Override
