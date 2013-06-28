@@ -319,7 +319,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         }
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
     public void resynch(PhysicsResynchEvent event, EntityRef entity) {
         logger.debug("Received resynch event");
         LocationComponent loc = entity.getComponent(LocationComponent.class);
