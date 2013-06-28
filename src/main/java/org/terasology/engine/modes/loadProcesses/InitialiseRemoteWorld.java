@@ -53,6 +53,9 @@ public class InitialiseRemoteWorld implements LoadProcess {
     @Override
     public boolean step() {
 
+        // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
+        CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
+
         RemoteChunkProvider chunkProvider = new RemoteChunkProvider();
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
@@ -65,9 +68,7 @@ public class InitialiseRemoteWorld implements LoadProcess {
         // Init. a new world
         WorldRenderer worldRenderer = new WorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
-
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
