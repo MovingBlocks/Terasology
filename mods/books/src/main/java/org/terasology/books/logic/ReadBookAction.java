@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.book;
+package org.terasology.books.logic;
 
+import org.terasology.books.rendering.gui.windows.UIScreenBook;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
