@@ -16,6 +16,7 @@
 
 package org.terasology.world;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
@@ -49,6 +50,11 @@ public class WorldInfo {
     private MapGeneratorUri mapGeneratorUri = new MapGeneratorUri("core:perlin");
     private GameTypeUri gameTypeUri = null;
     private ModConfig modConfiguration = new ModConfig();
+
+    @Deprecated
+    private String[] chunkGenerators;
+    @Deprecated
+    private String gameType = null;
 
     public WorldInfo() {
     }
@@ -128,6 +134,15 @@ public class WorldInfo {
     }
 
     public GameTypeUri getGameType() {
+        if( gameType!=null ) {
+            if( gameType.endsWith("FreeStyleType") ) {
+                gameTypeUri = new GameTypeUri("core:free-style");
+            } else if( gameType.endsWith("SurvivalType") ) {
+                gameTypeUri = new GameTypeUri("core:survival");
+            } else {
+                throw new IllegalStateException("Unknown game type (old style): "+gameType );
+            }
+        }
         return gameTypeUri;
     }
 
@@ -140,6 +155,32 @@ public class WorldInfo {
     }
 
     public MapGeneratorUri getMapGeneratorUri() {
+        if( chunkGenerators!=null ) {
+            for (String chunkGenerator : chunkGenerators) {
+                if( chunkGenerator.endsWith("PerlinTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:perlin");
+                    break;
+                } else if( chunkGenerator.endsWith("PerlinTerrainGeneratorWithSetup") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:perlin-setup");
+                    break;
+                } else if( chunkGenerator.endsWith("FlatTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:flat");
+                    break;
+                } else if( chunkGenerator.endsWith("MultiTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:multi");
+                    break;
+                } else if( chunkGenerator.endsWith("BasicHMTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:heightmap");
+                    break;
+                } else if( chunkGenerator.endsWith("PathfinderTestGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("pathfinding:testgen");
+                    break;
+                }
+            }
+            if( mapGeneratorUri==null ) {
+                throw new IllegalStateException("Unknown chunk generators: "+ chunkGenerators );
+            }
+        }
         return mapGeneratorUri;
     }
 

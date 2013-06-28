@@ -24,6 +24,7 @@ import org.terasology.game.modes.StateLoading;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.GameTypeManager;
 import org.terasology.game.paths.PathManager;
+import org.terasology.game.types.GameTypeUri;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -144,16 +145,22 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
         typeOfGame = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2*COMPONENT_HEIGHT));
         gameTypes = CoreRegistry.get(GameTypeManager.class).listItems();
+        GameTypeUri defaultGameType = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultGameType();
+
         int index = 0;
         int defaultIndex = 0;
         for (GameType gameType : gameTypes) {
+            if( gameType.uri().equals(defaultGameType) ) {
+                defaultIndex = index;
+            }
             UIListItem item = new UIListItem(gameType.name(), index);
             item.setTextColor(Color.black);
             item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
             typeOfGame.addItem(item);
+
+            index ++;
         }
 
-        typeOfGame.select(defaultIndex);
         typeOfGame.setVisible(true);
         typeOfGame.addSelectionListener(new SelectionListener() {
             @Override
@@ -163,6 +170,13 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 if( gameTypeModConfig!=null ) {
                     modConfig.copy(gameTypeModConfig);
                     modConfig.addMod(CoreRegistry.get(GameTypeManager.class).getMod(getSelectedGameType().uri()));
+                    if( modButton!=null ) {
+                        modButton.setVisible(false);
+                    }
+                } else {
+                    if( modButton!=null ) {
+                        modButton.setVisible(true);
+                    }
                 }
 
                 MapGeneratorUri mapGeneratorUri = getSelectedGameType().defaultMapGenerator();
@@ -178,6 +192,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 }
             }
         });
+        typeOfGame.select(defaultIndex);
     }
 
     private void createChunkGeneratorInput() {
@@ -206,7 +221,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
         int index = 0;
         int defaultIndex = 0;
         for (MapGenerator mapGenerator : mapGenerators) {
-
             if( mapGenerator.uri().equals(defaultMapGenerator) ) {
                 defaultIndex = index;
             }
