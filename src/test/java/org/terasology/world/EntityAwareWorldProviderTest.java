@@ -17,13 +17,13 @@
 package org.terasology.world;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.Component;
@@ -94,6 +94,8 @@ public class EntityAwareWorldProviderTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
+        CoreRegistry.put(ComponentSystemManager.class, mock(ComponentSystemManager.class));
+
         blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new DefaultBlockFamilyFactoryRegistry()));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
@@ -104,7 +106,7 @@ public class EntityAwareWorldProviderTest {
 
         blockWithString = new Block();
         Prefab prefabWithString = new PojoPrefab(
-            new AssetUri(AssetType.PREFAB, "test:prefabWithString"), null, true, new StringComponent("Test"));
+                new AssetUri(AssetType.PREFAB, "test:prefabWithString"), null, true, new StringComponent("Test"));
         prefabManager.registerPrefab(prefabWithString);
         blockWithString.setPrefab("test:prefabWithString");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithString"), blockWithString), true);
@@ -217,7 +219,7 @@ public class EntityAwareWorldProviderTest {
         worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
         assertEquals(blockWithString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
         worldProvider.setBlock(0, 0, 0, blockWithDifferentString, blockWithString);
-        assertEquals(blockWithDifferentString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0,0,0)).getParentPrefab().getName());
+        assertEquals(blockWithDifferentString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
     }
 
     @Test
@@ -235,7 +237,7 @@ public class EntityAwareWorldProviderTest {
         worldProvider.setBlock(0, 0, 0, keepActiveBlock, BlockManager.getAir());
         worldProvider.update(1.0f);
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
-        worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         assertTrue(checker.receivedEvents.isEmpty());
     }
 
@@ -261,7 +263,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testEntityExtraComponentsRemovedBeforeCleanUp() {
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new StringComponent("test"));
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
@@ -273,7 +275,7 @@ public class EntityAwareWorldProviderTest {
     @Test
     public void testEntityExtraComponentsRemovedBeforeCleanUpForBlocksWithPrefabs() {
         worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new IntegerComponent(1));
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), IntegerComponent.class);
@@ -285,7 +287,7 @@ public class EntityAwareWorldProviderTest {
     @Test
     public void testEntityMissingComponentsAddedBeforeCleanUp() {
         worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.removeComponent(StringComponent.class);
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
@@ -297,7 +299,7 @@ public class EntityAwareWorldProviderTest {
     @Test
     public void testChangedComponentsRevertedBeforeCleanUp() {
         worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         StringComponent comp = entity.getComponent(StringComponent.class);
         comp.value = "Moo";
         entity.saveComponent(comp);
@@ -311,7 +313,7 @@ public class EntityAwareWorldProviderTest {
     @Test
     public void allComponentsNotMarkedAsRetainedRemovedOnBlockChange() {
         worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new ForceBlockActiveComponent());
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
@@ -323,7 +325,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void retainedComponentsNotAltered() {
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
         worldProvider.setBlock(0, 0, 0, blockWithRetainedComponent, BlockManager.getAir());
@@ -334,7 +336,7 @@ public class EntityAwareWorldProviderTest {
     @Test
     public void networkComponentAddedWhenChangedToNonTemporary() {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
         assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)), checker.receivedEvents);
@@ -343,7 +345,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void networkComponentRemovedWhenTemporaryCleanedUp() {
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0,0,0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
