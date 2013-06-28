@@ -769,12 +769,15 @@ public final class WorldRenderer {
         program.setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
 
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-        // TODO: Add culling for light components
         for (EntityRef entity : entityManager.iteratorEntities(LocationComponent.class, LightComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
 
-            renderLightComponent(lightComponent, locationComponent.getWorldPosition(), program, camera, modelMatrix);
+            final Vector3f worldPosition = locationComponent.getWorldPosition();
+
+            if (isLightVisible(worldPosition, lightComponent)) {
+                renderLightComponent(lightComponent, worldPosition, program, camera, modelMatrix);
+            }
         }
 
         DefaultRenderingProcess.getInstance().endRenderLightGeometry();
@@ -1240,6 +1243,17 @@ public final class WorldRenderer {
 
     public boolean isChunkVisible(Chunk c) {
         return isChunkVisible(activeCamera, c);
+    }
+
+    public boolean isLightVisible(Vector3f position, LightComponent component) {
+        if (component.lightType == LightComponent.LightType.DIRECTIONAL) {
+            return true;
+        }
+
+        Vector3f positionFrustumSpace = new Vector3f();
+        positionFrustumSpace.sub(position, activeCamera.getPosition());
+
+        return activeCamera.getViewFrustum().intersects(positionFrustumSpace, component.lightAttenuationRange);
     }
 
     public double getDaylight() {

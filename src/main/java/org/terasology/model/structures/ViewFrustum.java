@@ -152,4 +152,16 @@ public class ViewFrustum {
 
         return true;
     }
+
+    /**
+     * Returns true if the given sphere intersects the given AABB.
+     */
+    public boolean intersects(Vector3f position, float radius) {
+        for (int i = 0; i < 6; i++) {
+            if (planes[i].getA() * position.x + planes[i].getB() * position.y + planes[i].getC() * position.z + planes[i].getD() <= -radius) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
