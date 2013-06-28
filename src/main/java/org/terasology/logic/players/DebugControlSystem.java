@@ -65,19 +65,19 @@ public class DebugControlSystem implements ComponentSystem {
         if (debugEnabled && event.isDown()) {
             switch (event.getKey()) {
                 case Keyboard.KEY_UP:
-                    world.getWorldTime().setTimeInDays(world.getWorldTime().getTimeInDays() + 0.005f);
+                    world.getTime().setDays(world.getTime().getDays() + 0.005f);
                     event.consume();
                     break;
                 case Keyboard.KEY_DOWN:
-                    world.getWorldTime().setTimeInDays(world.getWorldTime().getTimeInDays() - 0.005f);
+                    world.getTime().setDays(world.getTime().getDays() - 0.005f);
                     event.consume();
                     break;
                 case Keyboard.KEY_RIGHT:
-                    world.getWorldTime().setTimeInDays(world.getWorldTime().getTimeInDays() + 0.02f);
+                    world.getTime().setDays(world.getTime().getDays() + 0.02f);
                     event.consume();
                     break;
                 case Keyboard.KEY_LEFT:
-                    world.getWorldTime().setTimeInDays(world.getWorldTime().getTimeInDays() - 0.02f);
+                    world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
                     break;
             }

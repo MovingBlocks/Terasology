@@ -186,6 +186,6 @@ public interface WorldProviderCore {
      */
     void dispose();
 
-    WorldTime getWorldTime();
+    WorldTime getTime();
 
 }

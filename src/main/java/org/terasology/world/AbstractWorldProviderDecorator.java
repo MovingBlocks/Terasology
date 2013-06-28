@@ -133,7 +133,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public WorldTime getWorldTime() {
-        return base.getWorldTime();
+    public WorldTime getTime() {
+        return base.getTime();
     }
 }
