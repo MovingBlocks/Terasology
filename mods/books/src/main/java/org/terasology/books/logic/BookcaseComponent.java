@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.book;
+
+package org.terasology.books.logic;
+
 
 import org.terasology.entitySystem.Component;
 
-/**
- * Books are Knowledge
- *
- * @author bi0hax
- */
-public class BookComponent implements Component {
-    public enum BookType {
-        Blank,
-        WContents,
-        Recipe         // Not yet implemented
+public class BookcaseComponent implements Component {
+    public BookcaseComponent() {
     }
-
-    public BookType type;
-
-
 }
