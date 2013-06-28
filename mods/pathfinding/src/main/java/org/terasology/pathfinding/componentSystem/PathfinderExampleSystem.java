@@ -207,7 +207,7 @@ public class PathfinderExampleSystem implements EventHandlerSystem, UpdateSubscr
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
     }
 
     @Override

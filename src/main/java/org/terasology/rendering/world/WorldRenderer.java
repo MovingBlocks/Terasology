@@ -913,6 +913,7 @@ public final class WorldRenderer {
         modelMatrix.setScale(lightComponent.lightAttenuationRange);
         program.setMatrix4("modelMatrix", modelMatrix);
 
+        // TODO: Pack those values into float4s
         program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z);
         program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z);
 
