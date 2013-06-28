@@ -21,7 +21,7 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.world.block.Block;

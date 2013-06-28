@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
     private static final float WORLD_TIME_MULTIPLIER = 48f;
-    private static final long DAYS_TO_MS = (1000 * 60 * 60 * 24);
+    private static final long DAYS_TO_MS = (DAY_LENGTH);
     private static final float MS_TO_DAYS = 1.f / (DAYS_TO_MS);
 
     private AtomicLong worldTime = new AtomicLong(0);

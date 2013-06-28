@@ -60,7 +60,7 @@ public class PlayerEntityStore implements EntityStore {
         helper = new OwnershipHelper(manager.getComponentLibrary());
         serializer = new EntitySerializer(manager, manager.getComponentLibrary());
         serializer.setIgnoringEntityId(false);
-        File playerSubDir = new File(PathManager.getInstance().getCurrentWorldPath(), PLAYER_STORE_SUBDIR);
+        File playerSubDir = new File(PathManager.getInstance().getCurrentSavePath(), PLAYER_STORE_SUBDIR);
         playerSubDir.mkdirs();
         playerDataFile = new File(playerSubDir, playerId + ".dat");
     }

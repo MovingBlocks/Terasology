@@ -7,6 +7,8 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  */
 public interface WorldTime extends ComponentSystem {
 
+    static final int DAY_LENGTH = 1000 * 60 * 60 * 24;
+
     /**
      * @return World time in milliseconds.
      */

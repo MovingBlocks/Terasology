@@ -51,27 +51,27 @@ import static org.lwjgl.opengl.GL11.glNewList;
  */
 public class Skysphere {
 
-    private static int _displayListSphere = -1;
+    private static int displayListSphere = -1;
     private static final float PI = 3.1415926f;
 
     /* SKY */
-    private double _turbidity = 4.0f, _sunPosAngle = 0.1f;
-    private static IntBuffer _textureIds;
+    private double turbidity = 4.0f, sunPosAngle = 0.1f;
+    private static IntBuffer textureIds;
 
-    private final WorldRenderer _parent;
+    private final WorldRenderer parent;
 
     public Skysphere(WorldRenderer parent) {
-        _parent = parent;
+        this.parent = parent;
 
         initTextures();
-        loadCubeMap(_textureIds.get(0), "stars", 128);
-        loadCubeMap(_textureIds.get(1), "sky", 512);
+        loadCubeMap(textureIds.get(0), "stars", 128);
+        loadCubeMap(textureIds.get(1), "sky", 512);
     }
 
     private void initTextures() {
-        if (_textureIds == null) {
-            _textureIds = BufferUtils.createIntBuffer(2);
-            GL11.glGenTextures(_textureIds);
+        if (textureIds == null) {
+            textureIds = BufferUtils.createIntBuffer(2);
+            GL11.glGenTextures(textureIds);
         }
     }
 
@@ -101,12 +101,12 @@ public class Skysphere {
 
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureIds.get(0));
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(1));
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureIds.get(1));
 
-        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getWorldTime().getTimeInDays() - 90.0);
-        Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(_sunPosAngle), java.lang.Math.sin(_sunPosAngle), 1.0);
+        sunPosAngle = (float) java.lang.Math.toRadians(360.0 * parent.getWorldProvider().getWorldTime().getTimeInDays() - 90.0);
+        Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(sunPosAngle), java.lang.Math.sin(sunPosAngle), 1.0);
         sunNormalise.normalize();
 
         Vector3d zenithColor = new Vector3d();
@@ -119,10 +119,10 @@ public class Skysphere {
 
         shader.setInt("texCubeStars", 0);
         shader.setInt("texCubeSky", 1);
-        shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
-        shader.setFloat("time", _parent.getWorldProvider().getWorldTime().getTimeInDays());
-        shader.setFloat("sunAngle", (float) _sunPosAngle);
-        shader.setFloat("turbidity", (float) _turbidity);
+        shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(sunPosAngle), (float) java.lang.Math.sin(sunPosAngle), 1.0f);
+        shader.setFloat("time", parent.getWorldProvider().getWorldTime().getTimeInDays());
+        shader.setFloat("sunAngle", (float) sunPosAngle);
+        shader.setFloat("turbidity", (float) turbidity);
         shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
         shader.setFloat("daylight", (float) getDaylight());
 
@@ -143,14 +143,14 @@ public class Skysphere {
         Vector4f cy2 = new Vector4f(0.00516f, -0.04153f, 0.08970f, -0.04214f);
         Vector4f cy3 = new Vector4f(0.26688f, 0.06670f, -0.26756f, 0.15346f);
 
-        double t2 = (float) java.lang.Math.pow(_turbidity, 2);
-        double chi = (4.0f / 9.0f - _turbidity / 120.0f) * (PI - 2.0f * thetaSun);
+        double t2 = (float) java.lang.Math.pow(turbidity, 2);
+        double chi = (4.0f / 9.0f - turbidity / 120.0f) * (PI - 2.0f * thetaSun);
 
         Vector4f theta = new Vector4f(1, thetaSun, (float) java.lang.Math.pow(thetaSun, 2), (float) java.lang.Math.pow(thetaSun, 3));
 
-        double Y = (4.0453f * _turbidity - 4.9710f) * (float) java.lang.Math.tan(chi) - 0.2155f * _turbidity + 2.4192f;
-        double x = t2 * cx1.dot(theta) + _turbidity * cx2.dot(theta) + cx3.dot(theta);
-        double y = t2 * cy1.dot(theta) + _turbidity * cy2.dot(theta) + cy3.dot(theta);
+        double Y = (4.0453f * turbidity - 4.9710f) * (float) java.lang.Math.tan(chi) - 0.2155f * turbidity + 2.4192f;
+        double x = t2 * cx1.dot(theta) + turbidity * cx2.dot(theta) + cx3.dot(theta);
+        double y = t2 * cy1.dot(theta) + turbidity * cy2.dot(theta) + cy3.dot(theta);
 
         return new Vector3d(Y, x, y);
     }
@@ -158,37 +158,37 @@ public class Skysphere {
     public void update(float delta) {
         // Set the light direction according to the position of the sun
         FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
-        buffer.put(0.0f).put((float) java.lang.Math.cos(_sunPosAngle)).put((float) java.lang.Math.sin(_sunPosAngle)).put(1.0f);
+        buffer.put(0.0f).put((float) java.lang.Math.cos(sunPosAngle)).put((float) java.lang.Math.sin(sunPosAngle)).put(1.0f);
         buffer.flip();
 
         glLight(GL_LIGHT0, GL11.GL_POSITION, buffer);
     }
 
     private void drawSphere() {
-        if (_displayListSphere == -1) {
-            _displayListSphere = glGenLists(1);
+        if (displayListSphere == -1) {
+            displayListSphere = glGenLists(1);
 
             Sphere sphere = new Sphere();
-            glNewList(_displayListSphere, GL11.GL_COMPILE);
+            glNewList(displayListSphere, GL11.GL_COMPILE);
 
             sphere.draw(16, 16, 128);
 
             glEndList();
         }
 
-        glCallList(_displayListSphere);
+        glCallList(displayListSphere);
     }
 
     public double getSunPosAngle() {
-        return _sunPosAngle;
+        return sunPosAngle;
     }
 
     public double getTurbidity() {
-        return _turbidity;
+        return turbidity;
     }
 
     public double getDaylight() {
-        double angle = java.lang.Math.toDegrees(TeraMath.clamp(java.lang.Math.cos(_sunPosAngle)));
+        double angle = java.lang.Math.toDegrees(TeraMath.clamp(java.lang.Math.cos(sunPosAngle)));
         double daylight = 1.0;
 
         if (angle < 24.0) {

@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.game.Game;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
@@ -37,10 +39,10 @@ public class JoinServer implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(JoinServer.class);
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-    private WorldInfo worldInfo;
+    private GameManifest gameManifest;
 
-    public JoinServer(WorldInfo worldInfo) {
-        this.worldInfo = worldInfo;
+    public JoinServer(GameManifest gameManifest) {
+        this.gameManifest = gameManifest;
     }
 
     @Override
@@ -52,17 +54,23 @@ public class JoinServer implements LoadProcess {
     public boolean step() {
         if (networkSystem.getServer() != null && networkSystem.getServer().getInfo() != null) {
             NetData.ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
-            worldInfo.setTitle(serverInfo.getWorldName());
+            gameManifest.setTitle(serverInfo.getGameName());
+            for (NetData.WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
+                WorldInfo world = new WorldInfo();
+                world.setTime(worldInfo.getTime());
+                world.setTitle(worldInfo.getTitle());
+                gameManifest.addWorldInfo(world);
+            }
 
             Map<String, Byte> blockMap = Maps.newHashMap();
             for (int i = 0; i < serverInfo.getBlockIdCount(); ++i) {
                 blockMap.put(serverInfo.getBlockName(i), (byte) serverInfo.getBlockId(i));
             }
-            worldInfo.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
-            worldInfo.setBlockIdMap(blockMap);
-            worldInfo.setTime(networkSystem.getServer().getInfo().getTime());
+            gameManifest.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
+            gameManifest.setBlockIdMap(blockMap);
+            gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
-            ModConfig modConfig = worldInfo.getModConfiguration();
+            ModConfig modConfig = gameManifest.getModConfiguration();
             ModManager modManager = CoreRegistry.get(ModManager.class);
             for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 Mod mod = modManager.getMod(moduleInfo.getModuleId());
@@ -72,8 +80,9 @@ public class JoinServer implements LoadProcess {
                     logger.debug("Activating module: {}", moduleInfo.getModuleId());
                     modConfig.addMod(moduleInfo.getModuleId());
                 }
-
             }
+
+            CoreRegistry.get(Game.class).load(gameManifest);
 
             return true;
         } else {

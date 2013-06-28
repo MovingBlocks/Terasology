@@ -20,8 +20,10 @@ import org.terasology.config.Config;
 import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -42,6 +44,7 @@ import org.terasology.world.generator.core.ForestGenerator;
 import org.terasology.world.generator.core.MultiTerrainGenerator;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
+import org.terasology.world.time.WorldTime;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -177,7 +180,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     getGUIManager().showMessage("Error", "Please enter a world name");
 
                     return;
-                } else if ((new File(PathManager.getInstance().getWorldSavePath(inputWorldTitle.getText()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
+                } else if ((new File(PathManager.getInstance().getSavePath(inputWorldTitle.getText()), GameManifest.DEFAULT_FILE_NAME)).exists()) {
                     getGUIManager().showMessage("Error", "A World with this name already exists");
 
                     return;
@@ -232,7 +235,16 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 config.getDefaultModSelection().copy(modConfig);
                 config.save();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(config.getWorldGeneration().getWorldTitle(), config.getWorldGeneration().getDefaultSeed(), config.getSystem().getDayNightLengthInMs() / 4, chunksListArr, modConfig), (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
+                GameManifest gameManifest = new GameManifest();
+                gameManifest.setTitle(config.getWorldGeneration().getWorldTitle());
+                gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
+                gameManifest.getModConfiguration().copy(modConfig);
+
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), 0, chunksListArr);
+                gameManifest.addWorldInfo(worldInfo);
+
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(gameManifest, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE))
+                ;
             }
         });
 
@@ -255,6 +267,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
     private String getWorldName() {
         UIMenuSingleplayer menu = (UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer");
-        return "World" + (menu.getWorldCount() + 1);
+        return "Game" + (menu.getWorldCount() + 1);
     }
 }

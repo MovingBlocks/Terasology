@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model;
+package org.terasology.rendering.icons;
 
 import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.widgets.UIImage;

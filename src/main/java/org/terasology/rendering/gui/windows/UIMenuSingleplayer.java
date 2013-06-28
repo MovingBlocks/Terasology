@@ -22,6 +22,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -116,7 +117,7 @@ public class UIMenuSingleplayer extends UIWindow {
 
                 try {
                     WorldInfo worldInfo = (WorldInfo) list.getSelection().getValue();
-                    File world = PathManager.getInstance().getWorldSavePath(worldInfo.getTitle());
+                    File world = PathManager.getInstance().getSavePath(worldInfo.getTitle());
                     WorldUtil.deleteWorld(world);
                     list.removeItem(list.getSelectionIndex());
                 } catch (Exception e) {
@@ -163,7 +164,7 @@ public class UIMenuSingleplayer extends UIWindow {
         }
 
         try {
-            WorldInfo info = (WorldInfo) list.getSelection().getValue();
+            GameManifest info = (GameManifest) list.getSelection().getValue();
             Config config = CoreRegistry.get(Config.class);
 
             config.getWorldGeneration().setDefaultSeed(info.getSeed());
@@ -176,15 +177,11 @@ public class UIMenuSingleplayer extends UIWindow {
 
     public void fillList() {
         list.removeAll();
-        File worldCatalog = PathManager.getInstance().getWorldPath();
+        File worldCatalog = PathManager.getInstance().getSavesPath();
 
         File[] listFiles = worldCatalog.listFiles(new FileFilter() {
             public boolean accept(File file) {
-                if (file.isDirectory()) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return file.isDirectory();
             }
         });
 
@@ -208,13 +205,13 @@ public class UIMenuSingleplayer extends UIWindow {
         DateFormat date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
         for (File file : listFiles) {
-            File worldManifest = new File(file, WorldInfo.DEFAULT_FILE_NAME);
-            if (!worldManifest.exists())
+            File gameManifest = new File(file, GameManifest.DEFAULT_FILE_NAME);
+            if (!gameManifest.exists())
                 continue;
             try {
-                WorldInfo info = WorldInfo.load(worldManifest);
+                GameManifest info = GameManifest.load(gameManifest);
                 if (!info.getTitle().isEmpty()) {
-                    UIListItem item = new UIListItem(info.getTitle() + "\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString(), info);
+                    UIListItem item = new UIListItem(info.getTitle() + "\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())), info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }

@@ -116,11 +116,19 @@ message ServerInfoMessage {
     repeated int32 assetId = 6 [packed=true];
     repeated string assetUri = 7;
     repeated string registerBlockFamily = 8;
+    repeated WorldInfo worldInfo = 9;
 
     optional string version = 15;
-    optional string worldName = 16;
+    optional string gameName = 16;
     optional int32 clientId = 17;
     optional int64 time = 18;
+
+    extensions 5000 to max;
+}
+
+message WorldInfo {
+    optional string title = 1;
+    optional int64 time = 2;
 
     extensions 5000 to max;
 }

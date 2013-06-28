@@ -30,7 +30,7 @@ import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.primitives.Mesh;

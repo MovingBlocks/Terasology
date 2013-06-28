@@ -25,7 +25,6 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.world.WorldInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,10 +36,7 @@ public class LoadEntities implements LoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadEntities.class);
 
-    private WorldInfo worldInfo;
-
-    public LoadEntities(WorldInfo worldInfo) {
-        this.worldInfo = worldInfo;
+    public LoadEntities() {
     }
 
     @Override
@@ -53,7 +49,7 @@ public class LoadEntities implements LoadProcess {
         CoreRegistry.put(WorldPersister.class, new WorldPersister((EngineEntityManager)CoreRegistry.get(EntityManager.class)));
 
         // TODO: Should probably not use the world title as a path?
-        File entityDataFile = new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.ENTITY_DATA_FILE);
+        File entityDataFile = new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.ENTITY_DATA_FILE);
         if (entityDataFile.exists()) {
             try {
                 CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
