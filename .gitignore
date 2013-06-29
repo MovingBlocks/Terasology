@@ -33,8 +33,10 @@ Thumbs.db
 /worlds/
 /screenshots/
 /screens/
+/saves/
 /logs/
 /dev/
+/unittesthome/
 config.cfg
 entityDump.txt
 

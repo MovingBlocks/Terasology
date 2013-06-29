@@ -36,32 +36,31 @@ public class Diamond3iIteratorTest {
     @Test
     public void zeroDistanceIteration() {
         Iterator<Vector3i> iter = new Diamond3iIterator(Vector3i.zero(), 0);
-        assertFalse(iter.hasNext());
-    }
-
-    @Test
-    public void oneDistanceIteration() {
-        Iterator<Vector3i> iter = new Diamond3iIterator(Vector3i.zero(), 1);
         assertEquals(Lists.newArrayList(Vector3i.zero()), Lists.newArrayList(iter));
     }
 
     @Test
-    public void twoDistanceIteration() {
-        Iterator<Vector3i> iter = new Diamond3iIterator(Vector3i.zero(), 2);
+    public void oneDistanceIteration() {
+        Set<Vector3i> actual = Sets.newHashSet(new Diamond3iIterator(Vector3i.zero(), 1));
         Set<Vector3i> expected = Sets.newHashSet(Vector3i.zero(), new Vector3i(1,0,0), new Vector3i(-1,0,0), new Vector3i(0,1,0), new Vector3i(0,-1,0), new Vector3i(0,0,1), new Vector3i(0,0,-1));
-        while (iter.hasNext()) {
-            Vector3i next = iter.next();
-            assertTrue("Received Unexpected: " + next, expected.remove(next));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void twoDistanceIteration() {
+        Set<Vector3i> actual = Sets.newHashSet(new Diamond3iIterator(Vector3i.zero(), 2));
+        assertEquals(25, actual.size());
+        for (Vector3i pos : actual) {
+            assertTrue(pos.gridDistance(new Vector3i()) <= 2);
         }
-        assertTrue("Missing: " + expected, expected.isEmpty());
     }
 
     @Test
     public void threeDistanceOnlyIteration() {
-        Iterator<Vector3i> iter = new Diamond3iIterator(Vector3i.zero(), 4, 3);
-        while (iter.hasNext()) {
-            Vector3i next = iter.next();
-            assertEquals(3, Vector3i.zero().gridDistance(next));
+        Set<Vector3i> actual = Sets.newHashSet(Diamond3iIterator.iterateAtDistance(new Vector3i(0,0,0), 3));
+        assertEquals(38, actual.size());
+        for (Vector3i pos : actual) {
+            assertTrue(pos.gridDistance(new Vector3i()) == 3);
         }
     }
 }
