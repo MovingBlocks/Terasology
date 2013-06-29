@@ -20,9 +20,6 @@
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
 
-#define BLOCK_LIGHT_DAYLIGHT_FACTOR 1.0
-#define BLOCK_LIGHT_FACTOR 1.25
-
 #define WATER_AMB 0.25
 #define WATER_SPEC 1.0
 #define WATER_DIFF 0.75
@@ -129,7 +126,7 @@ void main() {
     vec3 binormal = dp2perp * duv1.y + dp1perp * duv2.y;
 
     float invMax = inversesqrt(max(dot(tangent,tangent), dot(binormal,binormal)));
-    mat3 tbn = mat3( tangent * invMax, binormal * invMax, normal );
+    mat3 tbn = mat3(tangent * invMax, binormal * invMax, normal);
 
     vec3 eyeTangentSpace = tbn * vertexViewPos.xyz;
 
@@ -195,7 +192,7 @@ void main() {
         color = texture2D(textureAtlas, texCoord.xy);
 
 #if defined FEATURE_ALPHA_REJECT
-        if (color.a < 0.5) {
+        if (color.a < 0.1) {
             discard;
         }
 #endif
@@ -272,7 +269,7 @@ void main() {
     daylightColorValue.xyz *= expLightValue(daylightScaledValue) + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
 
     // Calculate the final block light brightness
-    float blockBrightness = expBlockLightValue(blocklightValue) * BLOCK_LIGHT_FACTOR;
+    float blockBrightness = expBlockLightValue(blocklightValue);
 #if defined (FLICKERING_LIGHT)
     blockBrightness -= flickeringLightOffset * blocklightValue;
 #endif
@@ -356,11 +353,11 @@ void main() {
     // Primitive objects ids... Will be extended later on
 #ifdef FEATURE_REFRACTIVE_PASS
     if (isOceanWater) {
-        gl_FragData[1].a = 1.0f;
+        gl_FragData[1].a = 1.0;
     }
     else
 #endif
     {
-        gl_FragData[1].a = 0.0f;
+        gl_FragData[1].a = 0.0;
     }
 }

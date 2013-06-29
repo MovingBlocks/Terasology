@@ -301,6 +301,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                         location.getWorldScale());
                 }
             }
+
             if (aabb != null) {
                 aabbRenderer.setAABB(aabb);
                 aabbRenderer.render(2f);

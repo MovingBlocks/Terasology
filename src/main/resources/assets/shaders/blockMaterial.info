@@ -1,6 +1,0 @@
-{
-    "params" : [
-        { "name" : "textureAtlas",
-          "type" : "sampler2D" }
-    ]
-}

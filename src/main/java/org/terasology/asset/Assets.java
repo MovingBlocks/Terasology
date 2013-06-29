@@ -3,11 +3,11 @@ package org.terasology.asset;
 import org.terasology.audio.Sound;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.MaterialShader;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 
 /**
  * Assets provides a collection of static methods for obtaining assets and registering procedural assets
@@ -81,8 +81,8 @@ public final class Assets {
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested shader, or null if it doesn't exist
      */
-    public static MaterialShader getShader(String simpleUri) {
-        return get(new AssetUri(AssetType.SHADER, simpleUri), MaterialShader.class);
+    public static GLSLShaderProgram getShader(String simpleUri) {
+        return get(new AssetUri(AssetType.SHADER, simpleUri), GLSLShaderProgram.class);
     }
 
     /**
@@ -90,8 +90,8 @@ public final class Assets {
      * @param assetName
      * @return The requested shader, or null if it doesn't exist
      */
-    public static MaterialShader getShader(String module, String assetName) {
-        return get(new AssetUri(AssetType.SHADER, module, assetName), MaterialShader.class);
+    public static GLSLShaderProgram getShader(String module, String assetName) {
+        return get(new AssetUri(AssetType.SHADER, module, assetName), GLSLShaderProgram.class);
     }
 
     /**

@@ -1,5 +1,5 @@
 {
-    "shader" : "engine:genericMesh",
+    "shader" : "engine:genericMeshMaterial",
     "params" : {
         "diffuse" : "lightAndShadow:Placeholder",
         "colorOffset" : [1.0, 1.0, 1.0],

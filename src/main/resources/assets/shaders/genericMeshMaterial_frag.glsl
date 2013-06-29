@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-uniform sampler2D textureAtlas;
+uniform sampler2D diffuse;
+
+// TODO: Add normal mapping support
+//uniform sampler2D normalMap;
 
 uniform float light;
 uniform vec3 colorOffset;
 uniform bool textured;
-uniform float alpha = 1.0;
 
 varying vec3 normal;
-varying vec4 vertexViewPos;
 
 void main(){
     vec4 color;
 
     if (textured) {
-        color = texture2D(textureAtlas, gl_TexCoord[0].xy);
-        color.rgb *= gl_Color.rgb;
-    } else {
-        color.rgba = gl_Color.rgba;
-    }
-
-    color.a *= alpha;
-
-    if (color.a < 0.1) {
-        discard;
-    }
-    if (textured) {
+        color = texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
         color.rgb *= colorOffset.rgb;
         gl_FragData[0].rgba = color;
     } else {
+        color = vec4(colorOffset.r, colorOffset.g, colorOffset.b, 1.0);
         gl_FragData[0].rgba = color;
     }
 

@@ -46,7 +46,7 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldBiomeProvider;
@@ -85,6 +85,10 @@ public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+
+    public static final float BLOCK_LIGHT_POW = 0.96f;
+    public static final float BLOCK_LIGHT_SUN_POW = 0.8f;
+    public static final float BLOCK_INTENSITY_FACTOR = 1.25f;
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);
 
@@ -685,31 +689,9 @@ public final class WorldRenderer {
         DefaultRenderingProcess.getInstance().renderScene(stereoRenderState);
         PerformanceMonitor.endActivity();
 
-        if (activeCamera != null
-                // TODO: First person view is currently not working with OculusVR support enabled
-                && stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO
-                && !config.getSystem().isDebugFirstPersonElementsHidden()) {
-            PerformanceMonitor.startActivity("Render First Person");
-
-            glClear(GL_DEPTH_BUFFER_BIT);
-            glPushMatrix();
-            glLoadIdentity();
-
-            activeCamera.updateMatrices(90f);
-            activeCamera.loadProjectionMatrix();
-
-            for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
-                renderer.renderFirstPerson();
-            }
-
-            activeCamera.updateMatrices();
-
-            glPopMatrix();
-
-            PerformanceMonitor.endActivity();
+        if (activeCamera != null) {
+            activeCamera.updatePrevViewProjectionMatrix();
         }
-
-        activeCamera.updatePrevViewProjectionMatrix();
     }
 
     private void renderWorld(Camera camera) {
@@ -792,6 +774,46 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
+        /*
+         * FIRST PERSON VIEW
+         */
+        if (activeCamera != null && !config.getSystem().isDebugFirstPersonElementsHidden()) {
+            PerformanceMonitor.startActivity("Render First Person");
+
+            glPushMatrix();
+            glLoadIdentity();
+
+            activeCamera.updateMatrices(90f);
+            activeCamera.loadProjectionMatrix();
+
+            glDepthFunc(GL_ALWAYS);
+
+            for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+                renderer.renderFirstPerson();
+            }
+
+            glDepthFunc(GL_LEQUAL);
+
+            activeCamera.updateMatrices();
+            activeCamera.loadProjectionMatrix();
+
+            glPopMatrix();
+
+            PerformanceMonitor.endActivity();
+        }
+
+        /*
+         * OVERLAYS
+         */
+
+        PerformanceMonitor.startActivity("Render Overlays");
+
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderOverlay();
+        }
+
+        PerformanceMonitor.endActivity();
+
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 
         /*
@@ -800,7 +822,7 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Render Light Geometry");
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
 
-        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightGeometryPass");
+        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightGeometryPass");
         program.enable();
 
         Matrix4f modelMatrix = new Matrix4f();
@@ -877,28 +899,16 @@ public final class WorldRenderer {
 
         DefaultRenderingProcess.getInstance().endRenderSceneTransparent();
 
-        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
-
-        PerformanceMonitor.startActivity("Render Overlays");
-
-        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
-            renderer.renderOverlay();
-        }
-
-        PerformanceMonitor.endActivity();
-
-        DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
-
         if (config.getSystem().isDebugRenderWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
     }
 
-    private void renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, ShaderProgram program, Camera camera, Matrix4f modelMatrix) {
+    private void renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, GLSLShaderProgram program, Camera camera, Matrix4f modelMatrix) {
         if (lightComponent.lightType == LightComponent.LightType.POINT) {
-            program.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
+            program.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-            program.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+            program.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
         }
 
         Vector3f worldPosition = new Vector3f();
@@ -967,7 +977,7 @@ public final class WorldRenderer {
 
         if (chunk.getChunkState() == ChunkState.COMPLETE && chunk.getMesh() != null) {
 
-            ShaderProgram shader = null;
+            GLSLShaderProgram shader = null;
 
             final Vector3f cameraPosition = camera.getPosition();
             final Vector3d chunkPositionRelToCamera =
@@ -981,9 +991,9 @@ public final class WorldRenderer {
                 shader.enable();
 
                 if (phase == ChunkMesh.RENDER_PHASE.REFRACTIVE) {
-                    shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue());
+                    shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue());
                 } else if (phase == ChunkMesh.RENDER_PHASE.ALPHA_REJECT) {
-                    shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
+                    shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
                 } else {
                     shader.setActiveFeatures(0);
                 }
@@ -1044,11 +1054,14 @@ public final class WorldRenderer {
     }
 
     public float getRenderingLightValueAt(Vector3f pos) {
-        float lightValueSun = (float) Math.pow(0.76, 16 - worldProvider.getSunlight(pos));
-        lightValueSun *= getDaylight();
-        float lightValueBlock = (float) Math.pow(0.76, 16 - worldProvider.getLight(pos));
+        float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
+        float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
 
-        return (lightValueSun + lightValueBlock * (1.0f - lightValueSun)) + (1.0f - (float) getDaylight()) * 0.05f;
+        float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0f) * rawLightValueSun;
+        lightValueSun *= getDaylight();
+        float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
+
+        return Math.max(lightValueBlock, lightValueSun);
     }
 
     public void update(float delta) {

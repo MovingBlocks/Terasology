@@ -20,8 +20,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.assets.Texture;
 
 /**
@@ -35,7 +34,7 @@ public class ShaderParametersBlock extends ShaderParametersBase {
     }
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
 
         Texture terrainTex = Assets.getTexture("engine:terrain");
@@ -47,7 +46,7 @@ public class ShaderParametersBlock extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
-        program.setInt("textured", 1);
+        program.setBoolean("textured", true);
         program.setFloat("alpha", 1.0f);
     }
 

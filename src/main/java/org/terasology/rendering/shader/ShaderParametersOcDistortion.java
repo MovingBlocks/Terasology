@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.properties.Property;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 public class ShaderParametersOcDistortion extends ShaderParametersBase {
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
 
         int texId = 0;

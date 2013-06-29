@@ -15,14 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.config.Config;
-import org.terasology.game.CoreRegistry;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.world.WorldRenderer;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 
 /**
  * Shader parameters for the Shadow Map shader program.
@@ -31,7 +24,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersShadowMap extends ShaderParametersBase {
 
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
     }
 

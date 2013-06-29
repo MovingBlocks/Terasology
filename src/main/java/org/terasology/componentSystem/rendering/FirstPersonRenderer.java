@@ -16,11 +16,8 @@
 package org.terasology.componentSystem.rendering;
 
 import static org.lwjgl.opengl.GL11.GL_GREATER;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glAlphaFunc;
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -32,7 +29,6 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import java.util.Map;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
@@ -45,12 +41,12 @@ import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.TeraMath;
 import org.terasology.model.inventory.Icon;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.assets.Texture;
@@ -58,11 +54,9 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.family.BlockFamily;
 
 import com.google.common.collect.Maps;
@@ -139,7 +133,10 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+
         shader.enable();
         shader.setFloat("light", worldRenderer.getRenderingLightValue());
         glBindTexture(GL11.GL_TEXTURE_2D, handTex.getId());
@@ -154,13 +151,18 @@ public class FirstPersonRenderer implements RenderSystem {
         handMesh.render();
 
         glPopMatrix();
+
+        shader.setActiveFeatures(0);
     }
 
     private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+                | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+
         shader.enable();
 
-        shader.setInt("textured", 0);
+        shader.setBoolean("textured", false);
         shader.setFloat("light", worldRenderer.getRenderingLightValue());
 
         glPushMatrix();
@@ -182,6 +184,8 @@ public class FirstPersonRenderer implements RenderSystem {
         itemMesh.render();
 
         glPopMatrix();
+
+        shader.setActiveFeatures(0);
     }
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
@@ -189,21 +193,16 @@ public class FirstPersonRenderer implements RenderSystem {
         //Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+
         shader.enable();
 
         // Apply biome and overall color offset
         // TODO: Make me look nice not ugly!
         //Vector4f color = activeBlock.calcColorOffsetFor(BlockPart.CENTER, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
         //shader.setFloat3("colorOffset", color.x, color.y, color.z);
-
-        glEnable(GL11.GL_BLEND);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glAlphaFunc(GL_GREATER, 0.1f);
-        if (activeBlock.isTranslucent()) {
-            glEnable(GL11.GL_ALPHA_TEST);
-        }
 
         glPushMatrix();
 
@@ -224,10 +223,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        if (activeBlock.isTranslucent()) {
-            glDisable(GL11.GL_ALPHA_TEST);
-        }
-        glDisable(GL11.GL_BLEND);
+        shader.setActiveFeatures(0);
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {

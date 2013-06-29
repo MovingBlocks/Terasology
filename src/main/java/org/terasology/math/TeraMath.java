@@ -537,30 +537,6 @@ public final class TeraMath {
         return result;
     }
 
-    public static void matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
-        Matrix4f tempMatrix = new Matrix4f();
-        tempMatrix.transpose(m);
-
-        fb.put(tempMatrix.m00);
-        fb.put(tempMatrix.m01);
-        fb.put(tempMatrix.m02);
-        fb.put(tempMatrix.m03);
-        fb.put(tempMatrix.m10);
-        fb.put(tempMatrix.m11);
-        fb.put(tempMatrix.m12);
-        fb.put(tempMatrix.m13);
-        fb.put(tempMatrix.m20);
-        fb.put(tempMatrix.m21);
-        fb.put(tempMatrix.m22);
-        fb.put(tempMatrix.m23);
-        fb.put(tempMatrix.m30);
-        fb.put(tempMatrix.m31);
-        fb.put(tempMatrix.m32);
-        fb.put(tempMatrix.m33);
-
-        fb.flip();
-    }
-
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         matrixToFloatBuffer(m, buffer);
@@ -586,6 +562,30 @@ public final class TeraMath {
         fb.put(tempMatrix.m20);
         fb.put(tempMatrix.m21);
         fb.put(tempMatrix.m22);
+
+        fb.flip();
+    }
+
+    public static void matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
+        Matrix4f tempMatrix = new Matrix4f();
+        tempMatrix.transpose(m);
+
+        fb.put(tempMatrix.m00);
+        fb.put(tempMatrix.m01);
+        fb.put(tempMatrix.m02);
+        fb.put(tempMatrix.m03);
+        fb.put(tempMatrix.m10);
+        fb.put(tempMatrix.m11);
+        fb.put(tempMatrix.m12);
+        fb.put(tempMatrix.m13);
+        fb.put(tempMatrix.m20);
+        fb.put(tempMatrix.m21);
+        fb.put(tempMatrix.m22);
+        fb.put(tempMatrix.m23);
+        fb.put(tempMatrix.m30);
+        fb.put(tempMatrix.m31);
+        fb.put(tempMatrix.m32);
+        fb.put(tempMatrix.m33);
 
         fb.flip();
     }

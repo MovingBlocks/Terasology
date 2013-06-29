@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.rendering.assets;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
@@ -32,13 +37,19 @@ import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.assets.MaterialShader;
+import org.terasology.rendering.assets.metadata.ParamMetadata;
+import org.terasology.rendering.assets.metadata.ParamType;
+import org.terasology.rendering.assets.metadata.ShaderMetadata;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.shader.IShaderParameters;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.Block;
 
 import javax.swing.*;
@@ -52,20 +63,26 @@ import javax.vecmath.Vector4f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderProgram {
-    private static final Logger logger = LoggerFactory.getLogger(ShaderProgram.class);
+public class GLSLShaderProgram implements Asset {
+    private static final Logger logger = LoggerFactory.getLogger(GLSLShaderProgram.class);
 
     private TIntIntMap fragmentPrograms = new TIntIntHashMap();
     private TIntIntMap vertexPrograms = new TIntIntHashMap();
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
     private String title;
+    private String vertShader;
+    private String fragShader;
 
     private int availableFeatures = 0;
-
     private int activeFeatures = 0;
 
+    private boolean disposed = false;
+    private Map<String, ParamType> params = Maps.newHashMap();
     private IShaderParameters parameters;
+    private AssetUri uri;
+
+    private static String includedFunctionsVertex = "", includedFunctionsFragment = "";
 
     public enum ShaderProgramFeatures {
         FEATURE_REFRACTIVE_PASS(0x01),
@@ -73,7 +90,8 @@ public class ShaderProgram {
         FEATURE_LIGHT_POINT(0x04),
         FEATURE_LIGHT_DIRECTIONAL(0x08),
         FEATURE_DEFERRED_LIGHTING(0x10),
-        FEATURE_ALL(0x20);
+        FEATURE_USE_MATRIX_STACK(0x20),
+        FEATURE_ALL(0x40);
 
         private int value;
         private ShaderProgramFeatures(int value) {
@@ -84,23 +102,77 @@ public class ShaderProgram {
         }
     }
 
-    public ShaderProgram(String title) {
+    static {
+        InputStream vertStream = GLSLShaderProgram.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
+        InputStream fragStream = GLSLShaderProgram.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
+
+        try {
+            includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
+            includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));
+        } catch (IOException e) {
+            logger.error("Failed to load Include shader resources");
+        } finally {
+            // JAVA7: Clean up
+            try {
+                vertStream.close();
+            } catch (IOException e) {
+                logger.error("Failed to close globalFunctionsVertIncl.glsl stream");
+            }
+            try {
+                fragStream.close();
+            } catch (IOException e) {
+                logger.error("Failed to close globalFunctionsFragIncl.glsl stream");
+            }
+        }
+    }
+
+    public GLSLShaderProgram(String title) {
         this(title, null);
     }
 
-    public ShaderProgram(String title, IShaderParameters params) {
+    public GLSLShaderProgram(String title, IShaderParameters params) {
         this.title = title;
         this.parameters = params;
 
+        logger.info("Loading shader program '"+title+"' as default...");
+
+        this.vertShader = readShader(title+"_vert.glsl");
+        this.fragShader = readShader(title+"_frag.glsl");
+
+        updateAvailableFeatures();
         compileAllShaderPermutations();
     }
 
-    public ShaderProgram(String title, IShaderParameters params, int availableFeatures) {
-        this.title = title;
-        this.parameters = params;
-        this.availableFeatures = availableFeatures;
+    public GLSLShaderProgram(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
+        this.uri = uri;
+        this.vertShader = vertShader;
+        this.fragShader = fragShader;
 
+        logger.info("Loading shader program '"+uri+"' as asset...");
+
+        for (ParamMetadata paramData : metadata.getParameters()) {
+            params.put(paramData.getName(), paramData.getType());
+        }
+
+        updateAvailableFeatures();
         compileAllShaderPermutations();
+    }
+
+    private void updateAvailableFeatures() {
+        availableFeatures = 0;
+
+        // Check which features are used in the shaders and update the available features mask accordingly
+        for (int i=0; i<ShaderProgramFeatures.FEATURE_ALL.ordinal(); ++i) {
+            ShaderProgramFeatures feature = ShaderProgramFeatures.values()[i];
+
+            if (fragShader.contains(feature.toString())) {
+                logger.info("Fragment shader feature '" + feature.toString() + "' is available...");
+                availableFeatures |= feature.getValue();
+            } else if (vertShader.contains(feature.toString())) {
+                logger.info("Vertex shader feature '" + feature.toString() + "' is available...");
+                availableFeatures |= feature.getValue();
+            }
+        }
     }
 
     private void compileShaderProgram(int featureHash) {
@@ -124,8 +196,8 @@ public class ShaderProgram {
 
         for (int i=1; i<ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
             // Compile all selected features for this shader...
-
             int maskedHash = (i & availableFeatures);
+
             if (maskedHash > 0 && !compiledPermutations.contains(maskedHash)) {
                 compileShaderProgram(i);
                 compiledPermutations.add(maskedHash);
@@ -142,6 +214,11 @@ public class ShaderProgram {
 
         dispose();
         compileAllShaderPermutations();
+    }
+
+    @Override
+    public AssetUri getURI() {
+        return uri;
     }
 
     public void dispose() {
@@ -167,12 +244,16 @@ public class ShaderProgram {
             GL20.glDeleteShader(it.value());
         }
         vertexPrograms.clear();
+
+        disposed = true;
+    }
+
+    public boolean isDisposed() {
+        return disposed;
     }
 
     private void compileShader(int type, int featureHash) {
-
         int shaderId = GL20.glCreateShader(type);
-
         StringBuilder shader = createShaderBuilder();
 
         // Add the activated features for this shader
@@ -183,22 +264,15 @@ public class ShaderProgram {
         }
 
         if (type == GL20.GL_FRAGMENT_SHADER)
-            shader.append(MaterialShader.getIncludedFunctionsFragment()).append("\n");
+            shader.append(includedFunctionsFragment).append("\n");
         else
-            shader.append(MaterialShader.getIncludedFunctionsVertex()).append("\n");
-
-        String filename = title;
+            shader.append(includedFunctionsVertex).append("\n");
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
-            filename += "_frag.glsl";
+            shader.append(fragShader);
         } else if (type == GL20.GL_VERTEX_SHADER) {
-            filename += "_vert.glsl";
+            shader.append(vertShader);
         }
-
-        logger.debug("Loading shader {} ({}, type = {})", title, filename, String.valueOf(type));
-
-        // Read in the shader code
-        shader.append(readShader(filename));
 
         String debugShaderType = "UNKNOWN";
         if (type == GL20.GL_FRAGMENT_SHADER) {
@@ -288,9 +362,9 @@ public class ShaderProgram {
     }
 
     public void enable() {
-        ShaderProgram activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
+        GLSLShaderProgram activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
 
-        if (activeProgram != this || (activeProgram != null && ShaderManager.getInstance().getActiveFeatures() != activeFeatures)) {
+        if (activeProgram != this || ShaderManager.getInstance().getActiveFeatures() != activeFeatures) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL20.glUseProgram(shaderPrograms.get(activeFeatures));
 
@@ -302,6 +376,13 @@ public class ShaderProgram {
                 parameters.applyParameters(this);
             }
         }
+    }
+
+    public ParamMetadata getParameter(String desc) {
+        if (params.containsKey(desc)) {
+            return new ParamMetadata(desc, params.get(desc));
+        }
+        return null;
     }
 
     public void setFloat(String desc, float f) {
@@ -334,6 +415,54 @@ public class ShaderProgram {
         GL20.glUniform1i(id, i);
     }
 
+    public void setBoolean(String desc, boolean b) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        GL20.glUniform1i(id, b ? 1 : 0);
+    }
+
+    public void setIntForAllPermutations(String desc, int i) {
+        TIntIntIterator it = shaderPrograms.iterator();
+
+        while (it.hasNext()) {
+            it.advance();
+
+            GL20.glUseProgram(it.value());
+            int id = GL20.glGetUniformLocation(it.value(), desc);
+            GL20.glUniform1i(id, i);
+        }
+
+        enable();
+    }
+
+    public void setBooleanForAllPermutations(String desc, boolean b) {
+        TIntIntIterator it = shaderPrograms.iterator();
+
+        while (it.hasNext()) {
+            it.advance();
+
+            GL20.glUseProgram(it.value());
+            int id = GL20.glGetUniformLocation(it.value(), desc);
+            GL20.glUniform1i(id, b ? 1 : 0);
+        }
+
+        enable();
+    }
+
+    public void setFloat3ForAllPermutations(String desc, float f1, float f2, float f3) {
+        TIntIntIterator it = shaderPrograms.iterator();
+
+        while (it.hasNext()) {
+            it.advance();
+
+            GL20.glUseProgram(it.value());
+            int id = GL20.glGetUniformLocation(it.value(), desc);
+            GL20.glUniform3f(id, f1, f2, f3);
+        }
+
+        enable();
+    }
+
     public void setFloat2(String desc, FloatBuffer buffer) {
         enable();
         int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
@@ -348,6 +477,18 @@ public class ShaderProgram {
 
     public void setFloat4(String desc, Vector4f vec) {
         setFloat4(desc, vec.x, vec.y, vec.z, vec.w);
+    }
+
+    public void setMatrix4(String desc, FloatBuffer floatBuffer) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        GL20.glUniformMatrix4(id, false, floatBuffer);
+    }
+
+    public void setMatrix3(String desc, FloatBuffer floatBuffer) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        GL20.glUniformMatrix3(id, false, floatBuffer);
     }
 
     public void setMatrix4(String desc, Matrix4f m) {
@@ -378,10 +519,30 @@ public class ShaderProgram {
         activeFeatures = featureHash;
     }
 
+    public void addFeatureIfAvailable(ShaderProgramFeatures feature) {
+        for (int i=1; i<ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
+            if ((ShaderProgramFeatures.values()[i].getValue() & feature.getValue()) > 0) {
+                activeFeatures |= feature.getValue();
+                return;
+            }
+        }
+    }
+
+    public void removeFeature(ShaderProgramFeatures feature) {
+        activeFeatures &= ~feature.getValue();
+    }
+
+    public void removeFeatures(int featureHash) {
+        activeFeatures &= ~featureHash;
+    }
+
     public static StringBuilder createShaderBuilder() {
         String preProcessorPreamble = "#version 120\n";
 
         preProcessorPreamble += "float TEXTURE_OFFSET = " + Block.calcRelativeTileSize() + ";\n";
+        preProcessorPreamble += "float BLOCK_LIGHT_POW = " + WorldRenderer.BLOCK_LIGHT_POW + ";\n";
+        preProcessorPreamble += "float BLOCK_LIGHT_SUN_POW = " + WorldRenderer.BLOCK_LIGHT_SUN_POW + ";\n";
+        preProcessorPreamble += "float BLOCK_INTENSITY_FACTOR = " + WorldRenderer.BLOCK_INTENSITY_FACTOR + ";\n";
         // TODO: This shouldn't be hardcoded
         preProcessorPreamble += "float TEXTURE_OFFSET_EFFECTS = " + 0.0625f + ";\n";
 
@@ -417,11 +578,10 @@ public class ShaderProgram {
         if (config.getRendering().isParallaxMapping())
             builder.append("#define PARALLAX_MAPPING \n");
 
-        // BG: Add the enums for the debug rendering stages
         for (int i=0; i<SystemConfig.DebugRenderingStages.values().length; ++i) {
             builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" "+SystemConfig.DebugRenderingStages.values()[i].ordinal()+" \n");
         }
-        // BG: Add the enums for the block flags
+
         for (int i=0; i< ChunkTessellator.ChunkVertexFlags.values().length; ++i) {
             builder.append("#define "+ChunkTessellator.ChunkVertexFlags.values()[i].toString()+" "+ChunkTessellator.ChunkVertexFlags.values()[i].getValue()+" \n");
         }

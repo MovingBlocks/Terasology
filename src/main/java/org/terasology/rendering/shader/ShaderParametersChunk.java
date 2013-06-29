@@ -21,6 +21,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -62,7 +63,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property parallaxBias = new Property("parallaxBias", 0.05f, 0.0f, 0.5f);
     Property parallaxScale = new Property("parallaxScale", 0.05f, 0.0f, 0.5f);
 
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
 
         Texture terrain = Assets.getTexture("engine:terrain");

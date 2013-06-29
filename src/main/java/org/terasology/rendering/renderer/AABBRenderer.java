@@ -179,7 +179,7 @@ public class AABBRenderer implements BlockOverlayRenderer
         displayListWire = glGenLists(1);
 
         glNewList(displayListWire, GL11.GL_COMPILE);
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         Vector3f dimensions = aabb.getExtents();
 

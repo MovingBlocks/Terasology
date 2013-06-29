@@ -22,6 +22,7 @@ import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -52,7 +53,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     Property blurLength = new Property("blurLength", 0.025f, 0.0f, 1.0f);
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);

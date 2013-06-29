@@ -29,7 +29,6 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.MaterialShader;
 import org.terasology.rendering.assets.Texture;
 
 import com.google.common.collect.Maps;
@@ -41,6 +40,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 
 /**
  * @author Immortius
@@ -57,7 +57,7 @@ public class MaterialLoader implements AssetLoader<Material> {
     public Material load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream), MaterialMetadata.class);
 
-        MaterialShader materialShader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), MaterialShader.class);
+        GLSLShaderProgram materialShader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), GLSLShaderProgram.class);
         if (materialShader == null) return null;
 
         Material result = new Material(uri, materialShader);
@@ -67,26 +67,26 @@ public class MaterialLoader implements AssetLoader<Material> {
         }
 
         for (Map.Entry<String, Float> entry : metadata.floatParams.entrySet()) {
-            result.setFloat(entry.getKey(), entry.getValue());
+            result.getShaderProgram().setFloat(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<String, Integer> entry : metadata.intParams.entrySet()) {
-            result.setInt(entry.getKey(), entry.getValue());
+            result.getShaderProgram().setInt(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<String, float[]> entry : metadata.floatArrayParams.entrySet()) {
             switch (entry.getValue().length) {
                 case 1:
-                    result.setFloat(entry.getKey(), entry.getValue()[0]);
+                    result.getShaderProgram().setFloat(entry.getKey(), entry.getValue()[0]);
                     break;
                 case 2:
-                    result.setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                    result.getShaderProgram().setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
                     break;
                 case 3:
-                    result.setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                    result.getShaderProgram().setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
                     break;
                 case 4:
-                    result.setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                    result.getShaderProgram().setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
                     break;
             }
         }

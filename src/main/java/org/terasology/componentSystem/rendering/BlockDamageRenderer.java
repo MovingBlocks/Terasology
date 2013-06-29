@@ -141,7 +141,6 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderFirstPerson() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -150,11 +149,9 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderOpaque() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void renderAlphaBlend() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

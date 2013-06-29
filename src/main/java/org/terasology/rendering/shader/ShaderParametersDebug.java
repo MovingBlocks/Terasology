@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -30,7 +31,7 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class ShaderParametersDebug extends ShaderParametersBase {
 
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
 
         Config config = CoreRegistry.get(Config.class);

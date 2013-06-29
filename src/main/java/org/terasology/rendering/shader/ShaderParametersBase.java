@@ -20,6 +20,7 @@ import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -37,11 +38,10 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
     }
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgram program) {
         program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getActiveViewingDistance() * 8.0f);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
         if (worldRenderer != null) {

@@ -22,18 +22,16 @@ varying vec4 vertexViewPos;
 
 uniform float light = 1.0;
 
-void main(){
+void main() {
     vec4 color = texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
 
     float highlight = calcLambLight(normal, -normalize(vertexViewPos.xyz));
 
     color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;
-
-    float lightValue = expLightValue(light);
-    color.rgb *= lightValue * 0.85 + 0.15 * highlight * lightValue;
+    color.rgb *= light * 0.85 + 0.15 * highlight * light;
 
     color.a = gl_Color.a;
 
     gl_FragData[0].rgba = color;
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0);
 }

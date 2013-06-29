@@ -29,7 +29,7 @@ import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.imageio.ImageIO;
@@ -86,6 +86,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int overwriteRtWidth = 0;
     private int overwriteRtHeight = 0;
 
+    private String currentlyBoundFboName = "";
+
     /* VARIOUS */
     private boolean takeScreenshot = false;
 
@@ -94,9 +96,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
 
     private Config config = CoreRegistry.get(Config.class);
-    
-	private static boolean tainted = false;
-	private static Collection<String> taintedReasons = new HashSet<String>();
 
     public enum FBOType {
         DEFAULT,
@@ -240,29 +239,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         readBackPBOBack.init(1,1);
 
         readBackPBOCurrent = readBackPBOFront;
-    }
-    
-    private class Tainted extends RuntimeException {
-    	public Tainted(Object object, String reason)
-    	{
-    		super(object.toString() + " tainted! (Reason: " + reason + ")");
-    	}
-    }
-    
-    private void taint(String passedReason)
-    {
-    	String reason = passedReason;
-    	tainted = true;
-    	
-    	if ( (reason == null) || (reason == "") )
-    		reason = "Tainted by " + Thread.currentThread().getStackTrace()[2].toString() + ", no reason given.";
-    	
-    	Tainted taintException = new Tainted(this, reason);
-    	
-    	logger.error(taintException.getLocalizedMessage());
-    	taintException.printStackTrace();
-    	
-    	taintedReasons.add(reason);
     }
 
     /**
@@ -480,12 +456,9 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
         }
         bufferIds.flip();
+
         if (bufferIds.limit() == 0) {
-            if (type == FBOType.NO_COLOR) {
-                GL11.glReadBuffer(GL11.GL_NONE);
-            } else {
-                GL11.glReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
-            }
+            GL11.glReadBuffer(GL11.GL_NONE);
             GL20.glDrawBuffers(GL11.GL_NONE);
         } else {
             GL20.glDrawBuffers(bufferIds);
@@ -530,8 +503,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
                 if (type == FBOType.NO_COLOR) {
                 	logger.error("FrameBuffer: " + title
                             + ", ...but the FBOType was NO_COLOR, ignoring this error and continuing without this FBO.");
-                	
-                	taint("Got a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT because of FBOType.NO_COLOR.");
+
                 	return null;
                 }
 
@@ -627,18 +599,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glBlendFunc(GL_ONE, GL_ONE);
         glCullFace(GL_FRONT);
 
-        glDrawBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
+        // Only write to the light buffer
+        setRenderBufferMask(false, false, true);
     }
 
     public void endRenderLightGeometry() {
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
-        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
-        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
-        bufferIds.flip();
-
-        GL20.glDrawBuffers(bufferIds);
-
+        setRenderBufferMask(true, true, true);
         unbindFbo("sceneOpaque");
 
         glDisable(GL_BLEND);
@@ -647,6 +613,50 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glCullFace(GL_BACK);
 
         applyLightBufferPass("sceneOpaque");
+    }
+
+    public void setRenderBufferMask(boolean color, boolean normal, boolean lightBuffer) {
+        setRenderBufferMask(currentlyBoundFboName, color, normal, lightBuffer);
+    }
+
+    public void setRenderBufferMask(String fboTitle, boolean color, boolean normal, boolean lightBuffer) {
+        setRenderBufferMask(getFBO(fboTitle), color, normal, lightBuffer);
+    }
+
+    public void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
+        if (fbo == null) {
+            return;
+        }
+
+        int attachmentId = 0;
+
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
+
+        if (fbo.textureId != 0) {
+            if (color) {
+                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+
+            attachmentId++;
+        }
+        if (fbo.normalsTextureId != 0) {
+            if (normal) {
+                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+
+            attachmentId++;
+        }
+        if (fbo.lightBufferTextureId != 0) {
+            if (lightBuffer) {
+                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+
+            attachmentId++;
+        }
+
+        bufferIds.flip();
+
+        GL20.glDrawBuffers(bufferIds);
     }
 
     public void beginRenderSceneTransparent() {
@@ -774,7 +784,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void renderFinalSceneToRT(StereoRenderState stereoRenderState) {
-        ShaderProgram shader;
+        GLSLShaderProgram shader;
 
         if (config.getSystem().isDebugRenderingEnabled()) {
             shader = ShaderManager.getInstance().getShaderProgram("debug");
@@ -805,7 +815,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         unbindFbo("sceneFinal");
     }
 
-    private void updateOcShaderParametersForVP(ShaderProgram program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
+    private void updateOcShaderParametersForVP(GLSLShaderProgram program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
         float w = (float) vpWidth / rtFullWidth;
         float h = (float) vpHeight / rtFullHeight;
         float x = (float) vpX / rtFullWidth;
@@ -828,7 +838,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private void renderFinalScene() {
 
-        ShaderProgram shader;
+        GLSLShaderProgram shader;
 
         if (config.getRendering().isOculusVrSupport()) {
             shader = ShaderManager.getInstance().getShaderProgram("ocDistortion");
@@ -870,7 +880,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void applyLightBufferPass(String target) {
-        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightBufferPass");
+        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightBufferPass");
         program.enable();
 
         DefaultRenderingProcess.FBO targetFbo = DefaultRenderingProcess.getInstance().getFBO(target);
@@ -918,7 +928,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         skyBand.bind();
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
         shader.setFloat("radius", 32.0f);
@@ -1011,7 +1021,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateBlurredSSAO(int id) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
         shader.setFloat("radius", (Float) ssaoBlurRadius.getValue());
@@ -1054,7 +1064,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateHighPass() {
-        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("highp");
+        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("highp");
         program.setFloat("highPassThreshold", (Float) bloomHighPassThreshold.getValue());
         program.enable();
 
@@ -1079,7 +1089,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateBlur(int id) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
         shader.enable();
 
         shader.setFloat("radius", (Float) overallBlurFactor.getValue() * config.getRendering().getBlurRadius());
@@ -1110,7 +1120,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateBloom(int id) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
         shader.setFloat("radius", 32.0f);
@@ -1141,7 +1151,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateDownsampledScene() {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
         shader.enable();
 
         for (int i = 4; i >= 0; i--) {
@@ -1315,6 +1325,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.bind();
+            currentlyBoundFboName = title;
             return true;
         }
 
@@ -1327,6 +1338,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.unbind();
+            currentlyBoundFboName = "";
             return true;
         }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define LIGHT_SHAFT_SAMPLES 50
+#define LIGHT_SHAFT_SAMPLES 64
 #define MOTION_BLUR_SAMPLES 8
 
 #define A 0.15
@@ -79,12 +79,12 @@ vec4 srgbToLinear(vec4 color) {
 
 float expBlockLightValue(float light) {
 	float lightScaled = (1.0 - light) * 16.0;
-	return pow(0.96, lightScaled) * light;
+	return pow(BLOCK_LIGHT_POW, lightScaled) * light * BLOCK_INTENSITY_FACTOR;
 }
 
 float expLightValue(float light) {
 	float lightScaled = (1.0 - light) * 16.0;
-	return pow(0.8, lightScaled) * light;
+	return pow(BLOCK_LIGHT_SUN_POW, lightScaled) * light;
 }
 
 float expOccValue(float light) {

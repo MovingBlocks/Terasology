@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.TeraEd;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.shader.ShaderParametersBase;
-import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,7 +127,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     }
 
     public void initPostEngine() {
-        HashMap<String, ShaderProgram> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
+        HashMap<String, GLSLShaderProgram> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
         Iterator<String> shaderIterator = shaderPrograms.keySet().iterator();
         while (shaderIterator.hasNext()) {
             String programName = shaderIterator.next();

@@ -22,7 +22,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 
 import javax.vecmath.Vector4f;
 
@@ -75,7 +75,7 @@ public class AnimationOpacity extends Animation {
     @Override
     public void renderEnd(){
         DefaultRenderingProcess.getInstance().getFBO(id).unbind();
-        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("animateOpacity");
+        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("animateOpacity");
         program.setFloat("alpha", currentOpacity);
         program.enable();
         DefaultRenderingProcess.getInstance().getFBO(id).bindTexture();

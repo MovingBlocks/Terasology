@@ -22,7 +22,7 @@ void main()
 	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
 
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	normal = gl_NormalMatrix * vec3(0.0f, 1.0f, 0.0f);
+	normal = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
 
     gl_TexCoord[0] = gl_MultiTexCoord0;
 }

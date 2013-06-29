@@ -15,9 +15,6 @@
  */
 package org.terasology.logic.manager;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.util.HashMap;
 
 import org.lwjgl.opengl.GL11;
@@ -25,6 +22,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.shader.*;
@@ -37,25 +35,22 @@ import org.terasology.rendering.shader.*;
 public class ShaderManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShaderManager.class);
-    private static ShaderManager _instance = null;
+    private static ShaderManager instance = null;
 
-    private final HashMap<String, ShaderProgram> shaderPrograms = new HashMap<String, ShaderProgram>(16);
+    private final HashMap<String, GLSLShaderProgram> shaderPrograms = new HashMap<String, GLSLShaderProgram>(16);
 
     private int activeFeatures = 0;
-    private ShaderProgram activeShaderProgram = null;
-
-    private ShaderProgram _defaultShaderProgram, _defaultTexturedShaderProgram;
-
     private Material activateMaterial = null;
+    private GLSLShaderProgram activeShaderProgram = null;
 
-    private TIntObjectMap<Texture> boundTextures = new TIntObjectHashMap<Texture>();
+    private GLSLShaderProgram defaultShaderProgram, defaultTexturedShaderProgram;
 
     public static ShaderManager getInstance() {
-        if (_instance == null) {
-            _instance = new ShaderManager();
+        if (instance == null) {
+            instance = new ShaderManager();
         }
 
-        return _instance;
+        return instance;
     }
 
     private ShaderManager() {
@@ -68,9 +63,10 @@ public class ShaderManager {
     }
 
     private void initShaders() {
-        _defaultShaderProgram = createAndStoreShaderProgram("default", new ShaderParametersDefault());
-        _defaultTexturedShaderProgram = createAndStoreShaderProgram("defaultTextured", new ShaderParametersDefault());
+        defaultShaderProgram = createAndStoreShaderProgram("default", new ShaderParametersDefault());
+        defaultTexturedShaderProgram = createAndStoreShaderProgram("defaultTextured", new ShaderParametersDefault());
 
+        // TODO: Port this to the asset pipeline
         createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
         createAndStoreShaderProgram("lightshaft", new ShaderParametersLightShaft());
@@ -82,22 +78,16 @@ public class ShaderManager {
         createAndStoreShaderProgram("down", new ShaderParametersDefault());
         createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
         createAndStoreShaderProgram("sky", new ShaderParametersSky());
-        createAndStoreShaderProgram("chunk", new ShaderParametersChunk(),
-                ShaderProgram.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue()
-                | ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
+        createAndStoreShaderProgram("chunk", new ShaderParametersChunk());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
-        createAndStoreShaderProgram("block", new ShaderParametersBlock(),
-                ShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue());
+        createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
         createAndStoreShaderProgram("animateOpacity", new ShaderParametersDefault());
         createAndStoreShaderProgram("shadowMap", new ShaderParametersShadowMap());
         createAndStoreShaderProgram("debug", new ShaderParametersDebug());
-        //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
         createAndStoreShaderProgram("ocDistortion", new ShaderParametersOcDistortion());
         createAndStoreShaderProgram("lightBufferPass", new ShaderParametersLightBufferPass());
-        createAndStoreShaderProgram("lightGeometryPass", new ShaderParametersLightGeometryPass(),
-                ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue()
-                | ShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+        createAndStoreShaderProgram("lightGeometryPass", new ShaderParametersLightGeometryPass());
     }
 
     public void enableMaterial(Material material) {
@@ -107,7 +97,7 @@ public class ShaderManager {
         }
 
         if (!material.equals(activateMaterial)) {
-            GL20.glUseProgram(material.getShaderId());
+            material.getShaderProgram().enable();
             activateMaterial = material;
             activeShaderProgram = null;
         }
@@ -118,7 +108,6 @@ public class ShaderManager {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + slot);
             // TODO: Need to be cubemap aware, only need to clear bind when switching from cubemap to 2D and vice versa,
             // TODO: Don't bind if already bound to the same
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
         }
@@ -129,29 +118,18 @@ public class ShaderManager {
     }
 
     public void recompileAllShaders() {
-        for (ShaderProgram program : shaderPrograms.values()) {
+        for (GLSLShaderProgram program : shaderPrograms.values()) {
             program.recompile();
         }
     }
 
-    private ShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params, int availableFeatures) {
+    private GLSLShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params) {
         // Make sure to remove the old shader program
         if (shaderPrograms.containsKey(title)) {
             shaderPrograms.remove(title).dispose();
         }
 
-        ShaderProgram program = new ShaderProgram(title, params, availableFeatures);
-        shaderPrograms.put(title, program);
-        return program;
-    }
-
-    private ShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params) {
-        // Make sure to remove the old shader program
-        if (shaderPrograms.containsKey(title)) {
-            shaderPrograms.remove(title).dispose();
-        }
-
-        ShaderProgram program = new ShaderProgram(title, params);
+        GLSLShaderProgram program = new GLSLShaderProgram(title, params);
         shaderPrograms.put(title, program);
         return program;
     }
@@ -160,21 +138,21 @@ public class ShaderManager {
      * Enables the default shader program.
      */
     public void enableDefault() {
-        _defaultShaderProgram.enable();
+        defaultShaderProgram.enable();
     }
 
     /**
      * Enables the default shader program.
      */
     public void enableDefaultTextured() {
-        _defaultTexturedShaderProgram.enable();
+        defaultTexturedShaderProgram.enable();
     }
 
     /**
      * @param s Name of the shader to activate
      */
     public void enableShader(String s) {
-        ShaderProgram program = getShaderProgram(s);
+        GLSLShaderProgram program = getShaderProgram(s);
         program.enable();
     }
 
@@ -182,7 +160,7 @@ public class ShaderManager {
         GL20.glUseProgram(0);
     }
 
-    public ShaderProgram getActiveShaderProgram() {
+    public GLSLShaderProgram getActiveShaderProgram() {
         return activeShaderProgram;
     }
 
@@ -190,7 +168,7 @@ public class ShaderManager {
         return activeFeatures;
     }
 
-    public void setActiveShaderProgram(ShaderProgram program) {
+    public void setActiveShaderProgram(GLSLShaderProgram program) {
         activeShaderProgram = program;
         activateMaterial = null;
         activeFeatures = program.getActiveFeatures();
@@ -199,15 +177,11 @@ public class ShaderManager {
      * @param s Nave of the shader to return
      * @return The id of the requested shader
      */
-    public ShaderProgram getShaderProgram(String s) {
+    public GLSLShaderProgram getShaderProgram(String s) {
         return shaderPrograms.get(s);
     }
 
-    /**
-     *
-     * @return
-     */
-    public HashMap<String, ShaderProgram> getShaderPrograms() {
+    public HashMap<String, GLSLShaderProgram> getShaderPrograms() {
         return shaderPrograms;
     }
 }

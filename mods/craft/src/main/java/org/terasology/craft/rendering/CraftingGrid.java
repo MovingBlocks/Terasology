@@ -15,8 +15,9 @@ import javax.vecmath.Vector4f;
 
 public class CraftingGrid implements BlockOverlayRenderer {
 
-    private int selectedLevel;
+    public static final Vector3f CUBE_SIZE = new Vector3f(0.33333f, 0.33333f, 0.333333f);
 
+    private int selectedLevel;
     private ArrayList<AABBRenderer> cellsRender = new ArrayList<AABBRenderer>();
 
     private AABB  aabb;
@@ -54,10 +55,10 @@ public class CraftingGrid implements BlockOverlayRenderer {
         boolean catched = false;
         for( AABBRenderer cell : cellsRender ){
             if(!catched && cell.getAABB().intersectRectangle(camera.getPosition(), camera.getViewingDirection())){
-                cell.renderSolid();
+                cell.render(lineThickness * 2.5f);
                 catched = true;
             }else{
-                cell.render(1f);
+                cell.render(lineThickness);
             }
         }
     }
@@ -75,28 +76,23 @@ public class CraftingGrid implements BlockOverlayRenderer {
     }
 
     private void reCalculateCells(){
-
         AABB tAabb = null;
 
         Vector3f min = aabb.getMin();
-        Vector3f max = aabb.getMax();
-        Vector3f cubeSize = new Vector3f(0.3f, 0.3f, 0.3f);
 
         for( int x = 0; x < countOfCells; x++ ){
             for( int z = 0; z < countOfCells; z++){
                 Vector3f newMin = new Vector3f(min);
-                newMin.x += x*cubeSize.x;
-                newMin.y += selectedLevel*cubeSize.y;
-                newMin.z += z*cubeSize.z;
+                newMin.x += x*CUBE_SIZE.x;
+                newMin.y += selectedLevel*CUBE_SIZE.y;
+                newMin.z += z*CUBE_SIZE.z;
 
                 Vector3f newMax = new Vector3f(newMin);
-                newMax.add(cubeSize);
+                newMax.add(CUBE_SIZE);
 
                 tAabb = AABB.createMinMax(newMin, newMax);
 
                 AABBRenderer aabbRenderCell = new  AABBRenderer(tAabb);
-                aabbRenderCell.setSolidColor(new Vector4f(0.92f, 1f, 0f, 0.3f));
-
                 cellsRender.add(aabbRenderCell);
             }
         }

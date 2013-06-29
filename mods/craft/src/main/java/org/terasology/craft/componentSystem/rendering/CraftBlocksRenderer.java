@@ -1,5 +1,6 @@
 package org.terasology.craft.componentSystem.rendering;
 
+import org.terasology.craft.rendering.CraftingGrid;
 import org.terasology.math.*;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
@@ -18,7 +19,6 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
-import org.terasology.math.TeraMath;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.Texture;
@@ -26,18 +26,16 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
-import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Map;
@@ -46,8 +44,11 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glEnd;
 
 /**
+ *
+ * TODO: This class is filled up with duplicated rendering code...
  * @author Small-Jeeper
  */
+
 @RegisterComponentSystem(headedOnly = true)
 public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     private Texture toolTipTexture;
@@ -96,12 +97,10 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
 
     @Override
     public void shutdown() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void renderAlphaBlend() {
-        Vector3f cubeSize = new Vector3f(0.3f, 0.3f, 0.3f);
+    public void renderOpaque() {
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         EntityRef target = CoreRegistry.get(CameraTargetSystem.class).getTarget();
         boolean foundedTargetWithCraft = false;
@@ -172,9 +171,9 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
                         for( int z = 0; z < 3; z++ ){
                             Vector3f bobOffset = new Vector3f(aabb.getMin());
                             bobOffset.add(new Vector3f(0.15f, 0.15f, 0.15f));
-                            bobOffset.x += x*cubeSize.x;
-                            bobOffset.y += y*cubeSize.y;
-                            bobOffset.z += z*cubeSize.z;
+                            bobOffset.x += x*CraftingGrid.CUBE_SIZE.x;
+                            bobOffset.y += y*CraftingGrid.CUBE_SIZE.y;
+                            bobOffset.z += z*CraftingGrid.CUBE_SIZE.z;
 
                             int i = x*3 + z;
 
@@ -209,28 +208,19 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
 
     private void renderBlock(BlockFamily blockFamily, Vector3f blockPos, Vector3f cameraPos, boolean notCurrentLevel) {
         // Adjust the brightness of the block according to the current position of the player
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+
         shader.enable();
 
         Block activeBlock = blockFamily.getArchetypeBlock();
-
-        // Apply biome and overall color offset
-        Vector4f color = activeBlock.calcColorOffsetFor(BlockPart.CENTER, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(cameraPos.x), TeraMath.floorToInt(cameraPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(cameraPos.x), TeraMath.floorToInt(cameraPos.z)));
-        shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         if(notCurrentLevel){
             shader.setFloat("alpha", 0.3f);
         }
 
-        shader.setInt("textured", 1);
-
-        glEnable(GL11.GL_BLEND);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glAlphaFunc(GL_GREATER, 0.1f);
-        if (activeBlock.isTranslucent()) {
-            glEnable(GL11.GL_ALPHA_TEST);
-        }
+        shader.setBoolean("textured", true);
 
         glMatrixMode(GL11.GL_MODELVIEW);
         glPushMatrix();
@@ -239,24 +229,23 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         activeBlock.renderWithLightValue(worldRenderer.getRenderingLightValue());
         glPopMatrix();
 
-        if (activeBlock.isTranslucent()) {
-            glDisable(GL11.GL_ALPHA_TEST);
-        }
-        glDisable(GL11.GL_BLEND);
         if(notCurrentLevel){
             shader.setFloat("alpha", 1.0f);
         }
     }
 
     private void renderIcon(String iconName, Vector3f offset, Vector3f cameraPos, boolean notCurrentLevel) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+
         shader.enable();
 
         if(notCurrentLevel){
             shader.setFloat("alpha", 0.3f);
         }
 
-        shader.setInt("textured", 0);
+        shader.setBoolean("textured", false);
         shader.setFloat("light", worldRenderer.getRenderingLightValue());
 
         Mesh itemMesh = iconMeshes.get(iconName);
@@ -366,7 +355,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         position.y += 0.2f;
 
         renderBillboardBegin(-1, position, null, new Vector3f(0.005f, -0.005f, 0.005f));
-        font.drawString(0,0, String.format("%.0f",count), Color.orange);
+        font.drawString(0,0, String.format("%.0f",count), Color.white);
         renderBillboardEnd();
 
     }
@@ -471,7 +460,6 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     }
 
     private void renderBillboardBegin(int textureId, Vector3f position, Vector3f offset, Vector3f scale){
-
         glDisable(GL11.GL_CULL_FACE);
 
         if( textureId>=0 ){
@@ -479,9 +467,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
             glBindTexture(GL11.GL_TEXTURE_2D, textureId);
         }
 
-        glDepthMask (false);
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthFunc(GL_ALWAYS);
 
         glPushMatrix();
         glTranslated(position.x, position.y, position.z);
@@ -501,8 +487,9 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     private void renderBillboardEnd(){
         glPopMatrix();
         glPopMatrix();
-        glDisable(GL11.GL_BLEND);
-        glDepthMask ( true );
+
+        glDepthFunc(GL_LEQUAL);
+        glEnable(GL11.GL_DEPTH_TEST);
         glEnable(GL11.GL_CULL_FACE);
     }
 
@@ -519,6 +506,6 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     }
 
     @Override
-    public void renderOpaque() {
+    public void renderAlphaBlend() {
     }
 }

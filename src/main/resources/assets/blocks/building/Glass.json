@@ -20,5 +20,6 @@
 {
     "translucent" : true,
     "shadowCasting" : false,
-    "hardness" : 1
+    "hardness" : 1,
+    "doubleSided" : true
 }
