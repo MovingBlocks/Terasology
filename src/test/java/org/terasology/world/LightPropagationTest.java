@@ -224,6 +224,24 @@ public class LightPropagationTest extends TerasologyTestingEnvironment {
         }
     }
 
+    @Test
+    public void diagonalPropagation() {
+        for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(WORLD_MIN.x, Chunk.SIZE_Y - 1, WORLD_MIN.z), new Vector3i(WORLD_MAX.x, Chunk.SIZE_Y - 1, WORLD_MAX.z))) {
+            view.setBlock(pos, dirt);
+        }
+
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), air);
+        propagator.update(8, Chunk.SIZE_Y - 1, 8, air, dirt);
+        view.setBlock(new Vector3i(14, Chunk.SIZE_Y - 1, 8), air);
+        propagator.update(14, Chunk.SIZE_Y - 1, 8, air, dirt);
+        view.setBlock(new Vector3i(8, Chunk.SIZE_Y - 1, 8), dirt);
+        propagator.update(8, Chunk.SIZE_Y - 1, 8, dirt, air);
+        for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(WORLD_MAX.x, WORLD_MAX.y - 1, WORLD_MAX.z))) {
+            int expected = Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 14) - TeraMath.fastAbs(pos.z - 8), 0);
+            assertEquals(pos.toString(), expected, view.getSunlight(pos));
+        }
+    }
+
     /*@Test
     public void pushSunlightPerf() {
         Block air = BlockManager.getInstance().getAir();

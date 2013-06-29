@@ -322,7 +322,7 @@ public class LightPropagator {
         Region3i region = Region3i.createFromCenterExtents(new Vector3i(x, y, z), checkExtent);
 
         // Clear old light, recording light sources
-        for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(x, y, z), checkExtent + 1)) {
+        for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(x, y, z), checkExtent)) {
             byte lum = chunkView.getBlock(pos).getLuminance();
             chunkView.setLight(pos, lum);
             if (lum > 1) {
@@ -349,12 +349,12 @@ public class LightPropagator {
 
     private void localRecalculateSunlightAround(int x, int y, int z, int oldLightLevel) {
         // Clear old light, recording light sources
-        for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(x, y, z), oldLightLevel)) {
+        for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(x, y, z), oldLightLevel - 1)) {
             chunkView.setSunlight(pos, (byte) 0);
 
         }
         // Draw in light from surrounding area
-        for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(x, y, z), oldLightLevel + 1)) {
+        for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(x, y, z), oldLightLevel)) {
             byte lightLevel = chunkView.getSunlight(pos);
             if (lightLevel > 1) {
                 pushSunlight(pos.x, pos.y, pos.z, lightLevel);
