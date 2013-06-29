@@ -147,6 +147,7 @@ public class GLSLShaderProgram implements Asset {
         this.uri = uri;
         this.vertShader = vertShader;
         this.fragShader = fragShader;
+        this.title = uri.toString();
 
         logger.info("Loading shader program '"+uri+"' as asset...");
 
