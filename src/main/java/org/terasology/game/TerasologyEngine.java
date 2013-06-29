@@ -63,13 +63,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Immortius
@@ -403,6 +397,8 @@ public class TerasologyEngine implements GameEngine {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_NORMALIZE);
         glDepthFunc(GL_LEQUAL);
+//        glEnable(GL_TEXTURE_2D);
+//        glEnable(GL12.GL_TEXTURE_3D);
     }
 
     private void initControls() {

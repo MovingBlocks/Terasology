@@ -336,7 +336,6 @@ public class UIItemCell extends UIDisplayContainer  {
 
             glTranslatef(20f, 20f, 0f);
 
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glPushMatrix();
             glTranslatef(4f, 0f, 0f);
             GL11.glScalef(20f, 20f, 20f);
@@ -349,7 +348,6 @@ public class UIItemCell extends UIDisplayContainer  {
 
             GL11.glPopMatrix();
 
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
             glPopMatrix();
             glDisable(GL11.GL_DEPTH_TEST);
         }

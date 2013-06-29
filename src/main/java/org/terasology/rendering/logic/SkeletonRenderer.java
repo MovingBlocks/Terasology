@@ -250,7 +250,6 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             renderBoneOrientation(skeletalMesh.rootBone);
         }
-        glEnable(GL11.GL_TEXTURE_2D);
         glPopMatrix();*/
     }
 

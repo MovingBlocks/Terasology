@@ -40,6 +40,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
     private static class TextureMetadata {
         Texture.FilterMode filterMode;
         Texture.WrapMode wrapMode;
+        Texture.Type type;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(PNGTextureLoader.class);
@@ -79,12 +80,12 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
 
             Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
             Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
+            Texture.Type type = Texture.Type.Texture2D;
 
             // TODO: Change asset loader setup so that the default filter mode can be set per asset location
             if (urls.get(0).toString().contains("/fonts/")) {
                 filterMode = Texture.FilterMode.Linear;
             }
-
 
             for (URL url : urls) {
                 if (url.toString().endsWith(".json")) {
@@ -94,6 +95,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                         TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
                         if (metadata.filterMode != null) filterMode = metadata.filterMode;
                         if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
+                        if (metadata.type != null) type = metadata.type;
                     } finally {
                         // JAVA7: Replace with new handling
                         if (reader != null) {
@@ -108,7 +110,37 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                 }
             }
 
-            return new Texture(uri, new ByteBuffer[]{data}, width, height, wrapMode, filterMode);
+            if (type == Texture.Type.Texture3D) {
+                final int byteLength = 4 * 16 * 16 * 16;
+                final int strideX = 16*4;
+                final int strideY = 16*16*4;
+                final int strideZ = 4;
+
+                if (width % height != 0 || width / height != height) {
+                    throw new RuntimeException("3D texture must be cubic (height^3) - width must thus be a multiple of height");
+                }
+
+                ByteBuffer alignedBuffer = ByteBuffer.allocateDirect(byteLength);
+
+                for (int x=0; x<height; x++) {
+                    for (int y=0; y<height; y++) {
+                        for (int z=0; z<height; z++) {
+                            final int index = x * strideX + z * strideZ + strideY * y;
+
+                            alignedBuffer.put(data.get(index));
+                            alignedBuffer.put(data.get(index + 1));
+                            alignedBuffer.put(data.get(index + 2));
+                            alignedBuffer.put(data.get(index + 3));
+                        }
+                    }
+                }
+
+                alignedBuffer.flip();
+
+                return new Texture(uri, new ByteBuffer[]{ alignedBuffer }, height, height, height, wrapMode, filterMode);
+            }
+
+            return new Texture(uri, new ByteBuffer[]{ data }, width, height, wrapMode, filterMode);
         } finally {
             pngStream.close();
         }

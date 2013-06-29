@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
@@ -43,6 +44,11 @@ import org.terasology.asset.AssetUri;
  * @author Immortius
  */
 public class Texture implements Asset {
+    public enum Type {
+        Texture2D,
+        Texture3D
+    }
+
     public enum WrapMode {
         Clamp(GL_CLAMP),
         Repeat(GL_REPEAT);
@@ -108,14 +114,46 @@ public class Texture implements Asset {
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode.getGLMode());
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode.getGLMode());
+
         GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filterMode.getGlMinFilter());
         GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filterMode.getGlMagFilter());
+
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, data.length - 1);
 
         for (int i = 0; i < data.length; i++) {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data[i]);
         }
+    }
+
+    public Texture(AssetUri uri, ByteBuffer[] data, int width, int height, int depth, WrapMode wrapMode, FilterMode filterMode) {
+        if (data.length == 0) throw new IllegalArgumentException("Expected Data.length >= 1");
+        this.uri = uri;
+        this.width = width;
+        this.height = height;
+        this.wrapMode = wrapMode;
+        this.filterMode = filterMode;
+        this.data = data;
+
+        id = glGenTextures();
+        logger.debug("Bound texture '{}' - {}", uri, id);
+        glBindTexture(GL12.GL_TEXTURE_3D, id);
+
+        glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrapMode.getGLMode());
+        glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrapMode.getGLMode());
+        glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, wrapMode.getGLMode());
+
+        GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER, filterMode.getGlMinFilter());
+        GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER, filterMode.getGlMagFilter());
+
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+        GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, data.length - 1);
+
+        for (int i = 0; i < data.length; i++) {
+            GL12.glTexImage3D(GL12.GL_TEXTURE_3D, i, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data[i]);
+        }
+
+        Util.checkGLError();
     }
 
     @Override

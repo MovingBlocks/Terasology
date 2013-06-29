@@ -15,8 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.*;
 import org.terasology.asset.Assets;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.config.Config;
@@ -43,8 +42,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 public class ShaderParametersPost extends ShaderParametersBase {
 
     FastRandom rand = new FastRandom();
-
-    Texture vignetteTexture = Assets.getTexture("engine:vignette");
 
     Texture filmGrainNoiseTexture = Assets.getTexture("engine:noise");
     Property filmGrainIntensity = new Property("filmGrainIntensity", 0.025f, 0.0f, 1.0f);
@@ -81,9 +78,22 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setFloat("blurLength", (Float) blurLength.getValue());
         }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
-        program.setInt("texVignette", texId++);
+        Texture vignetteTexture = Assets.getTexture("engine:vignette");
+
+        if (vignetteTexture != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
+            program.setInt("texVignette", texId++);
+        }
+
+        Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1");
+
+        if (colorGradingLut != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            glBindTexture(GL12.GL_TEXTURE_3D, colorGradingLut.getId());
+            program.setInt("texColorGradingLut", texId++);
+        }
+
         Vector3f tint = worldRenderer.getTint();
         program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z);
 

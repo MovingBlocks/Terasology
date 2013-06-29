@@ -313,8 +313,6 @@ public class Icon {
         if (_blockFamily == null) {
             _element.renderTransformed();
         } else {
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-
             GL11.glPushMatrix();
             glTranslatef(4f, 0f, 0f);
             GL11.glScalef(20f, 20f, 20f);
@@ -326,8 +324,6 @@ public class Icon {
             block.renderWithLightValue(1.0f);
 
             GL11.glPopMatrix();
-
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
         }
     }
 

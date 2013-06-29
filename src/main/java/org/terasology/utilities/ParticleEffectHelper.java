@@ -44,14 +44,14 @@ public class ParticleEffectHelper {
 
     public static BlockParticleEffectComponent createSmokeExplosionParticleEffect() {
         BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
-        particleEffect.spawnCount = 512;
+        particleEffect.spawnCount = 128;
         particleEffect.initialVelocityRange.set(6, 6, 6);
-        particleEffect.spawnRange.set(2f, 2f, 2f);
+        particleEffect.spawnRange.set(5f, 5f, 5f);
         particleEffect.destroyEntityOnCompletion = true;
-        particleEffect.minSize = 0.5f;
-        particleEffect.maxSize = 1.5f;
+        particleEffect.minSize = 1.0f;
+        particleEffect.maxSize = 3.0f;
         particleEffect.minLifespan = 1f;
-        particleEffect.maxLifespan = 1.5f;
+        particleEffect.maxLifespan = 3.0f;
         particleEffect.targetVelocity.set(0, 2, 0);
         particleEffect.acceleration.set(2f, 2f, 2f);
         particleEffect.collideWithBlocks = true;

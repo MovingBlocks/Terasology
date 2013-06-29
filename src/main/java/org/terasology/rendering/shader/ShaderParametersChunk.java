@@ -70,9 +70,9 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         Texture terrainNormal = Assets.getTexture("engine:terrainNormal");
         Texture terrainHeight = Assets.getTexture("engine:terrainHeight");
 
-        Texture water = Assets.getTexture("engine:custom_water_still");
-        Texture lava = Assets.getTexture("engine:custom_lava_still");
-        Texture waterNormal = Assets.getTexture("engine:water_normal");
+        Texture water = Assets.getTexture("engine:waterStill");
+        Texture lava = Assets.getTexture("engine:lavaStill");
+        Texture waterNormal = Assets.getTexture("engine:waterNormal");
         Texture effects = Assets.getTexture("engine:effects");
 
         if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
