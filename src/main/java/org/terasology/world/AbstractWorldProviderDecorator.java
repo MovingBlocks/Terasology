@@ -19,6 +19,7 @@ package org.terasology.world;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
+import org.terasology.world.time.WorldTime;
 
 /**
  * @author Immortius
@@ -127,27 +128,12 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public long getTime() {
-        return base.getTime();
-    }
-
-    @Override
-    public void setTime(long time) {
-        base.setTime(time);
-    }
-
-    @Override
-    public float getTimeInDays() {
-        return base.getTimeInDays();
-    }
-
-    @Override
-    public void setTimeInDays(float time) {
-        base.setTimeInDays(time);
-    }
-
-    @Override
     public void dispose() {
         base.dispose();
+    }
+
+    @Override
+    public WorldTime getTime() {
+        return base.getTime();
     }
 }

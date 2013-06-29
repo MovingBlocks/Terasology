@@ -36,22 +36,17 @@ import java.util.Map;
  *
  * @author Immortius
  */
-// TODO: Store this stuff in a protobuf?
 public class WorldInfo {
-    public static final String DEFAULT_FILE_NAME = "WorldManifest.json";
 
     private String title = "";
     private String seed = "";
     private long time = 0;
-    private List<String> registeredBlockFamilies = Lists.newArrayList();
-    private Map<String, Byte> blockIdMap = Maps.newHashMap();
     private String[] chunkGenerators = new String[]{};
-    private ModConfig modConfiguration = new ModConfig();
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, String[] chunkGenerators, ModConfig modConfig) {
+    public WorldInfo(String title, String seed, long time, String[] chunkGenerators) {
         if (title != null) {
             this.title = title;
         }
@@ -62,32 +57,6 @@ public class WorldInfo {
             this.chunkGenerators = chunkGenerators;
         }
         this.time = time;
-        this.modConfiguration.copy(modConfig);
-    }
-
-    public static void save(File toFile, WorldInfo worldInfo) throws IOException {
-        FileWriter writer = new FileWriter(toFile);
-        try {
-            new GsonBuilder().setPrettyPrinting().create().toJson(worldInfo, writer);
-        } finally {
-            // JAVA7: better closing support
-            writer.close();
-        }
-    }
-
-    public static WorldInfo load(File fromFile) throws IOException {
-        FileReader reader = new FileReader(fromFile);
-        try {
-            WorldInfo result = new GsonBuilder().create().fromJson(reader, WorldInfo.class);
-            if (result.modConfiguration.size() == 0) {
-                for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {
-                    result.modConfiguration.addMod(mod.getModInfo().getId());
-                }
-            }
-            return result;
-        } finally {
-            reader.close();
-        }
     }
 
     public String getTitle() {
@@ -118,22 +87,6 @@ public class WorldInfo {
         this.time = time;
     }
 
-    public List<String> getRegisteredBlockFamilies() {
-        return registeredBlockFamilies;
-    }
-
-    public void setRegisteredBlockFamilies(List<String> registeredBlockFamilies) {
-        this.registeredBlockFamilies = registeredBlockFamilies;
-    }
-
-    public Map<String, Byte> getBlockIdMap() {
-        return blockIdMap;
-    }
-
-    public void setBlockIdMap(Map<String, Byte> blockIdMap) {
-        this.blockIdMap = blockIdMap;
-    }
-
     public String[] getChunkGenerators() {
         return chunkGenerators;
     }
@@ -142,7 +95,4 @@ public class WorldInfo {
         this.chunkGenerators = chunkGenerators;
     }
 
-    public ModConfig getModConfiguration() {
-        return modConfiguration;
-    }
 }

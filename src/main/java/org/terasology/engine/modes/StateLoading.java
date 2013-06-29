@@ -21,13 +21,37 @@ import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.Timer;
-import org.terasology.engine.modes.loadProcesses.*;
+import org.terasology.engine.Time;
+import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
+import org.terasology.engine.modes.loadProcesses.CacheBlocks;
+import org.terasology.engine.modes.loadProcesses.CacheTextures;
+import org.terasology.engine.modes.loadProcesses.CreateWorldEntity;
+import org.terasology.engine.modes.loadProcesses.InitialiseBlockTypeEntities;
+import org.terasology.engine.modes.loadProcesses.InitialiseCommandSystem;
+import org.terasology.engine.modes.loadProcesses.InitialiseEntitySystem;
+import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
+import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
+import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
+import org.terasology.engine.modes.loadProcesses.JoinServer;
+import org.terasology.engine.modes.loadProcesses.LoadEntities;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.modes.loadProcesses.PrepareWorld;
+import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
+import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
+import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
+import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
+import org.terasology.engine.modes.loadProcesses.RegisterMods;
+import org.terasology.engine.modes.loadProcesses.RegisterSystems;
+import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
+import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
+import org.terasology.engine.modes.loadProcesses.StartServer;
+import org.terasology.game.Game;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
-import org.terasology.world.WorldInfo;
 
 import java.util.Queue;
 
@@ -38,7 +62,7 @@ public class StateLoading implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
-    private WorldInfo worldInfo;
+    private GameManifest gameManifest;
     private String serverAddress;
     private int serverPort;
     private NetworkMode netMode;
@@ -54,11 +78,11 @@ public class StateLoading implements GameState {
     /**
      * Constructor for server or single player games
      *
-     * @param worldInfo
+     * @param gameManifest
      * @param netMode
      */
-    public StateLoading(WorldInfo worldInfo, NetworkMode netMode) {
-        this.worldInfo = worldInfo;
+    public StateLoading(GameManifest gameManifest, NetworkMode netMode) {
+        this.gameManifest = gameManifest;
         this.guiManager = CoreRegistry.get(GUIManager.class);
         this.netMode = netMode;
     }
@@ -69,14 +93,18 @@ public class StateLoading implements GameState {
      * @param netMode
      */
     public StateLoading(NetworkMode netMode) {
-        this.worldInfo = new WorldInfo();
+        this.gameManifest = new GameManifest();
         this.guiManager = CoreRegistry.get(GUIManager.class);
         this.netMode = netMode;
     }
 
     @Override
     public void init(GameEngine engine) {
-        CoreRegistry.get(Timer.class).updateServerTime(0, true);
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        time.setPaused(true);
+        time.setGameTime(0);
+
+        CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:
                 initClient();
@@ -94,11 +122,11 @@ public class StateLoading implements GameState {
     }
 
     private void initClient() {
-        loadProcesses.add(new JoinServer(worldInfo));
-        loadProcesses.add(new RegisterMods(worldInfo));
+        loadProcesses.add(new JoinServer(gameManifest));
+        loadProcesses.add(new RegisterMods(gameManifest));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlockFamilyFactories());
-        loadProcesses.add(new RegisterBlocks(worldInfo));
+        loadProcesses.add(new RegisterBlocks(gameManifest));
         loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseEntitySystem());
         loadProcesses.add(new LoadPrefabs());
@@ -106,7 +134,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterInputSystem());
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
-        loadProcesses.add(new InitialiseRemoteWorld(worldInfo));
+        loadProcesses.add(new InitialiseRemoteWorld(gameManifest));
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new SetupRemotePlayer());
         loadProcesses.add(new AwaitCharacterSpawn());
@@ -114,10 +142,10 @@ public class StateLoading implements GameState {
     }
 
     private void initHost() {
-        loadProcesses.add(new RegisterMods(worldInfo));
+        loadProcesses.add(new RegisterMods(gameManifest));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlockFamilyFactories());
-        loadProcesses.add(new RegisterBlocks(worldInfo));
+        loadProcesses.add(new RegisterBlocks(gameManifest));
         loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseEntitySystem());
         loadProcesses.add(new LoadPrefabs());
@@ -125,9 +153,9 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterInputSystem());
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
-        loadProcesses.add(new InitialiseWorld(worldInfo));
+        loadProcesses.add(new InitialiseWorld(gameManifest));
         loadProcesses.add(new InitialiseSystems());
-        loadProcesses.add(new LoadEntities(worldInfo));
+        loadProcesses.add(new LoadEntities());
         loadProcesses.add(new InitialiseBlockTypeEntities());
         loadProcesses.add(new CreateWorldEntity());
         if (netMode == NetworkMode.SERVER) {
@@ -151,6 +179,8 @@ public class StateLoading implements GameState {
 
     @Override
     public void dispose() {
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        time.setPaused(false);
     }
 
     @Override

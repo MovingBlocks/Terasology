@@ -17,7 +17,6 @@ package org.terasology.engine.modes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
@@ -39,10 +38,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.chunks.ChunkProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,7 +99,7 @@ public class StateIngame implements GameState {
         CoreRegistry.get(BulletPhysics.class).dispose();
         if (saveWorld) {
             try {
-                CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+                CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {
                 logger.error("Failed to save entities", e);
             }

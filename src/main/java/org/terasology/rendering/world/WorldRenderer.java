@@ -27,9 +27,10 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.Timer;
+import org.terasology.engine.Time;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.game.Game;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
@@ -49,17 +50,11 @@ import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.ChunkView;
-import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldProviderCoreImpl;
-import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.WorldTimeEvent;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 
@@ -145,7 +140,7 @@ public final class WorldRenderer {
     private final Skysphere skysphere;
 
     /* TICKING */
-    private Timer timer = CoreRegistry.get(Timer.class);
+    private Time time = CoreRegistry.get(Time.class);
     private float tick = 0;
     private int tickTock = 0;
     private long lastTick;
@@ -158,9 +153,6 @@ public final class WorldRenderer {
 
     /* PHYSICS */
     private final BulletPhysics bulletPhysics;
-
-    /* BLOCK GRID */
-    private final BlockGrid blockGrid;
 
     /* STATISTICS */
     private int statDirtyChunks = 0, statVisibleChunks = 0, statIgnoredPhases = 0;
@@ -178,7 +170,6 @@ public final class WorldRenderer {
 
     /**
      * Initializes a new (local) world for the single player mode.
-     *
      */
     public WorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
         this.chunkProvider = chunkProvider;
@@ -188,7 +179,6 @@ public final class WorldRenderer {
         skysphere = new Skysphere(this);
         chunkUpdateManager = new ChunkUpdateManager(chunkTesselator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
-        blockGrid = new BlockGrid();
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(defaultCamera);
@@ -831,13 +821,9 @@ public final class WorldRenderer {
      */
     public void dispose(boolean saveWorld) {
         worldProvider.dispose();
+        // TODO: Move this somewhere more sensible
         if (saveWorld) {
-            WorldInfo worldInfo = worldProvider.getWorldInfo();
-            try {
-                WorldInfo.save(new File(PathManager.getInstance().getCurrentWorldPath(), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
-            } catch (IOException e) {
-                logger.error("Failed to save world manifest", e);
-            }
+            CoreRegistry.get(Game.class).save();
         }
 
         audioManager.stopAllSounds();
@@ -931,7 +917,7 @@ public final class WorldRenderer {
 
     @Override
     public String toString() {
-        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), skysphere.getSunPosAngle(), chunkProvider.size(), statDirtyChunks, statIgnoredPhases, statVisibleChunks, statRenderedTriangles, statChunkMeshEmpty, statChunkNotReady, worldProvider.getSeed(), worldProvider.getTitle());
+        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), worldProvider.getTime().getDays(), PostProcessingRenderer.getInstance().getExposure(), skysphere.getSunPosAngle(), chunkProvider.size(), statDirtyChunks, statIgnoredPhases, statVisibleChunks, statRenderedTriangles, statChunkMeshEmpty, statChunkNotReady, worldProvider.getSeed(), worldProvider.getTitle());
     }
 
     public LocalPlayer getPlayer() {
@@ -963,12 +949,12 @@ public final class WorldRenderer {
         return worldProvider;
     }
 
-    public BlockGrid getBlockGrid() {
-        return blockGrid;
-    }
-
     public Skysphere getSkysphere() {
         return skysphere;
+    }
+
+    public Time getTime() {
+        return time;
     }
 
     public double getTick() {

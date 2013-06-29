@@ -26,8 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.Timer;
+import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateMainMenu;
 
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
@@ -59,7 +60,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
         if (message.hasServerInfo()) {
-            CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), true);
+            ((EngineTime)CoreRegistry.get(Time.class)).setGameTime(message.getTime());
             receivedServerInfo(message.getServerInfo());
         }
         server.queueMessage(message);

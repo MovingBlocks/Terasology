@@ -51,12 +51,12 @@ public final class Diamond3iIterator implements Iterator<Vector3i> {
 
     Diamond3iIterator(Vector3i origin, int maxDistance) {
         this.origin = origin;
-        this.maxDistance = maxDistance;
+        this.maxDistance = maxDistance + 1;
     }
 
     Diamond3iIterator(Vector3i origin, int maxDistance, int startDistance) {
         this(origin, maxDistance);
-        this.level = startDistance;
+        this.level = startDistance + 1;
         x = -level;
     }
 

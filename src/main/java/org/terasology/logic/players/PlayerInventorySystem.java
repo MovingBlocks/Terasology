@@ -16,9 +16,9 @@
 
 package org.terasology.logic.players;
 
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.*;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
@@ -54,7 +54,7 @@ public class PlayerInventorySystem implements ComponentSystem {
     private LocalPlayer localPlayer;
 
     @In
-    private Timer timer;
+    private Time time;
 
     @In
     private CameraTargetSystem cameraTargetSystem;
@@ -103,7 +103,7 @@ public class PlayerInventorySystem implements ComponentSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity) {
-        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+        if (!event.isDown() || time.getGameTimeInMs() - lastInteraction < 200) {
             return;
         }
 
@@ -113,7 +113,7 @@ public class PlayerInventorySystem implements ComponentSystem {
 
         entity.send(new UseItemRequest(selectedItemEntity));
 
-        lastInteraction = timer.getTimeInMs();
+        lastInteraction = time.getGameTimeInMs();
         character.handAnimation = 0.5f;
         entity.saveComponent(character);
         event.consume();
@@ -121,7 +121,7 @@ public class PlayerInventorySystem implements ComponentSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onAttackRequest(AttackButton event, EntityRef entity) {
-        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+        if (!event.isDown() || time.getGameTimeInMs() - lastInteraction < 200) {
             return;
         }
 
@@ -130,7 +130,7 @@ public class PlayerInventorySystem implements ComponentSystem {
 
         entity.send(new AttackRequest(selectedItemEntity));
 
-        lastInteraction = timer.getTimeInMs();
+        lastInteraction = time.getGameTimeInMs();
         character.handAnimation = 0.5f;
         entity.saveComponent(character);
         event.consume();
@@ -147,7 +147,7 @@ public class PlayerInventorySystem implements ComponentSystem {
         //if this is our first time throwing, set the timer to something sensible, we can return since
         // this is a repeating event.
         if (event.isDown() && lastTimeThrowInteraction == 0) {
-            lastTimeThrowInteraction = timer.getTimeInMs();
+            lastTimeThrowInteraction = time.getGameTimeInMs();
             return;
         }
 
@@ -202,7 +202,7 @@ public class PlayerInventorySystem implements ComponentSystem {
         if (lastTimeThrowInteraction == 0) {
             return 0;
         }
-        float dropPower = (float) Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction) / 200);
+        float dropPower = (float) Math.floor((time.getGameTimeInMs() - lastTimeThrowInteraction) / 200);
 
         if (dropPower > 6) {
             dropPower = 6;

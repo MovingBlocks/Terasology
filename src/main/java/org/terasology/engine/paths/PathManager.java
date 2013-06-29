@@ -33,7 +33,7 @@ public final class PathManager {
     public static final String TERASOLOGY_FOLDER_NAME = "Terasology";
     public static final String TERASOLOGY_HIDDEN_FOLDER_NAME = ".terasology";
 
-    private static final String WORLD_DIR = "worlds";
+    private static final String SAVED_GAMES_DIR = "saves";
     private static final String LOG_DIR = "logs";
     private static final String MOD_DIR = "mods";
     private static final String SCREENSHOT_DIR = "screenshots";
@@ -42,7 +42,7 @@ public final class PathManager {
     private static PathManager instance;
     private File installPath;
     private File homePath;
-    private File worldPath;
+    private File savesPath;
     private File logPath;
     private File homeModPath;
     private File installModPath;
@@ -111,12 +111,12 @@ public final class PathManager {
         updateDirs();
     }
 
-    public File getCurrentWorldPath() {
+    public File getCurrentSavePath() {
         return currentWorldPath;
     }
 
-    public void setCurrentWorldTitle(String worldTitle) {
-        currentWorldPath = getWorldSavePath(worldTitle);
+    public void setCurrentSaveTitle(String worldTitle) {
+        currentWorldPath = getSavePath(worldTitle);
         currentWorldPath.mkdirs();
     }
 
@@ -128,8 +128,8 @@ public final class PathManager {
         return installPath;
     }
 
-    public File getWorldPath() {
-        return worldPath;
+    public File getSavesPath() {
+        return savesPath;
     }
 
     public File getLogPath() {
@@ -150,8 +150,8 @@ public final class PathManager {
 
     private void updateDirs() {
         homePath.mkdirs();
-        worldPath = new File(homePath, WORLD_DIR);
-        worldPath.mkdirs();
+        savesPath = new File(homePath, SAVED_GAMES_DIR);
+        savesPath.mkdirs();
         logPath = new File(homePath, LOG_DIR);
         logPath.mkdirs();
         homeModPath = new File(homePath, MOD_DIR);
@@ -175,7 +175,7 @@ public final class PathManager {
         return modPaths.get(0);
     }
 
-    public File getWorldSavePath(String title) {
-        return new File(worldPath, title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+    public File getSavePath(String title) {
+        return new File(savesPath, title.replaceAll("[^A-Za-z0-9-_ ]", ""));
     }
 }

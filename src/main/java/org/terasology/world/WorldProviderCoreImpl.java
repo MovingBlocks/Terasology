@@ -19,17 +19,11 @@ package org.terasology.world;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -37,6 +31,8 @@ import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.lighting.LightingUtil;
 import org.terasology.world.lighting.PropagationComparison;
 import org.terasology.world.liquid.LiquidData;
+import org.terasology.world.time.WorldTime;
+import org.terasology.world.time.WorldTimeImpl;
 
 import java.util.List;
 
@@ -45,7 +41,6 @@ import java.util.List;
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
     private static final Logger logger = LoggerFactory.getLogger(WorldProviderCoreImpl.class);
-    private final long DAY_NIGHT_LENGTH_IN_MS = CoreRegistry.get(Config.class).getSystem().getDayNightLengthInMs();
 
     private String title;
     private String seed = "";
@@ -53,13 +48,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private WorldBiomeProvider biomeProvider;
     private ChunkProvider chunkProvider;
-    private BlockManager blockManager;
-
-    private long timeOffset;
+    private WorldTime worldTime;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider, BlockManager blockManager) {
+    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
         if (title == null) {
             title = seed;
         }
@@ -69,14 +62,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkGenerators = chunkGenerators;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
-        this.blockManager = blockManager;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
-
-        setTime(time);
+        this.worldTime = new WorldTimeImpl();
+        worldTime.setMilliseconds(time);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider, blockManager);
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider);
     }
 
     @Override
@@ -91,18 +83,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        ModConfig modConfig = new ModConfig();
-        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-            modConfig.addMod(mod.getModInfo().getId());
-        }
-        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, modConfig);
-        List<String> registeredBlockFamilies = Lists.newArrayList();
-        for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
-            registeredBlockFamilies.add(family.getURI().toString());
-        }
-        worldInfo.setRegisteredBlockFamilies(registeredBlockFamilies);
-        worldInfo.setBlockIdMap(blockManager.getBlockIdMap());
-        return worldInfo;
+        return new WorldInfo(title, seed, worldTime.getMilliseconds(), chunkGenerators);
     }
 
     @Override
@@ -141,12 +122,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean setBlocks(BlockUpdate... updates) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        // TODO: Implement
+        return false;
     }
 
     @Override
     public boolean setBlocks(Iterable<BlockUpdate> updates) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        // TODO: Implement
+        return false;
     }
 
     @Override
@@ -246,7 +229,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public LiquidData getLiquid(int x, int y, int z) {
         if (y >= Chunk.SIZE_Y || y < 0) {
-            logger.warn("Accessed liquid outside of the height range");
             return new LiquidData();
         }
 
@@ -263,7 +245,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public Block getBlock(int x, int y, int z) {
         if (y >= Chunk.SIZE_Y || y < 0) {
-            logger.warn("Accessed block outside of the height range");
+            // Happens if you are moving around above the world
             return BlockManager.getAir();
         }
 
@@ -329,28 +311,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public long getTime() {
-        return CoreRegistry.get(Timer.class).getTimeInMs() + timeOffset;
-    }
-
-    @Override
-    public void setTime(long time) {
-        timeOffset = time - CoreRegistry.get(Timer.class).getTimeInMs();
-    }
-
-    @Override
-    public float getTimeInDays() {
-        return (float) getTime() / DAY_NIGHT_LENGTH_IN_MS;
-    }
-
-    @Override
-    public void setTimeInDays(float time) {
-        setTime((long) (time * DAY_NIGHT_LENGTH_IN_MS));
-    }
-
-    @Override
     public void dispose() {
         chunkProvider.dispose();
 
+    }
+
+    @Override
+    public WorldTime getTime() {
+        return worldTime;
     }
 }

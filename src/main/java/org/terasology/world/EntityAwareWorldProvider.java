@@ -18,9 +18,13 @@ package org.terasology.world;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
@@ -48,6 +52,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -57,6 +62,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
 
+    private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS = ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class, EntityInfoComponent.class);
 
     private EngineEntityManager entityManager;
@@ -71,12 +77,27 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
     private Thread mainThread;
-    private BlockingQueue<OnChangedBlock> eventQueue = Queues.newLinkedBlockingQueue();
+
+    private BlockingQueue<BlockChange> pendingChanges = Queues.newLinkedBlockingQueue();
+
+    private static class BlockChange {
+        private Vector3i position = new Vector3i();
+        private Block oldType;
+        private Block newType;
+
+        public BlockChange(Vector3i pos, Block oldType, Block newType) {
+            this.position.set(pos);
+            this.oldType = oldType;
+            this.newType = newType;
+        }
+    }
+
 
     public EntityAwareWorldProvider(WorldProviderCore base) {
         super(base);
         mainThread = Thread.currentThread();
         entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
+        CoreRegistry.get(ComponentSystemManager.class).register(getTime());
     }
 
     public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager) {
@@ -100,43 +121,56 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
             if (super.setBlock(x, y, z, type, oldType)) {
-                if (type.isKeepActive()) {
-                    temporaryBlockEntities.remove(blockEntity);
-                } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
-                    temporaryBlockEntities.add(blockEntity);
-                }
-                EntityRef regionEntity = blockRegionLookup.get(pos);
-                if (regionEntity != null) {
-                    regionEntity.send(new OnChangedBlock(pos, type, oldType));
-                }
-                updateBlockEntity(blockEntity, oldType, type);
-                blockEntity.send(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
+                updateBlockEntity(blockEntity, pos, oldType, type);
                 return true;
+            } else {
+                processOffThreadChanges();
             }
         } else {
-            // TODO: fix threading handling
             if (super.setBlock(x, y, z, type, oldType)) {
-                eventQueue.add(new OnChangedBlock(new Vector3i(x, y, z), type, oldType));
+                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type));
                 return true;
             }
         }
         return false;
     }
 
+    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type) {
+        if (type.isKeepActive()) {
+            temporaryBlockEntities.remove(blockEntity);
+        } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
+            temporaryBlockEntities.add(blockEntity);
+        }
+        EntityRef regionEntity = blockRegionLookup.get(pos);
+        if (regionEntity != null) {
+            regionEntity.send(new OnChangedBlock(pos, type, oldType));
+        }
+        updateBlockEntityComponents(blockEntity, oldType, type);
+        blockEntity.send(new OnChangedBlock(new Vector3i(pos), type, oldType));
+    }
+
     @Override
     public EntityRef getExistingBlockEntityAt(Vector3i blockPosition) {
-        EntityRef result = blockEntityLookup.get(blockPosition);
-        return (result == null) ? EntityRef.NULL : result;
+        if (Thread.currentThread() == mainThread) {
+            EntityRef result = blockEntityLookup.get(blockPosition);
+            return (result == null) ? EntityRef.NULL : result;
+        }
+        logger.error("Attempted to get block entity off-thread");
+        return EntityRef.NULL;
     }
 
     @Override
     public EntityRef getBlockEntityAt(Vector3i blockPosition) {
-        EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
-        if (!blockEntity.exists() && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
-            Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
-            blockEntity = createBlockEntity(blockPosition, block);
+        if (Thread.currentThread() == mainThread) {
+            EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
+            if (!blockEntity.exists() && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
+                Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
+                blockEntity = createBlockEntity(blockPosition, block);
+            }
+            return blockEntity;
         }
-        return blockEntity;
+        logger.error("Attempted to get block entity off-thread");
+        return EntityRef.NULL;
     }
 
     private boolean isTemporaryBlock(ComponentContainer entity, Block block) {
@@ -166,7 +200,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
      * @param oldType     The previous type of the block
      * @param type        The new type of the block
      */
-    private void updateBlockEntity(EntityRef blockEntity, Block oldType, Block type) {
+    private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type) {
         Prefab oldPrefab = entityManager.getPrefabManager().getPrefab(oldType.getPrefab());
         Prefab newPrefab = entityManager.getPrefabManager().getPrefab(type.getPrefab());
 
@@ -263,25 +297,38 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getExistingEntityAt(Vector3i blockPosition) {
-        EntityRef result = blockRegionLookup.get(blockPosition);
-        if (result == null) {
-            return getExistingBlockEntityAt(blockPosition);
+        if (Thread.currentThread() == mainThread) {
+            EntityRef result = blockRegionLookup.get(blockPosition);
+            if (result == null) {
+                return getExistingBlockEntityAt(blockPosition);
+            }
+            return result;
         }
-        return result;
+        logger.error("Attempted to get block entity off-thread");
+        return EntityRef.NULL;
     }
 
     @Override
     public EntityRef getEntityAt(Vector3i blockPosition) {
-        EntityRef entity = getExistingEntityAt(blockPosition);
-        if (!entity.exists()) {
-            return getBlockEntityAt(blockPosition);
+        if (Thread.currentThread() == mainThread) {
+            EntityRef entity = getExistingEntityAt(blockPosition);
+            if (!entity.exists()) {
+                return getBlockEntityAt(blockPosition);
+            }
+            return entity;
         }
-        return entity;
+        logger.error("Attempted to get block entity off-thread");
+        return EntityRef.NULL;
     }
 
     @Override
     public boolean hasPermanentBlockEntity(Vector3i blockPos) {
-        return blockEntityLookup.containsKey(blockPos) && !temporaryBlockEntities.contains(blockPos);
+        if (Thread.currentThread() == mainThread) {
+            EntityRef blockEntity = blockEntityLookup.get(blockPos);
+            return blockEntity != null && !temporaryBlockEntities.contains(blockEntity);
+        }
+        logger.error("Attempted check whether a block entity is permanent, off thread");
+        return false;
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
@@ -337,24 +384,34 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @Override
     public void update(float delta) {
         // TODO: This should be handled by the event system?
-        int processed = 0;
         PerformanceMonitor.startActivity("BlockChangedEventQueue");
-        OnChangedBlock event = eventQueue.poll();
-        while (event != null) {
-            getEntityAt(event.getBlockPosition()).send(event);
-            if (processed++ >= 4) {
-                break;
-            }
-            event = eventQueue.poll();
-        }
+        processOffThreadChanges();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Temp Blocks Cleanup");
-        for (EntityRef entity : temporaryBlockEntities) {
+        List<EntityRef> toRemove = Lists.newArrayList(temporaryBlockEntities);
+        temporaryBlockEntities.clear();
+        for (EntityRef entity : toRemove) {
             cleanUpTemporaryEntity(entity);
         }
-        temporaryBlockEntities.clear();
         PerformanceMonitor.endActivity();
+    }
+
+    private void processOffThreadChanges() {
+        List<BlockChange> changes = Lists.newArrayListWithExpectedSize(pendingChanges.size());
+        pendingChanges.drainTo(changes);
+        for (BlockChange change : changes) {
+            if (isBlockRelevant(change.position.x, change.position.y, change.position.z)) {
+                Block currentType = getBlock(change.position.x, change.position.y, change.position.z);
+                if (currentType == change.oldType) {
+                    EntityRef blockEntity = getExistingBlockEntityAt(change.position);
+                    if (!blockEntity.exists()) {
+                        blockEntity = createBlockEntity(change.position, change.oldType);
+                        updateBlockEntity(blockEntity, change.position, change.oldType, change.newType);
+                    }
+                }
+            }
+        }
     }
 
     private void cleanUpTemporaryEntity(EntityRef entity) {

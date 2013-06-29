@@ -26,6 +26,7 @@ import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
+import org.terasology.world.time.WorldTime;
 
 import java.util.Map;
 
@@ -152,27 +153,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public long getTime() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setTime(long time) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public float getTimeInDays() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setTimeInDays(float time) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public void dispose() {
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public WorldTime getTime() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

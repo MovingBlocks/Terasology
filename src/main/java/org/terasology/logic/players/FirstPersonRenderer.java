@@ -18,6 +18,7 @@ package org.terasology.logic.players;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -30,7 +31,7 @@ import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.primitives.Mesh;
@@ -67,7 +68,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterSystem(whenHeadless = false)
+@RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonRenderer implements RenderSystem {
 
     @In

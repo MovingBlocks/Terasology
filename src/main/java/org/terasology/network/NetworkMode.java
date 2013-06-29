@@ -27,7 +27,7 @@ public enum NetworkMode {
     NONE(true),
 
     /**
-     * The game is hosting a server
+     * The game is hosting a server.
      */
     SERVER(true),
 

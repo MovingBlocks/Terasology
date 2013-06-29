@@ -25,7 +25,7 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Timer;
+import org.terasology.engine.Time;
 import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.binds.ForwardsMovementAxis;
@@ -69,7 +69,7 @@ import javax.vecmath.Vector3f;
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private LocalPlayer localPlayer;
     private CameraTargetSystem cameraTargetSystem;
-    private Timer timer;
+    private Time time;
 
     private WorldProvider worldProvider;
     private DefaultCamera playerCamera;
@@ -100,7 +100,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        timer = CoreRegistry.get(Timer.class);
+        time = CoreRegistry.get(Time.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
     }
 
@@ -178,10 +178,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void onJump(JumpButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             jump = true;
-            if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
+            if (time.getGameTimeInMs() - lastTimeSpacePressed < 200) {
                 //characterMovement.isGhosting = !characterMovement.isGhosting;
             }
-            lastTimeSpacePressed = timer.getTimeInMs();
+            lastTimeSpacePressed = time.getGameTimeInMs();
             event.consume();
         } else {
             jump = false;

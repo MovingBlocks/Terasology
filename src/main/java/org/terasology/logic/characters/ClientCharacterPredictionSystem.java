@@ -33,7 +33,7 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.Timer;
+import org.terasology.engine.Time;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
@@ -50,13 +50,13 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-@RegisterSystem(RegisterMode.CLIENT)
+@RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(ClientCharacterPredictionSystem.class);
     private static final int BUFFER_SIZE = 128;
 
     @In
-    private Timer timer;
+    private Time time;
 
     @In
     private BulletPhysics physics;
@@ -157,7 +157,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(timer.getTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
@@ -166,7 +166,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        long renderTime = timer.getTimeInMs() - ServerCharacterPredictionSystem.RENDER_DELAY;
+        long renderTime = time.getGameTimeInMs() - ServerCharacterPredictionSystem.RENDER_DELAY;
         for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : playerStates.entrySet()) {
             CharacterStateEvent previous = null;
             CharacterStateEvent next = null;

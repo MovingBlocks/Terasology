@@ -15,7 +15,7 @@ import org.terasology.world.block.management.BlockManager;
 /**
  * @author Immortius
  */
-@RegisterSystem(RegisterMode.CLIENT)
+@RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class BlockTypeClientSystem implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(BlockTypeClientSystem.class);
 

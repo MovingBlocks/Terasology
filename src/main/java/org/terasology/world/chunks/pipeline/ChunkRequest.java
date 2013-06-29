@@ -47,7 +47,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         /**
          * End the processing of chunks
          */
-        EXIT;
+        EXIT
     }
 
     private ChunkGenerationPipeline pipeline;

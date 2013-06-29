@@ -455,7 +455,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
         farStore.dispose();
         String title = CoreRegistry.get(WorldProvider.class).getTitle();
-        File chunkFile = new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.WORLD_DATA_FILE);
+        File chunkFile = new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.WORLD_DATA_FILE);
         try {
             FileOutputStream fileOut = new FileOutputStream(chunkFile);
             BufferedOutputStream bos = new BufferedOutputStream(fileOut);

@@ -323,7 +323,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
      * Event handling
      */
 
-    @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.REMOTE_CLIENT)
     public void onChange(InventoryChangeAcknowledgedRequest event, EntityRef inventoryEntity) {
         logger.info("Received InventoryChangeAcknowledged for request {}", event.getChangeId());
         Iterator<MoveItemRequest> i = pendingMoves.iterator();

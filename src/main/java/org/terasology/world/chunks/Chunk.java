@@ -452,9 +452,6 @@ public class Chunk implements Externalizable {
     }
 
     public void deflate() {
-        if (getChunkState() != State.COMPLETE) {
-            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
-        }
         lock();
         try {
             AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();

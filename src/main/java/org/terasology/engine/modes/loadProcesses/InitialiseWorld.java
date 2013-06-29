@@ -23,6 +23,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.physics.BulletPhysics;
@@ -36,7 +37,6 @@ import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
-import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
@@ -58,10 +58,10 @@ public class InitialiseWorld implements LoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(InitialiseWorld.class);
 
-    private WorldInfo worldInfo;
+    private GameManifest gameManifest;
 
-    public InitialiseWorld(WorldInfo worldInfo) {
-        this.worldInfo = worldInfo;
+    public InitialiseWorld(GameManifest gameManifest) {
+        this.gameManifest = gameManifest;
     }
 
     @Override
@@ -110,6 +110,7 @@ public class InitialiseWorld implements LoadProcess {
 
     @Override
     public boolean step() {
+        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
             worldInfo.setSeed(random.randomCharacterString(16));
@@ -124,8 +125,7 @@ public class InitialiseWorld implements LoadProcess {
         chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
 
         ChunkStore chunkStore = null;
-        PathManager.getInstance().setCurrentWorldTitle(worldInfo.getTitle());
-        File f = new File(PathManager.getInstance().getCurrentWorldPath(), TerasologyConstants.WORLD_DATA_FILE);
+        File f = new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.WORLD_DATA_FILE);
         if (f.exists()) {
             try {
                 chunkStore = loadChunkStore(f);
@@ -141,10 +141,9 @@ public class InitialiseWorld implements LoadProcess {
         }
 
         // Init. a new world
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager));
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         CoreRegistry.put(WorldProvider.class, worldProvider);
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);
@@ -159,7 +158,8 @@ public class InitialiseWorld implements LoadProcess {
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
         // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing
-        CoreRegistry.get(WorldProvider.class).setTime(worldInfo.getTime());
+        worldProvider.getTime().setMilliseconds(worldInfo.getTime());
+
         return true;
     }
 

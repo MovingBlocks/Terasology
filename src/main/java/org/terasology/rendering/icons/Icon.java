@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.inventory;
+package org.terasology.rendering.icons;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
