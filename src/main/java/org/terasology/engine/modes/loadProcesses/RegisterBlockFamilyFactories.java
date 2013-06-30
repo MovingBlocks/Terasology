@@ -42,8 +42,6 @@ public class RegisterBlockFamilyFactories implements LoadProcess {
     @Override
     public boolean step() {
         DefaultBlockFamilyFactoryRegistry registry = new DefaultBlockFamilyFactoryRegistry();
-        registry.setDefaultBlockFamilyFactory(new SymmetricBlockFamilyFactory());
-        
         ModManager modManager = CoreRegistry.get(ModManager.class);
 
         loadFamilies(registry, modManager.getEngineReflections());
