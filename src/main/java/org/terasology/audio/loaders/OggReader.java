@@ -23,6 +23,8 @@ import com.jcraft.jorbis.Block;
 import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -43,6 +45,7 @@ import java.nio.ByteOrder;
  * data directly into a native buffer.
  */
 public class OggReader extends FilterInputStream {
+    private static final Logger logger = LoggerFactory.getLogger(OggReader.class);
 
     /**
      * The mono 16 bit format
@@ -399,7 +402,6 @@ public class OggReader extends FilterInputStream {
         int convOff = 0;
         int samples;
         while ((samples = dspState.synthesis_pcmout(_pcm, _index)) > 0) {
-            //System.out.println("while() 4");
             float[][] pcm = _pcm[0];
             int bout = (samples < convsize ? samples : convsize);
 
@@ -475,15 +477,13 @@ public class OggReader extends FilterInputStream {
                     // need more data fetching page..
                     fetchData();
                 } else if (result2 == -1) {
-                    //throw new Exception("syncState.pageout(page) result == -1");
-                    System.out.println("syncState.pageout(page) result == -1");
+                    logger.warn("syncState.pageout(page) result == -1");
                     return -1;
                 } else {
                     int result3 = streamState.pagein(page);
                 }
             } else if (result1 == -1) {
-                //throw new Exception("streamState.packetout(packet) result == -1");
-                System.out.println("streamState.packetout(packet) result == -1");
+                logger.warn("streamState.packetout(packet) result == -1");
                 return -1;
             } else {
                 fetchedPacket = true;
@@ -522,29 +522,4 @@ public class OggReader extends FilterInputStream {
         s = s + "rate (hz)       " + info.rate;
         return s;
     }
-
-    /**
-     * Tests this class by decoding an ogg file to a byte buffer.
-     */
-    /*
-    public static void main(String[] args) {
-        try {
-            InputStream inp = OggReader.class.getResourceAsStream("/audio/slash.ogg");
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream(1024 * 256);
-            byteOut.reset();
-            byte[] copyBuffer = new byte[1024 * 4];
-            OggInputStream oggInput = new OggInputStream(inp);
-            boolean done = false;
-            while (!done) {
-                int bytesRead = oggInput.read(copyBuffer, 0, copyBuffer.length);
-                byteOut.write(copyBuffer, 0, bytesRead);
-                done = (bytesRead != copyBuffer.length || bytesRead < 0);
-            }
-            System.out.println(byteOut.size() + " bytes read");
-            System.out.println(oggInput);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    */
 }

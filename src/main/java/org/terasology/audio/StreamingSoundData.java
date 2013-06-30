@@ -14,24 +14,27 @@
 * limitations under the License.
 */
 
-package org.terasology.asset;
+package org.terasology.audio;
+
+import org.terasology.asset.AssetData;
+
+import java.nio.ByteBuffer;
 
 /**
- *
+ * The information used to create a streaming sound asset
  */
-public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
+public interface StreamingSoundData extends AssetData {
 
-    private final AssetUri uri;
+    ByteBuffer readNextInto(ByteBuffer dataBuffer);
 
-    public AbstractAsset(AssetUri uri) {
-        this.uri = uri;
-    }
+    int getChannels();
 
-    /**
-     * @return This asset's identifying URI.
-     */
-    public final AssetUri getURI() {
-        return uri;
-    }
+    int getBufferBits();
+
+    int getSamplingRate();
+
+    void reset();
+
+    void dispose();
 
 }

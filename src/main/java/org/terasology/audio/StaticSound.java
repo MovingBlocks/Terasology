@@ -14,24 +14,17 @@
 * limitations under the License.
 */
 
-package org.terasology.asset;
+package org.terasology.audio;
 
 /**
- *
+ * Interface for a non-streamed sound - these sounds are loaded entirely into memory.
  */
-public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
-
-    private final AssetUri uri;
-
-    public AbstractAsset(AssetUri uri) {
-        this.uri = uri;
-    }
+public interface StaticSound extends Sound<StaticSoundData> {
 
     /**
-     * @return This asset's identifying URI.
+     * Returns sound sample length in seconds
+     *
+     * @return
      */
-    public final AssetUri getURI() {
-        return uri;
-    }
-
+    public float getLength();
 }

@@ -28,7 +28,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
