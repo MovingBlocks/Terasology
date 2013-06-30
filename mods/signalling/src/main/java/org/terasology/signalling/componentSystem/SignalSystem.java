@@ -96,7 +96,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     @Override
     public void update(float delta) {
-        long worldTime = worldProvider.getTime().getMilliseconds();
+        long worldTime = TimeUtils.getCorrectTime(worldProvider.getTime());
         if (worldTime > lastUpdate + PROCESSING_MINIMUM_INTERVAL) {
             lastUpdate = worldTime;
 
@@ -249,7 +249,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     @Override
     public void leafNodesAdded(Network network, Set<NetworkNode> leafNodes) {
         for (NetworkNode modifiedLeafNode : leafNodes) {
-            if (signalProducers.containsValue(modifiedLeafNode)) {
+            if (((SignalNetworkNode) modifiedLeafNode).getType() == SignalNetworkNode.Type.PRODUCER) {
                 logger.debug("Producer added to network");
                 networksToRecalculate.add(network);
                 producerNetworks.put(modifiedLeafNode, network);
@@ -266,7 +266,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     @Override
     public void leafNodesRemoved(Network network, Set<NetworkNode> leafNodes) {
         for (NetworkNode modifiedLeafNode : leafNodes) {
-            if (signalProducers.containsValue(modifiedLeafNode)) {
+            if (((SignalNetworkNode) modifiedLeafNode).getType() == SignalNetworkNode.Type.PRODUCER) {
                 logger.debug("Producer removed from network");
                 networksToRecalculate.add(network);
                 producerNetworks.remove(modifiedLeafNode, network);
@@ -285,8 +285,8 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
     public void networkRemoved(Network network) {
     }
 
-    private NetworkNode toNode(Vector3i location, byte directions) {
-        return new NetworkNode(location, directions);
+    private SignalNetworkNode toNode(Vector3i location, byte directions, SignalNetworkNode.Type type) {
+        return new SignalNetworkNode(location, directions, type);
     }
 
     /*
@@ -298,7 +298,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         byte connectingOnSides = blockType.getComponent(SignalConductorComponent.class).connectionSides;
         Set<NetworkNode> conductorNodes = Sets.newHashSet();
         for (Vector3i location : event.getBlockPositions()) {
-            final NetworkNode conductorNode = toNode(location, connectingOnSides);
+            final NetworkNode conductorNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONDUCTOR);
             conductorNodes.add(conductorNode);
 
             signalConductors.put(conductorNode.location, conductorNode);
@@ -312,7 +312,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Set<NetworkNode> conductorNodes = Sets.newHashSet();
         // Quite messy due to the order of operations, need to check if the order is important
         for (Vector3i location : event.getBlockPositions()) {
-            final NetworkNode conductorNode = toNode(location, connectingOnSides);
+            final NetworkNode conductorNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONDUCTOR);
             conductorNodes.add(conductorNode);
         }
         signalNetwork.removeNetworkingBlocks(conductorNodes);
@@ -326,7 +326,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
         final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
-        final NetworkNode conductorNode = toNode(location, connectingOnSides);
+        final NetworkNode conductorNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONDUCTOR);
 
         signalConductors.put(conductorNode.location, conductorNode);
         signalNetwork.addNetworkingBlock(conductorNode);
@@ -342,7 +342,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             final ImmutableBlockLocation blockLocation = new ImmutableBlockLocation(location);
             final NetworkNode oldConductorNode = signalConductors.get(blockLocation);
             if (oldConductorNode != null) {
-                final NetworkNode newConductorNode = toNode(new Vector3i(location), connectingOnSides);
+                final NetworkNode newConductorNode = toNode(new Vector3i(location), connectingOnSides, SignalNetworkNode.Type.CONDUCTOR);
                 signalConductors.put(newConductorNode.location, newConductorNode);
                 signalNetwork.updateNetworkingBlock(oldConductorNode, newConductorNode);
             }
@@ -354,7 +354,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         byte connectingOnSides = block.getComponent(SignalConductorComponent.class).connectionSides;
 
         final Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
-        final NetworkNode conductorNode = toNode(location, connectingOnSides);
+        final NetworkNode conductorNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONDUCTOR);
         signalNetwork.removeNetworkingBlock(conductorNode);
         signalConductors.remove(conductorNode.location);
     }
@@ -370,7 +370,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         int signalStrength = producerComponent.signalStrength;
         Set<NetworkNode> producerNodes = Sets.newHashSet();
         for (Vector3i location : event.getBlockPositions()) {
-            final NetworkNode producerNode = toNode(location, connectingOnSides);
+            final NetworkNode producerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.PRODUCER);
 
             signalProducers.put(producerNode.location, producerNode);
             producerSignalStrengths.put(producerNode, signalStrength);
@@ -385,7 +385,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         // Quite messy due to the order of operations, need to check if the order is important
         Set<NetworkNode> producerNodes = Sets.newHashSet();
         for (Vector3i location : event.getBlockPositions()) {
-            final NetworkNode producerNode = toNode(location, connectingOnSides);
+            final NetworkNode producerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.PRODUCER);
             producerNodes.add(producerNode);
         }
 
@@ -403,7 +403,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         final int signalStrength = producerComponent.signalStrength;
         byte connectingOnSides = producerComponent.connectionSides;
 
-        final NetworkNode producerNode = toNode(location, connectingOnSides);
+        final NetworkNode producerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.PRODUCER);
 
         signalProducers.put(producerNode.location, producerNode);
         producerSignalStrengths.put(producerNode, signalStrength);
@@ -422,18 +422,20 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             final byte oldConnectionSides = signalProducers.get(blockLocation).connectionSides;
             byte newConnectionSides = producerComponent.connectionSides;
 
-            NetworkNode node = toNode(location, newConnectionSides);
+            NetworkNode node = toNode(location, newConnectionSides, SignalNetworkNode.Type.PRODUCER);
+            NetworkNode oldNode = toNode(location, oldConnectionSides, SignalNetworkNode.Type.PRODUCER);
             if (oldConnectionSides != newConnectionSides) {
+                producerSignalStrengths.put(node, producerComponent.signalStrength);
                 signalProducers.put(node.location, node);
-                final NetworkNode oldNode = toNode(location, oldConnectionSides);
                 signalNetwork.updateLeafBlock(oldNode, node);
-            }
-
-            int oldSignalStrength = producerSignalStrengths.get(node);
-            int newSignalStrength = producerComponent.signalStrength;
-            if (oldSignalStrength != newSignalStrength) {
-                producerSignalStrengths.put(node, newSignalStrength);
-                producersSignalsChanged.add(node);
+                producerSignalStrengths.remove(oldNode);
+            } else {
+                int oldSignalStrength = producerSignalStrengths.get(oldNode);
+                int newSignalStrength = producerComponent.signalStrength;
+                if (oldSignalStrength != newSignalStrength) {
+                    producerSignalStrengths.put(node, newSignalStrength);
+                    producersSignalsChanged.add(node);
+                }
             }
         }
     }
@@ -443,7 +445,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalProducerComponent.class).connectionSides;
 
-        final NetworkNode producerNode = toNode(location, connectingOnSides);
+        final NetworkNode producerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.PRODUCER);
         signalNetwork.removeLeafBlock(producerNode);
         signalProducers.remove(producerNode.location);
         producerSignalStrengths.remove(producerNode);
@@ -458,7 +460,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         byte connectingOnSides = blockType.getComponent(SignalConsumerComponent.class).connectionSides;
         Set<NetworkNode> consumerNodes = Sets.newHashSet();
         for (Vector3i location : event.getBlockPositions()) {
-            NetworkNode consumerNode = toNode(location, connectingOnSides);
+            NetworkNode consumerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONSUMER);
 
             signalConsumers.put(consumerNode.location, consumerNode);
             consumerSignalInNetworks.put(consumerNode, Maps.<Network, NetworkSignals>newHashMap());
@@ -474,7 +476,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
         // Quite messy due to the order of operations, need to check if the order is important
         for (Vector3i location : event.getBlockPositions()) {
-            NetworkNode consumerNode = toNode(location, connectingOnSides);
+            NetworkNode consumerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONSUMER);
             consumerNodes.add(consumerNode);
         }
 
@@ -490,7 +492,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
-        NetworkNode consumerNode = toNode(location, connectingOnSides);
+        NetworkNode consumerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONSUMER);
 
         signalConsumers.put(consumerNode.location, consumerNode);
         consumerSignalInNetworks.put(consumerNode, Maps.<Network, NetworkSignals>newHashMap());
@@ -508,10 +510,15 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             final byte oldConnectionSides = signalConsumers.get(blockLocation).connectionSides;
             byte newConnectionSides = consumerComponent.connectionSides;
 
-            NetworkNode node = toNode(location, newConnectionSides);
+            NetworkNode node = toNode(location, newConnectionSides, SignalNetworkNode.Type.CONSUMER);
             if (oldConnectionSides != newConnectionSides) {
                 signalConsumers.put(node.location, node);
-                signalNetwork.updateLeafBlock(toNode(location, oldConnectionSides), node);
+                SignalNetworkNode oldNode = toNode(location, oldConnectionSides, SignalNetworkNode.Type.CONSUMER);
+                consumerSignalInNetworks.put(node, Maps.<Network, NetworkSignals>newHashMap());
+
+                signalNetwork.updateLeafBlock(oldNode, node);
+
+                consumerSignalInNetworks.remove(oldNode);
             }
             // Mode could have changed
             consumersToRecalculate.add(node);
@@ -523,7 +530,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         Vector3i location = new Vector3i(block.getComponent(BlockComponent.class).getPosition());
         byte connectingOnSides = block.getComponent(SignalConsumerComponent.class).connectionSides;
 
-        final NetworkNode consumerNode = toNode(location, connectingOnSides);
+        final NetworkNode consumerNode = toNode(location, connectingOnSides, SignalNetworkNode.Type.CONSUMER);
         signalNetwork.removeLeafBlock(consumerNode);
         signalConsumers.remove(consumerNode.location);
         consumerSignalInNetworks.remove(consumerNode);
