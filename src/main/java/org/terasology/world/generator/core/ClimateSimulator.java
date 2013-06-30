@@ -16,12 +16,16 @@
 
 package org.terasology.world.generator.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Climate simulation based on weighted distances
  *
  * @author Nym Traveel
  */
 public class ClimateSimulator {
+    private static final Logger logger = LoggerFactory.getLogger(ClimateSimulator.class);
     private float[][] heightmap, climate, humidity;
     private int size;
 
@@ -91,7 +95,7 @@ public class ClimateSimulator {
         float[][] distArr = initDist(fromWhat);
         float currentDistance = 0;
 
-        System.out.println("Starting distance calculation: " + fromWhat);
+        logger.info("Starting distance calculation: {}", fromWhat);
         while (currentDistance < size) {
             for (int width = 0; width < size; width++) {
                 for (int height = 0; height < size; height++) {

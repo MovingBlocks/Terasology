@@ -19,6 +19,8 @@ package org.terasology.world.block;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -33,13 +35,15 @@ import org.terasology.world.WorldProvider;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(BlockFamilyUpdateSystem.class);
+
     @In
     private WorldProvider worldProvider;
     @In
     private BlockEntityRegistry blockEntityRegistry;
 
     public BlockFamilyUpdateSystem() {
-        System.out.println("Creating system");
+        logger.info("Creating system");
     }
 
     @Override
