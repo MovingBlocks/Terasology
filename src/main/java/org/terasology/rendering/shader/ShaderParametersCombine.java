@@ -20,8 +20,11 @@ import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
+import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.List;
 
@@ -32,12 +35,15 @@ import java.util.List;
  */
 public class ShaderParametersCombine extends ShaderParametersBase {
 
-    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.001f, 0.001f, 0.1f);
+    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.001f, 0.001f, 0.005f);
     private Property outlineThickness = new Property("outlineThickness", 0.65f);
 
     Property skyInscatteringLength = new Property("skyInscatteringLength", 0.25f, 0.0f, 1.0f);
     Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.3f, 0.0f, 1.0f);
     Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 1.0f, 0.0f, 1.0f);
+
+    Property shadowIntens = new Property("shadowIntens", 0.65f, 0.0f, 1.0f);
+    Property shadowMapBias = new Property("shadowMapBias", 0.003f, 0.0f, 0.1f);
 
     @Override
     public void applyParameters(GLSLShaderProgram program) {
@@ -63,6 +69,30 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindLightBufferTexture();
             program.setInt("texSceneOpaqueLightBuffer", texId++);
+        }
+
+        if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
+            program.setInt("texSceneShadowMap", texId++);
+
+            Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();
+            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+
+            if (lightCamera != null && activeCamera != null) {
+                program.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix());
+                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix());
+
+                Vector3f activeCameraToLightSpace = new Vector3f();
+                activeCameraToLightSpace.sub(activeCamera.getPosition(), lightCamera.getPosition());
+                program.setFloat3("mainCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z);
+            }
+
+            Vector4f shadowSettingsFrag = new Vector4f();
+            shadowSettingsFrag.x = (Float) shadowIntens.getValue();
+            shadowSettingsFrag.y = (Float) shadowMapBias.getValue();
+
+            program.setFloat4("shadowSettingsFrag", shadowSettingsFrag);
         }
 
         DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
@@ -106,5 +136,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         properties.add(skyInscatteringThreshold);
         properties.add(outlineThickness);
         properties.add(outlineDepthThreshold);
+        properties.add(shadowIntens);
+        properties.add(shadowMapBias);
     }
 }

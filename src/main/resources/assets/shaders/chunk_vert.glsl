@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-#if defined (DYNAMIC_SHADOWS)
-uniform vec3 chunkPositionRelToLightCamera;
-uniform mat4 lightViewProjMatrix;
-
-varying vec4 vertexLightProjPos;
-#endif
-
 #ifdef FEATURE_REFRACTIVE_PASS
 varying vec3 waterNormalViewSpace;
 #endif
@@ -122,13 +115,6 @@ void main()
     gl_TexCoord[1] = gl_MultiTexCoord1;
 
 	vertexWorldPos = gl_Vertex;
-
-#if defined (DYNAMIC_SHADOWS)
-	vertexLightProjPos =
-	    lightViewProjMatrix
-	    * vec4(vertexWorldPos.x + chunkPositionRelToLightCamera.x, gl_Vertex.y + chunkPositionRelToLightCamera.y, gl_Vertex.z + chunkPositionRelToLightCamera.z, gl_Vertex.w);
-#endif
-
 	vertexViewPos = gl_ModelViewMatrix * vertexWorldPos;
 
 	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;

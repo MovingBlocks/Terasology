@@ -27,15 +27,6 @@
 #define BLOCK_DIFF 0.75
 #define BLOCK_AMB 2.0
 
-#if defined (DYNAMIC_SHADOWS)
-uniform vec4 shadowSettingsFrag;
-#define shadowIntens shadowSettingsFrag.x
-#define shadowMapBias shadowSettingsFrag.y
-
-uniform sampler2D texSceneShadowMap;
-varying vec4 vertexLightProjPos;
-#endif
-
 #ifdef FEATURE_REFRACTIVE_PASS
 varying vec3 waterNormalViewSpace;
 #endif
@@ -191,11 +182,11 @@ void main() {
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
 
-#if defined FEATURE_ALPHA_REJECT
+# if defined FEATURE_ALPHA_REJECT
         if (color.a < 0.1) {
             discard;
         }
-#endif
+# endif
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
@@ -236,18 +227,6 @@ void main() {
     {
         diffuseLighting = calcLambLight(normalOpaque, sunVecViewAdjusted);
     }
-
-#if defined (DYNAMIC_SHADOWS)
-    float shadowTerm = 1.0;
-
-    vec3 vertexLightPosClipSpace = vertexLightProjPos.xyz / vertexLightProjPos.w;
-    vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5) + vec2(0.5);
-    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
-
-    if (shadowMapDepth < vertexLightPosClipSpace.z - shadowMapBias) {
-        shadowTerm = shadowIntens;
-    }
-#endif
 
     vec3 daylightColorValue;
 
@@ -330,18 +309,10 @@ void main() {
 
 #if defined (FEATURE_REFRACTIVE_PASS)
     gl_FragData[0].rgba = color;
-
-# if defined (DYNAMIC_SHADOWS)
-    color.xyz *= shadowTerm;
-# endif
 #else
     gl_FragData[0].rgb = color.rgb;
     // Encode occlusion value into the alpha channel
     gl_FragData[0].a = occlusionValue;
-
-# if defined (DYNAMIC_SHADOWS)
-    gl_FragData[0].a *= shadowTerm;
-# endif
 #endif
 
 #if !defined (FEATURE_REFRACTIVE_PASS)

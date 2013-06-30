@@ -57,9 +57,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
     Property waterSpecExp = new Property("waterSpecExp", 512.0f, 0.0f, 1024.0f);
 
-    Property shadowIntens = new Property("shadowIntens", 0.5f, 0.0f, 1.0f);
-    Property shadowMapBias = new Property("shadowMapBias", 0.01f, 0.0f, 0.1f);
-
     Property parallaxBias = new Property("parallaxBias", 0.05f, 0.0f, 0.5f);
     Property parallaxScale = new Property("parallaxScale", 0.05f, 0.0f, 0.5f);
 
@@ -114,23 +111,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             }
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
-            program.setInt("texSceneShadowMap", texId++);
-
-            Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();
-            if (lightCamera != null) {
-                program.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix());
-            }
-
-            Vector4f shadowSettingsFrag = new Vector4f();
-            shadowSettingsFrag.x = (Float) shadowIntens.getValue();
-            shadowSettingsFrag.y = (Float) shadowMapBias.getValue();
-
-            program.setFloat4("shadowSettingsFrag", shadowSettingsFrag);
-        }
-
         Vector4f lightingSettingsFrag = new Vector4f();
         lightingSettingsFrag.z = (Float) waterSpecExp.getValue();
         program.setFloat4("lightingSettingsFrag", lightingSettingsFrag);
@@ -178,8 +158,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(waterRefraction);
         properties.add(waterOffsetY);
         properties.add(waveOverallScale);
-        properties.add(shadowIntens);
-        properties.add(shadowMapBias);
         properties.add(waterTint);
         properties.add(parallaxBias);
         properties.add(parallaxScale);

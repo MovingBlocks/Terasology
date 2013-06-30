@@ -130,11 +130,19 @@ vec2 projectVertexToTexCoord(vec4 projVertexPos) {
     return 0.5 * (projVertexPos.xy/projVertexPos.w) + vec2(0.5);
 }
 
+// NOTE: Can also be used to reconstruct the position in world space by passing the inverse view projection matrix
 vec3 reconstructViewPos(float depth, vec2 texCoord, mat4 paramInvProjMatrix) {
     vec4 screenSpaceNorm = vec4(texCoord.x, texCoord.y, depth, 1.0);
     vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
     vec4 viewSpacePos = paramInvProjMatrix * screenSpacePos;
     return viewSpacePos.xyz / viewSpacePos.w;
+}
+
+vec4 reconstructViewPosWithoutPerspectiveDivide(float depth, vec2 texCoord, mat4 paramInvProjMatrix) {
+    vec4 screenSpaceNorm = vec4(texCoord.x, texCoord.y, depth, 1.0);
+    vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
+    vec4 viewSpacePos = paramInvProjMatrix * screenSpacePos;
+    return viewSpacePos;
 }
 
 vec2 normalizeAtlasTexCoord(vec2 atlasTexCoord) {

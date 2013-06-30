@@ -998,14 +998,6 @@ public final class WorldRenderer {
                     shader.setActiveFeatures(0);
                 }
 
-                if (config.getRendering().isDynamicShadows()) {
-                    if (lightCamera != null) {
-                        Vector3d chunkPositionRelToLightCamera =
-                                new Vector3d(chunk.getPos().x * Chunk.SIZE_X - lightCamera.getPosition().x, chunk.getPos().y * Chunk.SIZE_Y - lightCamera.getPosition().y, chunk.getPos().z * Chunk.SIZE_Z - lightCamera.getPosition().z);
-                        shader.setFloat3("chunkPositionRelToLightCamera", (float) chunkPositionRelToLightCamera.x, (float) chunkPositionRelToLightCamera.y, (float)  chunkPositionRelToLightCamera.z);
-                    }
-                }
-
                 shader.setFloat3("chunkPositionWorld", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
                 shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
