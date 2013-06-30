@@ -40,7 +40,7 @@ import com.google.common.collect.Sets;
 public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
 
-    public static final int GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL = 2000;
+    public static final int GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL = 500;
     public static final int NOT_LOADED_BLOCK_RETRY_DELAY = 500;
 
     @In
@@ -305,8 +305,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private void signalChangedForDelayOffGate(EntityRef entity, SignalConsumerStatusComponent consumerStatusComponent) {
         SignalTimeDelayComponent delay = entity.getComponent(SignalTimeDelayComponent.class);
         if (consumerStatusComponent.hasSignal) {
-            // Remove any signal-delayed actions on the entity and turn on signal from it, if it doesn't have any
-            entity.removeComponent(SignalDelayedActionComponent.class);
+                // Remove any signal-delayed actions on the entity and turn on signal from it, if it doesn't have any
+            if (entity.hasComponent(SignalDelayedActionComponent.class)) {
+                entity.removeComponent(SignalDelayedActionComponent.class);
+            }
             startProducingSignal(entity, -1);
         } else {
             // Schedule for the gate to be looked at when the time passes
@@ -324,8 +326,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             delayedAction.executeTime = TimeUtils.getCorrectTime(worldProvider.getTime()) + delay.delaySetting;
             entity.addComponent(delayedAction);
         } else {
-            // Remove any signal-delayed actions on the entity and turn off signal from it, if it has any
-            entity.removeComponent(SignalDelayedActionComponent.class);
+                // Remove any signal-delayed actions on the entity and turn off signal from it, if it has any
+            if (entity.hasComponent(SignalDelayedActionComponent.class)) {
+                entity.removeComponent(SignalDelayedActionComponent.class);
+            }
             stopProducingSignal(entity);
         }
     }
