@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.assetLoaders;
+package org.terasology.rendering.assets.mesh;
 
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Vector3i;
-import org.terasology.rendering.primitives.Mesh;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
@@ -43,12 +42,12 @@ import java.util.List;
  * @author Immortius <immortius@gmail.com>
  */
 
-public class ObjMeshLoader implements AssetLoader<Mesh> {
+public class ObjMeshLoader implements AssetLoader<MeshData> {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjMeshLoader.class);
 
     @Override
-    public Mesh load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public MeshData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
         List<Vector3f> rawVertices = Lists.newArrayList();
@@ -59,27 +58,32 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
         // Gather data
         readMeshData(reader, rawVertices, rawNormals, rawTexCoords, rawIndices);
 
-        // Process data
-        TFloatList vertices = new TFloatArrayList();
-        TFloatList texCoord0 = new TFloatArrayList();
-        TFloatList normals = new TFloatArrayList();
-        TIntList indices = new TIntArrayList();
-
         // Determine face format;
         if (rawIndices.size() == 0) {
             throw new IOException("No index data");
         }
 
-        processData(rawVertices, rawNormals, rawTexCoords, rawIndices, vertices, texCoord0, normals, indices);
+        MeshData data = processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
 
-        if (normals.size() != vertices.size() || texCoord0.size() / 2 != vertices.size() / 3) {
-            throw new IOException("Mixed face format");
+        if (data.getVertices() == null) {
+            throw new IOException("No vertices define");
+        }
+        if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
+            throw new IOException("The number of normals does not match the number of vertices.");
+        }
+        if (data.getTexCoord0() == null || data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
+            throw new IOException("The number of tex coords does not match the number of vertices.");
         }
 
-        return Mesh.buildMesh(uri, vertices, texCoord0, null, normals, null, indices);
+        return data;
     }
 
-    private void processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices, TFloatList vertices, TFloatList texCoord0, TFloatList normals, TIntList indices) throws IOException {
+    private MeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices) throws IOException {
+        MeshData result = new MeshData();
+        TFloatList vertices = result.getVertices();
+        TFloatList texCoord0 = result.getTexCoord0();
+        TFloatList normals = result.getNormals();
+        TIntList indices = result.getIndices();
         int vertCount = 0;
         for (Tuple3i[] face : rawIndices) {
             for (Tuple3i indexSet : face) {
@@ -118,6 +122,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
             }
             vertCount += face.length;
         }
+        return result;
     }
 
     private void readMeshData(BufferedReader reader, List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices) throws IOException {
@@ -140,66 +145,72 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                     throw new IOException(String.format("Incomplete statement"));
                 }
 
-                // JAVA7: Replace with switch
-                // Object name
-                if ("o".equals(prefix)) {
-                    // Just skip the name
-                }
-                // Vertex position
-                else if ("v".equals(prefix)) {
-                    String[] floats = prefixSplit[1].trim().split("\\s+", 4);
-                    if (floats.length != 3) {
-                        throw new IOException("Bad statement");
-                    }
-                    rawVertices.add(new Vector3f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1]), Float.parseFloat(floats[2])));
-                }
-                // Vertex texture coords
-                else if ("vt".equals(prefix)) {
-                    String[] floats = prefixSplit[1].trim().split("\\s+", 4);
-                    if (floats.length < 2 || floats.length > 3) {
-                        throw new IOException("Bad statement");
-                    }
-                    // Need to flip v coord, apparently
-                    rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1])));
-                }
-                // Vertex normal
-                else if ("vn".equals(prefix)) {
-                    String[] floats = prefixSplit[1].trim().split("\\s+", 4);
-                    if (floats.length != 3) {
-                        throw new IOException("Bad statement");
-                    }
-                    rawNormals.add(new Vector3f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1]), Float.parseFloat(floats[2])));
-                }
-                // Material name (ignored)
-                else if ("usemtl".equals(prefix)) {
-                    continue;
-                }
-                // Smoothing group (not supported)
-                else if ("s".equals(prefix)) {
-                    if (!"off".equals(prefixSplit[1]) && !"0".equals(prefixSplit[1])) {
-                        logger.warn("Smoothing groups not supported in obj import yet");
-                    }
-                }
-                // Face (polygon)
-                else if ("f".equals(prefix)) {
-                    String[] elements = prefixSplit[1].trim().split("\\s+");
-                    Tuple3i[] result = new Tuple3i[elements.length];
-                    for (int i = 0; i < elements.length; ++i) {
-                        String[] parts = elements[i].split("/", 4);
-                        if (parts.length > 3) {
-                            throw new IOException("Bad Statement");
+                switch (prefix) {
+                    // Object name
+                    case "o":
+                        // Just skip the name
+                        break;
+
+                    // Vertex position
+                    case "v": {
+                        String[] floats = prefixSplit[1].trim().split("\\s+", 4);
+                        if (floats.length != 3) {
+                            throw new IOException("Bad statement");
                         }
-                        result[i] = new Vector3i(Integer.parseInt(parts[0]), -1, -1);
-                        if (parts.length > 1 && !parts[1].isEmpty()) {
-                            result[i].y = Integer.parseInt(parts[1]);
-                        }
-                        if (parts.length > 2 && !parts[2].isEmpty()) {
-                            result[i].z = Integer.parseInt(parts[2]);
-                        }
+                        rawVertices.add(new Vector3f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1]), Float.parseFloat(floats[2])));
+                        break;
                     }
-                    rawIndices.add(result);
-                } else {
-                    logger.warn("Skipping unsupported obj statement on line {}:\"{}\"", lineNum, line);
+                    // Vertex texture coords
+                    case "vt": {
+                        String[] floats = prefixSplit[1].trim().split("\\s+", 4);
+                        if (floats.length < 2 || floats.length > 3) {
+                            throw new IOException("Bad statement");
+                        }
+                        // Need to flip v coord, apparently
+                        rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1])));
+                        break;
+                    }
+                    // Vertex normal
+                    case "vn": {
+                        String[] floats = prefixSplit[1].trim().split("\\s+", 4);
+                        if (floats.length != 3) {
+                            throw new IOException("Bad statement");
+                        }
+                        rawNormals.add(new Vector3f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1]), Float.parseFloat(floats[2])));
+                        break;
+                    }
+                    // Material name (ignored)
+                    case "usemtl":
+                        break;
+                    // Smoothing group (not supported)
+                    case "s": {
+                        if (!"off".equals(prefixSplit[1]) && !"0".equals(prefixSplit[1])) {
+                            logger.warn("Smoothing groups not supported in obj import yet");
+                        }
+                        break;
+                    }
+                    // Face (polygon)
+                    case "f": {
+                        String[] elements = prefixSplit[1].trim().split("\\s+");
+                        Tuple3i[] result = new Tuple3i[elements.length];
+                        for (int i = 0; i < elements.length; ++i) {
+                            String[] parts = elements[i].split("/", 4);
+                            if (parts.length > 3) {
+                                throw new IOException("Bad Statement");
+                            }
+                            result[i] = new Vector3i(Integer.parseInt(parts[0]), -1, -1);
+                            if (parts.length > 1 && !parts[1].isEmpty()) {
+                                result[i].y = Integer.parseInt(parts[1]);
+                            }
+                            if (parts.length > 2 && !parts[2].isEmpty()) {
+                                result[i].z = Integer.parseInt(parts[2]);
+                            }
+                        }
+                        rawIndices.add(result);
+                        break;
+                    }
+                    default:
+                        logger.warn("Skipping unsupported obj statement on line {}:\"{}\"", lineNum, line);
                 }
             }
         } catch (Exception e) {

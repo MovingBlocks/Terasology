@@ -17,6 +17,8 @@
 package org.terasology.logic.inventory;
 
 import com.google.common.collect.Maps;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.logic.common.lifespan.LifespanComponent;
@@ -29,7 +31,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.physics.RigidBodyComponent;
 import org.terasology.rendering.logic.MeshComponent;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.world.block.items.BlockItemComponent;
 
@@ -64,7 +66,7 @@ public class ItemPickupFactory {
                 Mesh itemMesh = iconMeshes.get(itemComp.icon);
                 if (itemMesh == null) {
                     Icon icon = Icon.get(itemComp.icon);
-                    itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
+                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + itemComp.icon), icon.getX(), icon.getY());
                     iconMeshes.put(itemComp.icon, itemMesh);
                 }
                 builder.getComponent(MeshComponent.class).mesh = itemMesh;

@@ -59,7 +59,7 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 

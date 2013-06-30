@@ -15,33 +15,24 @@
  */
 package org.terasology.rendering.primitives;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 
-public class MeshFactory {
-
-    /* SINGLETON */
-    private static MeshFactory _instance;
-    private Tessellator tessellator = new Tessellator();
-
-    public static MeshFactory getInstance() {
-        if (_instance == null)
-            _instance = new MeshFactory();
-
-        return _instance;
-    }
+public final class MeshFactory {
 
     private MeshFactory() {
     }
 
-    public Mesh generateItemMesh(int posX, int posY) {
-        return generateItemMesh(posX, posY, 0, false, null);
+    public static Mesh generateItemMesh(AssetUri uri, int posX, int posY) {
+        return generateItemMesh(uri, posX, posY, 0, false, null);
     }
 
-    public Mesh generateItemMesh(int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
+    public static Mesh generateItemMesh(AssetUri uri, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
         Texture tex = Assets.getTexture("engine:items");
         ByteBuffer buffer = tex.getData().getBuffers()[0];
 
@@ -49,6 +40,8 @@ public class MeshFactory {
         posY *= 16;
 
         int stride = tex.getWidth() * 4;
+
+        Tessellator tessellator = new Tessellator();
 
         for (int y = 0; y < 16; y++) {
             for (int x = 0; x < 16; x++) {
@@ -111,10 +104,7 @@ public class MeshFactory {
             }
         }
 
-        Mesh result = tessellator.generateMesh();
-        tessellator.resetAll();
-
-        return result;
+        return tessellator.generateMesh(uri);
     }
 
 }
