@@ -38,6 +38,7 @@ public class RenderingConfig {
     private boolean normalMapping = false;
     private boolean parallaxMapping = false;
     private boolean useZPrePass = false;
+    private boolean dynamicShadowsPcfFiltering = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -297,5 +298,13 @@ public class RenderingConfig {
 
     public void setUseZPrePass(boolean useZPrePass) {
         this.useZPrePass = useZPrePass;
+    }
+
+    public boolean isDynamicShadowsPcfFiltering() {
+        return dynamicShadowsPcfFiltering;
+    }
+
+    public void setDynamicShadowsPcfFiltering(boolean dynamicShadowsPcfFiltering) {
+        this.dynamicShadowsPcfFiltering = dynamicShadowsPcfFiltering;
     }
 }

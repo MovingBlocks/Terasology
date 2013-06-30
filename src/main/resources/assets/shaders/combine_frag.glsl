@@ -97,12 +97,16 @@ void main() {
     vec3 lightPosClipSpace = lightProjPos.xyz / lightProjPos.w;
     vec2 shadowMapTexPos = lightPosClipSpace.xy * vec2(0.5) + vec2(0.5);
 
-    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
-
     float shadowTerm = 1.0;
-    if (lightPosClipSpace.z < 1.0 && shadowMapDepth < lightPosClipSpace.z - shadowMapBias) {
+
+#if defined (DYNAMIC_SHADOWS_PCF)
+    shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightPosClipSpace.z, shadowMapTexPos, shadowIntens, shadowMapBias);
+#else
+    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
+    if (shadowMapDepth + shadowMapBias < lightPosClipSpace.z) {
         shadowTerm = shadowIntens;
     }
+#endif
 
     colorOpaque.rgb *= mix(shadowTerm, 1.0, fogValue);
 #endif

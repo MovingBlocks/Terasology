@@ -579,6 +579,8 @@ public class GLSLShaderProgram implements Asset {
             builder.append("#define NORMAL_MAPPING \n");
         if (config.getRendering().isParallaxMapping())
             builder.append("#define PARALLAX_MAPPING \n");
+        if (config.getRendering().isDynamicShadowsPcfFiltering())
+            builder.append("#define DYNAMIC_SHADOWS_PCF \n");
 
         for (int i=0; i<SystemConfig.DebugRenderingStages.values().length; ++i) {
             builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" "+SystemConfig.DebugRenderingStages.values()[i].ordinal()+" \n");
