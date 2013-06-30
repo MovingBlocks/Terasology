@@ -17,6 +17,7 @@ package org.terasology.rendering.primitives;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
@@ -165,7 +166,7 @@ public class Tessellator {
 
     public Mesh generateMesh() {
         if (_vertices.size() > 0) {
-            return Mesh.buildMesh(_vertices, _texCoord0, _texCoord1, _normals, _color, _indices);
+            return Mesh.buildMesh(new AssetUri(AssetType.MESH, "temp:mesh"), _vertices, _texCoord0, _texCoord1, _normals, _color, _indices);
         }
         return null;
     }

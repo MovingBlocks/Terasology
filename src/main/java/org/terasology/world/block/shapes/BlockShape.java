@@ -25,7 +25,9 @@ import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Maps;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.math.Pitch;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
@@ -45,8 +47,7 @@ import java.util.Map;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class BlockShape implements Asset {
-    private AssetUri uri;
+public class BlockShape extends CompatibilityHackAsset implements Asset<AssetData> {
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
     private CollisionShape baseCollisionShape;
@@ -55,6 +56,9 @@ public class BlockShape implements Asset {
     private boolean yawSymmetric = false;
     private boolean pitchSymmetric = false;
     private boolean rollSymmetric = false;
+
+    public BlockShape() {
+    }
 
     public BlockMeshPart getMeshPart(BlockPart part) {
         return meshParts.get(part);
@@ -65,16 +69,7 @@ public class BlockShape implements Asset {
     }
 
     @Override
-    public AssetUri getURI() {
-        return uri;
-    }
-
-    @Override
     public void dispose() {
-    }
-
-    public void setURI(AssetUri uri) {
-        this.uri = uri;
     }
 
     public CollisionShape getCollisionShape() {

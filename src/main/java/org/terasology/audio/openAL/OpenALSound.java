@@ -16,6 +16,7 @@
 package org.terasology.audio.openAL;
 
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.audio.Sound;
 
 import static org.lwjgl.openal.AL10.AL_BITS;
@@ -24,16 +25,15 @@ import static org.lwjgl.openal.AL10.AL_FREQUENCY;
 import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
-public abstract class OpenALSound implements Sound {
+public abstract class OpenALSound extends CompatibilityHackAsset implements Sound {
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
 
-    private AssetUri uri;
     private int bufferId = 0;
     protected int length = 0;
 
     public OpenALSound(AssetUri uri, int bufferId) {
-        this.uri = uri;
+        super(uri);
         this.bufferId = bufferId;
 
         OpenALException.checkState("Allocating sound buffer");
@@ -75,11 +75,6 @@ public abstract class OpenALSound implements Sound {
     @Override
     public int getBufferSize() {
         return alGetBufferi(bufferId, AL_SIZE);
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override

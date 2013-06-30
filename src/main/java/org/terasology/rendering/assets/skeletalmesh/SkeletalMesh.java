@@ -26,7 +26,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 
 import javax.vecmath.Quat4f;
@@ -52,13 +54,12 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
 /**
  * @author Immortius
  */
-public class SkeletalMesh implements Asset {
+public class SkeletalMesh extends CompatibilityHackAsset implements Asset<AssetData> {
     private static final int TEX_COORD_SIZE = 2;
     private static final int VECTOR3_SIZE = 3;
     private static final int STRIDE = 24;
     private static final int NORMAL_OFFSET = VECTOR3_SIZE * 4;
 
-    private AssetUri uri;
     private Bone rootBone;
     private Map<String, Bone> boneLookup = Maps.newHashMap();
     private List<Bone> bones = Lists.newArrayList();
@@ -73,13 +74,8 @@ public class SkeletalMesh implements Asset {
     private int vboIndexBuffer = 0;
 
     public SkeletalMesh(AssetUri uri) {
-        this.uri = uri;
+        super(uri);
         vboPosNormBuffer = VertexBufferObjectManager.getInstance().getVboId();
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override

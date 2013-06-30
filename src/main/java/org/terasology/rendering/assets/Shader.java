@@ -24,7 +24,9 @@ import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
@@ -43,13 +45,12 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class Shader implements Asset {
+public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
     private static final String PreProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
     private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
 
     private static final Logger logger = LoggerFactory.getLogger(Shader.class);
 
-    private final AssetUri uri;
     private String vertShader;
     private String fragShader;
 
@@ -60,7 +61,7 @@ public class Shader implements Asset {
 
 
     public Shader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
-        this.uri = uri;
+        super(uri);
 
         this.vertShader = vertShader;
         this.fragShader = fragShader;
@@ -72,20 +73,16 @@ public class Shader implements Asset {
         compileShaderProgram();
     }
 
-    @Override
-    public AssetUri getURI() {
-        return uri;
-    }
 
     public void recompile() {
-        logger.debug("Recompiling shader {}.", uri);
+        logger.debug("Recompiling shader {}.", getURI());
 
         dispose();
         compileShaderProgram();
     }
 
     public void dispose() {
-        logger.debug("Disposing shader {}.", uri);
+        logger.debug("Disposing shader {}.", getURI());
 
         GL20.glDeleteProgram(fragmentProgram);
         fragmentProgram = 0;

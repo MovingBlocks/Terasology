@@ -16,8 +16,9 @@
 package org.terasology.audio;
 
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 
-public interface Sound extends Asset {
+public interface Sound extends Asset<AssetData>, AssetData {
 
     /**
      * Returns sound sample length in seconds

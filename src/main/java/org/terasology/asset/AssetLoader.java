@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Immortius
  */
-public interface AssetLoader<T extends Asset> {
+public interface AssetLoader<T extends AssetData> {
 
     /**
      * Loads an asset. The uri identifying the asset is provided, along with an stream, and the urls relating to the

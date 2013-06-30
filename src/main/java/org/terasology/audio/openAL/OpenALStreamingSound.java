@@ -17,6 +17,7 @@ package org.terasology.audio.openAL;
 
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.audio.Sound;
 
 import java.net.URL;
@@ -25,10 +26,9 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
-public abstract class OpenALStreamingSound implements Sound {
+public abstract class OpenALStreamingSound extends CompatibilityHackAsset implements Sound {
     private final static int BUFFER_POOL_SIZE = 3;
 
-    private final AssetUri uri;
     protected final URL audioSource;
 
     protected int[] buffers;
@@ -36,17 +36,12 @@ public abstract class OpenALStreamingSound implements Sound {
     protected int lastUpdatedBuffer;
 
     public OpenALStreamingSound(AssetUri uri, URL source) {
-        this.uri = uri;
+        super(uri);
         this.audioSource = source;
 
         this.initializeBuffers();
 
         this.reset();
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     protected abstract ByteBuffer fetchData();

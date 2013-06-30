@@ -20,7 +20,9 @@ import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
@@ -29,20 +31,14 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class MeshAnimation implements Asset {
-    private AssetUri uri;
+public class MeshAnimation extends CompatibilityHackAsset implements Asset<AssetData> {
     private List<String> boneNames;
     private TIntList boneParent;
     private List<MeshAnimationFrame> frames = Lists.newArrayList();
     private float timePerFrame;
 
     public MeshAnimation(AssetUri uri) {
-        this.uri = uri;
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
+        super(uri);
     }
 
     @Override

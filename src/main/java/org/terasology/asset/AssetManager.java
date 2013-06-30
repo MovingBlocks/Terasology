@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 // TODO: Split out static methods to an Assets static class
 // TODO: Split out an interface, possibly two with one for loading and adding assets, the other with disposal and other more management methods
@@ -51,8 +52,13 @@ public class AssetManager {
     private EnumMap<AssetType, Map<String, AssetLoader>> assetLoaders = Maps.newEnumMap(AssetType.class);
     private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
     private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
+    private Map<AssetType, AssetFactory> factories = Maps.newHashMap();
 
     protected AssetManager() {
+    }
+
+    public void setAssetFactory(AssetType type, AssetFactory factory) {
+        factories.put(type, factory);
     }
 
     // Static syntax sugar
@@ -73,6 +79,7 @@ public class AssetManager {
         assetTypeMap.put(extension.toLowerCase(Locale.ENGLISH), loader);
     }
 
+    // TODO: Remove (we have generateAsset now)?
     public void addAssetTemporary(AssetUri uri, Asset asset) {
         assetCache.put(uri, asset);
         // TODO - most of our assets cause crashes when disposed at the moment
@@ -92,10 +99,14 @@ public class AssetManager {
 
     private Asset loadAsset(AssetUri uri, boolean logErrors) {
 
-        if (!uri.isValid()) return null;
+        if (!uri.isValid()) {
+            return null;
+        }
 
         Asset asset = assetCache.get(uri);
-        if (asset != null) return asset;
+        if (asset != null) {
+            return asset;
+        }
 
         List<URL> urls = getAssetURLs(uri);
         if (urls.size() == 0) {
@@ -105,25 +116,49 @@ public class AssetManager {
             return null;
         }
 
+        AssetFactory factory = factories.get(uri.getAssetType());
+        if (factory == null) {
+            // TODO:
+            //logger.error("No asset factory set for assets of type {}", uri.getAssetType());
+            //return null;
+        }
+
         for (URL url : urls) {
             int extensionIndex = url.toString().lastIndexOf('.');
-            if (extensionIndex == -1) continue;
+            if (extensionIndex == -1) {
+                continue;
+            }
 
             String extension = url.toString().substring(extensionIndex + 1).toLowerCase(Locale.ENGLISH);
             Map<String, AssetLoader> extensionMap = assetLoaders.get(uri.getAssetType());
-            if (extensionMap == null) continue;
+            if (extensionMap == null) {
+                continue;
+            }
 
             AssetLoader loader = extensionMap.get(extension);
-            if (loader == null) continue;
+            if (loader == null) {
+                continue;
+            }
 
             InputStream stream = null;
             try {
                 stream = url.openStream();
                 urls.remove(url);
                 urls.add(0, url);
-                asset = loader.load(uri, stream, urls);
-                if (asset != null) {
-                    assetCache.put(uri, asset);
+                AssetData data = loader.load(uri, stream, urls);
+
+                if (data != null) {
+                    if (data instanceof CompatibilityHackAsset) {
+                        asset = (Asset) data;
+                    } else if (factory != null) {
+                        asset = factory.buildAsset(uri, data);
+                    } else {
+                        logger.error("No factory available for {}", uri.getAssetType());
+                        return null;
+                    }
+                    if (asset != null) {
+                        assetCache.put(uri, asset);
+                    }
                 }
                 logger.debug("Loaded {}", uri);
                 return asset;
@@ -164,6 +199,22 @@ public class AssetManager {
 //                iterator.remove();
 //            }
 //        }
+    }
+
+    public <U extends AssetData> Asset<U> generateAsset(AssetUri uri, U data) {
+        if (data instanceof CompatibilityHackAsset) {
+            return (Asset) data;
+        }
+        AssetFactory assetFactory = factories.get(uri.getAssetType());
+        if (assetFactory == null) {
+            logger.warn("Unsupported asset type: {}", uri.getAssetType());
+            return null;
+        }
+        return assetFactory.buildAsset(uri, data);
+    }
+
+    public <U extends AssetData> Asset<U> generateTemporaryAsset(AssetType type, U data) {
+        return generateAsset(new AssetUri(type, "temp", UUID.randomUUID().toString()), data);
     }
 
     public void addAssetSource(AssetSource source) {

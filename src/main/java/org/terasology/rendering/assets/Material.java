@@ -24,7 +24,9 @@ import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 
@@ -33,11 +35,9 @@ import java.nio.FloatBuffer;
 /**
  * @author Immortius
  */
-public class Material implements Asset {
+public class Material extends CompatibilityHackAsset implements Asset<AssetData> {
 
     private static final Logger logger = LoggerFactory.getLogger(Material.class);
-
-    private final AssetUri uri;
 
     private Shader shader;
     private int shaderProgram;
@@ -46,13 +46,13 @@ public class Material implements Asset {
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<Texture>();
 
     public Material(AssetUri uri, Shader shader) {
-        this.uri = uri;
+        super(uri);
         this.shader = shader;
         shaderProgram = shader.generateShaderInstance();
     }
 
     public void dispose() {
-        logger.debug("Disposing material {}.", uri);
+        logger.debug("Disposing material {}.", getURI());
 
         GL20.glDeleteShader(shaderProgram);
         shaderProgram = 0;
@@ -194,11 +194,6 @@ public class Material implements Asset {
         }
 
         textureMap.put(texId, texture);
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
 }
