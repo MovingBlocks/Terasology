@@ -22,7 +22,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

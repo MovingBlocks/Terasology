@@ -24,8 +24,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
@@ -46,6 +48,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
 
@@ -297,6 +302,12 @@ public class TerasologyEngine implements GameEngine {
         checkOpenGL();
         resizeViewport();
         initOpenGLParams();
+        AssetManager.getInstance().setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
+            @Override
+            public Texture buildAsset(AssetUri uri, TextureData data) {
+                return new OpenGLTexture(uri, data);
+            }
+        });
     }
 
     private void checkOpenGL() {

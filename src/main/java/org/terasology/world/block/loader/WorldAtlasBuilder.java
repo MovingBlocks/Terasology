@@ -28,7 +28,8 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.world.block.Block;
 
 import javax.imageio.ImageIO;
@@ -90,8 +91,8 @@ public class WorldAtlasBuilder {
             }
         }
 
-        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
-        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
+        TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
         terrainMat.setFloat3("colorOffset", 1, 1, 1);

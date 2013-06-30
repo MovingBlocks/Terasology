@@ -17,7 +17,7 @@ package org.terasology.rendering.icons;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;

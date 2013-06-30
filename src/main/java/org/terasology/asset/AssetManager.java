@@ -219,7 +219,17 @@ public class AssetManager {
             logger.warn("Unsupported asset type: {}", uri.getAssetType());
             return null;
         }
-        return assetFactory.buildAsset(uri, data);
+        Asset asset = assetCache.get(uri);
+        if (asset != null) {
+            logger.info("Reloading {} with newly generated data", uri);
+            asset.reload(data);
+        } else {
+            asset = assetFactory.buildAsset(uri, data);
+            if (asset != null && !asset.isDisposed()) {
+                assetCache.put(uri, asset);
+            }
+        }
+        return asset;
     }
 
     public <U extends AssetData> Asset<U> generateTemporaryAsset(AssetType type, U data) {

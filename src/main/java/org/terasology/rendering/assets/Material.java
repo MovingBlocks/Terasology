@@ -29,6 +29,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
+import org.terasology.rendering.assets.texture.Texture;
 
 import java.nio.FloatBuffer;
 

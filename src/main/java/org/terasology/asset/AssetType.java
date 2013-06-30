@@ -27,7 +27,7 @@ import org.terasology.rendering.assetLoaders.FontLoader;
 import org.terasology.rendering.assetLoaders.GLSLShaderLoader;
 import org.terasology.rendering.assetLoaders.MaterialLoader;
 import org.terasology.rendering.assetLoaders.ObjMeshLoader;
-import org.terasology.rendering.assetLoaders.PNGTextureLoader;
+import org.terasology.rendering.assets.texture.PNGTextureLoader;
 import org.terasology.rendering.assetLoaders.md5.MD5AnimationLoader;
 import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;

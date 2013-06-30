@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.assetLoaders;
+package org.terasology.rendering.assets.texture;
 
 import com.google.gson.Gson;
 import org.newdawn.slick.opengl.PNGDecoder;
@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.Texture;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +33,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class PNGTextureLoader implements AssetLoader<Texture> {
+public class PNGTextureLoader implements AssetLoader<TextureData> {
 
     private static class TextureMetadata {
         Texture.FilterMode filterMode;
@@ -50,7 +49,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
     }
 
     @Override
-    public Texture load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public TextureData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         InputStream pngStream = null;
         if (urls.get(0).toString().endsWith(".png")) {
             pngStream = stream;
@@ -84,7 +83,6 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                 filterMode = Texture.FilterMode.Linear;
             }
 
-
             for (URL url : urls) {
                 if (url.toString().endsWith(".json")) {
                     InputStreamReader reader = null;
@@ -107,7 +105,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                 }
             }
 
-            return new Texture(uri, new ByteBuffer[]{data}, width, height, wrapMode, filterMode);
+            return new TextureData(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
         } finally {
             pngStream.close();
         }

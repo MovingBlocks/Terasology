@@ -16,6 +16,8 @@
 
 package org.terasology.rendering.assets;
 
+import org.terasology.rendering.assets.texture.Texture;
+
 /**
  * @author Immortius
  */
