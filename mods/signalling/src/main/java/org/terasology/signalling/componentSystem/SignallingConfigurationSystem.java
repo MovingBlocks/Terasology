@@ -20,7 +20,7 @@ import org.terasology.world.block.BlockComponent;
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-@RegisterSystem(whenHeadless = false)
+@RegisterSystem(RegisterMode.CLIENT)
 public class SignallingConfigurationSystem implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(SignallingConfigurationSystem.class);
 

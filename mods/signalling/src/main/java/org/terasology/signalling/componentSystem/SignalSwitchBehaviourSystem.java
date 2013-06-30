@@ -81,7 +81,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private long lastSignalCleanupExecuteTime;
 
     private void deleteOldSignalChangesForGates() {
-        long worldTime = worldProvider.getTime();
+        long worldTime = worldProvider.getTime().getMilliseconds();
         if (lastSignalCleanupExecuteTime + SIGNAL_CLEANUP_INTERVAL < worldTime) {
             final TObjectLongIterator<ImmutableBlockLocation> iterator = gateLastSignalChangeTime.iterator();
             while (iterator.hasNext()) {
@@ -95,7 +95,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     }
 
     private void handleDelayedActionsEvents() {
-        long worldTime = worldProvider.getTime();
+        long worldTime = worldProvider.getTime().getMilliseconds();
         BlockAtLocationDelayedAction action;
         while ((action = delayedActions.peek()) != null
                 && action.executeTime <= worldTime) {
@@ -212,9 +212,9 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         SignalTimeDelayComponent timeDelayComponent = entity.getComponent(SignalTimeDelayComponent.class);
         timeDelayComponent.delaySetting = event.getTime();
         entity.saveComponent(timeDelayComponent);
-        if (timeDelayComponent.delaySetting== 1000) {
+        if (timeDelayComponent.delaySetting== 1000 && entity.hasComponent(SignalTimeDelayModifiedComponent.class)) {
             entity.removeComponent(SignalTimeDelayModifiedComponent.class);
-        } else {
+        } else if (!entity.hasComponent(SignalTimeDelayModifiedComponent.class)) {
             entity.addComponent(new SignalTimeDelayModifiedComponent());
         }
     }
@@ -311,7 +311,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         } else {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
-            delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
+            delayedAction.executeTime = worldProvider.getTime().getMilliseconds() + delay.delaySetting;
             entity.addComponent(delayedAction);
         }
     }
@@ -321,7 +321,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         if (consumerStatusComponent.hasSignal) {
             // Schedule for the gate to be looked at when the time passes
             SignalDelayedActionComponent delayedAction = new SignalDelayedActionComponent();
-            delayedAction.executeTime = worldProvider.getTime() + delay.delaySetting;
+            delayedAction.executeTime = worldProvider.getTime().getMilliseconds() + delay.delaySetting;
             entity.addComponent(delayedAction);
         } else {
             // Remove any signal-delayed actions on the entity and turn off signal from it, if it has any
@@ -350,7 +350,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             if (gateLastSignalChangeTime.containsKey(location)) {
                 whenToLookAt = gateLastSignalChangeTime.get(location) + GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL;
             } else {
-                whenToLookAt = worldProvider.getTime();
+                whenToLookAt = worldProvider.getTime().getMilliseconds();
             }
             delayedAction.executeTime = whenToLookAt;
             entity.addComponent(delayedAction);

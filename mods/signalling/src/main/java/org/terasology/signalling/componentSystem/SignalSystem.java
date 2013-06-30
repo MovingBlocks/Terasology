@@ -96,7 +96,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     @Override
     public void update(float delta) {
-        long worldTime = worldProvider.getTime();
+        long worldTime = worldProvider.getTime().getMilliseconds();
         if (worldTime > lastUpdate + PROCESSING_MINIMUM_INTERVAL) {
             lastUpdate = worldTime;
 
