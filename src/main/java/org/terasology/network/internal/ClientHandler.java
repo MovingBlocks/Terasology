@@ -53,7 +53,10 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Disconnected From Server"));
+        GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
+        if (gameEngine != null) {
+            gameEngine.changeState(new StateMainMenu("Disconnected From Server"));
+        }
     }
 
     @Override

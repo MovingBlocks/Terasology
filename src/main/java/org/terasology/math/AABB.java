@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.math;
 
 import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.base.Objects;
+import gnu.trove.list.TFloatList;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -79,6 +81,25 @@ public class AABB {
             Vector3fUtil.max(max, otherMax, max);
         }
         return new AABB(min, max);
+    }
+
+    public static AABB createEncompasing(TFloatList vertices) {
+        int vertexCount = vertices.size() / 3;
+        if (vertexCount == 0) {
+            return AABB.createEmpty();
+        }
+
+        Vector3f min = new Vector3f(vertices.get(0), vertices.get(1), vertices.get(2));
+        Vector3f max = new Vector3f(vertices.get(0), vertices.get(1), vertices.get(2));
+        for (int index = 1; index < vertexCount; ++index) {
+            min.x = Math.min(min.x, vertices.get(3 * index));
+            max.x = Math.max(max.x, vertices.get(3 * index));
+            min.y = Math.min(min.y, vertices.get(3 * index + 1));
+            max.y = Math.max(max.y, vertices.get(3 * index + 1));
+            min.z = Math.min(min.z, vertices.get(3 * index + 2));
+            max.z = Math.max(max.z, vertices.get(3 * index + 2));
+        }
+        return AABB.createMinMax(min, max);
     }
 
     private AABB(Vector3f min, Vector3f max) {
