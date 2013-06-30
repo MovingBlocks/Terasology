@@ -17,6 +17,8 @@ package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
@@ -51,6 +53,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  *         TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
+    private static final Logger logger = LoggerFactory.getLogger(UIDisplayElement.class);
 
     protected static UIDisplayElement focusedElement;
 
@@ -210,7 +213,6 @@ public abstract class UIDisplayElement {
                         if (!consumed) {
                             mouseIsDown = true;
                             if (consumeEvents) {
-                                //System.out.println("consumed mouse down event (intersect): " + this);
                                 consumed = true;
                             }
                         }
@@ -222,13 +224,11 @@ public abstract class UIDisplayElement {
                         //check double click
                         if ((System.currentTimeMillis() - lastTime) < doubleClickTimeout && lastButton == button) {
                             notifyDoubleClickListeners(button);
-                            //System.out.println("double click! " + this);
                         }
                         lastTime = System.currentTimeMillis();
                         lastButton = button;
 
                         if (!consumed && consumeEvents) {
-                            //System.out.println("consumed mouse up/click event (intersect): " + this);
                             consumed = true;
                         }
                     }
@@ -238,7 +238,6 @@ public abstract class UIDisplayElement {
                         if (!consumed) {
                             lastMouseState = EMouseEvents.ENTER;
                             if (consumeEvents) {
-                                //System.out.println("consumed mouse enter event: " + this);
                                 consumed = true;
                             }
                         }
@@ -255,7 +254,6 @@ public abstract class UIDisplayElement {
                     if (!consumed) {
                         lastMouseState = EMouseEvents.ENTER;
                         if (consumeEvents) {
-                            //System.out.println("consumed mouse hover event: " + this);
                             consumed = true;
                         }
                     }
@@ -878,12 +876,11 @@ public abstract class UIDisplayElement {
         UIDisplayElement parent = this;
         while (parent != null) {
             if (parent != this) {
-                System.out.print(" -> ");
+                logger.info(" -> ");
             }
-            System.out.print(parent.getClass().getSimpleName() + " (id: " + parent.getId() + ")");
+            logger.info(parent.getClass().getSimpleName() + " (id: " + parent.getId() + ")");
             parent = parent.getParent();
         }
-        System.out.println();
     }
 
     /**

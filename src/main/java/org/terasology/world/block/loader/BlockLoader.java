@@ -126,12 +126,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
                         if (blockDef.shapes.isEmpty()) {
                             BlockFamilyFactory familyFactory = blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation);
-                            if (familyFactory == null) {
-                                logger.error("Invalid rotation '{}', reverting to symmetric", blockDef.rotation);
-                                result.families.add(new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), constructSingleBlock(blockDefUri, blockDef), blockDef.categories));
-                            } else {
-                                result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
-                            }
+                            result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
                         }

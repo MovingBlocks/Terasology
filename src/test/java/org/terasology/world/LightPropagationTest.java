@@ -242,23 +242,4 @@ public class LightPropagationTest extends TerasologyTestingEnvironment {
         }
     }
 
-    /*@Test
-    public void pushSunlightPerf() {
-        Block air = BlockManager.getInstance().getAir();
-        long total = 0;
-        for (int i = 0; i < 1; ++i) {
-            for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, WORLD_MAX)) {
-                view.setSunlight(pos, Chunk.MAX_LIGHT);
-                view.setBlock(pos, air, dirt);
-            }
-            long start = System.nanoTime();
-            for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(8,128,8),8)) {
-                view.setBlock(pos, dirt, air);
-                new LightPropagator(view).update(pos, dirt, air);
-            }
-            total += System.nanoTime() - start;
-        }
-        System.out.println((double)(total) / 10e8);
-    }*/
-
 }

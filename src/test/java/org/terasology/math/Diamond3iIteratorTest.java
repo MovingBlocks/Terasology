@@ -62,10 +62,10 @@ public class Diamond3iIteratorTest {
 
     @Test
     public void threeDistanceOnlyIteration() {
-        Set<Vector3i> iter = Sets.newHashSet(Diamond3iIterator.iterate(Vector3i.zero(), 3));
-        assertEquals(63, iter.size());
+        Set<Vector3i> iter = Sets.newHashSet(Diamond3iIterator.iterateAtDistance(new Vector3i(), 3));
+        assertEquals(38, iter.size());
         for (Vector3i pos : iter) {
-            assertTrue(pos.gridDistance(new Vector3i()) <= 3);
+            assertTrue(pos.gridDistance(new Vector3i()) == 3);
         }
     }
 }
