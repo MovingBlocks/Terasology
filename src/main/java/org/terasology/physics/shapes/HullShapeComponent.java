@@ -17,7 +17,7 @@
 package org.terasology.physics.shapes;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 
 /**
  * @author Immortius

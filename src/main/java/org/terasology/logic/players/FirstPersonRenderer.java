@@ -17,6 +17,8 @@ package org.terasology.logic.players;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -34,7 +36,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -179,7 +181,7 @@ public class FirstPersonRenderer implements RenderSystem {
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
             Icon icon = Icon.get(iconName);
-            itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
+            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + iconName), icon.getX(), icon.getY());
             iconMeshes.put(iconName, itemMesh);
         }
 
