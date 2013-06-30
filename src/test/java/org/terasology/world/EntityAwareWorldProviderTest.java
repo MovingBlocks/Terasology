@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -33,13 +34,13 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.ForceBlockActiveComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -105,22 +106,27 @@ public class EntityAwareWorldProviderTest {
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 
         blockWithString = new Block();
-        Prefab prefabWithString = new PojoPrefab(
-                new AssetUri(AssetType.PREFAB, "test:prefabWithString"), null, true, new StringComponent("Test"));
+        PrefabData prefabData = new PrefabData();
+        prefabData.addComponent(new StringComponent("Test"));
+        Prefab prefabWithString = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "test:prefabWithString"), prefabData, Prefab.class);
         prefabManager.registerPrefab(prefabWithString);
         blockWithString.setPrefab("test:prefabWithString");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithString"), blockWithString), true);
 
         blockWithDifferentString = new Block();
-        Prefab prefabWithDifferentString = new PojoPrefab(
-                new AssetUri(AssetType.PREFAB, "test:prefabWithDifferentString"), null, true, new StringComponent("Test2"));
+        prefabData = new PrefabData();
+        prefabData.addComponent(new StringComponent("Test2"));
+        Prefab prefabWithDifferentString = Assets.generateAsset(
+                new AssetUri(AssetType.PREFAB, "test:prefabWithDifferentString"), prefabData, Prefab.class);
         prefabManager.registerPrefab(prefabWithDifferentString);
         blockWithDifferentString.setPrefab("test:prefabWithDifferentString");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithDifferentString"), blockWithDifferentString), true);
 
         blockWithRetainedComponent = new Block();
-        Prefab prefabWithRetainedComponent = new PojoPrefab(
-                new AssetUri(AssetType.PREFAB, "test:prefabWithRetainedComponent"), null, true, new RetainedOnBlockChangeComponent(3));
+        prefabData = new PrefabData();
+        prefabData.addComponent(new RetainedOnBlockChangeComponent(3));
+        Prefab prefabWithRetainedComponent = Assets.generateAsset(
+                new AssetUri(AssetType.PREFAB, "test:prefabWithRetainedComponent"), prefabData, Prefab.class);
         prefabManager.registerPrefab(prefabWithRetainedComponent);
         blockWithRetainedComponent.setPrefab("test:prefabWithRetainedComponent");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithRetainedComponent"), blockWithRetainedComponent), true);

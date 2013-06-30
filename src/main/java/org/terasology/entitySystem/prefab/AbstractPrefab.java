@@ -16,15 +16,13 @@
 package org.terasology.entitySystem.prefab;
 
 import com.google.common.base.Objects;
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.CompatibilityHackAsset;
 
-/**
- * @todo javadoc
- */
-public abstract class AbstractPrefab extends CompatibilityHackAsset implements Prefab {
+public abstract class AbstractPrefab extends AbstractAsset<PrefabData> implements Prefab {
 
-    protected AbstractPrefab(AssetUri uri) {
+    public AbstractPrefab(AssetUri uri) {
         super(uri);
     }
 

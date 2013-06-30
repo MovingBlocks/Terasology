@@ -18,17 +18,17 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class PrefabLoader implements AssetLoader<Prefab> {
+public class PrefabLoader implements AssetLoader<PrefabData> {
 
     public PrefabLoader() {
     }
 
     @Override
-    public Prefab load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public PrefabData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
         if (prefabData != null) {
-            return new PrefabSerializer(CoreRegistry.get(ComponentLibrary.class)).deserialize(prefabData, uri);
+            return new PrefabSerializer(CoreRegistry.get(ComponentLibrary.class)).deserialize(prefabData);
         }
         return null;
     }
