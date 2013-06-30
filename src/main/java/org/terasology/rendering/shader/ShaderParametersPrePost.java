@@ -31,6 +31,9 @@ import java.util.List;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
+    Property abberationOffsetX = new Property("abberationOffsetX", 0.0f, 0.0f, 0.1f);
+    Property abberationOffsetY = new Property("abberationOffsetY", 0.0f, 0.0f, 0.1f);
+
     @Override
     public void applyParameters(GLSLShaderProgram program) {
         super.applyParameters(program);
@@ -39,6 +42,8 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texScene", texId++);
+
+        program.setFloat2("abberationOffset", (Float) abberationOffsetX.getValue(), (Float) abberationOffsetY.getValue());
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -49,5 +54,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
+        properties.add(abberationOffsetX);
+        properties.add(abberationOffsetY);
     }
 }

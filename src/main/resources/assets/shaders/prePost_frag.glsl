@@ -14,13 +14,30 @@
  * limitations under the License.
  */
 
+// TODO: Currently not in use - but working
+//#define CHROMATIC_ABBERATION
+
+#if defined (CHROMATIC_ABBERATION)
+uniform vec2 abberationOffset = vec2(0.0, 0.0);
+#endif
+
 uniform sampler2D texScene;
+
 #ifdef LIGHT_SHAFTS
 uniform sampler2D texLightShafts;
 #endif
 
 void main() {
+
+#if !defined (CHROMATIC_ABBERATION)
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+#else
+    float r = texture2D(texScene, gl_TexCoord[0].xy - abberationOffset).r;
+    vec2 ga = texture2D(texScene, gl_TexCoord[0].xy).ga;
+    float b = texture2D(texScene, gl_TexCoord[0].xy - abberationOffset).b;
+
+    vec4 color = vec4(r, ga.x, b, ga.y);
+#endif
 
 #ifdef LIGHT_SHAFTS
     vec4 colorShafts = texture2D(texLightShafts, gl_TexCoord[0].xy);
