@@ -52,6 +52,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton bobbingButton;
     private final UIStateButton fullscreenButton;
     private final UIStateButton outlineButton;
+    private final UIStateButton shadowButton;
     private final UIButton backToConfigMenuButton;
 
     private final Config config = CoreRegistry.get(Config.class);
@@ -104,7 +105,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setSsao(false);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
-                        config.getRendering().setDynamicShadows(false);
                         break;
                     case 1:
                         config.getRendering().setFlickeringLight(true);
@@ -117,7 +117,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
-                        config.getRendering().setDynamicShadows(false);
                         break;
                     case 2:
                         config.getRendering().setFlickeringLight(true);
@@ -130,7 +129,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setLightShafts(true);
 
                         config.getRendering().setAnimateWater(false);
-                        config.getRendering().setDynamicShadows(false);
                         break;
                     case 3:
                         config.getRendering().setFlickeringLight(true);
@@ -142,7 +140,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setSsao(true);
                         config.getRendering().setLightShafts(true);
                         config.getRendering().setAnimateWater(true);
-                        config.getRendering().setDynamicShadows(true);
                         break;
                 }
             }
@@ -283,6 +280,36 @@ public class UIMenuConfigVideo extends UIWindow {
         outlineButton.setPosition(new Vector2f(outlineButton.getSize().x / 2f, 300f + 4 * 40f));
         outlineButton.setVisible(true);
 
+        shadowButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction shadowStateAction = new StateButtonAction() {
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton) element;
+                switch (button.getState()) {
+                    case 0:
+                        config.getRendering().setDynamicShadowsPcfFiltering(false);
+                        config.getRendering().setDynamicShadows(false);
+                        break;
+                    case 1:
+                        config.getRendering().setDynamicShadowsPcfFiltering(false);
+                        config.getRendering().setDynamicShadows(true);
+
+                        break;
+                    case 2:
+                        config.getRendering().setDynamicShadowsPcfFiltering(true);
+                        config.getRendering().setDynamicShadows(true);
+                        break;
+                }
+            }
+        };
+        shadowButton.addState("Dynamic Shadows: Off", shadowStateAction);
+        shadowButton.addState("Dynamic Shadows: On", shadowStateAction);
+        shadowButton.addState("Dynamic Shadows: On (PCF)", shadowStateAction);
+        shadowButton.addClickListener(clickAction);
+        shadowButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        shadowButton.setPosition(new Vector2f(-fovButton.getSize().x / 2f - 10f, 300f + 4 * 40f));
+        shadowButton.setVisible(true);
+
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
         backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -310,6 +337,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(backToConfigMenuButton);
         addDisplayElement(fullscreenButton);
         addDisplayElement(outlineButton);
+        addDisplayElement(shadowButton);
 
         setup();
     }
@@ -319,7 +347,7 @@ public class UIMenuConfigVideo extends UIWindow {
         viewingDistanceButton.setState(config.getRendering().getActiveViewDistanceMode());
         blurIntensityButton.setState(config.getRendering().getBlurIntensity());
 
-        if (config.getRendering().isDynamicShadows())
+        if (config.getRendering().isAnimateWater())
             graphicsQualityButton.setState(3);
         else if (config.getRendering().isLightShafts())
             graphicsQualityButton.setState(2);
@@ -356,6 +384,14 @@ public class UIMenuConfigVideo extends UIWindow {
             outlineButton.setState(1);
         } else {
             outlineButton.setState(0);
+        }
+
+        if (config.getRendering().isDynamicShadowsPcfFiltering()) {
+            shadowButton.setState(2);
+        } else if (config.getRendering().isDynamicShadows()) {
+            shadowButton.setState(1);
+        } else {
+            shadowButton.setState(0);
         }
     }
 }
