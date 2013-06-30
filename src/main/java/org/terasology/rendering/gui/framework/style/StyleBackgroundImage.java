@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIImage;
 
 import javax.vecmath.Vector2f;

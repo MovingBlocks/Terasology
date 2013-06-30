@@ -24,7 +24,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.FontCharacter;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Point4i;
 import javax.vecmath.Tuple4i;

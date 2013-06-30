@@ -16,7 +16,7 @@
 package org.terasology.rendering.primitives;
 
 import org.terasology.asset.Assets;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
@@ -43,7 +43,7 @@ public class MeshFactory {
 
     public Mesh generateItemMesh(int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
         Texture tex = Assets.getTexture("engine:items");
-        ByteBuffer buffer = tex.getImageData(0);
+        ByteBuffer buffer = tex.getData().getBuffers()[0];
 
         posX *= 16;
         posY *= 16;

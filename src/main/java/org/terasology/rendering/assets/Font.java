@@ -25,6 +25,7 @@ import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.assets.texture.Texture;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
 import static org.lwjgl.opengl.GL11.glBegin;
