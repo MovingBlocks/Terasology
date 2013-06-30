@@ -78,8 +78,8 @@ public class GLSLShaderProgram implements Asset {
     private int activeFeatures = 0;
 
     private boolean disposed = false;
-    private Map<String, ParamType> params = Maps.newHashMap();
-    private IShaderParameters parameters;
+    private Map<String, ParamType> materialParameters = Maps.newHashMap();
+    private IShaderParameters shaderParameters;
     private AssetUri uri;
 
     private static String includedFunctionsVertex = "", includedFunctionsFragment = "";
@@ -126,23 +126,6 @@ public class GLSLShaderProgram implements Asset {
         }
     }
 
-    public GLSLShaderProgram(String title) {
-        this(title, null);
-    }
-
-    public GLSLShaderProgram(String title, IShaderParameters params) {
-        this.title = title;
-        this.parameters = params;
-
-        logger.info("Loading shader program '"+title+"' as default...");
-
-        this.vertShader = readShader(title+"_vert.glsl");
-        this.fragShader = readShader(title+"_frag.glsl");
-
-        updateAvailableFeatures();
-        compileAllShaderPermutations();
-    }
-
     public GLSLShaderProgram(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
         this.uri = uri;
         this.vertShader = vertShader;
@@ -152,8 +135,23 @@ public class GLSLShaderProgram implements Asset {
         logger.info("Loading shader program '"+uri+"' as asset...");
 
         for (ParamMetadata paramData : metadata.getParameters()) {
-            params.put(paramData.getName(), paramData.getType());
+            materialParameters.put(paramData.getName(), paramData.getType());
         }
+    }
+
+    protected GLSLShaderProgram(AssetUri uri, String vertShader, String fragShader, Map<String, ParamType> materialParameters) {
+        this(uri, vertShader, fragShader, materialParameters, null);
+    }
+
+    protected GLSLShaderProgram(AssetUri uri, String vertShader, String fragShader, Map<String, ParamType> materialParameters, IShaderParameters shaderParameters) {
+        this.uri = uri;
+        this.vertShader = vertShader;
+        this.fragShader = fragShader;
+        this.title = uri.toString();
+        this.materialParameters = materialParameters;
+        this.shaderParameters = shaderParameters;
+
+        logger.info("Loading shader program '"+uri+"' as asset...");
 
         updateAvailableFeatures();
         compileAllShaderPermutations();
@@ -207,6 +205,7 @@ public class GLSLShaderProgram implements Asset {
             }
         }
 
+        disposed = false;
         logger.info("Compiled {} permutations.", counter);
     }
 
@@ -373,15 +372,15 @@ public class GLSLShaderProgram implements Asset {
             ShaderManager.getInstance().setActiveShaderProgram(this);
 
             // Set the shader parameters if available
-            if (parameters != null) {
-                parameters.applyParameters(this);
+            if (shaderParameters != null) {
+                shaderParameters.applyParameters(this);
             }
         }
     }
 
-    public ParamMetadata getParameter(String desc) {
-        if (params.containsKey(desc)) {
-            return new ParamMetadata(desc, params.get(desc));
+    public ParamMetadata getMaterialParameter(String desc) {
+        if (materialParameters.containsKey(desc)) {
+            return new ParamMetadata(desc, materialParameters.get(desc));
         }
         return null;
     }
@@ -505,7 +504,7 @@ public class GLSLShaderProgram implements Asset {
     }
 
     public IShaderParameters getShaderParameters() {
-        return parameters;
+        return shaderParameters;
     }
 
     public int getActiveFeatures() {
@@ -591,5 +590,14 @@ public class GLSLShaderProgram implements Asset {
         }
 
         return builder;
+    }
+
+    public GLSLShaderProgram createShaderProgramInstance(IShaderParameters shaderParameters) {
+        GLSLShaderProgram instance = new GLSLShaderProgram(uri, vertShader, fragShader, materialParameters, shaderParameters);
+        return instance;
+    }
+
+    public GLSLShaderProgram createShaderProgramInstance() {
+        return createShaderProgramInstance(null);
     }
 }

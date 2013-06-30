@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.GLSLShaderProgram;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
@@ -63,31 +64,30 @@ public class ShaderManager {
     }
 
     private void initShaders() {
-        defaultShaderProgram = createAndStoreShaderProgram("default", new ShaderParametersDefault());
-        defaultTexturedShaderProgram = createAndStoreShaderProgram("defaultTextured", new ShaderParametersDefault());
+        defaultShaderProgram = prepareAndStoreShaderProgramInstance("default", new ShaderParametersDefault());
+        defaultTexturedShaderProgram = prepareAndStoreShaderProgramInstance("defaultTextured", new ShaderParametersDefault());
 
-        // TODO: Port this to the asset pipeline
-        createAndStoreShaderProgram("post", new ShaderParametersPost());
-        createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
-        createAndStoreShaderProgram("lightshaft", new ShaderParametersLightShaft());
-        createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
-        createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
-        createAndStoreShaderProgram("combine", new ShaderParametersCombine());
-        createAndStoreShaderProgram("highp", new ShaderParametersDefault());
-        createAndStoreShaderProgram("blur", new ShaderParametersDefault());
-        createAndStoreShaderProgram("down", new ShaderParametersDefault());
-        createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
-        createAndStoreShaderProgram("sky", new ShaderParametersSky());
-        createAndStoreShaderProgram("chunk", new ShaderParametersChunk());
-        createAndStoreShaderProgram("particle", new ShaderParametersParticle());
-        createAndStoreShaderProgram("block", new ShaderParametersBlock());
-        createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
-        createAndStoreShaderProgram("animateOpacity", new ShaderParametersDefault());
-        createAndStoreShaderProgram("shadowMap", new ShaderParametersShadowMap());
-        createAndStoreShaderProgram("debug", new ShaderParametersDebug());
-        createAndStoreShaderProgram("ocDistortion", new ShaderParametersOcDistortion());
-        createAndStoreShaderProgram("lightBufferPass", new ShaderParametersLightBufferPass());
-        createAndStoreShaderProgram("lightGeometryPass", new ShaderParametersLightGeometryPass());
+        prepareAndStoreShaderProgramInstance("post", new ShaderParametersPost());
+        prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersSSAO());
+        prepareAndStoreShaderProgramInstance("lightshaft", new ShaderParametersLightShaft());
+        prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersSobel());
+        prepareAndStoreShaderProgramInstance("prePost", new ShaderParametersPrePost());
+        prepareAndStoreShaderProgramInstance("combine", new ShaderParametersCombine());
+        prepareAndStoreShaderProgramInstance("highp", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("blur", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("down", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("hdr", new ShaderParametersHdr());
+        prepareAndStoreShaderProgramInstance("sky", new ShaderParametersSky());
+        prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
+        prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());
+        prepareAndStoreShaderProgramInstance("block", new ShaderParametersBlock());
+        prepareAndStoreShaderProgramInstance("gelatinousCube", new ShaderParametersGelCube());
+        prepareAndStoreShaderProgramInstance("animateOpacity", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersShadowMap());
+        prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());
+        prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
+        prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersLightBufferPass());
+        prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
     }
 
     public void enableMaterial(Material material) {
@@ -123,14 +123,15 @@ public class ShaderManager {
         }
     }
 
-    private GLSLShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params) {
+    private GLSLShaderProgram prepareAndStoreShaderProgramInstance(String title, IShaderParameters params) {
         // Make sure to remove the old shader program
         if (shaderPrograms.containsKey(title)) {
             shaderPrograms.remove(title).dispose();
         }
 
-        GLSLShaderProgram program = new GLSLShaderProgram(title, params);
+        GLSLShaderProgram program = Assets.getShader("engine:" + title).createShaderProgramInstance(params);
         shaderPrograms.put(title, program);
+
         return program;
     }
 

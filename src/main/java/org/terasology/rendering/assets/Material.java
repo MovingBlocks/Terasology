@@ -46,7 +46,7 @@ public class Material implements Asset {
 
     public Material(AssetUri uri, GLSLShaderProgram shader) {
         this.uri = uri;
-        this.shader = shader;
+        this.shader = shader.createShaderProgramInstance();
     }
 
     public void dispose() {
@@ -88,7 +88,7 @@ public class Material implements Asset {
             texId = bindMap.get(desc);
         } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
-            ParamMetadata metadata = shader.getParameter(desc);
+            ParamMetadata metadata = shader.getMaterialParameter(desc);
             if (metadata == null) {
                 return;
             }
