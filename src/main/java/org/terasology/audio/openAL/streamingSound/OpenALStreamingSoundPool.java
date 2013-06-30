@@ -13,25 +13,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package org.terasology.audio.openAL.streamingSound;
 
-package org.terasology.asset;
+import org.terasology.audio.openAL.BaseSoundPool;
+import org.terasology.audio.openAL.SoundSource;
 
-/**
- *
- */
-public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
+public class OpenALStreamingSoundPool extends BaseSoundPool {
 
-    private final AssetUri uri;
-
-    public AbstractAsset(AssetUri uri) {
-        this.uri = uri;
+    public OpenALStreamingSoundPool(int capacity) {
+        super(capacity);
     }
 
-    /**
-     * @return This asset's identifying URI.
-     */
-    public final AssetUri getURI() {
-        return uri;
+    public OpenALStreamingSoundPool() {
     }
 
+    @Override
+    protected SoundSource createSoundSource() {
+        return new OpenALStreamingSoundSource(this);
+    }
 }

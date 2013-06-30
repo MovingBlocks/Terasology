@@ -1,22 +1,21 @@
 /*
- * Copyright 2013 Moving Blocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2013 Moving Blocks
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.terasology.audio.openAL;
 
 import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.AL11;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.engine.CoreRegistry;
@@ -26,7 +25,6 @@ import javax.vecmath.Vector3f;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
-import static org.lwjgl.openal.AL10.AL_LOOPING;
 import static org.lwjgl.openal.AL10.AL_MAX_DISTANCE;
 import static org.lwjgl.openal.AL10.AL_PLAYING;
 import static org.lwjgl.openal.AL10.AL_REFERENCE_DISTANCE;
@@ -40,13 +38,12 @@ import static org.lwjgl.openal.AL10.alSource3f;
 import static org.lwjgl.openal.AL10.alSourceRewind;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
-import static org.lwjgl.openal.AL10.alSourcei;
 
-public class BasicSoundSource implements SoundSource {
+public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T> {
 
     private SoundPool owningPool;
 
-    protected Sound audio;
+    protected T audio;
     protected int sourceId;
 
     protected float srcGain = 1.0f;
@@ -61,7 +58,7 @@ public class BasicSoundSource implements SoundSource {
 
     protected boolean playing = false;
 
-    public BasicSoundSource(SoundPool pool) {
+    public BaseSoundSource(SoundPool pool) {
         this.owningPool = pool;
         sourceId = alGenSources();
         OpenALException.checkState("Creating sound source");
@@ -81,10 +78,6 @@ public class BasicSoundSource implements SoundSource {
 
     @Override
     public SoundSource stop() {
-        if (audio != null) {
-            audio.reset();
-        }
-
         alSourceStop(getSourceId());
         OpenALException.checkState("Stop playback");
 
@@ -152,58 +145,6 @@ public class BasicSoundSource implements SoundSource {
         return this;
     }
 
-    @Override
-    public int getLength() {
-        return audio.getLength();
-    }
-
-    @Override
-    public SoundSource setPlaybackPosition(int position) {
-        boolean playing = isPlaying();
-        if (playing) {
-            AL10.alSourceStop(getSourceId());
-        }
-
-        AL10.alSourceRewind(getSourceId());
-        AL10.alSourcei(getSourceId(), AL11.AL_SAMPLE_OFFSET, audio.getSamplingRate() * position);
-
-        OpenALException.checkState("Setting sound playback absolute position");
-
-        if (playing) {
-            play();
-        }
-
-        return this;
-    }
-
-    @Override
-    public int getPlaybackPosition() {
-        return AL10.alGetSourcei(getSourceId(), AL11.AL_SAMPLE_OFFSET) / audio.getSamplingRate();
-    }
-
-    @Override
-    public SoundSource setPlaybackPosition(float position) {
-        boolean playing = isPlaying();
-        if (playing) {
-            AL10.alSourceStop(getSourceId());
-        }
-
-        AL10.alSourceRewind(getSourceId());
-        AL10.alSourcei(getSourceId(), AL11.AL_BYTE_OFFSET, (int) (audio.getBufferSize() * position));
-
-        OpenALException.checkState("Setting sound playback relaive position");
-
-        if (playing) {
-            play();
-        }
-
-        return this;
-    }
-
-    @Override
-    public float getPlaybackPositionf() {
-        return AL10.alGetSourcei(getSourceId(), AL11.AL_BYTE_OFFSET) / audio.getBufferSize();
-    }
 
     @Override
     public SoundSource setAbsolute(boolean absolute) {
@@ -314,46 +255,7 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public boolean isLooping() {
-        return alGetSourcei(getSourceId(), AL_LOOPING) == AL_TRUE;
-    }
-
-    @Override
-    public SoundSource setLooping(boolean looping) {
-        alSourcei(getSourceId(), AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
-
-        OpenALException.checkState("Setting sound looping");
-
-        return this;
-    }
-
-    @Override
-    public SoundSource setAudio(Sound sound) {
-        boolean playing = isPlaying();
-        if (playing) {
-            stop();
-        }
-
-        reset();
-
-        if (sound instanceof OpenALSound) {
-            audio = sound;
-            AL10.alSourcei(getSourceId(), AL10.AL_BUFFER, audio.getBufferId());
-
-            OpenALException.checkState("Assigning buffer to source");
-        } else {
-            throw new IllegalArgumentException("Unsupported sound object!");
-        }
-
-        if (playing) {
-            play();
-        }
-
-        return this;
-    }
-
-    @Override
-    public Sound getAudio() {
+    public T getAudio() {
         return audio;
     }
 
@@ -385,17 +287,10 @@ public class BasicSoundSource implements SoundSource {
         }
     }
 
-    private Vector3f getCameraPosition() {
-        return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-    }
-
-    @Override
-    // TODO: This is no guaranteed to be executed at all – move to a safer place
-    protected void finalize() throws Throwable {
+    public void dispose() {
         if (sourceId != 0) {
             AL10.alDeleteSources(sourceId);
         }
-        super.finalize();
     }
 
     @Override

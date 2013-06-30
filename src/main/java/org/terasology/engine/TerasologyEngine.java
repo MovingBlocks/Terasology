@@ -28,7 +28,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.engine.internal.TimeLwjgl;
@@ -278,6 +278,8 @@ public class TerasologyEngine implements GameEngine {
             audioManager = new OpenALManager(config.getAudio());
         }
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
+        AssetManager.getInstance().setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
+        AssetManager.getInstance().setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }
 
     private void initDisplay() {

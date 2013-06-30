@@ -16,15 +16,11 @@
 
 package org.terasology.audio.loaders;
 
+import com.google.common.io.ByteStreams;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.openal.AL10;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
-import org.terasology.audio.openAL.OggSound;
-import org.terasology.audio.openAL.OpenALException;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.audio.StaticSoundData;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,12 +34,20 @@ import static org.lwjgl.openal.AL10.alGenBuffers;
 /**
  * @author Immortius
  */
-public class OggSoundLoader implements AssetLoader<Sound> {
+public class OggSoundLoader implements AssetLoader<StaticSoundData> {
 
     @Override
-    public Sound load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
-        // TODO: Use a different sound loader rather than hacking in a check here
-        AudioManager audioManager = CoreRegistry.get(AudioManager.class);
-        return audioManager.loadSound(uri, stream);
+    public StaticSoundData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+        try (OggReader reader = new OggReader(stream)) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ByteStreams.copy(reader, bos);
+
+            ByteBuffer data = BufferUtils.createByteBuffer(bos.size()).put(bos.toByteArray());
+            data.flip();
+
+            return new StaticSoundData(data, reader.getChannels(), reader.getRate(), 16);
+        } catch (IOException e) {
+            throw new IOException("Failed to load sound: " + e.getMessage(), e);
+        }
     }
 }

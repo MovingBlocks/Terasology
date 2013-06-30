@@ -26,10 +26,18 @@ import org.lwjgl.openal.ALCcontext;
 import org.lwjgl.openal.ALCdevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.audio.loaders.OggReader;
+import org.terasology.audio.StaticSoundData;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
+import org.terasology.audio.StreamingSoundData;
+import org.terasology.audio.openAL.staticSound.OpenALSound;
+import org.terasology.audio.openAL.staticSound.OpenALSoundPool;
+import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
+import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
 
@@ -37,18 +45,10 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static org.lwjgl.openal.AL10.alGenBuffers;
 
 public class OpenALManager implements AudioManager {
 
@@ -111,8 +111,8 @@ public class OpenALManager implements AudioManager {
         AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);
 
         // Initialize sound pools
-        pools.put("sfx", new BasicSoundPool(30)); // effects pool
-        pools.put("music", new BasicStreamingSoundPool(2)); // music pool
+        pools.put("sfx", new OpenALSoundPool(30)); // effects pool
+        pools.put("music", new OpenALStreamingSoundPool(2)); // music pool
         pools.get("sfx").setVolume(config.getSoundVolume());
         pools.get("music").setVolume(config.getMusicVolume());
     }
@@ -122,54 +122,11 @@ public class OpenALManager implements AudioManager {
         AL.destroy();
     }
 
+
     @Override
     public void stopAllSounds() {
         for (SoundPool pool : pools.values()) {
             pool.stopAll();
-        }
-    }
-
-    @Override
-    public Sound loadStreamingSound(AssetUri uri, List<URL> urls) {
-        return new OggStreamingSound(uri, urls.get(0));
-    }
-
-    @Override
-    public Sound loadSound(AssetUri uri, InputStream stream) throws IOException {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            OggReader reader = new OggReader(stream);
-
-            byte buffer[] = new byte[1024];
-            int read;
-            int totalRead = 0;
-
-            do {
-                read = reader.read(buffer, 0, buffer.length);
-
-                if (read < 0) {
-                    break;
-                }
-
-                totalRead += read;
-
-                bos.write(buffer, 0, read);
-            } while (read > 0);
-
-            buffer = bos.toByteArray();
-
-            ByteBuffer data = BufferUtils.createByteBuffer(totalRead).put(buffer);
-            data.flip();
-
-            int channels = reader.getChannels();
-            int sampleRate = reader.getRate();
-            int bufferId = alGenBuffers();
-            AL10.alBufferData(bufferId, channels == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, data, sampleRate);
-
-            OpenALException.checkState("Uploading buffer");
-            return new OggSound(uri, bufferId);
-        } catch (IOException e) {
-            throw new IOException("Failed to load sound: " + e.getMessage(), e);
         }
     }
 
@@ -286,5 +243,25 @@ public class OpenALManager implements AudioManager {
         distance.sub(listenerPosition);
 
         return distance.lengthSquared() < MAX_DISTANCE_SQUARED;
+    }
+
+    @Override
+    public AssetFactory<StaticSoundData, StaticSound> getStaticSoundFactory() {
+        return new AssetFactory<StaticSoundData, StaticSound>() {
+            @Override
+            public StaticSound buildAsset(AssetUri uri, StaticSoundData data) {
+                return new OpenALSound(uri, data);
+            }
+        };
+    }
+
+    @Override
+    public AssetFactory<StreamingSoundData, StreamingSound> getStreamingSoundFactory() {
+        return new AssetFactory<StreamingSoundData, StreamingSound>() {
+            @Override
+            public StreamingSound buildAsset(AssetUri uri, StreamingSoundData data) {
+                return new OpenALStreamingSound(uri, data);
+            }
+        };
     }
 }

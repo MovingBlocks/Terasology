@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.audio;
+package org.terasology.audio.nullAudio;
 
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.nullAudio.NullSound;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSoundData;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
+import org.terasology.audio.StreamingSoundData;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
 
 /**
  * Null implementation of the AudioManager
@@ -86,12 +88,22 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public Sound loadStreamingSound(AssetUri uri, List<URL> urls) {
-        return new NullSound(uri);
+    public AssetFactory<StaticSoundData, StaticSound> getStaticSoundFactory() {
+        return new AssetFactory<StaticSoundData, StaticSound>() {
+            @Override
+            public StaticSound buildAsset(AssetUri uri, StaticSoundData data) {
+                return new NullSound(uri, data);
+            }
+        };
     }
 
     @Override
-    public Sound loadSound(AssetUri uri, InputStream stream) throws IOException {
-        return new NullSound(uri);
+    public AssetFactory<StreamingSoundData, StreamingSound> getStreamingSoundFactory() {
+        return new AssetFactory<StreamingSoundData, StreamingSound>() {
+            @Override
+            public StreamingSound buildAsset(AssetUri uri, StreamingSoundData data) {
+                return new NullStreamingSound(uri, data);
+            }
+        };
     }
 }

@@ -1,36 +1,37 @@
 package org.terasology.audio.nullAudio;
 
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.CompatibilityHackAsset;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSoundData;
+import org.terasology.audio.StaticSound;
 
 /**
  * @author Immortius
  */
-// TODO: Provide as much information as possible without loading the sound proper
-public class NullSound extends CompatibilityHackAsset implements Sound {
+public class NullSound extends AbstractAsset<StaticSoundData> implements StaticSound {
 
-    public NullSound(AssetUri uri) {
+    private int channels;
+    private int sampleRate;
+    private float length;
+
+    public NullSound(AssetUri uri, StaticSoundData data) {
         super(uri);
+        reload(data);
     }
 
     @Override
-    public int getLength() {
-        return 0;
+    public float getLength() {
+        return length;
     }
 
     @Override
     public int getChannels() {
-        return 0;
+        return channels;
     }
 
     @Override
     public int getSamplingRate() {
-        return 0;
-    }
-
-    @Override
-    public void reset() {
+        return sampleRate;
     }
 
     @Override
@@ -39,11 +40,18 @@ public class NullSound extends CompatibilityHackAsset implements Sound {
     }
 
     @Override
-    public int getBufferId() {
-        return 0;
+    public void reload(StaticSoundData data) {
+        this.channels = data.getChannels();
+        this.sampleRate = data.getSampleRate();
+        this.length = data.getData().limit() / getChannels() / (data.getBufferBits() / 8) / getSamplingRate();
     }
 
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return false;
     }
 }

@@ -14,24 +14,20 @@
 * limitations under the License.
 */
 
-package org.terasology.asset;
+package org.terasology.audio;
+
+import org.terasology.asset.Asset;
 
 /**
  *
  */
-public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
-
-    private final AssetUri uri;
-
-    public AbstractAsset(AssetUri uri) {
-        this.uri = uri;
-    }
+public interface StreamingSound extends Sound<StreamingSoundData> {
 
     /**
-     * @return This asset's identifying URI.
+     * Reset sound state (clears buffers, reset cached info)
+     *
+     * @return
      */
-    public final AssetUri getURI() {
-        return uri;
-    }
+    public void reset();
 
 }
