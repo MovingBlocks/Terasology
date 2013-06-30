@@ -544,6 +544,7 @@ public class GLSLShaderProgram implements Asset {
         preProcessorPreamble += "float BLOCK_LIGHT_POW = " + WorldRenderer.BLOCK_LIGHT_POW + ";\n";
         preProcessorPreamble += "float BLOCK_LIGHT_SUN_POW = " + WorldRenderer.BLOCK_LIGHT_SUN_POW + ";\n";
         preProcessorPreamble += "float BLOCK_INTENSITY_FACTOR = " + WorldRenderer.BLOCK_INTENSITY_FACTOR + ";\n";
+        preProcessorPreamble += "float SHADOW_MAP_RESOLUTION = " + CoreRegistry.get(Config.class).getRendering().getShadowMapResolution() + ";\n";
         // TODO: This shouldn't be hardcoded
         preProcessorPreamble += "float TEXTURE_OFFSET_EFFECTS = " + 0.0625f + ";\n";
 

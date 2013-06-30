@@ -53,7 +53,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultRenderingProcess.class);
 
-    private static DefaultRenderingProcess _instance = null;
+    private static DefaultRenderingProcess instance = null;
 
     /* PROPERTIES */
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
@@ -81,8 +81,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int rtWidth8, rtHeight8;
     private int rtWidth16, rtHeight16;
 
-    private final int screenshotRtWidth = 1024;
-    private final int screenshotRtHeight = 780;
     private int overwriteRtWidth = 0;
     private int overwriteRtHeight = 0;
 
@@ -213,11 +211,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
      * @return The instance
      */
     public static DefaultRenderingProcess getInstance() {
-        if (_instance == null) {
-            _instance = new DefaultRenderingProcess();
+        if (instance == null) {
+            instance = new DefaultRenderingProcess();
         }
 
-        return _instance;
+        return instance;
     }
 
     public DefaultRenderingProcess() {
