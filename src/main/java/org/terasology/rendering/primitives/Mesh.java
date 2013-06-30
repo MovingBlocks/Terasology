@@ -24,7 +24,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.math.AABB;
 
@@ -45,7 +47,7 @@ import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 // TODO: Store mesh information in Mesh class in a usable format, for
-public class Mesh implements Asset {
+public class Mesh extends CompatibilityHackAsset implements Asset<AssetData> {
 
     public static final int VERTEX_SIZE = 3;
     public static final int TEX_COORD_0_SIZE = 2;
@@ -202,11 +204,6 @@ public class Mesh implements Asset {
 
     public AABB getAABB() {
         return aabb;
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override

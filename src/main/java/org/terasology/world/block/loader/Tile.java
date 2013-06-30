@@ -17,26 +17,22 @@
 package org.terasology.world.block.loader;
 
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 
 import java.awt.image.BufferedImage;
 
 /**
  * @author Immortius
  */
-public class Tile implements Asset {
-    private AssetUri uri;
+public class Tile extends CompatibilityHackAsset implements Asset<AssetData> {
     private BufferedImage image;
 
 
     public Tile(AssetUri uri, BufferedImage image) {
-        this.uri = uri;
+        super(uri);
         this.image = image;
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override

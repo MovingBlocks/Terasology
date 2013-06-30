@@ -21,7 +21,9 @@ import org.lwjgl.opengl.GL12;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 
 import java.nio.ByteBuffer;
 
@@ -42,7 +44,7 @@ import static org.lwjgl.opengl.GL11.glTexParameterf;
 /**
  * @author Immortius
  */
-public class Texture implements Asset {
+public class Texture extends CompatibilityHackAsset implements Asset<AssetData> {
     public enum WrapMode {
         Clamp(GL_CLAMP),
         Repeat(GL_REPEAT);
@@ -81,7 +83,6 @@ public class Texture implements Asset {
 
     private static final Logger logger = LoggerFactory.getLogger(Texture.class);
 
-    private AssetUri uri;
     private int id;
     private int width;
     private int height;
@@ -94,8 +95,8 @@ public class Texture implements Asset {
     }
 
     public Texture(AssetUri uri, ByteBuffer[] data, int width, int height, WrapMode wrapMode, FilterMode filterMode) {
+        super(uri);
         if (data.length == 0) throw new IllegalArgumentException("Expected Data.length >= 1");
-        this.uri = uri;
         this.width = width;
         this.height = height;
         this.wrapMode = wrapMode;
@@ -116,11 +117,6 @@ public class Texture implements Asset {
         for (int i = 0; i < data.length; i++) {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data[i]);
         }
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override

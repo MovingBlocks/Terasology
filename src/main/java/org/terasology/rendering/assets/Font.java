@@ -21,7 +21,9 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
@@ -39,23 +41,17 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 /**
  * @author Immortius
  */
-public class Font implements Asset {
+public class Font extends CompatibilityHackAsset implements Asset<AssetData> {
 
-    private AssetUri uri;
     private TIntObjectMap<FontCharacter> charMap = new TIntObjectHashMap<FontCharacter>();
     private int lineHeight;
 
     public Font(AssetUri uri) {
-        this.uri = uri;
+        super(uri);
     }
 
     public void setCharacter(int id, FontCharacter character) {
         charMap.put(id, character);
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override

@@ -1,18 +1,17 @@
 package org.terasology.audio.nullAudio;
 
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.audio.Sound;
 
 /**
  * @author Immortius
  */
 // TODO: Provide as much information as possible without loading the sound proper
-public class NullSound implements Sound {
-
-    private AssetUri uri;
+public class NullSound extends CompatibilityHackAsset implements Sound {
 
     public NullSound(AssetUri uri) {
-        this.uri = uri;
+        super(uri);
     }
 
     @Override
@@ -42,11 +41,6 @@ public class NullSound implements Sound {
     @Override
     public int getBufferId() {
         return 0;
-    }
-
-    @Override
-    public AssetUri getURI() {
-        return uri;
     }
 
     @Override
