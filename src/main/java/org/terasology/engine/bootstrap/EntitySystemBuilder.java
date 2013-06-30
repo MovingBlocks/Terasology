@@ -20,6 +20,7 @@ import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.DoNotAutoRegister;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -55,10 +56,10 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
-import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -122,7 +123,9 @@ public class EntitySystemBuilder {
 
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
-            library.register(componentType);
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+                library.register(componentType);
+            }
         }
     }
 
@@ -138,7 +141,9 @@ public class EntitySystemBuilder {
     private void registerEvents(String packageName, EventSystem eventSystem, Reflections reflections) {
         Set<Class<? extends Event>> eventTypes = reflections.getSubTypesOf(Event.class);
         for (Class<? extends Event> eventType : eventTypes) {
-            eventSystem.registerEvent(packageName + ":" + eventType.getSimpleName(), eventType);
+            if (eventType.getAnnotation(DoNotAutoRegister.class) == null) {
+                eventSystem.registerEvent(packageName + ":" + eventType.getSimpleName(), eventType);
+            }
         }
     }
 }

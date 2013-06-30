@@ -24,11 +24,13 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.engine.internal.TimeLwjgl;
@@ -46,6 +48,27 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationData;
+import org.terasology.rendering.assets.animation.MeshAnimationImpl;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.rendering.opengl.OpenGLMaterial;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
+import org.terasology.rendering.opengl.OpenGLFont;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.opengl.OpenGLMesh;
+import org.terasology.rendering.opengl.OpenGLShader;
+import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
+import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
 
@@ -278,6 +301,8 @@ public class TerasologyEngine implements GameEngine {
             audioManager = new OpenALManager(config.getAudio());
         }
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
+        AssetManager.getInstance().setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
+        AssetManager.getInstance().setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }
 
     private void initDisplay() {
@@ -295,6 +320,48 @@ public class TerasologyEngine implements GameEngine {
         checkOpenGL();
         resizeViewport();
         initOpenGLParams();
+        AssetManager.getInstance().setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
+            @Override
+            public Texture buildAsset(AssetUri uri, TextureData data) {
+                return new OpenGLTexture(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+            @Override
+            public Font buildAsset(AssetUri uri, FontData data) {
+                return new OpenGLFont(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
+            @Override
+            public Shader buildAsset(AssetUri uri, ShaderData data) {
+                return new OpenGLShader(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
+            @Override
+            public Material buildAsset(AssetUri uri, MaterialData data) {
+                return new OpenGLMaterial(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
+            @Override
+            public Mesh buildAsset(AssetUri uri, MeshData data) {
+                return new OpenGLMesh(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
+            @Override
+            public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
+                return new OpenGLSkeletalMesh(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
+            @Override
+            public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
+                return new MeshAnimationImpl(uri, data);
+            }
+        });
     }
 
     private void checkOpenGL() {

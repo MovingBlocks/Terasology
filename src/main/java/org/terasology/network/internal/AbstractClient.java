@@ -37,7 +37,10 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public void disconnect() {
-        clientEntity.getComponent(ClientComponent.class).clientInfo.destroy();
+        ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            clientComp.clientInfo.destroy();
+        }
         clientEntity.destroy();
     }
 

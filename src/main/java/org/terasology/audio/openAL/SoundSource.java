@@ -19,7 +19,7 @@ import org.terasology.audio.Sound;
 
 import javax.vecmath.Vector3f;
 
-public interface SoundSource {
+public interface SoundSource<T extends Sound> {
 
     /**
      * Start sound playback
@@ -53,42 +53,6 @@ public interface SoundSource {
      * Update method, use it for position update, buffer switching, etc
      */
     public void update(float delta);
-
-    /**
-     * Returns audio length in seconds
-     * Will return -1 in sound is streaming
-     *
-     * @return
-     */
-    public int getLength();
-
-    /**
-     * Set playback position in seconds
-     *
-     * @param position
-     */
-    public SoundSource setPlaybackPosition(int position);
-
-    /**
-     * Returns sound playback position in seconds
-     *
-     * @return
-     */
-    public int getPlaybackPosition();
-
-    /**
-     * Set relative playback position (0.0f - start, 1.0f - end)
-     *
-     * @param position
-     */
-    public SoundSource setPlaybackPosition(float position);
-
-    /**
-     * Returns relative playback position (0.0f - start, 1.0f - end)
-     *
-     * @return
-     */
-    public float getPlaybackPositionf();
 
     /**
      * Set sound source absolute positioning.
@@ -209,14 +173,14 @@ public interface SoundSource {
      * @param sound
      * @return
      */
-    public SoundSource setAudio(Sound sound);
+    public SoundSource setAudio(T sound);
 
     /**
      * Returns sound of source :)
      *
      * @return
      */
-    public Sound getAudio();
+    public T getAudio();
 
     /**
      * Fade source smoothly

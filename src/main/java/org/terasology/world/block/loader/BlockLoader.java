@@ -126,12 +126,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
                         if (blockDef.shapes.isEmpty()) {
                             BlockFamilyFactory familyFactory = blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation);
-                            if (familyFactory == null) {
-                                logger.error("Invalid rotation '{}', reverting to symmetric", blockDef.rotation);
-                                result.families.add(new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), constructSingleBlock(blockDefUri, blockDef), blockDef.categories));
-                            } else {
-                                result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
-                            }
+                            result.families.add(familyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
                         }
@@ -182,7 +177,7 @@ public class BlockLoader implements BlockBuilderHelper {
         }
 
         def.shape = (shape.getURI().getSimpleString());
-        if (shape.isCollisionSymmetric()) {
+        if (shape.isCollisionYawSymmetric()) {
             Block block = constructSingleBlock(blockDefUri, def);
             return new SymmetricFamily(uri, block, def.categories);
         } else {
@@ -241,7 +236,7 @@ public class BlockLoader implements BlockBuilderHelper {
                     familyUri = new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName(), shapeUri.getPackage(), shapeUri.getAssetName());
                 }
                 blockDef.shape = shapeString;
-                if (shape.isCollisionSymmetric()) {
+                if (shape.isCollisionYawSymmetric()) {
                     Block block = constructSingleBlock(blockDefUri, blockDef);
                     result.add(new SymmetricFamily(familyUri, block, blockDef.categories));
                 } else {

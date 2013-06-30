@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Moving Blocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.entitySystem.prefab;
 
 import org.terasology.asset.AssetLoader;
@@ -18,17 +33,17 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class PrefabLoader implements AssetLoader<Prefab> {
+public class PrefabLoader implements AssetLoader<PrefabData> {
 
     public PrefabLoader() {
     }
 
     @Override
-    public Prefab load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public PrefabData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
         if (prefabData != null) {
-            return new PrefabSerializer(CoreRegistry.get(ComponentLibrary.class)).deserialize(prefabData, uri);
+            return new PrefabSerializer(CoreRegistry.get(ComponentLibrary.class)).deserialize(prefabData);
         }
         return null;
     }

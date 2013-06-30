@@ -52,8 +52,10 @@ import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.opengl.OpenGLMaterial;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -243,18 +245,19 @@ public class MeshRenderer implements RenderSystem {
         glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         for (Material material : opaqueMesh.keys()) {
-            Mesh lastMesh = null;
-            material.enable();
-            material.setInt("carryingTorch", carryingTorch ? 1 : 0);
-            material.setFloat("light", 1);
-            material.bindTextures();
+            OpenGLMesh lastMesh = null;
+            OpenGLMaterial openglMat = (OpenGLMaterial) material;
+            openglMat.enable();
+            openglMat.setInt("carryingTorch", carryingTorch ? 1 : 0);
+            openglMat.setFloat("light", 1);
+            openglMat.bindTextures();
             lastRendered = opaqueMesh.get(material).size();
 
             // Batching
             TFloatList vertexData = new TFloatArrayList();
             TIntList indexData = new TIntArrayList();
             int indexOffset = 0;
-            float[] openglMat = new float[16];
+            float[] openglMatrix = new float[16];
             FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
 
             for (EntityRef entity : opaqueMesh.get(material)) {
@@ -283,18 +286,18 @@ public class MeshRenderer implements RenderSystem {
                             if (lastMesh != null) {
                                 lastMesh.postRender();
                             }
-                            lastMesh = meshComp.mesh;
-                            meshComp.mesh.preRender();
+                            lastMesh = (OpenGLMesh)meshComp.mesh;
+                            lastMesh.preRender();
                         }
                         glPushMatrix();
-                        trans.getOpenGLMatrix(openglMat);
-                        mBuffer.put(openglMat);
+                        trans.getOpenGLMatrix(openglMatrix);
+                        mBuffer.put(openglMatrix);
                         mBuffer.flip();
                         glMultMatrix(mBuffer);
 
                         material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
-                        meshComp.mesh.doRender();
+                        lastMesh.doRender();
 
                         glPopMatrix();
                     }
@@ -314,7 +317,7 @@ public class MeshRenderer implements RenderSystem {
                     AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
                     if (worldRenderer.isAABBVisible(aabb)) {
-                        indexOffset = meshComp.mesh.addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
+                        indexOffset = ((OpenGLMesh)meshComp.mesh).addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
                     }
 
                     if (indexOffset > 100) {

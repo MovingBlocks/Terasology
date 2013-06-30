@@ -39,6 +39,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.opengl.OpenGLMaterial;
+import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Matrix4f;
@@ -86,7 +88,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
 
         if (skeleton.boneEntities == null) {
             skeleton.boneEntities = Maps.newHashMap();
-            for (Bone bone : skeleton.mesh.bones()) {
+            for (Bone bone : skeleton.mesh.getBones()) {
                 LocationComponent loc = new LocationComponent();
                 loc.setLocalPosition(bone.getLocalPosition());
                 loc.setLocalRotation(bone.getLocalRotation());
@@ -180,10 +182,11 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
             if (skeletalMesh.mesh == null || skeletalMesh.material == null) {
                 continue;
             }
-            skeletalMesh.material.enable();
+            OpenGLMaterial mat = (OpenGLMaterial) skeletalMesh.material;
+            mat.enable();
             skeletalMesh.material.setInt("carryingTorch", carryingTorch ? 1 : 0);
             skeletalMesh.material.setFloat("light", 1);
-            skeletalMesh.material.bindTextures();
+            mat.bindTextures();
 
             float[] openglMat = new float[16];
             FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
@@ -205,7 +208,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
             skeletalMesh.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
-            for (Bone bone : skeletalMesh.mesh.bones()) {
+            for (Bone bone : skeletalMesh.mesh.getBones()) {
                 EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                 if (boneEntity == null) {
                     boneEntity = EntityRef.NULL;
@@ -225,7 +228,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
                     boneRotations.add(new Quat4f());
                 }
             }
-            skeletalMesh.mesh.render(bonePositions, boneRotations);
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(bonePositions, boneRotations);
             glPopMatrix();
         }
 
@@ -239,23 +242,23 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
     @Override
     public void renderOverlay() {
         /*ShaderManager.getInstance().enableDefault();
-        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        glPushMatrix();
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        glDisable(GL11.GL_TEXTURE_2D);
-        glLineWidth(2);
-        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        for (EntityRef entity : entityManager.listEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
-            SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
-            renderBone(skeletalMesh.rootBone);
-        }
-        glColor4f(1.0f, 0.0f, 1.0f, 1.0f);
-        for (EntityRef entity : entityManager.listEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
-            SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
-            renderBoneOrientation(skeletalMesh.rootBone);
-        }
-        glEnable(GL11.GL_TEXTURE_2D);
-        glPopMatrix();*/
+Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+glPushMatrix();
+glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+glDisable(GL11.GL_TEXTURE_2D);
+glLineWidth(2);
+glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+for (EntityRef entity : entityManager.listEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
+renderBone(skeletalMesh.rootBone);
+}
+glColor4f(1.0f, 0.0f, 1.0f, 1.0f);
+for (EntityRef entity : entityManager.listEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
+renderBoneOrientation(skeletalMesh.rootBone);
+}
+glEnable(GL11.GL_TEXTURE_2D);
+glPopMatrix();*/
     }
 
     private void renderBoneOrientation(EntityRef boneEntity) {

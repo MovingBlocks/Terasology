@@ -17,8 +17,14 @@
 package org.terasology.asset;
 
 /**
- * Interface for AssetData.
- *
+ * AssetData is the implementation agnostic data for an asset - typically it isn't dependant on either the source format
+ * or the implementation consuming the resource. For instance, for a texture the asset data would not depend on the
+ * format of the image the texture is sourced from, nor whether textures are handled by LWJGL or some other renderer.
+ * <p/>
+ * This separation allows support for multiple implementations on either end, as well as the direct procedural creation
+ * of assets. It should be noted that there may be multiple implementations of Asset Data in some cases as well, although
+ * these cases should be rare.
+ * <p/>
  * AssetData is information used to create and reload assets
  */
 public interface AssetData {

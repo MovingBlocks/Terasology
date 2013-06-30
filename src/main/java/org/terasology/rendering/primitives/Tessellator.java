@@ -15,9 +15,11 @@
  */
 package org.terasology.rendering.primitives;
 
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
 import javax.vecmath.Vector2f;
@@ -26,36 +28,20 @@ import javax.vecmath.Vector4f;
 
 public class Tessellator {
 
-    private TFloatArrayList _color = new TFloatArrayList();
-    private TFloatArrayList _vertices = new TFloatArrayList();
-    private TFloatArrayList _texCoord0 = new TFloatArrayList();
-    private TFloatArrayList _texCoord1 = new TFloatArrayList();
-    private TFloatArrayList _normals = new TFloatArrayList();
-    private TIntArrayList _indices = new TIntArrayList();
-    private int _indexOffset = 0;
+    private MeshData meshData = new MeshData();
 
-    private Vector4f _activeColor = new Vector4f();
-    private Vector3f _activeNormal = new Vector3f();
-    private Vector2f _activeTex = new Vector2f();
-    private Vector3f _lighting = new Vector3f();
+    private int nextIndex = 0;
+
+    private Vector4f activeColor = new Vector4f();
+    private Vector3f activeNormal = new Vector3f();
+    private Vector2f activeTex = new Vector2f();
+    private Vector3f lighting = new Vector3f();
 
     private boolean useLighting = true;
     private boolean useNormals = true;
 
 
     public Tessellator() {
-        resetParams();
-    }
-
-    public void resetAll() {
-        _color.reset();
-        _vertices.reset();
-        _texCoord0.reset();
-        _texCoord1.reset();
-        _normals.reset();
-        _indices.reset();
-        _indexOffset = 0;
-
         resetParams();
     }
 
@@ -68,10 +54,10 @@ public class Tessellator {
     }
 
     public void resetParams() {
-        _activeColor.set(1, 1, 1, 1);
-        _activeTex.set(0, 0);
-        _lighting.set(1, 1, 1);
-        _activeNormal.set(0, 1, 0);
+        activeColor.set(1, 1, 1, 1);
+        activeTex.set(0, 0);
+        lighting.set(1, 1, 1);
+        activeNormal.set(0, 1, 0);
     }
 
     public void addPoly(Vector3f[] vertices, Vector2f[] texCoords) {
@@ -80,100 +66,97 @@ public class Tessellator {
         }
 
         for (int i = 0; i < vertices.length; ++i) {
-            _vertices.add(vertices[i].x);
-            _vertices.add(vertices[i].y);
-            _vertices.add(vertices[i].z);
+            meshData.getVertices().add(vertices[i].x);
+            meshData.getVertices().add(vertices[i].y);
+            meshData.getVertices().add(vertices[i].z);
 
-            _color.add(_activeColor.x);
-            _color.add(_activeColor.y);
-            _color.add(_activeColor.z);
-            _color.add(_activeColor.w);
+            meshData.getColors().add(activeColor.x);
+            meshData.getColors().add(activeColor.y);
+            meshData.getColors().add(activeColor.z);
+            meshData.getColors().add(activeColor.w);
 
             if (useNormals) {
-                _normals.add(_activeNormal.x);
-                _normals.add(_activeNormal.y);
-                _normals.add(_activeNormal.z);
+                meshData.getNormals().add(activeNormal.x);
+                meshData.getNormals().add(activeNormal.y);
+                meshData.getNormals().add(activeNormal.z);
             }
 
-            _texCoord0.add(texCoords[i].x);
-            _texCoord0.add(texCoords[i].y);
+            meshData.getTexCoord0().add(texCoords[i].x);
+            meshData.getTexCoord0().add(texCoords[i].y);
 
             if (useLighting) {
-                _texCoord1.add(_lighting.x);
-                _texCoord1.add(_lighting.y);
-                _texCoord1.add(_lighting.z);
+                meshData.getTexCoord1().add(lighting.x);
+                meshData.getTexCoord1().add(lighting.y);
+                meshData.getTexCoord1().add(lighting.z);
             }
         }
 
         // Standard fan
         for (int i = 0; i < vertices.length - 2; i++) {
-            _indices.add(_indexOffset);
-            _indices.add(_indexOffset + i + 1);
-            _indices.add(_indexOffset + i + 2);
+            meshData.getIndices().add(nextIndex);
+            meshData.getIndices().add(nextIndex + i + 1);
+            meshData.getIndices().add(nextIndex + i + 2);
         }
-        _indexOffset += vertices.length;
+        nextIndex += vertices.length;
     }
 
     public void addMeshPart(BlockMeshPart part) {
         for (int i = 0; i < part.size(); ++i) {
             Vector3f vertex = part.getVertex(i);
-            _vertices.add(vertex.x);
-            _vertices.add(vertex.y);
-            _vertices.add(vertex.z);
+            meshData.getVertices().add(vertex.x);
+            meshData.getVertices().add(vertex.y);
+            meshData.getVertices().add(vertex.z);
 
-            _color.add(_activeColor.x);
-            _color.add(_activeColor.y);
-            _color.add(_activeColor.z);
-            _color.add(_activeColor.w);
+            meshData.getColors().add(activeColor.x);
+            meshData.getColors().add(activeColor.y);
+            meshData.getColors().add(activeColor.z);
+            meshData.getColors().add(activeColor.w);
 
             Vector3f normal = part.getNormal(i);
-            _normals.add(normal.x);
-            _normals.add(normal.y);
-            _normals.add(normal.z);
+            meshData.getNormals().add(normal.x);
+            meshData.getNormals().add(normal.y);
+            meshData.getNormals().add(normal.z);
 
             Vector2f uv = part.getTexCoord(i);
-            _texCoord0.add(uv.x);
-            _texCoord0.add(uv.y);
+            meshData.getTexCoord0().add(uv.x);
+            meshData.getTexCoord0().add(uv.y);
 
-            _texCoord1.add(_lighting.x);
-            _texCoord1.add(_lighting.y);
-            _texCoord1.add(_lighting.z);
+            meshData.getTexCoord1().add(lighting.x);
+            meshData.getTexCoord1().add(lighting.y);
+            meshData.getTexCoord1().add(lighting.z);
         }
 
         for (int i = 0; i < part.indicesSize(); ++i) {
-            _indices.add(_indexOffset + part.getIndex(i));
+            meshData.getIndices().add(nextIndex + part.getIndex(i));
         }
-        _indexOffset += part.size();
+        nextIndex += part.size();
     }
 
     public void setColor(Vector4f v) {
-        _activeColor.set(v);
+        activeColor.set(v);
     }
 
     public void setNormal(Vector3f v) {
-        _activeNormal.set(v);
+        activeNormal.set(v);
     }
 
     public void setTex(Vector2f v) {
-        _activeTex.set(v);
+        activeTex.set(v);
     }
 
     public void setLighting(Vector3f v) {
-        _lighting.set(v);
-    }
-
-
-    public Mesh generateMesh() {
-        if (_vertices.size() > 0) {
-            return Mesh.buildMesh(_vertices, _texCoord0, _texCoord1, _normals, _color, _indices);
-        }
-        return null;
+        lighting.set(v);
     }
 
     public Mesh generateMesh(AssetUri uri) {
-        if (_vertices.size() > 0) {
-            return Mesh.buildMesh(uri, _vertices, _texCoord0, _texCoord1, _normals, _color, _indices);
-        }
-        return null;
+        Mesh result =  Assets.generateAsset(uri, meshData, Mesh.class);
+        meshData = new MeshData();
+        return result;
+    }
+
+    public Mesh generateMesh() {
+        Mesh result = Assets.generateAsset(AssetType.MESH, meshData, Mesh.class);
+        meshData = new MeshData();
+        return result;
     }
 }

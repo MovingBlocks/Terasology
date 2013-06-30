@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.widgets;
 
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;

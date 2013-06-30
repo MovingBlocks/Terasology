@@ -16,92 +16,23 @@
 
 package org.terasology.rendering.assets.animation;
 
-import com.google.common.collect.Lists;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.Asset;
-import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-
-import java.util.List;
 
 /**
  * @author Immortius
  */
-public class MeshAnimation implements Asset {
-    private AssetUri uri;
-    private List<String> boneNames;
-    private TIntList boneParent;
-    private List<MeshAnimationFrame> frames = Lists.newArrayList();
-    private float timePerFrame;
+public interface MeshAnimation extends Asset<MeshAnimationData> {
 
-    public MeshAnimation(AssetUri uri) {
-        this.uri = uri;
-    }
+    boolean isValidAnimationFor(SkeletalMesh mesh);
 
-    @Override
-    public AssetUri getURI() {
-        return uri;
-    }
+    int getBoneCount();
 
-    @Override
-    public void dispose() {
-    }
+    int getFrameCount();
 
-    /**
-     * Sets up the bone hierarchy for this animation
-     *
-     * @param names   The names of each bone
-     * @param parents The index of the parent of each bone, -1 for no parent
-     * @throws IllegalArgumentException If the names.length != parents.length
-     */
-    public void setBones(String[] names, int[] parents) {
-        if (names.length != parents.length) {
-            throw new IllegalArgumentException();
-        }
-        boneNames = Lists.newArrayList(names);
-        boneParent = new TIntArrayList(parents);
-    }
+    MeshAnimationFrame getFrame(int frame);
 
-    public boolean isValidAnimationFor(SkeletalMesh mesh) {
-        for (int i = 0; i < boneNames.size(); ++i) {
-            Bone bone = mesh.getBone(boneNames.get(i));
-            boolean hasParent = boneParent.get(i) != -1;
-            if (hasParent && (bone.getParent() == null || !bone.getParent().getName().equals(boneNames.get(boneParent.get(i))))) {
-                return false;
-            } else if (!hasParent && bone.getParent() != null) {
-                return false;
-            }
-        }
-        return true;
-    }
+    String getBoneName(int index);
 
-    public void addFrame(MeshAnimationFrame frame) {
-        frames.add(frame);
-    }
-
-    public int getBoneCount() {
-        return boneNames.size();
-    }
-
-    public int getFrameCount() {
-        return frames.size();
-    }
-
-    public MeshAnimationFrame getFrame(int frame) {
-        return frames.get(frame);
-    }
-
-    public String getBoneName(int index) {
-        return boneNames.get(index);
-    }
-
-    public void setTimePerFrame(float time) {
-        this.timePerFrame = time;
-    }
-
-    public float getTimePerFrame() {
-        return timePerFrame;
-    }
+    float getTimePerFrame();
 }

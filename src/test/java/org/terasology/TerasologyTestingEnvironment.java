@@ -28,7 +28,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
@@ -44,8 +44,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
@@ -72,7 +73,6 @@ public abstract class TerasologyTestingEnvironment {
     private static NetworkSystem networkSystem;
     private ComponentSystemManager componentSystemManager;
     private EngineTime mockTime;
-    private static BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
@@ -80,7 +80,17 @@ public abstract class TerasologyTestingEnvironment {
         if (!setup) {
             setup = true;
             bindLwjgl();
-            blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
+
+            modManager = new ModManager();
+            modManager.applyActiveMods();
+            CoreRegistry.put(ModManager.class, modManager);
+            AssetType.registerAssetTypes();
+            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+
+            DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
+            blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
+            blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AlignToSurfaceFamilyFactory());
             blockManager = new BlockManagerImpl(blockFamilyFactoryRegistry);
             CoreRegistry.put(BlockManager.class, blockManager);
 
@@ -96,13 +106,6 @@ public abstract class TerasologyTestingEnvironment {
 
             collisionGroupManager = new CollisionGroupManager();
             CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
-            modManager = new ModManager();
-            modManager.applyActiveMods();
-            CoreRegistry.put(ModManager.class, modManager);
-            AssetType.registerAssetTypes();
-            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
-            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
-
         } else {
             CoreRegistry.put(BlockManager.class, blockManager);
             CoreRegistry.put(Config.class, config);

@@ -22,7 +22,8 @@ import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.opengl.OpenGLShader;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -91,12 +92,12 @@ public class ShaderProgram {
 
         int shaderId = GL20.glCreateShader(type);
 
-        StringBuilder shader = Shader.createShaderBuilder();
+        StringBuilder shader = OpenGLShader.createShaderBuilder();
 
         if (type == GL20.GL_FRAGMENT_SHADER)
-            shader.append(Shader.getIncludedFunctionsFragment()).append("\n");
+            shader.append(OpenGLShader.INCLUDED_FUNCTIONS_FRAGMENT).append("\n");
         else
-            shader.append(Shader.getIncludedFunctionsVertex()).append("\n");
+            shader.append(OpenGLShader.INCLUDED_FUNCTIONS_VERTEX).append("\n");
 
         String filename = title;
 

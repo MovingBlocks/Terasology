@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.math;
 
 import org.lwjgl.BufferUtils;
@@ -330,6 +331,14 @@ public final class TeraMath {
         val = (val >> 16) | val;
         val++;
         return val;
+    }
+
+    /**
+     * @param val
+     * @return Whether val is a power of two
+     */
+    public static boolean isPowerOfTwo(int val) {
+        return val == ceilPowerOfTwo(val);
     }
 
     /**

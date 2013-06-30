@@ -19,7 +19,7 @@ import org.terasology.audio.Sound;
 
 import java.util.Set;
 
-public interface SoundPool {
+public interface SoundPool<SOUND extends Sound, SOUND_SOURCE extends SoundSource> {
 
     /**
      * Returns sound source tuned for specified sound with specified priority
@@ -28,7 +28,7 @@ public interface SoundPool {
      * @param priority
      * @return
      */
-    SoundSource getSource(Sound sound, int priority);
+    SOUND_SOURCE getSource(SOUND sound, int priority);
 
     /**
      * Returns sound source tuned for specified sound with normal priority
@@ -36,7 +36,7 @@ public interface SoundPool {
      * @param sound
      * @return
      */
-    SoundSource getSource(Sound sound);
+    SOUND_SOURCE getSource(SOUND sound);
 
     /**
      * Returns all available sound sources
@@ -44,21 +44,21 @@ public interface SoundPool {
      *
      * @return
      */
-    Set<SoundSource> getSources();
+    Set<SOUND_SOURCE> getSources();
 
     /**
      * Returns all inactive (available) sources
      *
      * @return
      */
-    Set<SoundSource> getInactiveSources();
+    Set<SOUND_SOURCE> getInactiveSources();
 
     /**
      * Returns all active or locked sources
      *
      * @return
      */
-    Set<SoundSource> getActiveSources();
+    Set<SOUND_SOURCE> getActiveSources();
 
     /**
      * Returns sound sources amount in this pool

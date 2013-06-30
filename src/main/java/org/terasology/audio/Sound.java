@@ -16,48 +16,23 @@
 package org.terasology.audio;
 
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 
-public interface Sound extends Asset {
-
-    /**
-     * Returns sound sample length in seconds
-     * Not available on streaming sounds (will return -1)
-     *
-     * @return
-     */
-    public int getLength();
+public interface Sound<T extends AssetData> extends Asset<T> {
 
     /**
-     * Return channels amount of sound (1 - mono, 2 - stereo)
-     *
-     * @return
+     * @return channels amount of sound (1 - mono, 2 - stereo)
      */
     public int getChannels();
 
     /**
-     * Returns sampling rate of sound (example 44100)
-     *
-     * @return
+     * @return sampling rate of sound (example 44100)
      */
     public int getSamplingRate();
-
-    /**
-     * Reset sound state (clears buffers, reset cached info)
-     *
-     * @return
-     */
-    public void reset();
-
-    // TODO: Have these here?
 
     /**
      * @return the size of the sound buffer
      */
     public int getBufferSize();
-
-    /**
-     * @return the id of the sound buffer
-     */
-    public int getBufferId();
 
 }

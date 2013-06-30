@@ -17,14 +17,13 @@
 package org.terasology.asset;
 
 import org.terasology.audio.Sound;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.rendering.assets.Font;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 
 /**
  * Assets provides a collection of static methods for obtaining assets and registering procedural assets
@@ -228,6 +227,22 @@ public final class Assets {
      */
     public static MeshAnimation getAnimation(String module, String assetName) {
         return get(new AssetUri(AssetType.ANIMATION, module, assetName), MeshAnimation.class);
+    }
+
+    public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {
+        Asset<U> asset = AssetManager.getInstance().generateAsset(uri, data);
+        if (assetClass.isInstance(asset)) {
+            return assetClass.cast(asset);
+        }
+        return null;
+    }
+
+    public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetType type, U data, Class<T> assetClass) {
+        Asset<U> asset = AssetManager.getInstance().generateTemporaryAsset(type, data);
+        if (assetClass.isInstance(asset)) {
+            return assetClass.cast(asset);
+        }
+        return null;
     }
 
     // Private constructor to prevent instantiation (static class)

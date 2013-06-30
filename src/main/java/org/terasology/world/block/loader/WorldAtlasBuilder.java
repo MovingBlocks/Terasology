@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Moving Blocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
@@ -12,8 +27,10 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.world.block.Block;
 
 import javax.imageio.ImageIO;
@@ -38,7 +55,7 @@ public class WorldAtlasBuilder {
     private int tileSize = 16;
 
     private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
-    private List<Tile> tiles = Lists.newArrayList();
+    private List<TileData> tiles = Lists.newArrayList();
 
     public int getAtlasSize() {
         return atlasSize;
@@ -75,13 +92,13 @@ public class WorldAtlasBuilder {
             }
         }
 
-        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
-        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
-        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
-        terrainMat.setTexture("textureAtlas", terrainTex);
-        terrainMat.setFloat3("colorOffset", 1, 1, 1);
-        terrainMat.setInt("textured", 1);
-        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMat);
+        TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
+        MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));
+        terrainMatData.setParam("textureAtlas", terrainTex);
+        terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
+        terrainMatData.setParam("textured", 1);
+        Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
     }
 
     private BufferedImage generateAtlas(int mipMapLevel) {
@@ -97,7 +114,7 @@ public class WorldAtlasBuilder {
         }
 
         for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
-            Tile tile = tiles.get(index);
+            TileData tile = tiles.get(index);
 
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
@@ -115,7 +132,8 @@ public class WorldAtlasBuilder {
 
     /**
      * Obtains the tex coords of a block tile. If it isn't part of the atlas it is added to the atlas.
-     * @param uri The uri of the block tile of interest.
+     *
+     * @param uri         The uri of the block tile of interest.
      * @param warnOnError Whether a warning should be logged if the asset canot be found
      * @return The tex coords of the tile in the atlas.
      */
@@ -136,7 +154,7 @@ public class WorldAtlasBuilder {
     }
 
     private int indexTile(AssetUri uri, boolean warnOnError) {
-        Tile tile = (Tile) AssetManager.tryLoad(uri);
+        TileData tile = AssetManager.tryLoadAssetData(uri, TileData.class);
         if (tile != null) {
             int index = tiles.size();
             tiles.add(tile);

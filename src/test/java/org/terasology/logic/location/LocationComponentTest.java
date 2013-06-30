@@ -266,12 +266,10 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
 
         loc.setWorldPosition(new Vector3f(2, 0, 0));
         Location.attachChild(parentEntity, entity);
-        System.out.println(entity.toFullDescription());
         Location locationSystem = new Location();
         locationSystem.onDestroyed(BeforeRemoveComponent.newInstance(), parentEntity);
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(null);
         when(parentEntity.exists()).thenReturn(false);
-        System.out.println(entity.toFullDescription());
 
         TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(), 0.000001f);
     }

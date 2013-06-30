@@ -21,9 +21,9 @@ import org.newdawn.slick.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 

@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.prefab;
 
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
 
@@ -27,7 +28,7 @@ import java.util.List;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Prefab extends ComponentContainer, Asset {
+public interface Prefab extends ComponentContainer, Asset<PrefabData> {
 
     /**
      * @return The identifier for this prefab

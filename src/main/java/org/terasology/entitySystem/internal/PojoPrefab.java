@@ -21,10 +21,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.AbstractPrefab;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ import java.util.Map;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PojoPrefab extends AbstractPrefab implements Prefab {
+public class PojoPrefab extends AbstractPrefab {
     private static final Logger logger = LoggerFactory.getLogger(PojoPrefab.class);
 
     private Prefab parent;
@@ -40,28 +42,9 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
     private List<Prefab> children = Lists.newArrayList();
     private boolean persisted;
 
-    public PojoPrefab(AssetUri uri, Map<Class<? extends Component>, Component> components, Prefab parent, boolean persisted) {
+    public PojoPrefab(AssetUri uri, PrefabData data) {
         super(uri);
-        this.componentMap = ImmutableMap.copyOf(components);
-        this.persisted = persisted;
-        this.parent = parent;
-        if (parent != null && parent instanceof PojoPrefab) {
-            ((PojoPrefab) parent).children.add(this);
-        }
-    }
-
-    public PojoPrefab(AssetUri uri, Prefab parent, boolean persisted, Component ... components) {
-        super(uri);
-        Map<Class<? extends Component>, Component> compMap = Maps.newHashMap();
-        for (Component comp : components) {
-            compMap.put(comp.getClass(), comp);
-        }
-        this.componentMap = ImmutableMap.copyOf(compMap);
-        this.persisted = persisted;
-        this.parent = parent;
-        if (parent != null && parent instanceof PojoPrefab) {
-            ((PojoPrefab) parent).children.add(this);
-        }
+        reload(data);
     }
 
     @Override
@@ -96,5 +79,20 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
 
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public void reload(PrefabData data) {
+        this.componentMap = ImmutableMap.copyOf(data.getComponents());
+        this.persisted = data.isPersisted();
+        this.parent = data.getParent();
+        if (parent != null && parent instanceof PojoPrefab) {
+            ((PojoPrefab) parent).children.add(this);
+        }
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return false;
     }
 }
