@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.widgets;
 
 import org.newdawn.slick.Color;
-import org.terasology.rendering.assets.Font;
+import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 
