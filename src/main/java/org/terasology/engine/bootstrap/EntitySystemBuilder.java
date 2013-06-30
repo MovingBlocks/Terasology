@@ -56,7 +56,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
-import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.primitives.Mesh;

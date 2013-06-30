@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.rendering.assets;
+package org.terasology.rendering.opengl;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
@@ -23,46 +22,83 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
-import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.OpenGLShader;
 
 import java.nio.FloatBuffer;
+import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class Material extends CompatibilityHackAsset implements Asset<AssetData> {
+public class OpenGLMaterial extends AbstractAsset<MaterialData> implements Material {
 
-    private static final Logger logger = LoggerFactory.getLogger(Material.class);
-
-    private Shader shader;
-    private int shaderProgram;
+    private OpenGLShader shader = null;
+    private int shaderProgram = 0;
     private int textureIndex = 0;
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<String>();
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<Texture>();
 
-    public Material(AssetUri uri, Shader shader) {
+    public OpenGLMaterial(AssetUri uri, MaterialData data) {
         super(uri);
-        this.shader = shader;
-        shaderProgram = ((OpenGLShader)shader).generateShaderInstance();
+        reload(data);
     }
 
+    @Override
     public void dispose() {
-        logger.debug("Disposing material {}.", getURI());
-
-        GL20.glDeleteShader(shaderProgram);
-        shaderProgram = 0;
+        if (shaderProgram != 0) {
+            GL20.glDeleteShader(shaderProgram);
+            shaderProgram = 0;
+        }
     }
 
+    @Override
     public boolean isDisposed() {
         return shaderProgram == 0;
+    }
+
+    @Override
+    public void reload(MaterialData data) {
+        dispose();
+        if (data.getShader() instanceof OpenGLShader) {
+            this.shader = (OpenGLShader) data.getShader();
+            shaderProgram = shader.generateShaderInstance();
+
+            for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
+                setTexture(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
+                setFloat(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
+                setInt(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
+                switch (entry.getValue().length) {
+                    case 1:
+                        setFloat(entry.getKey(), entry.getValue()[0]);
+                        break;
+                    case 2:
+                        setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                        break;
+                    case 3:
+                        setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                        break;
+                    case 4:
+                        setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                        break;
+                }
+            }
+        }
     }
 
     public int getShaderId() {

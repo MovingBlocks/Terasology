@@ -39,6 +39,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Matrix4f;
@@ -180,10 +181,11 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
             if (skeletalMesh.mesh == null || skeletalMesh.material == null) {
                 continue;
             }
-            skeletalMesh.material.enable();
-            skeletalMesh.material.setInt("carryingTorch", carryingTorch ? 1 : 0);
-            skeletalMesh.material.setFloat("light", 1);
-            skeletalMesh.material.bindTextures();
+            OpenGLMaterial openGLMat = (OpenGLMaterial) skeletalMesh.material;
+            openGLMat.enable();
+            openGLMat.setInt("carryingTorch", carryingTorch ? 1 : 0);
+            openGLMat.setFloat("light", 1);
+            openGLMat.bindTextures();
 
             float[] openglMat = new float[16];
             FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);

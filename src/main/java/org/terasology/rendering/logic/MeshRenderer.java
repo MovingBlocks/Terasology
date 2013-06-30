@@ -52,7 +52,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -244,17 +245,18 @@ public class MeshRenderer implements RenderSystem {
 
         for (Material material : opaqueMesh.keys()) {
             Mesh lastMesh = null;
-            material.enable();
-            material.setInt("carryingTorch", carryingTorch ? 1 : 0);
-            material.setFloat("light", 1);
-            material.bindTextures();
+            OpenGLMaterial openglMat = (OpenGLMaterial) material;
+            openglMat.enable();
+            openglMat.setInt("carryingTorch", carryingTorch ? 1 : 0);
+            openglMat.setFloat("light", 1);
+            openglMat.bindTextures();
             lastRendered = opaqueMesh.get(material).size();
 
             // Batching
             TFloatList vertexData = new TFloatArrayList();
             TIntList indexData = new TIntArrayList();
             int indexOffset = 0;
-            float[] openglMat = new float[16];
+            float[] openglMatrix = new float[16];
             FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
 
             for (EntityRef entity : opaqueMesh.get(material)) {
@@ -287,8 +289,8 @@ public class MeshRenderer implements RenderSystem {
                             meshComp.mesh.preRender();
                         }
                         glPushMatrix();
-                        trans.getOpenGLMatrix(openglMat);
-                        mBuffer.put(openglMat);
+                        trans.getOpenGLMatrix(openglMatrix);
+                        mBuffer.put(openglMatrix);
                         mBuffer.flip();
                         glMultMatrix(mBuffer);
 
