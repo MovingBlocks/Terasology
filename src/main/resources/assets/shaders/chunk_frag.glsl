@@ -20,7 +20,7 @@
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
 
-#define WATER_AMB 0.25
+#define WATER_AMB 1.0
 #define WATER_SPEC 1.0
 #define WATER_DIFF 0.75
 
