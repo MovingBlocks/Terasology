@@ -28,8 +28,10 @@ import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
+import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
+import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.opengl.OpenGLShader;
 
 import java.nio.FloatBuffer;
 
@@ -49,7 +51,7 @@ public class Material extends CompatibilityHackAsset implements Asset<AssetData>
     public Material(AssetUri uri, Shader shader) {
         super(uri);
         this.shader = shader;
-        shaderProgram = shader.generateShaderInstance();
+        shaderProgram = ((OpenGLShader)shader).generateShaderInstance();
     }
 
     public void dispose() {
@@ -183,7 +185,7 @@ public class Material extends CompatibilityHackAsset implements Asset<AssetData>
             texId = bindMap.get(desc);
         } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
-            ParamMetadata metadata = shader.getParameter(desc);
+            ShaderParameterMetadata metadata = shader.getParameter(desc);
             if (metadata == null) {
                 return;
             }

@@ -24,7 +24,7 @@ import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.PrefabLoader;
 import org.terasology.rendering.assets.font.FontLoader;
-import org.terasology.rendering.assetLoaders.GLSLShaderLoader;
+import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assetLoaders.MaterialLoader;
 import org.terasology.rendering.assetLoaders.ObjMeshLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;

@@ -30,7 +30,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.io.IOException;

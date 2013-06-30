@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.assetLoaders;
+package org.terasology.rendering.assets.shader;
 
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
@@ -23,12 +23,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
-import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +37,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class GLSLShaderLoader implements AssetLoader<Shader> {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(GLSLShaderLoader.class);
-
+public class GLSLShaderLoader implements AssetLoader<ShaderData> {
     private Gson gson;
 
     public GLSLShaderLoader() {
@@ -53,7 +47,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
     }
 
     @Override
-    public Shader load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public ShaderData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         String vertProgram = null;
         String fragProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();
@@ -68,36 +62,20 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
             }
         }
         if (vertProgram != null && fragProgram != null) {
-            return new Shader(uri, vertProgram, fragProgram, metadata);
+            return new ShaderData(vertProgram, fragProgram, metadata.getParameters());
         }
         return null;
     }
 
     private ShaderMetadata readMetadata(URL url) throws IOException {
-        Reader reader = new InputStreamReader(url.openStream());
-        try {
+        try (Reader reader = new InputStreamReader(url.openStream())) {
             return gson.fromJson(reader, ShaderMetadata.class);
-        } finally {
-            // JAVA7: clean up
-            try {
-                reader.close();
-            } catch (IOException e) {
-                logger.error("Failed to close stream", e);
-            }
         }
     }
 
     private String readUrl(URL url) throws IOException {
-        InputStream stream = url.openStream();
-        InputStreamReader reader = new InputStreamReader(stream);
-        try {
+        try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
             return CharStreams.toString(reader);
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                logger.error("Failed to close stream", e);
-            }
         }
     }
 
@@ -106,8 +84,8 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
         @Override
         public ShaderMetadata deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             ShaderMetadata result = new ShaderMetadata();
-            ParamMetadata[] params = context.deserialize(json.getAsJsonObject().get("params"), ParamMetadata[].class);
-            for (ParamMetadata param : params) {
+            ShaderParameterMetadata[] params = context.deserialize(json.getAsJsonObject().get("params"), ShaderParameterMetadata[].class);
+            for (ShaderParameterMetadata param : params) {
                 result.getParameters().add(param);
             }
             return result;

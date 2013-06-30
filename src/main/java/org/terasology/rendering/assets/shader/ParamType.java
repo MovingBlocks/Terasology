@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.assets.metadata;
+package org.terasology.rendering.assets.shader;
 
 /**
  * @author Immortius
