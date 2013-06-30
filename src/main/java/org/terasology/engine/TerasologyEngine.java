@@ -48,6 +48,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.opengl.OpenGLTexture;
@@ -306,6 +309,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
                 return new OpenGLTexture(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+            @Override
+            public Font buildAsset(AssetUri uri, FontData data) {
+                return new OpenGLFont(uri, data);
             }
         });
     }

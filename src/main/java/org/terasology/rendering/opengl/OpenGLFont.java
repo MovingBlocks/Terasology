@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.opengl;
 
-package org.terasology.rendering.assets;
-
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontCharacter;
+import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.texture.Texture;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
@@ -42,25 +40,19 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 /**
  * @author Immortius
  */
-public class Font extends CompatibilityHackAsset implements Asset<AssetData> {
+public class OpenGLFont extends AbstractAsset<FontData> implements Font {
+    private FontData data;
 
-    private TIntObjectMap<FontCharacter> charMap = new TIntObjectHashMap<FontCharacter>();
-    private int lineHeight;
-
-    public Font(AssetUri uri) {
+    public OpenGLFont(AssetUri uri, FontData data) {
         super(uri);
+        reload(data);
     }
 
-    public void setCharacter(int id, FontCharacter character) {
-        charMap.put(id, character);
-    }
-
-    @Override
-    public void dispose() {
-
-    }
-
+    // This function shouldn't be here, should be in a Canvas style class most likely.
     public void drawString(int x, int y, String text, Color color) {
+        if (isDisposed()) {
+            return;
+        }
         ShaderManager.getInstance().enableDefaultTextured();
 
         Texture bound = null;
@@ -70,12 +62,13 @@ public class Font extends CompatibilityHackAsset implements Asset<AssetData> {
         for (char c : text.toCharArray()) {
             if (c == '\n') {
                 posX = x;
-                posY += lineHeight;
+                posY += data.getLineHeight();
             } else {
-                FontCharacter character = charMap.get(c);
-                if (character != null) {
+                FontCharacter character = data.getCharacter(c);
+                if (character != null && character.getPage() != null) {
+                    Texture page = character.getPage();
                     if (!character.getPage().equals(bound)) {
-                        glBindTexture(GL11.GL_TEXTURE_2D, character.getPage().getId());
+                        glBindTexture(GL11.GL_TEXTURE_2D, page.getId());
                         bound = character.getPage();
                     }
 
@@ -109,7 +102,7 @@ public class Font extends CompatibilityHackAsset implements Asset<AssetData> {
                 largestWidth = Math.max(largestWidth, currentWidth);
                 currentWidth = 0;
             } else {
-                FontCharacter character = charMap.get(c);
+                FontCharacter character = data.getCharacter(c);
                 if (character != null) {
                     currentWidth += character.getxAdvance();
                 }
@@ -119,16 +112,27 @@ public class Font extends CompatibilityHackAsset implements Asset<AssetData> {
     }
 
     public int getHeight(String text) {
-        int height = lineHeight;
+        int height = data.getLineHeight();
         for (char c : text.toCharArray()) {
             if (c == '\n') {
-                height += lineHeight;
+                height += data.getLineHeight();
             }
         }
         return height;
     }
 
-    public void setLineHeight(int lineHeight) {
-        this.lineHeight = lineHeight;
+    @Override
+    public void reload(FontData data) {
+        this.data = data;
+    }
+
+    @Override
+    public void dispose() {
+        this.data = null;
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return data == null;
     }
 }
