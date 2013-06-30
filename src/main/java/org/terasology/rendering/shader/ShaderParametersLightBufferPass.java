@@ -16,7 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.terasology.editor.properties.Property;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class ShaderParametersLightBufferPass extends ShaderParametersBase {
     @Override
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
     }
 

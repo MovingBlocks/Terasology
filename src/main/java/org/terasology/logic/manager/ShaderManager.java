@@ -23,7 +23,7 @@ import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.shader.*;
@@ -38,13 +38,12 @@ public class ShaderManager {
     private static final Logger logger = LoggerFactory.getLogger(ShaderManager.class);
     private static ShaderManager instance = null;
 
-    private final HashMap<String, GLSLShaderProgram> shaderPrograms = new HashMap<String, GLSLShaderProgram>(16);
-
     private int activeFeatures = 0;
     private Material activateMaterial = null;
-    private GLSLShaderProgram activeShaderProgram = null;
 
-    private GLSLShaderProgram defaultShaderProgram, defaultTexturedShaderProgram;
+    private GLSLShaderProgramInstance activeShaderProgram = null;
+    private GLSLShaderProgramInstance defaultShaderProgram, defaultTexturedShaderProgram;
+    private final HashMap<String, GLSLShaderProgramInstance> shaderPrograms = new HashMap<String, GLSLShaderProgramInstance>(16);
 
     public static ShaderManager getInstance() {
         if (instance == null) {
@@ -97,7 +96,7 @@ public class ShaderManager {
         }
 
         if (!material.equals(activateMaterial)) {
-            material.getShaderProgram().enable();
+            material.getShaderProgramInstance().enable();
             activateMaterial = material;
             activeShaderProgram = null;
         }
@@ -118,18 +117,18 @@ public class ShaderManager {
     }
 
     public void recompileAllShaders() {
-        for (GLSLShaderProgram program : shaderPrograms.values()) {
+        for (GLSLShaderProgramInstance program : shaderPrograms.values()) {
             program.recompile();
         }
     }
 
-    private GLSLShaderProgram prepareAndStoreShaderProgramInstance(String title, IShaderParameters params) {
+    private GLSLShaderProgramInstance prepareAndStoreShaderProgramInstance(String title, IShaderParameters params) {
         // Make sure to remove the old shader program
         if (shaderPrograms.containsKey(title)) {
             shaderPrograms.remove(title).dispose();
         }
 
-        GLSLShaderProgram program = Assets.getShader("engine:" + title).createShaderProgramInstance(params);
+        GLSLShaderProgramInstance program = Assets.getShader("engine:" + title).createShaderProgramInstance(params);
         shaderPrograms.put(title, program);
 
         return program;
@@ -153,7 +152,7 @@ public class ShaderManager {
      * @param s Name of the shader to activate
      */
     public void enableShader(String s) {
-        GLSLShaderProgram program = getShaderProgram(s);
+        GLSLShaderProgramInstance program = getShaderProgramInstance(s);
         program.enable();
     }
 
@@ -161,7 +160,7 @@ public class ShaderManager {
         GL20.glUseProgram(0);
     }
 
-    public GLSLShaderProgram getActiveShaderProgram() {
+    public GLSLShaderProgramInstance getActiveShaderProgram() {
         return activeShaderProgram;
     }
 
@@ -169,7 +168,7 @@ public class ShaderManager {
         return activeFeatures;
     }
 
-    public void setActiveShaderProgram(GLSLShaderProgram program) {
+    public void setActiveShaderProgram(GLSLShaderProgramInstance program) {
         activeShaderProgram = program;
         activateMaterial = null;
         activeFeatures = program.getActiveFeatures();
@@ -178,11 +177,11 @@ public class ShaderManager {
      * @param s Nave of the shader to return
      * @return The id of the requested shader
      */
-    public GLSLShaderProgram getShaderProgram(String s) {
+    public GLSLShaderProgramInstance getShaderProgramInstance(String s) {
         return shaderPrograms.get(s);
     }
 
-    public HashMap<String, GLSLShaderProgram> getShaderPrograms() {
+    public HashMap<String, GLSLShaderProgramInstance> getShaderPrograms() {
         return shaderPrograms;
     }
 }

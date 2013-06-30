@@ -39,27 +39,27 @@ public class Material implements Asset {
 
     private final AssetUri uri;
 
-    private GLSLShaderProgram shader;
+    private GLSLShaderProgramInstance shaderProgramInstance;
     private int textureIndex = 0;
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<String>();
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<Texture>();
 
-    public Material(AssetUri uri, GLSLShaderProgram shader) {
+    public Material(AssetUri uri, GLSLShaderProgram shaderProgramInstance) {
         this.uri = uri;
-        this.shader = shader.createShaderProgramInstance();
+        this.shaderProgramInstance = shaderProgramInstance.createShaderProgramInstance();
     }
 
     public void dispose() {
         logger.debug("Disposing material {}.", uri);
-        shader.dispose();
+        shaderProgramInstance.dispose();
     }
 
     public boolean isDisposed() {
-        return shader == null || shader.isDisposed();
+        return shaderProgramInstance == null || shaderProgramInstance.isDisposed();
     }
 
-    public GLSLShaderProgram getShaderProgram() {
-        return shader;
+    public GLSLShaderProgramInstance getShaderProgramInstance() {
+        return shaderProgramInstance;
     }
 
     public void enable() {
@@ -88,7 +88,7 @@ public class Material implements Asset {
             texId = bindMap.get(desc);
         } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
-            ParamMetadata metadata = shader.getMaterialParameter(desc);
+            ParamMetadata metadata = shaderProgramInstance.getShaderProgramBase().getMaterialParameter(desc);
             if (metadata == null) {
                 return;
             }
@@ -96,7 +96,7 @@ public class Material implements Asset {
             texId = textureIndex++;
 
             // Make sure to bind the texture for all permutations
-            shader.setIntForAllPermutations(desc, texId);
+            shaderProgramInstance.setIntForAllPermutations(desc, texId);
 
             bindMap.put(desc, texId);
         }

@@ -177,8 +177,8 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
                 continue;
             }
             skeletalMesh.material.enable();
-            skeletalMesh.material.getShaderProgram().setFloat("light", 1.0f);
-            skeletalMesh.material.getShaderProgram().setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            skeletalMesh.material.getShaderProgramInstance().setFloat("light", 1.0f);
+            skeletalMesh.material.getShaderProgramInstance().setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
 
             LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -196,11 +196,11 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
             Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
             TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-            skeletalMesh.material.getShaderProgram().setMatrix4("worldViewMatrix", tempMatrixBuffer44);
+            skeletalMesh.material.getShaderProgramInstance().setMatrix4("worldViewMatrix", tempMatrixBuffer44);
 
             TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-            skeletalMesh.material.getShaderProgram().setMatrix3("normalMatrix", tempMatrixBuffer33);
-            skeletalMesh.material.getShaderProgram().setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+            skeletalMesh.material.getShaderProgramInstance().setMatrix3("normalMatrix", tempMatrixBuffer33);
+            skeletalMesh.material.getShaderProgramInstance().setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());

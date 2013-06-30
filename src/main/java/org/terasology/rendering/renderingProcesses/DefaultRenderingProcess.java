@@ -29,7 +29,7 @@ import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.imageio.ImageIO;
@@ -782,12 +782,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void renderFinalSceneToRT(StereoRenderState stereoRenderState) {
-        GLSLShaderProgram shader;
+        GLSLShaderProgramInstance shader;
 
         if (config.getSystem().isDebugRenderingEnabled()) {
-            shader = ShaderManager.getInstance().getShaderProgram("debug");
+            shader = ShaderManager.getInstance().getShaderProgramInstance("debug");
         } else {
-            shader = ShaderManager.getInstance().getShaderProgram("post");
+            shader = ShaderManager.getInstance().getShaderProgramInstance("post");
         }
 
         shader.enable();
@@ -813,7 +813,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         unbindFbo("sceneFinal");
     }
 
-    private void updateOcShaderParametersForVP(GLSLShaderProgram program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
+    private void updateOcShaderParametersForVP(GLSLShaderProgramInstance program, int vpX, int vpY, int vpWidth, int vpHeight, StereoRenderState stereoRenderState) {
         float w = (float) vpWidth / rtFullWidth;
         float h = (float) vpHeight / rtFullHeight;
         float x = (float) vpX / rtFullWidth;
@@ -836,18 +836,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private void renderFinalScene() {
 
-        GLSLShaderProgram shader;
+        GLSLShaderProgramInstance shader;
 
         if (config.getRendering().isOculusVrSupport()) {
-            shader = ShaderManager.getInstance().getShaderProgram("ocDistortion");
+            shader = ShaderManager.getInstance().getShaderProgramInstance("ocDistortion");
             shader.enable();
 
             updateOcShaderParametersForVP(shader, 0, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.OCULUS_LEFT_EYE);
         } else {
             if (config.getSystem().isDebugRenderingEnabled()) {
-                shader = ShaderManager.getInstance().getShaderProgram("debug");
+                shader = ShaderManager.getInstance().getShaderProgramInstance("debug");
             } else {
-                shader = ShaderManager.getInstance().getShaderProgram("post");
+                shader = ShaderManager.getInstance().getShaderProgramInstance("post");
             }
 
             shader.enable();
@@ -878,7 +878,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void applyLightBufferPass(String target) {
-        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightBufferPass");
+        GLSLShaderProgramInstance program = ShaderManager.getInstance().getShaderProgramInstance("lightBufferPass");
         program.enable();
 
         DefaultRenderingProcess.FBO targetFbo = DefaultRenderingProcess.getInstance().getFBO(target);
@@ -926,7 +926,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         skyBand.bind();
 
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
 
         shader.enable();
         shader.setFloat("radius", 32.0f);
@@ -1019,7 +1019,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateBlurredSSAO(int id) {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
 
         shader.enable();
         shader.setFloat("radius", (Float) ssaoBlurRadius.getValue());
@@ -1062,7 +1062,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateHighPass() {
-        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("highp");
+        GLSLShaderProgramInstance program = ShaderManager.getInstance().getShaderProgramInstance("highp");
         program.setFloat("highPassThreshold", (Float) bloomHighPassThreshold.getValue());
         program.enable();
 
@@ -1087,7 +1087,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateBlur(int id) {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
         shader.enable();
 
         shader.setFloat("radius", (Float) overallBlurFactor.getValue() * config.getRendering().getBlurRadius());
@@ -1118,7 +1118,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateBloom(int id) {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
 
         shader.enable();
         shader.setFloat("radius", 32.0f);
@@ -1149,7 +1149,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateDownsampledScene() {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("down");
         shader.enable();
 
         for (int i = 4; i >= 0; i--) {

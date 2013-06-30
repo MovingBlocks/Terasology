@@ -32,7 +32,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 import javax.vecmath.Vector3f;
 
@@ -60,7 +60,7 @@ public class Skysphere implements IPropertyProvider {
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("sky");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("sky");
         shader.enable();
 
         // Draw the skysphere

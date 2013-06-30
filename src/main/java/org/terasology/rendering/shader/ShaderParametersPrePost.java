@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
     Property abberationOffsetY = new Property("abberationOffsetY", 0.0f, 0.0f, 0.1f);
 
     @Override
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         int texId = 0;

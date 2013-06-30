@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -46,7 +46,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     Property shadowMapBias = new Property("shadowMapBias", 0.003f, 0.0f, 0.1f);
 
     @Override
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         int texId = 0;

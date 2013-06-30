@@ -16,7 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.editor.properties.Property;
 
@@ -32,7 +32,7 @@ public class ShaderParametersHdr extends ShaderParametersBase {
     final Property exposureBias = new Property("exposureBias", 4.0f, 0.0f, 10.0f);
     final Property whitePoint = new Property("whitePoint", 11.2f, 0.0f, 100.0f);
 
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

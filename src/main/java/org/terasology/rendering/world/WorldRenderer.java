@@ -46,7 +46,7 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldBiomeProvider;
@@ -793,7 +793,7 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Render Light Geometry");
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
 
-        GLSLShaderProgram program = ShaderManager.getInstance().getShaderProgram("lightGeometryPass");
+        GLSLShaderProgramInstance program = ShaderManager.getInstance().getShaderProgramInstance("lightGeometryPass");
         program.enable();
 
         Matrix4f modelMatrix = new Matrix4f();
@@ -875,11 +875,11 @@ public final class WorldRenderer {
         }
     }
 
-    private void renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, GLSLShaderProgram program, Camera camera, Matrix4f modelMatrix) {
+    private void renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, GLSLShaderProgramInstance program, Camera camera, Matrix4f modelMatrix) {
         if (lightComponent.lightType == LightComponent.LightType.POINT) {
-            program.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
+            program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-            program.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+            program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
         }
 
         Vector3f worldPosition = new Vector3f();
@@ -948,7 +948,7 @@ public final class WorldRenderer {
 
         if (chunk.getChunkState() == ChunkState.COMPLETE && chunk.getMesh() != null) {
 
-            GLSLShaderProgram shader = null;
+            GLSLShaderProgramInstance shader = null;
 
             final Vector3f cameraPosition = camera.getPosition();
             final Vector3d chunkPositionRelToCamera =
@@ -958,13 +958,13 @@ public final class WorldRenderer {
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
 
-                shader = ShaderManager.getInstance().getShaderProgram("chunk");
+                shader = ShaderManager.getInstance().getShaderProgramInstance("chunk");
                 shader.enable();
 
                 if (phase == ChunkMesh.RENDER_PHASE.REFRACTIVE) {
-                    shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue());
+                    shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue());
                 } else if (phase == ChunkMesh.RENDER_PHASE.ALPHA_REJECT) {
-                    shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
+                    shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
                 } else {
                     shader.setActiveFeatures(0);
                 }
@@ -979,7 +979,7 @@ public final class WorldRenderer {
                 }
 
             } else if (mode == ChunkRenderMode.SHADOW_MAP) {
-                shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
+                shader = ShaderManager.getInstance().getShaderProgramInstance("shadowMap");
                 shader.enable();
             } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
                 ShaderManager.getInstance().disableShader();

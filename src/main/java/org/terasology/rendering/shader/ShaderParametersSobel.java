@@ -17,7 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.properties.Property;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class ShaderParametersSobel extends ShaderParametersBase {
     Property pixelOffsetY = new Property("pixelOffsetY", 1.0f, 0.0f, 16.0f);
 
     @Override
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");

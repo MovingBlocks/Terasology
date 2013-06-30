@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.assets.Texture;
 
 /**
@@ -33,7 +33,7 @@ public class ShaderParametersGelCube extends ShaderParametersBase {
     private Texture slimeTex = Assets.getTexture("engine:slime");
 
     @Override
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

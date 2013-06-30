@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.TeraEd;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.shader.ShaderParametersBase;
 
 import javax.swing.*;
@@ -127,7 +127,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     }
 
     public void initPostEngine() {
-        HashMap<String, GLSLShaderProgram> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
+        HashMap<String, GLSLShaderProgramInstance> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
         Iterator<String> shaderIterator = shaderPrograms.keySet().iterator();
         while (shaderIterator.hasNext()) {
             String programName = shaderIterator.next();
@@ -151,7 +151,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
            for (int i=0; i<shaderPropertyMenuEntries.size(); ++i) {
                 if (e.getSource() == shaderPropertyMenuEntries.get(i)) {
                     String shaderProgramName = shaderPropertyMenuEntries.get(i).getText();
-                    propertyPanel.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram(shaderProgramName).getShaderParameters());
+                    propertyPanel.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgramInstance(shaderProgramName).getShaderParameters());
                     propertyPanel.setTitle(shaderProgramName);
                 }
            }

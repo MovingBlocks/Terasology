@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 /**
  * Shader parameters for the Particle shader program.
@@ -25,7 +25,7 @@ import org.terasology.rendering.assets.GLSLShaderProgram;
 public class ShaderParametersParticle extends ShaderParametersBase {
 
     @Override
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
     }
 

@@ -244,8 +244,8 @@ public class BlockLoader {
 
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
-        terrainMat.getShaderProgram().setFloat3ForAllPermutations("colorOffset", 1.0f, 1.0f, 1.0f);
-        terrainMat.getShaderProgram().setBooleanForAllPermutations("textured", true);
+        terrainMat.getShaderProgramInstance().setFloat3ForAllPermutations("colorOffset", 1.0f, 1.0f, 1.0f);
+        terrainMat.getShaderProgramInstance().setBooleanForAllPermutations("textured", true);
 
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMat);
     }

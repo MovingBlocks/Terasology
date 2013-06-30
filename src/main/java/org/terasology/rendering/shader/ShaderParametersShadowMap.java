@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 /**
  * Shader parameters for the Shadow Map shader program.
@@ -24,7 +24,7 @@ import org.terasology.rendering.assets.GLSLShaderProgram;
  */
 public class ShaderParametersShadowMap extends ShaderParametersBase {
 
-    public void applyParameters(GLSLShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
     }
 

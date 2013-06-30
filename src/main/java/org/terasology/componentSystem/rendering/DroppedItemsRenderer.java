@@ -19,7 +19,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.logic.MeshRenderer;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Matrix4f;
@@ -79,11 +79,11 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
         Matrix4f matrix = new Matrix4f();
         Transform trans = new Transform();
 
-        GLSLShaderProgram shader;
+        GLSLShaderProgramInstance shader;
 
-        shader = ShaderManager.getInstance().getShaderProgram("block");
-        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader = ShaderManager.getInstance().getShaderProgramInstance("block");
+        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
 
         shader.setBoolean("textured", false);
         shader.setFloat("light", worldRenderer.getRenderingLightValue());

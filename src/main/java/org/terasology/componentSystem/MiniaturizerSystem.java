@@ -83,7 +83,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
             glRotatef(min.orientation, 0, 1 ,0);
 
             ShaderManager.getInstance().enableShader("chunk");
-            ShaderManager.getInstance().getShaderProgram("chunk").setFloat("blockScale", MiniaturizerComponent.SCALE);
+            ShaderManager.getInstance().getShaderProgramInstance("chunk").setFloat("blockScale", MiniaturizerComponent.SCALE);
 
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.OPAQUE);
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.ALPHA_REJECT);

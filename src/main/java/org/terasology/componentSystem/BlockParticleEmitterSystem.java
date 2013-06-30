@@ -35,7 +35,7 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -272,7 +272,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     protected void renderParticle(Particle particle, float light) {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("particle");
 
         shader.setFloat4("colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w);
         shader.setFloat2("texOffset", particle.texOffset.x , particle.texOffset.y);
@@ -283,7 +283,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     protected void renderParticle(Particle particle, short blockType, float temperature, float humidity, float light) {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("particle");
         Block b = BlockManager.getInstance().getBlock(blockType);
 
         Vector4f colorMod = b.calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);

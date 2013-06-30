@@ -26,7 +26,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -208,9 +208,9 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
 
     private void renderBlock(BlockFamily blockFamily, Vector3f blockPos, Vector3f cameraPos, boolean notCurrentLevel) {
         // Adjust the brightness of the block according to the current position of the player
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
-        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
+        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
 
         shader.enable();
 
@@ -235,9 +235,9 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     }
 
     private void renderIcon(String iconName, Vector3f offset, Vector3f cameraPos, boolean notCurrentLevel) {
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
-        shader.setActiveFeatures(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgram.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
+        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
+            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
 
         shader.enable();
 

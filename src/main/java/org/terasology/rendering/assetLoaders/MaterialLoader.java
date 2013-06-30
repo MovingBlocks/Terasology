@@ -67,26 +67,26 @@ public class MaterialLoader implements AssetLoader<Material> {
         }
 
         for (Map.Entry<String, Float> entry : metadata.floatParams.entrySet()) {
-            result.getShaderProgram().setFloat(entry.getKey(), entry.getValue());
+            result.getShaderProgramInstance().setFloat(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<String, Integer> entry : metadata.intParams.entrySet()) {
-            result.getShaderProgram().setInt(entry.getKey(), entry.getValue());
+            result.getShaderProgramInstance().setInt(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<String, float[]> entry : metadata.floatArrayParams.entrySet()) {
             switch (entry.getValue().length) {
                 case 1:
-                    result.getShaderProgram().setFloat(entry.getKey(), entry.getValue()[0]);
+                    result.getShaderProgramInstance().setFloat(entry.getKey(), entry.getValue()[0]);
                     break;
                 case 2:
-                    result.getShaderProgram().setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                    result.getShaderProgramInstance().setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
                     break;
                 case 3:
-                    result.getShaderProgram().setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                    result.getShaderProgramInstance().setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
                     break;
                 case 4:
-                    result.getShaderProgram().setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                    result.getShaderProgramInstance().setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
                     break;
             }
         }

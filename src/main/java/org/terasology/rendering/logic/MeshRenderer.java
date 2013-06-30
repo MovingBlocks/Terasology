@@ -66,6 +66,7 @@ import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -75,7 +76,6 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -155,7 +155,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     @Override
     public void renderAlphaBlend() {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        GLSLShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("gelatinousCube");
         shader.enable();
 
         for (EntityRef entity : gelatinous) {
@@ -203,12 +203,12 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         for (Material material : opaqueMesh.keys()) {
             Mesh lastMesh = null;
 
-            material.getShaderProgram().addFeatureIfAvailable(GLSLShaderProgram.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+            material.getShaderProgramInstance().addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
             material.enable();
 
-            material.getShaderProgram().setBoolean("textured", true);
-            material.getShaderProgram().setFloat("light", 1.0f);
-            material.getShaderProgram().setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            material.getShaderProgramInstance().setBoolean("textured", true);
+            material.getShaderProgramInstance().setFloat("light", 1.0f);
+            material.getShaderProgramInstance().setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.bindTextures();
 
             lastRendered = opaqueMesh.get(material).size();
@@ -261,12 +261,12 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                         Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                         TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-                        material.getShaderProgram().setMatrix4("worldViewMatrix", tempMatrixBuffer44);
+                        material.getShaderProgramInstance().setMatrix4("worldViewMatrix", tempMatrixBuffer44);
 
                         TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-                        material.getShaderProgram().setMatrix3("normalMatrix", tempMatrixBuffer33);
+                        material.getShaderProgramInstance().setMatrix3("normalMatrix", tempMatrixBuffer33);
 
-                        material.getShaderProgram().setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+                        material.getShaderProgramInstance().setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
                         meshComp.mesh.doRender();
                     }

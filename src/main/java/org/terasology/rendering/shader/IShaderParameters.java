@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
-import org.terasology.rendering.assets.GLSLShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 /**
  * Interface for all shader parameters. Shader parameters can
@@ -25,5 +25,5 @@ import org.terasology.rendering.assets.GLSLShaderProgram;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface IShaderParameters {
-    public void applyParameters(GLSLShaderProgram program);
+    public void applyParameters(GLSLShaderProgramInstance program);
 }
