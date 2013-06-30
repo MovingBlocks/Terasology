@@ -45,9 +45,9 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     Property shadowIntens = new Property("shadowIntens", 0.65f, 0.0f, 1.0f);
     Property shadowMapBias = new Property("shadowMapBias", 0.003f, 0.0f, 0.1f);
 
-    Property volFogDensityAtViewer = new Property("volFogDensityAtViewer", 0.05f, 0.0f, 0.1f);
-    Property volFogGlobalDensity = new Property("volFogGlobalDensity", 0.05f, 0.0f, 0.1f);
-    Property volFogHeightFalloff = new Property("volFogHeightFalloff", 0.075f, 0.0f, 0.1f);
+    Property volFogDensityAtViewer = new Property("volFogDensityAtViewer", 0.15f, 0.001f, 1.0f);
+    Property volFogGlobalDensity = new Property("volFogGlobalDensity", 0.05f, 0.01f, 1.0f);
+    Property volFogHeightFalloff = new Property("volFogHeightFalloff", 0.1f, 0.01f, 1.0f);
 
     @Override
     public void applyParameters(GLSLShaderProgramInstance program) {
@@ -90,7 +90,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
             if (activeCamera != null) {
-                Vector3f fogWorldPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().y);
+                Vector3f fogWorldPosition = new Vector3f(activeCamera.getPosition().x, 32.0f, activeCamera.getPosition().y);
                 fogWorldPosition.sub(activeCamera.getPosition());
 
                 program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z);

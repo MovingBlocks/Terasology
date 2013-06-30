@@ -932,7 +932,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
 
         shader.enable();
-        shader.setFloat("radius", 32.0f);
+        shader.setFloat("radius", 256.0f);
 
         if (id == 0) {
             bindFboTexture("sceneOpaque");

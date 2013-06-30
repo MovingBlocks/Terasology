@@ -67,7 +67,7 @@ void main () {
 
     /* DAY AND NIGHT TEXTURES */
     skyColor.rgb = daylight * cloudsColor.rgb + blendNight * cloudsColorNight.rgb;
-    skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb * 1.5, vec3(0.1, 0.1, 0.1), blendNight);
+    skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb * 1.5, vec3(1.0, 1.0, 1.0), blendNight);
 
     skyColor.rgb += vec3((1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight);
 

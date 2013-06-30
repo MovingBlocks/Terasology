@@ -131,6 +131,9 @@ public final class WorldRenderer {
     /* TICKING */
     private float tick = 0;
 
+    /* LIGHTING */
+    private float smoothedPlayerRenderingLightValue;
+
     /* UPDATING */
     private final ChunkUpdateManager chunkUpdateManager;
 
@@ -1012,6 +1015,10 @@ public final class WorldRenderer {
         }
     }
 
+    public float getSmoothedPlayerRenderingLightValue() {
+        return smoothedPlayerRenderingLightValue;
+    }
+
     public float getRenderingLightValue() {
         return getRenderingLightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
@@ -1022,6 +1029,10 @@ public final class WorldRenderer {
 
         float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0f) * rawLightValueSun;
         lightValueSun *= getDaylight();
+        // TODO: Hardcoded factor and value to compensate for daylight tint and night brightness
+        lightValueSun *= 0.9f;
+        lightValueSun += 0.05f;
+
         float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
 
         return Math.max(lightValueBlock, lightValueSun);
@@ -1062,6 +1073,9 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Physics Renderer");
         bulletPhysics.update(delta);
         PerformanceMonitor.endActivity();
+
+        // Continuously updated rendering light value at the players position that fades smoothly from cell to cell
+        smoothedPlayerRenderingLightValue = TeraMath.lerpf(smoothedPlayerRenderingLightValue, getRenderingLightValue(), delta);
     }
 
     public void positionLightCamera() {

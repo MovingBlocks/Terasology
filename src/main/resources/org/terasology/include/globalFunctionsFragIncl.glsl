@@ -30,6 +30,7 @@ uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;
 uniform float time;
+uniform float lightValueAtPlayerPos;
 
 uniform vec3 sunVec;
 
@@ -177,4 +178,8 @@ float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtVi
     }
 
     return exp(-globalDensity * fogInt);
+}
+
+float calcLuminance(vec3 color) {
+    return 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
 }
