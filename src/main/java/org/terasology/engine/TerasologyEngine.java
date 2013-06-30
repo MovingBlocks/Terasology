@@ -48,6 +48,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationData;
+import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.material.Material;
@@ -351,6 +354,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
                 return new OpenGLSkeletalMesh(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
+            @Override
+            public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
+                return new MeshAnimationImpl(uri, data);
             }
         });
     }
