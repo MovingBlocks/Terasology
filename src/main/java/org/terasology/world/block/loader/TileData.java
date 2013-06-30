@@ -13,30 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.block.loader;
 
-import org.terasology.asset.Asset;
 import org.terasology.asset.AssetData;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.CompatibilityHackAsset;
 
 import java.awt.image.BufferedImage;
 
 /**
  * @author Immortius
  */
-public class Tile extends CompatibilityHackAsset implements Asset<AssetData> {
+public class TileData implements AssetData {
     private BufferedImage image;
 
-
-    public Tile(AssetUri uri, BufferedImage image) {
-        super(uri);
+    public TileData(BufferedImage image) {
         this.image = image;
-    }
-
-    @Override
-    public void dispose() {
     }
 
     public BufferedImage getImage() {

@@ -15,33 +15,11 @@
  */
 package org.terasology.rendering.assets.mesh;
 
-import com.bulletphysics.linearmath.Transform;
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.CompatibilityHackAsset;
-import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.math.AABB;
 
-import javax.vecmath.Vector3f;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
 import static org.lwjgl.opengl.GL11.glColorPointer;
-import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glNormalPointer;
 import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;

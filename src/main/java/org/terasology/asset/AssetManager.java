@@ -23,6 +23,9 @@ import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.shapes.BlockShapeData;
+import org.terasology.world.block.shapes.BlockShapeImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +55,13 @@ public class AssetManager {
                     return new PojoPrefab(uri, data);
                 }
             });
+            instance.setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
+
+                @Override
+                public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
+                    return new BlockShapeImpl(uri, data);
+                }
+            });
         }
 
         return instance;
@@ -79,6 +89,22 @@ public class AssetManager {
         return getInstance().tryLoadAsset(uri);
     }
 
+    public static <T> T tryLoadAssetData(AssetUri uri, Class<T> type) {
+        AssetData data = getInstance().loadAssetData(uri, false);
+        if (type.isInstance(data)) {
+            return type.cast(data);
+        }
+        return null;
+    }
+
+    public static <T> T loadAssetData(AssetUri uri, Class<T> type) {
+        AssetData data = getInstance().loadAssetData(uri, true);
+        if (type.isInstance(data)) {
+            return type.cast(data);
+        }
+        return null;
+    }
+
     public void register(AssetType type, String extension, AssetLoader loader) {
         Map<String, AssetLoader> assetTypeMap = assetLoaders.get(type);
         if (assetTypeMap == null) {
@@ -101,20 +127,13 @@ public class AssetManager {
         return loadAsset(uri, false);
     }
 
-
     public Asset loadAsset(AssetUri uri) {
         return loadAsset(uri, true);
     }
 
-    private Asset loadAsset(AssetUri uri, boolean logErrors) {
-
+    private AssetData loadAssetData(AssetUri uri, boolean logErrors) {
         if (!uri.isValid()) {
             return null;
-        }
-
-        Asset asset = assetCache.get(uri);
-        if (asset != null) {
-            return asset;
         }
 
         List<URL> urls = getAssetURLs(uri);
@@ -123,13 +142,6 @@ public class AssetManager {
                 logger.warn("Unable to resolve asset: {}", uri);
             }
             return null;
-        }
-
-        AssetFactory factory = factories.get(uri.getAssetType());
-        if (factory == null) {
-            // TODO:
-            //logger.error("No asset factory set for assets of type {}", uri.getAssetType());
-            //return null;
         }
 
         for (URL url : urls) {
@@ -154,23 +166,7 @@ public class AssetManager {
                 stream = url.openStream();
                 urls.remove(url);
                 urls.add(0, url);
-                AssetData data = loader.load(uri, stream, urls);
-
-                if (data != null) {
-                    if (data instanceof CompatibilityHackAsset) {
-                        asset = (Asset) data;
-                    } else if (factory != null) {
-                        asset = factory.buildAsset(uri, data);
-                    } else {
-                        logger.error("No factory available for {}", uri.getAssetType());
-                        return null;
-                    }
-                    if (asset != null) {
-                        assetCache.put(uri, asset);
-                    }
-                }
-                logger.debug("Loaded {}", uri);
-                return asset;
+                return loader.load(uri, stream, urls);
             } catch (IOException ioe) {
                 logger.error("Error reading asset {}", uri, ioe);
                 return null;
@@ -186,6 +182,34 @@ public class AssetManager {
         }
         logger.warn("Unable to resolve asset: {}", uri);
         return null;
+    }
+
+    private Asset loadAsset(AssetUri uri, boolean logErrors) {
+        if (!uri.isValid()) {
+            return null;
+        }
+
+        Asset asset = assetCache.get(uri);
+        if (asset != null) {
+            return asset;
+        }
+
+        AssetFactory factory = factories.get(uri.getAssetType());
+        if (factory == null) {
+            logger.error("No asset factory set for assets of type {}", uri.getAssetType());
+            return null;
+        }
+
+        AssetData data = loadAssetData(uri, logErrors);
+
+        if (data != null) {
+            asset = factory.buildAsset(uri, data);
+            if (asset != null) {
+                logger.debug("Loaded {}", uri);
+                assetCache.put(uri, asset);
+            }
+        }
+        return asset;
     }
 
     public void clear() {
@@ -211,9 +235,6 @@ public class AssetManager {
     }
 
     public <U extends AssetData> Asset<U> generateAsset(AssetUri uri, U data) {
-        if (data instanceof CompatibilityHackAsset) {
-            return (Asset) data;
-        }
         AssetFactory assetFactory = factories.get(uri.getAssetType());
         if (assetFactory == null) {
             logger.warn("Unsupported asset type: {}", uri.getAssetType());
