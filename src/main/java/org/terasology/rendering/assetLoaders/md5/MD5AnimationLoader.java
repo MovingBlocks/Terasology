@@ -17,10 +17,12 @@
 package org.terasology.rendering.assetLoaders.md5;
 
 import com.google.common.collect.Lists;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.AABB;
-import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 
 import javax.vecmath.Quat4f;
@@ -37,7 +39,7 @@ import java.util.regex.Pattern;
 /**
  * @author Immortius
  */
-public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
+public class MD5AnimationLoader implements AssetLoader<MeshAnimationData> {
 
     private final static String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
     private final static String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
@@ -56,26 +58,25 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
     private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
 
     @Override
-    public MeshAnimation load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public MeshAnimationData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         try {
             MD5 md5 = parse(stream);
-            return createAnimation(uri, md5);
+            return createAnimation(md5);
         } catch (NumberFormatException e) {
             throw new IOException("Error parsing " + uri.toString(), e);
         }
     }
 
-    private MeshAnimation createAnimation(AssetUri uri, MD5 md5) {
-        MeshAnimation animation = new MeshAnimation(uri);
-        String[] boneNames = new String[md5.numJoints];
-        int[] boneParents = new int[md5.numJoints];
+    private MeshAnimationData createAnimation(MD5 md5) {
+        List<String> boneNames = Lists.newArrayListWithCapacity(md5.numJoints);
+        TIntList boneParents = new TIntArrayList(md5.numJoints);
         for (int i = 0; i < md5.numJoints; ++i) {
-            boneNames[i] = md5.joints[i].name;
-            boneParents[i] = md5.joints[i].parent;
+            boneNames.add(md5.joints[i].name);
+            boneParents.add(md5.joints[i].parent);
         }
-        animation.setBones(boneNames, boneParents);
-        animation.setTimePerFrame(1.0f / md5.frameRate);
+        float timePerFrame = 1.0f / md5.frameRate;
 
+        List<MeshAnimationFrame> frames = Lists.newArrayList();
         for (int frameIndex = 0; frameIndex < md5.numFrames; ++frameIndex) {
             MD5Frame frame = md5.frames[frameIndex];
             List<Vector3f> positions = Lists.newArrayListWithExpectedSize(md5.numJoints);
@@ -109,7 +110,6 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
                 }
                 if ((md5.joints[jointIndex].flags & ORIENTATION_Z_FLAG) != 0) {
                     rawRotations.get(jointIndex).z = frame.components[md5.joints[jointIndex].startIndex + compIndex];
-                    compIndex++;
                 }
             }
 
@@ -117,14 +117,15 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
             for (Vector3f rot : rawRotations) {
                 rotations.add(MD5ParserCommon.completeQuat4f(rot.x, rot.y, rot.z));
             }
+
             // Rotate just the root bone to correct for coordinate system differences
             rotations.set(0, MD5ParserCommon.correctQuat4f(rotations.get(0)));
 
-            animation.addFrame(new MeshAnimationFrame(positions, rotations));
+            frames.add(new MeshAnimationFrame(positions, rotations));
 
         }
 
-        return animation;
+        return new MeshAnimationData(boneNames, boneParents, frames, timePerFrame);
     }
 
 
