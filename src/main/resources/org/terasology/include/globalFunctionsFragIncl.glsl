@@ -30,7 +30,7 @@ uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;
 uniform float time;
-uniform float lightValueAtPlayerPos;
+uniform float sunlightValueAtPlayerPos;
 
 uniform vec3 sunVec;
 

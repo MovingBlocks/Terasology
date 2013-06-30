@@ -132,7 +132,7 @@ void main() {
 
 #if defined (VOLUMETRIC_FOG)
     // Use lightValueAtPlayerPos to avoid volumetric fog in caves
-    float volumetricFogValue = lightValueAtPlayerPos * calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
+    float volumetricFogValue = sunlightValueAtPlayerPos * calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
 
     vec3 volFogColor = skyInscatteringColor * vec3(VOLUMETRIC_FOG_COLOR);
     colorOpaque.rgb = mix(colorOpaque.rgb, volFogColor, volumetricFogValue);

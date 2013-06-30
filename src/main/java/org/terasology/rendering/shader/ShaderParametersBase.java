@@ -47,7 +47,7 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
             program.setFloat("daylight", (float) worldRenderer.getDaylight());
             program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
             program.setFloat("tick", (float) worldRenderer.getTick());
-            program.setFloat("lightValueAtPlayerPos", worldRenderer.getSmoothedPlayerRenderingLightValue());
+            program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getSmoothedPlayerSunlightValue());
 
             if (worldRenderer.getActiveCamera() != null) {
                 Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
