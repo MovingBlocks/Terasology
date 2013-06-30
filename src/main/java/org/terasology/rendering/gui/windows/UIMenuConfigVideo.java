@@ -53,6 +53,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton fullscreenButton;
     private final UIStateButton outlineButton;
     private final UIStateButton shadowButton;
+    private final UIStateButton volumetricFogButton;
     private final UIButton backToConfigMenuButton;
 
     private final Config config = CoreRegistry.get(Config.class);
@@ -307,8 +308,23 @@ public class UIMenuConfigVideo extends UIWindow {
         shadowButton.addState("Dynamic Shadows: On (PCF)", shadowStateAction);
         shadowButton.addClickListener(clickAction);
         shadowButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        shadowButton.setPosition(new Vector2f(-fovButton.getSize().x / 2f - 10f, 300f + 4 * 40f));
+        shadowButton.setPosition(new Vector2f(-shadowButton.getSize().x / 2f - 10f, 300f + 4 * 40f));
         shadowButton.setVisible(true);
+
+        volumetricFogButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction volumetricFogStateAction = new StateButtonAction() {
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton) element;
+                config.getRendering().setVolumetricFog(button.getState()!=0);
+            }
+        };
+        volumetricFogButton.addState("Volumetric Fog: Off", volumetricFogStateAction);
+        volumetricFogButton.addState("Volumetric Fog: On", volumetricFogStateAction);
+        volumetricFogButton.addClickListener(clickAction);
+        volumetricFogButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        volumetricFogButton.setPosition(new Vector2f(-fovButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
+        volumetricFogButton.setVisible(true);
 
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
@@ -338,6 +354,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(fullscreenButton);
         addDisplayElement(outlineButton);
         addDisplayElement(shadowButton);
+        addDisplayElement(volumetricFogButton);
 
         setup();
     }
@@ -392,6 +409,12 @@ public class UIMenuConfigVideo extends UIWindow {
             shadowButton.setState(1);
         } else {
             shadowButton.setState(0);
+        }
+
+        if (config.getRendering().isVolumetricFog()) {
+            volumetricFogButton.setState(1);
+        } else {
+            volumetricFogButton.setState(0);
         }
     }
 }

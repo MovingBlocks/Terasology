@@ -39,11 +39,15 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     private Property outlineThickness = new Property("outlineThickness", 0.65f);
 
     Property skyInscatteringLength = new Property("skyInscatteringLength", 0.25f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.3f, 0.0f, 1.0f);
-    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 1.0f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.35f, 0.0f, 1.0f);
+    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.75f, 0.0f, 1.0f);
 
     Property shadowIntens = new Property("shadowIntens", 0.65f, 0.0f, 1.0f);
     Property shadowMapBias = new Property("shadowMapBias", 0.003f, 0.0f, 0.1f);
+
+    Property volFogDensityAtViewer = new Property("volFogDensityAtViewer", 0.05f, 0.0f, 0.1f);
+    Property volFogGlobalDensity = new Property("volFogGlobalDensity", 0.05f, 0.0f, 0.1f);
+    Property volFogHeightFalloff = new Property("volFogHeightFalloff", 0.075f, 0.0f, 0.1f);
 
     @Override
     public void applyParameters(GLSLShaderProgramInstance program) {
@@ -71,6 +75,28 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++);
         }
 
+        if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()
+                || CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {
+
+            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            if (activeCamera != null) {
+                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix());
+            }
+        }
+
+        if (CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {
+            program.setFloat4("volumetricFogSettings", (Float) volFogDensityAtViewer.getValue(),
+                    (Float) volFogGlobalDensity.getValue(), (Float) volFogHeightFalloff.getValue(), 0.0f);
+
+            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            if (activeCamera != null) {
+                Vector3f fogWorldPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().y);
+                fogWorldPosition.sub(activeCamera.getPosition());
+
+                program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z);
+            }
+        }
+
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
@@ -81,11 +107,10 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
             if (lightCamera != null && activeCamera != null) {
                 program.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix());
-                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix());
 
                 Vector3f activeCameraToLightSpace = new Vector3f();
                 activeCameraToLightSpace.sub(activeCamera.getPosition(), lightCamera.getPosition());
-                program.setFloat3("mainCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z);
+                program.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z);
             }
 
             Vector4f shadowSettingsFrag = new Vector4f();
@@ -138,5 +163,8 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         properties.add(outlineDepthThreshold);
         properties.add(shadowIntens);
         properties.add(shadowMapBias);
+        properties.add(volFogDensityAtViewer);
+        properties.add(volFogGlobalDensity);
+        properties.add(volFogHeightFalloff);
     }
 }

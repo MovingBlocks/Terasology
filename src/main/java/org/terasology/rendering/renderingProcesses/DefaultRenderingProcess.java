@@ -80,6 +80,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int rtWidth4, rtHeight4;
     private int rtWidth8, rtHeight8;
     private int rtWidth16, rtHeight16;
+    private int rtWidth32, rtHeight32;
 
     private int overwriteRtWidth = 0;
     private int overwriteRtHeight = 0;
@@ -274,6 +275,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         rtHeight8 = rtHeight4 / 2;
         rtWidth16 = rtHeight8 / 2;
         rtHeight16 = rtWidth8 / 2;
+        rtWidth32 = rtHeight16 / 2;
+        rtHeight32 = rtWidth16 / 2;
 
         FBO scene = getFBO("sceneOpaque");
         final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
@@ -312,8 +315,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
         createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneSkyBand0", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
-        createFBO("sceneSkyBand1", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
+        createFBO("sceneSkyBand0", rtWidth32, rtHeight32, FBOType.DEFAULT, false, false);
+        createFBO("sceneSkyBand1", rtWidth32, rtHeight32, FBOType.DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {

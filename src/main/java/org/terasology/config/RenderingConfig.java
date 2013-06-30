@@ -38,6 +38,7 @@ public class RenderingConfig {
     private boolean normalMapping = false;
     private boolean parallaxMapping = false;
     private boolean dynamicShadowsPcfFiltering = false;
+    private boolean volumetricFog = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -296,5 +297,13 @@ public class RenderingConfig {
 
     public void setDynamicShadowsPcfFiltering(boolean dynamicShadowsPcfFiltering) {
         this.dynamicShadowsPcfFiltering = dynamicShadowsPcfFiltering;
+    }
+
+    public boolean isVolumetricFog() {
+        return volumetricFog;
+    }
+
+    public void setVolumetricFog(boolean volumetricFog) {
+        this.volumetricFog = volumetricFog;
     }
 }

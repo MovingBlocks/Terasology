@@ -163,3 +163,18 @@ float calcPcfShadowTerm(sampler2D shadowMap, float lightDepth, vec2 texCoord, fl
 
 	return mix(mix(samples[0], samples[1], mixScale.x), mix(samples[2], samples[3], mixScale.x), mixScale.y);
 }
+
+float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtViewer, float globalDensity, float heightFalloff) {
+    vec3 cameraToFogWorldPosition = -fogWorldPosition;
+
+    float fogInt = length(cameraToFogWorldPosition) * volumetricHeightDensityAtViewer;
+    const float slopeThreshold = 0.01;
+
+    if (abs(cameraToFogWorldPosition.y) > slopeThreshold)
+    {
+        float t = heightFalloff * cameraToFogWorldPosition.y;
+        fogInt *= (1.0 - exp(-t)) / t;
+    }
+
+    return exp(-globalDensity * fogInt);
+}

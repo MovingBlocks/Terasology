@@ -161,6 +161,8 @@ public class GLSLShaderProgramInstance {
             builder.append("#define PARALLAX_MAPPING \n");
         if (config.getRendering().isDynamicShadowsPcfFiltering())
             builder.append("#define DYNAMIC_SHADOWS_PCF \n");
+        if (config.getRendering().isVolumetricFog())
+            builder.append("#define VOLUMETRIC_FOG \n");
 
         for (int i=0; i< SystemConfig.DebugRenderingStages.values().length; ++i) {
             builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" "+SystemConfig.DebugRenderingStages.values()[i].ordinal()+" \n");
