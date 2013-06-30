@@ -50,9 +50,12 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.opengl.OpenGLShader;
 import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
@@ -315,6 +318,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public Font buildAsset(AssetUri uri, FontData data) {
                 return new OpenGLFont(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
+            @Override
+            public Shader buildAsset(AssetUri uri, ShaderData data) {
+                return new OpenGLShader(uri, data);
             }
         });
     }

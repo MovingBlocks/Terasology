@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.rendering.assets;
+package org.terasology.rendering.opengl;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
@@ -23,15 +22,14 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.CompatibilityHackAsset;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
-import org.terasology.rendering.assets.metadata.ParamType;
-import org.terasology.rendering.assets.metadata.ShaderMetadata;
+import org.terasology.rendering.assets.shader.ParamType;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
+import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.world.block.Block;
 
 import java.io.IOException;
@@ -39,40 +37,41 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
-    private static final String PreProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
-    private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
+public class OpenGLShader extends AbstractAsset<ShaderData> implements Shader {
+    private static final String PRE_PROCESSOR_PREAMBLE = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
+    public static final String INCLUDED_FUNCTIONS_VERTEX;
+    public static final String INCLUDED_FUNCTIONS_FRAGMENT;
 
     private static final Logger logger = LoggerFactory.getLogger(Shader.class);
 
-    private String vertShader;
-    private String fragShader;
+    private ShaderData data;
+    private Map<String, ParamType> params = Maps.newHashMap();
 
     private int fragmentProgram = 0;
     private int vertexProgram = 0;
     private boolean valid = false;
-    private Map<String, ParamType> params = Maps.newHashMap();
 
-
-    public Shader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
+    public OpenGLShader(AssetUri uri, ShaderData data) {
         super(uri);
-
-        this.vertShader = vertShader;
-        this.fragShader = fragShader;
-
-        for (ParamMetadata paramData : metadata.getParameters()) {
-            params.put(paramData.getName(), paramData.getType());
-        }
-
-        compileShaderProgram();
+        reload(data);
     }
 
+    @Override
+    public void reload(ShaderData data) {
+        dispose();
+        this.data = data;
+
+        params.clear();
+        for (ShaderParameterMetadata paramData : data.getParameterMetadata()) {
+            params.put(paramData.getName(), paramData.getType());
+        }
+        compileShaderProgram();
+    }
 
     public void recompile() {
         logger.debug("Recompiling shader {}.", getURI());
@@ -84,11 +83,15 @@ public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
     public void dispose() {
         logger.debug("Disposing shader {}.", getURI());
 
-        GL20.glDeleteProgram(fragmentProgram);
-        fragmentProgram = 0;
+        if (fragmentProgram != 0) {
+            GL20.glDeleteProgram(fragmentProgram);
+            fragmentProgram = 0;
+        }
 
-        GL20.glDeleteProgram(vertexProgram);
-        vertexProgram = 0;
+        if (vertexProgram != 0) {
+            GL20.glDeleteProgram(vertexProgram);
+            vertexProgram = 0;
+        }
     }
 
     public boolean isDisposed() {
@@ -99,38 +102,15 @@ public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
         return valid;
     }
 
-    public ParamMetadata getParameter(String desc) {
+    public ShaderParameterMetadata getParameter(String desc) {
         if (params.containsKey(desc)) {
-            return new ParamMetadata(desc, params.get(desc));
+            return new ShaderParameterMetadata(desc, params.get(desc));
         }
         return null;
     }
 
-    public Iterable<ParamMetadata> listParameters() {
-        return new Iterable<ParamMetadata>() {
-            @Override
-            public Iterator<ParamMetadata> iterator() {
-                return new Iterator<ParamMetadata>() {
-                    Iterator<Map.Entry<String, ParamType>> internal = params.entrySet().iterator();
-
-                    @Override
-                    public boolean hasNext() {
-                        return internal.hasNext();
-                    }
-
-                    @Override
-                    public ParamMetadata next() {
-                        Map.Entry<String, ParamType> entry = internal.next();
-                        return new ParamMetadata(entry.getKey(), entry.getValue());
-                    }
-
-                    @Override
-                    public void remove() {
-                        throw new UnsupportedOperationException("Remove not supported");
-                    }
-                };
-            }
-        };
+    public Iterable<ShaderParameterMetadata> listParameters() {
+        return data.getParameterMetadata();
     }
 
     public int generateShaderInstance() {
@@ -154,8 +134,8 @@ public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
     }
 
     private void compileShaderProgram() {
-        String finalVert = createShaderBuilder().append(IncludedFunctionsVertex).append('\n').append(vertShader).toString();
-        String finalFrag = createShaderBuilder().append(IncludedFunctionsFragment).append('\n').append(fragShader).toString();
+        String finalVert = createShaderBuilder().append(INCLUDED_FUNCTIONS_VERTEX).append('\n').append(data.getVertexProgram()).toString();
+        String finalFrag = createShaderBuilder().append(INCLUDED_FUNCTIONS_FRAGMENT).append('\n').append(data.getFragmentProgram()).toString();
 
         valid = true;
         compileShader(GL20.GL_FRAGMENT_SHADER, finalFrag);
@@ -204,7 +184,7 @@ public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
 
     public static StringBuilder createShaderBuilder() {
         Config config = CoreRegistry.get(Config.class);
-        StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
+        StringBuilder builder = new StringBuilder().append(PRE_PROCESSOR_PREAMBLE);
         if (config.getRendering().isAnimateGrass())
             builder.append("#define ANIMATED_WATER_AND_GRASS \n");
         if (config.getRendering().getBlurIntensity() == 0)
@@ -216,35 +196,17 @@ public class Shader extends CompatibilityHackAsset implements Asset<AssetData> {
         return builder;
     }
 
-    public static String getIncludedFunctionsVertex() {
-        return IncludedFunctionsVertex;
-    }
-
-    public static String getIncludedFunctionsFragment() {
-        return IncludedFunctionsFragment;
-    }
-
     static {
-        InputStream vertStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
-        InputStream fragStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
-        try {
-            IncludedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
-            IncludedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));
+        String includeVertex = "";
+        String includeFrag = "";
+        try (InputStream vertStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
+             InputStream fragStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl")) {
+            includeVertex = CharStreams.toString(new InputStreamReader(vertStream));
+            includeFrag = CharStreams.toString(new InputStreamReader(fragStream));
         } catch (IOException e) {
             logger.error("Failed to load Include shader resources");
-        } finally {
-            // JAVA7: Clean up
-            try {
-                vertStream.close();
-            } catch (IOException e) {
-                logger.error("Failed to close globalFunctionsVertIncl.glsl stream");
-            }
-            try {
-                fragStream.close();
-            } catch (IOException e) {
-                logger.error("Failed to close globalFunctionsFragIncl.glsl stream");
-            }
         }
+        INCLUDED_FUNCTIONS_VERTEX = includeVertex;
+        INCLUDED_FUNCTIONS_FRAGMENT = includeFrag;
     }
-
 }
