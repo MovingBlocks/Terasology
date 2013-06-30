@@ -1,25 +1,23 @@
 package org.terasology.entitySystem;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.internal.PojoEntityManager;
-import org.terasology.entitySystem.internal.PojoPrefab;
-import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -27,6 +25,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +42,10 @@ import static org.mockito.Mockito.verify;
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityManagerTest {
-
-    PojoEntityManager entityManager;
-
     private static ModManager modManager;
+
+    private PojoEntityManager entityManager;
+    private Prefab prefab;
 
     @BeforeClass
     public static void setupClass() {
@@ -58,6 +57,12 @@ public class PojoEntityManagerTest {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
         entityManager = (PojoEntityManager) builder.build(modManager, mock(NetworkSystem.class));
+
+        PrefabManager prefabManager = entityManager.getPrefabManager();
+        PrefabData protoPrefab = new PrefabData();
+        protoPrefab.addComponent(new StringComponent("Test"));
+        prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), protoPrefab, Prefab.class);
+        prefabManager.registerPrefab(prefab);
     }
 
     @Test
@@ -226,14 +231,14 @@ public class PojoEntityManagerTest {
         entity1.addComponent(new StringComponent());
 
         List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class, IntegerComponent.class));
-        assertEquals(Lists.newArrayList(), results);
+        assertEquals(Collections.<EntityRef>emptyList(), results);
     }
 
     @Test
     public void iterateEntitiesFindsEntityWithTwoComponents() {
         EntityRef entity1 = entityManager.create();
-        StringComponent comp1 = entity1.addComponent(new StringComponent());
-        IntegerComponent comp2 = entity1.addComponent(new IntegerComponent());
+        entity1.addComponent(new StringComponent());
+        entity1.addComponent(new IntegerComponent());
 
         List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class, IntegerComponent.class));
         assertEquals(Lists.newArrayList(entity1), results);
@@ -242,7 +247,7 @@ public class PojoEntityManagerTest {
     @Test
     public void iterateWithNoComponents() {
         List<EntityRef> results = Lists.newArrayList(entityManager.getEntitiesWith(StringComponent.class));
-        assertEquals(Lists.newArrayList(), results);
+        assertEquals(Collections.<EntityRef>emptyList(), results);
     }
 
     @Test
@@ -276,9 +281,6 @@ public class PojoEntityManagerTest {
 
     @Test
     public void prefabCopiedCorrectly() {
-        PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
-        Prefab prefab = new PojoPrefab(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), null, true, new StringComponent("Test"));
-        manager.registerPrefab(prefab);
         EntityRef entity1 = entityManager.create(prefab);
         StringComponent comp = entity1.getComponent(StringComponent.class);
         assertEquals("Test", comp.value);
@@ -293,9 +295,6 @@ public class PojoEntityManagerTest {
 
     @Test
     public void prefabCopiedCorrectly2() {
-        PrefabManager prefabManager = entityManager.getPrefabManager();
-        Prefab prefab = new PojoPrefab(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), null, true, new StringComponent("Test"));
-        prefabManager.registerPrefab(prefab);
         EntityRef test1 = entityManager.create("unittest:myprefab");
         EntityRef test2 = entityManager.create("unittest:myprefab");
         //This returns true because the Objectids are Identical.
@@ -304,9 +303,11 @@ public class PojoEntityManagerTest {
 
     @Test
     public void prefabPersistedRetainedCorrectly() {
-        PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
-        Prefab prefab = new PojoPrefab(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), null, false, new StringComponent("Test"));
-        manager.registerPrefab(prefab);
+        PrefabData protoPrefab = new PrefabData();
+        protoPrefab.setPersisted(false);
+        prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "unittest:nonpersistentPrefab"), protoPrefab, Prefab.class);
+        entityManager.getPrefabManager().registerPrefab(prefab);
+
         EntityRef entity1 = entityManager.create(prefab);
         assertFalse(entity1.isPersistent());
     }
@@ -320,7 +321,6 @@ public class PojoEntityManagerTest {
     @Test
     public void isLoadedFalseAfterDestroyed() {
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
         entity.destroy();
         assertFalse(entity.isActive());
     }
@@ -328,7 +328,6 @@ public class PojoEntityManagerTest {
     @Test
     public void isLoadedFalseAfterPersist() {
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
         entityManager.deactivateForStorage(entity);
         assertFalse(entity.isActive());
     }
@@ -342,7 +341,6 @@ public class PojoEntityManagerTest {
     @Test
     public void loadedStateClearedWhenEntityManagerCleared() {
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
         entityManager.clear();
         assertFalse(entity.isActive());
     }
@@ -357,5 +355,4 @@ public class PojoEntityManagerTest {
         assertTrue(entity.exists());
         assertFalse(entityManager.getFreedIds().contains(id));
     }
-
 }

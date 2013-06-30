@@ -26,6 +26,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.protobuf.EntityData;
@@ -108,47 +109,45 @@ public class PrefabSerializer {
      * Deserializes a prefab, with a known uri. This uri will override any uri within the serialized prefab
      *
      * @param prefabData
-     * @param uri
      * @return The deserialized prefab
      */
-    public Prefab deserialize(EntityData.Prefab prefabData, AssetUri uri) {
-        boolean persisted = (prefabData.hasPersisted()) ? prefabData.getPersisted() : true;
-        Prefab parent = null;
+    public PrefabData deserialize(EntityData.Prefab prefabData) {
+        PrefabData result = new PrefabData();
+        result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
         if (prefabData.hasParentName()) {
             AssetUri parentUri = new AssetUri(AssetType.PREFAB, prefabData.getParentName());
             if (parentUri.isValid()) {
-                parent = Assets.get(parentUri, Prefab.class);
+                result.setParent(Assets.get(parentUri, Prefab.class));
             }
         }
 
-        Map<Class<? extends Component>, Component> componentMap = Maps.newHashMap();
-        if (parent != null) {
-            for (Component comp : parent.iterateComponents()) {
-                componentMap.put(comp.getClass(), componentLibrary.copy(comp));
+        if (result.getParent() != null) {
+            for (Component comp : result.getParent().iterateComponents()) {
+                result.addComponent(componentLibrary.copy(comp));
             }
         }
         for (String removedComponent : prefabData.getRemovedComponentList()) {
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(removedComponent);
             if (metadata != null) {
-                componentMap.remove(metadata.getType());
+                result.removeComponent(metadata.getType());
             }
         }
         for (EntityData.Component componentData : prefabData.getComponentList()) {
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentData.getType());
             if (metadata != null) {
-                Component existing = componentMap.get(metadata.getType());
+                Component existing = result.getComponent(metadata.getType());
                 if (existing != null) {
                     componentSerializer.deserializeOnto(existing, componentData);
                 } else {
                     Component newComponent = componentSerializer.deserialize(componentData);
                     if (newComponent != null) {
-                        componentMap.put(newComponent.getClass(), newComponent);
+                        result.addComponent(newComponent);
                     }
                 }
             }
         }
 
-        return new PojoPrefab(uri, componentMap, parent, persisted);
+        return result;
     }
 
 

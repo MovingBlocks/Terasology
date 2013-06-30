@@ -17,34 +17,27 @@ package org.terasology.entitySystem.persistence;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Queues;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 /**
  * Implementation of WorldSerializer for EngineEntityManager.
@@ -120,8 +113,7 @@ public class WorldSerializerImpl implements WorldSerializer {
             if (!prefabManager.exists(prefabData.getName())) {
                 if (!prefabData.hasParentName()) {
                     createPrefab(prefabData);
-                }
-                else {
+                } else {
                     pendingPrefabs.put(prefabData.getParentName(), prefabData);
                 }
             }
@@ -150,8 +142,8 @@ public class WorldSerializerImpl implements WorldSerializer {
 
 
     private void createPrefab(EntityData.Prefab prefabData) {
-        Prefab prefab = prefabSerializer.deserialize(prefabData, new AssetUri(AssetType.PREFAB, prefabData.getName()));
-        AssetManager.getInstance().addAssetTemporary(prefab.getURI(), prefab);
+        PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
+        Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
         prefabManager.registerPrefab(prefab);
     }
 

@@ -20,7 +20,9 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +45,13 @@ public class AssetManager {
     public static AssetManager getInstance() {
         if (instance == null) {
             instance = new AssetManager();
+            instance.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+
+                @Override
+                public Prefab buildAsset(AssetUri uri, PrefabData data) {
+                    return new PojoPrefab(uri, data);
+                }
+            });
         }
 
         return instance;
