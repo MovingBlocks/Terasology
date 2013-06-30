@@ -115,7 +115,9 @@ public class OpenGLMaterial extends AbstractAsset<MaterialData> implements Mater
     }
 
     public void bindTextures() {
-        if (isDisposed()) return;
+        if (isDisposed()) {
+            return;
+        }
 
         enable();
         for (int slot : textureMap.keys()) {

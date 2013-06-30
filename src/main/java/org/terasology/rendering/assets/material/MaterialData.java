@@ -45,7 +45,7 @@ public class MaterialData implements AssetData {
     }
 
     public void setParam(String parmName, Texture value) {
-        textures.put(parmName, value);
+        this.textures.put(parmName, value);
     }
 
     public Map<String, Float> getFloatParams() {
@@ -53,7 +53,7 @@ public class MaterialData implements AssetData {
     }
 
     public void setParam(String parmName, float value) {
-        floatParams.put(parmName, value);
+        this.floatParams.put(parmName, value);
     }
 
     public Map<String, float[]> getFloatArrayParams() {
@@ -61,7 +61,7 @@ public class MaterialData implements AssetData {
     }
 
     public void setParam(String parmName, float[] value) {
-        floatArrayParams.put(parmName, value);
+        this.floatArrayParams.put(parmName, value);
     }
 
     public Map<String, Integer> getIntegerParams() {
@@ -69,12 +69,12 @@ public class MaterialData implements AssetData {
     }
 
     public void setParam(String parmName, int value) {
-        intParams.put(parmName, value);
+        this.intParams.put(parmName, value);
     }
 
     public void setTextureParams(Map<String, Texture> textures) {
         this.textures.clear();
-        textures.putAll(textures);
+        this.textures.putAll(textures);
     }
 
     public void setFloatParams(Map<String, Float> floatParams) {
