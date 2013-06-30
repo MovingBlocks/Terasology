@@ -25,7 +25,8 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -42,7 +43,7 @@ import java.util.regex.Pattern;
 /**
  * @author Immortius
  */
-public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
+public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
 
     private static final String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
     private static final String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
@@ -58,10 +59,10 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
     private Pattern weightPattern = Pattern.compile("weight\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + VECTOR3_PATTERN);
 
     @Override
-    public SkeletalMesh load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public SkeletalMeshData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         try {
             MD5 md5 = parse(stream);
-            SkeletalMesh skeleton = new SkeletalMesh(uri);
+            SkeletalMeshDataBuilder skeletonBuilder = new SkeletalMeshDataBuilder();
             List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
             for (int i = 0; i < md5.numJoints; ++i) {
                 MD5Joint joint = md5.joints[i];
@@ -70,16 +71,14 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
                 if (joint.parent != -1) {
                     bones.get(joint.parent).addChild(bone);
                 }
-                skeleton.addBone(bone);
+                skeletonBuilder.addBone(bone);
             }
             if (md5.meshes.length > 0) {
                 // TODO: Support multiple mesh somehow?
                 MD5Mesh mesh = md5.meshes[0];
-                List<BoneWeight> boneWeights = Lists.newArrayListWithCapacity(mesh.numWeights);
                 for (MD5Weight weight : mesh.weightList) {
-                    boneWeights.add(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
+                    skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
                 }
-                skeleton.setWeights(boneWeights);
 
                 List<Vector2f> uvs = Lists.newArrayList();
                 TIntList vertexStartWeight = new TIntArrayList(mesh.numVertices);
@@ -89,19 +88,18 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
                     vertexStartWeight.add(vert.startWeight);
                     vertexWeightCount.add(vert.countWeight);
                 }
-                skeleton.setVertexWeights(vertexStartWeight, vertexWeightCount);
-                skeleton.setUvs(uvs);
+                skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
+                skeletonBuilder.setUvs(uvs);
                 TIntList indices = new TIntArrayList(mesh.indexList.length);
                 for (int i = 0; i < mesh.numTriangles; ++i) {
                     indices.add(mesh.indexList[i * 3]);
                     indices.add(mesh.indexList[i * 3 + 2]);
                     indices.add(mesh.indexList[i * 3 + 1]);
                 }
-                skeleton.setIndices(indices);
-                skeleton.calculateNormals();
+                skeletonBuilder.setIndices(indices);
             }
 
-            return skeleton;
+            return skeletonBuilder.build();
         } catch (NumberFormatException e) {
             throw new IOException("Error parsing " + uri.toString(), e);
         }
@@ -130,13 +128,13 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
         md5.meshes = new MD5Mesh[md5.numMeshes];
         for (int i = 0; i < md5.numMeshes; ++i) {
             MD5ParserCommon.readToLine(reader, "mesh {");
-            md5.meshes[i] = readMesh(reader, md5);
+            md5.meshes[i] = readMesh(reader);
         }
 
         return md5;
     }
 
-    private MD5Mesh readMesh(BufferedReader reader, MD5 md5) throws IOException {
+    private MD5Mesh readMesh(BufferedReader reader) throws IOException {
         MD5Mesh mesh = new MD5Mesh();
         String line = MD5ParserCommon.readToLine(reader, "numverts ");
         mesh.numVertices = Integer.parseInt(line.trim().split(" ", 3)[1]);

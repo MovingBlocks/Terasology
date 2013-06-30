@@ -54,6 +54,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
@@ -62,6 +64,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLShader;
+import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
@@ -342,6 +345,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public Mesh buildAsset(AssetUri uri, MeshData data) {
                 return new OpenGLMesh(uri, data);
+            }
+        });
+        AssetManager.getInstance().setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
+            @Override
+            public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
+                return new OpenGLSkeletalMesh(uri, data);
             }
         });
     }
