@@ -713,27 +713,6 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Render World");
         camera.lookThrough();
 
-        PerformanceMonitor.startActivity("Render World (Z-Prepass)");
-
-        /*
-         * RENDER PASS: Z-PREPASS
-         * ...for opaque chunks (avoids costly per-pixel operations with the cost of
-         * rendering the chunks twice.
-         */
-        if (config.getRendering().isUseZPrePass()) {
-            glColorMask(false, false, false, false);
-            glDepthFunc(GL_LESS);
-
-            Iterator<Chunk> it = renderQueueChunksOpaque.iterator();
-            while (it.hasNext()) {
-                renderChunk(it.next(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.Z_PRE_PASS);
-            }
-
-            glDepthFunc(GL_LEQUAL);
-            glColorMask(true, true, true, true);
-        }
-        PerformanceMonitor.endActivity();
-
         boolean headUnderWater = isUnderWater();
 
         PerformanceMonitor.startActivity("Render Objects (Opaque)");
@@ -746,19 +725,11 @@ public final class WorldRenderer {
 
         PerformanceMonitor.startActivity("Render Chunks (Opaque)");
 
-        if (config.getRendering().isUseZPrePass()) {
-            glDepthMask(false);
-        }
-
         /*
          * FIRST CHUNK PASS: OPAQUE
          */
         while (renderQueueChunksOpaque.size() > 0) {
             renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.DEFAULT);
-        }
-
-        if (config.getRendering().isUseZPrePass()) {
-            glDepthMask(true);
         }
 
         PerformanceMonitor.endActivity();
