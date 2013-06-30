@@ -55,7 +55,7 @@ public class WorldAtlasBuilder {
     private int tileSize = 16;
 
     private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
-    private List<Tile> tiles = Lists.newArrayList();
+    private List<TileData> tiles = Lists.newArrayList();
 
     public int getAtlasSize() {
         return atlasSize;
@@ -114,7 +114,7 @@ public class WorldAtlasBuilder {
         }
 
         for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
-            Tile tile = tiles.get(index);
+            TileData tile = tiles.get(index);
 
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
@@ -154,7 +154,7 @@ public class WorldAtlasBuilder {
     }
 
     private int indexTile(AssetUri uri, boolean warnOnError) {
-        Tile tile = (Tile) AssetManager.tryLoad(uri);
+        TileData tile = AssetManager.tryLoadAssetData(uri, TileData.class);
         if (tile != null) {
             int index = tiles.size();
             tiles.add(tile);

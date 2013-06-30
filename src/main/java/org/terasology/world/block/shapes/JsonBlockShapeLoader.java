@@ -56,14 +56,14 @@ import java.util.Locale;
 /**
  * @author Immortius
  */
-public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
+public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
     private Gson gson;
     private static BoxShape CUBE_SHAPE = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
 
     public JsonBlockShapeLoader() {
         gson = new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(BlockShape.class, new BlockShapeHandler())
+                .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
                 .registerTypeAdapter(BlockMeshPart.class, new BlockMeshPartHandler())
                 .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
                 .registerTypeAdapter(Vector2f.class, new Vector2fHandler())
@@ -72,13 +72,11 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
 
 
     @Override
-    public BlockShape load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
-        BlockShape shape = gson.fromJson(new InputStreamReader(stream), BlockShape.class);
-        shape.setURI(uri);
-        return shape;
+    public BlockShapeData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+        return gson.fromJson(new InputStreamReader(stream), BlockShapeData.class);
     }
 
-    private class BlockShapeHandler implements JsonDeserializer<BlockShape> {
+    private class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
 
         public static final String PITCH_SYMMETRIC = "pitchSymmetric";
         public static final String YAW_SYMMETRIC = "yawSymmetric";
@@ -96,8 +94,8 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
         public static final String RADIUS = "radius";
 
         @Override
-        public BlockShape deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            BlockShape shape = new BlockShape();
+        public BlockShapeData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            BlockShapeData shape = new BlockShapeData();
             JsonObject shapeObj = json.getAsJsonObject();
 
             for (BlockPart part : BlockPart.values()) {
@@ -120,7 +118,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             return shape;
         }
 
-        private void processCollision(JsonDeserializationContext context, BlockShape shape, JsonObject collisionInfo) {
+        private void processCollision(JsonDeserializationContext context, BlockShapeData shape, JsonObject collisionInfo) {
             if (collisionInfo.has(PITCH_SYMMETRIC) && collisionInfo.get(PITCH_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(PITCH_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
                 shape.setPitchSymmetric(collisionInfo.get(PITCH_SYMMETRIC).getAsBoolean());
             }
@@ -150,8 +148,8 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             }
         }
 
-        private ObjectArrayList<Vector3f> buildVertList(BlockShape shape) {
-            ObjectArrayList<Vector3f> result = new ObjectArrayList<Vector3f>();
+        private ObjectArrayList<Vector3f> buildVertList(BlockShapeData shape) {
+            ObjectArrayList<Vector3f> result = new ObjectArrayList<>();
             for (BlockPart part : BlockPart.values()) {
                 BlockMeshPart meshPart = shape.getMeshPart(part);
                 if (meshPart != null) {
@@ -163,7 +161,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
             return result;
         }
 
-        private void processColliders(JsonDeserializationContext context, JsonArray colliderArray, BlockShape shape) {
+        private void processColliders(JsonDeserializationContext context, JsonArray colliderArray, BlockShapeData shape) {
 
             List<ColliderInfo> colliders = Lists.newArrayList();
             for (JsonElement elem : colliderArray) {
@@ -224,9 +222,6 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
         private class ColliderInfo {
             public Vector3f offset;
             public CollisionShape collisionShape;
-
-            public ColliderInfo() {
-            }
 
             public ColliderInfo(Vector3f offset, CollisionShape shape) {
                 this.offset = offset;
