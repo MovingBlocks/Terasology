@@ -135,7 +135,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         this.networkSystem = networkSystem;
         this.time = CoreRegistry.get(Time.class);
         this.identity = identity;
-        CoreRegistry.get(WorldProvider.class).registerListener(this);
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        if (worldProvider != null) {
+            worldProvider.registerListener(this);
+        }
     }
 
     @Override
@@ -175,7 +178,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     @Override
     public void disconnect() {
         super.disconnect();
-        CoreRegistry.get(WorldProvider.class).unregisterListener(this);
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        if (worldProvider != null) {
+            worldProvider.unregisterListener(this);
+        }
     }
 
     @Override
