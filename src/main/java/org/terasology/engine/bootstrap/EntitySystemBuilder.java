@@ -20,6 +20,7 @@ import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.DoNotAutoRegister;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -122,7 +123,9 @@ public class EntitySystemBuilder {
 
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
-            library.register(componentType);
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+                library.register(componentType);
+            }
         }
     }
 
@@ -138,7 +141,9 @@ public class EntitySystemBuilder {
     private void registerEvents(String packageName, EventSystem eventSystem, Reflections reflections) {
         Set<Class<? extends Event>> eventTypes = reflections.getSubTypesOf(Event.class);
         for (Class<? extends Event> eventType : eventTypes) {
-            eventSystem.registerEvent(packageName + ":" + eventType.getSimpleName(), eventType);
+            if (eventType.getAnnotation(DoNotAutoRegister.class) == null) {
+                eventSystem.registerEvent(packageName + ":" + eventType.getSimpleName(), eventType);
+            }
         }
     }
 }

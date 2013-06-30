@@ -6,11 +6,7 @@ import java.util.Map;
 
 public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegistry {
     private Map<String, BlockFamilyFactory> registryMap = Maps.newHashMap();
-    private BlockFamilyFactory defaultBlockFamilyFactory;
-
-    public void setDefaultBlockFamilyFactory(BlockFamilyFactory defaultBlockFamilyFactory) {
-        this.defaultBlockFamilyFactory = defaultBlockFamilyFactory;
-    }
+    private BlockFamilyFactory defaultBlockFamilyFactory = new SymmetricBlockFamilyFactory();
 
     public void setBlockFamilyFactory(String id, BlockFamilyFactory blockFamilyFactory) {
         registryMap.put(id.toLowerCase(), blockFamilyFactory);
@@ -18,9 +14,13 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegi
 
     @Override
     public BlockFamilyFactory getBlockFamilyFactory(String blockFamilyFactoryId) {
-        if (blockFamilyFactoryId == null) {
+        if (blockFamilyFactoryId == null || blockFamilyFactoryId.isEmpty()) {
             return defaultBlockFamilyFactory;
         }
-        return registryMap.get(blockFamilyFactoryId.toLowerCase());
+        BlockFamilyFactory factory = registryMap.get(blockFamilyFactoryId.toLowerCase());
+        if (factory == null) {
+            return defaultBlockFamilyFactory;
+        }
+        return factory;
     }
 }
