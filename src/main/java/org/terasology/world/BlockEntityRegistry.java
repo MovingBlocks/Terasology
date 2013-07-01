@@ -35,6 +35,28 @@ public interface BlockEntityRegistry {
     EntityRef getExistingBlockEntityAt(Vector3i blockPosition);
 
     /**
+     * This method is the same as setBlock, except if the old and new block types are part of the same family the
+     * entity will be force updated (usually they are not in this situation).
+     * @param x
+     * @param y
+     * @param z
+     * @param type
+     * @param oldType
+     * @return Whether the block was changed.
+     */
+    boolean setBlockForceUpdateEntity(int x, int y, int z, Block type, Block oldType);
+
+    /**
+     * This method is the same as setBlock, except if the old and new block types are part of the same family the
+     * entity will be force updated (usually they are not in this situation).
+     * @param position
+     * @param type
+     * @param oldType
+     * @return Whether the block was changed.
+     */
+    boolean setBlockForceUpdateEntity(Vector3i position, Block type, Block oldType);
+
+    /**
      * @param blockPosition
      * @return The block entity for the location, creating it if it doesn't exist
      */

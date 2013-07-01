@@ -84,11 +84,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         private Vector3i position = new Vector3i();
         private Block oldType;
         private Block newType;
+        private boolean forceEntityUpdate;
 
-        public BlockChange(Vector3i pos, Block oldType, Block newType) {
+        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate) {
             this.position.set(pos);
             this.oldType = oldType;
             this.newType = newType;
+            this.forceEntityUpdate = forceEntityUpdate;
         }
     }
 
@@ -121,21 +123,46 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
             if (super.setBlock(x, y, z, type, oldType)) {
-                updateBlockEntity(blockEntity, pos, oldType, type);
+                updateBlockEntity(blockEntity, pos, oldType, type, false);
                 return true;
             } else {
                 processOffThreadChanges();
             }
         } else {
             if (super.setBlock(x, y, z, type, oldType)) {
-                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type));
+                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type, false));
                 return true;
             }
         }
         return false;
     }
 
-    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type) {
+    @Override
+    public boolean setBlockForceUpdateEntity(int x, int y, int z, Block type, Block oldType) {
+        if (Thread.currentThread().equals(mainThread)) {
+            Vector3i pos = new Vector3i(x, y, z);
+            EntityRef blockEntity = getBlockEntityAt(pos);
+            if (super.setBlock(x, y, z, type, oldType)) {
+                updateBlockEntity(blockEntity, pos, oldType, type, true);
+                return true;
+            } else {
+                processOffThreadChanges();
+            }
+        } else {
+            if (super.setBlock(x, y, z, type, oldType)) {
+                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type, true));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setBlockForceUpdateEntity(Vector3i position, Block type, Block oldType) {
+        return setBlockForceUpdateEntity(position.x, position.y, position.z, type, oldType);
+    }
+
+    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type, boolean forceEntityUpdate) {
         if (type.isKeepActive()) {
             temporaryBlockEntities.remove(blockEntity);
         } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
@@ -145,7 +172,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         if (regionEntity != null) {
             regionEntity.send(new OnChangedBlock(pos, type, oldType));
         }
-        updateBlockEntityComponents(blockEntity, oldType, type);
+        if (forceEntityUpdate || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily()) && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
+            updateBlockEntityComponents(blockEntity, oldType, type);
+        }
         blockEntity.send(new OnChangedBlock(new Vector3i(pos), type, oldType));
     }
 
@@ -407,7 +436,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                     EntityRef blockEntity = getExistingBlockEntityAt(change.position);
                     if (!blockEntity.exists()) {
                         blockEntity = createBlockEntity(change.position, change.oldType);
-                        updateBlockEntity(blockEntity, change.position, change.oldType, change.newType);
+                        updateBlockEntity(blockEntity, change.position, change.oldType, change.newType, change.forceEntityUpdate);
                     }
                 }
             }
