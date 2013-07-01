@@ -1,6 +1,6 @@
 {
     "displayName": "Signal Off Delay Timer",
-    "rotation": "oneCrucialSide",
+    "rotation": "allSides",
     "tiles": {
         "all":"signalling:SignalOffDelayGate",
         "front":"signalling:SignalSwitch"

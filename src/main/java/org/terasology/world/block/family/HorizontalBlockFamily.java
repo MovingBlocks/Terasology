@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class HorizontalBlockFamily extends AbstractBlockFamily {
+public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
 
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
@@ -88,5 +88,19 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     @Override
     public Iterable<Block> getBlocks() {
         return blocks.values();
+    }
+
+    @Override
+    public Block getBlockForSide(Side side) {
+        return blocks.get(side);
+    }
+
+    @Override
+    public Side getBlockSide(Block block) {
+        for (Map.Entry<Side, Block> sideBlock: blocks.entrySet()){
+            if (sideBlock.getValue() == block)
+                return sideBlock.getKey();
+        }
+        return null;
     }
 }
