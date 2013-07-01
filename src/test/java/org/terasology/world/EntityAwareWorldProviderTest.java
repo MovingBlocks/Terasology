@@ -17,6 +17,7 @@
 package org.terasology.world;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,6 +31,7 @@ import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
@@ -48,6 +50,7 @@ import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
@@ -58,12 +61,15 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
 import java.util.List;
 
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -85,6 +91,8 @@ public class EntityAwareWorldProviderTest {
     private Block blockWithDifferentString;
     private Block blockWithRetainedComponent;
     private Block keepActiveBlock;
+    private Block blockInFamilyOne;
+    private Block blockInFamilyTwo;
 
     @BeforeClass
     public static void commonSetup() {
@@ -130,6 +138,14 @@ public class EntityAwareWorldProviderTest {
         prefabManager.registerPrefab(prefabWithRetainedComponent);
         blockWithRetainedComponent.setPrefab("test:prefabWithRetainedComponent");
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithRetainedComponent"), blockWithRetainedComponent), true);
+
+        blockInFamilyOne = new Block();
+        blockInFamilyOne.setKeepActive(true);
+        blockInFamilyOne.setPrefab("test:prefabWithString");
+        blockInFamilyTwo = new Block();
+        blockInFamilyTwo.setPrefab("test:prefabWithString");
+        blockInFamilyTwo.setKeepActive(true);
+        blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"), ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne), NullIterator.<String>newInstance()), true);
 
         keepActiveBlock = new Block();
         keepActiveBlock.setKeepActive(true);
@@ -360,6 +376,24 @@ public class EntityAwareWorldProviderTest {
         worldProvider.update(1.0f);
 
         assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
+    }
+
+    @Test
+    public void componentsNotAlteredIfBlockInSameFamily() {
+        worldProvider.setBlock(0, 0, 0, blockInFamilyOne, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        entity.addComponent(new IntegerComponent());
+        worldProvider.setBlock(0, 0, 0, blockInFamilyTwo, blockInFamilyOne);
+        assertNotNull(entity.getComponent(IntegerComponent.class));
+    }
+
+    @Test
+    public void componentsAlteredIfBlockInSameFamilyWhenForced() {
+        worldProvider.setBlock(0, 0, 0, blockInFamilyOne, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        entity.addComponent(new IntegerComponent());
+        worldProvider.setBlockForceUpdateEntity(0, 0, 0, blockInFamilyTwo, blockInFamilyOne);
+        assertNull(entity.getComponent(IntegerComponent.class));
     }
 
     public static class LifecycleEventChecker {
