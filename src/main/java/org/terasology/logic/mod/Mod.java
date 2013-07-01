@@ -16,6 +16,7 @@
 
 package org.terasology.logic.mod;
 
+import com.google.common.base.Objects;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -40,6 +41,9 @@ public class Mod {
     private Reflections reflections;
 
     public Mod(File modRoot, ModInfo info, AssetSource modSource) {
+        if (info == null) {
+            throw new IllegalArgumentException("Mod info must not be null");
+        }
         this.modInfo = info;
         this.modRoot = modRoot;
         this.modSource = modSource;
@@ -117,5 +121,22 @@ public class Mod {
 
     public ModInfo getModInfo() {
         return modInfo;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof Mod) {
+            Mod other = (Mod) obj;
+            return Objects.equal(other.getModInfo().getId(), modInfo.getId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return modInfo.getId().hashCode();
     }
 }
