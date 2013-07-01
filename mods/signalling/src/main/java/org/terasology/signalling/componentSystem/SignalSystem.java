@@ -182,8 +182,8 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         byte withSignal = 0;
         if (networkSignals != null) {
             for (NetworkSignals networkSignal : networkSignals) {
-                withoutSignal+=networkSignal.sidesWithoutSignal;
-                withSignal+=networkSignal.sidesWithSignal;
+                withoutSignal|=networkSignal.sidesWithoutSignal;
+                withSignal|=networkSignal.sidesWithSignal;
             }
         }
         if (advancedStatusComponent.sidesWithoutSignals != withoutSignal
