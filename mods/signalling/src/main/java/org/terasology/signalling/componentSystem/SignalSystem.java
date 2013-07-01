@@ -15,10 +15,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.Vector3i;
-import org.terasology.signalling.components.SignalConductorComponent;
-import org.terasology.signalling.components.SignalConsumerComponent;
-import org.terasology.signalling.components.SignalConsumerStatusComponent;
-import org.terasology.signalling.components.SignalProducerComponent;
+import org.terasology.signalling.components.*;
 import org.terasology.world.BlockEntityRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,63 +135,111 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
             for (NetworkNode consumerToEvaluate : consumersToEvaluate) {
                 if (signalConsumers.containsValue(consumerToEvaluate)) {
                     final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(consumerToEvaluate.location.toVector3i());
-                    final SignalConsumerStatusComponent consumerStatusComponent = blockEntity.getComponent(SignalConsumerStatusComponent.class);
                     final SignalConsumerComponent consumerComponent = blockEntity.getComponent(SignalConsumerComponent.class);
-                    if (consumerComponent != null && consumerStatusComponent != null) {
+                    if (consumerComponent != null) {
                         Map<Network, NetworkSignals> consumerSignals = consumerSignalInNetworks.get(consumerToEvaluate);
-                        boolean newSignal = false;
-                        if (consumerSignals != null)
-                            newSignal = calculateResultSignal(consumerSignals.values(), consumerComponent);
-                        if (newSignal != consumerStatusComponent.hasSignal) {
-                            consumerStatusComponent.hasSignal = newSignal;
-                            blockEntity.saveComponent(consumerStatusComponent);
-                            logger.debug("Consumer has signal: " + newSignal);
-                        }
+                        processSignalConsumerResult(consumerSignals.values(), consumerComponent, blockEntity);
                     }
                 }
             }
         }
     }
 
-    private Boolean calculateResultSignal(Collection<NetworkSignals> networkSignals, SignalConsumerComponent signalConsumerComponent) {
+    private void processSignalConsumerResult(Collection<NetworkSignals> networkSignals, SignalConsumerComponent signalConsumerComponent, EntityRef entity) {
         final SignalConsumerComponent.Mode mode = signalConsumerComponent.mode;
         switch (mode) {
             // OR
             case AT_LEAST_ONE: {
-                for (NetworkSignals networkSignal : networkSignals) {
-                    if (networkSignal.sidesWithSignal > 0) return true;
-                }
-                return false;
+                final boolean signal = hasSignalForOr(networkSignals);
+                outputSignalToSimpleConsumer(entity, signal);
+                return;
             }
             // AND
             case ALL_CONNECTED: {
-                for (NetworkSignals networkSignal : networkSignals) {
-                    if (networkSignal.sidesWithoutSignal > 0) return false;
-                }
-                return true;
+                final boolean signal = hasSignalForAnd(networkSignals);
+                outputSignalToSimpleConsumer(entity, signal);
+                return;
             }
             // XOR
             case EXACTLY_ONE: {
-                boolean connected = false;
-                for (NetworkSignals networkSignal : networkSignals) {
-                    if (SideBitFlag.getSides(networkSignal.sidesWithSignal).size() > 1) {
-                        // More than one side connected in network
-                        return false;
-                    } else if (networkSignal.sidesWithSignal > 0) {
-                        if (connected) {
-                            // One side connected in network, but already connected in other network
-                            return false;
-                        } else {
-                            connected = true;
-                        }
-                    }
-                }
-
-                return connected;
+                final boolean signal = hasSignalForXor(networkSignals);
+                outputSignalToSimpleConsumer(entity, signal);
+                return;
+            }
+            // Special leaving the calculation to the block's system itself
+            case SPECIAL: {
+                outputSignalToAdvancedConsumer(entity, networkSignals);
+                return;
             }
             default:
                 throw new IllegalArgumentException("Unknown mode set for SignalConsumerComponent");
         }
+    }
+
+    private void outputSignalToAdvancedConsumer(EntityRef entity, Collection<NetworkSignals> networkSignals) {
+        final SignalConsumerAdvancedStatusComponent advancedStatusComponent = entity.getComponent(SignalConsumerAdvancedStatusComponent.class);
+        byte withoutSignal = 0;
+        byte withSignal = 0;
+        if (networkSignals != null) {
+            for (NetworkSignals networkSignal : networkSignals) {
+                withoutSignal+=networkSignal.sidesWithoutSignal;
+                withSignal+=networkSignal.sidesWithSignal;
+            }
+        }
+        if (advancedStatusComponent.sidesWithoutSignals != withoutSignal
+                || advancedStatusComponent.sidesWithSignals != withSignal) {
+            advancedStatusComponent.sidesWithoutSignals = withoutSignal;
+            advancedStatusComponent.sidesWithSignals = withSignal;
+            entity.saveComponent(advancedStatusComponent);
+        }
+    }
+
+    private void outputSignalToSimpleConsumer(EntityRef entity, boolean result) {
+        final SignalConsumerStatusComponent consumerStatusComponent = entity.getComponent(SignalConsumerStatusComponent.class);
+        if (consumerStatusComponent.hasSignal != result) {
+            consumerStatusComponent.hasSignal = result;
+            entity.saveComponent(consumerStatusComponent);
+            logger.debug("Consumer has signal: " + result);
+        }
+    }
+
+    private boolean hasSignalForXor(Collection<NetworkSignals> networkSignals) {
+        if (networkSignals == null)
+            return false;
+        boolean connected = false;
+        for (NetworkSignals networkSignal : networkSignals) {
+            if (SideBitFlag.getSides(networkSignal.sidesWithSignal).size() > 1) {
+                // More than one side connected in network
+                return false;
+            } else if (networkSignal.sidesWithSignal > 0) {
+                if (connected) {
+                    // One side connected in network, but already connected in other network
+                    return false;
+                } else {
+                    connected = true;
+                }
+            }
+        }
+
+        return connected;
+    }
+
+    private boolean hasSignalForAnd(Collection<NetworkSignals> networkSignals) {
+        if (networkSignals == null)
+            return false;
+        for (NetworkSignals networkSignal : networkSignals) {
+            if (networkSignal.sidesWithoutSignal > 0) return false;
+        }
+        return true;
+    }
+
+    private boolean hasSignalForOr(Collection<NetworkSignals> networkSignals) {
+        if (networkSignals == null)
+            return false;
+        for (NetworkSignals networkSignal : networkSignals) {
+            if (networkSignal.sidesWithSignal > 0) return true;
+        }
+        return false;
     }
 
     //
