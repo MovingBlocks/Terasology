@@ -10,14 +10,14 @@ import org.terasology.world.block.BlockUri;
 import java.util.Locale;
 import java.util.Map;
 
-public class OneCrucialSideFamily extends AbstractBlockFamily {
+public class AllSidesFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
     private Block archetypeBlock;
-    private Map<Side, Block> crucialSideBlocks;
+    private Map<Side, Block> sideBlocks;
 
-    public OneCrucialSideFamily(BlockUri uri, Iterable<String> categories, Block archetypeBlock, Map<Side, Block> crucialSideBlocks) {
+    public AllSidesFamily(BlockUri uri, Iterable<String> categories, Block archetypeBlock, Map<Side, Block> sideBlocks) {
         super(uri, categories);
 
-        for (Map.Entry<Side, Block> blockBySide : crucialSideBlocks.entrySet()){
+        for (Map.Entry<Side, Block> blockBySide : sideBlocks.entrySet()){
             final Side side = blockBySide.getKey();
             final Block block = blockBySide.getValue();
             if (block == null) {
@@ -28,7 +28,7 @@ public class OneCrucialSideFamily extends AbstractBlockFamily {
         }
 
         this.archetypeBlock = archetypeBlock;
-        this.crucialSideBlocks = crucialSideBlocks;
+        this.sideBlocks = sideBlocks;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class OneCrucialSideFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
-        return crucialSideBlocks.get(Side.FRONT);
+        return sideBlocks.get(Side.FRONT);
     }
 
     @Override
@@ -46,16 +46,18 @@ public class OneCrucialSideFamily extends AbstractBlockFamily {
         return oldBlock;
     }
 
+    @Override
     public Side getBlockSide(Block block) {
-        for (Map.Entry<Side, Block> blockBySide : crucialSideBlocks.entrySet()){
+        for (Map.Entry<Side, Block> blockBySide : sideBlocks.entrySet()){
             if (blockBySide.getValue() == block)
                 return blockBySide.getKey();
         }
         return null;
     }
 
+    @Override
     public Block getBlockForSide(Side side) {
-        return crucialSideBlocks.get(side);
+        return sideBlocks.get(side);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class OneCrucialSideFamily extends AbstractBlockFamily {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
                 Side side = Side.valueOf(blockUri.getIdentifier().toUpperCase(Locale.ENGLISH));
-                return crucialSideBlocks.get(side);
+                return sideBlocks.get(side);
             } catch (IllegalArgumentException e) {
                 return null;
             }
@@ -73,6 +75,6 @@ public class OneCrucialSideFamily extends AbstractBlockFamily {
 
     @Override
     public Iterable<Block> getBlocks() {
-        return crucialSideBlocks.values();
+        return sideBlocks.values();
     }
 }

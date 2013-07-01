@@ -2,7 +2,6 @@ package org.terasology.signalling.componentSystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -18,7 +17,8 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.OneCrucialSideFamily;
+import org.terasology.world.block.family.AllSidesFamily;
+import org.terasology.world.block.family.SideDefinedBlockFamily;
 
 import java.util.EnumMap;
 
@@ -53,12 +53,17 @@ public class ScrewdriverSystem implements ComponentSystem {
             final Vector3i targetLocation = new Vector3i(event.getTargetLocation());
             final Block block = worldProvider.getBlock(targetLocation);
             final BlockFamily blockFamily = block.getBlockFamily();
-            if (blockFamily instanceof OneCrucialSideFamily) {
-                final OneCrucialSideFamily gateBlockFamily = (OneCrucialSideFamily) blockFamily;
-                final Side currentSide = gateBlockFamily.getBlockSide(block);
-                final Side newSide = sideOrder.get(currentSide);
+            if (blockFamily instanceof SideDefinedBlockFamily) {
+                final SideDefinedBlockFamily sideDefinedBlockFamily = (SideDefinedBlockFamily) blockFamily;
+                // Figure out the next block and side
+                Side newSide = sideDefinedBlockFamily.getBlockSide(block);
+                Block blockForSide;
+                do {
+                    newSide = sideOrder.get(newSide);
+                    blockForSide = sideDefinedBlockFamily.getBlockForSide(newSide);
+                } while (blockForSide == null);
 
-                if (worldProvider.setBlock(targetLocation, gateBlockFamily.getBlockForSide(newSide), block)) {
+                if (worldProvider.setBlock(targetLocation, blockForSide, block)) {
                     final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
 
                     final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);

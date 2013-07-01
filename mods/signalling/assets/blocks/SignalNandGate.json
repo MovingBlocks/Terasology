@@ -1,6 +1,6 @@
 {
     "displayName": "Signal NAND Gate",
-    "rotation": "oneCrucialSide",
+    "rotation": "allSides",
     "tiles": {
         "all":"signalling:SignalNandGate",
         "front":"signalling:SignalSwitch"

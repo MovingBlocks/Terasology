@@ -1,6 +1,6 @@
 {
     "displayName": "Signal XOR Gate",
-    "rotation": "oneCrucialSide",
+    "rotation": "allSides",
     "tiles": {
         "all":"signalling:SignalXorGate",
         "front":"signalling:SignalSwitch"
