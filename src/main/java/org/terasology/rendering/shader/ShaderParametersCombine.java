@@ -42,7 +42,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.35f, 0.0f, 1.0f);
     Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.75f, 0.0f, 1.0f);
 
-    Property shadowIntens = new Property("shadowIntens", 0.65f, 0.0f, 1.0f);
+    Property shadowIntens = new Property("shadowIntens", 0.25f, 0.0f, 1.0f);
     Property shadowMapBias = new Property("shadowMapBias", 0.003f, 0.0f, 0.1f);
 
     Property volFogDensityAtViewer = new Property("volFogDensityAtViewer", 0.15f, 0.001f, 1.0f);
