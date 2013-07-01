@@ -1114,7 +1114,7 @@ public final class WorldRenderer {
         Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
 
         Vector3f sunPosition = new Vector3f(sunDirection);
-        sunPosition.scale(200.0f);
+        sunPosition.scale(256.0f + 64.0f);
         lightPosition.add(sunPosition);
 
         lightCamera.getPosition().set(lightPosition);
