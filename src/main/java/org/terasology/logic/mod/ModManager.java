@@ -43,6 +43,7 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -153,12 +154,12 @@ public class ModManager {
                 if (modInfoFile.exists()) {
                     try {
                         ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
-                        if (!mods.containsKey(modInfo.getId())) {
+                        if (!mods.containsKey(modInfo.getId().toLowerCase(Locale.ENGLISH))) {
                             File assetLocation = new File(modFile, ASSETS_SUBDIRECTORY);
                             File overridesLocation = new File(modFile, OVERRIDES_SUBDIRECTORY);
                             AssetSource source = new DirectorySource(modInfo.getId(), assetLocation, overridesLocation);
                             Mod mod = new Mod(modFile, modInfo, source);
-                            mods.put(modInfo.getId(), mod);
+                            mods.put(modInfo.getId().toLowerCase(Locale.ENGLISH), mod);
                             logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                         } else {
                             logger.info("Discovered duplicate mod: {}, skipping", modInfo.getDisplayName());
@@ -183,9 +184,9 @@ public class ModManager {
                     if (modInfoEntry != null) {
                         try {
                             ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
-                            if (!mods.containsKey(modInfo.getId())) {
+                            if (!mods.containsKey(modInfo.getId().toLowerCase(Locale.ENGLISH))) {
                                 Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
-                                mods.put(modInfo.getId(), mod);
+                                mods.put(modInfo.getId().toLowerCase(Locale.ENGLISH), mod);
                                 logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                             } else {
                                 logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
@@ -242,7 +243,7 @@ public class ModManager {
     }
 
     public Mod getMod(String modName) {
-        return mods.get(modName);
+        return mods.get(modName.toLowerCase(Locale.ENGLISH));
     }
 
     public Iterable<Mod> getActiveMods() {
