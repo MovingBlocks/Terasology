@@ -154,11 +154,11 @@ public class PlayerInventorySystem implements ComponentSystem {
         //resize the crosshair
         UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
 
-        crossHair.setTextureSize(new Vector2f(22f / 256f, 22f / 256f));
+        crossHair.setTextureSize(new Vector2f(22f, 22f));
         // compute drop power
         float dropPower = getDropPower();
         //update crosshair to show progress/power
-        crossHair.setTextureOrigin(new Vector2f((46f + 22f * dropPower) / 256f, 23f / 256f));
+        crossHair.setTextureOrigin(new Vector2f((46f + 22f * dropPower), 23f));
 
         //handle when we finally let go
         if (!event.isDown()) {
@@ -194,8 +194,8 @@ public class PlayerInventorySystem implements ComponentSystem {
     public void resetDropMark() {
         UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
         lastTimeThrowInteraction = 0;
-        crossHair.setTextureSize(new Vector2f(20f / 256f, 20f / 256f));
-        crossHair.setTextureOrigin(new Vector2f(24f / 256f, 24f / 256f));
+        crossHair.setTextureSize(new Vector2f(20f, 20f));
+        crossHair.setTextureOrigin(new Vector2f(24f, 24f));
     }
 
     private float getDropPower() {
