@@ -448,6 +448,11 @@ public class TerasologyEngine implements GameEngine {
 
             // Only process rendering and updating once a second
             if (!Display.isActive() && currentState.isHibernationAllowed()) {
+                time.setPaused(true);
+                Iterator<Float> updateCycles = time.tick();
+                while (updateCycles.hasNext()) {
+                    updateCycles.next();
+                }
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -455,6 +460,7 @@ public class TerasologyEngine implements GameEngine {
                 }
 
                 Display.processMessages();
+                time.setPaused(false);
                 continue;
             }
 
