@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.terasology.blockNetwork.*;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.lifecycleEvents.*;
@@ -34,6 +35,8 @@ import java.util.Set;
 public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyListener {
     private static final Logger logger = LoggerFactory.getLogger(SignalSystem.class);
 
+    @In
+    private Time time;
     @In
     private WorldProvider worldProvider;
 
@@ -96,7 +99,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
 
     @Override
     public void update(float delta) {
-        long worldTime = TimeUtils.getCorrectTime(worldProvider.getTime());
+        long worldTime = time.getGameTimeInMs();
         if (worldTime > lastUpdate + PROCESSING_MINIMUM_INTERVAL) {
             lastUpdate = worldTime;
 
