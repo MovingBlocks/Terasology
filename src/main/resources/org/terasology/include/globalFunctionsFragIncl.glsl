@@ -33,8 +33,9 @@ uniform float time;
 uniform float sunlightValueAtPlayerPos;
 
 uniform vec3 sunVec;
-
+uniform vec3 cameraPosition;
 uniform vec3 cameraDirection;
+
 uniform vec3 cameraParameters;
 #define zNear cameraParameters.x
 #define zFar cameraParameters.y

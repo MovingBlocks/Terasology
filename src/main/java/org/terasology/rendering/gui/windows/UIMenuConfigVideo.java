@@ -106,6 +106,7 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setSsao(false);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
+                        config.getRendering().setCloudShadows(false);
                         break;
                     case 1:
                         config.getRendering().setFlickeringLight(true);
@@ -118,6 +119,7 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
+                        config.getRendering().setCloudShadows(false);
                         break;
                     case 2:
                         config.getRendering().setFlickeringLight(true);
@@ -130,6 +132,7 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setLightShafts(true);
 
                         config.getRendering().setAnimateWater(false);
+                        config.getRendering().setCloudShadows(false);
                         break;
                     case 3:
                         config.getRendering().setFlickeringLight(true);
@@ -141,6 +144,7 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setSsao(true);
                         config.getRendering().setLightShafts(true);
                         config.getRendering().setAnimateWater(true);
+                        config.getRendering().setCloudShadows(true);
                         break;
                 }
             }

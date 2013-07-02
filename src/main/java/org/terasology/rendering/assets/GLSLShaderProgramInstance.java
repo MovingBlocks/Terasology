@@ -163,6 +163,8 @@ public class GLSLShaderProgramInstance {
             builder.append("#define DYNAMIC_SHADOWS_PCF \n");
         if (config.getRendering().isVolumetricFog())
             builder.append("#define VOLUMETRIC_FOG \n");
+        if (config.getRendering().isCloudShadows())
+            builder.append("#define CLOUD_SHADOWS \n");
 
         for (int i=0; i< SystemConfig.DebugRenderingStages.values().length; ++i) {
             builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" "+SystemConfig.DebugRenderingStages.values()[i].ordinal()+" \n");

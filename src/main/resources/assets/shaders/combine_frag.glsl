@@ -44,6 +44,10 @@ uniform mat4 invViewProjMatrix;
 #endif
 
 #if defined (DYNAMIC_SHADOWS)
+# if defined (CLOUD_SHADOWS)
+uniform sampler2D texSceneClouds;
+# endif
+
 uniform vec4 shadowSettingsFrag;
 #define shadowIntens shadowSettingsFrag.x
 #define shadowMapBias shadowSettingsFrag.y
@@ -106,17 +110,25 @@ void main() {
     float shadowTerm = 1.0;
 
     if (depthOpaque < 1.0) {
-#if defined (DYNAMIC_SHADOWS_PCF)
+# if defined (DYNAMIC_SHADOWS_PCF)
         shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightPosClipSpace.z, shadowMapTexPos, shadowIntens, shadowMapBias);
-#else
+# else
         float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
         if (shadowMapDepth + shadowMapBias < lightPosClipSpace.z) {
             shadowTerm = shadowIntens;
         }
-#endif
+# endif
+
+# if defined (CLOUD_SHADOWS)
+        // TODO: Not so nice that this is all hardcoded
+        float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.001 + timeToTick(time, 0.001)).r * 5.0, 0.0, 1.0);
+        shadowTerm = min(clamp(shadowTerm * cloudOcclusion + 0.25, 0.0, 1.0), shadowTerm);
+
         colorOpaque.rgb *= shadowTerm;
-#endif
+        colorTransparent.rgb *= clamp(shadowTerm * 2.0, 0.0, 1.0); // Shadows on transparent objects should be a bit brighter
+# endif
     }
+#endif
 
     // Sky inscattering using down-sampled sky band texture
     vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;

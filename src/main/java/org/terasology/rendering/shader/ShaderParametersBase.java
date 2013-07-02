@@ -50,7 +50,10 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
             program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getSmoothedPlayerSunlightValue());
 
             if (worldRenderer.getActiveCamera() != null) {
-                Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
+                final Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
+                final Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+
+                program.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z);
                 program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z);
                 program.setFloat3("cameraParameters", worldRenderer.getActiveCamera().getzNear(), worldRenderer.getActiveCamera().getzFar(), 0.0f);
             }

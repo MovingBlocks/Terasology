@@ -15,11 +15,14 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.assets.GLSLShaderProgramInstance;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -27,6 +30,8 @@ import org.terasology.rendering.world.WorldRenderer;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.List;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Combine shader program.
@@ -42,7 +47,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.35f, 0.0f, 1.0f);
     Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.75f, 0.0f, 1.0f);
 
-    Property shadowIntens = new Property("shadowIntens", 0.25f, 0.0f, 1.0f);
+    Property shadowIntens = new Property("shadowIntens", 0.4f, 0.0f, 1.0f);
     Property shadowMapBias = new Property("shadowMapBias", 0.003f, 0.0f, 0.1f);
 
     Property volFogDensityAtViewer = new Property("volFogDensityAtViewer", 0.15f, 0.001f, 1.0f);
@@ -82,6 +87,12 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             if (activeCamera != null) {
                 program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix());
             }
+
+            Texture clouds = Assets.getTexture("engine:perlinNoiseTileable");
+
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            glBindTexture(GL11.GL_TEXTURE_2D, clouds.getId());
+            program.setInt("texSceneClouds", texId++);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {

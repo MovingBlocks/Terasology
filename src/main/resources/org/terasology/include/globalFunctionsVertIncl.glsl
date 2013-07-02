@@ -21,9 +21,15 @@ uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;
 uniform float time;
+uniform float sunlightValueAtPlayerPos;
 
 uniform vec3 sunVec;
+uniform vec3 cameraPosition;
 uniform vec3 cameraDirection;
+
+uniform vec3 cameraParameters;
+#define zNear cameraParameters.x
+#define zFar cameraParameters.y
 
 float timeToTick(float time, float speed) {
     return time * 4000.0 * speed;
