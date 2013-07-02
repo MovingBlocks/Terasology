@@ -65,7 +65,7 @@ public abstract class Camera {
     protected float cachedFov = 0.0f, cachedZNear = 0.0f, cachedZFar = 0.0f;
 
     /* ETC */
-    protected boolean reflected = false;
+    private boolean reflected = false;
 
     /**
      * Applies the projection and modelview matrix.
@@ -211,5 +211,9 @@ public abstract class Camera {
 
     public void setzFar(float zFar) {
         this.zFar = zFar;
+    }
+
+    public boolean isReflected() {
+        return reflected;
     }
 }

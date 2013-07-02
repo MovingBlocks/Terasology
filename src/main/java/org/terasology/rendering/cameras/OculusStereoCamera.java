@@ -112,12 +112,12 @@ public class OculusStereoCamera extends Camera {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
         if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
-            if (!reflected) {
+            if (!isReflected()) {
                 return viewMatrixLeftEye;
             }
             return viewMatrixReflectedLeftEye;
         } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
-            if (!reflected) {
+            if (!isReflected()) {
                 return viewMatrixRightEye;
             }
             return viewMatrixReflectedRightEye;

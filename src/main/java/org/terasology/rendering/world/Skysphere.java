@@ -15,15 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
-
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -33,8 +24,11 @@ import org.terasology.math.TeraMath;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.GLSLShaderProgramInstance;
+import org.terasology.rendering.cameras.Camera;
 
 import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Skysphere based on the Perez all weather luminance model.
@@ -50,31 +44,41 @@ public class Skysphere implements IPropertyProvider {
 
     private static int displayListSphere = -1;
 
-    private final WorldRenderer _parent;
+    private final WorldRenderer parentWorldRenderer;
 
     public Skysphere(WorldRenderer parent) {
-        _parent = parent;
+        parentWorldRenderer = parent;
     }
 
-    public void render() {
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
+    public void render(Camera camera) {
+        glDepthMask(false);
+
+        if (camera.isReflected()) {
+            glCullFace(GL_BACK);
+        } else {
+            glCullFace(GL_FRONT);
+        }
 
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("sky");
         shader.enable();
 
         // Draw the skysphere
-        drawSphere();
+        drawSkysphere();
 
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
+        if (camera.isReflected()) {
+            glCullFace(GL_FRONT);
+        } else {
+            glCullFace(GL_BACK);
+        }
+
+        glDepthMask(true);
     }
 
     public void update(float delta) {
-        sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTimeInDays() - 90.0);
+        sunPosAngle = (float) java.lang.Math.toRadians(360.0 * parentWorldRenderer.getWorldProvider().getTimeInDays() - 90.0);
     }
 
-    private void drawSphere() {
+    private void drawSkysphere() {
         if (displayListSphere == -1) {
             displayListSphere = glGenLists(1);
 
@@ -83,7 +87,7 @@ public class Skysphere implements IPropertyProvider {
 
             glNewList(displayListSphere, GL11.GL_COMPILE);
 
-            sphere.draw(16, 16, 128);
+            sphere.draw(1024, 16, 128);
 
             glEndList();
         }

@@ -44,5 +44,4 @@ public class LightComponent implements Component {
     public float lightRenderingDistance = 0.0f;
 
     public LightType lightType = LightType.POINT;
-
 }

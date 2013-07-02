@@ -704,17 +704,22 @@ public final class WorldRenderer {
         DefaultRenderingProcess.getInstance().clear();
         DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
 
-        /* SKYSPHERE */
+        /*
+         * SKYSPHERE (Rendered first - z-buffer is empty but we can directly use the scene
+         * rendertarget to create the skyband texture for the in-scattering effects)
+         */
+        camera.lookThroughNormalized();
+
         PerformanceMonitor.startActivity("Render Sky");
         DefaultRenderingProcess.getInstance().beginRenderSceneSkyBand();
-        camera.lookThroughNormalized();
-        skysphere.render();
+        skysphere.render(camera);
         DefaultRenderingProcess.getInstance().endRenderSceneSkyBand();
         PerformanceMonitor.endActivity();
 
+        camera.lookThrough();
+
         /* WORLD RENDERING */
         PerformanceMonitor.startActivity("Render World");
-        camera.lookThrough();
 
         boolean headUnderWater = isUnderWater();
 
@@ -920,7 +925,7 @@ public final class WorldRenderer {
     private void renderWorldReflection(Camera camera) {
         PerformanceMonitor.startActivity("Render World (Reflection)");
         camera.lookThroughNormalized();
-        skysphere.render();
+        skysphere.render(camera);
 
         if (config.getRendering().isReflectiveWater()) {
             camera.lookThrough();
