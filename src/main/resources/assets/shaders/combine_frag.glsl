@@ -121,8 +121,8 @@ void main() {
 
 # if defined (CLOUD_SHADOWS)
         // TODO: Not so nice that this is all hardcoded
-        float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.001 + timeToTick(time, 0.001)).r * 5.0, 0.0, 1.0);
-        shadowTerm = min(clamp(shadowTerm * cloudOcclusion + 0.25, 0.0, 1.0), shadowTerm);
+        float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.001 + timeToTick(time, 0.0025)).r * 5.0, 0.0, 1.0);
+        shadowTerm *= clamp(1.0 - cloudOcclusion + 0.25, 0.0, 1.0);
 
         colorOpaque.rgb *= shadowTerm;
         colorTransparent.rgb *= clamp(shadowTerm * 2.0, 0.0, 1.0); // Shadows on transparent objects should be a bit brighter
