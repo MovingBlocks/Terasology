@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-varying vec4 vertexProjPos;
-varying vec3 eyeVec;
-
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
@@ -24,15 +21,5 @@ uniform mat4 viewProjMatrix;
 
 void main()
 {
-#if defined (FEATURE_LIGHT_POINT)
-    vertexProjPos = (viewProjMatrix * modelMatrix) * gl_Vertex;
-#else
-    vertexProjPos = gl_Vertex;
-#endif
-
-    eyeVec = -normalize(viewMatrix * gl_Vertex).xyz;
-
-	gl_Position = vertexProjPos;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = gl_Color;
+	gl_Position = (viewProjMatrix * modelMatrix) * gl_Vertex;
 }

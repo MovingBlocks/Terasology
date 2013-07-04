@@ -31,6 +31,7 @@ import org.terasology.config.SystemConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.IShaderParameters;
 import org.terasology.rendering.world.WorldRenderer;
@@ -63,6 +64,8 @@ public class GLSLShaderProgramInstance {
     private TIntIntMap fragmentPrograms = new TIntIntHashMap();
     private TIntIntMap vertexPrograms = new TIntIntHashMap();
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
+
+    private TIntIntMap uniformLocationMap = new TIntIntHashMap();
 
     private int availableFeatures = 0;
     private int activeFeatures = 0;
@@ -393,7 +396,7 @@ public class GLSLShaderProgramInstance {
 
         if (activeProgram != this || ShaderManager.getInstance().getActiveFeatures() != activeFeatures) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            GL20.glUseProgram(shaderPrograms.get(activeFeatures));
+            GL20.glUseProgram(getActiveShaderProgramId());
 
             // Make sure the shader manager knows that this program is currently active
             ShaderManager.getInstance().setActiveShaderProgram(this);
@@ -405,39 +408,79 @@ public class GLSLShaderProgramInstance {
         }
     }
 
+    public int getActiveShaderProgramId() {
+        return shaderPrograms.get(activeFeatures);
+    }
+
     public void setFloat(String desc, float f) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform1f(id, f);
     }
 
     public void setFloat2(String desc, float f1, float f2) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform2f(id, f1, f2);
     }
 
     public void setFloat3(String desc, float f1, float f2, float f3) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform3f(id, f1, f2, f3);
     }
 
     public void setFloat4(String desc, float f1, float f2, float f3, float f4) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform4f(id, f1, f2, f3, f4);
     }
 
     public void setInt(String desc, int i) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform1i(id, i);
     }
 
     public void setBoolean(String desc, boolean b) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform1i(id, b ? 1 : 0);
     }
 
@@ -448,7 +491,7 @@ public class GLSLShaderProgramInstance {
             it.advance();
 
             GL20.glUseProgram(it.value());
-            int id = GL20.glGetUniformLocation(it.value(), desc);
+            int id = getUniformLocation(it.value(), desc);
             GL20.glUniform1i(id, i);
         }
 
@@ -462,7 +505,7 @@ public class GLSLShaderProgramInstance {
             it.advance();
 
             GL20.glUseProgram(it.value());
-            int id = GL20.glGetUniformLocation(it.value(), desc);
+            int id = getUniformLocation(it.value(), desc);
             GL20.glUniform1i(id, b ? 1 : 0);
         }
 
@@ -476,7 +519,7 @@ public class GLSLShaderProgramInstance {
             it.advance();
 
             GL20.glUseProgram(it.value());
-            int id = GL20.glGetUniformLocation(it.value(), desc);
+            int id = getUniformLocation(it.value(), desc);
             GL20.glUniform3f(id, f1, f2, f3);
         }
 
@@ -484,43 +527,105 @@ public class GLSLShaderProgramInstance {
     }
 
     public void setFloat2(String desc, FloatBuffer buffer) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform2(id, buffer);
     }
 
-    public void setFloat1(String desc, FloatBuffer buffer) {
+    public void setFloat(String desc, FloatBuffer buffer) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform1(id, buffer);
     }
 
     public void setFloat4(String desc, Vector4f vec) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
         setFloat4(desc, vec.x, vec.y, vec.z, vec.w);
     }
 
     public void setMatrix4(String desc, FloatBuffer floatBuffer) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+        
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniformMatrix4(id, false, floatBuffer);
     }
 
     public void setMatrix3(String desc, FloatBuffer floatBuffer) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+        
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniformMatrix3(id, false, floatBuffer);
     }
 
     public void setMatrix4(String desc, Matrix4f m) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+        
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniformMatrix4(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
     public void setMatrix3(String desc, Matrix3f m) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+        
         enable();
-        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
+        int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(m));
+    }
+
+    private int getUniformLocation(int activeShaderProgramId, String desc) {
+        int hash = (desc + activeShaderProgramId).hashCode();
+
+        if (uniformLocationMap.containsKey(hash)) {
+            return uniformLocationMap.get(hash);
+        }
+
+        int id = GL20.glGetUniformLocation(activeShaderProgramId, desc);
+        uniformLocationMap.put(hash, id);
+
+        return id;
+    }
+
+    public void setCamera(Camera camera) {
+        setMatrix4("viewMatrix", camera.getViewMatrix());
+        setMatrix4("projMatrix", camera.getProjectionMatrix());
+        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix());
+        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
     }
 
     public int getActiveFeatures() {

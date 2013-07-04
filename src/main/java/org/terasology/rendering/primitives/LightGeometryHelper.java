@@ -18,7 +18,7 @@ public class LightGeometryHelper {
 
             glNewList(displayListSphere, GL11.GL_COMPILE);
 
-            sphere.draw(1, 4, 4);
+            sphere.draw(1, 8, 8);
 
             glEndList();
         }

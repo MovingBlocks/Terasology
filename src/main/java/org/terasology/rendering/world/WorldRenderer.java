@@ -721,8 +721,6 @@ public final class WorldRenderer {
         /* WORLD RENDERING */
         PerformanceMonitor.startActivity("Render World");
 
-        boolean headUnderWater = isUnderWater();
-
         PerformanceMonitor.startActivity("Render Objects (Opaque)");
 
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
@@ -784,7 +782,6 @@ public final class WorldRenderer {
         /*
          * OVERLAYS
          */
-
         PerformanceMonitor.startActivity("Render Overlays");
 
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
@@ -795,22 +792,16 @@ public final class WorldRenderer {
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 
-        /*
-         * LIGHT GEOMETRY PASS
-         */
         PerformanceMonitor.startActivity("Render Light Geometry");
-        DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
 
-        GLSLShaderProgramInstance program = ShaderManager.getInstance().getShaderProgramInstance("lightGeometryPass");
+        /*
+         * LIGHT GEOMETRY (STENCIL) PASS
+         */
+        DefaultRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
+
+        GLSLShaderProgramInstance program = ShaderManager.getInstance().getShaderProgramInstance("simple");
         program.enable();
-
-        Matrix4f modelMatrix = new Matrix4f();
-        modelMatrix.setIdentity();
-
-        program.setMatrix4("viewMatrix", camera.getViewMatrix());
-        program.setMatrix4("projMatrix", camera.getProjectionMatrix());
-        program.setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix());
-        program.setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
+        program.setCamera(camera);
 
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.iteratorEntities(LocationComponent.class, LightComponent.class)) {
@@ -818,19 +809,26 @@ public final class WorldRenderer {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
 
             final Vector3f worldPosition = locationComponent.getWorldPosition();
+            renderLightComponent(lightComponent, worldPosition, program, camera, true);
+        }
 
-            Vector3f positionViewSpace = new Vector3f();
-            positionViewSpace.sub(worldPosition, activeCamera.getPosition());
+        DefaultRenderingProcess.getInstance().endRenderLightGeometryStencilPass();
 
-            boolean doRenderLight = lightComponent.lightType == LightComponent.LightType.DIRECTIONAL
-                    || lightComponent.lightRenderingDistance == 0.0f
-                    || positionViewSpace.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
+        /*
+         * LIGHT GEOMETRY PASS
+         */
+        DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
 
-            doRenderLight &= isLightVisible(positionViewSpace, lightComponent);
+        program = ShaderManager.getInstance().getShaderProgramInstance("lightGeometryPass");
+        program.enable();
+        program.setCamera(camera);
 
-            if (doRenderLight) {
-                renderLightComponent(lightComponent, worldPosition, program, camera, modelMatrix);
-            }
+        for (EntityRef entity : entityManager.iteratorEntities(LocationComponent.class, LightComponent.class)) {
+            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+            LightComponent lightComponent = entity.getComponent(LightComponent.class);
+
+            final Vector3f worldPosition = locationComponent.getWorldPosition();
+            renderLightComponent(lightComponent, worldPosition, program, camera, false);
         }
 
         DefaultRenderingProcess.getInstance().endRenderLightGeometry();
@@ -841,6 +839,7 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
 
         // Make sure the water surface is rendered if the player is swimming
+        boolean headUnderWater = isUnderWater();
         if (headUnderWater) {
             glDisable(GL11.GL_CULL_FACE);
         }
@@ -883,11 +882,26 @@ public final class WorldRenderer {
         }
     }
 
-    private void renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, GLSLShaderProgramInstance program, Camera camera, Matrix4f modelMatrix) {
-        if (lightComponent.lightType == LightComponent.LightType.POINT) {
-            program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
-        } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-            program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+    private boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, GLSLShaderProgramInstance program, Camera camera, boolean geometryOnly) {
+        Vector3f positionViewSpace = new Vector3f();
+        positionViewSpace.sub(lightWorldPosition, activeCamera.getPosition());
+
+        boolean doRenderLight = lightComponent.lightType == LightComponent.LightType.DIRECTIONAL
+                || lightComponent.lightRenderingDistance == 0.0f
+                || positionViewSpace.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
+
+        doRenderLight &= isLightVisible(positionViewSpace, lightComponent);
+
+        if (!doRenderLight) {
+            return false;
+        }
+
+        if (!geometryOnly) {
+            if (lightComponent.lightType == LightComponent.LightType.POINT ) {
+                program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
+            } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
+                program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+            }
         }
 
         Vector3f worldPosition = new Vector3f();
@@ -898,28 +912,33 @@ public final class WorldRenderer {
 
         program.setFloat3("lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z);
 
+        Matrix4f modelMatrix = new Matrix4f();
+        modelMatrix.setIdentity();
+
         modelMatrix.setTranslation(worldPosition);
         modelMatrix.setScale(lightComponent.lightAttenuationRange);
         program.setMatrix4("modelMatrix", modelMatrix);
 
-        // TODO: Pack those values into float4s
-        program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z);
-        program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z);
+        if (!geometryOnly) {
+            program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z);
+            program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z);
 
-        program.setFloat("lightAmbientIntensity", lightComponent.lightAmbientIntensity);
-        program.setFloat("lightDiffuseIntensity", lightComponent.lightDiffuseIntensity);
-        program.setFloat("lightSpecularIntensity", lightComponent.lightSpecularIntensity);
-        program.setFloat("lightSpecularPower", lightComponent.lightSpecularPower);
+            program.setFloat4("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity,
+                    lightComponent.lightSpecularIntensity, lightComponent.lightSpecularPower);
+        }
 
         if (lightComponent.lightType == LightComponent.LightType.POINT) {
-            program.setFloat("lightAttenuationRange", lightComponent.lightAttenuationRange);
-            program.setFloat("lightAttenuationFalloff", lightComponent.lightAttenuationFalloff);
+            if (!geometryOnly) {
+                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange * 0.975f, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f);
+            }
 
             LightGeometryHelper.renderSphereGeometry();
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
             // Directional lights cover all pixels on the screen
             DefaultRenderingProcess.getInstance().renderFullscreenQuad();
         }
+
+        return true;
     }
 
     private void renderWorldReflection(Camera camera) {

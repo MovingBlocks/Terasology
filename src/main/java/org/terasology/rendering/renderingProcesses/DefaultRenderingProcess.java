@@ -43,6 +43,7 @@ import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
+import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
  * The default rendering process.
@@ -86,6 +87,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int overwriteRtHeight = 0;
 
     private String currentlyBoundFboName = "";
+    private static int currentlyBoundFboId = -1;
+    private static int currentlyBoundTextureId = -1;
 
     /* VARIOUS */
     private boolean takeScreenshot = false;
@@ -166,8 +169,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     public class FBO {
         public int fboId = 0;
         public int textureId = 0;
-        public int depthTextureId = 0;
-        public int depthRboId = 0;
+        public int depthStencilTextureId = 0;
+        public int depthStencilRboId = 0;
         public int normalsTextureId = 0;
         public int lightBufferTextureId = 0;
 
@@ -175,31 +178,52 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         public int height = 0;
 
         public void bind() {
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
+            if (fboId != currentlyBoundFboId) {
+                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
+                currentlyBoundFboId = fboId;
+            }
         }
 
         public void unbind() {
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+            if (currentlyBoundFboId != 0) {
+                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+                currentlyBoundFboId = 0;
+            }
         }
 
         public void bindDepthTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthTextureId);
+            if (currentlyBoundTextureId != depthStencilTextureId) {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
+                currentlyBoundTextureId = depthStencilTextureId;
+            }
         }
 
         public void bindTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+            if (currentlyBoundTextureId != textureId) {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+                currentlyBoundTextureId = textureId;
+            }
         }
 
         public void bindNormalsTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
+            if (currentlyBoundTextureId != normalsTextureId) {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
+                currentlyBoundTextureId = normalsTextureId;
+            }
         }
 
         public void bindLightBufferTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
+            if (currentlyBoundTextureId != lightBufferTextureId) {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
+                currentlyBoundTextureId = lightBufferTextureId;
+            }
         }
 
         public void unbindTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            if (currentlyBoundTextureId != 0) {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+                currentlyBoundTextureId = 0;
+            }
         }
     }
 
@@ -285,10 +309,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             return;
         }
 
-        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true);
-        createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true);
+        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
+        createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
 
-        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
+        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR);
         attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
 
         createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true, true, true);
@@ -296,27 +320,27 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
-        createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
-        createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR, false, false);
-        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
+        createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR);
+        createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR);
+        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
 
-        createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT, false, false);
+        createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
 
-        createFBO("ssao", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
-        createFBO("ssaoBlurred0", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
-        createFBO("ssaoBlurred1", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("ssao", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("ssaoBlurred0", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("ssaoBlurred1", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
-        createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
-        createFBO("sceneHighPass", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
-        createFBO("sceneBloom0", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
-        createFBO("sceneBloom1", rtWidth16, rtHeight16, FBOType.DEFAULT, false, false);
+        createFBO("sceneHighPass", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("sceneBloom0", rtWidth16, rtHeight16, FBOType.DEFAULT);
+        createFBO("sceneBloom1", rtWidth16, rtHeight16, FBOType.DEFAULT);
 
-        createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
-        createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT, false, false);
+        createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
-        createFBO("sceneSkyBand0", rtWidth32, rtHeight32, FBOType.DEFAULT, false, false);
-        createFBO("sceneSkyBand1", rtWidth32, rtHeight32, FBOType.DEFAULT, false, false);
+        createFBO("sceneSkyBand0", rtWidth32, rtHeight32, FBOType.DEFAULT);
+        createFBO("sceneSkyBand1", rtWidth32, rtHeight32, FBOType.DEFAULT);
     }
 
     public void deleteFBO(String title) {
@@ -324,9 +348,9 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             FBO fbo = FBOs.get(title);
 
             EXTFramebufferObject.glDeleteFramebuffersEXT(fbo.fboId);
-            EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo.depthRboId);
+            EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
             GL11.glDeleteTextures(fbo.normalsTextureId);
-            GL11.glDeleteTextures(fbo.depthTextureId);
+            GL11.glDeleteTextures(fbo.depthStencilTextureId);
             GL11.glDeleteTextures(fbo.textureId);
         }
     }
@@ -341,8 +365,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, target.fboId);
 
-        EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, source.depthRboId);
-        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, source.depthTextureId, 0);
+        EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, source.depthStencilRboId);
+        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, source.depthStencilTextureId, 0);
 
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
 
@@ -362,6 +386,10 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public FBO createFBO(String title, int width, int height, FBOType type, boolean depth, boolean normals, boolean lightBuffer) {
+        return createFBO(title, width, height, type, depth, normals, lightBuffer, false);
+    }
+
+    public FBO createFBO(String title, int width, int height, FBOType type, boolean depthBuffer, boolean normalBuffer, boolean lightBuffer, boolean stencilBuffer) {
         // Make sure to delete the existing FBO before creating a new one
         deleteFBO(title);
 
@@ -392,7 +420,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
         }
 
-        if (normals) {
+        if (normalBuffer) {
             fbo.normalsTextureId = GL11.glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsTextureId);
 
@@ -424,24 +452,38 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
         }
 
-        if (depth) {
-            fbo.depthTextureId = GL11.glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthTextureId);
+        if (depthBuffer) {
+            fbo.depthStencilTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (java.nio.ByteBuffer) null);
+            if (!stencilBuffer) {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_UNSIGNED_INT, (java.nio.ByteBuffer) null);
+            } else {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height, 0, EXTPackedDepthStencil.GL_DEPTH_STENCIL_EXT, EXTPackedDepthStencil.GL_UNSIGNED_INT_24_8_EXT, (java.nio.ByteBuffer) null);
+            }
 
-            fbo.depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
-            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthRboId);
-            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
+            fbo.depthStencilRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
+
+            if (!stencilBuffer) {
+                EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
+            } else {
+                EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height);
+            }
+
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
 
-            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthRboId);
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthTextureId, 0);
+            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+
+            if (stencilBuffer) {
+                EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+            }
         }
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
@@ -450,7 +492,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         if (type != FBOType.NO_COLOR) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
         }
-        if (normals) {
+        if (normalBuffer) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
         }
         if (lightBuffer) {
@@ -576,7 +618,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void clear() {
         bindFbo("sceneOpaque");
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         unbindFbo("sceneOpaque");
         bindFbo("sceneTransparent");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -591,27 +633,60 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         unbindFbo("sceneOpaque");
     }
 
+    public void beginRenderLightGeometryStencilPass() {
+        bindFbo("sceneOpaque");
+        setRenderBufferMask(false, false, false);
+
+        glDepthMask(false);
+
+        glClear(GL_STENCIL_BUFFER_BIT);
+
+        glCullFace(GL_FRONT);
+        glDisable(GL_CULL_FACE);
+
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_ALWAYS, 0, 0);
+
+        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR, GL_KEEP);
+        glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR, GL_KEEP);
+    }
+
+    public void endRenderLightGeometryStencilPass() {
+        setRenderBufferMask(true, true, true);
+        unbindFbo("sceneOpaque");
+    }
+
     public void beginRenderLightGeometry() {
         bindFbo("sceneOpaque");
 
-        // TODO: Use stencil masking technique for lights instead of disabling the depth test
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glCullFace(GL_FRONT);
-
         // Only write to the light buffer
         setRenderBufferMask(false, false, true);
+
+        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+
+        glDepthMask(true);
+        glDisable(GL_DEPTH_TEST);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
     }
 
     public void endRenderLightGeometry() {
-        setRenderBufferMask(true, true, true);
-        unbindFbo("sceneOpaque");
-
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glEnable(GL_DEPTH_TEST);
+
+        glDisable(GL_STENCIL_TEST);
+
         glCullFace(GL_BACK);
+
+        setRenderBufferMask(true, true, true);
+
+        unbindFbo("sceneOpaque");
 
         applyLightBufferPass("sceneOpaque");
     }
@@ -713,10 +788,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         generateSkyBand(1);
 
         bindFbo("sceneOpaque");
-    }
-
-    public void renderScene() {
-        renderScene(StereoRenderState.MONO);
     }
 
     /**
@@ -1322,7 +1393,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public boolean bindFbo(String title) {
-        FBO fbo = null;
+        FBO fbo;
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.bind();

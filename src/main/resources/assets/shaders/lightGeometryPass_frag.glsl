@@ -25,12 +25,15 @@ uniform sampler2D texSceneOpaqueNormals;
 uniform vec3 lightColorDiffuse = vec3(1.0, 0.0, 0.0);
 uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
 
-uniform float lightDiffuseIntensity = 1.0;
-uniform float lightAmbientIntensity = 1.0;
-uniform float lightSpecularIntensity = 0.0;
-uniform float lightSpecularPower = 16.0;
-uniform float lightAttenuationRange = 1.0;
-uniform float lightAttenuationFalloff = 1.0;
+uniform vec4 lightProperties;
+#define lightDiffuseIntensity lightProperties.y
+#define lightAmbientIntensity lightProperties.x
+#define lightSpecularIntensity lightProperties.z
+#define lightSpecularPower lightProperties.w
+
+uniform vec4 lightExtendedProperties;
+#define lightAttenuationRange lightExtendedProperties.x
+#define lightAttenuationFalloff lightExtendedProperties.y
 
 uniform mat4 invProjMatrix;
 
@@ -62,9 +65,8 @@ void main() {
     color += lightColorDiffuse * lightDiffuseIntensity * lambTerm;
 
 #if defined (FEATURE_LIGHT_POINT)
-    float distFactor = lightDist / lightAttenuationRange;
-    float damping = 1.0 - pow(distFactor, lightAttenuationFalloff);
-    float attenuation = clamp(damping, 0.0, 1.0);
+    //float attenuation = clamp (1.0 - ((lightDist * lightDist) / (lightAttenuationRange * lightAttenuationRange)), 0.0, 1.0);
+    float attenuation = clamp(1.0 - (pow (lightDist, lightAttenuationFalloff) / lightAttenuationRange), 0.0, 1.0);
 
     specular *= attenuation;
     color *= attenuation;

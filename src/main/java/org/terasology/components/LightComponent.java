@@ -38,7 +38,7 @@ public class LightComponent implements Component {
 
     public float lightSpecularPower = 4.0f;
     public float lightAttenuationRange = 16.0f;
-    public float lightAttenuationFalloff = 0.5f;
+    public float lightAttenuationFalloff = 1.25f;
 
     // The rendering distance for light components (0.0f == Always render the light)
     public float lightRenderingDistance = 0.0f;

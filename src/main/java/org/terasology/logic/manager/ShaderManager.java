@@ -87,6 +87,7 @@ public class ShaderManager {
         prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
         prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersLightBufferPass());
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
+        prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
     }
 
     public void enableMaterial(Material material) {

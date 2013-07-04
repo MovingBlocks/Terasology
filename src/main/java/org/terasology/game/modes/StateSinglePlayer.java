@@ -43,10 +43,7 @@ import org.terasology.world.WorldProvider;
 import java.io.File;
 import java.io.IOException;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Play mode.
