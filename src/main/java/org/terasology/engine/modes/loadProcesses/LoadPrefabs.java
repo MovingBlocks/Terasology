@@ -24,19 +24,10 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabLoader;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.persistence.PrefabSerializer;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
-import org.terasology.protobuf.EntityData;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Iterator;
 
 /**

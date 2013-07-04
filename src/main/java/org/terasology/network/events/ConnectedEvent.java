@@ -17,7 +17,7 @@
 package org.terasology.network.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.persistence.PlayerEntityStore;
+import org.terasology.persistence.PlayerEntityStore;
 
 /**
  * Event notifying that a new client has connected - sent against the client by the network system.

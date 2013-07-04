@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.persistence;
-
-import org.terasology.protobuf.EntityData;
+package org.terasology.persistence;
 
 /**
- * Serializes an entity system, with all prefabs and entities.
- *
- * @author Immortius <immortius@gmail.com>
+ * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
+ * it keeps track of their existence and the external references of each store, which can be invalidated.
+ * @author Immortius
  */
-public interface WorldSerializer {
+public interface StorageManager {
 
-    /**
-     * @return The serialized form of the current EntityManager's and PrefabManager's data
-     */
-    EntityData.World serializeWorld(boolean verbose);
+    PlayerStore createPlayerStoreForSave(String playerId);
 
-    /**
-     * Deserializes a world message, applying it to the current EntityManager
-     *
-     * @param world
-     */
-    void deserializeWorld(EntityData.World world);
-
+    PlayerStore loadStore(String playerId);
 }

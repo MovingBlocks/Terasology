@@ -17,8 +17,8 @@ package org.terasology.entitySystem;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullEntityRef;
-import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.persistence.EntitySerializer;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;

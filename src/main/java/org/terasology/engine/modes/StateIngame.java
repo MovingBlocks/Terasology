@@ -24,7 +24,7 @@ import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.event.EventSystem;
-import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.persistence.WorldPersister;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;

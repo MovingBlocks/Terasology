@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.testUtil.TeraAssert;

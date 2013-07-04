@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence.serializers;
 
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.internal.PojoPrefab;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

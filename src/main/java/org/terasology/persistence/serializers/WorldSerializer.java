@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.persistence.serializers;
 
-package org.terasology.entitySystem;
-
-import java.io.IOException;
-import java.util.Map;
+import org.terasology.protobuf.EntityData;
 
 /**
- * A store for entities. When added to the store, an entity is deactivated and removed from the entity system. Then
- * when restored, the entity is removed from the store, added too the entity system and reactivated.
+ * Serializes an entity system, with all prefabs and entities.
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public interface EntityStore {
-
-    void store(EntityRef entity);
-
-    void store(EntityRef entity, String name);
+public interface WorldSerializer {
 
     /**
-     * Restores all the stored entities
-     *
-     * @return A mapping of stored entities to names they were stored with.
-     * @throws IOException
+     * @return The serialized form of the current EntityManager's and PrefabManager's data
      */
-    public Map<String, EntityRef> restoreAll() throws IOException;
+    EntityData.World serializeWorld(boolean verbose);
+
+    /**
+     * Deserializes a world message, applying it to the current EntityManager
+     *
+     * @param world
+     */
+    void deserializeWorld(EntityData.World world);
 
 }

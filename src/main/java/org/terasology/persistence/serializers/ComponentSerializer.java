@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence.serializers;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;

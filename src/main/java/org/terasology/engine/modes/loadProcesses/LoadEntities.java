@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.persistence.WorldPersister;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;

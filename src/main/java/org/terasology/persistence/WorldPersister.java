@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import com.google.protobuf.TextFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.persistence.serializers.WorldSerializer;
+import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedReader;

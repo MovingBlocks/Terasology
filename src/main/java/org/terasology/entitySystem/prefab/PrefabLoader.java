@@ -19,8 +19,8 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.persistence.PrefabSerializer;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedReader;
