@@ -1,0 +1,9 @@
+{
+    "parent" : "engine:itemBase",
+    "Item" : {
+        "name" : "Screwdriver",
+        "icon" : "Axe",
+        "renderWithIcon" : true
+    },
+    "Screwdriver": {}
+}

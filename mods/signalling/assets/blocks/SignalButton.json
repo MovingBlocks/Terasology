@@ -1,0 +1,6 @@
+{
+    "displayName": "Signal Button",
+    "entity" : {
+        "prefab" : "signalling:SignalButton"
+    }
+}
