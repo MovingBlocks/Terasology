@@ -20,7 +20,7 @@ public class RenderingConfig {
     private float fieldOfView = 90;
     private boolean cameraBobbing = true;
     private boolean renderPlacingBox = true;
-    private int blurIntensity = 3;
+    private int blurIntensity = 2;
     private boolean reflectiveWater = false;
     private boolean vignette = true;
     private boolean motionBlur = false;
