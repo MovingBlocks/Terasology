@@ -1,0 +1,11 @@
+{
+    "displayName": "Signal OR Gate",
+    "rotation": "allSides",
+    "tiles": {
+        "all":"signalling:SignalOrGate",
+        "front":"signalling:SignalSwitch"
+    },
+    "entity" : {
+        "prefab" : "signalling:SignalOrGate"
+    }
+}
