@@ -32,7 +32,7 @@ public class SurvivalType extends BaseGameType{
 
     @Override
     public String name() {
-        return "Survival";
+        return "Normal";
     }
 
     @Override
