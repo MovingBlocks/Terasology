@@ -5,6 +5,7 @@ import java.util.*;
 import com.google.common.collect.*;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
+import org.terasology.math.Vector3i;
 
 /**
  * Represents one network of nodes, where each nodes is somehow connected to another within the network.
@@ -33,6 +34,9 @@ public class SimpleNetwork implements Network {
     public static SimpleNetwork createDegenerateNetwork(
             NetworkNode networkNode1,
             NetworkNode networkNode2) {
+        if (!areNodesConnecting(networkNode1, networkNode2))
+            throw new IllegalArgumentException("These two nodes are not connected");
+
         SimpleNetwork network = new SimpleNetwork();
         network.leafNodes.put(networkNode1.location, networkNode1);
         network.leafNodes.put(networkNode2.location, networkNode2);
@@ -230,6 +234,10 @@ public class SimpleNetwork implements Network {
                 || (!hasNetworkingNode(to) && !hasLeafNode(to)))
             throw new IllegalArgumentException("Cannot test nodes not in network");
 
+        return isInDistanceInternal(distance, from, to, nodePair);
+    }
+
+    private boolean isInDistanceInternal(int distance, NetworkNode from, NetworkNode to, TwoNetworkNodes cachePairKey) {
         if (from.equals(to))
             return true;
 
@@ -251,7 +259,7 @@ public class SimpleNetwork implements Network {
 
             for (NetworkNode nodeToTest : networkingNodesToTest) {
                 if (SimpleNetwork.areNodesConnecting(nodeToTest, to)) {
-                    distanceCache.put(nodePair, distanceSearched);
+                    distanceCache.put(cachePairKey, distanceSearched);
                     return true;
                 }
                 visitedNodes.add(nodeToTest);
@@ -267,7 +275,48 @@ public class SimpleNetwork implements Network {
         return false;
     }
 
-//    public Map<Vector3i, Byte> getConnectedNodes(Vector3i location, byte connectionSides) {
+    @Override
+    public boolean isInDistanceWithSide(int distance, NetworkNode from, NetworkNode to, Side toSide) {
+        to = new NetworkNode(to.location.toVector3i(), toSide);
+        TwoNetworkNodes nodePair = new TwoNetworkNodes(from, to);
+        return isInDistanceInternal(distance, from, to, nodePair);
+    }
+
+    @Override
+    public byte getLeafSidesInNetwork(NetworkNode networkNode) {
+        if (!hasLeafNode(networkNode))
+            throw new IllegalArgumentException("Cannot test nodes not in network");
+
+        if (networkingNodes.size() == 0) {
+            // Degenerated network
+            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
+                Vector3i possibleLocation = networkNode.location.toVector3i();
+                possibleLocation.add(connectingOnSide.getVector3i());
+                for (NetworkNode node : leafNodes.get(new ImmutableBlockLocation(possibleLocation))) {
+                    if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
+                        return SideBitFlag.getSide(connectingOnSide);
+                    }
+                }
+            }
+
+            return 0;
+        } else {
+            byte result = 0;
+            for (Side connectingOnSide : SideBitFlag.getSides(networkNode.connectionSides)) {
+                Vector3i possibleLocation = networkNode.location.toVector3i();
+                possibleLocation.add(connectingOnSide.getVector3i());
+                for (NetworkNode node : networkingNodes.get(new ImmutableBlockLocation(possibleLocation))) {
+                    if (SideBitFlag.hasSide(node.connectionSides, connectingOnSide.reverse())) {
+                        result+=SideBitFlag.getSide(connectingOnSide);
+                    }
+                }
+            }
+
+            return result;
+        }
+    }
+
+    //    public Map<Vector3i, Byte> getConnectedNodes(Vector3i location, byte connectionSides) {
 //        Map<Vector3i, Byte> result = Maps.newHashMap();
 //        for (Direction connectingOnSide : DirectionsUtil.getDirections(connectionSides)) {
 //            final Vector3i possibleNodeLocation = new Vector3i(location);

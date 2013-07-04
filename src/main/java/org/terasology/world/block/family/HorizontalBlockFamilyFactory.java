@@ -27,12 +27,15 @@ import java.util.Map;
 
 @RegisterBlockFamilyFactory("horizontal")
 public class HorizontalBlockFamilyFactory implements BlockFamilyFactory {
+    protected Side getArchetypeSide() {
+        return Side.FRONT;
+    }
 
     @Override
     public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
         Map<Side, Block> blockMap = Maps.newHashMap();
         blockMap.putAll(blockBuilder.constructHorizontalRotatedBlocks(blockDefUri, blockDefinition));
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
+        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getArchetypeSide(), blockMap, blockDefinition.categories);
     }
 
 }

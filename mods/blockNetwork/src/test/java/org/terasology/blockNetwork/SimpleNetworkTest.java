@@ -52,6 +52,18 @@ public class SimpleNetworkTest {
     }
 
     @Test
+    public void cantAddNetworkingNodeToDegeneratedNetwork() {
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        assertFalse(network.canAddNetworkingNode(toNode(new Vector3i(0, 0, 2), allDirections)));
+    }
+
+    @Test
+    public void cantAddLeafNodeToDegeneratedNetwork() {
+        network = SimpleNetwork.createDegenerateNetwork(toNode(new Vector3i(0, 0, 1), allDirections), toNode(new Vector3i(0, 0, 0), allDirections));
+        assertFalse(network.canAddLeafNode(toNode(new Vector3i(0, 0, 2), allDirections)));
+    }
+
+    @Test
     public void addingNetworkingNodeToNetworkingNode() {
         network.addNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections));
 
@@ -144,13 +156,31 @@ public class SimpleNetworkTest {
 
     @Test
     public void distanceForTwoLeafNodesOnNetwork() {
+        NetworkNode firstLeaf = toNode(new Vector3i(0, 0, 0), allDirections);
+        NetworkNode secondLeaf = toNode(new Vector3i(0, 0, 2), allDirections);
         network.addNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections));
-        network.addLeafNode(toNode(new Vector3i(0, 0, 2), allDirections));
-        network.addLeafNode(toNode(new Vector3i(0, 0, 0), allDirections));
+        network.addLeafNode(secondLeaf);
+        network.addLeafNode(firstLeaf);
 
-        assertTrue(network.isInDistance(2, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 2), allDirections)));
-        assertFalse(network.isInDistance(1, toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 2), allDirections)));
-        assertEquals(2, network.getDistance(toNode(new Vector3i(0, 0, 0), allDirections), toNode(new Vector3i(0, 0, 2), allDirections)));
+        assertTrue(network.isInDistance(2, firstLeaf, secondLeaf));
+        assertFalse(network.isInDistance(1, firstLeaf, secondLeaf));
+        assertEquals(2, network.getDistance(firstLeaf, secondLeaf));
+    }
+
+    @Test
+    public void distanceFromDifferentSides() {
+        NetworkNode firstLeaf = toNode(new Vector3i(0, 0, 0), allDirections);
+        NetworkNode secondLeaf = toNode(new Vector3i(0, 0, 2), allDirections);
+        network.addNetworkingNode(toNode(new Vector3i(0, 0, 1), allDirections));
+        network.addNetworkingNode(toNode(new Vector3i(0, 1, 1), allDirections));
+        network.addNetworkingNode(toNode(new Vector3i(0, 1, 2), allDirections));
+        network.addLeafNode(secondLeaf);
+        network.addLeafNode(firstLeaf);
+
+        assertTrue(network.isInDistanceWithSide(2, firstLeaf, secondLeaf, Side.FRONT));
+        assertFalse(network.isInDistanceWithSide(2, firstLeaf, secondLeaf, Side.TOP));
+        assertFalse(network.isInDistanceWithSide(3, firstLeaf, secondLeaf, Side.TOP));
+        assertTrue(network.isInDistanceWithSide(4, firstLeaf, secondLeaf, Side.TOP));
     }
 
     @Test

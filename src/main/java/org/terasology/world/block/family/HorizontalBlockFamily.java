@@ -31,9 +31,10 @@ import java.util.Map;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class HorizontalBlockFamily extends AbstractBlockFamily {
+public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
 
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
+    private Side archetypeSide;
 
     /**
      * @param uri        The asset uri for the block group.
@@ -41,7 +42,12 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
      * @param categories The set of categories this block family belongs to
      */
     public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
+            this(uri, Side.FRONT, blocks, categories);
+    }
+
+    public HorizontalBlockFamily(BlockUri uri, Side archetypeSide, Map<Side, Block> blocks, Iterable<String> categories) {
         super(uri, categories);
+        this.archetypeSide = archetypeSide;
         for (Side side : Side.horizontalSides()) {
             Block block = blocks.get(side);
             if (block == null) {
@@ -69,7 +75,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
 
     @Override
     public Block getArchetypeBlock() {
-        return blocks.get(Side.FRONT);
+        return blocks.get(archetypeSide);
     }
 
     @Override
@@ -88,5 +94,19 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     @Override
     public Iterable<Block> getBlocks() {
         return blocks.values();
+    }
+
+    @Override
+    public Block getBlockForSide(Side side) {
+        return blocks.get(side);
+    }
+
+    @Override
+    public Side getBlockSide(Block block) {
+        for (Map.Entry<Side, Block> sideBlock: blocks.entrySet()){
+            if (sideBlock.getValue() == block)
+                return sideBlock.getKey();
+        }
+        return null;
     }
 }
