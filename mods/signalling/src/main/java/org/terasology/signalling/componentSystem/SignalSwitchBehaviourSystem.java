@@ -46,6 +46,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     public static final int GATE_MINIMUM_SIGNAL_CHANGE_INTERVAL = 500;
     public static final int NOT_LOADED_BLOCK_RETRY_DELAY = 500;
+    public static final int BUTTON_PRESS_TIME = 500;
 
     @In
     private Time time;
@@ -67,6 +68,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     private Block signalPressurePlate;
     private Block signalSwitch;
     private Block signalLimitedSwitch;
+    private Block signalButton;
 
     private BlockFamily signalOrGate;
     private BlockFamily signalAndGate;
@@ -133,6 +135,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
                     if (processOutputForSetResetGate(blockEntity)) {
                         gateLastSignalChangeTime.put(new ImmutableBlockLocation(actionLocation), worldTime);
                     }
+                } else if (block == signalButton) {
+                    stopProducingSignal(blockEntity);
                 }
 
                 blockEntity.removeComponent(SignalDelayedActionComponent.class);
@@ -229,6 +233,7 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
         signalPressurePlate = blockManager.getBlock("signalling:SignalPressurePlate");
         signalSwitch = blockManager.getBlock("signalling:SignalSwitch");
         signalLimitedSwitch = blockManager.getBlock("signalling:SignalLimitedSwitch");
+        signalButton = blockManager.getBlock("signalling:SignalButton");
 
         signalOrGate = blockManager.getBlockFamily("signalling:SignalOrGate");
         signalAndGate = blockManager.getBlockFamily("signalling:SignalAndGate");
@@ -249,7 +254,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = {BlockComponent.class, SignalTimeDelayComponent.class})
     public void configureTimeDelay(SetSignalDelayEvent event, EntityRef entity) {
         SignalTimeDelayComponent timeDelayComponent = entity.getComponent(SignalTimeDelayComponent.class);
-        timeDelayComponent.delaySetting = event.getTime();
+        timeDelayComponent.delaySetting = Math.min(500, event.getTime());
+
         entity.saveComponent(timeDelayComponent);
         if (timeDelayComponent.delaySetting == 1000 && entity.hasComponent(SignalTimeDelayModifiedComponent.class)) {
             entity.removeComponent(SignalTimeDelayModifiedComponent.class);
@@ -269,6 +275,8 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             signalSwitchActivated(entity, producerComponent);
         } else if (blockAtLocation == signalLimitedSwitch) {
             signalLimitedSwitchActivated(entity, producerComponent);
+        } else if (blockAtLocation == signalButton) {
+            signalButtonActivated(entity, producerComponent);
         }
     }
 
@@ -278,6 +286,18 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
 
     private void signalSwitchActivated(EntityRef entity, SignalProducerComponent producerComponent) {
         switchFlipped(-1, entity, producerComponent);
+    }
+
+    private void signalButtonActivated(EntityRef block, SignalProducerComponent producerComponent) {
+        if (block.hasComponent(SignalDelayedActionComponent.class)) {
+            block.removeComponent(SignalDelayedActionComponent.class);
+        }
+
+        SignalDelayedActionComponent actionComponent = new SignalDelayedActionComponent();
+        actionComponent.executeTime = time.getGameTimeInMs() + BUTTON_PRESS_TIME;
+        block.addComponent(actionComponent);
+
+        startProducingSignal(block, -1);
     }
 
     private void switchFlipped(int onSignalStrength, EntityRef entity, SignalProducerComponent producerComponent) {
