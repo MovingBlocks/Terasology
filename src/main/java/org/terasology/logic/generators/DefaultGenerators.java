@@ -69,7 +69,7 @@ public class DefaultGenerators {
         TreeGenerator redTree = new TreeGeneratorLSystem("FFFFFAFAFAF", rules, probs, 4, 40).setLeafType(blockManager.getBlock("engine:RedLeaf")).setBarkType(blockManager.getBlock("engine:OakTrunk")).setGenerationProbability(0.05f);
 
         // Cactus
-        TreeGenerator cactus = new TreeGeneratorCactus().setBarkType(blockManager.getBlock("engine:Cactus")).setGenerationProbability(0.05f);
+        TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("engine:Cactus")).setGenerationProbability(0.05f);
 
         // Add the trees to the generator lists
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);

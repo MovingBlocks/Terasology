@@ -47,6 +47,4 @@ public abstract class TreeGenerator {
         this.generationProbability = genProbability;
         return this;
     }
-
-    public abstract TreeGenerator setBarkType(Block b);
 }

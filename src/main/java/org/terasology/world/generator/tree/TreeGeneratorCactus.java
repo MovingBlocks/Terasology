@@ -37,8 +37,7 @@ public class TreeGeneratorCactus extends TreeGenerator {
         }
     }
 
-    @Override
-    public TreeGenerator setBarkType(Block b) {
+    public TreeGenerator setTrunkType(Block b) {
         cactus = b;
         return this;
     }

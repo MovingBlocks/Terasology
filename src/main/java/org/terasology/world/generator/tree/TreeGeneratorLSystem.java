@@ -182,13 +182,13 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         }
     }
 
-    public TreeGenerator setLeafType(Block b) {
+    public TreeGeneratorLSystem setLeafType(Block b) {
         leafType = b;
         return this;
     }
 
 
-    public TreeGenerator setBarkType(Block b) {
+    public TreeGeneratorLSystem setBarkType(Block b) {
         barkType = b;
         return this;
     }
