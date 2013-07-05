@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;

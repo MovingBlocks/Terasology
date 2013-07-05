@@ -2,7 +2,6 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -11,29 +10,14 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Terasology;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
-import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.persistence.PrefabSerializer;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabLoader;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.protobuf.EntityData;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -1,10 +1,12 @@
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.persistence.serializers.WorldSerializer;
+import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;

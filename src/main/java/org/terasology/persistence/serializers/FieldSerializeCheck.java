@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence.serializers;
 
 import org.terasology.entitySystem.metadata.FieldMetadata;
 

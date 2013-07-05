@@ -1,16 +1,16 @@
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.engine.Terasology;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;

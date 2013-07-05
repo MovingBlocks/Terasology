@@ -1,4 +1,4 @@
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -12,6 +12,7 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence.serializers;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
@@ -25,13 +25,16 @@ import com.google.common.primitives.UnsignedBytes;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.EntityBuilder;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

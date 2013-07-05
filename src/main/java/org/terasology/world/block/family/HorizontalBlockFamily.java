@@ -100,13 +100,4 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
     public Block getBlockForSide(Side side) {
         return blocks.get(side);
     }
-
-    @Override
-    public Side getBlockSide(Block block) {
-        for (Map.Entry<Side, Block> sideBlock: blocks.entrySet()){
-            if (sideBlock.getValue() == block)
-                return sideBlock.getKey();
-        }
-        return null;
-    }
 }

@@ -22,6 +22,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.network.ClientComponent;
 import org.terasology.world.block.entity.BlockCommands;
 import org.terasology.logic.console.Command;
@@ -31,6 +32,7 @@ import org.terasology.logic.players.LocalPlayer;
 /**
  * @author Immortius
  */
+@RegisterSystem
 public class ItemCommands implements ComponentSystem {
 
     @In

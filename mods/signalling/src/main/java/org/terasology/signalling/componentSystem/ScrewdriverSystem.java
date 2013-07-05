@@ -56,7 +56,7 @@ public class ScrewdriverSystem implements ComponentSystem {
             if (blockFamily instanceof SideDefinedBlockFamily) {
                 final SideDefinedBlockFamily sideDefinedBlockFamily = (SideDefinedBlockFamily) blockFamily;
                 // Figure out the next block and side
-                Side newSide = sideDefinedBlockFamily.getBlockSide(block);
+                Side newSide = block.getDirection();
                 Block blockForSide;
                 do {
                     newSide = sideOrder.get(newSide);

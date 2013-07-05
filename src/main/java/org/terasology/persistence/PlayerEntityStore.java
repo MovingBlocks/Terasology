@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import com.google.common.collect.Maps;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EntityStore;
 import org.terasology.entitySystem.OwnershipHelper;
 import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.persistence.serializers.EntitySerializer;
+import org.terasology.persistence.serializers.FieldSerializeCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 

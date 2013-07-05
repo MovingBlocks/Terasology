@@ -116,11 +116,12 @@ public class UIMenuSingleplayer extends UIWindow {
                 }
 
                 try {
-                    WorldInfo worldInfo = (WorldInfo) list.getSelection().getValue();
-                    File world = PathManager.getInstance().getSavePath(worldInfo.getTitle());
+                    GameManifest gameManifest = (GameManifest) list.getSelection().getValue();
+                    File world = PathManager.getInstance().getSavePath(gameManifest.getTitle());
                     WorldUtil.deleteWorld(world);
                     list.removeItem(list.getSelectionIndex());
                 } catch (Exception e) {
+                    logger.error("Failed to delete world", e);
                     getGUIManager().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
             }

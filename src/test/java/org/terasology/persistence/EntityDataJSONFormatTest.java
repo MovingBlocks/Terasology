@@ -1,4 +1,4 @@
-package org.terasology.entitySystem.persistence;
+package org.terasology.persistence;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.protobuf.EntityData;
 
 import com.google.common.collect.Lists;

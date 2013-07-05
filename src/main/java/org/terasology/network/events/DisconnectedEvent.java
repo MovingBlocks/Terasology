@@ -16,9 +16,8 @@
 
 package org.terasology.network.events;
 
-import org.terasology.entitySystem.EntityStore;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.persistence.PlayerEntityStore;
+import org.terasology.persistence.PlayerEntityStore;
 
 /**
  * Event notifying of a client disconnecting.

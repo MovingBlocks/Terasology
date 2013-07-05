@@ -47,15 +47,6 @@ public class AllSidesFamily extends AbstractBlockFamily implements SideDefinedBl
     }
 
     @Override
-    public Side getBlockSide(Block block) {
-        for (Map.Entry<Side, Block> blockBySide : sideBlocks.entrySet()){
-            if (blockBySide.getValue() == block)
-                return blockBySide.getKey();
-        }
-        return null;
-    }
-
-    @Override
     public Block getBlockForSide(Side side) {
         return sideBlocks.get(side);
     }
