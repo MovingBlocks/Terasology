@@ -30,10 +30,6 @@ public class TreeGeneratorCactus extends TreeGenerator {
 
     private Block cactus;
 
-    public TreeGeneratorCactus() {
-        cactus = CoreRegistry.get(BlockManager.class).getBlock("engine:Cactus");
-    }
-
     @Override
     public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
         for (int y = posY; y < posY + 3; y++) {
@@ -43,6 +39,7 @@ public class TreeGeneratorCactus extends TreeGenerator {
 
     @Override
     public TreeGenerator setBarkType(Block b) {
+        cactus = b;
         return this;
     }
 }

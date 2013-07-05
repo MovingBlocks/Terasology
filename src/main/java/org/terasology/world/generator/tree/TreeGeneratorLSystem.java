@@ -61,9 +61,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         angleInDegree = angle;
         this.iterations = iterations;
         air = BlockManager.getAir();
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        leafType = blockManager.getBlock("engine:GreenLeaf");
-        barkType = blockManager.getBlock("engine:OakTrunk");
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
