@@ -34,6 +34,7 @@ import java.util.Map;
 public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
 
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
+    private Side archetypeSide;
 
     /**
      * @param uri        The asset uri for the block group.
@@ -41,7 +42,12 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
      * @param categories The set of categories this block family belongs to
      */
     public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
+            this(uri, Side.FRONT, blocks, categories);
+    }
+
+    public HorizontalBlockFamily(BlockUri uri, Side archetypeSide, Map<Side, Block> blocks, Iterable<String> categories) {
         super(uri, categories);
+        this.archetypeSide = archetypeSide;
         for (Side side : Side.horizontalSides()) {
             Block block = blocks.get(side);
             if (block == null) {
@@ -69,7 +75,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
 
     @Override
     public Block getArchetypeBlock() {
-        return blocks.get(Side.FRONT);
+        return blocks.get(archetypeSide);
     }
 
     @Override

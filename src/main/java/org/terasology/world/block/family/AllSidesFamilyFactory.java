@@ -24,8 +24,4 @@ public class AllSidesFamilyFactory implements BlockFamilyFactory {
         blocksBySide.put(Side.BOTTOM, blockBuilder.constructTransformedBlock(blockDefUri, blockDefinition, Rotation.rotate(Pitch.CLOCKWISE_270)));
         return new AllSidesFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockDefinition.categories, blocksBySide.get(Side.LEFT), blocksBySide);
     }
-
-    public static void main(String[]  args) {
-        System.out.println(Rotation.rotate(Pitch.CLOCKWISE_270).rotate(Side.FRONT));
-    }
 }
