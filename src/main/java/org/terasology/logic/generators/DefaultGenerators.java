@@ -26,6 +26,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.generator.core.ForestGenerator;
 import org.terasology.world.generator.tree.TreeGenerator;
+import org.terasology.world.generator.tree.TreeGeneratorAdvancedLSystem;
 import org.terasology.world.generator.tree.TreeGeneratorCactus;
 import org.terasology.world.generator.tree.TreeGeneratorLSystem;
 
@@ -70,6 +71,12 @@ public class DefaultGenerators {
 
         // Cactus
         TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("engine:Cactus")).setGenerationProbability(0.05f);
+
+        // Example tree growing in the new structure
+//b - Bb (0.7), b[&b] (0.2)
+//B - TB (0.1), B[&b] (0.3), BB (0.1)
+//T - TT (0.3)
+//s - b
 
         // Add the trees to the generator lists
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
