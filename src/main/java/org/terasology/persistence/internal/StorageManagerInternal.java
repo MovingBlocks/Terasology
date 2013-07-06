@@ -15,6 +15,8 @@
  */
 package org.terasology.persistence.internal;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.iterator.TIntIterator;
@@ -24,11 +26,17 @@ import gnu.trove.set.TIntSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.serializers.EntitySerializer;
+import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedInputStream;
@@ -38,6 +46,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -65,8 +75,15 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
     }
 
     @Override
-    public void loadGlobalEntities() {
-
+    public void loadGlobalEntities() throws IOException {
+        Path globalDataFile = PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE);
+        if (Files.isRegularFile(globalDataFile)) {
+            try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
+                EntityData.GlobalEntityStore store = EntityData.GlobalEntityStore.parseFrom(in);
+                GlobalStoreLoader loader = new GlobalStoreLoader(entityManager);
+                loader.load(store);
+            }
+        }
     }
 
     @Override
@@ -85,7 +102,7 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
         }
         playerStores.clear();
 
-        GlobalEntityStore globalStore = new GlobalEntityStore(entityManager);
+        GlobalStoreSaver globalStore = new GlobalStoreSaver(entityManager);
         for (EntityRef entity : entityManager.getAllEntities()) {
             globalStore.store(entity);
         }

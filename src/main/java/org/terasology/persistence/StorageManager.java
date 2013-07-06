@@ -30,5 +30,5 @@ public interface StorageManager {
 
     void flush() throws IOException;
 
-    void loadGlobalEntities();
+    void loadGlobalEntities() throws IOException;
 }

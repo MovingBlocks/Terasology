@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-class GlobalEntityStore {
+class GlobalStoreSaver {
 
     private EngineEntityManager entityManager;
     private EntityData.GlobalEntityStore.Builder store;
@@ -27,7 +27,7 @@ class GlobalEntityStore {
 
     private TIntSet nonPersistentIds = new TIntHashSet();
 
-    public GlobalEntityStore(EngineEntityManager entityManager) {
+    public GlobalStoreSaver(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         this.store = EntityData.GlobalEntityStore.newBuilder();
         this.entitySerializer = new EntitySerializer(entityManager);
