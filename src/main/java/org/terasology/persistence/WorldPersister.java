@@ -16,24 +16,23 @@
 package org.terasology.persistence;
 
 import com.google.protobuf.TextFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -100,7 +99,6 @@ public class WorldPersister {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(WorldPersister.class);
     private EngineEntityManager entityManager;
     private WorldSerializer persisterHelper;
 
@@ -109,26 +107,24 @@ public class WorldPersister {
         this.persisterHelper = new WorldSerializerImpl(entityManager);
     }
 
-    public void save(File file, SaveFormat format) throws IOException {
+    public void save(Path file, SaveFormat format) throws IOException {
         final EntityData.World world = persisterHelper.serializeWorld(format.isVerbose());
 
-        File parentFile = file.getParentFile();
-        if (parentFile != null && !parentFile.exists()) {
-            if (!parentFile.mkdirs()) {
-                logger.error("Failed to create world save directory {}", parentFile);
-            }
+        Path parentFile = file.getParent();
+        if (!Files.isDirectory(parentFile)) {
+            Files.createDirectories(parentFile);
         }
 
-        try (FileOutputStream out = new FileOutputStream(file)) {
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(file))) {
             format.save(out, world);
         }
     }
 
-    public void load(File file, SaveFormat format) throws IOException {
+    public void load(Path file, SaveFormat format) throws IOException {
         entityManager.clear();
 
-        EntityData.World world = null;
-        try (FileInputStream in = new FileInputStream(file)) {
+        EntityData.World world;
+        try (InputStream in = new BufferedInputStream(Files.newInputStream(file))) {
             world = format.load(in);
         }
 

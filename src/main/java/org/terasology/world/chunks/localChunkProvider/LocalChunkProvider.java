@@ -39,7 +39,6 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.ChunkView;
 import org.terasology.world.RegionalChunkView;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.OnActivatedBlocks;
@@ -63,10 +62,10 @@ import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -454,17 +453,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         nearCache.clear();
 
         farStore.dispose();
-        String title = CoreRegistry.get(WorldProvider.class).getTitle();
-        File chunkFile = new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.WORLD_DATA_FILE);
-        try {
-            FileOutputStream fileOut = new FileOutputStream(chunkFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fileOut);
-            ObjectOutputStream out = new ObjectOutputStream(bos);
+        Path chunkFile = PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.WORLD_DATA_FILE);
+        try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkFile)); ObjectOutputStream out = new ObjectOutputStream(bos)) {
             out.writeObject(farStore);
-            out.close();
-            bos.flush();
-            bos.close();
-            fileOut.close();
         } catch (IOException e) {
             logger.error("Error saving chunks", e);
         }

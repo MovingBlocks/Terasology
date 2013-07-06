@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -31,18 +32,21 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.world.WorldInfo;
-import org.terasology.world.WorldUtil;
+import org.terasology.utilities.FilesUtil;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Select world menu screen.
@@ -111,18 +115,18 @@ public class UIMenuSingleplayer extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 if (list.getSelection() == null) {
-                    getGUIManager().showMessage("Error", "Please choose a world first.");
+                    getGUIManager().showMessage("Error", "Please choose a saved game first.");
                     return;
                 }
 
                 try {
                     GameManifest gameManifest = (GameManifest) list.getSelection().getValue();
-                    File world = PathManager.getInstance().getSavePath(gameManifest.getTitle());
-                    WorldUtil.deleteWorld(world);
+                    Path world = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+                    FilesUtil.recursiveDelete(world);
                     list.removeItem(list.getSelectionIndex());
                 } catch (Exception e) {
-                    logger.error("Failed to delete world", e);
-                    getGUIManager().showMessage("Error", "Failed deleting world data object. Sorry.");
+                    logger.error("Failed to delete saved game", e);
+                    getGUIManager().showMessage("Error", "Failed to remove saved game - sorry.");
                 }
             }
         });
@@ -172,47 +176,52 @@ public class UIMenuSingleplayer extends UIWindow {
             config.getWorldGeneration().setWorldTitle(info.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
         } catch (Exception e) {
-            getGUIManager().showMessage("Error", "Failed reading world data object. Sorry.");
+            getGUIManager().showMessage("Error", "Failed reading saved game. Sorry.");
         }
     }
 
     public void fillList() {
         list.removeAll();
-        File worldCatalog = PathManager.getInstance().getSavesPath();
 
-        File[] listFiles = worldCatalog.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
+        Path savedGames = PathManager.getInstance().getSavesPath();
+        List<Path> savedGamePaths = Lists.newArrayList();
+        try (DirectoryStream<Path> stream =
+                     Files.newDirectoryStream(savedGames)) {
+            for (Path entry : stream) {
+                if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
+                    savedGamePaths.add(entry);
+                }
             }
-        });
+        } catch (IOException e) {
+            logger.error("Failed to read saved games path", e);
+        }
 
         //TODO type safety!
-        Arrays.sort(listFiles, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                if (((File) o1).isDirectory() && ((File) o2).isDirectory()) {
-                    File f1 = new File(((File) o1).getAbsolutePath(), "entity.dat");
-                    File f2 = new File(((File) o2).getAbsolutePath(), "entity.dat");
-                    if (f1.lastModified() > f2.lastModified()) {
-                        return -1;
-                    } else if (f1.lastModified() < f2.lastModified()) {
-                        return +1;
-                    }
+        Collections.sort(savedGamePaths, new Comparator<Path>() {
+            public int compare(Path o1, Path o2) {
+                Path f1 = o1.resolve(GameManifest.DEFAULT_FILE_NAME);
+                Path f2 = o2.resolve(GameManifest.DEFAULT_FILE_NAME);
+                try {
+                    FileTime f1Time = Files.getLastModifiedTime(f1);
+                    FileTime f2Time = Files.getLastModifiedTime(f2);
+                    return -f1Time.compareTo(f2Time);
+                } catch (IOException e) {
+                    logger.error("Failed to compare times for {} and {}", f1, f2, e);
                 }
-
                 return 0;
             }
         });
 
-        DateFormat date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
-        for (File file : listFiles) {
-            File gameManifest = new File(file, GameManifest.DEFAULT_FILE_NAME);
-            if (!gameManifest.exists())
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        for (Path savedGameDir : savedGamePaths) {
+            Path gameManifest = savedGameDir.resolve(GameManifest.DEFAULT_FILE_NAME);
+            if (!Files.isRegularFile(gameManifest))
                 continue;
             try {
                 GameManifest info = GameManifest.load(gameManifest);
                 if (!info.getTitle().isEmpty()) {
-                    UIListItem item = new UIListItem(info.getTitle() + "\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())), info);
+                    Date date = new Date(Files.getLastModifiedTime(gameManifest).toMillis());
+                    UIListItem item = new UIListItem(info.getTitle() + "\n" + dateFormat.format(date), info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }

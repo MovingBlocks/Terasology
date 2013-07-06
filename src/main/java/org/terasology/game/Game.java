@@ -52,7 +52,11 @@ public class Game {
     public void load(GameManifest manifest) {
         this.name = manifest.getTitle();
         this.seed = manifest.getSeed();
-        PathManager.getInstance().setCurrentSaveTitle(manifest.getTitle());
+        try {
+            PathManager.getInstance().setCurrentSaveTitle(manifest.getTitle());
+        } catch (IOException e) {
+            logger.error("Failed to set save path", e);
+        }
         time.setGameTime(manifest.getTime());
     }
 
@@ -76,7 +80,7 @@ public class Game {
         gameManifest.addWorldInfo(worldProvider.getWorldInfo());
 
         try {
-            GameManifest.save(new File(PathManager.getInstance().getCurrentSavePath(), GameManifest.DEFAULT_FILE_NAME), gameManifest);
+            GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);
         } catch (IOException e) {
             logger.error("Failed to save world manifest", e);
         }

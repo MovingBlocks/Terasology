@@ -20,6 +20,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
@@ -52,10 +53,17 @@ public class OpenGLMaterial extends AbstractAsset<MaterialData> implements Mater
 
     @Override
     public void dispose() {
+        Util.checkGLError();
         if (shaderProgram != 0) {
-            GL20.glDeleteShader(shaderProgram);
+            Material activeMaterial = ShaderManager.getInstance().getActiveMaterial();
+            if (activeMaterial == this) {
+                ShaderManager.getInstance().enableDefault();
+            }
+            // TODO: Delete shader (seems to crash at the moment)
+            //GL20.glDeleteShader(shaderProgram);
             shaderProgram = 0;
         }
+        Util.checkGLError();
     }
 
     @Override

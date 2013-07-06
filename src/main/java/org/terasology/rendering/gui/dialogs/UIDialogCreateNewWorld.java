@@ -48,7 +48,7 @@ import org.terasology.world.time.WorldTime;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
-import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -180,7 +180,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     getGUIManager().showMessage("Error", "Please enter a world name");
 
                     return;
-                } else if ((new File(PathManager.getInstance().getSavePath(inputWorldTitle.getText()), GameManifest.DEFAULT_FILE_NAME)).exists()) {
+                } else if (Files.isRegularFile(PathManager.getInstance().getSavePath(inputWorldTitle.getText()).resolve(GameManifest.DEFAULT_FILE_NAME))) {
                     getGUIManager().showMessage("Error", "A World with this name already exists");
 
                     return;

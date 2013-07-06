@@ -21,9 +21,12 @@ import org.lwjgl.LWJGLUtil;
 import org.terasology.engine.paths.windows.SavedGamesPathFinder;
 
 import javax.swing.*;
-import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -40,25 +43,24 @@ public final class PathManager {
     private static final String NATIVES_DIR = "natives";
 
     private static PathManager instance;
-    private File installPath;
-    private File homePath;
-    private File savesPath;
-    private File logPath;
-    private File homeModPath;
-    private File installModPath;
-    private File currentWorldPath;
+    private Path installPath;
+    private Path homePath;
+    private Path savesPath;
+    private Path logPath;
+    private Path currentWorldPath;
 
-    private ImmutableList<File> modPaths = ImmutableList.of();
-    private File screenshotPath;
-    private File nativesPath;
+    private ImmutableList<Path> modPaths = ImmutableList.of();
+    private Path screenshotPath;
+    private Path nativesPath;
 
     private PathManager() {
         // By default, the path should be the code location (where terasology.jar is)
         try {
-            URL path = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
-            File codeLocation = new File(path.toURI());
-            if (codeLocation.isFile()) {
-                installPath = codeLocation.getParentFile();
+            URL urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
+
+            Path codeLocation = Paths.get(urlToSource.toURI());
+            if (Files.isRegularFile(codeLocation)) {
+                installPath = codeLocation.getParent();
             }
         } catch (URISyntaxException e) {
             // Can't use logger, because logger not set up when PathManager is used.
@@ -66,7 +68,7 @@ public final class PathManager {
         }
         // If terasology.jar's location could not be resolved (maybe running from an IDE) then fallback on working path
         if (installPath == null) {
-            installPath = new File("").getAbsoluteFile();
+            installPath = Paths.get("");
         }
         homePath = installPath;
     }
@@ -78,104 +80,104 @@ public final class PathManager {
         return instance;
     }
 
-    public void useOverrideHomePath(File rootPath) {
+    public void useOverrideHomePath(Path rootPath) throws IOException {
         this.homePath = rootPath;
         updateDirs();
     }
 
-    public void useDefaultHomePath() {
+    public void useDefaultHomePath() throws IOException {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
-                homePath = new File(new File(System.getProperty("user.home")), TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_MACOSX:
-                homePath = new File(new File(System.getProperty("user.home")), "Library/Application Support/" + TERASOLOGY_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
                 String savedGamesPath = SavedGamesPathFinder.findSavedGamesPath();
                 if (savedGamesPath == null) {
                     savedGamesPath = SavedGamesPathFinder.findDocumentsPath();
                 }
-                File rawPath;
+                Path rawPath;
                 if (savedGamesPath != null) {
-                    rawPath = new File(savedGamesPath);
+                    rawPath = Paths.get(savedGamesPath);
                 } else {
-                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory();
+                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toPath();
                 }
-                homePath = new File(rawPath, TERASOLOGY_FOLDER_NAME);
+                homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
                 break;
             default:
-                homePath = new File(new File(System.getProperty("user.home")), TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
                 break;
         }
         updateDirs();
     }
 
-    public File getCurrentSavePath() {
+    public Path getCurrentSavePath() {
         return currentWorldPath;
     }
 
-    public void setCurrentSaveTitle(String worldTitle) {
+    public void setCurrentSaveTitle(String worldTitle) throws IOException {
         currentWorldPath = getSavePath(worldTitle);
-        currentWorldPath.mkdirs();
+        Files.createDirectories(currentWorldPath);
     }
 
-    public File getHomePath() {
+    public Path getHomePath() {
         return homePath;
     }
 
-    public File getInstallPath() {
+    public Path getInstallPath() {
         return installPath;
     }
 
-    public File getSavesPath() {
+    public Path getSavesPath() {
         return savesPath;
     }
 
-    public File getLogPath() {
+    public Path getLogPath() {
         return logPath;
     }
 
-    public List<File> getModPaths() {
+    public List<Path> getModPaths() {
         return modPaths;
     }
 
-    public File getScreenshotPath() {
+    public Path getScreenshotPath() {
         return screenshotPath;
     }
 
-    public File getNativesPath() {
+    public Path getNativesPath() {
         return nativesPath;
     }
 
-    private void updateDirs() {
-        homePath.mkdirs();
-        savesPath = new File(homePath, SAVED_GAMES_DIR);
-        savesPath.mkdirs();
-        logPath = new File(homePath, LOG_DIR);
-        logPath.mkdirs();
-        homeModPath = new File(homePath, MOD_DIR);
-        homeModPath.mkdirs();
-        installModPath = new File(installPath, MOD_DIR);
-        installModPath.mkdirs();
-        if (homeModPath.equals(installModPath)) {
+    private void updateDirs() throws IOException {
+        Files.createDirectories(homePath);
+        savesPath = homePath.resolve(SAVED_GAMES_DIR);
+        Files.createDirectories(savesPath);
+        logPath = homePath.resolve(LOG_DIR);
+        Files.createDirectories(logPath);
+        Path homeModPath = homePath.resolve(MOD_DIR);
+        Files.createDirectories(homeModPath);
+        Path installModPath = installPath.resolve(MOD_DIR);
+        Files.createDirectories(installModPath);
+        if (Files.isSameFile(homeModPath, installModPath)) {
             modPaths = ImmutableList.of(homeModPath);
         } else {
             modPaths = ImmutableList.of(homeModPath, installModPath);
         }
-        screenshotPath = new File(homePath, SCREENSHOT_DIR);
-        screenshotPath.mkdirs();
-        nativesPath = new File(installPath, NATIVES_DIR);
+        screenshotPath = homePath.resolve(SCREENSHOT_DIR);
+        Files.createDirectories(screenshotPath);
+        nativesPath = installPath.resolve(NATIVES_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }
     }
 
-    public File getHomeModPath() {
+    public Path getHomeModPath() {
         return modPaths.get(0);
     }
 
-    public File getSavePath(String title) {
-        return new File(savesPath, title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+    public Path getSavePath(String title) {
+        return savesPath.resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
     }
 }

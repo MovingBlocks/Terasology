@@ -120,9 +120,15 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     public void preRender() {
         glEnableClientState(GL_VERTEX_ARRAY);
-        if (hasTexCoord0 || hasTexCoord1) glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        if (hasColor) glEnableClientState(GL_COLOR_ARRAY);
-        if (hasNormal) glEnableClientState(GL_NORMAL_ARRAY);
+        if (hasTexCoord0 || hasTexCoord1) {
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
+        if (hasColor) {
+            glEnableClientState(GL_COLOR_ARRAY);
+        }
+        if (hasNormal) {
+            glEnableClientState(GL_NORMAL_ARRAY);
+        }
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboVertexBuffer);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboIndexBuffer);
@@ -144,9 +150,15 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     public void postRender() {
-        if (hasNormal) glDisableClientState(GL_NORMAL_ARRAY);
-        if (hasColor) glDisableClientState(GL_COLOR_ARRAY);
-        if (hasTexCoord0 || hasTexCoord1) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (hasNormal) {
+            glDisableClientState(GL_NORMAL_ARRAY);
+        }
+        if (hasColor) {
+            glDisableClientState(GL_COLOR_ARRAY);
+        }
+        if (hasTexCoord0 || hasTexCoord1) {
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
         glDisableClientState(GL_VERTEX_ARRAY);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);

@@ -20,8 +20,10 @@ import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
-import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.List;
 
@@ -40,11 +42,11 @@ public class ClasspathSource implements AssetSource {
         URL url = cs.getLocation();
 
         try {
-            File codePath = new File(url.toURI());
-            if (codePath.isFile()) {
-                source = new ArchiveSource(id, codePath, baseAssetsPath, baseOverridesPath);
+            Path codePath = Paths.get(url.toURI());
+            if (Files.isRegularFile(codePath)) {
+                source = new ArchiveSource(id, codePath.toFile(), baseAssetsPath, baseOverridesPath);
             } else {
-                source = new DirectorySource(id, new File(codePath, baseAssetsPath), new File(codePath, baseOverridesPath));
+                source = new DirectorySource(id, codePath.resolve(baseAssetsPath), codePath.resolve(baseOverridesPath));
             }
         } catch (Throwable e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);

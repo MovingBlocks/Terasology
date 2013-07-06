@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,13 +36,13 @@ public final class NativeHelper {
     private NativeHelper() {
     }
 
-    public static void addLibraryPath(File libPath) {
+    public static void addLibraryPath(Path libPath) {
         try {
             String envPath = System.getProperty("java.library.path");
             if (envPath == null || envPath.isEmpty()) {
-                System.setProperty("java.library.path", libPath.getAbsolutePath());
+                System.setProperty("java.library.path", libPath.toAbsolutePath().toString());
             } else {
-                System.setProperty("java.library.path", envPath + File.pathSeparator + libPath.getAbsolutePath());
+                System.setProperty("java.library.path", envPath + File.pathSeparator + libPath.toAbsolutePath().toString());
             }
 
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
@@ -49,11 +50,11 @@ public final class NativeHelper {
 
             List<String> paths = new ArrayList<String>(Arrays.asList((String[]) usrPathsField.get(null)));
 
-            if (paths.contains(libPath.getAbsolutePath())) {
+            if (paths.contains(libPath.toAbsolutePath().toString())) {
                 return;
             }
 
-            paths.add(0, libPath.getAbsolutePath()); // Add to beginning, to override system libraries
+            paths.add(0, libPath.toAbsolutePath().toString()); // Add to beginning, to override system libraries
 
             usrPathsField.set(null, paths.toArray(new String[paths.size()]));
         } catch (Exception e) {

@@ -61,9 +61,13 @@ import org.terasology.world.chunks.ChunkProvider;
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
@@ -891,7 +895,7 @@ public final class WorldRenderer {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
 
-                File file = new File(PathManager.getInstance().getScreenshotPath(), sdf.format(cal.getTime()) + ".png");
+                Path file = PathManager.getInstance().getScreenshotPath().resolve(sdf.format(cal.getTime()) + ".png");
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
                 for (int x = 0; x < width; x++)
@@ -903,8 +907,8 @@ public final class WorldRenderer {
                         image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
                     }
 
-                try {
-                    ImageIO.write(image, "png", file);
+                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(file))){
+                    ImageIO.write(image, "png", stream);
                 } catch (IOException e) {
                     logger.warn("Could not save screenshot!", e);
                 }

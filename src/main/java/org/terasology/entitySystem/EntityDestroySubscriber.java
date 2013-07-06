@@ -13,28 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world;
-
-import java.io.File;
+package org.terasology.entitySystem;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public final class WorldUtil {
+public interface EntityDestroySubscriber {
 
-    private WorldUtil() {
-    }
+    void onEntityDestroyed(int entityId);
 
-    public static void deleteWorld(File world) {
-        if (world.isDirectory()) {
-            String[] children = world.list();
-            for (String element : children) {
-                File f = new File(world, element);
-                deleteWorld(f);
-            }
-            world.delete();
-        } else {
-            world.delete();
-        }
-    }
 }

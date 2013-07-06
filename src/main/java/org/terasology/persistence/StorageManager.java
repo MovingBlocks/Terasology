@@ -25,4 +25,6 @@ public interface StorageManager {
     PlayerStore createPlayerStoreForSave(String playerId);
 
     PlayerStore loadStore(String playerId);
+
+    void flush();
 }

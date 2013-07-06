@@ -28,6 +28,8 @@ import org.terasology.engine.paths.PathManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Immortius
@@ -48,9 +50,8 @@ public class LoadEntities implements LoadProcess {
     public boolean step() {
         CoreRegistry.put(WorldPersister.class, new WorldPersister((EngineEntityManager)CoreRegistry.get(EntityManager.class)));
 
-        // TODO: Should probably not use the world title as a path?
-        File entityDataFile = new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.ENTITY_DATA_FILE);
-        if (entityDataFile.exists()) {
+        Path entityDataFile = PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.ENTITY_DATA_FILE);
+        if (Files.isRegularFile(entityDataFile)) {
             try {
                 CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {

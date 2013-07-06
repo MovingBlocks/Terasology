@@ -20,8 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Immortius
@@ -30,74 +32,61 @@ public class DirectorySource extends AbstractSource {
 
     private static final Logger logger = LoggerFactory.getLogger(DirectorySource.class);
 
-    public DirectorySource(String id, File rootAssetsDirectory, File rootOverridesDirectory) {
+    public DirectorySource(String id, Path rootAssetsDirectory, Path rootOverridesDirectory) {
         super(id);
 
-        assert rootAssetsDirectory.isDirectory();
-        assert rootOverridesDirectory.isDirectory();
-
         clear();
-        if (rootAssetsDirectory.exists() && rootAssetsDirectory.isDirectory()) {
-            scanAssets(rootAssetsDirectory, rootAssetsDirectory.getAbsolutePath());
+        if (Files.isDirectory(rootAssetsDirectory)) {
+            scanAssets(rootAssetsDirectory, rootAssetsDirectory);
         }
-        if (rootOverridesDirectory.exists() && rootOverridesDirectory.isDirectory()) {
-            scanOverrides(rootOverridesDirectory, rootOverridesDirectory.getAbsolutePath());
+        if (Files.isDirectory(rootOverridesDirectory)) {
+            scanOverrides(rootOverridesDirectory, rootOverridesDirectory);
         }
     }
 
-    private void scanOverrides(File overrideDirectory, String basePath) {
-        for (File child : overrideDirectory.listFiles()) {
-            if (child.isDirectory()) {
-                scanOverrides(child, basePath);
-            } else if (child.isFile()) {
-                String key = child.getAbsolutePath();
-                if (key.startsWith(basePath)) {
-                    key = key.substring(basePath.length() + 1);
-                    key = key.replace(File.separatorChar, '/');
-
-                    int separatorIndex = key.indexOf('/');
-                    if (separatorIndex == -1) {
-                        continue;
-                    }
-                    String moduleName = key.substring(0, separatorIndex);
-                    key = key.substring(separatorIndex + 1);
-
-                    AssetUri uri = getUri(moduleName, key);
+    private void scanOverrides(Path overrideDirectory, Path basePath) {
+        try {
+            for (Path child : Files.newDirectoryStream(overrideDirectory)) {
+                if (Files.isDirectory(child)) {
+                    scanOverrides(child, basePath);
+                } else if (Files.isRegularFile(child)) {
+                    Path relativePath = basePath.relativize(child);
+                    Path modulePath = relativePath.subpath(0, 1);
+                    AssetUri uri = getUri(modulePath.toString(), modulePath.relativize(child));
                     if (uri != null) {
                         try {
-                            addOverride(uri, child.toURI().toURL());
+                            addOverride(uri, child.toUri().toURL());
                         } catch (MalformedURLException e) {
-                            logger.warn("Failed to load override {}", key, e.getMessage());
+                            logger.warn("Failed to load override {}", child, e.getMessage());
                         }
                     }
                 }
             }
+        } catch (IOException e) {
+            logger.error("Failed to scan override path: {}", overrideDirectory, e);
         }
+
     }
 
-    private void scanAssets(File file, String basePath) {
-        for (File child : file.listFiles()) {
-            if (child.isDirectory()) {
-                scanAssets(child, basePath);
-            } else if (child.isFile()) {
-                String key = child.getAbsolutePath();
-
-                if (key.startsWith(basePath)) { //strip down basepath
-                    key = key.substring(basePath.length() + 1);
-                    key = key.replace(File.separatorChar, '/');
-
-                    AssetUri uri = getUri(key);
-
+    private void scanAssets(Path path, Path basePath) {
+        try {
+            for (Path child : Files.newDirectoryStream(path)) {
+                if (Files.isDirectory(child)) {
+                    scanAssets(child, basePath);
+                } else if (Files.isRegularFile(child)) {
+                    Path relativePath = basePath.relativize(child);
+                    AssetUri uri = getUri(relativePath);
                     if (uri != null) {
                         try {
-                            addItem(uri, child.toURI().toURL());
+                            addItem(uri, child.toUri().toURL());
                         } catch (MalformedURLException e) {
-                            logger.warn("Failed to load asset {}", key, e.getMessage());
+                            logger.warn("Failed to load asset {}", relativePath, e.getMessage());
                         }
                     }
                 }
             }
+        } catch (IOException e) {
+            logger.error("Failed to scan assets path: {}", path, e);
         }
-
     }
 }

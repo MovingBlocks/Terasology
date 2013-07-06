@@ -21,14 +21,16 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 
 import java.applet.Applet;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -43,7 +45,11 @@ public final class TerasologyApplet extends Applet {
     @Override
     public void init() {
         super.init();
-        PathManager.getInstance().useDefaultHomePath();
+        try {
+            PathManager.getInstance().useDefaultHomePath();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to start applet - could not obtain home path.", e);
+        }
         logger = LoggerFactory.getLogger(TerasologyApplet.class);
         obtainMods();
         startGame();
@@ -55,20 +61,27 @@ public final class TerasologyApplet extends Applet {
         for (String mod : mods) {
             try {
                 URL url = new URL(modsPath + mod);
-                ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-                FileOutputStream fos = new FileOutputStream(new File(PathManager.getInstance().getHomeModPath(), mod));
-                long readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
-                while (readBytes == 1 << 24) {
-                    readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+                try (ReadableByteChannel rbc = Channels.newChannel(url.openStream()); SeekableByteChannel writeChannel = Files.newByteChannel(PathManager.getInstance().getHomeModPath().resolve(mod), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);) {
+                    ByteBuffer buffer = ByteBuffer.allocateDirect(1 << 24);
+                    while (rbc.read(buffer) != -1) {
+                        buffer.flip();
+                        writeChannel.write(buffer);
+                        buffer.compact();
+                    }
+                    buffer.flip();
+                    while (buffer.hasRemaining()) {
+                        writeChannel.write(buffer);
+                    }
+                } catch (FileNotFoundException e) {
+                    logger.error("Unable to obtain mod '{}'", mod, e);
+                } catch (IOException e) {
+                    logger.error("Unable to obtain mod '{}'", mod, e);
                 }
-                fos.close();
             } catch (MalformedURLException e) {
                 logger.error("Unable to obtain mod '{}'", mod, e);
-            } catch (FileNotFoundException e) {
-                logger.error("Unable to obtain mod '{}'", mod, e);
-            } catch (IOException e) {
-                logger.error("Unable to obtain mod '{}'", mod, e);
             }
+
+
         }
     }
 

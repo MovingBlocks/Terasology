@@ -24,23 +24,24 @@ import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Immortius
  */
 public class Mod {
     private ModInfo modInfo;
-    private File modRoot;
+    private Path modRoot;
     private AssetSource modSource;
     private boolean enabled;
     private ClassLoader inactiveClassLoader;
     private ClassLoader activeClassLoader;
     private Reflections reflections;
 
-    public Mod(File modRoot, ModInfo info, AssetSource modSource) {
+    public Mod(Path modRoot, ModInfo info, AssetSource modSource) {
         if (info == null) {
             throw new IllegalArgumentException("Mod info must not be null");
         }
@@ -64,20 +65,21 @@ public class Mod {
         }
     }
 
-    public File getModRoot() {
+    public Path getModRoot() {
         return modRoot;
     }
 
     public URL getModClasspathUrl() {
         try {
-            if (modRoot.isDirectory()) {
-                File classesDir = new File(modRoot, "classes");
-                if (classesDir.exists() && classesDir.isDirectory()) {
-                    return classesDir.toURI().toURL();
+            if (Files.isDirectory(modRoot)) {
+                Path classesDir = modRoot.resolve("classes");
+                if (Files.isDirectory(classesDir)) {
+                    return classesDir.toUri().toURL();
                 }
-            } else {
-                if (modRoot.getAbsolutePath().endsWith(".jar")) {
-                    return modRoot.toURI().toURL();
+            } else if (Files.isRegularFile(modRoot)) {
+                String extension = com.google.common.io.Files.getFileExtension(modRoot.getFileName().toString());
+                if (extension.equals(".jar")) {
+                    return modRoot.toUri().toURL();
                 }
             }
         } catch (MalformedURLException e) {
