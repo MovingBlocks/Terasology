@@ -1,6 +1,7 @@
 package org.terasology.world.generator.tree;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.Rotation;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
@@ -26,7 +27,7 @@ import java.util.Stack;
 public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
     public final float MAX_ANGLE_OFFSET = (float) Math.PI / 36;
 
-    private Map<Character, Block> blockMap;
+    private Map<Character, AxionElementGeneration> blockMap;
     private String startingAxion;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
     private List<Block> blockPriorities;
@@ -34,7 +35,7 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
     private float angle;
 
     public TreeGeneratorAdvancedLSystem(String startingAxion, Map<Character, AxionElementReplacement> axionElementReplacements,
-                                        Map<Character, Block> blockMap, List<Block> blockPriorities, int generations, float angle) {
+                                        Map<Character, AxionElementGeneration> blockMap, List<Block> blockPriorities, int generations, float angle) {
         this.startingAxion = startingAxion;
         this.axionElementReplacements = axionElementReplacements;
         this.blockMap = blockMap;
@@ -62,10 +63,10 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
 
         Map<Vector3i, Block> treeInMemory = generateTreeFromAxiom(currentAxion, nextFloat(rand) * MAX_ANGLE_OFFSET);
 
-        for (Map.Entry<Vector3i, Block> blockAtPosition: treeInMemory.entrySet()){
+        for (Map.Entry<Vector3i, Block> blockAtPosition : treeInMemory.entrySet()) {
             final Vector3i position = blockAtPosition.getKey();
 
-            view.setBlock(posX+position.x, posY+position.y, posZ+position.z, blockAtPosition.getValue());
+            view.setBlock(posX + position.x, posY + position.y, posZ + position.z, blockAtPosition.getValue());
         }
     }
 
@@ -79,6 +80,8 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
         Matrix4f rotation = new Matrix4f();
         rotation.setIdentity();
 
+        Callback callback = new Callback(treeInMemory, position, rotation);
+
         for (char c : currentAxion.toCharArray()) {
             Matrix4f tempRotation = new Matrix4f();
             tempRotation.setIdentity();
@@ -89,27 +92,17 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
                     stackPosition.push(new Vector3f(position));
                     break;
                 case ']':
-                    rotation = stackOrientation.pop();
-                    position = stackPosition.pop();
+                    rotation.set(stackOrientation.pop());
+                    position.set(stackPosition.pop());
                     break;
-                case '+':
+                case '&':
                     tempRotation.setIdentity();
                     tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
-                case '-':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), angle + angleOffset));
-                    rotation.mul(tempRotation);
-                    break;
-                case '&':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), angle + angleOffset));
-                    rotation.mul(tempRotation);
-                    break;
                 case '^':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), angle + angleOffset));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), -(angle + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '*':
@@ -119,18 +112,14 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
                     break;
                 case '/':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), angle + angleOffset));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), -(angle + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 default:
-                    setBlock(treeInMemory, position, blockMap.get(c));
-
-                    // Tree grows up by default
-                    Vector3f dir = new Vector3f(0, 1, 0);
-                    rotation.transform(dir);
-
-                    position.add(dir);
-                    break;
+                    AxionElementGeneration axionElementGeneration = blockMap.get(c);
+                    if (axionElementGeneration != null) {
+                        axionElementGeneration.generate(callback, position, rotation);
+                    }
             }
         }
         return treeInMemory;
@@ -138,6 +127,7 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
 
     /**
      * Returns float in range of 0 <= result < 1
+     *
      * @param rand
      * @return
      */
@@ -147,14 +137,40 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
 
     private void setBlock(Map<Vector3i, Block> treeInMemory, Vector3f position, Block block) {
         Vector3i blockPosition = new Vector3i(position);
-        final Block blockAtPosition = treeInMemory.get(blockPosition);
-        if (blockAtPosition == block || hasBlockWithHigherPriority(block, blockAtPosition)) {
-            return;
+        if (blockPosition.y >= 0) {
+            final Block blockAtPosition = treeInMemory.get(blockPosition);
+            if (blockAtPosition == block || hasBlockWithHigherPriority(block, blockAtPosition)) {
+                return;
+            }
+            treeInMemory.put(blockPosition, block);
         }
-        treeInMemory.put(blockPosition, block);
     }
 
     private boolean hasBlockWithHigherPriority(Block block, Block blockAtPosition) {
         return blockAtPosition != null && blockPriorities.indexOf(blockAtPosition) < blockPriorities.indexOf(block);
+    }
+
+    private class Callback implements AxionElementGeneration.AxionElementGenerationCallback {
+        private Map<Vector3i, Block> treeInMemory;
+        private Vector3f position;
+        private Matrix4f rotation;
+
+        private Callback(Map<Vector3i, Block> treeInMemory, Vector3f position, Matrix4f rotation) {
+            this.treeInMemory = treeInMemory;
+            this.position = position;
+            this.rotation = rotation;
+        }
+
+        @Override
+        public void setBlock(Vector3f position, Block block) {
+            TreeGeneratorAdvancedLSystem.this.setBlock(treeInMemory, position, block);
+        }
+
+        @Override
+        public void advance(float distance) {
+            Vector3f dir = new Vector3f(0, distance, 0);
+            rotation.transform(dir);
+            position.add(dir);
+        }
     }
 }
