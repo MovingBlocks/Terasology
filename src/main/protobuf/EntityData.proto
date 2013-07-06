@@ -95,20 +95,31 @@ message PlayerEntityStore {
 
 message EntityStore {
     repeated Entity entity = 1;
-    repeated string entityName = 2;
     repeated string component_class = 3;
+
+    // These are paired, with entityNamed referencing entity id
+    repeated string entityName = 2;
+    repeated int32  entityNamed = 4 [packed = true];
 
     extensions 5000 to max;
 }
 
-message World {
+message EntityStoreReferenceSet {
+    optional string storeId = 1;
+    repeated int32 reference = 2 [packed=true];
+
+    extensions 5000 to max;
+}
+
+message GlobalEntityStore {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;
-    repeated PackedEntity packedEntity = 3;
+
     repeated string component_class = 15; // Table of component classes, the index of which corresponds to Component's type_index.
     optional int32 next_entity_id = 16;
     repeated int32 freed_entity_id = 17 [packed=true];
-    repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index;
+    repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index
+    repeated EntityStoreReferenceSet storeReferenceSet = 19;
 
     extensions 5000 to max;
 }

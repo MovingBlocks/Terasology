@@ -61,8 +61,8 @@ public class WorldSerializerImpl implements WorldSerializer {
     }
 
     @Override
-    public EntityData.World serializeWorld(boolean verbose) {
-        final EntityData.World.Builder world = EntityData.World.newBuilder();
+    public EntityData.GlobalEntityStore serializeWorld(boolean verbose) {
+        final EntityData.GlobalEntityStore.Builder world = EntityData.GlobalEntityStore.newBuilder();
 
         if (!verbose) {
             writeComponentTypeTable(world);
@@ -90,7 +90,7 @@ public class WorldSerializerImpl implements WorldSerializer {
 
 
     @Override
-    public void deserializeWorld(EntityData.World world) {
+    public void deserializeWorld(EntityData.GlobalEntityStore world) {
         entityManager.setNextId(world.getNextEntityId());
         for (Integer deadId : world.getFreedEntityIdList()) {
             entityManager.getFreedIds().add(deadId);
@@ -147,7 +147,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         prefabManager.registerPrefab(prefab);
     }
 
-    private void writeComponentTypeTable(EntityData.World.Builder world) {
+    private void writeComponentTypeTable(EntityData.GlobalEntityStore.Builder world) {
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (ClassMetadata<? extends Component> componentMetadata : componentLibrary) {
             int index = componentIdTable.size();
@@ -158,7 +158,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         prefabSerializer.setComponentIdMapping(componentIdTable);
     }
 
-    private void writeIdInfo(final EntityData.World.Builder world, TIntList nonPersistedIds) {
+    private void writeIdInfo(final EntityData.GlobalEntityStore.Builder world, TIntList nonPersistedIds) {
         world.setNextEntityId(entityManager.getNextId());
         entityManager.getFreedIds().forEach(new TIntProcedure() {
             public boolean execute(int i) {

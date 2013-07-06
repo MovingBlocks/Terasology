@@ -15,6 +15,8 @@
  */
 package org.terasology.persistence;
 
+import java.io.IOException;
+
 /**
  * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
  * it keeps track of their existence and the external references of each store, which can be invalidated.
@@ -24,7 +26,9 @@ public interface StorageManager {
 
     PlayerStore createPlayerStoreForSave(String playerId);
 
-    PlayerStore loadStore(String playerId);
+    PlayerStore loadPlayerStore(String playerId);
 
-    void flush();
+    void flush() throws IOException;
+
+    void loadGlobalEntities();
 }

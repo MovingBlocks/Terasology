@@ -15,16 +15,18 @@
  */
 package org.terasology.persistence;
 
+import com.google.common.collect.Lists;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
+import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkMode;
@@ -32,6 +34,17 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.internal.StorageManagerInternal;
 
 import javax.vecmath.Vector3f;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
@@ -39,13 +52,23 @@ import javax.vecmath.Vector3f;
 public class StorageManagerTest {
 
     public static final String PLAYER_ID = "someId";
+
+    private ModManager modManager;
+    private NetworkSystem networkSystem;
     private StorageManager esm;
     private EngineEntityManager entityManager;
 
     @Before
-    public void setup() {
-        ModManager modManager = new ModManager();
-        NetworkSystem networkSystem = mock(NetworkSystem.class);
+    public void setup() throws Exception {
+        JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
+        FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
+        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        PathManager.getInstance().setCurrentSaveTitle("testSave");
+
+        assert !Files.isRegularFile(vfs.getPath("global.dat"));
+
+        modManager = new ModManager();
+        networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = new EntitySystemBuilder().build(modManager, networkSystem);
         esm = new StorageManagerInternal(entityManager);
@@ -53,14 +76,14 @@ public class StorageManagerTest {
 
     @Test
     public void getUnstoredPlayerReturnsNothing() {
-        assertNull(esm.loadStore(PLAYER_ID));
+        assertNull(esm.loadPlayerStore(PLAYER_ID));
     }
 
     @Test
     public void storeAndRestorePlayerStore() {
         PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
         store.save();
-        PlayerStore restoredStore = esm.loadStore(PLAYER_ID);
+        PlayerStore restoredStore = esm.loadPlayerStore(PLAYER_ID);
         assertNotNull(restoredStore);
         assertFalse(restoredStore.hasCharacter());
         assertEquals(new Vector3f(), restoredStore.getRelevanceLocation());
@@ -68,13 +91,13 @@ public class StorageManagerTest {
 
     @Test
     public void playerRelevanceLocationSurvivesStorage() {
-        Vector3f loc = new Vector3f(1,2,3);
+        Vector3f loc = new Vector3f(1, 2, 3);
         PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
         store.setRelevanceLocation(loc);
         assertEquals(loc, store.getRelevanceLocation());
         store.save();
 
-        PlayerStore restored = esm.loadStore(PLAYER_ID);
+        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
         assertEquals(loc, restored.getRelevanceLocation());
     }
 
@@ -88,7 +111,7 @@ public class StorageManagerTest {
         assertEquals(character, store.getCharacter());
         store.save();
 
-        PlayerStore restored = esm.loadStore(PLAYER_ID);
+        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
         restored.restore();
         assertTrue(restored.hasCharacter());
         assertEquals(character, restored.getCharacter());
@@ -96,7 +119,7 @@ public class StorageManagerTest {
 
     @Test
     public void relevanceLocationSetToCharacterLocation() {
-        Vector3f loc = new Vector3f(1,2,3);
+        Vector3f loc = new Vector3f(1, 2, 3);
         EntityRef character = entityManager.create(new LocationComponent(loc));
         PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
         store.setCharacter(character);
@@ -123,9 +146,41 @@ public class StorageManagerTest {
         someEntity.destroy();
         entityManager.create(); // This causes the destroyed entity's id to be reused
 
-        PlayerStore restored = esm.loadStore(PLAYER_ID);
+        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
         restored.restore();
         assertFalse(character.getComponent(EntityRefComponent.class).entityRef.exists());
     }
+
+    @Test
+    public void canSaveAndRestoreStorage() throws Exception {
+        EntityRef character = entityManager.create();
+        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
+        store.setCharacter(character);
+        store.save();
+
+        esm.flush();
+
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        newSM.loadGlobalEntities();
+        assertNotNull(newSM.loadPlayerStore(PLAYER_ID));
+    }
+
+    @Test
+    public void globalEntitiesStoredAndRestored() throws Exception {
+        int entityId = entityManager.create(new StringComponent("Test")).getId();
+        esm.flush();
+
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        newSM.loadGlobalEntities();
+
+        List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
+        assertEquals(1, entities.size());
+        assertEquals(entityId, entities.get(0).getId());
+    }
+
+
+    // TODO: Store/restore validRefSets.
 
 }

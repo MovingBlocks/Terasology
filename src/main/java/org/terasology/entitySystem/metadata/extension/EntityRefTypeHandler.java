@@ -41,10 +41,9 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
     public EntityData.Value serialize(EntityRef value) {
         if (value.exists()) {
-            if (refInterceptor.get() != null) {
-                refInterceptor.get().savingRef(value.getId());
+            if (refInterceptor.get() == null || refInterceptor.get().savingRef(value)) {
+                return EntityData.Value.newBuilder().addInteger(value.getId()).build();
             }
-            return EntityData.Value.newBuilder().addInteger(value.getId()).build();
         }
         return null;
     }
@@ -68,10 +67,11 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
             if (!ref.exists()) {
                 result.addInteger(0);
             } else {
-                if (refInterceptor.get() != null) {
-                    refInterceptor.get().savingRef(ref.getId());
+                if (refInterceptor.get() == null || refInterceptor.get().savingRef(ref)) {
+                    result.addInteger((ref).getId());
+                } else {
+                    result.addInteger(0);
                 }
-                result.addInteger((ref).getId());
             }
         }
         return result.build();
@@ -97,9 +97,10 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         boolean loadingRef(int id);
 
         /**
-         * @param id The id of the ref being saved
+         * @param ref The entity ref being saved
+         * @return Whether to save this reference
          */
-        void savingRef(int id);
+        boolean savingRef(EntityRef ref);
 
     }
 

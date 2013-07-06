@@ -21,12 +21,23 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityDestroySubscriber;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.protobuf.EntityData;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +45,13 @@ import java.util.Map;
  * @author Immortius
  */
 public class StorageManagerInternal implements StorageManager, EntityDestroySubscriber {
+    private static final String PLAYERS_PATH = "players";
+    private static final String PLAYER_STORE_EXTENSION = ".player";
+    private static final String GLOBAL_ENTITY_STORE = "global.dat";
+
+    private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
+
+    private Path playersPath;
 
     private EngineEntityManager entityManager;
     private Map<String, EntityData.PlayerEntityStore> playerStores = Maps.newHashMap();
@@ -43,6 +61,12 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
     public StorageManagerInternal(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         entityManager.subscribe(this);
+        playersPath = PathManager.getInstance().getCurrentSavePath().resolve(PLAYERS_PATH);
+    }
+
+    @Override
+    public void loadGlobalEntities() {
+
     }
 
     @Override
@@ -51,12 +75,42 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
     }
 
     @Override
-    public void flush() {
+    public void flush() throws IOException {
+        Files.createDirectories(playersPath);
+        for (Map.Entry<String, EntityData.PlayerEntityStore> playerStoreEntry : playerStores.entrySet()) {
+            Path playerFile = playersPath.resolve(playerStoreEntry.getKey() + PLAYER_STORE_EXTENSION);
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerFile));) {
+                playerStoreEntry.getValue().writeTo(out);
+            }
+        }
+        playerStores.clear();
+
+        GlobalEntityStore globalStore = new GlobalEntityStore(entityManager);
+        for (EntityRef entity : entityManager.getAllEntities()) {
+            globalStore.store(entity);
+        }
+        for (StoreRefTable table : playerStoreExternalRefs.values()) {
+            globalStore.addRefTable(table.id, table.externalReferences);
+        }
+        EntityData.GlobalEntityStore globalStoreData = globalStore.save();
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE)))) {
+            globalStoreData.writeTo(out);
+        }
     }
 
     @Override
-    public PlayerStore loadStore(String playerId) {
+    public PlayerStore loadPlayerStore(String playerId) {
         EntityData.PlayerEntityStore store = playerStores.get(playerId);
+        if (store == null) {
+            Path storePath = playersPath.resolve(playerId + PLAYER_STORE_EXTENSION);
+            if (Files.isRegularFile(storePath)) {
+                try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(storePath))) {
+                    store = EntityData.PlayerEntityStore.parseFrom(inputStream);
+                } catch (IOException e) {
+                    logger.error("Failed to load player data for {}", playerId, e);
+                }
+            }
+        }
         if (store != null) {
             TIntSet validRefs = null;
             StoreRefTable table = playerStoreExternalRefs.get(playerId);
