@@ -101,6 +101,7 @@ public class Texture implements Asset {
 
     public Texture(AssetUri uri, ByteBuffer[] data, int width, int height, WrapMode wrapMode, FilterMode filterMode) {
         if (data.length == 0) throw new IllegalArgumentException("Expected Data.length >= 1");
+
         this.uri = uri;
         this.width = width;
         this.height = height;

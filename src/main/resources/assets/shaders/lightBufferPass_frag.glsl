@@ -21,23 +21,20 @@ uniform sampler2D texSceneOpaqueLightBuffer;
 
 void main() {
     vec4 colorOpaque = texture2D(texSceneOpaque, gl_TexCoord[0].xy);
-    float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r;
-    vec4 normalsOpaque = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
+    float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r * 2.0 - 1.0;
+    vec4 normalBuffer = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy).rgba;
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
 
-    // Gamma to linear
-    //colorOpaque.rgb = colorOpaque.rgb*colorOpaque.rgb;
-
-    // Diffuse
-    colorOpaque.rgb *= lightBufferOpaque.rgb * colorOpaque.a; // colorOpaque.a contains occlusion
-    // Specular
-    colorOpaque.rgb += lightBufferOpaque.aaa;
-
-    // Linear to gamma
-    //colorOpaque.rgb = sqrt(colorOpaque.rgb);
+    if (!epsilonEqualsOne(depthOpaque)) {
+        // Diffuse
+        colorOpaque.rgb *= lightBufferOpaque.rgb * colorOpaque.a; // colorOpaque.a contains occlusion
+        // Specular
+        colorOpaque.rgb += lightBufferOpaque.aaa;
+    }
 
     gl_FragData[0].rgba = colorOpaque.rgba;
-    gl_FragData[1].rgba = normalsOpaque.rgba;
+    gl_FragData[1].rgba = normalBuffer.rgba;
     gl_FragData[2].rgba = lightBufferOpaque.rgba;
-    gl_FragDepth = depthOpaque;
+
+    gl_FragDepth = depthOpaque * 0.5 + 0.5;
 }

@@ -26,7 +26,7 @@ void main()
 {
 #if defined (FEATURE_LIGHT_POINT)
     vertexProjPos = (viewProjMatrix * modelMatrix) * gl_Vertex;
-#else
+#elif defined (FEATURE_LIGHT_DIRECTIONAL)
     vertexProjPos = gl_Vertex;
 #endif
 

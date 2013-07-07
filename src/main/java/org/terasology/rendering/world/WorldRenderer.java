@@ -110,6 +110,9 @@ public final class WorldRenderer {
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     private Camera lightCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
+    /* LIGHTING */
+    LightComponent mainDirectionalLight = new LightComponent();
+
     /* CHUNKS */
     private ChunkTessellator chunkTessellator;
     private boolean pendingChunks = false;
@@ -258,6 +261,15 @@ public final class WorldRenderer {
         }
 
         activeCamera = localPlayerCamera;
+
+        // Setup the main directional light (the sunlight)
+        mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
+        // TODO: Those values HAVE to match the hardcoded value for the forward transparent pass for chunks
+        mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
+        mainDirectionalLight.lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
+        mainDirectionalLight.lightAmbientIntensity = 2.0f;
+        mainDirectionalLight.lightDiffuseIntensity = 1.0f;
+        mainDirectionalLight.lightSpecularIntensity = 0.0f;
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
@@ -705,15 +717,14 @@ public final class WorldRenderer {
         DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
 
         /*
-         * SKYSPHERE (Rendered first - z-buffer is empty but we can directly use the scene
-         * rendertarget to create the skyband texture for the in-scattering effects)
+         * SKYSPHERE
          */
         camera.lookThroughNormalized();
 
         PerformanceMonitor.startActivity("Render Sky");
-        DefaultRenderingProcess.getInstance().beginRenderSceneSkyBand();
+        DefaultRenderingProcess.getInstance().beginRenderSceneSky();
         skysphere.render(camera);
-        DefaultRenderingProcess.getInstance().endRenderSceneSkyBand();
+        DefaultRenderingProcess.getInstance().endRenderSceneSky();
         PerformanceMonitor.endActivity();
 
         camera.lookThrough();
@@ -820,8 +831,6 @@ public final class WorldRenderer {
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
 
         program = ShaderManager.getInstance().getShaderProgramInstance("lightGeometryPass");
-        program.enable();
-        program.setCamera(camera);
 
         for (EntityRef entity : entityManager.iteratorEntities(LocationComponent.class, LightComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
@@ -832,6 +841,14 @@ public final class WorldRenderer {
         }
 
         DefaultRenderingProcess.getInstance().endRenderLightGeometry();
+        DefaultRenderingProcess.getInstance().beginRenderDirectionalLights();
+
+        // Sunlight
+        Vector3f sunlightWorldPosition = new Vector3f(skysphere.getSunDirection(true));
+        renderLightComponent(mainDirectionalLight, sunlightWorldPosition, program, camera, false);
+
+        DefaultRenderingProcess.getInstance().endRenderDirectionalLights();
+
         PerformanceMonitor.endActivity();
 
         DefaultRenderingProcess.getInstance().beginRenderSceneTransparent();
@@ -898,11 +915,13 @@ public final class WorldRenderer {
 
         if (!geometryOnly) {
             if (lightComponent.lightType == LightComponent.LightType.POINT ) {
-                program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT.getValue());
+                program.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT);
             } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL.getValue());
+                program.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL);
             }
         }
+        program.enable();
+        program.setCamera(camera);
 
         Vector3f worldPosition = new Vector3f();
         worldPosition.sub(lightWorldPosition, activeCamera.getPosition());
@@ -938,6 +957,14 @@ public final class WorldRenderer {
             DefaultRenderingProcess.getInstance().renderFullscreenQuad();
         }
 
+        if (!geometryOnly) {
+            if (lightComponent.lightType == LightComponent.LightType.POINT ) {
+                program.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT);
+            } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
+                program.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL);
+            }
+        }
+
         return true;
     }
 
@@ -946,12 +973,17 @@ public final class WorldRenderer {
         camera.lookThroughNormalized();
         skysphere.render(camera);
 
+        GLSLShaderProgramInstance chunkShader = ShaderManager.getInstance().getShaderProgramInstance("chunk");
+        chunkShader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_FORWARD_LIGHTING);
+
         if (config.getRendering().isReflectiveWater()) {
             camera.lookThrough();
 
             while (renderQueueChunksOpaqueReflection.size() > 0)
                 renderChunk(renderQueueChunksOpaqueReflection.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, ChunkRenderMode.REFLECTION);
         }
+
+        chunkShader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_FORWARD_LIGHTING);
 
         PerformanceMonitor.endActivity();
     }
@@ -984,16 +1016,13 @@ public final class WorldRenderer {
                             chunk.getPos().z * Chunk.SIZE_Z - cameraPosition.z);
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-
                 shader = ShaderManager.getInstance().getShaderProgramInstance("chunk");
                 shader.enable();
 
                 if (phase == ChunkMesh.RENDER_PHASE.REFRACTIVE) {
-                    shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS.getValue());
+                    shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS);
                 } else if (phase == ChunkMesh.RENDER_PHASE.ALPHA_REJECT) {
-                    shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
-                } else {
-                    shader.setActiveFeatures(0);
+                    shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
                 }
 
                 shader.setFloat3("chunkPositionWorld", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
@@ -1030,6 +1059,14 @@ public final class WorldRenderer {
 
                     chunk.getMesh()[i].render(phase);
                     statRenderedTriangles += chunk.getMesh()[i].triangleCount();
+                }
+            }
+
+            if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
+                if (phase == ChunkMesh.RENDER_PHASE.REFRACTIVE) {
+                    shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_REFRACTIVE_PASS);
+                } else if (phase == ChunkMesh.RENDER_PHASE.ALPHA_REJECT) {
+                    shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
                 }
             }
 

@@ -14,28 +14,8 @@
  * limitations under the License.
  */
 
-uniform sampler2D diffuse;
-
-// TODO: Add normal mapping support
-//uniform sampler2D normalMap;
-
-uniform float light;
-uniform vec3 colorOffset;
-uniform bool textured;
-
-varying vec3 normal;
-
-void main(){
-    vec4 color;
-
-    if (textured) {
-        color = texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
-        color.rgb *= colorOffset.rgb;
-        gl_FragData[0].rgba = color;
-    } else {
-        color = vec4(colorOffset.r, colorOffset.g, colorOffset.b, 1.0);
-        gl_FragData[0].rgba = color;
-    }
-
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, light);
+void main() {
+	gl_Position = ftransform();
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_FrontColor = gl_Color;
 }

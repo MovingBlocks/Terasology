@@ -25,18 +25,22 @@ uniform sampler2D texSky90;
 uniform float colorExp;
 uniform vec3 zenith;
 
-uniform float sunExponent;
-uniform float moonExponent;
+uniform vec4 skySettings;
+#define sunExponent skySettings.x
+#define moonExponent skySettings.y
+
+#define skyDaylightBrightness skySettings.z
+#define skyNightBrightness skySettings.w
 
 const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 #define HIGHLIGHT_BLEND_START 0.1
-#define SUN_HIGHLIGHT_INTENSITY_FACTOR 4.0
+#define SUN_HIGHLIGHT_INTENSITY_FACTOR 1.0
 #define MOON_HIGHLIGHT_INTENSITY_FACTOR 1.0
 
 void main () {
-    vec3 v = normalize (position.xyz);
-    vec3 l = normalize (sunVec.xyz);
+    vec3 v = normalize(position.xyz);
+    vec3 l = normalize(sunVec.xyz);
 
     float lDotV = dot(l, v);
     float negLDotV = dot(-l, v);
@@ -66,14 +70,11 @@ void main () {
     vec4 cloudsColorNight =  texture2D(texSky90, gl_TexCoord[0].xy);
 
     /* DAY AND NIGHT TEXTURES */
-    skyColor.rgb = daylight * cloudsColor.rgb + blendNight * cloudsColorNight.rgb;
-    skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb * 1.5, vec3(1.0, 1.0, 1.0), blendNight);
+    skyColor.rgb = skyDaylightBrightness * daylight * cloudsColor.rgb + skyNightBrightness * blendNight * cloudsColorNight.rgb;
+    skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb, vec3(1.0, 1.0, 1.0), blendNight);
 
     skyColor.rgb += vec3((1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight);
 
     gl_FragData[0].rgba = skyColor.rgba;
-    gl_FragData[1].rgba = vec4(0.0, 0.0, 0.0, 1.0);
-
-    // The sky is always fully lit
-    gl_FragData[2].rgba = vec4(1.0, 1.0, 1.0, 0.0);
+    gl_FragDepth = 1.0;
 }

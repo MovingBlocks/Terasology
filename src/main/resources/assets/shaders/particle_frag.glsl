@@ -34,7 +34,7 @@ void main() {
     }
 #endif
 
-    // Particles are currently renderer using forward shading
+    // Particles are currently renderer using forward rendering
     color.rgb *= light;
 
     gl_FragData[0].a = color.a * colorOffset.a;

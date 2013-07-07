@@ -24,20 +24,11 @@ uniform sampler2D texDepth;
 uniform sampler3D texColorGradingLut;
 #endif
 
-#ifdef BLOOM
-uniform sampler2D texBloom;
-#endif
-
 #if !defined (NO_BLUR)
 uniform sampler2D texBlur;
 uniform float blurFocusDistance;
 uniform float blurStart;
 uniform float blurLength;
-#endif
-
-#ifdef VIGNETTE
-uniform sampler2D texVignette;
-uniform vec3 inLiquidTint;
 #endif
 
 #ifdef FILM_GRAIN
@@ -117,25 +108,9 @@ void main() {
     vec4 finalColor = color;
 #endif
 
-#ifdef BLOOM
-    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
-    finalColor += colorBloom;
-#endif
-
 #ifdef FILM_GRAIN
     vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
     finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0f, 1.0f);
-#endif
-
-#ifdef VIGNETTE
-    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
-
-    if (!swimming) {
-        finalColor.rgb *= vig;
-    } else {
-        finalColor.rgb *= vig * vig * vig;
-        finalColor.rgb *= inLiquidTint;
-    }
 #endif
 
     // In the case the color is > 1.0 or < 0.0 despite tonemapping

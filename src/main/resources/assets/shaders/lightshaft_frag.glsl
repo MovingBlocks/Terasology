@@ -20,7 +20,7 @@ uniform float exposure;
 uniform float density;
 
 uniform sampler2D texScene;
-uniform sampler2D texNormals;
+uniform sampler2D texDepth;
 
 uniform float lightDirDotViewDir;
 uniform vec2 lightScreenPos;
@@ -29,18 +29,24 @@ void main() {
     gl_FragData[0].rgba = vec4(0.0, 0.0, 0.0, 1.0);
 
     if (lightDirDotViewDir > 0.0) {
-        vec2 textCoo = gl_TexCoord[0].xy;
-        vec2 deltaTextCoord = vec2(textCoo.xy - lightScreenPos.xy);
+        vec2 texCoord = gl_TexCoord[0].xy;
 
-        deltaTextCoord *= (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density;
+        float sceneDepth = texture2D(texDepth, texCoord).r * 2.0 - 1.0;
+
+        // Only blur the sky
+//        if (!epsilonEqualsOne(sceneDepth)) {
+//            discard;
+//        }
+
+        vec2 deltaTexCoord = vec2(texCoord - lightScreenPos.xy);
+
+        deltaTexCoord *= (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density;
 
         float illuminationDecay = 1.0;
         for(int i=0; i < LIGHT_SHAFT_SAMPLES ; i++)
         {
-            textCoo -= deltaTextCoord;
-
-            float mask = texture2D(texNormals, textCoo).w;
-            vec3 sample = texture2D(texScene, textCoo).rgb * mask;
+            texCoord -= deltaTexCoord;
+            vec3 sample = texture2D(texScene, texCoord).rgb;
 
             sample *= illuminationDecay * weight;
 

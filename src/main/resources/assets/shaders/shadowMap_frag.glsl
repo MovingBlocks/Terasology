@@ -16,7 +16,6 @@
 
 varying vec4 positionProj;
 
-void main(){
-    gl_FragData[0] = vec4(0.0);
+void main() {
     gl_FragDepth = positionProj.z / positionProj.w;
 }

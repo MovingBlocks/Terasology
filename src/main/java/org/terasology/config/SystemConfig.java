@@ -18,7 +18,8 @@ public class SystemConfig {
         DEBUG_STAGE_RECONSTRUCTED_POSITION,
         DEBUG_STAGE_BLOOM,
         DEBUG_STAGE_HIGH_PASS,
-        DEBUG_STAGE_SKY_BAND
+        DEBUG_STAGE_SKY_BAND,
+        DEBUG_STAGE_LIGHT_SHAFTS
     }
 
     private long dayNightLengthInMs = 1800000;

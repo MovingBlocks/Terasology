@@ -130,8 +130,8 @@ public class FirstPersonRenderer implements RenderSystem {
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
         shader.setFloat("light", worldRenderer.getRenderingLightValue());
@@ -148,13 +148,14 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        shader.setActiveFeatures(0);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-                | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
 
@@ -181,7 +182,8 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        shader.setActiveFeatures(0);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
@@ -190,8 +192,8 @@ public class FirstPersonRenderer implements RenderSystem {
 
         // Adjust the brightness of the block according to the current position of the player
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
 
@@ -219,7 +221,8 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        shader.setActiveFeatures(0);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {

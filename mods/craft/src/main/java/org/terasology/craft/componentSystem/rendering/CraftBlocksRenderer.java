@@ -209,8 +209,8 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     private void renderBlock(BlockFamily blockFamily, Vector3f blockPos, Vector3f cameraPos, boolean notCurrentLevel) {
         // Adjust the brightness of the block according to the current position of the player
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
 
@@ -232,12 +232,15 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         if(notCurrentLevel){
             shader.setFloat("alpha", 1.0f);
         }
+
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderIcon(String iconName, Vector3f offset, Vector3f cameraPos, boolean notCurrentLevel) {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
 
@@ -260,6 +263,9 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         glRotatef(90f, 1f, 0f, 0f);
         itemMesh.render();
         glPopMatrix();
+
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderToolTip(Vector3f worldPos, EntityRef entity, boolean renderFar){

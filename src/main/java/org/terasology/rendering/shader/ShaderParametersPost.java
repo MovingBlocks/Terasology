@@ -61,10 +61,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
         DefaultRenderingProcess.getInstance().bindFboTexture("sceneToneMapped");
         program.setInt("texScene", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom1");
-        program.setInt("texBloom", texId++);
-
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
@@ -78,14 +74,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setFloat("blurLength", (Float) blurLength.getValue());
         }
 
-        Texture vignetteTexture = Assets.getTexture("engine:vignette");
-
-        if (vignetteTexture != null) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
-            program.setInt("texVignette", texId++);
-        }
-
         Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1");
 
         if (colorGradingLut != null) {
@@ -94,13 +82,9 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++);
         }
 
-        Vector3f tint = worldRenderer.getTint();
-        program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z);
-
         DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (sceneCombined != null) {
-
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneCombined.bindDepthTexture();
             program.setInt("texDepth", texId++);

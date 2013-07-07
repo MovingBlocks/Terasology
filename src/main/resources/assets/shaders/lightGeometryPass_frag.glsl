@@ -37,32 +37,91 @@ uniform vec4 lightExtendedProperties;
 
 uniform mat4 invProjMatrix;
 
+#if defined (DYNAMIC_SHADOWS)
+# if defined (CLOUD_SHADOWS)
+uniform sampler2D texSceneClouds;
+# endif
+
+#define SHADOW_MAP_BIAS 0.003
+
+uniform sampler2D texSceneShadowMap;
+uniform mat4 lightViewProjMatrix;
+
+uniform vec3 activeCameraToLightSpace;
+
+uniform mat4 invViewProjMatrix;
+#endif
+
 void main() {
 
 #if defined (FEATURE_LIGHT_POINT)
     vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
-#else
+#elif defined (FEATURE_LIGHT_DIRECTIONAL)
     vec2 projectedPos = gl_TexCoord[0].xy;
+#else
+    vec2 projectedPos = vec2(0.0);
 #endif
 
-    vec3 normal = normalize(texture2D(texSceneOpaqueNormals, projectedPos.xy).rgb * 2.0 - 1.0);
+    vec4 normalBuffer = texture2D(texSceneOpaqueNormals, projectedPos.xy).rgba;
+    vec3 normal = normalize(normalBuffer.xyz * 2.0 - 1.0);
     float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
+
+#if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
+    // TODO: Uhhh... Doing this twice here :/ Frustum ray would be better!
+    vec3 worldPosition = reconstructViewPos(depth, gl_TexCoord[0].xy, invViewProjMatrix);
+    vec3 lightWorldPosition = worldPosition.xyz + activeCameraToLightSpace;
+
+    vec4 lightProjPos = lightViewProjMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
+
+    vec3 lightPosClipSpace = lightProjPos.xyz / lightProjPos.w;
+    vec2 shadowMapTexPos = lightPosClipSpace.xy * vec2(0.5) + vec2(0.5);
+
+    float shadowTerm = 1.0;
+
+    if (!epsilonEqualsOne(depth)) {
+# if defined (DYNAMIC_SHADOWS_PCF)
+        shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightPosClipSpace.z, shadowMapTexPos, 0.0, SHADOW_MAP_BIAS);
+# else
+        float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
+        if (shadowMapDepth + SHADOW_MAP_BIAS < lightPosClipSpace.z) {
+            shadowTerm = 0.0;
+        }
+# endif
+
+# if defined (CLOUD_SHADOWS)
+        // TODO: Not so nice that this is all hardcoded
+        float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 5.0, 0.0, 1.0);
+        shadowTerm *= clamp(1.0 - cloudOcclusion + 0.25, 0.0, 1.0);
+#  endif
+   }
+#endif
 
     // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
     vec3 viewSpacePos = reconstructViewPos(depth, projectedPos, invProjMatrix);
-
-    vec3 color = lightColorAmbient * lightAmbientIntensity;
 
     vec3 lightDir = lightViewPos.xyz - viewSpacePos;
     float lightDist = length(lightDir);
     vec3 lightDirNorm = lightDir / lightDist;
 
+    float ambTerm = lightAmbientIntensity;
     float lambTerm = calcLambLight(normal, lightDirNorm);
     float specTerm  = calcSpecLight(normal, lightDirNorm, eyeVec, lightSpecularPower);
 
+#if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
+    lambTerm *= shadowTerm;
+    ambTerm *= clamp(shadowTerm, 0.25, 1.0);
+#endif
+
     float specular = lightSpecularIntensity * specTerm;
 
+#if defined (FEATURE_LIGHT_POINT)
+    vec3 color = ambTerm * lightColorAmbient;
     color += lightColorDiffuse * lightDiffuseIntensity * lambTerm;
+#elif defined (FEATURE_LIGHT_DIRECTIONAL)
+    vec3 color = calcSunlightColorDeferred(normalBuffer.a, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
+#else
+    vec3 color = vec3(0.0);
+#endif
 
 #if defined (FEATURE_LIGHT_POINT)
     //float attenuation = clamp (1.0 - ((lightDist * lightDist) / (lightAttenuationRange * lightAttenuationRange)), 0.0, 1.0);

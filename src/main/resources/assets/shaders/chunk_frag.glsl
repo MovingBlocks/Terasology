@@ -14,19 +14,9 @@
  * limitations under the License.
 */
 
-#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
-#define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
-
-#define NIGHT_BRIGHTNESS 0.1
-
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
-#define WATER_AMB 1.0
 #define WATER_SPEC 1.0
-#define WATER_DIFF 0.75
-
-#define BLOCK_DIFF 0.75
-#define BLOCK_AMB 2.0
 
 #ifdef FEATURE_REFRACTIVE_PASS
 varying vec3 waterNormalViewSpace;
@@ -212,56 +202,31 @@ void main() {
 
     // Calculate daylight lighting value
     float daylightValue = gl_TexCoord[1].x;
-    float daylightScaledValue = daylight * daylightValue;
-
     // Calculate blocklight lighting value
     float blocklightValue = gl_TexCoord[1].y;
-
+    // ...and finally the occlusion value
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
-    float diffuseLighting;
 
-#ifdef FEATURE_REFRACTIVE_PASS
-    if (isOceanWater) {
-        diffuseLighting = calcLambLight(normalWater, sunVecViewAdjusted);
-    } else
-#endif
-    {
-        diffuseLighting = calcLambLight(normalOpaque, sunVecViewAdjusted);
-    }
+    vec3 blocklightColorValue = calcBlocklightColor(blocklightValue, flickeringLightOffset);
 
+#if defined (FEATURE_REFRACTIVE_PASS)
     vec3 daylightColorValue;
 
-    /* CREATE THE DAYLIGHT LIGHTING MIX */
-#ifdef FEATURE_REFRACTIVE_PASS
     if (isOceanWater) {
-        /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
-        daylightColorValue = vec3(diffuseLighting * WATER_DIFF + WATER_AMB);
-    } else
-#endif
-    {
-        daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
+        daylightColorValue = calcSunlightColorWater(daylightValue, normalWater, sunVecViewAdjusted);
+    } else {
+        daylightColorValue = calcSunlightColorOpaque(daylightValue, normal, sunVecViewAdjusted);
     }
 
-    vec3 ambientTint = mix(vec3(MOONLIGHT_AMBIENT_COLOR), vec3(DAYLIGHT_AMBIENT_COLOR), daylight);
-    daylightColorValue.xyz *= ambientTint;
-
-    // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= expLightValue(daylightScaledValue) + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
-
-    // Calculate the final block light brightness
-    float blockBrightness = expBlockLightValue(blocklightValue);
-#if defined (FLICKERING_LIGHT)
-    blockBrightness -= flickeringLightOffset * blocklightValue;
+    vec3 combinedLightValue = max(daylightColorValue, blocklightColorValue);
+#elif defined (FEATURE_USE_FORWARD_LIGHTING)
+    vec3 daylightColorValue = calcSunlightColorOpaque(daylightValue, normal, sunVecViewAdjusted);
+    vec3 combinedLightValue = max(daylightColorValue, blocklightColorValue);
 #endif
 
-    // Calculate the final blocklight color value and add a slight reddish tint to it
-    vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
-
-    vec3 finalLightValue = max(daylightColorValue, blocklightColorValue);
-
-#ifdef FEATURE_REFRACTIVE_PASS
+#if defined (FEATURE_REFRACTIVE_PASS)
     // Apply the final lighting mix
-    color.xyz *= finalLightValue * occlusionValue;
+    color.xyz *= combinedLightValue * occlusionValue;
 
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
@@ -271,7 +236,7 @@ void main() {
             vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
             vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
 
-            vec4 litWaterTint = vec4(WATER_TINT) * vec4(finalLightValue.x, finalLightValue.y, finalLightValue.z, 1.0);
+            vec4 litWaterTint = vec4(WATER_TINT) * vec4(combinedLightValue.x, combinedLightValue.y, combinedLightValue.z, 1.0);
 
             /* FRESNEL */
             if (!swimming) {
@@ -289,7 +254,7 @@ void main() {
             texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
 
             vec4 albedoColor = texture2D(textureWater, texCoord.xy).rgba;
-            albedoColor.rgb *= finalLightValue;
+            albedoColor.rgb *= combinedLightValue;
 
             vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
 
@@ -298,38 +263,32 @@ void main() {
     } else {
         vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
         vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
-        albedoColor.rgb *= finalLightValue;
+        albedoColor.rgb *= combinedLightValue;
 
         // TODO: Add support for actual refraction here
         color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
         color.a = 1.0;
     }
+#elif defined (FEATURE_USE_FORWARD_LIGHTING)
+    // Apply the final lighting mix
+    color.xyz *= combinedLightValue * occlusionValue;
 #else
-    gl_FragData[2].rgba = vec4(finalLightValue.r, finalLightValue.g, finalLightValue.b, 0.0);
+    gl_FragData[2].rgba = vec4(blocklightColorValue.r, blocklightColorValue.g, blocklightColorValue.b, 0.0);
 #endif
 
-#if defined (FEATURE_REFRACTIVE_PASS)
-    gl_FragData[0].rgba = color;
+#if defined (FEATURE_REFRACTIVE_PASS) || defined (FEATURE_USE_FORWARD_LIGHTING)
+    gl_FragData[0].rgba = color.rgba;
 #else
     gl_FragData[0].rgb = color.rgb;
     // Encode occlusion value into the alpha channel
     gl_FragData[0].a = occlusionValue;
+    // Encode daylight value into the normal alpha channel
+    gl_FragData[1].a = daylightValue;
 #endif
 
-#if !defined (FEATURE_REFRACTIVE_PASS)
+#if !defined (FEATURE_REFRACTIVE_PASS) && !defined (FEATURE_USE_FORWARD_LIGHTING)
     gl_FragData[1].rgb = vec3(normalOpaque.x / 2.0 + 0.5, normalOpaque.y / 2.0 + 0.5, normalOpaque.z / 2.0 + 0.5);
-#else
+#elif defined (FEATURE_REFRACTIVE_PASS)
     gl_FragData[1].rgb = vec3(normalWater.x / 2.0 + 0.5, normalWater.y / 2.0 + 0.5, normalWater.z / 2.0 + 0.5);
 #endif
-
-    // Primitive objects ids... Will be extended later on
-#ifdef FEATURE_REFRACTIVE_PASS
-    if (isOceanWater) {
-        gl_FragData[1].a = 1.0;
-    }
-    else
-#endif
-    {
-        gl_FragData[1].a = 0.0;
-    }
 }

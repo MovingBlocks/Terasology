@@ -23,7 +23,6 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -41,7 +40,6 @@ import javax.swing.*;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector4f;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -83,7 +81,8 @@ public class GLSLShaderProgramInstance {
         FEATURE_LIGHT_DIRECTIONAL(0x08),
         FEATURE_DEFERRED_LIGHTING(0x10),
         FEATURE_USE_MATRIX_STACK(0x20),
-        FEATURE_ALL(0x40);
+        FEATURE_USE_FORWARD_LIGHTING(0x40),
+        FEATURE_ALL(0x80);
 
         private int value;
         private ShaderProgramFeatures(int value) {
@@ -135,9 +134,8 @@ public class GLSLShaderProgramInstance {
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
         if (config.getRendering().isAnimateGrass())
             builder.append("#define ANIMATED_GRASS \n");
-        if (config.getRendering().isAnimateWater()) {
+        if (config.getRendering().isAnimateWater())
             builder.append("#define ANIMATED_WATER \n");
-        }
         if (config.getRendering().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
         if (config.getRendering().isFlickeringLight())
@@ -224,12 +222,12 @@ public class GLSLShaderProgramInstance {
     }
 
     private void compileAllShaderPermutations() {
-        int counter = 1;
         compileShaderProgram(0);
 
         TIntArrayList compiledPermutations = new TIntArrayList();
+        int counter = 1;
 
-        for (int i=1; i< ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
+        for (int i=1; i<ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
             // Compile all selected features for this shader...
             int maskedHash = (i & availableFeatures);
 
@@ -276,6 +274,9 @@ public class GLSLShaderProgramInstance {
             GL20.glDeleteShader(it.value());
         }
         vertexPrograms.clear();
+
+        uniformLocationMap.clear();
+        disposed = true;
     }
 
     public boolean isDisposed() {
@@ -293,10 +294,11 @@ public class GLSLShaderProgramInstance {
             }
         }
 
-        if (type == GL20.GL_FRAGMENT_SHADER)
+        if (type == GL20.GL_FRAGMENT_SHADER) {
             shader.append(includedFunctionsFragment).append("\n");
-        else
+        } else {
             shader.append(includedFunctionsVertex).append("\n");
+        }
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
             shader.append(shaderProgramBase.getFragShader());
@@ -358,20 +360,6 @@ public class GLSLShaderProgramInstance {
         }
     }
 
-    private String readShader(String filename) {
-        String line, code = "";
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("assets/shaders/" + filename).openStream()));
-            while ((line = reader.readLine()) != null) {
-                code += line + "\n";
-            }
-        } catch (Exception e) {
-            logger.error("Failed to read shader '{}'.", filename, e);
-        }
-
-        return code;
-    }
-
     private boolean printLogInfo(int shaderId, StringBuilder logEntry) {
         int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
@@ -394,7 +382,8 @@ public class GLSLShaderProgramInstance {
     public void enable() {
         GLSLShaderProgramInstance activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
 
-        if (activeProgram != this || ShaderManager.getInstance().getActiveFeatures() != activeFeatures) {
+        if (activeProgram != this
+                || ShaderManager.getInstance().getActiveFeatures() != activeFeatures) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL20.glUseProgram(getActiveShaderProgramId());
 
@@ -446,6 +435,18 @@ public class GLSLShaderProgramInstance {
         enable();
         int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniform3f(id, f1, f2, f3);
+    }
+
+    public void setFloat3(String desc, FloatBuffer buffer) {
+        int activeShaderProgramId = getActiveShaderProgramId();
+
+        if (activeShaderProgramId <= 0) {
+            return;
+        }
+
+        enable();
+        int id = getUniformLocation(activeShaderProgramId, desc);
+        GL20.glUniform3(id, buffer);
     }
 
     public void setFloat4(String desc, float f1, float f2, float f3, float f4) {
@@ -608,8 +609,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
+    private int generateHash(int activeShaderProgramId, String desc) {
+        return (desc + activeShaderProgramId).hashCode();
+    }
+
     private int getUniformLocation(int activeShaderProgramId, String desc) {
-        int hash = (desc + activeShaderProgramId).hashCode();
+        int hash = generateHash(activeShaderProgramId, desc);
 
         if (uniformLocationMap.containsKey(hash)) {
             return uniformLocationMap.get(hash);
@@ -619,6 +624,10 @@ public class GLSLShaderProgramInstance {
         uniformLocationMap.put(hash, id);
 
         return id;
+    }
+
+    public boolean wasSet(String desc) {
+        return uniformLocationMap.containsKey(generateHash(getActiveShaderProgramId(), desc));
     }
 
     public void setCamera(Camera camera) {
@@ -632,16 +641,11 @@ public class GLSLShaderProgramInstance {
         return activeFeatures;
     }
 
-    public void setActiveFeatures(int featureHash) {
-        activeFeatures = featureHash;
-    }
-
     public void addFeatureIfAvailable(ShaderProgramFeatures feature) {
-        for (int i=1; i< ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
-            if ((ShaderProgramFeatures.values()[i].getValue() & feature.getValue()) > 0) {
-                activeFeatures |= feature.getValue();
-                return;
-            }
+        if ((availableFeatures & feature.getValue()) == feature.getValue()) {
+            activeFeatures |= feature.getValue();
+        } else {
+            throw new RuntimeException("Feature not available");
         }
     }
 

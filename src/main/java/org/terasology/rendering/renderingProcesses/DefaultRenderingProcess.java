@@ -61,14 +61,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
     private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
     private Property hdrMinExposure = new Property("hdrMinExposure", 1.0f, 0.0f, 10.0f);
-    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.5f, 0.0f, 4.0f);
+    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.6f, 0.0f, 4.0f);
     private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.05f, 0.0f, 0.5f);
 
-    private Property bloomHighPassThreshold = new Property("bloomHighPassThreshold", 1.05f, 0.0f, 5.0f);
+    private Property bloomHighPassThreshold = new Property("bloomHighPassThreshold", 1.35f, 0.0f, 5.0f);
+    private Property bloomBlurRadius = new Property("bloomBlurRadius", 3.0f, 0.0f, 64.0f);
 
-    private Property ssaoBlurRadius = new Property("ssaoBlurRadius", 8.0f, 0.0f, 64.0f);
-
-    private Property overallBlurFactor = new Property("overallBlurFactor", 1.75f, 0.0f, 16.0f);
+    private Property overallBlurRadiusFactor = new Property("overallBlurRadiusFactor", 0.8f, 0.0f, 16.0f);
 
     /* HDR */
     private float currentExposure = 2.0f;
@@ -87,8 +86,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private int overwriteRtHeight = 0;
 
     private String currentlyBoundFboName = "";
-    private static int currentlyBoundFboId = -1;
-    private static int currentlyBoundTextureId = -1;
+    private FBO currentlyBoundFbo = null;
+    private int currentlyBoundTextureId = -1;
 
     /* VARIOUS */
     private boolean takeScreenshot = false;
@@ -178,16 +177,16 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         public int height = 0;
 
         public void bind() {
-            if (fboId != currentlyBoundFboId) {
+            if (this != currentlyBoundFbo) {
                 EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
-                currentlyBoundFboId = fboId;
+                currentlyBoundFbo = this;
             }
         }
 
         public void unbind() {
-            if (currentlyBoundFboId != 0) {
+            if (currentlyBoundFbo != null) {
                 EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
-                currentlyBoundFboId = 0;
+                currentlyBoundFbo = null;
             }
         }
 
@@ -302,7 +301,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         rtWidth32 = rtHeight16 / 2;
         rtHeight32 = rtWidth16 / 2;
 
-        FBO scene = getFBO("sceneOpaque");
+        FBO scene = FBOs.get("sceneOpaque");
         final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
 
         if (!recreate) {
@@ -315,8 +314,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR);
         attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
 
-        createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true, true, true);
-        createFBO("sceneReflectedPingPong", rtWidth2, rtHeight2, FBOType.DEFAULT, true, true, true);
+        createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true);
 
         createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
@@ -326,15 +324,14 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
 
-        createFBO("ssao", rtWidth2, rtHeight2, FBOType.DEFAULT);
-        createFBO("ssaoBlurred0", rtWidth2, rtHeight2, FBOType.DEFAULT);
-        createFBO("ssaoBlurred1", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("ssao", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
+        createFBO("ssaoBlurred", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
 
         createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
-        createFBO("sceneHighPass", rtWidth2, rtHeight2, FBOType.DEFAULT);
-        createFBO("sceneBloom0", rtWidth16, rtHeight16, FBOType.DEFAULT);
-        createFBO("sceneBloom1", rtWidth16, rtHeight16, FBOType.DEFAULT);
+        createFBO("sceneHighPass", rtWidth4, rtHeight4, FBOType.DEFAULT);
+        createFBO("sceneBloom0", rtWidth4, rtHeight4, FBOType.DEFAULT);
+        createFBO("sceneBloom1", rtWidth4, rtWidth4, FBOType.DEFAULT);
 
         createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT);
         createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT);
@@ -627,9 +624,11 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void beginRenderSceneOpaque() {
         bindFbo("sceneOpaque");
+        setRenderBufferMask(true, true, false);
     }
 
     public void endRenderSceneOpaque() {
+        setRenderBufferMask(true, true, true);
         unbindFbo("sceneOpaque");
     }
 
@@ -675,17 +674,23 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public void endRenderLightGeometry() {
+        glDisable(GL_STENCIL_TEST);
+        glCullFace(GL_BACK);
+
+        unbindFbo("sceneOpaque");
+    }
+
+    public void beginRenderDirectionalLights() {
+        bindFbo("sceneOpaque");
+    }
+
+    public void endRenderDirectionalLights() {
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glEnable(GL_DEPTH_TEST);
 
-        glDisable(GL_STENCIL_TEST);
-
-        glCullFace(GL_BACK);
-
         setRenderBufferMask(true, true, true);
-
         unbindFbo("sceneOpaque");
 
         applyLightBufferPass("sceneOpaque");
@@ -758,8 +763,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void endRenderReflectedScene() {
         unbindFbo("sceneReflected");
-
-        applyLightBufferPass("sceneReflected");
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
@@ -780,10 +783,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
-    public void beginRenderSceneSkyBand() {
+    public void beginRenderSceneSky() {
+        setRenderBufferMask(true, false, false);
     }
 
-    public void endRenderSceneSkyBand() {
+    public void endRenderSceneSky() {
+        setRenderBufferMask(true, true, true);
+
         generateSkyBand(0);
         generateSkyBand(1);
 
@@ -803,9 +809,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         if (config.getRendering().isSsao()) {
             generateSSAO();
-            for (int i = 0; i < 2; i++) {
-                generateBlurredSSAO(i);
-            }
+            generateBlurredSSAO();
         }
 
         generateCombinedScene();
@@ -955,7 +959,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         GLSLShaderProgramInstance program = ShaderManager.getInstance().getShaderProgramInstance("lightBufferPass");
         program.enable();
 
-        DefaultRenderingProcess.FBO targetFbo = DefaultRenderingProcess.getInstance().getFBO(target);
+        DefaultRenderingProcess.FBO targetFbo = getFBO(target);
 
         int texId = 0;
         if (targetFbo != null) {
@@ -977,6 +981,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         bindFbo(target+"PingPong");
+        setRenderBufferMask(true, true, true);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -999,11 +1004,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         skyBand.bind();
+        setRenderBufferMask(true, false, false);
 
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
 
         shader.enable();
-        shader.setFloat("radius", 256.0f);
+        shader.setFloat("radius", 8.0f);
+        shader.setFloat2("texelSize", 1.0f / skyBand.width, 1.0f / skyBand.height);
 
         if (id == 0) {
             bindFboTexture("sceneOpaque");
@@ -1053,13 +1060,17 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     private void generateSSAO() {
-        ShaderManager.getInstance().enableShader("ssao");
+        GLSLShaderProgramInstance ssaoShader = ShaderManager.getInstance().getShaderProgramInstance("ssao");
+        ssaoShader.enable();
 
         FBO ssao = getFBO("ssao");
 
         if (ssao == null) {
             return;
         }
+
+        ssaoShader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height);
+        ssaoShader.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f);
 
         ssao.bind();
 
@@ -1092,13 +1103,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
-    private void generateBlurredSSAO(int id) {
-        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
-
+    private void generateBlurredSSAO() {
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("ssaoBlur");
         shader.enable();
-        shader.setFloat("radius", (Float) ssaoBlurRadius.getValue());
 
-        FBO ssao = getFBO("ssaoBlurred" + id);
+        FBO ssao = getFBO("ssaoBlurred");
+        shader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height);
 
         if (ssao == null) {
             return;
@@ -1110,11 +1120,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (id == 0) {
-            bindFboTexture("ssao");
-        } else {
-            bindFboTexture("ssaoBlurred" + (id - 1));
-        }
+        bindFboTexture("ssao");
 
         renderFullscreenQuad();
 
@@ -1148,10 +1154,20 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         highPass.bind();
 
+        FBO sceneOpaque = getFBO("sceneOpaque");
+
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        sceneOpaque.bindTexture();
+        program.setInt("tex", texId++);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        sceneOpaque.bindDepthTexture();
+        program.setInt("texDepth", texId++);
+
         glViewport(0, 0, highPass.width, highPass.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bindFboTexture("sceneToneMapped");
 
         renderFullscreenQuad();
 
@@ -1164,13 +1180,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
         shader.enable();
 
-        shader.setFloat("radius", (Float) overallBlurFactor.getValue() * config.getRendering().getBlurRadius());
+        shader.setFloat("radius", (Float) overallBlurRadiusFactor.getValue() * config.getRendering().getBlurRadius());
 
         FBO blur = getFBO("sceneBlur" + id);
 
         if (blur == null) {
             return;
         }
+
+        shader.setFloat2("texelSize", 1.0f / blur.width, 1.0f / blur.height);
 
         blur.bind();
 
@@ -1195,13 +1213,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("blur");
 
         shader.enable();
-        shader.setFloat("radius", 32.0f);
+        shader.setFloat("radius", (Float) bloomBlurRadius.getValue());
 
         FBO bloom = getFBO("sceneBloom" + id);
 
         if (bloom == null) {
             return;
         }
+
+        shader.setFloat2("texelSize", 1.0f / bloom.width, 1.0f / bloom.height);
 
         bloom.bind();
 
@@ -1486,8 +1506,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         properties.add(hdrMaxExposureNight);
         properties.add(hdrMinExposure);
         properties.add(hdrTargetLuminance);
-        properties.add(ssaoBlurRadius);
-        properties.add(overallBlurFactor);
+        properties.add(overallBlurRadiusFactor);
         properties.add(bloomHighPassThreshold);
+        properties.add(bloomBlurRadius);
     }
 }

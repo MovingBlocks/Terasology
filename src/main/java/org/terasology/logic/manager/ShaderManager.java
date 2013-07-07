@@ -39,9 +39,9 @@ public class ShaderManager {
     private static ShaderManager instance = null;
 
     private int activeFeatures = 0;
-    private Material activateMaterial = null;
-
+    private Material activeMaterial = null;
     private GLSLShaderProgramInstance activeShaderProgram = null;
+
     private GLSLShaderProgramInstance defaultShaderProgram, defaultTexturedShaderProgram;
     private final HashMap<String, GLSLShaderProgramInstance> shaderPrograms = new HashMap<String, GLSLShaderProgramInstance>(16);
 
@@ -88,6 +88,7 @@ public class ShaderManager {
         prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersLightBufferPass());
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
         prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersDefault());
     }
 
     public void enableMaterial(Material material) {
@@ -96,15 +97,15 @@ public class ShaderManager {
             return;
         }
 
-        if (!material.equals(activateMaterial)) {
+        if (!material.equals(activeMaterial)) {
             material.getShaderProgramInstance().enable();
-            activateMaterial = material;
+            activeMaterial = material;
             activeShaderProgram = null;
         }
     }
 
     public void bindTexture(int slot, Texture texture) {
-        if (activateMaterial != null && !activateMaterial.isDisposed()) {
+        if (activeMaterial != null && !activeMaterial.isDisposed()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + slot);
             // TODO: Need to be cubemap aware, only need to clear bind when switching from cubemap to 2D and vice versa,
             // TODO: Don't bind if already bound to the same
@@ -114,13 +115,17 @@ public class ShaderManager {
     }
 
     public Material getActiveMaterial() {
-        return activateMaterial;
+        return activeMaterial;
     }
 
     public void recompileAllShaders() {
         for (GLSLShaderProgramInstance program : shaderPrograms.values()) {
             program.recompile();
         }
+
+        activeMaterial = null;
+        activeFeatures = 0;
+        activeShaderProgram = null;
     }
 
     private GLSLShaderProgramInstance prepareAndStoreShaderProgramInstance(String title, IShaderParameters params) {
@@ -171,7 +176,7 @@ public class ShaderManager {
 
     public void setActiveShaderProgram(GLSLShaderProgramInstance program) {
         activeShaderProgram = program;
-        activateMaterial = null;
+        activeMaterial = null;
         activeFeatures = program.getActiveFeatures();
     }
     /**

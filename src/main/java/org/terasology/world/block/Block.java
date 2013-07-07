@@ -682,8 +682,8 @@ public class Block {
         }
 
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.setActiveFeatures(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING.getValue()
-            | GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK.getValue());
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
         shader.setFloat("light", light);
@@ -703,7 +703,8 @@ public class Block {
             glEnable(GL11.GL_CULL_FACE);
         }
 
-        shader.setActiveFeatures(0);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void generateMesh() {

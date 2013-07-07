@@ -19,6 +19,7 @@ import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -194,7 +195,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntities(), cameraTarget.toString()));
             }
             debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
-            debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
+            debugLine4.setText(String.format("total vus: %s | active threads: %s | debug rendering mode: %s",
+                    ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(),
+                    SystemConfig.DebugRenderingStages.values()[config.getSystem().getDebugRenderingStage()].toString()));
         }
     }
 

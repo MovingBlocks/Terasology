@@ -26,6 +26,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -88,10 +89,15 @@ public class BlockDamageRenderer implements RenderSystem {
     public void renderOverlay() {
         if (effectsTexture == null) return;
 
-        ShaderManager.getInstance().enableDefaultTextured();
+        GLSLShaderProgramInstance defaultTextured = ShaderManager.getInstance().getShaderProgramInstance("defaultTextured");
+        defaultTextured.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
+        defaultTextured.enable();
+
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
+
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class, BlockComponent.class)) {
@@ -112,7 +118,10 @@ public class BlockDamageRenderer implements RenderSystem {
                 renderHealth(blockPos, health, cameraPosition);
             }
         }
+
         glDisable(GL11.GL_BLEND);
+
+        defaultTextured.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
     }
 
     private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
