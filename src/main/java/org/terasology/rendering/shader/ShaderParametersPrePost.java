@@ -38,8 +38,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
-//    Property abberationOffsetX = new Property("abberationOffsetX", 0.0f, 0.0f, 0.1f);
-//    Property abberationOffsetY = new Property("abberationOffsetY", 0.0f, 0.0f, 0.1f);
+    Property aberrationOffsetX = new Property("aberrationOffsetX", 0.0f, 0.0f, 0.1f);
+    Property aberrationOffsetY = new Property("aberrationOffsetY", 0.0f, 0.0f, 0.1f);
 
     Property bloomFactor = new Property("bloomFactor", 1.0f, 0.0f, 1.0f);
 
@@ -63,7 +63,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
             program.setFloat("bloomFactor", (Float) bloomFactor.getValue());
         }
 
-//      program.setFloat2("abberationOffset", (Float) abberationOffsetX.getValue(), (Float) abberationOffsetY.getValue());
+        program.setFloat2("aberrationOffset", (Float) aberrationOffsetX.getValue(), (Float) aberrationOffsetY.getValue());
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -82,8 +82,8 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
-//        properties.add(abberationOffsetX);
-//        properties.add(abberationOffsetY);
+        properties.add(aberrationOffsetX);
+        properties.add(aberrationOffsetY);
         properties.add(bloomFactor);
     }
 }

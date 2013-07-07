@@ -191,38 +191,38 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         }
 
         public void bindDepthTexture() {
-            if (currentlyBoundTextureId != depthStencilTextureId) {
+            //if (currentlyBoundTextureId != depthStencilTextureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
                 currentlyBoundTextureId = depthStencilTextureId;
-            }
+            //}
         }
 
         public void bindTexture() {
-            if (currentlyBoundTextureId != textureId) {
+            //if (currentlyBoundTextureId != textureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
                 currentlyBoundTextureId = textureId;
-            }
+            //}
         }
 
         public void bindNormalsTexture() {
-            if (currentlyBoundTextureId != normalsTextureId) {
+            //if (currentlyBoundTextureId != normalsTextureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
                 currentlyBoundTextureId = normalsTextureId;
-            }
+            //}
         }
 
         public void bindLightBufferTexture() {
-            if (currentlyBoundTextureId != lightBufferTextureId) {
+            //if (currentlyBoundTextureId != lightBufferTextureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
                 currentlyBoundTextureId = lightBufferTextureId;
-            }
+            //}
         }
 
         public void unbindTexture() {
-            if (currentlyBoundTextureId != 0) {
+            //if (currentlyBoundTextureId != 0) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
                 currentlyBoundTextureId = 0;
-            }
+            //}
         }
     }
 

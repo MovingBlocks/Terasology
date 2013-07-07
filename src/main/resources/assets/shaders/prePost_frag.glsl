@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
- #ifdef BLOOM
- uniform float bloomFactor;
+// TODO: define could be removed
+#define CHROMATIC_ABERRATION
 
- uniform sampler2D texBloom;
- #endif
+#ifdef BLOOM
+uniform float bloomFactor;
 
-// TODO: Currently not in use - but working
-//#define CHROMATIC_ABBERATION
+uniform sampler2D texBloom;
+#endif
 
-#if defined (CHROMATIC_ABBERATION)
-uniform vec2 abberationOffset = vec2(0.0, 0.0);
+#if defined (CHROMATIC_ABERRATION)
+uniform vec2 aberrationOffset = vec2(0.0, 0.0);
 #endif
 
 uniform sampler2D texScene;
@@ -40,12 +40,12 @@ uniform sampler2D texLightShafts;
 
 void main() {
 
-#if !defined (CHROMATIC_ABBERATION)
+#if !defined (CHROMATIC_ABERRATION)
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
 #else
-    float r = texture2D(texScene, gl_TexCoord[0].xy - abberationOffset).r;
+    float r = texture2D(texScene, gl_TexCoord[0].xy - aberrationOffset).r;
     vec2 ga = texture2D(texScene, gl_TexCoord[0].xy).ga;
-    float b = texture2D(texScene, gl_TexCoord[0].xy - abberationOffset).b;
+    float b = texture2D(texScene, gl_TexCoord[0].xy - aberrationOffset).b;
 
     vec4 color = vec4(r, ga.x, b, ga.y);
 #endif
