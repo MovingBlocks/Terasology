@@ -1,0 +1,35 @@
+{
+    "persisted" : true,
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "lightAndShadow:redKing",
+        "material" : "lightAndShadow:redKingSkin",
+        "animation" : "lightAndShadow:redKingStill",
+        "loop" : true
+    },
+     "Minion" : {
+         "side" : "red",
+	     "Healthtotal" = 300
+   },
+	"CharacterMovement" : {
+    	"faceMovementDirection" : true
+  },
+  "Animation" : {
+		"walkAnim" = "lightAndShadow:redKingWalk",
+		"idleAnim" = "lightAndShadow:redKingStill",
+		"attackAnim" = "lightAndShadow:redKingStill",
+		"dieAnim" = "lightAndShadow:redKingWalk",
+		"fadeInAnim" = "lightAndShadow:redKingStill",
+		"fadeOutAnim" = "lightAndShadow:redKingStill",
+		"workAnim" = "lightAndShadow:redKingStill",
+		"terraformAnim" = "lightAndShadow:redKingStill",
+		"randomAnim" : ["lightAndShadow:redKingStill"]
+	},
+  "CharacterSound" : {
+	    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+	    "footstepVolume" : 0.7
+  },
+  "Spawnable" : {
+    "type" : "oreon"
+  }
+}
