@@ -28,7 +28,7 @@ uniform sampler2D texDepth;
 uniform mat4 invProjMatrix;
 uniform mat4 projMatrix;
 
-uniform vec3 ssaoSamples[16];
+uniform vec3 ssaoSamples[SSAO_KERNEL_ELEMENTS];
 
 void main() {
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
@@ -40,7 +40,7 @@ void main() {
     }
 
     vec3 normal = texture2D(texNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0;
-    // TODO: Holy hell, this is costly... See below
+    // TODO: This is costly... See below
     vec3 viewSpacePos = reconstructViewPos(currentDepth, gl_TexCoord[0].xy, invProjMatrix);
 
     vec2 noiseScale = noiseTexelSize / texelSize;
@@ -51,8 +51,15 @@ void main() {
     mat3 tbn = mat3(tangent, bitangent, normal);
 
     float occlusion = 0.0;
-    for (int i=0; i<16; ++i) {
+    float sampleCount = 0.0;
+
+    for (int i=0; i<SSAO_KERNEL_ELEMENTS; ++i) {
         vec3 sample = tbn * ssaoSamples[i];
+
+//        if (dot(sample, normal) < 0.05) {
+//            continue;
+//        }
+
         sample = sample * ssaoRad + viewSpacePos;
 
         vec4 offset = vec4(sample.x, sample.y, sample.z, 1.0);
@@ -60,14 +67,15 @@ void main() {
         offset.xy /= offset.w;
         offset.xy = offset.xy * vec2(0.5) + vec2(0.5);
 
-        // TODO: ...frustum ray and linearized depth - please!
+        // TODO: Holy... frustum ray and linearized depth - please!
         float sampleDepth = reconstructViewPos(texture2D(texDepth, offset.xy).r * 2.0 - 1.0, gl_TexCoord[0].xy, invProjMatrix).z;
 
         float rangeCheck = smoothstep(0.0, 1.0, ssaoRad / abs(viewSpacePos.z - sampleDepth));
         occlusion += step(sample.z, sampleDepth) * rangeCheck;
+        sampleCount += 1.0;
     }
 
-    occlusion = 1.0 - occlusion / 16.0;
+    occlusion = 1.0 - occlusion / sampleCount;
 
     gl_FragData[0].rgba = vec4(pow(occlusion, ssaoStrength));
 }

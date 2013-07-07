@@ -18,7 +18,6 @@ package org.terasology.rendering.shader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.GLSLShaderProgramInstance;
@@ -43,8 +42,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersSSAO extends ShaderParametersBase {
 
-    private static final int SSAO_KERNEL_SIZE = 16;
-    private static final int SSAO_NOISE_SIZE = 4;
+    public static final int SSAO_KERNEL_ELEMENTS = 16;
+    public static final int SSAO_NOISE_SIZE = 4;
 
     private static final FastRandom rand = new FastRandom();
 
@@ -110,9 +109,9 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     private void updateAndSetHemisphereSamples(GLSLShaderProgramInstance program) {
         if (ssaoSamples == null) {
-            ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_SIZE*3);
+            ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS *3);
 
-            for (int i=0; i<SSAO_KERNEL_SIZE; ++i) {
+            for (int i=0; i< SSAO_KERNEL_ELEMENTS; ++i) {
                 Vector3f vec = new Vector3f();
                 vec.x = rand.randomFloat();
                 vec.y = rand.randomFloat();
@@ -120,7 +119,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
                 vec.normalize();
                 vec.scale(rand.randomPosFloat());
-                float scale = i / (float) SSAO_KERNEL_SIZE;
+                float scale = i / (float) SSAO_KERNEL_ELEMENTS;
                 scale = TeraMath.lerpf(0.1f, 1.0f, scale * scale);
 
                 vec.scale(scale);

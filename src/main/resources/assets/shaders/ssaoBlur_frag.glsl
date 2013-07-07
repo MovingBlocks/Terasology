@@ -19,7 +19,7 @@ uniform vec2 texelSize;
 
 void main() {
     float result = 0.0;
-        for (int i=-2; i<2; ++i) {
+    for (int i=-2; i<2; ++i) {
         for (int j=-2; j<2; ++j) {
             vec2 offset = vec2(texelSize.x * float(j), texelSize.y * float(i));
             result += texture2D(tex, gl_TexCoord[0].xy + offset).r;

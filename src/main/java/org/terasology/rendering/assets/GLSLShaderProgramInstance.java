@@ -34,6 +34,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.IShaderParameters;
+import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.Block;
 
@@ -141,6 +142,8 @@ public class GLSLShaderProgramInstance {
         preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";
         preProcessorPreamble += "#define BLOCK_INTENSITY_FACTOR " + WorldRenderer.BLOCK_INTENSITY_FACTOR + "\n";
         preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) CoreRegistry.get(Config.class).getRendering().getShadowMapResolution() + "\n";
+        preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + ShaderParametersSSAO.SSAO_KERNEL_ELEMENTS + "\n";
+        preProcessorPreamble += "#define SSAO_NOISE_SIZE " + ShaderParametersSSAO.SSAO_NOISE_SIZE + "\n";
         // TODO: This shouldn't be hardcoded
         preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
 
