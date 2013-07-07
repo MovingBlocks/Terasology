@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-uniform float ssaoStrength;
-uniform float ssaoRad;
+uniform vec4 ssaoSettings;
+#define ssaoStrength ssaoSettings.x
+#define ssaoRad ssaoSettings.y
 
 uniform vec2 texelSize;
 uniform vec2 noiseTexelSize;

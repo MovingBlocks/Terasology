@@ -48,14 +48,11 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     private static final FastRandom rand = new FastRandom();
 
-    Property ssaoStrength = new Property("ssaoStrength", 2.5f, 0.01f, 12.0f);
-    Property ssaoRad = new Property("ssaoRad", 4.0f, 0.1f, 25.0f);
+    private Property ssaoStrength = new Property("ssaoStrength", 2.5f, 0.01f, 12.0f);
+    private Property ssaoRad = new Property("ssaoRad", 4.0f, 0.1f, 25.0f);
 
-    Texture ssaoNoiseTexture = null;
+    private Texture ssaoNoiseTexture = null;
     private FloatBuffer ssaoSamples = null;
-
-    static {
-    }
 
     @Override
     public void applyParameters(GLSLShaderProgramInstance program) {
@@ -74,6 +71,23 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
             program.setInt("texNormals", texId++);
         }
 
+        updateAndSetHemisphereSamples(program);
+        updateNoiseTexture();
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
+        program.setInt("texNoise", texId++);
+
+        program.setFloat4("ssaoSettings", (Float) ssaoStrength.getValue(), (Float) ssaoRad.getValue(), 0.0f, 0.0f);
+
+        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        if (activeCamera != null) {
+            program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix());
+            program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix());
+        }
+    }
+
+    private void updateNoiseTexture() {
         if (ssaoNoiseTexture == null) {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE*SSAO_NOISE_SIZE*4);
 
@@ -92,17 +106,13 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
             ssaoNoiseTexture = new Texture(new ByteBuffer[] { noiseValues }, SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, Texture.WrapMode.Repeat, Texture.FilterMode.Nearest);
         }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
-        program.setInt("texNoise", texId++);
+    }
 
-        program.setFloat("ssaoStrength", (Float) ssaoStrength.getValue());
-        program.setFloat("ssaoRad", (Float) ssaoRad.getValue());
-
+    private void updateAndSetHemisphereSamples(GLSLShaderProgramInstance program) {
         if (ssaoSamples == null) {
             ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_SIZE*3);
 
-            for (int i = 0; i < SSAO_KERNEL_SIZE; ++i) {
+            for (int i=0; i<SSAO_KERNEL_SIZE; ++i) {
                 Vector3f vec = new Vector3f();
                 vec.x = rand.randomFloat();
                 vec.y = rand.randomFloat();
@@ -125,12 +135,6 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
         if (!program.wasSet("ssaoSamples")) {
             program.setFloat3("ssaoSamples", ssaoSamples);
-        }
-
-        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-        if (activeCamera != null) {
-            program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix());
-            program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix());
         }
     }
 
