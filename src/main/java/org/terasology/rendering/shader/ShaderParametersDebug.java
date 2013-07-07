@@ -46,7 +46,8 @@ public class ShaderParametersDebug extends ShaderParametersBase {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
             program.setInt("texDebug", texId++);
-        } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_OPAQUE_NORMALS.ordinal()) {
+        } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_OPAQUE_NORMALS.ordinal()
+                || config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_SUNLIGHT.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboNormalsTexture("sceneOpaque");
             program.setInt("texDebug", texId++);
@@ -69,6 +70,10 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_SOBEL.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("sobel");
+            program.setInt("texDebug", texId++);
+        } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_BAKED_OCCLUSION.ordinal()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
             program.setInt("texDebug", texId++);
         }  else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_RECONSTRUCTED_POSITION.ordinal()) {
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();

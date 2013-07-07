@@ -22,7 +22,6 @@ uniform mat4 invProjMatrix;
 
 void main(){
     vec4 color;
-
     vec4 texColor;
 
     if (debugRenderingStage == DEBUG_STAGE_OPAQUE_DEPTH) {
@@ -45,6 +44,18 @@ void main(){
         color.rgb += texColor.aaa;
         color.a = 1.0;
 
+    } else if (debugRenderingStage == DEBUG_STAGE_SUNLIGHT) {
+
+        texColor = texture2D(texDebug, gl_TexCoord[0].xy);
+        color.rgb = texColor.aaa;
+        color.a = 1.0;
+
+    } else if (debugRenderingStage == DEBUG_STAGE_BAKED_OCCLUSION) {
+
+        texColor = texture2D(texDebug, gl_TexCoord[0].xy);
+        color.rgb = texColor.aaa;
+        color.a = 1.0;
+
    }  else if (debugRenderingStage == DEBUG_STAGE_RECONSTRUCTED_POSITION) {
 
        float depth = texture2D(texDebug, gl_TexCoord[0].xy).r;
@@ -60,5 +71,5 @@ void main(){
 
    }
 
-    gl_FragData[0] = color;
+   gl_FragData[0] = color;
 }

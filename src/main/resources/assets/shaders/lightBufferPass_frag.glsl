@@ -27,7 +27,11 @@ void main() {
 
     if (!epsilonEqualsOne(depthOpaque)) {
         // Diffuse
-        colorOpaque.rgb *= lightBufferOpaque.rgb * colorOpaque.a; // colorOpaque.a contains occlusion
+        colorOpaque.rgb *= lightBufferOpaque.rgb;
+#if !defined (SSAO)
+        // Occlusion
+        colorOpaque.rgb *= colorOpaque.a;
+#endif
         // Specular
         colorOpaque.rgb += lightBufferOpaque.aaa;
     }

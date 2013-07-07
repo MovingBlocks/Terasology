@@ -45,10 +45,10 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public static final int SSAO_KERNEL_ELEMENTS = 16;
     public static final int SSAO_NOISE_SIZE = 4;
 
-    private static final FastRandom rand = new FastRandom();
+    private static final FastRandom rand = new FastRandom(0xD3ADBEEF);
 
-    private Property ssaoStrength = new Property("ssaoStrength", 1.25f, 0.01f, 12.0f);
-    private Property ssaoRad = new Property("ssaoRad", 4.0f, 0.1f, 25.0f);
+    private Property ssaoStrength = new Property("ssaoStrength", 2.0f, 0.01f, 12.0f);
+    private Property ssaoRad = new Property("ssaoRad", 2.0f, 0.1f, 25.0f);
 
     private Texture ssaoNoiseTexture = null;
     private FloatBuffer ssaoSamples = null;
@@ -104,12 +104,11 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
             ssaoNoiseTexture = new Texture(new ByteBuffer[] { noiseValues }, SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, Texture.WrapMode.Repeat, Texture.FilterMode.Nearest);
         }
-
     }
 
     private void updateAndSetHemisphereSamples(GLSLShaderProgramInstance program) {
         if (ssaoSamples == null) {
-            ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS *3);
+            ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS*3);
 
             for (int i=0; i< SSAO_KERNEL_ELEMENTS; ++i) {
                 Vector3f vec = new Vector3f();
