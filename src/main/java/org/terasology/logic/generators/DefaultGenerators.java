@@ -22,6 +22,7 @@ package org.terasology.logic.generators;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -42,10 +43,18 @@ public class DefaultGenerators {
         SimpleAxionElementReplacement sapling = new SimpleAxionElementReplacement("s");
         sapling.addReplacement(1f, "Tt");
 
+        final FastRandom rnd = new FastRandom();
+
         SimpleAxionElementReplacement trunkTop = new SimpleAxionElementReplacement("t");
         trunkTop.addReplacement(0.5f, "Wt");
-        trunkTop.addReplacement(0.25f, "W[&Mb][^Mb]t");
-        trunkTop.addReplacement(0.25f, "W[*Mb][/Mb]t");
+        trunkTop.addReplacement(0.5f,
+                new SimpleAxionElementReplacement.ReplacementGenerator() {
+                    @Override
+                    public String generateReplacement() {
+                        int angleDeg = rnd.randomInt(180);
+                        return "W[+("+angleDeg+")&Mb][+("+angleDeg+")^Mb]t";
+                    }
+                });
 
         SimpleAxionElementReplacement smallBranch = new SimpleAxionElementReplacement("b");
         smallBranch.addReplacement(0.8f, "Bb");
@@ -67,16 +76,22 @@ public class DefaultGenerators {
         Block greenLeaf = blockManager.getBlock("engine:GreenLeaf");
         Block oakTrunk = blockManager.getBlock("engine:OakTrunk");
 
-        float advance = 0.5f;
+        float trunkAdvance = 0.5f;
+        float branchAdvance = 0.6f;
 
         Map<Character, AxionElementGeneration> blockMap = Maps.newHashMap();
-        blockMap.put('t', new DefaultAxionElementGeneration(greenLeaf, advance));
-        blockMap.put('T', new DefaultAxionElementGeneration(oakTrunk, advance));
-        blockMap.put('N', new DefaultAxionElementGeneration(oakTrunk, advance));
-        blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, advance, 2f));
-        blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, advance, 4f));
-        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, advance, 2f));
-        blockMap.put('M', new AdvanceAxionElementGeneration(advance));
+        // Trunk building blocks
+        blockMap.put('t', new DefaultAxionElementGeneration(greenLeaf, trunkAdvance));
+        blockMap.put('T', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
+        blockMap.put('N', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
+//        blockMap.put('W', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
+//        blockMap.put('B', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
+        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 1.7f));
+
+        // Branch building blocks
+        blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 1.7f));
+        blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.8f));
+        blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
 
         TreeGenerator oakTree = new TreeGeneratorAdvancedLSystem("s", replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), 16, (float) Math.PI/3)
                 .setGenerationProbability(0.1f);

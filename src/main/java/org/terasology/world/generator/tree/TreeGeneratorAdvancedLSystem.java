@@ -1,15 +1,14 @@
 package org.terasology.world.generator.tree;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.Rotation;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -25,7 +24,7 @@ import java.util.Stack;
  * R - removed (nothing, doesn't grow)
  */
 public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
-    public final float MAX_ANGLE_OFFSET = (float) Math.PI / 36;
+    public final float MAX_ANGLE_OFFSET = (float) Math.PI / 36f;
 
     private Map<Character, AxionElementGeneration> blockMap;
     private String startingAxion;
@@ -49,19 +48,21 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
         String currentAxion = startingAxion;
         for (int i = 0; i < generations; i++) {
             StringBuilder result = new StringBuilder();
-            for (char axionChar : currentAxion.toCharArray()) {
-                final AxionElementReplacement axionElementReplacement = axionElementReplacements.get(axionChar);
+            for (AxionElement axion : parseAxions(currentAxion)) {
+                final AxionElementReplacement axionElementReplacement = axionElementReplacements.get(axion.key);
                 if (axionElementReplacement != null) {
                     result.append(axionElementReplacement.getReplacement(nextFloat(rand)));
                 } else {
-                    result.append(axionChar);
+                    result.append(axion.key);
+                    if (axion.parameter != null)
+                        result.append("(").append(axion.parameter).append(")");
                 }
             }
 
             currentAxion = result.toString();
         }
 
-        Map<Vector3i, Block> treeInMemory = generateTreeFromAxiom(currentAxion, nextFloat(rand) * MAX_ANGLE_OFFSET);
+        Map<Vector3i, Block> treeInMemory = generateTreeFromAxiom(currentAxion, nextFloat(rand) * MAX_ANGLE_OFFSET, (float) (nextFloat(rand) * Math.PI));
 
         for (Map.Entry<Vector3i, Block> blockAtPosition : treeInMemory.entrySet()) {
             final Vector3i position = blockAtPosition.getKey();
@@ -70,7 +71,7 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
         }
     }
 
-    private Map<Vector3i, Block> generateTreeFromAxiom(String currentAxion, float angleOffset) {
+    private Map<Vector3i, Block> generateTreeFromAxiom(String currentAxion, float angleOffset, float treeRotation) {
         Map<Vector3i, Block> treeInMemory = Maps.newHashMap();
 
         Stack<Vector3f> stackPosition = new Stack<>();
@@ -79,13 +80,15 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
         Vector3f position = new Vector3f(0, 0, 0);
         Matrix4f rotation = new Matrix4f();
         rotation.setIdentity();
+        rotation.rotY(treeRotation);
 
         Callback callback = new Callback(treeInMemory, position, rotation);
 
-        for (char c : currentAxion.toCharArray()) {
+        for (AxionElement axion : parseAxions(currentAxion)) {
             Matrix4f tempRotation = new Matrix4f();
             tempRotation.setIdentity();
 
+            char c = axion.key;
             switch (c) {
                 case '[':
                     stackOrientation.push(new Matrix4f(rotation));
@@ -97,28 +100,28 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
                     break;
                 case '&':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), angle + angleOffset));
+                    tempRotation.rotX(angle + angleOffset);
                     rotation.mul(tempRotation);
                     break;
                 case '^':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), -(angle + angleOffset)));
+                    tempRotation.rotX(-angle - angleOffset);
                     rotation.mul(tempRotation);
                     break;
-                case '*':
+                case '+':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), angle + angleOffset));
+                    tempRotation.rotY((float) Math.toRadians(Integer.parseInt(axion.parameter)));
                     rotation.mul(tempRotation);
                     break;
-                case '/':
+                case '-':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), -(angle + angleOffset)));
+                    tempRotation.rotY(-(float) Math.toRadians(Integer.parseInt(axion.parameter)));
                     rotation.mul(tempRotation);
                     break;
                 default:
                     AxionElementGeneration axionElementGeneration = blockMap.get(c);
                     if (axionElementGeneration != null) {
-                        axionElementGeneration.generate(callback, position, rotation);
+                        axionElementGeneration.generate(callback, position, rotation, axion.parameter);
                     }
             }
         }
@@ -172,5 +175,46 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
             rotation.transform(dir);
             position.add(dir);
         }
+    }
+
+    private static class AxionElement {
+        private char key;
+        private String parameter;
+
+        private AxionElement(char key, String parameter) {
+            this.key = key;
+            this.parameter = parameter;
+        }
+
+        private AxionElement(char key) {
+            this.key = key;
+        }
+    }
+
+    private static List<AxionElement> parseAxions(String axionString) {
+        List<AxionElement> result = new LinkedList<>();
+        char[] chars = axionString.toCharArray();
+        for (int i = 0, size = chars.length; i < size; i++) {
+            char c = chars[i];
+            if (c == '(' || c == ')')
+                throw new IllegalArgumentException("Invalid axion - parameter without key");
+            if (i + 1 < size && chars[i + 1] == '(') {
+                int closingBracket = axionString.indexOf(')', i + 1);
+                if (closingBracket < 0)
+                    throw new IllegalArgumentException("Invalid axion - missing closing bracket");
+                String parameter = axionString.substring(i + 2, closingBracket);
+                i = closingBracket;
+                result.add(new AxionElement(c, parameter));
+            } else {
+                result.add(new AxionElement(c));
+            }
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        List<AxionElement> axionElements = parseAxions("da(b)c");
+        System.out.println(axionElements.toString());
     }
 }

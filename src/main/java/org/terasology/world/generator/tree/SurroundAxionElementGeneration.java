@@ -1,6 +1,5 @@
 package org.terasology.world.generator.tree;
 
-import org.terasology.math.TeraMath;
 import org.terasology.world.block.Block;
 
 import javax.vecmath.Matrix4f;
@@ -27,14 +26,14 @@ public class SurroundAxionElementGeneration implements AxionElementGeneration {
     }
 
     @Override
-    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation) {
+    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter) {
         callback.setBlock(position, baseBlock);
         int rangeInt = (int) range;
         for (int x = -rangeInt; x <= rangeInt; x++) {
             int y=0;
 //            for (int y = -rangeInt; y <= rangeInt; y++) {
                 for (int z = -rangeInt; z <= rangeInt; z++) {
-                    if (Math.sqrt(x * x + y * y + z * z) < range) {
+                    if (Math.sqrt(x * x + y * y + z * z) <= range) {
                         Vector3f v = new Vector3f(x, y, z);
                         rotation.transform(v);
                         Vector3f sideVec = new Vector3f(position);

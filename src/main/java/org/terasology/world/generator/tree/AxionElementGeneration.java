@@ -11,7 +11,7 @@ import javax.vecmath.Vector3f;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public interface AxionElementGeneration {
-    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation);
+    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter);
 
     public interface AxionElementGenerationCallback {
         public void setBlock(Vector3f position, Block block);

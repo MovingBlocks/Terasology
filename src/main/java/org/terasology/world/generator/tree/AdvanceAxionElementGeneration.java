@@ -14,7 +14,7 @@ public class AdvanceAxionElementGeneration implements AxionElementGeneration {
     }
 
     @Override
-    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation) {
+    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter) {
         callback.advance(advance);
     }
 }

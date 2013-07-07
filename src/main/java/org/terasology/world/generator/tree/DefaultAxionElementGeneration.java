@@ -1,6 +1,5 @@
 package org.terasology.world.generator.tree;
 
-import org.terasology.math.Rotation;
 import org.terasology.world.block.Block;
 
 import javax.vecmath.Matrix4f;
@@ -19,7 +18,7 @@ public class DefaultAxionElementGeneration implements AxionElementGeneration {
     }
 
     @Override
-    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation) {
+    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter) {
         callback.setBlock(position, block);
         callback.advance(advance);
     }
