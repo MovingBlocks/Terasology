@@ -48,7 +48,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     private static final FastRandom rand = new FastRandom();
 
-    private Property ssaoStrength = new Property("ssaoStrength", 2.5f, 0.01f, 12.0f);
+    private Property ssaoStrength = new Property("ssaoStrength", 1.25f, 0.01f, 12.0f);
     private Property ssaoRad = new Property("ssaoRad", 4.0f, 0.1f, 25.0f);
 
     private Texture ssaoNoiseTexture = null;
