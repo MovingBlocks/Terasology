@@ -86,7 +86,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
             program.setInt("texDebug", texId++);
         } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_BLOOM.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom1");
+            DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom2");
             program.setInt("texDebug", texId++);
         } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_HIGH_PASS.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

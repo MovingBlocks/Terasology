@@ -41,7 +41,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
     Property aberrationOffsetX = new Property("aberrationOffsetX", 0.0f, 0.0f, 0.1f);
     Property aberrationOffsetY = new Property("aberrationOffsetY", 0.0f, 0.0f, 0.1f);
 
-    Property bloomFactor = new Property("bloomFactor", 1.0f, 0.0f, 1.0f);
+    Property bloomFactor = new Property("bloomFactor", 0.5f, 0.0f, 1.0f);
 
     @Override
     public void applyParameters(GLSLShaderProgramInstance program) {
@@ -57,7 +57,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom1");
+            DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom2");
             program.setInt("texBloom", texId++);
 
             program.setFloat("bloomFactor", (Float) bloomFactor.getValue());

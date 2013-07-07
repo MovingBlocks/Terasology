@@ -64,8 +64,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.6f, 0.0f, 4.0f);
     private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.05f, 0.0f, 0.5f);
 
-    private Property bloomHighPassThreshold = new Property("bloomHighPassThreshold", 1.35f, 0.0f, 5.0f);
-    private Property bloomBlurRadius = new Property("bloomBlurRadius", 3.0f, 0.0f, 64.0f);
+    private Property bloomHighPassThreshold = new Property("bloomHighPassThreshold", 0.5f, 0.0f, 5.0f);
+    private Property bloomBlurRadius = new Property("bloomBlurRadius", 12.0f, 0.0f, 32.0f);
 
     private Property overallBlurRadiusFactor = new Property("overallBlurRadiusFactor", 0.8f, 0.0f, 16.0f);
 
@@ -329,14 +329,15 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
-        createFBO("sceneHighPass", rtWidth4, rtHeight4, FBOType.DEFAULT);
-        createFBO("sceneBloom0", rtWidth4, rtHeight4, FBOType.DEFAULT);
-        createFBO("sceneBloom1", rtWidth4, rtWidth4, FBOType.DEFAULT);
+        createFBO("sceneHighPass", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
+        createFBO("sceneBloom0", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("sceneBloom1", rtWidth4, rtHeight4, FBOType.DEFAULT);
+        createFBO("sceneBloom2", rtWidth8, rtHeight8, FBOType.DEFAULT);
 
         createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT);
         createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
-        createFBO("sceneSkyBand0", rtWidth32, rtHeight32, FBOType.DEFAULT);
+        createFBO("sceneSkyBand0", rtWidth16, rtHeight16, FBOType.DEFAULT);
         createFBO("sceneSkyBand1", rtWidth32, rtHeight32, FBOType.DEFAULT);
     }
 
@@ -832,10 +833,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             generateHighPass();
         }
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             if (config.getRendering().isBloom()) {
                 generateBloom(i);
             }
+        }
+
+        for (int i = 0; i < 2; i++) {
             if (config.getRendering().getBlurIntensity() != 0) {
                 generateBlur(i);
             }
