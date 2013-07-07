@@ -67,7 +67,7 @@ void main() {
         occlusion += step(sample.z, sampleDepth) * rangeCheck;
     }
 
-    occlusion = 1.0 -occlusion / 16.0;
+    occlusion = 1.0 - occlusion / 16.0;
 
     gl_FragData[0].rgba = vec4(pow(occlusion, ssaoStrength));
 }

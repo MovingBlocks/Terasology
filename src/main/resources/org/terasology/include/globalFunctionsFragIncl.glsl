@@ -61,11 +61,6 @@ float linDepthViewingDistance(float depth) {
     return (linDepth(depth) * zFar) / viewingDistance;
 }
 
-
-float linDepth(float depth, mat4 projMatrix) {
-	return projMatrix[3][2] / (depth - projMatrix[2][2]);
-}
-
 vec3 uncharted2Tonemap(vec3 x) {
 	return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }

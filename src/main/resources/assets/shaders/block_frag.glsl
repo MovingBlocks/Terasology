@@ -29,7 +29,7 @@ void main(){
     vec4 color;
 
     if (textured) {
-        color = texture2D(textureAtlas, gl_TexCoord[0].xy);
+        color = gl_Color * texture2D(textureAtlas, gl_TexCoord[0].xy);
     } else {
         color = gl_Color;
     }
