@@ -2,7 +2,10 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -19,6 +22,7 @@ import org.terasology.protobuf.EntityData;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +35,7 @@ public class GlobalStoreLoader {
     private ComponentLibrary componentLibrary;
     private EntitySerializer entitySerializer;
     private PrefabSerializer prefabSerializer;
+    private List<StoreRefTable> refTables;
 
     public GlobalStoreLoader(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
@@ -51,6 +56,16 @@ public class GlobalStoreLoader {
             entitySerializer.deserialize(entityData);
         }
 
+        refTables = Lists.newArrayListWithCapacity(globalStore.getStoreReferenceSetCount());
+        for (EntityData.EntityStoreReferenceSet refSet : globalStore.getStoreReferenceSetList()) {
+            TIntSet refs = new TIntHashSet(refSet.getReferenceList());
+            StoreRefTable refTable = new StoreRefTable(refSet.getStoreId(), refs);
+            refTables.add(refTable);
+        }
+    }
+
+    public List<StoreRefTable> getStoreRefTables() {
+        return refTables;
     }
 
     private void loadMissingPrefabs(EntityData.GlobalEntityStore globalStore) {

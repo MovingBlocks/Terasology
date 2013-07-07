@@ -21,17 +21,35 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.config.Config;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.testUtil.WorldProviderCoreStub;
+import org.terasology.world.EntityAwareWorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.management.BlockManagerImpl;
+import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
 import java.nio.file.FileSystem;
@@ -52,11 +70,13 @@ import static org.mockito.Mockito.when;
 public class StorageManagerTest {
 
     public static final String PLAYER_ID = "someId";
+    public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
 
     private ModManager modManager;
     private NetworkSystem networkSystem;
     private StorageManager esm;
     private EngineEntityManager entityManager;
+    private Block testBlock;
 
     @Before
     public void setup() throws Exception {
@@ -71,7 +91,14 @@ public class StorageManagerTest {
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = new EntitySystemBuilder().build(modManager, networkSystem);
+
+        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new DefaultBlockFamilyFactoryRegistry()));
+        testBlock = new Block();
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
+
         esm = new StorageManagerInternal(entityManager);
+
+        CoreRegistry.put(Config.class, new Config());
     }
 
     @Test
@@ -181,6 +208,41 @@ public class StorageManagerTest {
     }
 
 
-    // TODO: Store/restore validRefSets.
+    @Test
+    public void referenceRemainsValidOverStorageRestoral() throws Exception {
+        EntityRef someEntity = entityManager.create();
+        EntityRef character = entityManager.create(new EntityRefComponent(someEntity));
+        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
+        store.setCharacter(character);
+        store.save();
 
+        esm.flush();
+
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        newSM.loadGlobalEntities();
+
+        PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
+        restored.restore();
+        assertTrue(restored.getCharacter().getComponent(EntityRefComponent.class).entityRef.exists());
+    }
+
+    @Test
+    public void getUnstoredChunkReturnsNothing() {
+        esm.loadChunkStore(CHUNK_POS);
+    }
+
+    @Test
+    public void storeAndRestoreChunkStore() {
+        Chunk chunk = new Chunk(CHUNK_POS);
+        ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
+        chunk.setBlock(0, 0, 0, testBlock);
+        chunkStore.save();
+
+        ChunkStore restored = esm.loadChunkStore(CHUNK_POS);
+        assertNotNull(restored);
+        assertEquals(CHUNK_POS, restored.getChunkPosition());
+        assertNotNull(restored.getChunk());
+        assertEquals(testBlock, restored.getChunk().getBlock(0, 0, 0));
+    }
 }

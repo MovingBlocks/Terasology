@@ -33,11 +33,14 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.math.Vector3i;
+import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.chunks.Chunk;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -68,6 +71,8 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
     private TIntObjectMap<List<StoreRefTable>> externalRefHolderLookup = new TIntObjectHashMap<>();
     private Map<String, StoreRefTable> playerStoreExternalRefs = Maps.newHashMap();
 
+    private Map<Vector3i, ChunkStore> chunkStores = Maps.newHashMap();
+
     public StorageManagerInternal(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         entityManager.subscribe(this);
@@ -82,6 +87,10 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
                 EntityData.GlobalEntityStore store = EntityData.GlobalEntityStore.parseFrom(in);
                 GlobalStoreLoader loader = new GlobalStoreLoader(entityManager);
                 loader.load(store);
+                for (StoreRefTable refTable : loader.getStoreRefTables()) {
+                    playerStoreExternalRefs.put(refTable.getId(), refTable);
+                    indexStoreRefTable(refTable);
+                }
             }
         }
     }
@@ -107,7 +116,7 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
             globalStore.store(entity);
         }
         for (StoreRefTable table : playerStoreExternalRefs.values()) {
-            globalStore.addRefTable(table.id, table.externalReferences);
+            globalStore.addRefTable(table.getId(), table.getExternalReferences());
         }
         EntityData.GlobalEntityStore globalStoreData = globalStore.save();
         try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE)))) {
@@ -132,49 +141,57 @@ public class StorageManagerInternal implements StorageManager, EntityDestroySubs
             TIntSet validRefs = null;
             StoreRefTable table = playerStoreExternalRefs.get(playerId);
             if (table != null) {
-                validRefs = table.externalReferences;
+                validRefs = table.getExternalReferences();
             }
             return new PlayerStoreInternal(playerId, store, validRefs, this, entityManager);
         }
         return null;
     }
 
+    @Override
+    public ChunkStore createChunkStoreForSave(Chunk chunk) {
+        return new ChunkStoreInternal(chunk, this);
+    }
+
+    @Override
+    public ChunkStore loadChunkStore(Vector3i chunkPos) {
+        return chunkStores.get(chunkPos);
+    }
+
+    public void store(ChunkStoreInternal chunkStore) {
+        this.chunkStores.put(chunkStore.getChunkPosition(), chunkStore);
+    }
+
     public void store(String id, EntityData.PlayerEntityStore playerStore, TIntSet externalReference) {
         if (externalReference.size() > 0) {
             StoreRefTable refTable = new StoreRefTable(id, externalReference);
-            playerStoreExternalRefs.put(id, refTable);
-            TIntIterator iterator = externalReference.iterator();
-            while (iterator.hasNext()) {
-                int refId = iterator.next();
-                List<StoreRefTable> tables = externalRefHolderLookup.get(refId);
-                if (tables == null) {
-                    tables = Lists.newArrayList();
-                    externalRefHolderLookup.put(refId, tables);
-                }
-                tables.add(refTable);
-            }
+            indexStoreRefTable(refTable);
         }
         playerStores.put(id, playerStore);
+    }
+
+    private void indexStoreRefTable(StoreRefTable refTable) {
+        playerStoreExternalRefs.put(refTable.getId(), refTable);
+        TIntIterator iterator = refTable.getExternalReferences().iterator();
+        while (iterator.hasNext()) {
+            int refId = iterator.next();
+            List<StoreRefTable> tables = externalRefHolderLookup.get(refId);
+            if (tables == null) {
+                tables = Lists.newArrayList();
+                externalRefHolderLookup.put(refId, tables);
+            }
+            tables.add(refTable);
+        }
     }
 
     @Override
     public void onEntityDestroyed(int entityId) {
         List<StoreRefTable> tables = externalRefHolderLookup.remove(entityId);
         for (StoreRefTable table : tables) {
-            table.externalReferences.remove(entityId);
-            if (table.externalReferences.isEmpty()) {
-                playerStoreExternalRefs.remove(table.id);
+            table.getExternalReferences().remove(entityId);
+            if (table.getExternalReferences().isEmpty()) {
+                playerStoreExternalRefs.remove(table.getId());
             }
-        }
-    }
-
-    private static class StoreRefTable {
-        private String id;
-        private TIntSet externalReferences;
-
-        public StoreRefTable(String id, TIntSet externalReferences) {
-            this.id = id;
-            this.externalReferences = externalReferences;
         }
     }
 }
