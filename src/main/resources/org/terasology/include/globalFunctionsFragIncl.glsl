@@ -14,45 +14,6 @@
  * limitations under the License.
  */
 
-#define LIGHT_SHAFT_SAMPLES 64
-#define MOTION_BLUR_SAMPLES 8
-
-#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
-#define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
-
-#define NIGHT_BRIGHTNESS 0.1
-
-#define WATER_AMB 1.0
-#define WATER_DIFF 0.75
-
-#define BLOCK_DIFF 0.75
-#define BLOCK_AMB 2.0
-
-#define EPSILON 0.000001
-
-#define A 0.15
-#define B 0.50
-#define C 0.10
-#define D 0.20
-#define E 0.02
-#define F 0.30
-#define W 11.2
-
-uniform bool swimming;
-uniform float viewingDistance;
-uniform float daylight;
-uniform float tick;
-uniform float time;
-uniform float sunlightValueAtPlayerPos;
-
-uniform vec3 sunVec;
-uniform vec3 cameraPosition;
-uniform vec3 cameraDirection;
-
-uniform vec3 cameraParameters;
-#define zNear cameraParameters.x
-#define zFar cameraParameters.y
-
 float linDepth(float depth) {
     return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }

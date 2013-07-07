@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-float timeToTick(float time, float speed) {
-    return time * 4000.0 * speed;
-}
+uniform bool swimming;
+uniform float viewingDistance;
+uniform float daylight;
+uniform float tick;
+uniform float time;
+uniform float sunlightValueAtPlayerPos;
 
-float smoothCurve(float x) {
-  return x * x * (3.0 - 2.0 * x);
-}
+uniform vec3 sunVec;
+uniform vec3 cameraPosition;
+uniform vec3 cameraDirection;
 
-float triangleWave(float x) {
-  return abs(fract(x + 0.5) * 2.0 - 1.0);
-}
-
-float smoothTriangleWave(float x) {
-  return smoothCurve(triangleWave(x)) * 2.0 - 1.0;
-}
-
-bool checkFlag(int flag, float val) {
-    return flag == int(val);
-}
+uniform vec3 cameraParameters;
+#define zNear cameraParameters.x
+#define zFar cameraParameters.y

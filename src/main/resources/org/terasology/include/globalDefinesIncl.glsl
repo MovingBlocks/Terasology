@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
-float timeToTick(float time, float speed) {
-    return time * 4000.0 * speed;
-}
+#define OCEAN_OCTAVES 16
 
-float smoothCurve(float x) {
-  return x * x * (3.0 - 2.0 * x);
-}
+#define LIGHT_SHAFT_SAMPLES 64
+#define MOTION_BLUR_SAMPLES 8
 
-float triangleWave(float x) {
-  return abs(fract(x + 0.5) * 2.0 - 1.0);
-}
+#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
+#define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
 
-float smoothTriangleWave(float x) {
-  return smoothCurve(triangleWave(x)) * 2.0 - 1.0;
-}
+#define NIGHT_BRIGHTNESS 0.1
 
-bool checkFlag(int flag, float val) {
-    return flag == int(val);
-}
+#define WATER_AMB 1.0
+#define WATER_DIFF 0.75
+
+#define BLOCK_DIFF 0.75
+#define BLOCK_AMB 2.0
+
+#define EPSILON 0.000001
+
+#define A 0.15
+#define B 0.50
+#define C 0.10
+#define D 0.20
+#define E 0.02
+#define F 0.30
+#define W 11.2
+

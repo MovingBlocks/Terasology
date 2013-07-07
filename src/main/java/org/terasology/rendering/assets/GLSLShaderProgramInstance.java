@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.cameras.Camera;
@@ -40,9 +41,7 @@ import javax.swing.*;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector4f;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.FloatBuffer;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -94,14 +93,19 @@ public class GLSLShaderProgramInstance {
     }
 
     private static String includedFunctionsVertex = "", includedFunctionsFragment = "";
+    private static String includedDefines = "", includedUniforms = "";
 
     static {
         InputStream vertStream = GLSLShaderProgram.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
         InputStream fragStream = GLSLShaderProgram.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
+        InputStream uniformsStream = GLSLShaderProgram.class.getClassLoader().getResourceAsStream("org/terasology/include/globalUniformsIncl.glsl");
+        InputStream definesStream = GLSLShaderProgram.class.getClassLoader().getResourceAsStream("org/terasology/include/globalDefinesIncl.glsl");
 
         try {
             includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
             includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));
+            includedDefines = CharStreams.toString(new InputStreamReader(definesStream));
+            includedUniforms = CharStreams.toString(new InputStreamReader(uniformsStream));
         } catch (IOException e) {
             logger.error("Failed to load Include shader resources");
         } finally {
@@ -116,19 +120,29 @@ public class GLSLShaderProgramInstance {
             } catch (IOException e) {
                 logger.error("Failed to close globalFunctionsFragIncl.glsl stream");
             }
+            try {
+                uniformsStream.close();
+            } catch (IOException e) {
+                logger.error("Failed to close globalUniformsIncl.glsl stream");
+            }
+            try {
+                definesStream.close();
+            } catch (IOException e) {
+                logger.error("Failed to close globalDefinesIncl.glsl stream");
+            }
         }
     }
 
     protected static StringBuilder createShaderBuilder() {
         String preProcessorPreamble = "#version 120\n";
 
-        preProcessorPreamble += "float TEXTURE_OFFSET = " + Block.calcRelativeTileSize() + ";\n";
-        preProcessorPreamble += "float BLOCK_LIGHT_POW = " + WorldRenderer.BLOCK_LIGHT_POW + ";\n";
-        preProcessorPreamble += "float BLOCK_LIGHT_SUN_POW = " + WorldRenderer.BLOCK_LIGHT_SUN_POW + ";\n";
-        preProcessorPreamble += "float BLOCK_INTENSITY_FACTOR = " + WorldRenderer.BLOCK_INTENSITY_FACTOR + ";\n";
-        preProcessorPreamble += "float SHADOW_MAP_RESOLUTION = " + CoreRegistry.get(Config.class).getRendering().getShadowMapResolution() + ";\n";
+        preProcessorPreamble += "#define TEXTURE_OFFSET " + Block.calcRelativeTileSize() + "\n";
+        preProcessorPreamble += "#define BLOCK_LIGHT_POW " + WorldRenderer.BLOCK_LIGHT_POW + "\n";
+        preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";
+        preProcessorPreamble += "#define BLOCK_INTENSITY_FACTOR " + WorldRenderer.BLOCK_INTENSITY_FACTOR + "\n";
+        preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) CoreRegistry.get(Config.class).getRendering().getShadowMapResolution() + "\n";
         // TODO: This shouldn't be hardcoded
-        preProcessorPreamble += "float TEXTURE_OFFSET_EFFECTS = " + 0.0625f + ";\n";
+        preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
 
         Config config = CoreRegistry.get(Config.class);
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
@@ -168,11 +182,11 @@ public class GLSLShaderProgramInstance {
             builder.append("#define CLOUD_SHADOWS \n");
 
         for (int i=0; i< SystemConfig.DebugRenderingStages.values().length; ++i) {
-            builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" "+SystemConfig.DebugRenderingStages.values()[i].ordinal()+" \n");
+            builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" int("+SystemConfig.DebugRenderingStages.values()[i].ordinal()+") \n");
         }
 
         for (int i=0; i< ChunkTessellator.ChunkVertexFlags.values().length; ++i) {
-            builder.append("#define "+ChunkTessellator.ChunkVertexFlags.values()[i].toString()+" "+ChunkTessellator.ChunkVertexFlags.values()[i].getValue()+" \n");
+            builder.append("#define "+ChunkTessellator.ChunkVertexFlags.values()[i].toString()+" int("+ChunkTessellator.ChunkVertexFlags.values()[i].getValue()+") \n");
         }
 
         return builder;
@@ -294,6 +308,9 @@ public class GLSLShaderProgramInstance {
             }
         }
 
+        shader.append(includedDefines);
+        shader.append(includedUniforms);
+
         if (type == GL20.GL_FRAGMENT_SHADER) {
             shader.append(includedFunctionsFragment).append("\n");
         } else {
@@ -313,6 +330,22 @@ public class GLSLShaderProgramInstance {
         } else if (type == GL20.GL_VERTEX_SHADER) {
             vertexPrograms.put(featureHash, shaderId);
             debugShaderType = "VERTEX";
+        }
+
+        // Dump all final shader sources to the log directory
+        try {
+            final String strippedTitle = shaderProgramBase.getTitle().replace(":", "");
+
+            File file = new File(PathManager.getInstance().getLogPath(), debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl");
+            FileWriter fileWriter = new FileWriter(file);
+
+            BufferedWriter out = new BufferedWriter(fileWriter);
+
+            out.write(shader.toString());
+
+            out.close();
+        } catch (Exception e) {
+            logger.error("Failed to dump shader source.");
         }
 
         GL20.glShaderSource(shaderId, shader.toString());
