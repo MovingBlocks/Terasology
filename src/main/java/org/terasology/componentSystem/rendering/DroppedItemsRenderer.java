@@ -82,11 +82,11 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
         GLSLShaderProgramInstance shader;
 
         shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.setBoolean("textured", false);
-        shader.setFloat("light", worldRenderer.getRenderingLightValue());
+        shader.setFloat("blockLight", worldRenderer.getRenderingLightValue());
+        shader.setFloat("sunlight", worldRenderer.getRenderingLightValue());
 
         shader.enable();
 
@@ -133,7 +133,6 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
 
         glPopMatrix();
 
-        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 

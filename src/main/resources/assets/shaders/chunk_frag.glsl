@@ -38,6 +38,7 @@ uniform sampler2D textureWaterRefraction;
 uniform sampler2D textureWaterReflection;
 uniform sampler2D texSceneOpaque;
 uniform sampler2D textureWaterNormal;
+uniform sampler2D textureWaterNormalAlt;
 #endif
 
 #if defined (NORMAL_MAPPING)
@@ -60,7 +61,7 @@ uniform sampler2D textureAtlasHeight;
 varying float flickeringLightOffset;
 #endif
 
-varying vec4 vertexWorldPos;
+varying vec3 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
 varying vec3 sunVecView;
@@ -135,11 +136,13 @@ void main() {
 
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
         if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
-            vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
-            vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+            vec2 scaledVertexWorldPos = vertexWorldPos.xz / 32.0;
+
+            vec2 waterOffset = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.0075), scaledVertexWorldPos.y + timeToTick(time, 0.0075));
+            vec2 waterOffset2 = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.005), scaledVertexWorldPos.y - timeToTick(time, 0.005));
 
             normalWaterOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-            normalWaterOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+            normalWaterOffset += (texture2D(textureWaterNormalAlt, waterOffset2).xyz * 2.0 - 1.0).xy;
             normalWaterOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
 
             normalWater.xy += normalWaterOffset;
@@ -188,8 +191,6 @@ void main() {
             } else {
                 color.rgb *= gl_Color.rgb;
             }
-
-            color.a *= gl_Color.a;
         }
     /* MASK GRASS AND APPLY BIOME COLOR */
     } else {

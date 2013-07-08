@@ -20,7 +20,9 @@ uniform vec3 colorOffset = vec3(1.0, 1.0, 1.0);
 
 uniform bool textured = false;
 
-uniform float light = 1.0;
+uniform float blockLight = 1.0;
+uniform float sunlight = 1.0;
+
 uniform float alpha = 1.0;
 
 varying vec3 normal;
@@ -40,12 +42,9 @@ void main(){
         discard;
     }
 
-#if !defined (FEATURE_DEFERRED_LIGHTING)
-    color.rgb *= light;
-#endif
-
     color.rgb *= colorOffset.rgb;
 
     gl_FragData[0].rgba = color;
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, light);
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, sunlight);
+    gl_FragData[2].rgba = vec4(blockLight, blockLight, blockLight, 0.0);
 }

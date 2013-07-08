@@ -98,7 +98,7 @@ uniform bool animated;
 
 varying vec3 normal;
 
-varying vec4 vertexWorldPos;
+varying vec3 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
 
@@ -114,8 +114,8 @@ void main()
 
     gl_TexCoord[1] = gl_MultiTexCoord1;
 
-	vertexWorldPos = gl_Vertex;
-	vertexViewPos = gl_ModelViewMatrix * vertexWorldPos;
+	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
+	vertexWorldPos = gl_Vertex.xyz + chunkPositionWorld.xyz;
 
 	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
@@ -136,23 +136,19 @@ void main()
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 4.0;
 #endif
 
-#if defined (ANIMATED_GRASS) || defined (ANIMATED_WATER)
-    vec3 vertexChunkPos = vertexWorldPos.xyz + chunkPositionWorld.xyz;
-#endif
-
 #ifdef ANIMATED_GRASS
     if (animated) {
         // GRASS ANIMATION
         if ( checkFlag(BLOCK_HINT_WAVING, blockHint) ) {
            // Only animate the upper two vertices
            if (mod(gl_TexCoord[0].y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
-               vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
-               vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
+               vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexWorldPos.x * 0.1 + vertexWorldPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
+               vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexWorldPos.x * -0.5 + vertexWorldPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
            }
         } else if ( checkFlag(BLOCK_HINT_WAVING_BLOCK, blockHint) ) {
-            vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.01 * blockScale;
-            vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.15) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.05 * blockScale;
-            vertexViewPos.z += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.01 * blockScale;
+            vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.1) + vertexWorldPos.x * 0.01 + vertexWorldPos.z * 0.01) * 2.0 - 1.0) * 0.01 * blockScale;
+            vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.15) + vertexWorldPos.x * -0.01 + vertexWorldPos.z * -0.01) * 2.0 - 1.0) * 0.05 * blockScale;
+            vertexViewPos.z += (smoothTriangleWave(timeToTick(time, 0.1) + vertexWorldPos.x * -0.01 + vertexWorldPos.z * -0.01) * 2.0 - 1.0) * 0.01 * blockScale;
         }
     }
 #endif
@@ -162,7 +158,7 @@ void main()
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
-            vec4 normalAndOffset = calcWaterNormalAndOffset(vertexChunkPos.xz);
+            vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
 
             waterNormalViewSpace = gl_NormalMatrix * normalAndOffset.xyz;
             vertexViewPos.y += normalAndOffset.w + waterOffsetY;

@@ -1084,6 +1084,10 @@ public final class WorldRenderer {
         return getSunlightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
 
+    public float getBlockLightValue() {
+        return getBlockLightValueAt(new Vector3f(getActiveCamera().getPosition()));
+    }
+
     public float getRenderingLightValue() {
         return getRenderingLightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
@@ -1108,11 +1112,13 @@ public final class WorldRenderer {
 
         float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0f) * rawLightValueSun;
         lightValueSun *= getDaylight();
-        // TODO: Hardcoded factor and value to compensate for daylight tint and night brightness
-        lightValueSun *= 0.9f;
-        lightValueSun += 0.05f;
 
         return lightValueSun;
+    }
+
+    public float getBlockLightValueAt(Vector3f pos) {
+        float rawLightValue = worldProvider.getLight(pos) / 15.0f;
+        return (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - rawLightValue) * 16.0f) * rawLightValue;
     }
 
     public void update(float delta) {

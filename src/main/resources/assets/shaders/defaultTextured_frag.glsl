@@ -26,4 +26,5 @@ void main(){
 
     gl_FragData[0].rgba = diffColor * gl_Color;
     gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
+    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
 }

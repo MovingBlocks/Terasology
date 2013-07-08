@@ -181,8 +181,6 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
         for (Material material : opaqueMesh.keys()) {
             Mesh lastMesh = null;
-
-            material.getShaderProgramInstance().addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
             material.enable();
 
             material.getShaderProgramInstance().setBoolean("textured", true);
@@ -245,7 +243,8 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                         TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
                         material.getShaderProgramInstance().setMatrix3("normalMatrix", tempMatrixBuffer33);
 
-                        material.getShaderProgramInstance().setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+                        material.getShaderProgramInstance().setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos));
+                        material.getShaderProgramInstance().setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos));
 
                         meshComp.mesh.doRender();
                     }

@@ -186,7 +186,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
                                     renderIcon(heldItemComp.icon, bobOffset, cameraPosition, notCurrentLevel);
                                 }
 
-                                if( !notCurrentLevel && heldItemComp != null && foundedTarget){
+                                if (!notCurrentLevel && heldItemComp != null && foundedTarget) {
                                     renderToolTipCount(bobOffset,heldItemComp.stackCount>1?heldItemComp.stackCount:1);
                                 }
 
@@ -207,9 +207,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     }
 
     private void renderBlock(BlockFamily blockFamily, Vector3f blockPos, Vector3f cameraPos, boolean notCurrentLevel) {
-        // Adjust the brightness of the block according to the current position of the player
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -226,20 +224,18 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         glPushMatrix();
         glTranslatef(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
         glScalef(0.3f, 0.3f, 0.3f);
-        activeBlock.renderWithLightValue(worldRenderer.getRenderingLightValue());
+        activeBlock.renderWithLightValue(worldRenderer.getSunlightValue(), worldRenderer.getBlockLightValue());
         glPopMatrix();
 
         if(notCurrentLevel){
             shader.setFloat("alpha", 1.0f);
         }
 
-        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderIcon(String iconName, Vector3f offset, Vector3f cameraPos, boolean notCurrentLevel) {
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -249,7 +245,8 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         }
 
         shader.setBoolean("textured", false);
-        shader.setFloat("light", worldRenderer.getRenderingLightValue());
+        shader.setFloat("sunlight", worldRenderer.getSunlightValue());
+        shader.setFloat("blockLight", worldRenderer.getBlockLightValue());
 
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
@@ -264,7 +261,6 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         itemMesh.render();
         glPopMatrix();
 
-        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
@@ -411,7 +407,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         if(block != null){
             GL11.glRotatef(170f, -1f, 0f, 0f);
             GL11.glRotatef(-16f, 0f, 1f, 0f);
-            block.renderWithLightValue(1.0f);
+            block.renderWithLightValue(1.0f, 1.0f);
         }else{
             float offsetX = icon.getX() * 0.0625f,
                   offsetY = icon.getY() * 0.0625f;
@@ -468,8 +464,12 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     private void renderBillboardBegin(int textureId, Vector3f position, Vector3f offset, Vector3f scale){
         glDisable(GL11.GL_CULL_FACE);
 
-        if( textureId>=0 ){
-            ShaderManager.getInstance().enableDefaultTextured();
+        // TODO: Create a specific shader instance for that - and at some other places too
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("defaultTextured");
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
+        shader.enable();
+
+        if (textureId >= 0) {
             glBindTexture(GL11.GL_TEXTURE_2D, textureId);
         }
 
@@ -481,13 +481,14 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         glPushMatrix();
         applyOrientation();
 
-        if(offset != null){
+        if (offset != null) {
             glTranslatef(offset.x, offset.y, offset.z);
         }
 
-        if(scale != null){
+        if (scale != null) {
             glScalef(scale.x, scale.y, scale.z);
         }
+
     }
 
     private void renderBillboardEnd(){
@@ -497,6 +498,9 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         glDepthFunc(GL_LEQUAL);
         glEnable(GL11.GL_DEPTH_TEST);
         glEnable(GL11.GL_CULL_FACE);
+
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("defaultTextured");
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
     }
 
     @Override

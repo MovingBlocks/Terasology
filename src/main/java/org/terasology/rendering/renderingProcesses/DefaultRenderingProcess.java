@@ -625,7 +625,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void beginRenderSceneOpaque() {
         bindFbo("sceneOpaque");
-        setRenderBufferMask(true, true, false);
+        setRenderBufferMask(true, true, true);
     }
 
     public void endRenderSceneOpaque() {
@@ -636,7 +636,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     public void beginRenderLightGeometryStencilPass() {
         bindFbo("sceneOpaque");
         setRenderBufferMask(false, false, false);
-
         glDepthMask(false);
 
         glClear(GL_STENCIL_BUFFER_BIT);

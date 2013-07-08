@@ -200,7 +200,8 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
 
             TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
             skeletalMesh.material.getShaderProgramInstance().setMatrix3("normalMatrix", tempMatrixBuffer33);
-            skeletalMesh.material.getShaderProgramInstance().setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+            skeletalMesh.material.getShaderProgramInstance().setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos));
+            skeletalMesh.material.getShaderProgramInstance().setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos));
 
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());

@@ -47,7 +47,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
             DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
             program.setInt("texDebug", texId++);
         } else if (config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_OPAQUE_NORMALS.ordinal()
-                || config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_SUNLIGHT.ordinal()) {
+                || config.getSystem().getDebugRenderingStage() == SystemConfig.DebugRenderingStages.DEBUG_STAGE_OPAQUE_SUNLIGHT.ordinal()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboNormalsTexture("sceneOpaque");
             program.setInt("texDebug", texId++);

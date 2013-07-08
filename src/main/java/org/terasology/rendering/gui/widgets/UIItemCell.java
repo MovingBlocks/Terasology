@@ -344,7 +344,7 @@ public class UIItemCell extends UIDisplayContainer  {
             glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
             Block block = blockFamily.getArchetypeBlock();
-            block.renderWithLightValue(1.0f);
+            block.renderWithLightValue(1.0f, 1.0f);
 
             GL11.glPopMatrix();
 

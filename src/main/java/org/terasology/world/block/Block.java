@@ -676,17 +676,17 @@ public class Block {
         return getBounds(new Vector3i(floatPos, 0.5f));
     }
 
-    public void renderWithLightValue(float light) {
+    public void renderWithLightValue(float sunlight, float blockLight) {
         if (isInvisible()) {
             return;
         }
 
         GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
-        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
-        shader.setFloat("light", light);
+        shader.setFloat("sunlight", sunlight);
+        shader.setFloat("blockLight", blockLight);
 
         if (mesh == null) {
             generateMesh();
@@ -703,7 +703,6 @@ public class Block {
             glEnable(GL11.GL_CULL_FACE);
         }
 
-        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_DEFERRED_LIGHTING);
         shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 

@@ -68,6 +68,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         Texture water = Assets.getTexture("engine:waterStill");
         Texture lava = Assets.getTexture("engine:lavaStill");
         Texture waterNormal = Assets.getTexture("engine:waterNormal");
+        Texture waterNormalAlt = Assets.getTexture("engine:waterNormalAlt");
         Texture effects = Assets.getTexture("engine:effects");
 
         if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
@@ -87,6 +88,9 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.getId());
         program.setInt("textureWaterNormal", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.getId());
+        program.setInt("textureWaterNormalAlt", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         program.setInt("textureEffects", texId++);

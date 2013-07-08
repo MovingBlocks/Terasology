@@ -19,7 +19,9 @@ uniform sampler2D diffuse;
 // TODO: Add normal mapping support
 //uniform sampler2D normalMap;
 
-uniform float light;
+uniform float blockLight = 1.0;
+uniform float sunlight = 1.0;
+
 uniform vec3 colorOffset;
 uniform bool textured;
 
@@ -37,5 +39,6 @@ void main(){
         gl_FragData[0].rgba = color;
     }
 
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, light);
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, sunlight);
+    gl_FragData[2].rgba = vec4(blockLight, blockLight, blockLight, 0.0);
 }
