@@ -1,10 +1,16 @@
-package org.terasology.world.generator.tree;
+package org.terasology.logic.tree.lsystem;
 
 import com.google.common.collect.Maps;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Time;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.tree.TreeDefinition;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.world.ChunkView;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -14,61 +20,99 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
- * This tree growing L-System uses following axion elements:
- * S - sapling (sapling)
- * T - trunk (wood, doesn't create new branches)
- * B - branch (wood, creates new side branches)
- * b - branch small (leaves, can grow into a B)
- * W - blocked (wood, doesn't grow)
- * L - blocked (leaves, doesn't grow)
- * R - removed (nothing, doesn't grow)
+ * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
-    public final float MAX_ANGLE_OFFSET = (float) Math.PI / 36f;
+public class AdvancedLSystemTreeDefinition implements TreeDefinition {
+    private final float MAX_ANGLE_OFFSET = (float) Math.PI / 36f;
+    private final int GROWTH_INTERVAL = 10000;
 
     private Map<Character, AxionElementGeneration> blockMap;
-    private String startingAxion;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
     private List<Block> blockPriorities;
-    private int generations;
     private float angle;
+    private float deathChanceOnGrowth = 0.05f;
 
-    public TreeGeneratorAdvancedLSystem(String startingAxion, Map<Character, AxionElementReplacement> axionElementReplacements,
-                                        Map<Character, AxionElementGeneration> blockMap, List<Block> blockPriorities, int generations, float angle) {
-        this.startingAxion = startingAxion;
+    public AdvancedLSystemTreeDefinition(Map<Character, AxionElementReplacement> axionElementReplacements,
+                                         Map<Character, AxionElementGeneration> blockMap, List<Block> blockPriorities, float angle) {
         this.axionElementReplacements = axionElementReplacements;
         this.blockMap = blockMap;
         this.blockPriorities = blockPriorities;
-        this.generations = generations;
         this.angle = angle;
     }
 
     @Override
-    public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
-        String currentAxion = startingAxion;
-        for (int i = 0; i < generations; i++) {
-            StringBuilder result = new StringBuilder();
-            for (AxionElement axion : parseAxions(currentAxion)) {
-                final AxionElementReplacement axionElementReplacement = axionElementReplacements.get(axion.key);
-                if (axionElementReplacement != null) {
-                    result.append(axionElementReplacement.getReplacement(nextFloat(rand)));
-                } else {
-                    result.append(axion.key);
-                    if (axion.parameter != null)
-                        result.append("(").append(axion.parameter).append(")");
-                }
+    public void updateTree(WorldProvider worldProvider, EntityRef treeRef) {
+        LSystemTreeComponent lSystemTree = treeRef.getComponent(LSystemTreeComponent.class);
+
+        long time = CoreRegistry.get(Time.class).getGameTimeInMs();
+        if (lSystemTree.lastGrowthTime + GROWTH_INTERVAL < time) {
+            Vector3i treeLocation = treeRef.getComponent(BlockComponent.class).getPosition();
+
+            FastRandom rand = new FastRandom();
+
+            if (!lSystemTree.initialized) {
+                lSystemTree.branchAngle = this.angle + rand.randomFloat()*MAX_ANGLE_OFFSET;
+                lSystemTree.rotationAngle = (float) Math.PI*rand.randomPosFloat();
+                lSystemTree.generation = 1;
+                lSystemTree.initialized = true;
             }
 
-            currentAxion = result.toString();
+            Map<Vector3i, Block> currentTree = generateTreeFromAxiom(lSystemTree.axion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
+
+            String nextAxion = generateNextAxion(rand, lSystemTree.axion);
+
+            Map<Vector3i, Block> nextTree = generateTreeFromAxiom(nextAxion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
+
+            updateTreeInGame(worldProvider, treeLocation, currentTree, nextTree);
+
+            lSystemTree.axion = nextAxion;
+            lSystemTree.generation++;
+
+            if (rand.randomPosFloat() < deathChanceOnGrowth) {
+                treeRef.destroy();
+            } else {
+                lSystemTree.lastGrowthTime = time;
+                treeRef.saveComponent(lSystemTree);
+            }
+        }
+    }
+
+    private void updateTreeInGame(WorldProvider worldProvider, Vector3i treeLocation, Map<Vector3i, Block> currentTree, Map<Vector3i, Block> nextTree) {
+        Block air = BlockManager.getAir();
+
+        for (Map.Entry<Vector3i, Block> newTreeBlock : nextTree.entrySet()) {
+            Vector3i location = newTreeBlock.getKey();
+            Block oldBlock = currentTree.remove(location);
+            if (oldBlock != null) {
+                worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
+                        newTreeBlock.getValue(), oldBlock);
+            } else {
+                worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
+                        newTreeBlock.getValue(), air);
+            }
         }
 
-        Map<Vector3i, Block> treeInMemory = generateTreeFromAxiom(currentAxion, nextFloat(rand) * MAX_ANGLE_OFFSET, (float) (nextFloat(rand) * Math.PI));
-
-        for (Map.Entry<Vector3i, Block> blockAtPosition : treeInMemory.entrySet()) {
-            final Vector3i position = blockAtPosition.getKey();
-
-            view.setBlock(posX + position.x, posY + position.y, posZ + position.z, blockAtPosition.getValue());
+        for (Map.Entry<Vector3i, Block> oldTreeBlock : currentTree.entrySet()) {
+            Vector3i location = oldTreeBlock.getKey();
+            worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
+                    oldTreeBlock.getValue(), air);
         }
+    }
+
+    private String generateNextAxion(FastRandom rand, String currentAxion) {
+        StringBuilder result = new StringBuilder();
+        for (AxionElement axion : parseAxions(currentAxion)) {
+            final AxionElementReplacement axionElementReplacement = axionElementReplacements.get(axion.key);
+            if (axionElementReplacement != null) {
+                result.append(axionElementReplacement.getReplacement(rand.randomPosFloat()));
+            } else {
+                result.append(axion.key);
+                if (axion.parameter != null)
+                    result.append("(").append(axion.parameter).append(")");
+            }
+        }
+
+        return result.toString();
     }
 
     private Map<Vector3i, Block> generateTreeFromAxiom(String currentAxion, float angleOffset, float treeRotation) {
@@ -128,16 +172,6 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
         return treeInMemory;
     }
 
-    /**
-     * Returns float in range of 0 <= result < 1
-     *
-     * @param rand
-     * @return
-     */
-    private float nextFloat(FastRandom rand) {
-        return (rand.randomFloat() + 1f) / 2f;
-    }
-
     private void setBlock(Map<Vector3i, Block> treeInMemory, Vector3f position, Block block) {
         Vector3i blockPosition = new Vector3i(position);
         if (blockPosition.y >= 0) {
@@ -166,7 +200,7 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
 
         @Override
         public void setBlock(Vector3f position, Block block) {
-            TreeGeneratorAdvancedLSystem.this.setBlock(treeInMemory, position, block);
+            AdvancedLSystemTreeDefinition.this.setBlock(treeInMemory, position, block);
         }
 
         @Override
@@ -213,8 +247,4 @@ public class TreeGeneratorAdvancedLSystem extends TreeGenerator {
         return result;
     }
 
-    public static void main(String[] args) {
-        List<AxionElement> axionElements = parseAxions("da(b)c");
-        System.out.println(axionElements.toString());
-    }
 }

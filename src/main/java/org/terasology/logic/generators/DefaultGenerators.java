@@ -19,9 +19,9 @@
 
 package org.terasology.logic.generators;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.logic.tree.lsystem.*;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
@@ -37,64 +37,6 @@ public class DefaultGenerators {
     public DefaultGenerators(ForestGenerator mngr) {
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-
-        Map<Character, AxionElementReplacement> replacementMap = Maps.newHashMap();
-
-        SimpleAxionElementReplacement sapling = new SimpleAxionElementReplacement("s");
-        sapling.addReplacement(1f, "Tt");
-
-        final FastRandom rnd = new FastRandom();
-
-        SimpleAxionElementReplacement trunkTop = new SimpleAxionElementReplacement("t");
-        trunkTop.addReplacement(0.5f, "Wt");
-        trunkTop.addReplacement(0.5f,
-                new SimpleAxionElementReplacement.ReplacementGenerator() {
-                    @Override
-                    public String generateReplacement() {
-                        int angleDeg = rnd.randomInt(180);
-                        return "W[+("+angleDeg+")&Mb][+("+angleDeg+")^Mb]t";
-                    }
-                });
-
-        SimpleAxionElementReplacement smallBranch = new SimpleAxionElementReplacement("b");
-        smallBranch.addReplacement(0.8f, "Bb");
-
-        SimpleAxionElementReplacement trunk = new SimpleAxionElementReplacement("T");
-        trunk.addReplacement(0.7f, "TN");
-
-        // T - trunk bottom
-        // t - trunk top
-        // W - wood
-        // N - non-growing trunk
-
-        replacementMap.put('s', sapling);
-        replacementMap.put('t', trunkTop);
-        replacementMap.put('T', trunk);
-        replacementMap.put('b', smallBranch);
-
-
-        Block greenLeaf = blockManager.getBlock("engine:GreenLeaf");
-        Block oakTrunk = blockManager.getBlock("engine:OakTrunk");
-
-        float trunkAdvance = 0.5f;
-        float branchAdvance = 0.6f;
-
-        Map<Character, AxionElementGeneration> blockMap = Maps.newHashMap();
-        // Trunk building blocks
-        blockMap.put('t', new DefaultAxionElementGeneration(greenLeaf, trunkAdvance));
-        blockMap.put('T', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-        blockMap.put('N', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-//        blockMap.put('W', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-//        blockMap.put('B', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 1.7f));
-
-        // Branch building blocks
-        blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 1.7f));
-        blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.8f));
-        blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
-
-        TreeGenerator oakTree = new TreeGeneratorAdvancedLSystem("s", replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), 16, (float) Math.PI/3)
-                .setGenerationProbability(0.1f);
 
 //        Map<String, Double> probs = Maps.newHashMap();
 //        probs.put("A", 1.0);
@@ -130,28 +72,23 @@ public class DefaultGenerators {
         // Cactus
         TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("engine:Cactus")).setGenerationProbability(0.05f);
 
-        // Example tree growing in the new structure
-//b - Bb (0.7), b[&b] (0.2)
-//B - TB (0.1), B[&b] (0.3), BB (0.1)
-//T - TT (0.3)
-//s - b
-
-        // Add the trees to the generator lists
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, pineTree);
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, redTree);
-
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakTree);
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, pineTree);
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
-
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, birkTree);
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, oakTree);
 //
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, redTree);
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
-
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, oakTree);
-        //mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, cactus);
+//        // Add the trees to the generator lists
+//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
+////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, pineTree);
+////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, redTree);
+//
+//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakTree);
+////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, pineTree);
+////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
+//
+////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, birkTree);
+//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, oakTree);
+////
+////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, redTree);
+//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
+//
+//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, oakTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, cactus);
     }
 }

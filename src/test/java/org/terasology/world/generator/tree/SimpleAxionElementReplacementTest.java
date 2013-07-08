@@ -1,6 +1,7 @@
 package org.terasology.world.generator.tree;
 
 import org.junit.Test;
+import org.terasology.logic.tree.lsystem.SimpleAxionElementReplacement;
 
 import static org.junit.Assert.assertEquals;
 
