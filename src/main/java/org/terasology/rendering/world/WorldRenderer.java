@@ -124,7 +124,7 @@ public final class WorldRenderer {
     private final PriorityQueue<Chunk> renderQueueChunksOpaqueShadow = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
     private final PriorityQueue<Chunk> renderQueueChunksOpaqueReflection = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
     private final PriorityQueue<Chunk> renderQueueChunksAlphaReject = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksAlphaBlend = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksAlphaBlend = new PriorityQueue<Chunk>(64*64, new ChunkBackToFrontComparator());
 
     private WorldRenderingStage currentRenderStage = WorldRenderingStage.DEFAULT;
 
@@ -1108,17 +1108,14 @@ public final class WorldRenderer {
     }
 
     public float getSunlightValueAt(Vector3f pos) {
-        float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
+        float sunlight = worldProvider.getSunlight(pos) / 15.0f;
+        sunlight *= getDaylight();
 
-        float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0f) * rawLightValueSun;
-        lightValueSun *= getDaylight();
-
-        return lightValueSun;
+        return sunlight;
     }
 
     public float getBlockLightValueAt(Vector3f pos) {
-        float rawLightValue = worldProvider.getLight(pos) / 15.0f;
-        return (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - rawLightValue) * 16.0f) * rawLightValue;
+        return worldProvider.getLight(pos) / 15.0f;
     }
 
     public void update(float delta) {
