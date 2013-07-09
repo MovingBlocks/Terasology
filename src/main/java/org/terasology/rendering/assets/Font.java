@@ -21,21 +21,13 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Asset;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
-import org.terasology.logic.manager.ShaderManager;
+import org.terasology.asset.Assets;
 
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glColor3b;
-import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -53,8 +45,13 @@ public class Font implements Asset {
     private TIntObjectMap<FontCharacter> charMap = new TIntObjectHashMap<FontCharacter>();
     private int lineHeight;
 
+    private GLSLShaderProgramInstance shaderProgramInstanceFont;
+
     public Font(AssetUri uri) {
         this.uri = uri;
+
+        shaderProgramInstanceFont = Assets.getShader("engine:defaultTextured").createShaderProgramInstance();
+        shaderProgramInstanceFont.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
     }
 
     public void setCharacter(int id, FontCharacter character) {
@@ -72,7 +69,7 @@ public class Font implements Asset {
     }
 
     public void drawString(int x, int y, String text, Color color) {
-        ShaderManager.getInstance().enableDefaultTextured();
+        shaderProgramInstanceFont.enable();
 
         Texture bound = null;
 

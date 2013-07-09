@@ -67,6 +67,7 @@ public class GLSLShaderProgramInstance {
 
     private int availableFeatures = 0;
     private int activeFeatures = 0;
+    private boolean activeFeaturesChanged = false;
 
     private IShaderParameters shaderParameters;
 
@@ -310,6 +311,8 @@ public class GLSLShaderProgramInstance {
             }
         }
 
+        shader.append("\n");
+
         shader.append(includedDefines);
         shader.append(includedUniforms);
 
@@ -417,13 +420,13 @@ public class GLSLShaderProgramInstance {
     public void enable() {
         GLSLShaderProgramInstance activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
 
-        if (activeProgram != this
-                || ShaderManager.getInstance().getActiveFeatures() != activeFeatures) {
+        if (activeProgram != this || activeFeaturesChanged) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL20.glUseProgram(getActiveShaderProgramId());
 
             // Make sure the shader manager knows that this program is currently active
             ShaderManager.getInstance().setActiveShaderProgram(this);
+            activeFeaturesChanged = false;
 
             // Set the shader parameters if available
             if (shaderParameters != null) {
@@ -679,6 +682,7 @@ public class GLSLShaderProgramInstance {
     public void addFeatureIfAvailable(ShaderProgramFeatures feature) {
         if ((availableFeatures & feature.getValue()) == feature.getValue()) {
             activeFeatures |= feature.getValue();
+            activeFeaturesChanged = true;
         } else {
             throw new RuntimeException("Feature not available");
         }
@@ -686,10 +690,12 @@ public class GLSLShaderProgramInstance {
 
     public void removeFeature(ShaderProgramFeatures feature) {
         activeFeatures &= ~feature.getValue();
+        activeFeaturesChanged = true;
     }
 
     public void removeFeatures(int featureHash) {
         activeFeatures &= ~featureHash;
+        activeFeaturesChanged = true;
     }
 
     public GLSLShaderProgram getShaderProgramBase() {

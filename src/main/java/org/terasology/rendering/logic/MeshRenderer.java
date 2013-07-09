@@ -184,7 +184,10 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
             material.enable();
 
             material.getShaderProgramInstance().setBoolean("textured", true);
-            material.getShaderProgramInstance().setFloat("light", 1.0f);
+
+            material.getShaderProgramInstance().setFloat("sunlight", 1.0f);
+            material.getShaderProgramInstance().setFloat("blockLight", 1.0f);
+
             material.getShaderProgramInstance().setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.bindTextures();
 

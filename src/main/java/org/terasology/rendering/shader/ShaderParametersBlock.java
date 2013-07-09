@@ -38,6 +38,7 @@ public class ShaderParametersBlock extends ShaderParametersBase {
         super.applyParameters(program);
 
         Texture terrainTex = Assets.getTexture("engine:terrain");
+
         if (terrainTex == null) {
             return;
         }

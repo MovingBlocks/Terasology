@@ -158,7 +158,9 @@ public class FirstPersonRenderer implements RenderSystem {
         shader.enable();
 
         shader.setBoolean("textured", false);
-        shader.setFloat("light", 1.0f);
+
+        shader.setFloat("sunlight", worldRenderer.getSunlightValue());
+        shader.setFloat("blockLight", worldRenderer.getBlockLightValue());
 
         glPushMatrix();
 
@@ -192,11 +194,6 @@ public class FirstPersonRenderer implements RenderSystem {
         shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
-
-        // Apply biome and overall color offset
-        // TODO: Make me look nice not ugly!
-        //Vector4f color = activeBlock.calcColorOffsetFor(BlockPart.CENTER, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
-        //shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         glPushMatrix();
 

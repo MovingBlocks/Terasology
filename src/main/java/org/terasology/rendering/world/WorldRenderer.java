@@ -116,15 +116,15 @@ public final class WorldRenderer {
     /* CHUNKS */
     private ChunkTessellator chunkTessellator;
     private boolean pendingChunks = false;
-    private final ArrayList<Chunk> chunksInProximity = new ArrayList<Chunk>(64*64);
+    private final ArrayList<Chunk> chunksInProximity = new ArrayList<Chunk>(64 * 64);
     private int chunkPosX, chunkPosZ;
 
     /* RENDERING */
-    private final PriorityQueue<Chunk> renderQueueChunksOpaque = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksOpaqueShadow = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksOpaqueReflection = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksAlphaReject = new PriorityQueue<Chunk>(64*64, new ChunkFrontToBackComparator());
-    private final PriorityQueue<Chunk> renderQueueChunksAlphaBlend = new PriorityQueue<Chunk>(64*64, new ChunkBackToFrontComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksOpaque = new PriorityQueue<Chunk>(64 * 64, new ChunkFrontToBackComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksOpaqueShadow = new PriorityQueue<Chunk>(64 * 64, new ChunkFrontToBackComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksOpaqueReflection = new PriorityQueue<Chunk>(64 * 64, new ChunkFrontToBackComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksAlphaReject = new PriorityQueue<Chunk>(64 * 64, new ChunkFrontToBackComparator());
+    private final PriorityQueue<Chunk> renderQueueChunksAlphaBlend = new PriorityQueue<Chunk>(64 * 64, new ChunkBackToFrontComparator());
 
     private WorldRenderingStage currentRenderStage = WorldRenderingStage.DEFAULT;
 
@@ -241,7 +241,7 @@ public final class WorldRenderer {
 
         if (chunkStore == null)
             chunkStore = new ChunkStoreProtobuf();
-        
+
         chunkProvider = new LocalChunkProvider(chunkStore, mapGenerator);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
@@ -914,7 +914,7 @@ public final class WorldRenderer {
         }
 
         if (!geometryOnly) {
-            if (lightComponent.lightType == LightComponent.LightType.POINT ) {
+            if (lightComponent.lightType == LightComponent.LightType.POINT) {
                 program.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT);
             } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
                 program.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL);
@@ -958,7 +958,7 @@ public final class WorldRenderer {
         }
 
         if (!geometryOnly) {
-            if (lightComponent.lightType == LightComponent.LightType.POINT ) {
+            if (lightComponent.lightType == LightComponent.LightType.POINT) {
                 program.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_POINT);
             } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
                 program.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_LIGHT_DIRECTIONAL);
@@ -1355,7 +1355,7 @@ public final class WorldRenderer {
         }
 
         return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                +" cache: %.1fMb, dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
+                + " cache: %.1fMb, dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
 
                 ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered,
                 getPlayerBiome(), worldProvider.getTimeInDays(),

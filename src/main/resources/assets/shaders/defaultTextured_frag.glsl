@@ -20,8 +20,9 @@ void main(){
     vec4 diffColor = texture2D(texture, gl_TexCoord[0].xy);
 
 #if defined (FEATURE_ALPHA_REJECT)
-    if (diffColor.a < 0.1)
+    if (diffColor.a < 0.1) {
         discard;
+    }
 #endif
 
     gl_FragData[0].rgba = diffColor * gl_Color;

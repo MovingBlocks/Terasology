@@ -16,9 +16,9 @@
 package org.terasology.craft.components.actions;
 
 import com.google.common.collect.Maps;
+import org.terasology.components.actions.ActionTarget;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.components.actions.ActionTarget;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Small-Jeeper
  */
 public class CraftingActionComponent implements Component {
-    public ActionTarget relativeTo   = ActionTarget.Self;
+    public ActionTarget relativeTo = ActionTarget.Self;
 
     private Map<String, ArrayList<EntityRef>> elements = Maps.newHashMap();
 
@@ -40,38 +40,37 @@ public class CraftingActionComponent implements Component {
     public final static int MAX_SLOTS = 9;
     public final static int MAX_LEVEL = 3;
 
-    private int currentItemSlot       = 0;
-    private int currentLevel          = 0;
+    private int currentItemSlot = 0;
+    private int currentLevel = 0;
 
-
-    public void increaseLevel(){
+    public void increaseLevel() {
         currentLevel++;
-        if( currentLevel >= MAX_LEVEL ){
-            currentLevel = (MAX_LEVEL-1);
+        if (currentLevel >= MAX_LEVEL) {
+            currentLevel = (MAX_LEVEL - 1);
         }
     }
 
-    public void decreaseLevel(){
+    public void decreaseLevel() {
         currentLevel--;
 
-        if( currentLevel < 0 ){
+        if (currentLevel < 0) {
             currentLevel = 0;
         }
     }
-    
-    public void addItem( int slot, EntityRef entity){
-        if( ! elements.containsKey(levels[currentLevel])){
+
+    public void addItem(int slot, EntityRef entity) {
+        if (!elements.containsKey(levels[currentLevel])) {
             ArrayList<EntityRef> list = new ArrayList<EntityRef>();
 
-            for(int i=0; i<MAX_SLOTS; i++){
-                if(slot == i){
-                   list.add(entity);
-                }else{
-                   list.add(EntityRef.NULL);
+            for (int i = 0; i < MAX_SLOTS; i++) {
+                if (slot == i) {
+                    list.add(entity);
+                } else {
+                    list.add(EntityRef.NULL);
                 }
             }
 
-            elements.put( levels[currentLevel], list );
+            elements.put(levels[currentLevel], list);
 
             return;
         }
@@ -79,80 +78,80 @@ public class CraftingActionComponent implements Component {
         elements.get(levels[currentLevel]).set(slot, entity);
     }
 
-    public void deleteItem(int slot){
-        if( ! elements.containsKey(levels[currentLevel])){
+    public void deleteItem(int slot) {
+        if (!elements.containsKey(levels[currentLevel])) {
             return;
         }
 
         ArrayList<EntityRef> list = elements.get(levels[currentLevel]);
         list.set(slot, EntityRef.NULL);
-        
 
-        for(String key : levels){
 
-            if( !elements.containsKey(key) ){
+        for (String key : levels) {
+
+            if (!elements.containsKey(key)) {
                 continue;
             }
 
             boolean deleteLevel = true;
-            for(EntityRef entity : elements.get(key)){
-                if( !entity.equals(EntityRef.NULL) ){
+            for (EntityRef entity : elements.get(key)) {
+                if (!entity.equals(EntityRef.NULL)) {
                     deleteLevel = false;
                     break;
                 }
             }
-            if(deleteLevel){
-             elements.remove(key);
+            if (deleteLevel) {
+                elements.remove(key);
             }
         }
     }
 
-    public void deleteItem(int level, int slot){
-        if( ! elements.containsKey(levels[level])){
+    public void deleteItem(int level, int slot) {
+        if (!elements.containsKey(levels[level])) {
             return;
         }
 
         ArrayList<EntityRef> list = elements.get(levels[level]);
         list.set(slot, EntityRef.NULL);
 
-        for(EntityRef entity : list){
-            if( !entity.equals(EntityRef.NULL) ){
+        for (EntityRef entity : list) {
+            if (!entity.equals(EntityRef.NULL)) {
                 return;
             }
         }
 
         elements.remove(levels[level]);
     }
-    
-    public int getCurrentLevel(){
+
+    public int getCurrentLevel() {
         return currentLevel;
     }
 
-    public ArrayList<EntityRef> getLevelElements(int level){
-        if( ! elements.containsKey(levels[level]) ){
+    public ArrayList<EntityRef> getLevelElements(int level) {
+        if (!elements.containsKey(levels[level])) {
             return null;
         }
 
         return elements.get(levels[level]);
     }
 
-    public ArrayList<EntityRef> getLevelElements(String level){
-        if( ! elements.containsKey(level)){
+    public ArrayList<EntityRef> getLevelElements(String level) {
+        if (!elements.containsKey(level)) {
             return null;
         }
 
         return elements.get(level);
     }
 
-    public ArrayList<EntityRef> getCurrentLevelElements(){
-        if( ! elements.containsKey(levels[currentLevel]) ){
+    public ArrayList<EntityRef> getCurrentLevelElements() {
+        if (!elements.containsKey(levels[currentLevel])) {
             addItem(0, EntityRef.NULL);
         }
 
         return elements.get(levels[currentLevel]);
     }
 
-    public Map<String, ArrayList<EntityRef>> getAllElements(){
+    public Map<String, ArrayList<EntityRef>> getAllElements() {
         return elements;
     }
 

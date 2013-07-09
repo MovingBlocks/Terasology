@@ -4,7 +4,7 @@ import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
 /**
-@author Small-Jeeper
+ * @author Small-Jeeper
  */
 public class CheckRefinementEvent extends AbstractEvent {
     private EntityRef target;
@@ -12,7 +12,7 @@ public class CheckRefinementEvent extends AbstractEvent {
 
 
     public CheckRefinementEvent(EntityRef target, EntityRef instigator) {
-        this.target     = target;
+        this.target = target;
         this.instigator = instigator;
     }
 
@@ -21,7 +21,7 @@ public class CheckRefinementEvent extends AbstractEvent {
         return target;
     }
 
-    public EntityRef getInstigator(){
+    public EntityRef getInstigator() {
         return instigator;
     }
 

@@ -8,11 +8,11 @@ public class ChangeLevelEvent extends AbstractEvent {
     private EntityRef instigator;
 
     public ChangeLevelEvent(float nextLevel, EntityRef instigator) {
-        this.nextLevel  = nextLevel;
+        this.nextLevel = nextLevel;
         this.instigator = instigator;
     }
-    
-    public boolean isDecreaseEvent(){
+
+    public boolean isDecreaseEvent() {
         return nextLevel < 0;
     }
 

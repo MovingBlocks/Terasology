@@ -3,7 +3,7 @@ package org.terasology.craft.events.crafting;
 import org.terasology.entitySystem.AbstractEvent;
 
 /**
- *  @author Small-Jeeper
+ * @author Small-Jeeper
  */
 public class DeleteItemEvent extends AbstractEvent {
     private float percent;
@@ -16,7 +16,7 @@ public class DeleteItemEvent extends AbstractEvent {
         this.percent = percent;
     }
 
-    public float getPercent(){
+    public float getPercent() {
         return percent;
     }
 }

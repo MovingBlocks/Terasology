@@ -38,7 +38,6 @@ public class ShaderManager {
     private static final Logger logger = LoggerFactory.getLogger(ShaderManager.class);
     private static ShaderManager instance = null;
 
-    private int activeFeatures = 0;
     private Material activeMaterial = null;
     private GLSLShaderProgramInstance activeShaderProgram = null;
 
@@ -124,7 +123,6 @@ public class ShaderManager {
         }
 
         activeMaterial = null;
-        activeFeatures = 0;
         activeShaderProgram = null;
     }
 
@@ -170,14 +168,9 @@ public class ShaderManager {
         return activeShaderProgram;
     }
 
-    public int getActiveFeatures() {
-        return activeFeatures;
-    }
-
     public void setActiveShaderProgram(GLSLShaderProgramInstance program) {
         activeShaderProgram = program;
         activeMaterial = null;
-        activeFeatures = program.getActiveFeatures();
     }
     /**
      * @param s Nave of the shader to return
