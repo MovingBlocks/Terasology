@@ -1,5 +1,7 @@
 package org.terasology.pathfinding.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.Set;
  * @author synopia
  */
 public class HAStar {
+    private static final Logger logger = LoggerFactory.getLogger(HAStar.class);
+    private static final int MAX_NODES = 64*1024;
     private Path localPath;
     private HAStar localAStar;
 
@@ -51,7 +55,7 @@ public class HAStar {
                 float fB = nodes.get(b).f;
                 return -(fA < fB ? -1 : ( fA > fB ? 1 : 0 ));
             }
-        }, 16*1024, 16*1024);
+        }, MAX_NODES, MAX_NODES);
         if( useContour ) {
             localAStar = new HAStar(false);
         }
@@ -92,7 +96,8 @@ public class HAStar {
             if( current==this.end ) {
                 break;
             }
-            if( nodes.size()>16*1000 ){
+            if( nodes.size()>MAX_NODES-MAX_NODES/10 ){
+                logger.info("stop hpa*... nodes: "+nodes.size());
                 break;
             }
             expand( current );
@@ -126,10 +131,10 @@ public class HAStar {
         Node currentNode = nodes.get(current);
         Floor currentFloor = currentNode.block.floor;
         Set<WalkableBlock> neighbors = new HashSet<WalkableBlock>();
-        boolean onEndFloor = nodes.get(end).block.floor == currentFloor;
-        boolean onStartFloor = nodes.get(start).block.floor == currentFloor;
-        if( !useContour || onEndFloor || onStartFloor ) {
-            // normal A* if on start or end floor
+        boolean onEndHeightMap = nodes.get(end).block.floor.heightMap == currentFloor.heightMap;
+        boolean onStartHeightMap = nodes.get(start).block.floor.heightMap == currentFloor.heightMap;
+        if( !useContour || onEndHeightMap || onStartHeightMap ) {
+            // normal A* if on start or end height map
             for (WalkableBlock neighbor : currentNode.block.neighbors) {
                 if( neighbor==null ) {
                     continue;
@@ -137,17 +142,10 @@ public class HAStar {
                 neighbors.add(neighbor);
             }
         } else {
-            // otherwise use contour points...
-            for (WalkableBlock block : currentFloor.contour()) {
-                if( block==currentNode.block) {
-                    continue;
-                }
-                neighbors.add(block);
-            }
-            // .. and neighbors of other floor, that are part of their contour
-            for (WalkableBlock neighbor : currentNode.block.neighbors) {
-                if( neighbor!=null && neighbor.floor!=currentFloor && neighbor.floor.isContour(neighbor)) {
-                    neighbors.add(neighbor);
+            // otherwise use entrances of other floor
+            for (Floor neighborFloor : currentFloor.neighborRegions) {
+                for (Entrance neighborEntrance : neighborFloor.entrances()) {
+                    neighbors.add(neighborEntrance.getAbstractBlock());
                 }
             }
         }

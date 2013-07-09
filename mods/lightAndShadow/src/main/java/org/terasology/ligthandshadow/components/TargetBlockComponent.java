@@ -1,4 +1,4 @@
-package org.terasology.pathfinding.components;
+package org.terasology.ligthandshadow.components;
 
 import org.terasology.entitySystem.Component;
 
@@ -6,4 +6,5 @@ import org.terasology.entitySystem.Component;
  * @author synopia
  */
 public class TargetBlockComponent implements Component {
+    public String side;
 }

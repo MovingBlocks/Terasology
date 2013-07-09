@@ -399,15 +399,11 @@ public class ContourFinderTest {
             @Override
             public char run(int x, int y, int z, char value) {
                 if( value=='C' ) {
-                    helper.map.getBlock(x,y,z).floor.setContour(x,z);
+                    helper.map.getBlock(x,y,z).floor.setEntrance(x, z);
                 }
                 return 0;
             }
         }, contour);
-        for (Floor floor : helper.map.floors) {
-            floor.findContour();
-            floor.findContour();
-        }
         String[] actual = helper.evaluate(new TestHelper.Runner() {
             @Override
             public char run(int x, int y, int z, char value) {
@@ -415,7 +411,7 @@ public class ContourFinderTest {
                 if (block == null) {
                     return ' ';
                 }
-                if (block.floor.isContour(block)) {
+                if (block.floor.isEntrance(block)) {
                     return 'C';
                 }
                 return 'I';

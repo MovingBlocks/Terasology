@@ -49,39 +49,55 @@ public class WalkableBlockFinder {
             for (int x = 0; x < Chunk.SIZE_X; x++) {
                 int offset = x + z * Chunk.SIZE_Z;
                 HeightMapCell cell = map.cells[offset];
-                findNeighbor(map, cell, x, z);
+                for (WalkableBlock block : cell.blocks) {
+                    for (int i = 0; i < HeightMap.DIRECTIONS.length; i++) {
+                        connectToDirection(map, x, z, block, i);
+                    }
+//                    for (int i = 1; i < HeightMap.DIRECTIONS.length; i+=2) {
+//                        connectToDirectionDiagonal(map, x, z, block, i);
+//                    }
+                }
             }
         }
     }
 
-    private void findNeighbor(HeightMap map, HeightMapCell cell, int x, int z) {
-        for (WalkableBlock block : cell.blocks) {
-            for (int i = 0; i < HeightMap.DIRECTIONS.length; i++) {
-                int nx = x + HeightMap.DIRECTIONS[i][0];
-                int nz = z + HeightMap.DIRECTIONS[i][1];
-                if( nx<0 || nz<0 || nx>= HeightMap.SIZE_X || nz>=HeightMap.SIZE_Z ) {
-                    map.borderBlocks.add(block);
-                    continue;
+    private void connectToDirection(HeightMap map, int x, int z, WalkableBlock block, int direction) {
+        int dx = HeightMap.DIRECTIONS[direction][0];
+        int dy = HeightMap.DIRECTIONS[direction][1];
+        int nx = x + dx;
+        int nz = z + dy;
+        if( nx<0 || nz<0 || nx>= HeightMap.SIZE_X || nz>=HeightMap.SIZE_Z ) {
+            map.borderBlocks.add(block);
+            return;
+        }
+        HeightMapCell neighbor = map.cells[nx + nz * HeightMap.SIZE_Z];
+        for (WalkableBlock neighborBlock : neighbor.blocks) {
+            connectBlocks(block, neighborBlock, direction);
+        }
+    }
+    private void connectBlocks( WalkableBlock block, WalkableBlock neighborBlock, int direction ) {
+        int heightDiff = block.height() - neighborBlock.height();
+        boolean diagonal = (direction%2)==1;
+        if( heightDiff==0 ) {
+            if( !diagonal ) {
+                block.neighbors[direction] = neighborBlock;
+            } else {
+                int dx = block.x()-neighborBlock.x();
+                int dz = block.z()-neighborBlock.z();
+                boolean free1 = world.getBlock(block.x()-dx, block.height()+1, block.z()).isPenetrable();
+                free1 &= world.getBlock(block.x()-dx, block.height()+2, block.z()).isPenetrable();
+                boolean free2 = world.getBlock(block.x(), block.height()+1, block.z()-dz).isPenetrable();
+                free2 &= world.getBlock(block.x(), block.height()+2, block.z()-dz).isPenetrable();
+                if( free1&&free2 ) {
+                    block.neighbors[direction] = neighborBlock;
                 }
-                HeightMapCell neighbor = map.cells[nx + nz * HeightMap.SIZE_Z];
-                for (WalkableBlock neighborBlock : neighbor.blocks) {
-                    int heightDiff = block.height() - neighborBlock.height();
-                    if( heightDiff>-2 && heightDiff<2 ) {
-                        if( heightDiff>0 ) {
-                            Block air = world.getBlock(map.worldPos.x+nx, neighborBlock.height() + 3, map.worldPos.z+nz);
-                            if( air.isPenetrable() ) {
-                                block.neighbors[i] = neighborBlock;
-                            }
-                        } else if( heightDiff<0 ) {
-                            Block air = world.getBlock(map.worldPos.x+x, block.height() + 3, map.worldPos.z+z);
-                            if( air.isPenetrable() ) {
-                                block.neighbors[i] = neighborBlock;
-                            }
-                        } else {
-                            block.neighbors[i] = neighborBlock;
-                        }
-                    }
-                }
+            }
+        } else if( Math.abs(heightDiff)<2 && !diagonal ) {
+            WalkableBlock lower = heightDiff < 0 ? block : neighborBlock;
+            WalkableBlock higher = heightDiff < 0 ? neighborBlock : block;
+            Block jumpCheck = world.getBlock(lower.x(), lower.height()+3, lower.z());
+            if( jumpCheck.isPenetrable() ) {
+                block.neighbors[direction] = neighborBlock;
             }
         }
     }

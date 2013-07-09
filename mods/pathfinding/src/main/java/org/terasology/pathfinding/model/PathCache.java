@@ -34,12 +34,12 @@ public class PathCache {
         return getCachedPath(from, to)!=null;
     }
     public Path findPath( WalkableBlock from, WalkableBlock to, Callback callback ) {
-        Path path = null; //getCachedPath(from, to);
-//        if( path==null ) {
-        path = callback.run(from, to);
-        insert(from, to, path);
-        insert(to, from, path);
-//        }
+        Path path = getCachedPath(from, to);
+        if( path==null ) {
+            path = callback.run(from, to);
+            insert(from, to, path);
+//        insert(to, from, path);
+        }
         return path;
     }
 

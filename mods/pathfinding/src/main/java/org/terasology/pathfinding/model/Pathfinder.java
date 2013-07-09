@@ -50,6 +50,7 @@ public class Pathfinder {
     }
 
     public HeightMap init( Vector3i chunkPos ) {
+        clearCache();
         HeightMap heightMap = heightMaps.get(chunkPos);
         if( heightMap==null ) {
             long time = System.nanoTime();
@@ -70,7 +71,6 @@ public class Pathfinder {
     }
 
     public HeightMap update( Vector3i chunkPos ) {
-
         HeightMap heightMap = heightMaps.remove(chunkPos);
         if( heightMap!=null ) {
             heightMap.disconnectNeighborMaps(getNeighbor(chunkPos, -1, 0), getNeighbor(chunkPos, 0, -1), getNeighbor(chunkPos, 1,0), getNeighbor(chunkPos, 0,1));
@@ -87,5 +87,10 @@ public class Pathfinder {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return haStar.toString();
     }
 }

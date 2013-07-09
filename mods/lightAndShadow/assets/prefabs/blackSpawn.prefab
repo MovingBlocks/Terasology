@@ -1,0 +1,6 @@
+{
+    "name": "Black Spawn",
+    "SpawnerBlock": {
+        "side": "black"
+    }
+}

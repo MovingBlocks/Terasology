@@ -3,5 +3,5 @@
     "displayName" : "Light & Shadow",
     "author" : "Terasology Community - http://forum.movingblocks.net/threads/light-and-shadow.762",
     "description" : "Initial game mode - not ready yet!",
-    "dependencies" : []
+    "dependencies" : ["pathfinding", "oreominions"]
 }
