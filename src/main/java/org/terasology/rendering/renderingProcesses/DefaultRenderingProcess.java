@@ -61,7 +61,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
     private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
     private Property hdrMinExposure = new Property("hdrMinExposure", 1.0f, 0.0f, 10.0f);
-    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.6f, 0.0f, 4.0f);
+    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 1.0f, 0.0f, 4.0f);
     private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.05f, 0.0f, 0.5f);
 
     private Property bloomHighPassThreshold = new Property("bloomHighPassThreshold", 0.5f, 0.0f, 5.0f);
