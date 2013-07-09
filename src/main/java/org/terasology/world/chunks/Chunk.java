@@ -221,8 +221,7 @@ public class Chunk {
     }
 
     public Vector3i getPos() {
-//        return new Vector3i(pos);
-        return pos;
+        return new Vector3i(pos);
     }
 
     public boolean isInBounds(int x, int y, int z) {
