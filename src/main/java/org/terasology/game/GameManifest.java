@@ -20,14 +20,16 @@ import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.WorldInfo;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -115,14 +117,14 @@ public class GameManifest {
         return this.worldInfo.values();
     }
 
-    public static void save(File toFile, GameManifest gameManifest) throws IOException {
-        try (FileWriter writer = new FileWriter(toFile)) {
+    public static void save(Path toFile, GameManifest gameManifest) throws IOException {
+        try (Writer writer = Files.newBufferedWriter(toFile, TerasologyConstants.CHARSET)) {
             new GsonBuilder().setPrettyPrinting().create().toJson(gameManifest, writer);
         }
     }
 
-    public static GameManifest load(File fromFile) throws IOException {
-        try (FileReader reader = new FileReader(fromFile)) {
+    public static GameManifest load(Path filePath) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
             GameManifest result = new GsonBuilder().create().fromJson(reader, GameManifest.class);
             if (result.modConfiguration.size() == 0) {
                 for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {

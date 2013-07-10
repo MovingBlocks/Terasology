@@ -15,30 +15,95 @@
  */
 package org.terasology.persistence.internal;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.TIntSet;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.PlayerStore;
+import org.terasology.protobuf.EntityData;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class StorageManagerInternal implements StorageManager {
+public class StorageManagerInternal implements StorageManager, EntityDestroySubscriber {
 
-    private Map<String, PlayerStoreInternal> playerStores = Maps.newHashMap();
+    private EngineEntityManager entityManager;
+    private Map<String, EntityData.PlayerEntityStore> playerStores = Maps.newHashMap();
+    private TIntObjectMap<List<StoreRefTable>> externalRefHolderLookup = new TIntObjectHashMap<>();
+    private Map<String, StoreRefTable> playerStoreExternalRefs = Maps.newHashMap();
+
+    public StorageManagerInternal(EngineEntityManager entityManager) {
+        this.entityManager = entityManager;
+        entityManager.subscribe(this);
+    }
 
     @Override
     public PlayerStore createPlayerStoreForSave(String playerId) {
-        return new PlayerStoreInternal(playerId, this);
+        return new PlayerStoreInternal(playerId, this, entityManager);
+    }
+
+    @Override
+    public void flush() {
     }
 
     @Override
     public PlayerStore loadStore(String playerId) {
-        return playerStores.get(playerId);
+        EntityData.PlayerEntityStore store = playerStores.get(playerId);
+        if (store != null) {
+            TIntSet validRefs = null;
+            StoreRefTable table = playerStoreExternalRefs.get(playerId);
+            if (table != null) {
+                validRefs = table.externalReferences;
+            }
+            return new PlayerStoreInternal(playerId, store, validRefs, this, entityManager);
+        }
+        return null;
     }
 
-    public void store(PlayerStoreInternal playerStore) {
-        playerStores.put(playerStore.getId(), playerStore);
+    public void store(String id, EntityData.PlayerEntityStore playerStore, TIntSet externalReference) {
+        if (externalReference.size() > 0) {
+            StoreRefTable refTable = new StoreRefTable(id, externalReference);
+            playerStoreExternalRefs.put(id, refTable);
+            TIntIterator iterator = externalReference.iterator();
+            while (iterator.hasNext()) {
+                int refId = iterator.next();
+                List<StoreRefTable> tables = externalRefHolderLookup.get(refId);
+                if (tables == null) {
+                    tables = Lists.newArrayList();
+                    externalRefHolderLookup.put(refId, tables);
+                }
+                tables.add(refTable);
+            }
+        }
+        playerStores.put(id, playerStore);
+    }
+
+    @Override
+    public void onEntityDestroyed(int entityId) {
+        List<StoreRefTable> tables = externalRefHolderLookup.remove(entityId);
+        for (StoreRefTable table : tables) {
+            table.externalReferences.remove(entityId);
+            if (table.externalReferences.isEmpty()) {
+                playerStoreExternalRefs.remove(table.id);
+            }
+        }
+    }
+
+    private static class StoreRefTable {
+        private String id;
+        private TIntSet externalReferences;
+
+        public StoreRefTable(String id, TIntSet externalReferences) {
+            this.id = id;
+            this.externalReferences = externalReferences;
+        }
     }
 }

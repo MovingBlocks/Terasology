@@ -9,4 +9,12 @@ import org.terasology.entitySystem.EntityRef;
 public class EntityRefComponent implements Component {
 
     public EntityRef entityRef = EntityRef.NULL;
+
+    public EntityRefComponent() {
+
+    }
+
+    public EntityRefComponent(EntityRef ref) {
+        this.entityRef = ref;
+    }
 }

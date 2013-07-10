@@ -45,10 +45,11 @@ import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -69,13 +70,8 @@ public class InitialiseWorld implements LoadProcess {
         return "Initializing world...";
     }
 
-    private ChunkStore loadChunkStore(File file) throws IOException {
-        FileInputStream fileIn = null;
-        ObjectInputStream in = null;
-        try {
-            fileIn = new FileInputStream(file);
-            in = new ObjectInputStream(fileIn);
-
+    private ChunkStore loadChunkStore(Path file) throws IOException {
+        try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(Files.newInputStream(file)))) {
             ChunkStore cache = (ChunkStore) in.readObject();
             if (cache instanceof ChunkStoreGZip) {
                 ((ChunkStoreGZip) cache).setup();
@@ -89,22 +85,6 @@ public class InitialiseWorld implements LoadProcess {
 
         } catch (ClassNotFoundException e) {
             throw new IOException("Unable to load chunk cache", e);
-        } finally {
-            // JAVA7 : cleanup
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close input stream", e);
-                }
-            }
-            if (fileIn != null) {
-                try {
-                    fileIn.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close input stream", e);
-                }
-            }
         }
     }
 
@@ -125,8 +105,8 @@ public class InitialiseWorld implements LoadProcess {
         chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
 
         ChunkStore chunkStore = null;
-        File f = new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.WORLD_DATA_FILE);
-        if (f.exists()) {
+        Path f = PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.WORLD_DATA_FILE);
+        if (Files.isRegularFile(f)) {
             try {
                 chunkStore = loadChunkStore(f);
             } catch (IOException e) {

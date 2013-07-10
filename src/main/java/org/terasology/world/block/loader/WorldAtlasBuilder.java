@@ -18,6 +18,7 @@ package org.terasology.world.block.loader;
 import com.google.common.collect.Lists;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.lwjgl.opengl.Util;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +38,13 @@ import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.List;
 
 /**
@@ -71,16 +74,14 @@ public class WorldAtlasBuilder {
         for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i);
             if (i == 0) {
-                try {
-                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles.png"));
+                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve("tiles.png")))) {
+                    ImageIO.write(image, "png", stream);
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
                 }
             }
 
-            // TODO: Read data directly from image buffer into texture
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
                 ImageIO.write(image, "png", bos);
                 PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
                 ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
@@ -92,13 +93,19 @@ public class WorldAtlasBuilder {
             }
         }
 
+        Util.checkGLError();
         TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Util.checkGLError();
         Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
+        Util.checkGLError();
         MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));
+        Util.checkGLError();
         terrainMatData.setParam("textureAtlas", terrainTex);
         terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
         terrainMatData.setParam("textured", 1);
+        Util.checkGLError();
         Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
+        Util.checkGLError();
     }
 
     private BufferedImage generateAtlas(int mipMapLevel) {

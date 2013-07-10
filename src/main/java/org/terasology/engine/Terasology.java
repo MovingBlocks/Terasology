@@ -20,6 +20,8 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Main method for launching Terasology
@@ -36,12 +38,12 @@ public final class Terasology {
 
     public static void main(String[] args) {
         try {
-            File homePath = null;
+            Path homePath = null;
             for (String arg : args) {
                 if (arg.startsWith(HOME_ARG)) {
-                    homePath = new File(arg.substring(HOME_ARG.length()));
+                    homePath = Paths.get(arg.substring(HOME_ARG.length()));
                 } else if (arg.equals(LOCAL_ARG)) {
-                    homePath = new File("").getAbsoluteFile();
+                    homePath = Paths.get("");
                 }
             }
             if (homePath != null) {

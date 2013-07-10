@@ -27,24 +27,30 @@ public interface PlayerStore {
     /**
      * @return The id of this store
      */
-    public String getId();
+    String getId();
 
     /**
-     * Saves the store - call this when you have finished setting up the store.
+     * Saves the store - call this when you have finished setting up the store. When this is called all entities
+     * in the store will be deactivated.
      */
-    public void save();
+    void save();
 
     /**
-     * Stores the character, unloading it from the world
+     * Restores all entities contained in this store, activating them.
+     */
+    void restore();
+
+    /**
+     * Stores the character
      * @param character
      */
-    public void storeCharacter(EntityRef character);
+    void setCharacter(EntityRef character);
 
     /**
-     * Restores the player's character, loading it into the entity system
+     * Retrieves the player's character entity
      * @return The restored character's EntityRef
      */
-    public EntityRef restoreCharacter();
+    EntityRef getCharacter();
 
     /**
      * Sets the location which should be loaded for the player when they rejoin the game.
@@ -53,17 +59,17 @@ public interface PlayerStore {
      *
      * @param location
      */
-    public void setRelevanceLocation(Vector3f location);
+    void setRelevanceLocation(Vector3f location);
 
     /**
      * @return The location that is the center of the area relevant for the player.
      */
-    public Vector3f getRelevanceLocation();
+    Vector3f getRelevanceLocation();
 
     /**
      * @return Whether the player has a character or not
      */
-    public boolean hasCharacter();
+    boolean hasCharacter();
 
 
 }

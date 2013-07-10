@@ -17,30 +17,29 @@ package org.terasology.engine.modes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.players.MenuControlSystem;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.event.EventSystem;
-import org.terasology.persistence.WorldPersister;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
+import org.terasology.logic.console.Console;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.persistence.WorldPersister;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 
-import java.io.File;
 import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -80,7 +79,7 @@ public class StateIngame implements GameState {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         eventSystem = CoreRegistry.get(EventSystem.class);
         componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        entityManager = (EngineEntityManager)CoreRegistry.get(EntityManager.class);
+        entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
@@ -99,7 +98,7 @@ public class StateIngame implements GameState {
         CoreRegistry.get(BulletPhysics.class).dispose();
         if (saveWorld) {
             try {
-                CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getCurrentSavePath(), TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+                CoreRegistry.get(WorldPersister.class).save(PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {
                 logger.error("Failed to save entities", e);
             }

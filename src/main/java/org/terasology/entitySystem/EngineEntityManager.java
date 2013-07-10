@@ -18,8 +18,6 @@ package org.terasology.entitySystem;
 import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.event.EventSystem;
 
-import java.util.Map;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -92,6 +90,12 @@ public interface EngineEntityManager extends EntityManager {
      * @param subscriber
      */
     void subscribe(EntityChangeSubscriber subscriber);
+
+    /**
+     * Subscribe for notification the destruction of entities.
+     * @param subscriber
+     */
+    void subscribe(EntityDestroySubscriber subscriber);
 
     /**
      * Unsubscribes from changes relating to entities. Used by engine systems.

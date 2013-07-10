@@ -15,22 +15,46 @@
  */
 package org.terasology.persistence.internal;
 
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.persistence.PlayerStore;
+import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector3f;
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class PlayerStoreInternal implements PlayerStore {
+    private static final String CHARACTER = "character";
 
-    private String id;
-    private StorageManagerInternal manager;
+    private final EngineEntityManager entityManager;
+    private final String id;
+    private final StorageManagerInternal manager;
+    private final Vector3f relevanceLocation = new Vector3f();
+    private EntityRef character = EntityRef.NULL;
+    private boolean hasCharacter = false;
+    private EntityData.EntityStore entityStore;
+    private TIntSet externalRefs;
 
-    PlayerStoreInternal(String id, StorageManagerInternal entityStoreManager) {
+    PlayerStoreInternal(String id, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
         this.id = id;
         this.manager = entityStoreManager;
+        this.entityManager = entityManager;
+    }
+
+    PlayerStoreInternal(String id, EntityData.PlayerEntityStore store, TIntSet externalRefs, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
+        this.id = id;
+        this.manager = entityStoreManager;
+        this.entityManager = entityManager;
+        this.entityStore = store.getStore();
+        this.relevanceLocation.set(store.getCharacterPosX(), store.getCharacterPosY(), store.getCharacterPosZ());
+        this.hasCharacter = store.getHasCharacter();
+        this.externalRefs = externalRefs;
     }
 
     @Override
@@ -40,31 +64,64 @@ public class PlayerStoreInternal implements PlayerStore {
 
     @Override
     public void save() {
-        manager.store(this);
+        EntityData.PlayerEntityStore.Builder playerEntityStore = EntityData.PlayerEntityStore.newBuilder();
+        playerEntityStore.setCharacterPosX(relevanceLocation.x);
+        playerEntityStore.setCharacterPosY(relevanceLocation.y);
+        playerEntityStore.setCharacterPosZ(relevanceLocation.z);
+        playerEntityStore.setHasCharacter(hasCharacter());
+        EntityStorer storer = new EntityStorer(entityManager);
+        storer.store(character, CHARACTER);
+        playerEntityStore.setStore(storer.finaliseStore());
+        manager.store(id, playerEntityStore.build(), storer.getExternalReferences());
     }
 
     @Override
-    public void storeCharacter(EntityRef character) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void restore() {
+        if (entityStore != null) {
+            EntityRestorer restorer = new EntityRestorer(entityManager);
+            TIntSet validRefs = new TIntHashSet();
+            if (externalRefs != null) {
+                validRefs.addAll(externalRefs);
+            }
+            for (EntityData.Entity entity : entityStore.getEntityList()) {
+                validRefs.add(entity.getId());
+            }
+            Map<String, EntityRef> refMap = restorer.restore(entityStore, validRefs);
+            EntityRef character = refMap.get(CHARACTER);
+            if (character != null) {
+                this.character = character;
+            }
+            entityStore = null;
+        }
     }
 
     @Override
-    public EntityRef restoreCharacter() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public void setCharacter(EntityRef character) {
+        this.character = character;
+        hasCharacter = character.exists();
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        if (location != null) {
+            setRelevanceLocation(location.getWorldPosition());
+        }
+    }
+
+    @Override
+    public EntityRef getCharacter() {
+        return character;
     }
 
     @Override
     public void setRelevanceLocation(Vector3f location) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        relevanceLocation.set(location);
     }
 
     @Override
     public Vector3f getRelevanceLocation() {
-        return new Vector3f();
+        return relevanceLocation;
     }
 
     @Override
     public boolean hasCharacter() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return hasCharacter;
     }
 }

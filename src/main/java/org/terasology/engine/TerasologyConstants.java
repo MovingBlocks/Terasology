@@ -16,6 +16,10 @@
 
 package org.terasology.engine;
 
+import com.google.common.base.Charsets;
+
+import java.nio.charset.Charset;
+
 /**
  * @author Immortius
  */
@@ -24,6 +28,7 @@ public final class TerasologyConstants {
     public static final int DEFAULT_PORT = 25777;
     public static final String WORLD_DATA_FILE = "world.dat";
     public static final String MAIN_WORLD = "main";
+    public static final Charset CHARSET = Charsets.UTF_8;
 
     private TerasologyConstants() {
     }
