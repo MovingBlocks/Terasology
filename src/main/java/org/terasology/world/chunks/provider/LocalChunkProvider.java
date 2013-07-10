@@ -43,13 +43,13 @@ import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
+import org.terasology.world.generator.MapGenerator;
 import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkReadyEvent;
 import org.terasology.world.chunks.ChunkState;
 import org.terasology.world.chunks.store.ChunkStore;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.localChunkProvider.AbstractChunkTask;
 import org.terasology.world.localChunkProvider.ChunkRequest;
 import org.terasology.world.localChunkProvider.ChunkTask;
@@ -77,7 +77,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private BlockingQueue<ChunkRequest> reviewChunkQueue;
     private ExecutorService reviewThreads;
     private ExecutorService chunkProcessingThreads;
-    private ChunkGeneratorManager generator;
+    private MapGenerator generator;
 
     private Set<CacheRegion> regions = Sets.newHashSet();
 
@@ -88,7 +88,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
-    public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
+    public LocalChunkProvider(ChunkStore farStore, MapGenerator generator) {
         this.farStore = farStore;
         this.generator = generator;
         
@@ -280,10 +280,10 @@ public class LocalChunkProvider implements ChunkProvider {
         reviewThreads.shutdown();
         chunkProcessingThreads.shutdown();
         try {
-            if (!reviewThreads.awaitTermination(1, TimeUnit.SECONDS)) {
+            if (!reviewThreads.awaitTermination(10, TimeUnit.SECONDS)) {
                 logger.warn("Timed out awaiting chunk review thread termination");
             }
-            if (!chunkProcessingThreads.awaitTermination(1, TimeUnit.SECONDS)) {
+            if (!chunkProcessingThreads.awaitTermination(10, TimeUnit.SECONDS)) {
                 logger.warn("Timed out awaiting chunk processing thread termination");
             }
         } catch (InterruptedException e) {
@@ -296,6 +296,11 @@ public class LocalChunkProvider implements ChunkProvider {
         }
         nearCache.clear();
         ChunkMonitor.fireChunkProviderDisposed(this);
+    }
+
+    @Override
+    public long sizeInBytes() {
+        return farStore.sizeInBytes();
     }
 
     @Override

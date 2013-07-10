@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,26 +39,26 @@ import static org.lwjgl.opengl.GL11.glColorMask;
 public class BlockGrid {
 
     public class GridPosition {
-        public GridPosition(Vector3i position, byte blockType) {
+        public GridPosition(Vector3i position, short blockType) {
             this.position = position;
             this.blockType = blockType;
         }
 
         public Vector3i position;
-        public byte blockType;
+        public short blockType;
     }
 
     /* CONST */
-    private final Mesh _mesh;
+    private final Mesh mesh;
 
-    private final Set<GridPosition> _gridPositions = new HashSet<GridPosition>();
-    private Vector3i _minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-    private Vector3i _maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+    private final Set<GridPosition> gridPositions = new HashSet<GridPosition>();
+    private Vector3i minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    private Vector3i maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
     public BlockGrid() {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
-        _mesh = tessellator.generateMesh();
+        mesh = tessellator.generateMesh();
     }
 
     public void render() {
@@ -71,13 +71,13 @@ public class BlockGrid {
                 glColorMask(true, true, true, true);
             }
 
-            for (GridPosition gp : _gridPositions) {
+            for (GridPosition gp : gridPositions) {
                 GL11.glPushMatrix();
 
                 Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
                 GL11.glTranslated(gp.position.x - cameraPosition.x, gp.position.y - cameraPosition.y, gp.position.z - cameraPosition.z);
 
-                _mesh.render();
+                mesh.render();
 
                 GL11.glPopMatrix();
             }
@@ -89,28 +89,28 @@ public class BlockGrid {
      *
      * @param gridPosition The block position to add
      */
-    public void addGridPosition(Vector3i gridPosition, byte blockType) {
-        if (gridPosition.x < _minBounds.x) {
-            _minBounds.x = gridPosition.x;
+    public void addGridPosition(Vector3i gridPosition, short blockType) {
+        if (gridPosition.x < minBounds.x) {
+            minBounds.x = gridPosition.x;
         }
-        if (gridPosition.y < _minBounds.y) {
-            _minBounds.y = gridPosition.y;
+        if (gridPosition.y < minBounds.y) {
+            minBounds.y = gridPosition.y;
         }
-        if (gridPosition.z < _minBounds.z) {
-            _minBounds.z = gridPosition.z;
-        }
-
-        if (gridPosition.x > _maxBounds.x) {
-            _maxBounds.x = gridPosition.x;
-        }
-        if (gridPosition.y > _maxBounds.y) {
-            _maxBounds.y = gridPosition.y;
-        }
-        if (gridPosition.z > _maxBounds.z) {
-            _maxBounds.z = gridPosition.z;
+        if (gridPosition.z < minBounds.z) {
+            minBounds.z = gridPosition.z;
         }
 
-        _gridPositions.add(new GridPosition(gridPosition, blockType));
+        if (gridPosition.x > maxBounds.x) {
+            maxBounds.x = gridPosition.x;
+        }
+        if (gridPosition.y > maxBounds.y) {
+            maxBounds.y = gridPosition.y;
+        }
+        if (gridPosition.z > maxBounds.z) {
+            maxBounds.z = gridPosition.z;
+        }
+
+        gridPositions.add(new GridPosition(gridPosition, blockType));
     }
 
     /**
@@ -119,28 +119,28 @@ public class BlockGrid {
      * @param gridPosition The block position to remove
      */
     public void removeGridPosition(BlockPosition gridPosition) {
-        _gridPositions.remove(gridPosition);
+        gridPositions.remove(gridPosition);
     }
 
     public Set<GridPosition> getGridPositions() {
-        return _gridPositions;
+        return gridPositions;
     }
 
     public Vector3i getMinBounds() {
-        return _minBounds;
+        return minBounds;
     }
 
     public Vector3i getMaxBounds() {
-        return _maxBounds;
+        return maxBounds;
     }
 
     /**
      * Removes all block positions from the grid.
      */
     public void clear() {
-        _minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-        _maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-        _gridPositions.clear();
+        minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        gridPositions.clear();
     }
 
 }

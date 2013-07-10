@@ -15,12 +15,11 @@
  */
 package org.terasology.components;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 /**
  * Item data is stored using this component
@@ -84,7 +83,6 @@ public final class ItemComponent implements Component {
      */
     public int baseDamage = 1;
 
-    // TODO: Should use block categories, rather than specific block names (or support both)
     /**
      * Map for what this item would have a bonus against (shovels dig faster than hammers)
      */

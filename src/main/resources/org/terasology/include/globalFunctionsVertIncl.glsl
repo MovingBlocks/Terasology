@@ -14,34 +14,22 @@
  * limitations under the License.
  */
 
-#define OCEAN_OCTAVES 16
-
-uniform bool swimming;
-uniform float carryingTorch;
-uniform float viewingDistance;
-uniform float daylight;
-uniform float tick;
-uniform float time;
-
-uniform vec3 sunVec;
-uniform vec3 cameraDirection;
-
 float timeToTick(float time, float speed) {
     return time * 4000.0 * speed;
 }
 
-// Crytek fast sin/cos approximations
-
-float smoothCurve( float x ) {
-  return x * x * ( 3.0 - 2.0 * x );
-}
-float triangleWave( float x ) {
-  return abs( fract( x + 0.5 ) * 2.0 - 1.0 );
-}
-float smoothTriangleWave( float x ) {
-  return smoothCurve( triangleWave( x ) ) * 2.0 - 1.0 ;
+float smoothCurve(float x) {
+  return x * x * (3.0 - 2.0 * x);
 }
 
-bool checkFlag (int flag, float val) {
-    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
+float triangleWave(float x) {
+  return abs(fract(x + 0.5) * 2.0 - 1.0);
+}
+
+float smoothTriangleWave(float x) {
+  return smoothCurve(triangleWave(x)) * 2.0 - 1.0;
+}
+
+bool checkFlag(int flag, float val) {
+    return flag == int(val);
 }

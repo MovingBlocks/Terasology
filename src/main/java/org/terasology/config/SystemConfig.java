@@ -7,14 +7,20 @@ package org.terasology.config;
 public class SystemConfig {
     public enum DebugRenderingStages {
         DEBUG_STAGE_OPAQUE_COLOR,
+        DEBUG_STAGE_TRANSPARENT_COLOR,
         DEBUG_STAGE_OPAQUE_NORMALS,
         DEBUG_STAGE_OPAQUE_DEPTH,
-        DEBUG_STAGE_OPAQUE_NORMALS_ALPHA,
-        DEBUG_STAGE_TRANSPARENT_COLOR,
-        DEBUG_STAGE_TRANSPARENT_NORMALS,
-        DEBUG_STAGE_TRANSPARENT_DEPTH,
-        DEBUG_STAGE_TRANSPARENT_NORMALS_ALPHA,
-        DEBUG_STAGE_SHADOW_MAP
+        DEBUG_STAGE_OPAQUE_SUNLIGHT,
+        DEBUG_STAGE_BAKED_OCCLUSION,
+        DEBUG_STAGE_SSAO,
+        DEBUG_STAGE_OPAQUE_LIGHT_BUFFER,
+        DEBUG_STAGE_SHADOW_MAP,
+        DEBUG_STAGE_SOBEL,
+        DEBUG_STAGE_HIGH_PASS,
+        DEBUG_STAGE_BLOOM,
+        DEBUG_STAGE_SKY_BAND,
+        DEBUG_STAGE_LIGHT_SHAFTS,
+        DEBUG_STAGE_RECONSTRUCTED_POSITION,
     }
 
     private long dayNightLengthInMs = 1800000;
@@ -27,6 +33,7 @@ public class SystemConfig {
     private int debugRenderingStage;
     private boolean debugFirstPersonElementsHidden;
     private boolean debugRenderWireframe;
+    private boolean debugHudHidden;
 
     public boolean isDebugFirstPersonElementsHidden() {
         return debugFirstPersonElementsHidden;
@@ -98,5 +105,13 @@ public class SystemConfig {
 
     public void setDebugRenderWireframe(boolean debugRenderWireframe) {
         this.debugRenderWireframe = debugRenderWireframe;
+    }
+
+    public boolean isDebugHudHidden() {
+        return debugHudHidden;
+    }
+
+    public void setDebugHudHidden(boolean debugHudHidden) {
+        this.debugHudHidden = debugHudHidden;
     }
 }

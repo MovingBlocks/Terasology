@@ -33,8 +33,9 @@ import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.game.modes.GameState;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
@@ -44,7 +45,9 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.version.TerasologyGameVersionInfo;
+import org.terasology.world.generator.MapGeneratorManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,13 +63,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Immortius
@@ -114,6 +111,8 @@ public class TerasologyEngine implements GameEngine {
 
         logger.info("Initializing Terasology...");
         logger.info(TerasologyGameVersionInfo.getInstance().toString());
+        logger.info("Home path: {}", PathManager.getInstance().getHomePath());
+        logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
 
         initConfig();
         
@@ -277,10 +276,10 @@ public class TerasologyEngine implements GameEngine {
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
+                addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
+                addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "linux"));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -288,13 +287,20 @@ public class TerasologyEngine implements GameEngine {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
+                addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");
                 } else {
                     System.loadLibrary("OpenAL32");
                 }
+
+                try {
+                    OculusVrHelper.loadNatives();
+                } catch (UnsatisfiedLinkError  e) {
+                    logger.warn("Could not load TeraOVR native library. No worries... It's completely optional.");
+                }
+
                 break;
             default:
                 logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());
@@ -391,6 +397,8 @@ public class TerasologyEngine implements GameEngine {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_NORMALIZE);
         glDepthFunc(GL_LEQUAL);
+//        glEnable(GL_TEXTURE_2D);
+//        glEnable(GL12.GL_TEXTURE_3D);
     }
 
     private void initControls() {
@@ -411,6 +419,8 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+        CoreRegistry.put(MapGeneratorManager.class, new MapGeneratorManager());
+        CoreRegistry.put(GameTypeManager.class, new GameTypeManager());
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));

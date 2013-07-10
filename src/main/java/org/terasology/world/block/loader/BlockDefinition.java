@@ -19,6 +19,7 @@ package org.terasology.world.block.loader;
 import java.util.EnumMap;
 import java.util.List;
 
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import org.terasology.world.block.BlockAdjacentType;
@@ -57,9 +58,14 @@ public class BlockDefinition {
 
     public byte luminance = 0;
 
+    public Vector3f tint = new Vector3f(0f, 0f, 0f);
+
     public List<String> categories = Lists.newArrayList();
 
     public String tile = "";
+    public String tileNormal = "";
+    public String tileHeight = "";
+
     public Tiles tiles;
 
     public Block.ColorSource colorSource = Block.ColorSource.DEFAULT;
@@ -76,16 +82,9 @@ public class BlockDefinition {
 
     public String shape = "";
     public List<String> shapes = Lists.newArrayList();
-    public RotationType rotation = RotationType.NONE;
+    public String rotation;
 
     public List<Type> types;
-
-    public static enum RotationType {
-        NONE,
-        HORIZONTAL,
-        ALIGNTOSURFACE,
-        CONNECTTOADJACENT
-    }
 
     public static class Tiles {
         public EnumMap<BlockPart, String> map = Maps.newEnumMap(BlockPart.class);
@@ -107,6 +106,7 @@ public class BlockDefinition {
     public static class Inventory {
         public boolean directPickup = false;
         public boolean stackable = true;
+        public String pickupFamily = "";
     }
 
     public static class Type {

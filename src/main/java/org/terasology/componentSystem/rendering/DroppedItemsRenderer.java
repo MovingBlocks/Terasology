@@ -19,10 +19,9 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.logic.MeshRenderer;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -72,36 +71,28 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
     public void shutdown() {
     }
 
-    private void render(boolean shadows) {
+    private void render() {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        AxisAngle4f rot = new AxisAngle4f();
         Matrix4f matrix = new Matrix4f();
         Transform trans = new Transform();
-        Transform normTrans = new Transform();
 
-        ShaderProgram shader;
+        GLSLShaderProgramInstance shader;
 
-        if (!shadows) {
-            shader = ShaderManager.getInstance().getShaderProgram("block");
-            shader.setInt("textured", 0);
-            shader.setFloat("light", worldRenderer.getRenderingLightValue());
-        } else {
-            shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
-        }
+        shader = ShaderManager.getInstance().getShaderProgramInstance("block");
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
+
+        shader.setBoolean("textured", false);
+        shader.setFloat("blockLight", 1.0f);
+        shader.setFloat("sunlight", 1.0f);
 
         shader.enable();
 
         glPushMatrix();
 
-        if (!shadows) {
-            glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        } else {
-            Vector3f lightCamPos = worldRenderer.getLightCamera().getPosition();
-            glTranslated(-lightCamPos.x, -lightCamPos.y, -lightCamPos.z);
-        }
+        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         float[] openglMat = new float[16];
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
@@ -127,13 +118,7 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
             trans.set(matrix);
             AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
-            boolean visible;
-            if (shadows) {
-                visible = worldRenderer.isAABBVisibleLight(aabb);
-            } else {
-                visible = worldRenderer.isAABBVisible(aabb);
-            }
-
+            final boolean visible = worldRenderer.isAABBVisible(aabb);
             if (visible) {
                 glPushMatrix();
                 trans.getOpenGLMatrix(openglMat);
@@ -141,20 +126,27 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
                 mBuffer.flip();
                 glMultMatrix(mBuffer);
 
+                shader.setBoolean("textured", false);
+                shader.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos));
+                shader.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos));
+
                 meshComp.mesh.render();
                 glPopMatrix();
             }
         }
+
         glPopMatrix();
+
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     @Override
     public void renderOpaque() {
-        render(false);
+        render();
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
     }
 
     @Override
@@ -167,6 +159,5 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderShadows() {
-        //render(true);
     }
 }

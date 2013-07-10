@@ -45,7 +45,10 @@ public class LocalPlayer {
     }
 
     public boolean isValid() {
-        return entity.exists() && entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
+        return entity.exists() && entity.hasComponent(LocationComponent.class)
+                && entity.hasComponent(LocalPlayerComponent.class)
+                && entity.hasComponent(PlayerComponent.class)
+                && entity.hasComponent(LightComponent.class);
     }
 
     public Vector3f getPosition() {

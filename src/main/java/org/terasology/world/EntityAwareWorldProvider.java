@@ -163,6 +163,24 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
+    public boolean setBlockRetainEntity(int x, int y, int z, Block type, Block oldType) {
+        return setBlockRetainEntity(new Vector3i(x, y, z), type, oldType);
+    }
+
+    @Override
+    public boolean setBlockRetainEntity(Vector3i pos, Block type, Block oldType) {
+        if (super.setBlock(pos.x, pos.y, pos.z, type, oldType)) {
+            if (Thread.currentThread().equals(mainThread)) {
+                getOrCreateEntityAt(pos).send(new BlockChangedEvent(pos, type, oldType));
+            } else {
+                eventQueue.add(new BlockChangedEvent(pos, type, oldType));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType, EntityRef entity) {
         return setBlock(new Vector3i(x, y, z), type, oldType, entity);
     }

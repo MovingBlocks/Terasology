@@ -14,57 +14,68 @@
  * limitations under the License.
  */
 
-uniform float   ssaoStrength;
-uniform float   ssaoTotalStrength;
-uniform float   ssaoFalloff;
-uniform float   ssaoRad;
+uniform vec4 ssaoSettings;
+#define ssaoStrength ssaoSettings.x
+#define ssaoRad ssaoSettings.y
 
-uniform vec2    noiseSize = vec2(64.0, 64.0);
-uniform vec2    renderTargetSize = vec2(1280.0, 720.0);
+uniform vec2 texelSize;
+uniform vec2 noiseTexelSize;
 
 uniform sampler2D texNormals;
 uniform sampler2D texNoise;
 uniform sampler2D texDepth;
 
-const int     ssaoSamples = 16;
-const float   ssaoInvSamples = 1.0 / 16.0;
+uniform mat4 invProjMatrix;
+uniform mat4 projMatrix;
 
-vec3 sphereSamples[16] = vec3[](
-    vec3(0.53812504, 0.18565957, -0.43192),vec3(0.13790712, 0.24864247, 0.44301823),vec3(0.33715037, 0.56794053, -0.005789503),
-    vec3(-0.6999805, -0.04511441, -0.0019965635),vec3(0.06896307, -0.15983082, -0.85477847),vec3(0.056099437, 0.006954967, -0.1843352),
-    vec3(-0.014653638, 0.14027752, 0.0762037),vec3(0.010019933, -0.1924225, -0.034443386),vec3(-0.35775623, -0.5301969, -0.43581226),
-    vec3(-0.3169221, 0.106360726, 0.015860917),vec3(0.010350345, -0.58698344, 0.0046293875),vec3(-0.08972908, -0.49408212, 0.3287904),
-    vec3(0.7119986, -0.0154690035, -0.09183723),vec3(-0.053382345, 0.059675813, -0.5411899),vec3(0.035267662, -0.063188605, 0.54602677),
-    vec3(-0.47761092, 0.2847911, -0.0271716)
-    );
+uniform vec3 ssaoSamples[SSAO_KERNEL_ELEMENTS];
 
 void main() {
-    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
-    vec3 screenSpacePosition = vec3(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth);
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
 
-    vec3 screenNormal = normalize(texture2D(texNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0);
-    vec3 randomNormal = normalize(texture2D(texNoise, renderTargetSize * gl_TexCoord[0].xy / noiseSize).xyz * 2.0 - 1.0);
-
-    float bl = 0.0;
-    float radD = ssaoRad / screenSpacePosition.z;
-
-    vec3 ray, se, occNorm;
-    float occluderDepth, depthDifference, normDiff, occDepth;
-
-    for (int i=0; i<ssaoSamples;++i) {
-        ray = radD*reflect(sphereSamples[i],randomNormal);
-        se = screenSpacePosition.xyz + sign(dot(ray,screenNormal))*ray;
-
-        occNorm = normalize(texture2D(texNormals,se.xy).xyz * 2.0 - 1.0);
-
-        occDepth = texture2D(texDepth, se.xy).x;
-        depthDifference = currentDepth-occDepth;
-
-        normDiff = (1.0-dot(occNorm,screenNormal));
-
-        bl += step(ssaoFalloff, depthDifference) * normDiff * (1.0 - smoothstep(ssaoFalloff, ssaoStrength, depthDifference));
+    // Exclude the sky...
+    if (epsilonEqualsOne(currentDepth)) {
+        gl_FragData[0].rgba = vec4(1.0);
+        return;
     }
 
-    float ao = 1.0-ssaoTotalStrength*bl*ssaoInvSamples;
-    gl_FragData[0].rgba = vec4(ao);
+    vec3 normal = texture2D(texNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0;
+    // TODO: This is costly... See below
+    vec3 viewSpacePos = reconstructViewPos(currentDepth, gl_TexCoord[0].xy, invProjMatrix);
+
+    vec2 noiseScale = noiseTexelSize / texelSize;
+    vec3 randomVec = texture2D(texNoise, gl_TexCoord[0].xy * noiseScale).xyz * 2.0 - 1.0;
+
+    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
+    vec3 bitangent = cross(normal, tangent);
+    mat3 tbn = mat3(tangent, bitangent, normal);
+
+    float occlusion = 0.0;
+    float sampleCount = 0.0;
+
+    for (int i=0; i<SSAO_KERNEL_ELEMENTS; ++i) {
+        vec3 sample = tbn * ssaoSamples[i];
+
+//        if (dot(sample, normal) < 0.05) {
+//            continue;
+//        }
+
+        sample = sample * ssaoRad + viewSpacePos;
+
+        vec4 offset = vec4(sample.x, sample.y, sample.z, 1.0);
+        offset = projMatrix * offset;
+        offset.xy /= offset.w;
+        offset.xy = offset.xy * vec2(0.5) + vec2(0.5);
+
+        // TODO: Holy... frustum ray and linearized depth - please!
+        float sampleDepth = reconstructViewPos(texture2D(texDepth, offset.xy).r * 2.0 - 1.0, gl_TexCoord[0].xy, invProjMatrix).z;
+
+        float rangeCheck = smoothstep(0.0, 1.0, ssaoRad / abs(viewSpacePos.z - sampleDepth));
+        occlusion += step(sample.z, sampleDepth) * rangeCheck;
+        sampleCount += 1.0;
+    }
+
+    occlusion = 1.0 - occlusion / sampleCount;
+
+    gl_FragData[0].rgba = vec4(pow(occlusion, ssaoStrength));
 }

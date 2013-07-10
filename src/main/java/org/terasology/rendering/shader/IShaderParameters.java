@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.shader;
 
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
+
 /**
  * Interface for all shader parameters. Shader parameters can
  * be used to automatically set shader parameters when the
@@ -23,5 +25,5 @@ package org.terasology.rendering.shader;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface IShaderParameters {
-    public void applyParameters(ShaderProgram program);
+    public void applyParameters(GLSLShaderProgramInstance program);
 }

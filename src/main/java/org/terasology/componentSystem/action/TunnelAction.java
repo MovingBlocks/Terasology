@@ -26,6 +26,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.ParticleEffectHelper;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -38,12 +39,16 @@ import org.terasology.world.block.management.BlockManager;
 public class TunnelAction implements EventHandlerSystem {
 
     private static int MAX_DESTROYED_BLOCKS = 100;
+    private static int MAX_PARTICLE_EFFECTS = 4;
 
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysics physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
     private DroppedBlockFactory droppedBlockFactory;
+
+    @In
+    private EntityManager entityManager;
 
     @Override
     public void initialise() {
@@ -61,11 +66,16 @@ public class TunnelAction implements EventHandlerSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
 
         Vector3f dir = new Vector3f(event.getDirection());
+        dir.scale(4.0f);
+
         Vector3f origin = new Vector3f(event.getOrigin());
+        origin.add(dir);
+
         Vector3i blockPos = new Vector3i();
 
+        int maxParticleEffects = MAX_PARTICLE_EFFECTS;
         int blockCounter = MAX_DESTROYED_BLOCKS;
-        for (int s = 4; s <= 10000; s += 30) {
+        for (int s = 0; s < 512; s++) {
             origin.add(dir);
 
             for (int i = 0; i < 64; i++) {
@@ -89,26 +99,34 @@ public class TunnelAction implements EventHandlerSystem {
                         continue;
 
                     if (currentBlock.isDestructible()) {
+                        if (maxParticleEffects > 0) {
+                            ParticleEffectHelper.spawnParticleEffect(target, ParticleEffectHelper.createSmokeExplosionParticleEffect());
+                        }
+
                         worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
 
                         EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                         blockEntity.destroy();
 
-                        if (random.randomInt(6) == 0) {
-                            EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily(), 5);
+                        if (random.randomInt(4) == 0) {
+                            EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getPickupBlockFamily(), 5);
                             block.send(new ImpulseEvent(impulse));
                         }
 
+                        maxParticleEffects--;
                         blockCounter--;
                     }
 
-                    if (blockCounter <= 0)
+                    if (blockCounter <= 0) {
                         return;
+                    }
                 }
             }
         }
-        //If no blocks were destroyed, cancel the event
-        if(blockCounter == MAX_DESTROYED_BLOCKS)
+
+        // If no blocks were destroyed, cancel the event
+        if (blockCounter == MAX_DESTROYED_BLOCKS) {
             event.cancel();
+        }
     }
 }

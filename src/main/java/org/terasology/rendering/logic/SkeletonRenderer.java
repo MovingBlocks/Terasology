@@ -17,7 +17,6 @@
 package org.terasology.rendering.logic;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
@@ -26,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -36,7 +35,6 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.world.WorldRenderer;
@@ -49,10 +47,8 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glMultMatrix;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 /**
@@ -169,12 +165,11 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        Matrix4f matrix = new Matrix4f();
-        Transform trans = new Transform();
         Quat4f inverseWorldRot = new Quat4f();
+        Matrix4f matrixCameraSpace = new Matrix4f();
 
-        glPushMatrix();
-        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+        FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
+        FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);;
 
         for (EntityRef entity : entityManager.iteratorEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
@@ -182,27 +177,37 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
                 continue;
             }
             skeletalMesh.material.enable();
-            skeletalMesh.material.setFloat("light", 1);
+
+            skeletalMesh.material.getShaderProgramInstance().setFloat("sunlight", 1.0f);
+            skeletalMesh.material.getShaderProgramInstance().setFloat("blockLight", 1.0f);
+
+            skeletalMesh.material.getShaderProgramInstance().setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
 
-            float[] openglMat = new float[16];
-            FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
             LocationComponent location = entity.getComponent(LocationComponent.class);
 
             location.getWorldRotation(worldRot);
             inverseWorldRot.inverse(worldRot);
             location.getWorldPosition(worldPos);
+
+            Vector3f worldPositionCameraSpace = new Vector3f();
+            worldPositionCameraSpace.sub(worldPos, cameraPosition);
+
             float worldScale = location.getWorldScale();
-            matrix.set(worldRot, worldPos, worldScale);
-            trans.set(matrix);
+            matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);
 
-            glPushMatrix();
-            trans.getOpenGLMatrix(openglMat);
-            mBuffer.put(openglMat);
-            mBuffer.flip();
-            glMultMatrix(mBuffer);
+            Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+            TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-            skeletalMesh.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+            skeletalMesh.material.getShaderProgramInstance().setMatrix4("worldViewMatrix", tempMatrixBuffer44);
+
+            TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+            skeletalMesh.material.getShaderProgramInstance().setMatrix3("normalMatrix", tempMatrixBuffer33);
+
+            skeletalMesh.material.getShaderProgramInstance().setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos));
+            skeletalMesh.material.getShaderProgramInstance().setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos));
+
+            // TODO: Add frustum culling here
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             for (Bone bone : skeletalMesh.mesh.bones()) {
@@ -226,14 +231,11 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
                 }
             }
             skeletalMesh.mesh.render(bonePositions, boneRotations);
-            glPopMatrix();
         }
-
-        glPopMatrix();
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
     }
 
     @Override
@@ -254,7 +256,6 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             renderBoneOrientation(skeletalMesh.rootBone);
         }
-        glEnable(GL11.GL_TEXTURE_2D);
         glPopMatrix();*/
     }
 

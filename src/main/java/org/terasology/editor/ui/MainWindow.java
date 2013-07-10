@@ -19,15 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.TeraEd;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.shader.ShaderParametersBase;
-import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -59,9 +56,6 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     private JMenu propertiesMenu;
     private JMenuItem propertiesMenuScene;
 
-    //private JToolBar toolbar;
-    //private JToggleButton activateGameModeButton;
-
     private JScrollPane propertyPanelScrollPane;
 
     public ViewPort getViewPort() {
@@ -83,17 +77,15 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
                 propertyPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        propertyPanelScrollPane.setSize(350, 720);
         propertyPanelScrollPane.setMinimumSize(new Dimension(350, 720));
         propertyPanelScrollPane.setPreferredSize(new Dimension(350, 720));
 
         verticalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewPort, propertyPanelScrollPane);
         verticalSplitPane.setContinuousLayout(true);
-        verticalSplitPane.setResizeWeight(1.0);
+        verticalSplitPane.setResizeWeight(0.5);
         getContentPane().add(verticalSplitPane, BorderLayout.CENTER);
 
         setTitle("TeraEd - Terasology" + " | " + "Pre Alpha");
-        setSize(new Dimension(1280+350, 720));
 
         mainMenuBar = new JMenuBar();
         setJMenuBar(mainMenuBar);
@@ -116,18 +108,12 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         mainMenuBar.add(shaderPropertiesMenu);
         mainMenuBar.add(propertiesMenu);
 
-//        toolbar = new JToolBar();
-//        add(toolbar, BorderLayout.NORTH);
-//
-//        activateGameModeButton = new JToggleButton(UIManager.getIcon("OptionPane.warningIcon"));
-//        activateGameModeButton.addActionListener(this);
-//        toolbar.add(activateGameModeButton);
-
+        pack();
         setVisible(true);
     }
 
     public void initPostEngine() {
-        HashMap<String, ShaderProgram> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
+        HashMap<String, GLSLShaderProgramInstance> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
         Iterator<String> shaderIterator = shaderPrograms.keySet().iterator();
         while (shaderIterator.hasNext()) {
             String programName = shaderIterator.next();
@@ -151,15 +137,13 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
            for (int i=0; i<shaderPropertyMenuEntries.size(); ++i) {
                 if (e.getSource() == shaderPropertyMenuEntries.get(i)) {
                     String shaderProgramName = shaderPropertyMenuEntries.get(i).getText();
-                    propertyPanel.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram(shaderProgramName).getShaderParameters());
+                    propertyPanel.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgramInstance(shaderProgramName).getShaderParameters());
                     propertyPanel.setTitle(shaderProgramName);
                 }
            }
-       }// else if (e.getSource() == activateGameModeButton) {
-//           TerasologyEngine.setEditorInFocus(!TerasologyEngine.isEditorInFocus());
-//           Mouse.setGrabbed(!TerasologyEngine.isEditorInFocus());
-//       }
+       }
     }
+
     @Override
     public void windowOpened(WindowEvent e) {
     }

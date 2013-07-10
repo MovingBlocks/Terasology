@@ -1,11 +1,11 @@
 /*
- * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.rendering.gui.dialogs;
 
 import com.google.common.collect.Lists;
@@ -65,6 +64,7 @@ public class UIDialogMods extends UIDialog {
         this.modConfig = new ModConfig();
         this.originalModConfig = modConfig;
         this.modConfig.copy(modConfig);
+        this.setEnableScrolling(false);
         populateModList();
         setTitle("Select Mods...");
 
@@ -110,20 +110,33 @@ public class UIDialogMods extends UIDialog {
             }
         });
 
+        modList.addDoubleClickListener(new ClickListener() {
+            @Override
+            public void click(final UIDisplayElement element, final int button) {
+                if (!((Mod) modList.getSelection().getValue()).getModInfo().getId().equals("core")) {
+                    toggleSelectedModActivation();
+                }
+            }
+        });
+
         toggleButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                Mod selectedMod = (Mod) modList.getSelection().getValue();
-                if (modConfig.hasMod(selectedMod.getModInfo().getId())) {
-                    deactivateMod(selectedMod);
-                    toggleButton.getLabel().setText(ACTIVATE_TEXT);
-                } else {
-                    activateMod(selectedMod);
-                    toggleButton.getLabel().setText(DEACTIVATE_TEXT);
-                }
-                refreshListItemActivation();
+                toggleSelectedModActivation();
             }
         });
+    }
+
+    private void toggleSelectedModActivation() {
+        Mod selectedMod = (Mod) modList.getSelection().getValue();
+        if (modConfig.hasMod(selectedMod.getModInfo().getId())) {
+            deactivateMod(selectedMod);
+            toggleButton.getLabel().setText(ACTIVATE_TEXT);
+        } else {
+            activateMod(selectedMod);
+            toggleButton.getLabel().setText(DEACTIVATE_TEXT);
+        }
+        refreshListItemActivation();
     }
 
     private void refreshListItemActivation() {
@@ -159,8 +172,6 @@ public class UIDialogMods extends UIDialog {
         }
     }
 
-
-
     @Override
     protected void createDialogArea(UIDisplayContainer parent) {
 
@@ -179,7 +190,8 @@ public class UIDialogMods extends UIDialog {
         modList.setSize(new Vector2f(300f, 350f));
         modList.setPadding(new Vector4f(10f, 5f, 10f, 5f));
         modList.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
-        modList.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
+        modList.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f),
+            new Vector4f(16f, 7f, 7f, 7f));
 
         modPanel.addDisplayElement(modList);
         modPanel.layout();
@@ -218,14 +230,14 @@ public class UIDialogMods extends UIDialog {
 
         addDisplayElement(modPanel);
         addDisplayElement(detailPanel);
-
     }
 
     @Override
     protected void createButtons(UIDisplayContainer parent) {
         UIButton okButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         okButton.getLabel().setText("Ok");
-        okButton.setPosition(new Vector2f(getSize().x / 2 - okButton.getSize().x - 16f, getSize().y - okButton.getSize().y - 10));
+        okButton.setPosition(new Vector2f(getSize().x / 2 - okButton.getSize().x - 16f,
+            getSize().y - okButton.getSize().y - 10));
         okButton.setVisible(true);
 
         okButton.addClickListener(new ClickListener() {
@@ -237,7 +249,8 @@ public class UIDialogMods extends UIDialog {
         });
 
         UIButton cancelButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
-        cancelButton.setPosition(new Vector2f(okButton.getPosition().x + okButton.getSize().x + 16f, okButton.getPosition().y));
+        cancelButton.setPosition(new Vector2f(okButton.getPosition().x + okButton.getSize().x + 16f,
+            okButton.getPosition().y));
         cancelButton.getLabel().setText("Cancel");
         cancelButton.setVisible(true);
 

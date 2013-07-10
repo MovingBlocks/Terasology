@@ -20,26 +20,26 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.Block;
 
 /**
- * copied from the attackevent
  * @author Immortius <immortius@gmail.com>
+ *
  * created as a way to catch minions breaking blocks and sending them to their inventory
  * oldblock is the block being destroyed, instigator is the entity who broke the block
- * droppedblock is the itemblock dropped in the world
+ * droppedBlock is the itemblock dropped in the world
  */
 public class BlockDroppedEvent extends AbstractEvent {
-    private EntityRef droppedblock;
+    private EntityRef droppedBlock;
     private Block oldblock;
     
-    public BlockDroppedEvent(Block oldblock, EntityRef droppedblock) {
-        this.oldblock = oldblock;
-        this.droppedblock = droppedblock;
+    public BlockDroppedEvent(Block oldBlock, EntityRef droppedBlock) {
+        this.oldblock = oldBlock;
+        this.droppedBlock = droppedBlock;
     }
     
     public EntityRef getDroppedBlock() {
-        return droppedblock;
+        return droppedBlock;
     }
     
-    public Block getoldBlock() {
+    public Block getOldBlock() {
         return oldblock;
     }
 }

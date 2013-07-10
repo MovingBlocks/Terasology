@@ -22,8 +22,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.game.types.GameType;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
@@ -102,7 +102,7 @@ public class UIScreenInventory extends UIWindow {
             }
         });
 
-        CoreRegistry.get(GameType.class).onCreateInventoryHook(this);
+        CoreRegistry.get(GameTypeManager.class).getActiveGameType().onCreateInventoryHook(this);
 
         toolbar = new UIItemContainer(10);
         toolbar.setVisible(true);

@@ -1,0 +1,20 @@
+{
+    "Item" : {
+        "name" : "Spades Ace",
+        "icon" : "door",
+        "renderWithIcon" : true,
+        "stackId" : "lightAndShadow:spadesAce",
+        "consumedOnUse" : false,
+        "usage" : "ON_BLOCK"
+    },
+    "Card" : {
+        "topBlockFamily" : "lightAndShadow:spadesAceTop",
+        "bottomBlockFamily" : "lightAndShadow:spadesAceBottom"
+    },
+    "Health" : {
+        "currentHealth" : 64,
+        "maxHealth" : 64,
+        "regenRate" : 4,
+        "waitBeforeRegen" : 1
+    }
+}

@@ -15,13 +15,21 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
+import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -30,25 +38,52 @@ import java.util.List;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
+    Property aberrationOffsetX = new Property("aberrationOffsetX", 0.0f, 0.0f, 0.1f);
+    Property aberrationOffsetY = new Property("aberrationOffsetY", 0.0f, 0.0f, 0.1f);
+
+    Property bloomFactor = new Property("bloomFactor", 0.5f, 0.0f, 1.0f);
+
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
-        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
+        Vector3f tint = CoreRegistry.get(WorldRenderer.class).getTint();
+        program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z);
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneCombined.bindTexture();
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texScene", texId++);
+
+        if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("sceneBloom2");
+            program.setInt("texBloom", texId++);
+
+            program.setFloat("bloomFactor", (Float) bloomFactor.getValue());
+        }
+
+        program.setFloat2("aberrationOffset", (Float) aberrationOffsetX.getValue(), (Float) aberrationOffsetY.getValue());
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().getFBO("lightShafts").bindTexture();
+            DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");
             program.setInt("texLightShafts", texId++);
+        }
+
+        Texture vignetteTexture = Assets.getTexture("engine:vignette");
+
+        if (vignetteTexture != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
+            program.setInt("texVignette", texId++);
         }
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
+        properties.add(aberrationOffsetX);
+        properties.add(aberrationOffsetY);
+        properties.add(bloomFactor);
     }
 }

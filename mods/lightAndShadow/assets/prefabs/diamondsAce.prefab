@@ -1,0 +1,20 @@
+{
+    "Item" : {
+        "name" : "Diamonds Ace",
+        "icon" : "door",
+        "renderWithIcon" : true,
+        "stackId" : "lightAndShadow:diamondsAce",
+        "consumedOnUse" : false,
+        "usage" : "ON_BLOCK"
+    },
+    "Card" : {
+        "topBlockFamily" : "lightAndShadow:diamondsAceTop",
+        "bottomBlockFamily" : "lightAndShadow:diamondsAceBottom"
+    },
+    "Health" : {
+        "currentHealth" : 64,
+        "maxHealth" : 64,
+        "regenRate" : 4,
+        "waitBeforeRegen" : 1
+    }
+}

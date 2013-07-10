@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.editor.properties.Property;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -36,8 +37,10 @@ import java.util.List;
  */
 public class ShaderParametersSky extends ShaderParametersBase {
 
-    private Property sunExponent = new Property("sunExponent", 4096.0f, 1.0f, 8192f);
+    private Property sunExponent = new Property("sunExponent", 512.0f, 1.0f, 8192f);
     private Property moonExponent = new Property("moonExponent", 256.0f, 1.0f, 8192f);
+    private Property skyDaylightBrightness = new Property("skyDaylightBrightness", 1.3f, 0.0f, 10.0f);
+    private Property skyNightBrightness = new Property("skyNightBrightness", 1.0f, 0.0f, 10.0f);
 
     private Texture skyTexture90 = Assets.getTexture("engine:sky90");;
     private Texture skyTexture180 = Assets.getTexture("engine:sky180");;
@@ -64,7 +67,7 @@ public class ShaderParametersSky extends ShaderParametersBase {
     }
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         int texId = 0;
@@ -89,13 +92,15 @@ public class ShaderParametersSky extends ShaderParametersBase {
             program.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
         }
 
-        program.setFloat("sunExponent", (Float) sunExponent.getValue());
-        program.setFloat("moonExponent", (Float) moonExponent.getValue());
+        program.setFloat4("skySettings", (Float) sunExponent.getValue(), (Float) moonExponent.getValue(),
+                (Float) skyDaylightBrightness.getValue(), (Float) skyNightBrightness.getValue());
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(sunExponent);
         properties.add(moonExponent);
+        properties.add(skyDaylightBrightness);
+        properties.add(skyNightBrightness);
     }
 }

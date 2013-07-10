@@ -16,17 +16,22 @@
 
 package org.terasology.world;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.types.GameTypeUri;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.world.generator.MapGeneratorUri;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,33 +46,41 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time = 0;
-    private Map<String, Byte> blockIdMap = Maps.newHashMap();
-    private String[] chunkGenerators = new String[]{};
-    private String gameType = null;
+    private Map<String, Short> blockIdMap = Maps.newHashMap();
+    private MapGeneratorUri mapGeneratorUri = new MapGeneratorUri("core:perlin");
+    private GameTypeUri gameTypeUri = null;
     private ModConfig modConfiguration = new ModConfig();
+
+    @Deprecated
+    private String[] chunkGenerators;
+    @Deprecated
+    private String gameType = null;
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, String[] chunkGenerators, String gameType, ModConfig modConfig) {
+    public WorldInfo(String title, String seed, long time, MapGeneratorUri mapGeneratorUri, GameTypeUri gameTypeUri, ModConfig modConfig) {
         if (title != null) {
             this.title = title;
         }
         if (seed != null) {
             this.seed = seed;
         }
-        if (chunkGenerators != null) {
-            this.chunkGenerators = chunkGenerators;
+        if( mapGeneratorUri != null ) {
+            this.mapGeneratorUri = mapGeneratorUri;
         }
         this.time = time;
-        this.gameType = gameType;
+        this.gameTypeUri = gameTypeUri;
         this.modConfiguration.copy(modConfig);
     }
 
     public static void save(File toFile, WorldInfo worldInfo) throws IOException {
         FileWriter writer = new FileWriter(toFile);
         try {
-            new GsonBuilder().setPrettyPrinting().create().toJson(worldInfo, writer);
+            new GsonBuilder().
+                    registerTypeAdapter(MapGeneratorUri.class, new MapGeneratorUri.GsonAdapter()).
+                    registerTypeAdapter(GameTypeUri.class, new GameTypeUri.GsonAdapter()).
+                    setPrettyPrinting().create().toJson(worldInfo, writer);
         } finally {
             // JAVA7: better closing support
             writer.close();
@@ -77,7 +90,10 @@ public class WorldInfo {
     public static WorldInfo load(File fromFile) throws IOException {
         FileReader reader = new FileReader(fromFile);
         try {
-            WorldInfo result = new GsonBuilder().create().fromJson(reader, WorldInfo.class);
+            WorldInfo result = new GsonBuilder().
+                    registerTypeAdapter(MapGeneratorUri.class, new MapGeneratorUri.GsonAdapter()).
+                    registerTypeAdapter(GameTypeUri.class, new GameTypeUri.GsonAdapter()).
+                    create().fromJson(reader, WorldInfo.class);
             if (result.modConfiguration.size() == 0) {
                 for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {
                     result.modConfiguration.addMod(mod.getModInfo().getId());
@@ -117,24 +133,59 @@ public class WorldInfo {
         this.time = time;
     }
 
-    public String getGameType() {
-        return gameType;
+    public GameTypeUri getGameType() {
+        if (gameType != null) {
+            if (gameType.endsWith("FreeStyleType")) {
+                gameTypeUri = new GameTypeUri("core:free-style");
+            } else if (gameType.endsWith("SurvivalType")) {
+                gameTypeUri = new GameTypeUri("core:survival");
+            } else {
+                throw new IllegalStateException("Unknown game type (old style): "+gameType );
+            }
+        }
+        return gameTypeUri;
     }
 
-    public Map<String, Byte> getBlockIdMap() {
+    public Map<String, Short> getBlockIdMap() {
         return blockIdMap;
     }
 
-    public void setBlockIdMap(Map<String, Byte> blockIdMap) {
+    public void setBlockIdMap(Map<String, Short> blockIdMap) {
         this.blockIdMap = blockIdMap;
     }
 
-    public String[] getChunkGenerators() {
-        return chunkGenerators;
+    public MapGeneratorUri getMapGeneratorUri() {
+        if( chunkGenerators!=null ) {
+            for (String chunkGenerator : chunkGenerators) {
+                if( chunkGenerator.endsWith("PerlinTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:perlin");
+                    break;
+                } else if( chunkGenerator.endsWith("PerlinTerrainGeneratorWithSetup") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:perlin-setup");
+                    break;
+                } else if( chunkGenerator.endsWith("FlatTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:flat");
+                    break;
+                } else if( chunkGenerator.endsWith("MultiTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:multi");
+                    break;
+                } else if( chunkGenerator.endsWith("BasicHMTerrainGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("core:heightmap");
+                    break;
+                } else if( chunkGenerator.endsWith("PathfinderTestGenerator") ) {
+                    mapGeneratorUri = new MapGeneratorUri("pathfinding:testgen");
+                    break;
+                }
+            }
+            if (mapGeneratorUri == null) {
+                throw new IllegalStateException("Unknown chunk generators: "+ chunkGenerators );
+            }
+        }
+        return mapGeneratorUri;
     }
 
-    public void setChunkGenerators(String[] chunkGenerators) {
-        this.chunkGenerators = chunkGenerators;
+    public void setMapGeneratorUri(MapGeneratorUri mapGeneratorUri) {
+        this.mapGeneratorUri = mapGeneratorUri;
     }
 
     public ModConfig getModConfiguration() {

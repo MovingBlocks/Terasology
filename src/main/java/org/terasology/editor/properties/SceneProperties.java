@@ -16,7 +16,7 @@
 package org.terasology.editor.properties;
 
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.DefaultRenderingProcess;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
 

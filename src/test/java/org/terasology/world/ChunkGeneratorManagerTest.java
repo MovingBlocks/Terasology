@@ -17,13 +17,17 @@
 package org.terasology.world;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.BaseMapGenerator;
 import org.terasology.world.generator.ChunkGenerator;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
+import org.terasology.world.generator.MapGenerator;
+import org.terasology.world.generator.MapGeneratorUri;
 
 /**
  * @author Immortius
@@ -31,11 +35,35 @@ import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
 public class ChunkGeneratorManagerTest {
 
     private final static String SEED = "Seed";
+    private static class TestMapGenerator extends BaseMapGenerator {
+        private TestMapGenerator() {
+            super(new MapGeneratorUri("test:test"));
+        }
+
+        @Override
+        public void setup() {
+        }
+
+        @Override
+        public String name() {
+            return "test";
+        }
+
+        @Override
+        public boolean hasSetup() {
+            return false;
+        }
+    }
+
+    @Before
+    public void setup() {
+        CoreRegistry.put(Config.class, new Config());
+    }
 
     @Test
     public void registeredGeneratorsReceivesSeed() {
         final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
-        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        final TestMapGenerator generatorManager = new TestMapGenerator();
         generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
         final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
@@ -46,7 +74,7 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void registeredGeneratorReceivesBiomeProvider() {
         final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
-        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        final TestMapGenerator generatorManager = new TestMapGenerator();
         generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
         final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
@@ -57,7 +85,7 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void changeSeedPropagatedToChunkGenerator() {
         final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
-        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        final TestMapGenerator generatorManager = new TestMapGenerator();
         generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
         final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
@@ -69,7 +97,7 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void changeBiomeProviderToChunkGenerator() {
         final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
-        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        final TestMapGenerator generatorManager = new TestMapGenerator();
         generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
         final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
@@ -82,7 +110,7 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void createChunkPassesThroughGenerator() {
         final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
-        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        final TestMapGenerator generatorManager = new TestMapGenerator();
         generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
         final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);

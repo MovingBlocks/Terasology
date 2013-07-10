@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -37,29 +37,29 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
     }
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getActiveViewingDistance() * 8.0f);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
         if (worldRenderer != null) {
             program.setFloat("daylight", (float) worldRenderer.getDaylight());
             program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
             program.setFloat("tick", (float) worldRenderer.getTick());
+            program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getSmoothedPlayerSunlightValue());
 
             if (worldRenderer.getActiveCamera() != null) {
-                Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
+                final Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
+                final Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+
+                program.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z);
                 program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z);
+                program.setFloat3("cameraParameters", worldRenderer.getActiveCamera().getzNear(), worldRenderer.getActiveCamera().getzFar(), 0.0f);
             }
 
             Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(false);
             program.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z);
-        }
-
-        if (localPlayer != null) {
-            program.setFloat("carryingTorch", localPlayer.isCarryingTorch() ? 1.0f : 0.0f);
         }
 
         if (worldProvider != null) {

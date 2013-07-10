@@ -1,5 +1,9 @@
 package org.terasology.monitoring.impl;
 
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
@@ -12,7 +16,18 @@ public class ChunkMonitorEntry {
     protected static final Logger logger = LoggerFactory.getLogger(ChunkMonitorEntry.class);
     
     protected final Vector3i pos;
-    protected WeakChunk chunk = null;
+    protected LinkedList<WeakReference<Chunk>> chunks = new LinkedList<WeakReference<Chunk>>();
+    protected LinkedList<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<ChunkMonitorEvent.BasicChunkEvent>();
+    
+    protected final void purge() {
+        if (chunks.size() == 0) return;
+        final Iterator<WeakReference<Chunk>> it = chunks.iterator();
+        while (it.hasNext()) {
+            final WeakReference<Chunk> w = it.next();
+            if (w.get() == null)
+                it.remove();
+        } 
+    }
     
     public ChunkMonitorEntry(Vector3i pos) {
         this.pos = Preconditions.checkNotNull(pos, "The parameter 'pos' must not be null");
@@ -22,19 +37,25 @@ public class ChunkMonitorEntry {
         return new Vector3i(pos);
     }
     
-    public Chunk getChunk() {
+    public Chunk getLatestChunk() {
+        final WeakReference<Chunk> chunk = chunks.peekLast();
         if (chunk != null)
-            return chunk.getChunk();
+            return chunk.get();
         return null;
     }
     
-    public void setChunk(Chunk value) {
+    public void addChunk(Chunk value) {
         Preconditions.checkNotNull(value, "The parameter 'value' must not be null");
-        if (value == null)
-            this.chunk = null;
-        else if (chunk == null || chunk.getChunk() == null)
-            chunk = new WeakChunk(value);
-        else
-            logger.error("A chunk is already registered for position {}", pos);
+        Preconditions.checkArgument(pos.equals(value.getPos()), "Expected chunk for position {} but got position {} instead", pos, value.getPos());
+        purge();
+        chunks.add(new WeakReference<Chunk>(value));
+        if (chunks.size() > 1)
+            logger.warn("Multiple chunks for position {} are registered ({})", pos, chunks.size());
+    }
+    
+    public void addEvent(ChunkMonitorEvent.BasicChunkEvent event) {
+        Preconditions.checkNotNull(event, "The parameter 'event' must not be null");
+        Preconditions.checkArgument(pos.equals(event.position), "Expected event for position {} but got position {} instead", pos, event.position);
+        events.add(event);
     }
 }

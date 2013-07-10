@@ -17,8 +17,10 @@ package org.terasology.game.modes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.TeraOVR;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.MenuControlSystem;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventSystem;
@@ -29,19 +31,19 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
+import org.terasology.rendering.renderingProcesses.DefaultRenderingProcess;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.game.paths.PathManager;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Play mode.
@@ -79,6 +81,22 @@ public class StateSinglePlayer implements GameState {
         inputSystem = CoreRegistry.get(InputSystem.class);
 
         guiManager.openWindow(MenuControlSystem.HUD);
+
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+                && OculusVrHelper.isNativeLibraryLoaded()) {
+            logger.info("Trying to initialize Oculus SDK...");
+            TeraOVR.initSDK();
+            logger.info("Done!");
+            logger.info("Updating Oculus projection parameters from device...");
+            OculusVrHelper.updateFromDevice();
+            logger.info("Done!");
+        }
+
+        // Show or hide the HUD according to the settings
+        final boolean hudHidden = CoreRegistry.get(Config.class).getSystem().isDebugHudHidden();
+        for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+            element.setVisible(!hudHidden);
+        }
     }
 
     @Override
@@ -99,6 +117,13 @@ public class StateSinglePlayer implements GameState {
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
+        }
+
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+                && OculusVrHelper.isNativeLibraryLoaded()) {
+            logger.info("Shutting down Oculus SDK...");
+            TeraOVR.clear();
+            logger.info("Done!");
         }
     }
 
@@ -134,7 +159,12 @@ public class StateSinglePlayer implements GameState {
         glLoadIdentity();
 
         if (worldRenderer != null) {
-            worldRenderer.render();
+            if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.MONO);
+            } else {
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_RIGHT_EYE);
+            }
         }
 
         /* UI */

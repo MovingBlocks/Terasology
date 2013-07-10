@@ -16,25 +16,27 @@
 
 uniform sampler2D texScene;
 uniform sampler2D texDepth;
-#ifdef BLOOM
-uniform sampler2D texBloom;
+
+// TODO: Move me some place else
+#define COLOR_GRADING
+
+#ifdef COLOR_GRADING
+uniform sampler3D texColorGradingLut;
 #endif
+
 #if !defined (NO_BLUR)
 uniform sampler2D texBlur;
 uniform float blurFocusDistance;
 uniform float blurStart;
 uniform float blurLength;
 #endif
-#ifdef VIGNETTE
-uniform sampler2D texVignette;
-#endif
-#ifdef FILM_GRAIN
-uniform sampler2D texNoise;
-uniform vec2 noiseSize = vec2(64.0, 64.0);
-uniform vec2 renderTargetSize = vec2(1280.0, 720.0);
-#endif
 
 #ifdef FILM_GRAIN
+uniform sampler2D texNoise;
+
+uniform vec2 noiseSize;
+uniform vec2 renderTargetSize;
+
 uniform float noiseOffset;
 uniform float grainIntensity;
 #endif
@@ -49,10 +51,10 @@ void main() {
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
-    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
 
 #ifndef NO_BLUR
-    float depthLin = linDepthVDist(currentDepth);
+    float depthLin = linDepthViewingDistance(currentDepth);
     float blur = 0.0;
 
     float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;
@@ -106,25 +108,19 @@ void main() {
     vec4 finalColor = color;
 #endif
 
-#ifdef BLOOM
-    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
-    finalColor += colorBloom;
-#endif
-
 #ifdef FILM_GRAIN
     vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
-    finalColor.rgb += vec3(noise) * grainIntensity;
+    finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0f, 1.0f);
 #endif
 
-#ifdef VIGNETTE
-    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
+    // In the case the color is > 1.0 or < 0.0 despite tonemapping
+    finalColor.rgb = clamp(finalColor.rgb, 0.0, 1.0);
 
-    if (!swimming) {
-        finalColor.rgb *= vig;
-    } else {
-        finalColor.rgb *= vig * vig * vig;
-        finalColor.rgb *= vec3(0.1, 0.2, 0.2);
-    }
+#ifdef COLOR_GRADING
+    vec3 lutScale = vec3(15.0 / 16.0);
+    vec3 lutOffset = vec3(1.0 / 32.0);
+
+    finalColor.rgb = texture3D(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
 #endif
 
     gl_FragData[0].rgba = finalColor;

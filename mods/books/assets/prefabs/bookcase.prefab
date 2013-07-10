@@ -1,41 +1,21 @@
 {
-  "Bookshelf": {},
+  "Bookcase": {},
   "Inventory": {
     "itemSlots": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     ]
   },
+  "AccessInventoryAction": {},
+
   "PlaySoundAction" : {
     sounds = "click"
   },
-  "AccessInventoryAction": {}
+
+  "Health" : {
+    "currentHealth" : 5,
+    "maxHealth" : 5,
+    "regenRate" : 1,
+    "waitBeforeRegen" : 2
+  }
 }

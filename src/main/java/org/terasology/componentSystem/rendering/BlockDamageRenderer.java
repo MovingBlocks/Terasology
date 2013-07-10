@@ -26,6 +26,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -88,10 +89,15 @@ public class BlockDamageRenderer implements RenderSystem {
     public void renderOverlay() {
         if (effectsTexture == null) return;
 
-        ShaderManager.getInstance().enableDefaultTextured();
+        GLSLShaderProgramInstance defaultTextured = ShaderManager.getInstance().getShaderProgramInstance("defaultTextured");
+        defaultTextured.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
+        defaultTextured.enable();
+
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
+
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class, BlockComponent.class)) {
@@ -112,7 +118,10 @@ public class BlockDamageRenderer implements RenderSystem {
                 renderHealth(blockPos, health, cameraPosition);
             }
         }
+
         glDisable(GL11.GL_BLEND);
+
+        defaultTextured.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_ALPHA_REJECT);
     }
 
     private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
@@ -123,7 +132,7 @@ public class BlockDamageRenderer implements RenderSystem {
         glPushMatrix();
         glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
 
-        float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 10.0f) * 0.0625f;
+        float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 9.0f) * 0.0625f;
 
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
@@ -141,7 +150,6 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderFirstPerson() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -150,11 +158,9 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderOpaque() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void renderTransparent() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void renderAlphaBlend() {
     }
 }

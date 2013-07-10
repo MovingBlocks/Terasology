@@ -19,8 +19,13 @@ uniform sampler2D texture;
 void main(){
     vec4 diffColor = texture2D(texture, gl_TexCoord[0].xy);
 
-    if (diffColor.a < 0.5)
+#if defined (FEATURE_ALPHA_REJECT)
+    if (diffColor.a < 0.1) {
         discard;
+    }
+#endif
 
     gl_FragData[0].rgba = diffColor * gl_Color;
+    gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
+    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
 }

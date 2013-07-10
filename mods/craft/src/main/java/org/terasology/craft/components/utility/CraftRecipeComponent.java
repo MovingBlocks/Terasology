@@ -1,8 +1,8 @@
 package org.terasology.craft.components.utility;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
+
 import java.util.List;
 import java.util.Map;
 

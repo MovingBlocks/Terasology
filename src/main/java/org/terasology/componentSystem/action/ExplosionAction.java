@@ -19,7 +19,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.In;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.utilities.ParticleEffectHelper;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -30,7 +30,6 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
@@ -49,6 +48,9 @@ public class ExplosionAction implements EventHandlerSystem {
 
     @In
     private BlockEntityRegistry blockEntityRegistry;
+
+    @In
+    private EntityManager entityManager;
 
     private FastRandom random = new FastRandom();
     private DroppedBlockFactory droppedBlockFactory;
@@ -85,6 +87,8 @@ public class ExplosionAction implements EventHandlerSystem {
             return;
         }
 
+        ParticleEffectHelper.spawnParticleEffect(origin, ParticleEffectHelper.createSmokeExplosionParticleEffect());
+
         Vector3i blockPos = new Vector3i();
         for (int i = 0; i < 256; i++) {
             // TODO: Add a randomVector3f method to FastRandom?
@@ -114,7 +118,7 @@ public class ExplosionAction implements EventHandlerSystem {
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
                     if (random.randomInt(4) == 0) {
-                        EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily(), 5);
+                        EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getPickupBlockFamily(), 5);
                         block.send(new ImpulseEvent(impulse));
                     }
                 }

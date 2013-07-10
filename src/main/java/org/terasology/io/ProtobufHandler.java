@@ -15,4 +15,6 @@ public interface ProtobufHandler<T, M extends MessageOrBuilder> {
     
     public T decode(M message);
     
+    public void decode(M message, T value);
+    
 }

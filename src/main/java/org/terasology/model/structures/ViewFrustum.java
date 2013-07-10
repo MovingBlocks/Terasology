@@ -20,7 +20,6 @@ import java.nio.FloatBuffer;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
@@ -32,88 +31,82 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class ViewFrustum {
 
-    private final FrustumPlane[] _planes = new FrustumPlane[6];
-
-    private final FloatBuffer _proj = BufferUtils.createFloatBuffer(16);
-    private final FloatBuffer _model = BufferUtils.createFloatBuffer(16);
-    private final FloatBuffer _clip = BufferUtils.createFloatBuffer(16);
+    private final FrustumPlane[] planes = new FrustumPlane[6];
+    private final FloatBuffer clip = BufferUtils.createFloatBuffer(16);
 
     /**
      * Init. a new view frustum.
      */
     public ViewFrustum() {
         for (int i = 0; i < 6; i++)
-            _planes[i] = new FrustumPlane();
+            planes[i] = new FrustumPlane();
     }
 
     /**
      * Updates the view frustum using the currently active modelview and projection matrices.
      */
-    public void updateFrustum() {
-        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, _proj);
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, _model);
+    public void updateFrustum(FloatBuffer modelViewMatrix, FloatBuffer projectionMatrix) {
+        clip.put(0, modelViewMatrix.get(0) * projectionMatrix.get(0) + modelViewMatrix.get(1) * projectionMatrix.get(4) + modelViewMatrix.get(2) * projectionMatrix.get(8) + modelViewMatrix.get(3) * projectionMatrix.get(12));
+        clip.put(1, modelViewMatrix.get(0) * projectionMatrix.get(1) + modelViewMatrix.get(1) * projectionMatrix.get(5) + modelViewMatrix.get(2) * projectionMatrix.get(9) + modelViewMatrix.get(3) * projectionMatrix.get(13));
+        clip.put(2, modelViewMatrix.get(0) * projectionMatrix.get(2) + modelViewMatrix.get(1) * projectionMatrix.get(6) + modelViewMatrix.get(2) * projectionMatrix.get(10) + modelViewMatrix.get(3) * projectionMatrix.get(14));
+        clip.put(3, modelViewMatrix.get(0) * projectionMatrix.get(3) + modelViewMatrix.get(1) * projectionMatrix.get(7) + modelViewMatrix.get(2) * projectionMatrix.get(11) + modelViewMatrix.get(3) * projectionMatrix.get(15));
 
-        _clip.put(0, _model.get(0) * _proj.get(0) + _model.get(1) * _proj.get(4) + _model.get(2) * _proj.get(8) + _model.get(3) * _proj.get(12));
-        _clip.put(1, _model.get(0) * _proj.get(1) + _model.get(1) * _proj.get(5) + _model.get(2) * _proj.get(9) + _model.get(3) * _proj.get(13));
-        _clip.put(2, _model.get(0) * _proj.get(2) + _model.get(1) * _proj.get(6) + _model.get(2) * _proj.get(10) + _model.get(3) * _proj.get(14));
-        _clip.put(3, _model.get(0) * _proj.get(3) + _model.get(1) * _proj.get(7) + _model.get(2) * _proj.get(11) + _model.get(3) * _proj.get(15));
+        clip.put(4, modelViewMatrix.get(4) * projectionMatrix.get(0) + modelViewMatrix.get(5) * projectionMatrix.get(4) + modelViewMatrix.get(6) * projectionMatrix.get(8) + modelViewMatrix.get(7) * projectionMatrix.get(12));
+        clip.put(5, modelViewMatrix.get(4) * projectionMatrix.get(1) + modelViewMatrix.get(5) * projectionMatrix.get(5) + modelViewMatrix.get(6) * projectionMatrix.get(9) + modelViewMatrix.get(7) * projectionMatrix.get(13));
+        clip.put(6, modelViewMatrix.get(4) * projectionMatrix.get(2) + modelViewMatrix.get(5) * projectionMatrix.get(6) + modelViewMatrix.get(6) * projectionMatrix.get(10) + modelViewMatrix.get(7) * projectionMatrix.get(14));
+        clip.put(7, modelViewMatrix.get(4) * projectionMatrix.get(3) + modelViewMatrix.get(5) * projectionMatrix.get(7) + modelViewMatrix.get(6) * projectionMatrix.get(11) + modelViewMatrix.get(7) * projectionMatrix.get(15));
 
-        _clip.put(4, _model.get(4) * _proj.get(0) + _model.get(5) * _proj.get(4) + _model.get(6) * _proj.get(8) + _model.get(7) * _proj.get(12));
-        _clip.put(5, _model.get(4) * _proj.get(1) + _model.get(5) * _proj.get(5) + _model.get(6) * _proj.get(9) + _model.get(7) * _proj.get(13));
-        _clip.put(6, _model.get(4) * _proj.get(2) + _model.get(5) * _proj.get(6) + _model.get(6) * _proj.get(10) + _model.get(7) * _proj.get(14));
-        _clip.put(7, _model.get(4) * _proj.get(3) + _model.get(5) * _proj.get(7) + _model.get(6) * _proj.get(11) + _model.get(7) * _proj.get(15));
+        clip.put(8, modelViewMatrix.get(8) * projectionMatrix.get(0) + modelViewMatrix.get(9) * projectionMatrix.get(4) + modelViewMatrix.get(10) * projectionMatrix.get(8) + modelViewMatrix.get(11) * projectionMatrix.get(12));
+        clip.put(9, modelViewMatrix.get(8) * projectionMatrix.get(1) + modelViewMatrix.get(9) * projectionMatrix.get(5) + modelViewMatrix.get(10) * projectionMatrix.get(9) + modelViewMatrix.get(11) * projectionMatrix.get(13));
+        clip.put(10, modelViewMatrix.get(8) * projectionMatrix.get(2) + modelViewMatrix.get(9) * projectionMatrix.get(6) + modelViewMatrix.get(10) * projectionMatrix.get(10) + modelViewMatrix.get(11) * projectionMatrix.get(14));
+        clip.put(11, modelViewMatrix.get(8) * projectionMatrix.get(3) + modelViewMatrix.get(9) * projectionMatrix.get(7) + modelViewMatrix.get(10) * projectionMatrix.get(11) + modelViewMatrix.get(11) * projectionMatrix.get(15));
 
-        _clip.put(8, _model.get(8) * _proj.get(0) + _model.get(9) * _proj.get(4) + _model.get(10) * _proj.get(8) + _model.get(11) * _proj.get(12));
-        _clip.put(9, _model.get(8) * _proj.get(1) + _model.get(9) * _proj.get(5) + _model.get(10) * _proj.get(9) + _model.get(11) * _proj.get(13));
-        _clip.put(10, _model.get(8) * _proj.get(2) + _model.get(9) * _proj.get(6) + _model.get(10) * _proj.get(10) + _model.get(11) * _proj.get(14));
-        _clip.put(11, _model.get(8) * _proj.get(3) + _model.get(9) * _proj.get(7) + _model.get(10) * _proj.get(11) + _model.get(11) * _proj.get(15));
-
-        _clip.put(12, _model.get(12) * _proj.get(0) + _model.get(13) * _proj.get(4) + _model.get(14) * _proj.get(8) + _model.get(15) * _proj.get(12));
-        _clip.put(13, _model.get(12) * _proj.get(1) + _model.get(13) * _proj.get(5) + _model.get(14) * _proj.get(9) + _model.get(15) * _proj.get(13));
-        _clip.put(14, _model.get(12) * _proj.get(2) + _model.get(13) * _proj.get(6) + _model.get(14) * _proj.get(10) + _model.get(15) * _proj.get(14));
-        _clip.put(15, _model.get(12) * _proj.get(3) + _model.get(13) * _proj.get(7) + _model.get(14) * _proj.get(11) + _model.get(15) * _proj.get(15));
+        clip.put(12, modelViewMatrix.get(12) * projectionMatrix.get(0) + modelViewMatrix.get(13) * projectionMatrix.get(4) + modelViewMatrix.get(14) * projectionMatrix.get(8) + modelViewMatrix.get(15) * projectionMatrix.get(12));
+        clip.put(13, modelViewMatrix.get(12) * projectionMatrix.get(1) + modelViewMatrix.get(13) * projectionMatrix.get(5) + modelViewMatrix.get(14) * projectionMatrix.get(9) + modelViewMatrix.get(15) * projectionMatrix.get(13));
+        clip.put(14, modelViewMatrix.get(12) * projectionMatrix.get(2) + modelViewMatrix.get(13) * projectionMatrix.get(6) + modelViewMatrix.get(14) * projectionMatrix.get(10) + modelViewMatrix.get(15) * projectionMatrix.get(14));
+        clip.put(15, modelViewMatrix.get(12) * projectionMatrix.get(3) + modelViewMatrix.get(13) * projectionMatrix.get(7) + modelViewMatrix.get(14) * projectionMatrix.get(11) + modelViewMatrix.get(15) * projectionMatrix.get(15));
 
         // RIGHT
-        _planes[0].setA(_clip.get(3) - _clip.get(0));
-        _planes[0].setB(_clip.get(7) - _clip.get(4));
-        _planes[0].setC(_clip.get(11) - _clip.get(8));
-        _planes[0].setD(_clip.get(15) - _clip.get(12));
-        _planes[0].normalize();
+        planes[0].setA(clip.get(3) - clip.get(0));
+        planes[0].setB(clip.get(7) - clip.get(4));
+        planes[0].setC(clip.get(11) - clip.get(8));
+        planes[0].setD(clip.get(15) - clip.get(12));
+        planes[0].normalize();
 
         // LEFT
-        _planes[1].setA(_clip.get(3) + _clip.get(0));
-        _planes[1].setB(_clip.get(7) + _clip.get(4));
-        _planes[1].setC(_clip.get(11) + _clip.get(8));
-        _planes[1].setD(_clip.get(15) + _clip.get(12));
-        _planes[1].normalize();
+        planes[1].setA(clip.get(3) + clip.get(0));
+        planes[1].setB(clip.get(7) + clip.get(4));
+        planes[1].setC(clip.get(11) + clip.get(8));
+        planes[1].setD(clip.get(15) + clip.get(12));
+        planes[1].normalize();
 
         // BOTTOM
-        _planes[2].setA(_clip.get(3) + _clip.get(1));
-        _planes[2].setB(_clip.get(7) + _clip.get(5));
-        _planes[2].setC(_clip.get(11) + _clip.get(9));
-        _planes[2].setD(_clip.get(15) + _clip.get(13));
-        _planes[2].normalize();
+        planes[2].setA(clip.get(3) + clip.get(1));
+        planes[2].setB(clip.get(7) + clip.get(5));
+        planes[2].setC(clip.get(11) + clip.get(9));
+        planes[2].setD(clip.get(15) + clip.get(13));
+        planes[2].normalize();
 
         // TOP
-        _planes[3].setA(_clip.get(3) - _clip.get(1));
-        _planes[3].setB(_clip.get(7) - _clip.get(5));
-        _planes[3].setC(_clip.get(11) - _clip.get(9));
-        _planes[3].setD(_clip.get(15) - _clip.get(13));
-        _planes[3].normalize();
+        planes[3].setA(clip.get(3) - clip.get(1));
+        planes[3].setB(clip.get(7) - clip.get(5));
+        planes[3].setC(clip.get(11) - clip.get(9));
+        planes[3].setD(clip.get(15) - clip.get(13));
+        planes[3].normalize();
 
         // FAR
-        _planes[4].setA(_clip.get(3) - _clip.get(2));
-        _planes[4].setB(_clip.get(7) - _clip.get(6));
-        _planes[4].setC(_clip.get(11) - _clip.get(10));
-        _planes[4].setD(_clip.get(15) - _clip.get(14));
-        _planes[4].normalize();
+        planes[4].setA(clip.get(3) - clip.get(2));
+        planes[4].setB(clip.get(7) - clip.get(6));
+        planes[4].setC(clip.get(11) - clip.get(10));
+        planes[4].setD(clip.get(15) - clip.get(14));
+        planes[4].normalize();
 
         // NEAR
-        _planes[5].setA(_clip.get(3) + _clip.get(2));
-        _planes[5].setB(_clip.get(7) + _clip.get(6));
-        _planes[5].setC(_clip.get(11) + _clip.get(10));
-        _planes[5].setD(_clip.get(15) + _clip.get(14));
-        _planes[5].normalize();
+        planes[5].setA(clip.get(3) + clip.get(2));
+        planes[5].setB(clip.get(7) + clip.get(6));
+        planes[5].setC(clip.get(11) + clip.get(10));
+        planes[5].setD(clip.get(15) + clip.get(14));
+        planes[5].normalize();
     }
 
     /**
@@ -121,7 +114,7 @@ public class ViewFrustum {
      */
     public boolean intersects(double x, double y, double z) {
         for (int i = 0; i < 6; i++) {
-            if (_planes[i].getA() * x + _planes[i].getB() * y + _planes[i].getC() * z + _planes[i].getD() <= 0) {
+            if (planes[i].getA() * x + planes[i].getB() * y + planes[i].getC() * z + planes[i].getD() <= 0) {
                 return false;
             }
         }
@@ -138,25 +131,37 @@ public class ViewFrustum {
         Vector3f cp = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         for (int i = 0; i < 6; i++) {
-            if (_planes[i].getA() * (aabbVertices[0].x - cp.x) + _planes[i].getB() * (aabbVertices[0].y - cp.y) + _planes[i].getC() * (aabbVertices[0].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[0].x - cp.x) + planes[i].getB() * (aabbVertices[0].y - cp.y) + planes[i].getC() * (aabbVertices[0].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[1].x - cp.x) + _planes[i].getB() * (aabbVertices[1].y - cp.y) + _planes[i].getC() * (aabbVertices[1].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[1].x - cp.x) + planes[i].getB() * (aabbVertices[1].y - cp.y) + planes[i].getC() * (aabbVertices[1].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[2].x - cp.x) + _planes[i].getB() * (aabbVertices[2].y - cp.y) + _planes[i].getC() * (aabbVertices[2].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[2].x - cp.x) + planes[i].getB() * (aabbVertices[2].y - cp.y) + planes[i].getC() * (aabbVertices[2].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[3].x - cp.x) + _planes[i].getB() * (aabbVertices[3].y - cp.y) + _planes[i].getC() * (aabbVertices[3].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[3].x - cp.x) + planes[i].getB() * (aabbVertices[3].y - cp.y) + planes[i].getC() * (aabbVertices[3].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[4].x - cp.x) + _planes[i].getB() * (aabbVertices[4].y - cp.y) + _planes[i].getC() * (aabbVertices[4].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[4].x - cp.x) + planes[i].getB() * (aabbVertices[4].y - cp.y) + planes[i].getC() * (aabbVertices[4].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[5].x - cp.x) + _planes[i].getB() * (aabbVertices[5].y - cp.y) + _planes[i].getC() * (aabbVertices[5].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[5].x - cp.x) + planes[i].getB() * (aabbVertices[5].y - cp.y) + planes[i].getC() * (aabbVertices[5].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[6].x - cp.x) + _planes[i].getB() * (aabbVertices[6].y - cp.y) + _planes[i].getC() * (aabbVertices[6].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[6].x - cp.x) + planes[i].getB() * (aabbVertices[6].y - cp.y) + planes[i].getC() * (aabbVertices[6].z - cp.z) + planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[7].x - cp.x) + _planes[i].getB() * (aabbVertices[7].y - cp.y) + _planes[i].getC() * (aabbVertices[7].z - cp.z) + _planes[i].getD() > 0)
+            if (planes[i].getA() * (aabbVertices[7].x - cp.x) + planes[i].getB() * (aabbVertices[7].y - cp.y) + planes[i].getC() * (aabbVertices[7].z - cp.z) + planes[i].getD() > 0)
                 continue;
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Returns true if the given sphere intersects the given AABB.
+     */
+    public boolean intersects(Vector3f position, float radius) {
+        for (int i = 0; i < 6; i++) {
+            if (planes[i].getA() * position.x + planes[i].getB() * position.y + planes[i].getC() * position.z + planes[i].getD() <= -radius) {
+                return false;
+            }
+        }
         return true;
     }
 }

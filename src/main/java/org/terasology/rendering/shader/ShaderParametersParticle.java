@@ -15,14 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.asset.Assets;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 /**
  * Shader parameters for the Particle shader program.
@@ -32,16 +25,8 @@ import org.terasology.rendering.assets.Texture;
 public class ShaderParametersParticle extends ShaderParametersBase {
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
-
-        Texture terrainTex = Assets.getTexture("engine:terrain");
-        if (terrainTex == null) {
-            return;
-        }
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
     }
 
 }

@@ -20,7 +20,7 @@ import javax.vecmath.Vector3f;
 import org.terasology.entitySystem.Component;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.BlockGrid;
-import org.terasology.world.MiniatureChunk;
+import org.terasology.world.chunks.MiniatureChunk;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -45,5 +45,4 @@ public class MiniaturizerComponent implements Component {
         renderPosition = null;
         miniatureChunk = null;
     }
-
 }

@@ -19,6 +19,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 
 /**
  * Shader parameters for the Block shader program.
@@ -27,7 +28,7 @@ import org.lwjgl.opengl.GL13;
  */
 public class ShaderParametersDefault extends ShaderParametersBase {
 
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(GLSLShaderProgramInstance program) {
         super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

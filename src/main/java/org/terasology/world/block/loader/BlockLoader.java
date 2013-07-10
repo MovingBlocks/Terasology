@@ -32,15 +32,17 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.logic.manager.PathManager;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.paths.PathManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.utilities.gson.Vector3fHandler;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.*;
@@ -48,6 +50,7 @@ import org.terasology.world.block.shapes.BlockShape;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -60,23 +63,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
-import java.util.EnumMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class BlockLoader {
-    private static final int MAX_TILES = 256;
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
     private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
-
-    // TODO: for now these are fixed (constant in the chunk shader)
-    private int atlasSize = 256;
-    private int tileSize = 16;
 
     private JsonParser parser;
     private Gson gson;
@@ -85,29 +81,34 @@ public class BlockLoader {
     private BlockShape loweredShape;
     private BlockShape trimmedLoweredShape;
 
-    private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
-    private List<Tile> tiles = Lists.newArrayList();
+    private Tile tiles[] = new Tile[1024];
+    private Tile tilesNormal[] = new Tile[1024];
+    private Tile tilesHeight[] = new Tile[1024];
+    private int currentMaxTileIndex = 0;
+
+    private TObjectIntMap<AssetUri> tileIndices = new TObjectIntHashMap<AssetUri>();
 
     public BlockLoader() {
         parser = new JsonParser();
         gson = new GsonBuilder()
-            .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-            .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
-            .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
-            .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
-            .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
-            .create();
+                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+                .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
+                .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
+                .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
+                .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
+                .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
+                .create();
         cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
         loweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
         trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
     }
 
-    public int getAtlasSize() {
-        return atlasSize;
+    public <T> T fromJson(JsonElement element, Class<T> type) {
+        return gson.fromJson(element, type);
     }
 
     public int getNumMipmaps() {
-        return TeraMath.sizeOfPower(tileSize) + 1;
+        return TeraMath.sizeOfPower(Block.TILE_SIZE) + 1;
     }
 
     public LoadBlockDefinitionResults loadBlockDefinitions() {
@@ -128,30 +129,26 @@ public class BlockLoader {
                     BlockDefinition blockDef = loadBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
                     if (isShapelessBlockFamily(blockDef)) {
-                        indexTile(getDefaultTile(blockDef, blockDefUri), true);
+                        int index = indexTile(getDefaultTile(blockDef, blockDefUri), true);
+
+                        Tile tileNormal = (Tile) AssetManager.tryLoad(getDefaultTileNormal(blockDef, blockDefUri));
+                        tilesNormal[index] = tileNormal;
+                        Tile tileHeight = (Tile) AssetManager.tryLoad(getDefaultTileHeight(blockDef, blockDefUri));
+                        tilesHeight[index] = tileHeight;
+
                         result.shapelessDefinitions.add(new ShapelessFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
                     } else {
                         if (blockDef.liquid) {
-                            blockDef.rotation = BlockDefinition.RotationType.NONE;
+                            blockDef.rotation = null;
                             blockDef.shapes.clear();
                             blockDef.shape = trimmedLoweredShape.getURI().getSimpleString();
                         }
 
+                        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
+
                         if (blockDef.shapes.isEmpty()) {
-                            switch (blockDef.rotation) {
-                                case ALIGNTOSURFACE:
-                                    result.families.add(processAlignToSurfaceFamily(blockDefUri, blockDefJson));
-                                    break;
-                                case HORIZONTAL:
-                                    result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
-                                    break;
-                                case CONNECTTOADJACENT:
-                                    result.families.add(processConnectToAdjacentFamily(blockDefUri, blockDefJson));
-                                    break;
-                                default:
-                                    result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
-                                    break;
-                            }
+                            final BlockFamilyFactory blockFamilyFactory = blockFamilyFactoryRegistry.getBlockFamilyFactory(blockDef.rotation);
+                            result.families.add(blockFamilyFactory.createBlockFamily(this, blockDefUri, blockDef, blockDefJson));
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
                         }
@@ -201,59 +198,93 @@ public class BlockLoader {
     }
 
     public void buildAtlas() {
+        // Update the atlas configuration using the given set of tiles
+        for (int index = 0; index < currentMaxTileIndex; ++index) {
+            if (tiles[index] != null) {
+                Tile tile = tiles[index];
+                updateAtlasConfiguration(tile);
+            }
+        }
+
         int numMipMaps = getNumMipmaps();
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
+        ByteBuffer[] dataNormal = new ByteBuffer[numMipMaps];
+        ByteBuffer[] dataHeight = new ByteBuffer[numMipMaps];
+
+        final Color unitZColor = new Color(0.5f, 0.5f, 1.0f, 1.0f);
+        final Color transparentColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+        final Color blackColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+
         for (int i = 0; i < numMipMaps; ++i) {
-            BufferedImage image = generateAtlas(i);
+            BufferedImage imageDiffuse = generateAtlas(i, tiles, transparentColor);
+            BufferedImage imageNormal = generateAtlas(i, tilesNormal, unitZColor);
+            BufferedImage imageHeight = generateAtlas(i, tilesHeight, blackColor);
+
             if (i == 0) {
                 try {
-                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreensPath(), "tiles.png"));
+                    ImageIO.write(imageDiffuse, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles.png"));
+                    ImageIO.write(imageNormal, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles_normal.png"));
+                    ImageIO.write(imageHeight, "png", new File(PathManager.getInstance().getScreenshotPath(), "tiles_height.png"));
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
                 }
             }
 
-            // TODO: Read data directly from image buffer into texture
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(image, "png", bos);
-                PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
-                ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
-                buf.flip();
-                data[i] = buf;
-            } catch (IOException e) {
-                logger.error("Failed to create atlas texture");
-            }
+            writeImageToBuffer(imageDiffuse, i, data);
+            writeImageToBuffer(imageNormal, i, dataNormal);
+            writeImageToBuffer(imageHeight, i, dataHeight);
         }
 
-        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = new Texture(data, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
+        Texture terrainNormalTex = new Texture(dataNormal, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrainNormal"), terrainNormalTex);
+        Texture terrainHeightTex = new Texture(dataHeight, Block.ATLAS_SIZE, Block.ATLAS_SIZE, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrainHeight"), terrainHeightTex);
+
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
-        terrainMat.setFloat3("colorOffset", 1, 1, 1);
-        terrainMat.setInt("textured", 1);
+        terrainMat.getShaderProgramInstance().setFloat3ForAllPermutations("colorOffset", 1.0f, 1.0f, 1.0f);
+        terrainMat.getShaderProgramInstance().setBooleanForAllPermutations("textured", true);
+
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMat);
     }
 
-    private BufferedImage generateAtlas(int mipMapLevel) {
-        int size = atlasSize / (1 << mipMapLevel);
-        int textureSize = tileSize / (1 << mipMapLevel);
-        int tilesPerDim = atlasSize / tileSize;
+    private void writeImageToBuffer(BufferedImage image , int mipMapIndex, ByteBuffer[] ouputData) {
+        // TODO: Read data directly from image buffer into texture
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "png", bos);
+            PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
+            ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+            buf.flip();
+            ouputData[mipMapIndex] = buf;
+        } catch (IOException e) {
+            logger.error("Failed to create atlas texture");
+        }
+    }
+
+    private BufferedImage generateAtlas(int mipMapLevel, Tile[] tiles, Color clearColor) {
+        int size = Block.ATLAS_SIZE / (1 << mipMapLevel);
+        int textureSize = Block.TILE_SIZE / (1 << mipMapLevel);
+        int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
 
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
 
-        if (tiles.size() > MAX_TILES) {
-            logger.error("Too many tiles, culling overflow");
-        }
+        g.setColor(clearColor);
+        g.fillRect(0, 0, size, size);
 
-        for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
-            Tile tile = tiles.get(index);
+        for (int index = 0; index < currentMaxTileIndex; ++index) {
 
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
-            g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+
+            Tile tile = tiles[index];
+            if (tile != null) {
+                g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+            }
         }
 
         return result;
@@ -274,7 +305,7 @@ public class BlockLoader {
     }
 
     private boolean isShapelessBlockFamily(BlockDefinition blockDef) {
-        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation == BlockDefinition.RotationType.NONE && !blockDef.liquid && blockDef.tiles == null;
+        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation==null && !blockDef.liquid && blockDef.tiles == null;
     }
 
     private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
@@ -322,78 +353,7 @@ public class BlockLoader {
         return result;
     }
 
-    private BlockFamily processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        String[] categories = new String[0];
-        if (blockDefJson.has("top")) {
-            JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
-            blockDefJson.remove("top");
-            mergeJsonInto(blockDefJson, topDefJson);
-            BlockDefinition topDef = loadBlockDefinition(topDefJson);
-            Block block = constructSingleBlock(blockDefUri, topDef);
-            block.setDirection(Side.TOP);
-            blockMap.put(Side.TOP, block);
-            categories = getCategories(topDef);
-        }
-        if (blockDefJson.has("sides")) {
-            JsonObject sideDefJson = blockDefJson.getAsJsonObject("sides");
-            blockDefJson.remove("sides");
-            mergeJsonInto(blockDefJson, sideDefJson);
-            BlockDefinition sideDef = loadBlockDefinition(sideDefJson);
-            constructHorizontalBlocks(blockDefUri, sideDef, blockMap);
-            categories = getCategories(sideDef);
-        }
-        if (blockDefJson.has("bottom")) {
-            JsonObject bottomDefJson = blockDefJson.getAsJsonObject("bottom");
-            blockDefJson.remove("bottom");
-            mergeJsonInto(blockDefJson, bottomDefJson);
-            BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
-            Block block = constructSingleBlock(blockDefUri, bottomDef);
-            block.setDirection(Side.BOTTOM);
-            blockMap.put(Side.BOTTOM, block);
-            categories = getCategories(bottomDef);
-        }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
-    }
-
-    private BlockFamily processConnectToAdjacentFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
-        Map<BlockAdjacentType, EnumMap<Side, Block> > blockMap = Maps.newEnumMap(BlockAdjacentType.class);
-        String[] categories = new String[0];
-
-        if ( blockDefJson.has("types") ){
-
-            JsonArray blockTypes = blockDefJson.getAsJsonArray("types");
-
-            blockDefJson.remove("types");
-
-            for ( JsonElement element : blockTypes.getAsJsonArray() ){
-                JsonObject typeDefJson = element.getAsJsonObject();
-
-                if ( !typeDefJson.has("type") ){
-                    throw new IllegalArgumentException("Block type is empty");
-                }
-                BlockAdjacentType type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
-
-                if ( type == null ){
-                    throw new IllegalArgumentException("Invalid type block: " + gson.fromJson(typeDefJson.get("type"), String.class));
-                }
-
-                if ( !blockMap.containsKey(type) ){
-                    blockMap.put( type, Maps.<Side, Block>newEnumMap(Side.class));
-                }
-
-                typeDefJson.remove("type");
-                mergeJsonInto(blockDefJson, typeDefJson);
-                BlockDefinition typeDef = loadBlockDefinition(typeDefJson);
-                constructHorizontalBlocks( blockDefUri, typeDef, blockMap.get(type) );
-
-
-            }
-        }
-        return  new ConnectToAdjacentBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap,  categories);
-    }
-
-    private void mergeJsonInto(JsonObject from, JsonObject to) {
+    public void mergeJsonInto(JsonObject from, JsonObject to) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
                 if (!to.has(entry.getKey())) {
@@ -407,13 +367,7 @@ public class BlockLoader {
         }
     }
 
-    private BlockFamily processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Block block = constructSingleBlock(blockDefUri, blockDef);
-
-        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block, getCategories(blockDef));
-    }
-
-    private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
+    public Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
         Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
@@ -434,14 +388,7 @@ public class BlockLoader {
         return block;
     }
 
-    private BlockFamily processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, getCategories(blockDef));
-    }
-
-    private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
+    public void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
         Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
@@ -452,26 +399,6 @@ public class BlockLoader {
 
             block.setDirection(rot.rotate(Side.FRONT));
 
-            applyShape(block, shape, tileUris, rot);
-
-            for (BlockPart part : BlockPart.values()) {
-                block.setColorSource(part, colorSourceMap.get(part));
-                block.setColorOffset(part, colorOffsetsMap.get(part));
-            }
-
-            blockMap.put(rot.rotate(Side.FRONT), block);
-        }
-    }
-
-    private void constructConnectToAdjacentBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
-        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
-        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
-        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
-        BlockShape shape = getShape(blockDef);
-
-        for (Rotation rot : Rotation.horizontalRotations()) {
-            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-            block.setDirection(rot.rotate(Side.FRONT));
             applyShape(block, shape, tileUris, rot);
 
             for (BlockPart part : BlockPart.values()) {
@@ -525,6 +452,8 @@ public class BlockLoader {
     }
 
     private void applyShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             int tileIndex = getTileIndex(tileUris.get(part), shape.getMeshPart(part) != null);
@@ -532,7 +461,7 @@ public class BlockLoader {
             BlockPart targetPart = rot.rotate(part);
             block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
+                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.calcRelativeTileSizeWithOffset()));
                 if (part.isSide()) {
                     block.setFullSide(targetPart.getSide(), shape.isBlockingSide(part.getSide()));
                 }
@@ -542,15 +471,17 @@ public class BlockLoader {
     }
 
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
+        BlockLoader loader = CoreRegistry.get(BlockLoader.class);
+
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.calcRelativeTileSizeWithOffset()));
         }
     }
 
     private Vector2f calcAtlasPositionForId(int id) {
-        int tilesPerDim = atlasSize / tileSize;
-        return new Vector2f((id % tilesPerDim) * Block.TEXTURE_OFFSET, (id / tilesPerDim) * Block.TEXTURE_OFFSET);
+        int tilesPerDim = Block.ATLAS_SIZE / Block.TILE_SIZE;
+        return new Vector2f((id % tilesPerDim) * Block.calcRelativeTileSize(), (id / tilesPerDim) * Block.calcRelativeTileSize());
     }
 
     private Block createRawBlock(BlockDefinition def, String defaultName) {
@@ -569,6 +500,7 @@ public class BlockLoader {
         block.setShadowCasting(def.shadowCasting);
         block.setWaving(def.waving);
         block.setLuminance(def.luminance);
+        block.setTint(def.tint);
         block.setCraftPlace(def.craftPlace);
         block.setConnectToAllBlocks(def.connectToAllBlock);
         block.setCheckHeightDiff(def.checkHeightDiff);
@@ -591,6 +523,12 @@ public class BlockLoader {
         if (def.inventory != null) {
             block.setStackable(def.inventory.stackable);
             block.setDirectPickup(def.inventory.directPickup);
+            if (!def.inventory.pickupFamily.isEmpty()) {
+                BlockUri uri = new BlockUri(def.inventory.pickupFamily);
+                if (uri.isValid()) {
+                    block.setPickupBlockFamily(uri);
+                }
+            }
         }
 
         return block;
@@ -616,7 +554,7 @@ public class BlockLoader {
         return tileUris;
     }
 
-    private String[] getCategories(BlockDefinition def) {
+    public String[] getCategories(BlockDefinition def) {
         return def.categories.toArray(new String[def.categories.size()]);
     }
 
@@ -628,9 +566,25 @@ public class BlockLoader {
         return new AssetUri(AssetType.BLOCK_TILE, defaultName);
     }
 
+    private AssetUri getDefaultTileNormal(BlockDefinition blockDef, AssetUri uri) {
+        String defaultName = uri.getSimpleString()+"Normal";
+        if (!blockDef.tileNormal.isEmpty()) {
+            defaultName = blockDef.tileNormal;
+        }
+        return new AssetUri(AssetType.BLOCK_TILE, defaultName);
+    }
+
+    private AssetUri getDefaultTileHeight(BlockDefinition blockDef, AssetUri uri) {
+        String defaultName = uri.getSimpleString()+"Height";
+        if (!blockDef.tileHeight.isEmpty()) {
+            defaultName = blockDef.tileHeight;
+        }
+        return new AssetUri(AssetType.BLOCK_TILE, defaultName);
+    }
+
     private int getTileIndex(AssetUri uri, boolean warnOnError) {
-        if (tileIndexes.containsKey(uri)) {
-            return tileIndexes.get(uri);
+        if (tileIndices.containsKey(uri)) {
+            return tileIndices.get(uri);
         }
         return indexTile(uri, warnOnError);
     }
@@ -638,14 +592,51 @@ public class BlockLoader {
     private int indexTile(AssetUri uri, boolean warnOnError) {
         Tile tile = (Tile) AssetManager.tryLoad(uri);
         if (tile != null) {
-            int index = tiles.size();
-            tiles.add(tile);
-            tileIndexes.put(uri, index);
+            int index = currentMaxTileIndex++;
+            tiles[index] = tile;
+            tileIndices.put(uri, index);
             return index;
         } else if (warnOnError) {
             logger.warn("Unable to resolve block tile '{}'", uri);
         }
-        return 0;
+        return -1;
+    }
+
+    private void updateAtlasConfiguration(Tile currentTile) {
+        // The atlas is configured using the following constraints...
+        // 1.   The overall tile size is the size of the largest tile loaded
+        // 2.   The atlas will never be larger than 4096*4096 px
+        // 3.   The tile size gets adjusted if the tiles won't fit into the atlas using the overall tile size
+        //      (the tile size gets halved until all tiles will fit into the atlas)
+        // 4.   The size of the atlas is always a power of two - as is the tile size
+        int tileSize = Block.TILE_SIZE;
+        int atlasSize = Block.ATLAS_SIZE;
+
+        if (currentTile.getImage().getWidth() > tileSize) {
+            tileSize = currentTile.getImage().getWidth();
+        }
+
+        int atlasSizePow = 0, count = 0;
+        while (atlasSizePow * atlasSizePow < currentMaxTileIndex) {
+            atlasSizePow = (1 << count);
+            count++;
+        }
+
+        atlasSize = atlasSizePow * tileSize;
+
+        final int maxTextureAtlasRes = CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution();
+        if (atlasSize > maxTextureAtlasRes) {
+            atlasSize = maxTextureAtlasRes;
+        }
+
+        int maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+        while (maxTiles < currentMaxTileIndex) {
+            tileSize >>= 1;
+            maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+        }
+
+        Block.ATLAS_SIZE = atlasSize;
+        Block.TILE_SIZE = tileSize;
     }
 
     private JsonElement readJson(AssetUri blockDefUri) {
@@ -675,10 +666,9 @@ public class BlockLoader {
         return null;
     }
 
-    private BlockDefinition loadBlockDefinition(JsonElement element) {
+    public BlockDefinition loadBlockDefinition(JsonElement element) {
         return gson.fromJson(element, BlockDefinition.class);
     }
-
     private static class BlockTilesDefinitionHandler implements JsonDeserializer<BlockDefinition.Tiles> {
 
         @Override

@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -66,13 +66,15 @@ public class Chunk {
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
-    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem()
+        .getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
     public static final byte MAX_LIQUID_DEPTH = 0x07;
 
     public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);
     public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
-    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
+    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0,
+        INNER_CHUNK_POS_FILTER_Z);
 
     private ChunkState chunkState = ChunkState.ADJACENCY_GENERATION_PENDING;
     private final Vector3i pos = new Vector3i();
@@ -121,7 +123,8 @@ public class Chunk {
         ChunkMonitor.fireChunkCreated(this);
     }
 
-    public Chunk(Vector3i pos, ChunkState chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
+    public Chunk(Vector3i pos, ChunkState chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light,
+                 TeraArray liquid) {
         this.pos.set(Preconditions.checkNotNull(pos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.sunlightData = Preconditions.checkNotNull(sunlight);
@@ -136,7 +139,7 @@ public class Chunk {
      * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
      *
      * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @todo Add support for chunk data extensions.
+     * TODO: Add support for chunk data extensions.
      */
     public static class ProtobufHandler implements org.terasology.io.ProtobufHandler<Chunk, ChunksProtobuf.Chunk> {
 
@@ -157,32 +160,51 @@ public class Chunk {
         @Override
         public Chunk decode(ChunksProtobuf.Chunk message) {
             Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
-            if (!message.hasX())
+            if (!message.hasX()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing x coordinate.");
-            if (!message.hasY())
+            }
+            if (!message.hasY()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing y coordinate.");
-            if (!message.hasZ())
+            }
+            if (!message.hasZ()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing z coordinate.");
+            }
+
             final Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
-            if (!message.hasState())
+
+            if (!message.hasState()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing chunk state.");
+            }
+
             final ChunkState state = ChunkState.getStateById(message.getState());
-            if (state == null)
-                throw new IllegalArgumentException("Illformed protobuf message. Unknown chunk state: " + message.getState());
-            if (!message.hasBlockData())
+
+            if (state == null) {
+                throw new IllegalArgumentException("Illformed protobuf message. Unknown chunk state: "
+                    + message.getState());
+            }
+            if (!message.hasBlockData()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing block data.");
-            if (!message.hasSunlightData())
+            }
+            if (!message.hasSunlightData()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing sunlight data.");
-            if (!message.hasLightData())
+            }
+            if (!message.hasLightData()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing light data.");
-            if (!message.hasExtraData())
+            }
+            if (!message.hasExtraData()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing extra data.");
+            }
             final TeraArrays t = TeraArrays.getInstance();
             final TeraArray blockData = t.decode(message.getBlockData());
             final TeraArray sunlightData = t.decode(message.getSunlightData());
             final TeraArray lightData = t.decode(message.getLightData());
             final TeraArray extraData = t.decode(message.getExtraData());
             return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
+        }
+
+        @Override
+        public void decode(org.terasology.protobuf.ChunksProtobuf.Chunk message, Chunk value) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -233,15 +255,16 @@ public class Chunk {
     }
 
     public int getEstimatedMemoryConsumptionInBytes() {
-        return blockData.getEstimatedMemoryConsumptionInBytes() + sunlightData.getEstimatedMemoryConsumptionInBytes() + lightData.getEstimatedMemoryConsumptionInBytes() + extraData.getEstimatedMemoryConsumptionInBytes();
+        return blockData.getEstimatedMemoryConsumptionInBytes() + sunlightData.getEstimatedMemoryConsumptionInBytes()
+            + lightData.getEstimatedMemoryConsumptionInBytes() + extraData.getEstimatedMemoryConsumptionInBytes();
     }
 
     public Block getBlock(Vector3i pos) {
-        return BlockManager.getInstance().getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
+        return BlockManager.getInstance().getBlock((short) blockData.get(pos.x, pos.y, pos.z));
     }
 
     public Block getBlock(int x, int y, int z) {
-        return BlockManager.getInstance().getBlock((byte) blockData.get(x, y, z));
+        return BlockManager.getInstance().getBlock((short) blockData.get(x, y, z));
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
@@ -371,7 +394,8 @@ public class Chunk {
     public AABB getAABB() {
         if (aabb == null) {
             Vector3f dimensions = new Vector3f(0.5f * getChunkSizeX(), 0.5f * getChunkSizeY(), 0.5f * getChunkSizeZ());
-            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f,
+                getChunkWorldPosZ() + dimensions.z - 0.5f);
             aabb = AABB.createCenterExtent(position, dimensions);
         }
 
@@ -383,7 +407,8 @@ public class Chunk {
 
     public void deflate() {
         if (getChunkState() != ChunkState.COMPLETE) {
-            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
+            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is " +
+                "now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
         }
         lock();
         try {
@@ -415,7 +440,13 @@ public class Chunk {
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
 
                 ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
-                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, " +
+                    "total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, " +
+                    "light-deflated-by=%s%%, liquid-deflated-by=%s%%",
+                    pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced),
+                    fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent),
+                    fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+
             } else {
                 final int oldSize = getEstimatedMemoryConsumptionInBytes();
                 
@@ -435,14 +466,18 @@ public class Chunk {
     public void inflate() {
         lock();
         try {
-            if (!(blockData instanceof TeraDenseArray8Bit))
+            if (!(blockData instanceof TeraDenseArray8Bit)) {
                 blockData = new TeraDenseArray8Bit(blockData);
-            if (!(sunlightData instanceof TeraDenseArray4Bit))
+            }
+            if (!(sunlightData instanceof TeraDenseArray4Bit)) {
                 sunlightData = new TeraDenseArray4Bit(sunlightData);
-            if (!(lightData instanceof TeraDenseArray4Bit))
+            }
+            if (!(lightData instanceof TeraDenseArray4Bit)) {
                 lightData = new TeraDenseArray4Bit(lightData);
-            if (!(extraData instanceof TeraDenseArray4Bit))
+            }
+            if (!(extraData instanceof TeraDenseArray4Bit)) {
                 extraData = new TeraDenseArray4Bit(extraData);
+            }
         } finally {
             unlock();
         }
@@ -491,7 +526,8 @@ public class Chunk {
 
             for (int i = 0; i < subMeshAABB.length; i++) {
                 Vector3f dimensions = new Vector3f(8, heightHalf, 8);
-                Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+                Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f,
+                    (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
                 subMeshAABB[i] = AABB.createCenterExtent(position, dimensions);
             }
         }

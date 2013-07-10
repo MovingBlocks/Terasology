@@ -28,7 +28,7 @@ import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.types.GameType;
+import org.terasology.game.types.GameTypeManager;
 import org.terasology.math.TeraMath;
 
 /**
@@ -107,6 +107,6 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     
 
     private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator) {
-        CoreRegistry.get(GameType.class).onPlayerDamageHook(entity, health, damageAmount, instigator);
+        CoreRegistry.get(GameTypeManager.class).getActiveGameType().onPlayerDamageHook(entity, health, damageAmount, instigator);
     }
 }

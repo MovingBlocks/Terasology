@@ -19,5 +19,7 @@
     "craftPlace" : false,
     "climbable"  : true,
     "penetrable" : true,
-    "shape" : "engine:verticalOffsetPlane"
+    "shape" : "engine:verticalOffsetPlane",
+    "translucent" : true,
+    "doubleSided" : true
 }

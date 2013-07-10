@@ -4,7 +4,7 @@ import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
 /**
-@author Small-Jeeper
+ * @author Small-Jeeper
  */
 public class AddItemEvent extends AbstractEvent {
     private EntityRef target;
@@ -16,20 +16,20 @@ public class AddItemEvent extends AbstractEvent {
     }
 
     public AddItemEvent(EntityRef target, EntityRef instigator, float percent) {
-        this.target     = target;
+        this.target = target;
         this.instigator = instigator;
-        this.percent  = percent;
+        this.percent = percent;
     }
 
     public EntityRef getTarget() {
         return target;
     }
 
-    public EntityRef getInstigator(){
+    public EntityRef getInstigator() {
         return instigator;
     }
 
-    public float getPercent(){
+    public float getPercent() {
         return percent;
     }
 

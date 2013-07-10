@@ -16,22 +16,24 @@
 
 uniform sampler2D textureAtlas;
 
-uniform float light;
-uniform vec3 colorOffset;
-uniform bool textured;
+uniform vec3 colorOffset = vec3(1.0, 1.0, 1.0);
+
+uniform bool textured = false;
+
+uniform float blockLight = 1.0;
+uniform float sunlight = 1.0;
+
 uniform float alpha = 1.0;
 
 varying vec3 normal;
-varying vec4 vertexViewPos;
 
 void main(){
     vec4 color;
 
     if (textured) {
-        color = texture2D(textureAtlas, gl_TexCoord[0].xy);
-        color.rgb *= gl_Color.rgb;
+        color = gl_Color * texture2D(textureAtlas, gl_TexCoord[0].xy);
     } else {
-        color.rgba = gl_Color.rgba;
+        color = gl_Color;
     }
 
     color.a *= alpha;
@@ -40,22 +42,9 @@ void main(){
         discard;
     }
 
-    float torchlight = 0.0;
+    color.rgb *= colorOffset.rgb;
 
-    // Apply torchlight
-    if (carryingTorch > 0.99) {
-        torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexViewPos.xyz)), vertexViewPos.xyz);
-    }
-
-    // Apply light
-    color.rgb *= light + torchlight;
-
-    if (textured) {
-        color.rgb *= colorOffset.rgb;
-        gl_FragData[0].rgba = color;
-    } else {
-        gl_FragData[0].rgba = color;
-    }
-
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
+    gl_FragData[0].rgba = color;
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, sunlight);
+    gl_FragData[2].rgba = vec4(blockLight, blockLight, blockLight, 0.0);
 }

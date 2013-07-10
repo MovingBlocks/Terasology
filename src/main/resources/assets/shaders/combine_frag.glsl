@@ -17,9 +17,16 @@
 uniform sampler2D texSceneOpaque;
 uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D texSceneOpaqueNormals;
+uniform sampler2D texSceneOpaqueLightBuffer;
 uniform sampler2D texSceneTransparent;
-uniform sampler2D texSceneTransparentDepth;
-uniform sampler2D texSceneTransparentNormals;
+
+uniform vec4 skyInscatteringSettingsFrag;
+#define skyInscatteringStrength skyInscatteringSettingsFrag.y
+#define skyInscatteringLength skyInscatteringSettingsFrag.z
+#define skyInscatteringThreshold skyInscatteringSettingsFrag.w
+
+uniform sampler2D texSceneSkyBand;
+
 #ifdef SSAO
 uniform sampler2D texSsao;
 #endif
@@ -28,60 +35,76 @@ uniform sampler2D texEdges;
 
 uniform float outlineDepthThreshold;
 uniform float outlineThickness;
+
+# define OUTLINE_COLOR 0.0, 0.0, 0.0
 #endif
 
-uniform float shoreStart;
-uniform float shoreEnd;
+#if defined (VOLUMETRIC_FOG)
+uniform mat4 invViewProjMatrix;
+#endif
 
-#define OUTLINE_COLOR 0.0, 0.0, 0.0
+#if defined (VOLUMETRIC_FOG)
+#define VOLUMETRIC_FOG_COLOR 1.0, 1.0, 1.0
+
+uniform vec4 volumetricFogSettings;
+#define volFogDensityAtViewer volumetricFogSettings.x
+#define volFogGlobalDensity volumetricFogSettings.y
+#define volFogHeightFalloff volumetricFogSettings.z
+
+uniform vec3 fogWorldPosition;
+#endif
 
 void main() {
     vec4 colorOpaque = texture2D(texSceneOpaque, gl_TexCoord[0].xy);
-    float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r;
+    float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r * 2.0 - 1.0;
     vec4 normalsOpaque = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
     vec4 colorTransparent = texture2D(texSceneTransparent, gl_TexCoord[0].xy);
-    float depthTransparent = texture2D(texSceneTransparentDepth, gl_TexCoord[0].xy).r;
-    vec4 normalsTransparent = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy);
+    vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
+
+#if defined (VOLUMETRIC_FOG)
+    // TODO: As costly as in the deferred light geometry pass - frustum ray method would be great here
+    vec3 worldPosition = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invViewProjMatrix);
+#endif
 
 #ifdef SSAO
     float ssao = texture2D(texSsao, gl_TexCoord[0].xy).x;
-    colorOpaque *= vec4(ssao, ssao, ssao, 1.0);
+    colorOpaque.rgb *= ssao;
 #endif
 
 #ifdef OUTLINE
-    float outline = step(outlineDepthThreshold, texture2D(texEdges, gl_TexCoord[0].xy).x) * outlineThickness;
-    colorOpaque.rgb = (1.0 - outline) * colorOpaque.rgb + outline * vec3(OUTLINE_COLOR);
+    vec3 screenSpaceNormal = normalsOpaque.xyz * 2.0 - 1.0;
+    float outlineFadeFactor = (1.0 - abs(screenSpaceNormal.y)); // Use the normal to avoid artifacts on flat wide surfaces
+
+    float outline = step(outlineDepthThreshold, texture2D(texEdges, gl_TexCoord[0].xy).x) * outlineThickness * outlineFadeFactor;
+    colorOpaque.rgb = mix(colorOpaque.rgb, vec3(OUTLINE_COLOR), outline);
 #endif
 
-    vec4 color = vec4(0.0);
-    float depth = depthOpaque;
-    vec4 normals = vec4(0.0);
+    // Sky inscattering using down-sampled sky band texture
+    vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
 
-    // Combine transparent and opaque RTs
-    if (depthTransparent < depthOpaque) {
-        depth = depthTransparent;
+    float d = abs(linDepthViewingDistance(depthOpaque));
+    float fogValue = clamp(((skyInscatteringLength - d) / (skyInscatteringLength - skyInscatteringThreshold)) * skyInscatteringStrength, 0.0, 1.0);
 
-        // TODO: Fix alpha blending...
-        //float fade = 1.0 - colorTransparent.a;
-        float fade = 0.0;
-        // Detect water in the transparent RT...
-        if (normalsTransparent.a > 0.99) {
-            // ... and fade out at the shore
-            float linDepthOpaque = linDepth(depthOpaque);
-            float linDepthTransparent = linDepth(depthTransparent);
-
-            float depthDiff = linDepthOpaque - linDepthTransparent;
-            fade = clamp((shoreEnd - depthDiff) / (shoreEnd - shoreStart), 0.0, 1.0);
-        }
-
-        normals = mix(normalsTransparent, normalsOpaque, fade);
-        color = mix(colorTransparent, colorOpaque, fade);
-    } else {
-        normals = normalsOpaque;
-        color = colorOpaque;
+    // No scattering in the sky please - otherwise we end up with an ugly blurry sky
+    if (!epsilonEqualsOne(depthOpaque)) {
+        colorOpaque.rgb = mix(colorOpaque.rgb, skyInscatteringColor, fogValue);
+        colorTransparent.rgb = mix(colorTransparent.rgb, skyInscatteringColor, fogValue);
     }
 
+#if defined (VOLUMETRIC_FOG)
+    // Use lightValueAtPlayerPos to avoid volumetric fog in caves
+    float volumetricFogValue = sunlightValueAtPlayerPos * calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
+
+    vec3 volFogColor = skyInscatteringColor * vec3(VOLUMETRIC_FOG_COLOR);
+    colorOpaque.rgb = mix(colorOpaque.rgb, volFogColor, volumetricFogValue);
+    colorTransparent.rgb = mix(colorTransparent.rgb, volFogColor, volumetricFogValue);
+#endif
+
+    float fade = clamp(1.0 - colorTransparent.a, 0.0, 1.0);
+    vec4 color = mix(colorTransparent, colorOpaque, fade);
+
     gl_FragData[0].rgba = color.rgba;
-    gl_FragData[1].rgba = normals.rgba;
-    gl_FragDepth = depth;
+    gl_FragData[1].rgba = normalsOpaque.rgba;
+    gl_FragData[2].rgba = lightBufferOpaque.rgba;
+    gl_FragDepth = depthOpaque * 0.5 + 0.5;
 }

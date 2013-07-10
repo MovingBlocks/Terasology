@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright (c) 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,10 @@ package org.terasology.world.block;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -33,11 +33,10 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.GLSLShaderProgramInstance;
 import org.terasology.utilities.collection.EnumBooleanMap;
-import java.util.*;
-import java.util.List;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.chunks.Chunk;
 
@@ -47,14 +46,14 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
 
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Stores all information for a specific block type.
@@ -64,13 +63,14 @@ import static org.lwjgl.opengl.GL11.glIsEnabled;
  */
 // TODO: Make this immutable, add a block builder class
 public class Block {
-    public static final float TEXTURE_OFFSET = 0.0625f;
-    public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
-
     private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this
     private static final EnumMap<BlockPart, Float> DIRECTION_LIT_LEVEL = new EnumMap<BlockPart, Float>(BlockPart.class);
+
+    // TODO: Move me some place else - please
+    public static int ATLAS_SIZE = 256;
+    public static int TILE_SIZE = 16;
 
     /**
      * Different color sources for blocks.
@@ -130,7 +130,7 @@ public class Block {
         }
     }
 
-    private byte id = 0x0;
+    private short id = 0x0;
     private String displayName = "Untitled block";
     private BlockUri uri;
     private BlockFamily family = null;
@@ -158,6 +158,7 @@ public class Block {
     private boolean shadowCasting = true;
     private boolean waving = false;
     private byte luminance = 0;
+    private Vector3f tint = new Vector3f(0f, 0f, 0f);
     private EnumMap<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
     private EnumMap<BlockPart, Vector4f> colorOffset = new EnumMap<BlockPart, Vector4f>(BlockPart.class);
 
@@ -176,6 +177,7 @@ public class Block {
     // Inventory settings
     private boolean directPickup = false;
     private boolean stackable = true;
+    private BlockUri pickupBlockFamily = null;
 
     /* Mesh */
     private Mesh mesh;
@@ -200,11 +202,11 @@ public class Block {
         }
     }
 
-    public byte getId() {
+    public Short getId() {
         return id;
     }
 
-    public void setId(byte id) {
+    public void setId(short id) {
         this.id = id;
     }
 
@@ -451,6 +453,20 @@ public class Block {
         this.stackable = stackable;
     }
 
+    public void setPickupBlockFamily(BlockUri uri) {
+        this.pickupBlockFamily = uri;
+    }
+
+    public BlockFamily getPickupBlockFamily() {
+        if (pickupBlockFamily != null) {
+            BlockFamily family = BlockManager.getInstance().getBlockFamily(pickupBlockFamily);
+            if (family != null) {
+                return family;
+            }
+        }
+        return this.getBlockFamily();
+    }
+
     /**
      * @return How much damage it takes to destroy the block
      */
@@ -475,6 +491,17 @@ public class Block {
 
     public void setLuminance(byte luminance) {
         this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunk.MAX_LIGHT);
+    }
+
+    /**
+     * @return The tint of this liquid
+     */
+    public Vector3f getTint() {
+        return tint;
+    }
+
+    public void setTint(Vector3f tint) {
+        this.tint = tint;
     }
 
     /**
@@ -649,13 +676,17 @@ public class Block {
         return getBounds(new Vector3i(floatPos, 0.5f));
     }
 
-    public void renderWithLightValue(float light) {
-        if (isInvisible())
+    public void renderWithLightValue(float sunlight, float blockLight) {
+        if (isInvisible()) {
             return;
+        }
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        GLSLShaderProgramInstance shader = ShaderManager.getInstance().getShaderProgramInstance("block");
+        shader.addFeatureIfAvailable(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
+
         shader.enable();
-        shader.setFloat("light", light);
+        shader.setFloat("sunlight", sunlight);
+        shader.setFloat("blockLight", blockLight);
 
         if (mesh == null) {
             generateMesh();
@@ -664,7 +695,6 @@ public class Block {
             return;
         }
 
-
         if (!isDoubleSided() || !glIsEnabled(GL11.GL_CULL_FACE)) {
             mesh.render();
         } else {
@@ -672,6 +702,8 @@ public class Block {
             mesh.render();
             glEnable(GL11.GL_CULL_FACE);
         }
+
+        shader.removeFeature(GLSLShaderProgramInstance.ShaderProgramFeatures.FEATURE_USE_MATRIX_STACK);
     }
 
     private void generateMesh() {
@@ -695,4 +727,11 @@ public class Block {
         return uri.toString();
     }
 
+    public static float calcRelativeTileSize() {
+        return 1.0f  / (ATLAS_SIZE / TILE_SIZE);
+    }
+
+    public static float calcRelativeTileSizeWithOffset() {
+        return calcRelativeTileSize() - 0.001f;
+    }
 }
