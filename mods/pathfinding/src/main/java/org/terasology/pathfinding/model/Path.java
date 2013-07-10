@@ -1,5 +1,7 @@
 package org.terasology.pathfinding.model;
 
+import org.terasology.math.Vector3i;
+
 import java.util.ArrayList;
 
 /**

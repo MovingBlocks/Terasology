@@ -34,9 +34,9 @@ public class FloorFinderTest {
         },new String[]{
                 "IIIIIIIII|         |         |         |         |IIIIIIIII",
                 "III  IIII|   II    |         |         |         |III  IIII",
-                "CIC  CIIC|         |   II    |         |         |III  IIII",
-                "CIIIIIIIC|         |         |   II    |         |CIC  CIIC",
-                "IIIIIIIII|         |         |         |   II    |CII  IIIC",
+                "CCC  CCCC|         |   II    |         |         |III  IIII",
+                "CCCIICCCC|         |         |   II    |         |CCC  CCCC",
+                "IIIIIIIII|         |         |         |   II    |CCC  CCCC",
                 "IIIIIIIII|         |         |         |         |IIIIIIIII",
                 "IIIIIIIII|         |         |         |         |IIIIIIIII",
                 "IIIIIIIII|         |         |         |         |IIIIIIIII",
@@ -135,9 +135,9 @@ public class FloorFinderTest {
                 "0  2| 0  |  0 |   0",
                 "0000|    |    |3333"
         }, new String[]{
-                "IICC|    |    |ICIC",
-                "I  C| I  |  I |   I",
-                "IICC|    |    |ICIC"
+                "IIIC|    |    |IICC",
+                "I  C| I  |  C |   C",
+                "IIIC|    |    |IICC"
         }, new int[][]{ {1,2,3}, {0}, {0}, {0} });
     }
 
@@ -230,8 +230,8 @@ public class FloorFinderTest {
                 "IIIIIIIII|         |         |IIIIIIIII",
                 "IIIIIIIII|         |         |IIIIIIIII",
                 "IIIIIIIII|         |         |III   III",
-                "III   III|   CIC   |         |III   III",
-                "III   III|         |   CIC   |III   III",
+                "III   III|   CCC   |         |III   III",
+                "III   III|         |   CCC   |III   III",
                 "IIIIIIIII|         |         |IIIIIIIII",
                 "IIIIIIIII|         |         |IIIIIIIII",
                 "IIIIIIIII|         |         |IIIIIIIII",
@@ -295,6 +295,7 @@ public class FloorFinderTest {
         new WalkableBlockFinder(helper.world).findWalkableBlocks(helper.map);
         final FloorFinder finder = new FloorFinder(helper.world);
         finder.findFloors(helper.map);
+        helper.map.findContour();
         String[] actual = helper.evaluate(new TestHelper.Runner() {
             @Override
             public char run(int x, int y, int z, char value) {
@@ -307,14 +308,12 @@ public class FloorFinderTest {
         });
         Assert.assertArrayEquals(floors, actual);
         if( contour!=null ) {
-            final Set<WalkableBlock> contourBlocks = new HashSet<WalkableBlock>();
             actual = helper.evaluate(new TestHelper.Runner() {
                 @Override
                 public char run(int x, int y, int z, char value) {
                     WalkableBlock block = helper.map.getBlock(x, y, z);
                     if (block != null) {
-                        if( block.floor.isContour(block) ) {
-                            contourBlocks.add(block);
+                        if( block.floor.isEntrance(block) ) {
                             return 'C';
                         }
                         return 'I';
@@ -323,12 +322,6 @@ public class FloorFinderTest {
                 }
             });
             Assert.assertArrayEquals(contour, actual);
-            for (Floor floor : helper.map.floors) {
-                for (WalkableBlock block : floor.contour()) {
-                    Assert.assertTrue(contourBlocks.remove(block));
-                }
-            }
-            Assert.assertEquals(0, contourBlocks.size());
         }
         if( connections!=null ) {
             for (Floor floor : helper.map.floors) {

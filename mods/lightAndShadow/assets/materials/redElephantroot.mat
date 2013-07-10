@@ -1,7 +1,7 @@
 {
     "shader" : "engine:genericMeshMaterial",
     "params" : {
-        "diffuse" : "lightAndShadow:Placeholder",
+        "diffuse" : "lightAndShadow:redElephantrook",
         "colorOffset" : [1.0, 1.0, 1.0],
         "textured" : true
     }

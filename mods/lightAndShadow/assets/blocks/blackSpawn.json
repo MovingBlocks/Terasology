@@ -1,0 +1,10 @@
+{
+    "basedOn" : "lightAndShadow:spawn",
+    "categories" : ["darkSide", "stone"],
+
+    "entity" : {
+        "prefab" : "lightAndShadow:blackSpawn",
+        "mode" : "persistent"
+    }
+}
+
