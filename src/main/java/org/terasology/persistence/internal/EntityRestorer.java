@@ -17,6 +17,7 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -30,7 +31,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
+final class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
 
     private EngineEntityManager entityManager;
     private TIntSet validRefs;
@@ -39,8 +40,14 @@ class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
         this.entityManager = entityManager;
     }
 
-    public Map<String, EntityRef> restore(EntityData.EntityStore store, TIntSet validRefs) {
-        this.validRefs = validRefs;
+    public Map<String, EntityRef> restore(EntityData.EntityStore store, TIntSet externalRefs) {
+        validRefs = new TIntHashSet();
+        if (externalRefs != null) {
+            validRefs.addAll(externalRefs);
+        }
+        for (EntityData.Entity entity : store.getEntityList()) {
+            validRefs.add(entity.getId());
+        }
 
         EntitySerializer serializer = new EntitySerializer(entityManager);
         EntityRefTypeHandler.setReferenceInterceptor(this);

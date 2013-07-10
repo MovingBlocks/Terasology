@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
+final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
 
     private final EngineEntityManager entityManager;
     private final EntitySerializer serializer;

@@ -105,7 +105,6 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public final int get(int x, int y, int z) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         int row = y * getSizeXZHalf(), pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             return TeraArrayUtils.getHi(data[row + pos]);
@@ -116,8 +115,6 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public final int set(int x, int y, int z, int value) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < 0 || value > 15) throw new IllegalArgumentException("Parameter 'value' has to be in the range 0 - 15 (" + value + ")");
         int row = y * getSizeXZHalf(), pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             byte raw = data[row + pos];
@@ -134,9 +131,6 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public final boolean set(int x, int y, int z, int value, int expected) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < 0 || value > 15) throw new IllegalArgumentException("Parameter 'value' has to be in the range 0 - 15 (" + value + ")");
-//        if (expected < 0 || expected > 15) throw new IllegalArgumentException("Parameter 'expected' has to be in the range 0 - 15 (" + value + ")");
         int row = y * getSizeXZHalf(), pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             byte raw = data[row + pos];

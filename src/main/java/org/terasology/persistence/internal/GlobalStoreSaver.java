@@ -19,17 +19,17 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-class GlobalStoreSaver {
+final class GlobalStoreSaver {
 
     private EngineEntityManager entityManager;
-    private EntityData.GlobalEntityStore.Builder store;
+    private EntityData.GlobalStore.Builder store;
     private EntitySerializer entitySerializer;
 
     private TIntSet nonPersistentIds = new TIntHashSet();
 
     public GlobalStoreSaver(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
-        this.store = EntityData.GlobalEntityStore.newBuilder();
+        this.store = EntityData.GlobalStore.newBuilder();
         this.entitySerializer = new EntitySerializer(entityManager);
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
@@ -46,9 +46,9 @@ class GlobalStoreSaver {
         }
     }
 
-    public void addRefTable(String id, TIntSet references) {
-        EntityData.EntityStoreReferenceSet.Builder referenceSet = EntityData.EntityStoreReferenceSet.newBuilder();
-        TIntIterator iterator = references.iterator();
+    public void addStoreMetadata(StoreMetadata metadata) {
+        EntityData.EntityStoreMetadata.Builder referenceSet = EntityData.EntityStoreMetadata.newBuilder();
+        TIntIterator iterator = metadata.getExternalReferences().iterator();
         while (iterator.hasNext()) {
             int ref = iterator.next();
             if (!nonPersistentIds.contains(ref)) {
@@ -56,7 +56,7 @@ class GlobalStoreSaver {
             }
         }
         if (referenceSet.getReferenceCount() > 0) {
-            referenceSet.setStoreId(id);
+            metadata.getId().setUpIdentity(referenceSet);
             store.addStoreReferenceSet(referenceSet);
         }
     }
@@ -69,7 +69,7 @@ class GlobalStoreSaver {
         }
     }
 
-    public EntityData.GlobalEntityStore save() {
+    public EntityData.GlobalStore save() {
         writeIdInfo();
 
         return store.build();

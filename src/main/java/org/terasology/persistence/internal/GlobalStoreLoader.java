@@ -1,7 +1,5 @@
 package org.terasology.persistence.internal;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
@@ -16,26 +14,25 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.math.Vector3i;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class GlobalStoreLoader {
+final class GlobalStoreLoader {
 
     private EngineEntityManager entityManager;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
     private EntitySerializer entitySerializer;
     private PrefabSerializer prefabSerializer;
-    private List<StoreRefTable> refTables;
+    private List<StoreMetadata> refTables;
 
     public GlobalStoreLoader(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
@@ -45,7 +42,7 @@ public class GlobalStoreLoader {
         this.prefabSerializer = new PrefabSerializer(componentLibrary);
     }
 
-    public void load(EntityData.GlobalEntityStore globalStore) {
+    public void load(EntityData.GlobalStore globalStore) {
         entityManager.setNextId(globalStore.getNextEntityId());
         entityManager.getFreedIds().addAll(globalStore.getFreedEntityIdList());
 
@@ -57,18 +54,28 @@ public class GlobalStoreLoader {
         }
 
         refTables = Lists.newArrayListWithCapacity(globalStore.getStoreReferenceSetCount());
-        for (EntityData.EntityStoreReferenceSet refSet : globalStore.getStoreReferenceSetList()) {
-            TIntSet refs = new TIntHashSet(refSet.getReferenceList());
-            StoreRefTable refTable = new StoreRefTable(refSet.getStoreId(), refs);
-            refTables.add(refTable);
+        for (EntityData.EntityStoreMetadata metadataData : globalStore.getStoreReferenceSetList()) {
+            TIntSet refs = new TIntHashSet(metadataData.getReferenceList());
+            StoreId id;
+            switch (metadataData.getType()) {
+                case ChunkStoreType:
+                    id = new ChunkStoreId(new Vector3i(metadataData.getStoreIntegerId(0), metadataData.getStoreIntegerId(1), metadataData.getStoreIntegerId(2)));
+                    break;
+                default:
+                    id = new PlayerStoreId(metadataData.getStoreStringId());
+                    break;
+
+            }
+            StoreMetadata metadata = new StoreMetadata(id, refs);
+            refTables.add(metadata);
         }
     }
 
-    public List<StoreRefTable> getStoreRefTables() {
+    public List<StoreMetadata> getStoreMetadata() {
         return refTables;
     }
 
-    private void loadMissingPrefabs(EntityData.GlobalEntityStore globalStore) {
+    private void loadMissingPrefabs(EntityData.GlobalStore globalStore) {
         // Prefabs that still need to be created, by their name
         Map<String, EntityData.Prefab> pendingPrefabs = Maps.newHashMap();
 
@@ -106,7 +113,7 @@ public class GlobalStoreLoader {
         return prefab;
     }
 
-    private void loadComponentMapping(EntityData.GlobalEntityStore globalStore) {
+    private void loadComponentMapping(EntityData.GlobalStore globalStore) {
         ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < globalStore.getComponentClassCount(); ++index) {

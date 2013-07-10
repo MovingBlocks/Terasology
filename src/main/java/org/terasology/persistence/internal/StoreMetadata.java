@@ -5,16 +5,16 @@ import gnu.trove.set.TIntSet;
 /**
  * @author Immortius
  */
-class StoreRefTable {
-    private String id;
+final class StoreMetadata {
+    private StoreId id;
     private TIntSet externalReferences;
 
-    public StoreRefTable(String id, TIntSet externalReferences) {
+    public StoreMetadata(StoreId id, TIntSet externalReferences) {
         this.id = id;
         this.externalReferences = externalReferences;
     }
 
-    public String getId() {
+    public StoreId getId() {
         return id;
     }
 

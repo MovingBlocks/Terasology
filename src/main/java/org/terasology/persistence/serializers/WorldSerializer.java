@@ -27,13 +27,13 @@ public interface WorldSerializer {
     /**
      * @return The serialized form of the current EntityManager's and PrefabManager's data
      */
-    EntityData.GlobalEntityStore serializeWorld(boolean verbose);
+    EntityData.GlobalStore serializeWorld(boolean verbose);
 
     /**
      * Deserializes a world message, applying it to the current EntityManager
      *
      * @param world
      */
-    void deserializeWorld(EntityData.GlobalEntityStore world);
+    void deserializeWorld(EntityData.GlobalStore world);
 
 }

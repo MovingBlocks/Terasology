@@ -43,42 +43,42 @@ public class WorldPersister {
     public enum SaveFormat {
         Binary(false) {
             @Override
-            void save(OutputStream out, EntityData.GlobalEntityStore world) throws IOException {
+            void save(OutputStream out, EntityData.GlobalStore world) throws IOException {
                 world.writeTo(out);
                 out.flush();
             }
 
             @Override
-            EntityData.GlobalEntityStore load(InputStream in) throws IOException {
-                return EntityData.GlobalEntityStore.parseFrom(in);
+            EntityData.GlobalStore load(InputStream in) throws IOException {
+                return EntityData.GlobalStore.parseFrom(in);
             }
         },
         Text(true) {
             @Override
-            void save(OutputStream out, EntityData.GlobalEntityStore world) throws IOException {
+            void save(OutputStream out, EntityData.GlobalStore world) throws IOException {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
                 TextFormat.print(world, bufferedWriter);
                 bufferedWriter.flush();
             }
 
             @Override
-            EntityData.GlobalEntityStore load(InputStream in) throws IOException {
+            EntityData.GlobalStore load(InputStream in) throws IOException {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-                EntityData.GlobalEntityStore.Builder builder = EntityData.GlobalEntityStore.newBuilder();
+                EntityData.GlobalStore.Builder builder = EntityData.GlobalStore.newBuilder();
                 TextFormat.merge(bufferedReader, builder);
                 return builder.build();
             }
         },
         JSON(true) {
             @Override
-            void save(OutputStream out, EntityData.GlobalEntityStore world) throws IOException {
+            void save(OutputStream out, EntityData.GlobalStore world) throws IOException {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
                 EntityDataJSONFormat.write(world, bufferedWriter);
                 bufferedWriter.flush();
             }
 
             @Override
-            EntityData.GlobalEntityStore load(InputStream in) throws IOException {
+            EntityData.GlobalStore load(InputStream in) throws IOException {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
                 return EntityDataJSONFormat.readWorld(bufferedReader);
             }
@@ -90,9 +90,9 @@ public class WorldPersister {
             this.verbose = verbose;
         }
 
-        abstract void save(OutputStream out, EntityData.GlobalEntityStore world) throws IOException;
+        abstract void save(OutputStream out, EntityData.GlobalStore world) throws IOException;
 
-        abstract EntityData.GlobalEntityStore load(InputStream in) throws IOException;
+        abstract EntityData.GlobalStore load(InputStream in) throws IOException;
 
         public boolean isVerbose() {
             return verbose;
@@ -108,7 +108,7 @@ public class WorldPersister {
     }
 
     public void save(Path file, SaveFormat format) throws IOException {
-        final EntityData.GlobalEntityStore world = persisterHelper.serializeWorld(format.isVerbose());
+        final EntityData.GlobalStore world = persisterHelper.serializeWorld(format.isVerbose());
 
         Path parentFile = file.getParent();
         if (!Files.isDirectory(parentFile)) {
@@ -123,7 +123,7 @@ public class WorldPersister {
     public void load(Path file, SaveFormat format) throws IOException {
         entityManager.clear();
 
-        EntityData.GlobalEntityStore world;
+        EntityData.GlobalStore world;
         try (InputStream in = new BufferedInputStream(Files.newInputStream(file))) {
             world = format.load(in);
         }

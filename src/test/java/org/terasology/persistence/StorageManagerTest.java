@@ -245,4 +245,45 @@ public class StorageManagerTest {
         assertNotNull(restored.getChunk());
         assertEquals(testBlock, restored.getChunk().getBlock(0, 0, 0));
     }
+
+    @Test
+    public void chunkSurvivesStorageSaveAndRestore() throws Exception {
+        Chunk chunk = new Chunk(CHUNK_POS);
+        chunk.setBlock(0, 0, 0, testBlock);
+        ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
+        chunkStore.save();
+
+        esm.flush();
+
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+
+        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
+        assertNotNull(restored);
+        assertEquals(CHUNK_POS, restored.getChunkPosition());
+        assertNotNull(restored.getChunk());
+        assertEquals(testBlock, restored.getChunk().getBlock(0, 0, 0));
+    }
+
+    @Test
+    public void entitySurvivesStorageInChunkStore() throws Exception {
+        Chunk chunk = new Chunk(CHUNK_POS);
+        chunk.setBlock(0, 0, 0, testBlock);
+        ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
+        EntityRef entity = entityManager.create();
+        int id = entity.getId();
+        chunkStore.store(entity);
+        chunkStore.save();
+
+        esm.flush();
+
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+
+        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
+        restored.restoreEntities();
+        EntityRef ref = newEntityManager.getEntity(id);
+        assertTrue(ref.exists());
+        assertTrue(ref.isActive());
+    }
 }

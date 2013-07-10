@@ -2,6 +2,8 @@
  * @author Immortius <immortius@gmail.com>
  */
 
+import "Chunks.proto";
+
 option java_package = "org.terasology.protobuf";
 option java_outer_classname = "EntityData";
 option optimize_for = SPEED;
@@ -83,16 +85,6 @@ message Event {
     extensions 5000 to max;
 }
 
-message PlayerEntityStore {
-    optional EntityStore store = 1;
-    optional float characterPosX = 15;
-    optional float characterPosY = 16;
-    optional float characterPosZ = 17;
-    optional bool hasCharacter = 18;
-
-    extensions 5000 to max;
-}
-
 message EntityStore {
     repeated Entity entity = 1;
     repeated string component_class = 3;
@@ -104,22 +96,55 @@ message EntityStore {
     extensions 5000 to max;
 }
 
-message EntityStoreReferenceSet {
-    optional string storeId = 1;
-    repeated int32 reference = 2 [packed=true];
+enum StoreType {
+    PlayerStoreType           = 1;
+    ChunkStoreType            = 2;
+}
+
+message PlayerStore {
+    optional EntityStore store = 1;
+    optional float characterPosX = 15;
+    optional float characterPosY = 16;
+    optional float characterPosZ = 17;
+    optional bool hasCharacter = 18;
 
     extensions 5000 to max;
 }
 
-message GlobalEntityStore {
+message ChunkStore {
+    optional EntityStore store       = 1;
+    optional sint32    x             = 2;
+    optional sint32    y             = 3;
+    optional sint32    z             = 4;
+
+    optional State     state         = 5;
+
+    optional TeraArray block_data    = 6;
+    optional TeraArray sunlight_data = 7;
+    optional TeraArray light_data    = 8;
+    optional TeraArray liquid_data   = 9;
+
+    extensions 5000 to max;
+}
+
+message EntityStoreMetadata {
+    optional StoreType type = 1;
+    optional string storeStringId = 2;
+    repeated int32 storeIntegerId = 3 [packed=true];
+    repeated int32 reference = 4 [packed=true];
+
+    extensions 5000 to max;
+}
+
+message GlobalStore {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;
+    repeated string component_class = 3;
 
-    repeated string component_class = 15; // Table of component classes, the index of which corresponds to Component's type_index.
     optional int32 next_entity_id = 16;
     repeated int32 freed_entity_id = 17 [packed=true];
     repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index
-    repeated EntityStoreReferenceSet storeReferenceSet = 19;
+    repeated EntityStoreMetadata storeReferenceSet = 19;
 
     extensions 5000 to max;
 }

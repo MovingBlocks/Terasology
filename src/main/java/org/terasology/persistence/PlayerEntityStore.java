@@ -119,7 +119,7 @@ public class PlayerEntityStore implements EntityStore {
     public void endStore() throws IOException {
 
         try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerDataFile))) {
-            EntityData.PlayerEntityStore.Builder playerEntityStore = EntityData.PlayerEntityStore.newBuilder();
+            EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
             playerEntityStore.setStore(entityStoreBuilder);
             playerEntityStore.setCharacterPosX(relevanceLocation.x);
             playerEntityStore.setCharacterPosY(relevanceLocation.y);
@@ -133,7 +133,7 @@ public class PlayerEntityStore implements EntityStore {
     public void beginRestore() throws IOException {
         if (Files.isRegularFile(playerDataFile)) {
             try (InputStream in = new BufferedInputStream(Files.newInputStream(playerDataFile))) {
-                EntityData.PlayerEntityStore playerEntityStore = EntityData.PlayerEntityStore.parseFrom(in);
+                EntityData.PlayerStore playerEntityStore = EntityData.PlayerStore.parseFrom(in);
                 loadedData = playerEntityStore.getStore();
                 if (playerEntityStore.hasCharacterPosX() && playerEntityStore.hasCharacterPosY() && playerEntityStore.hasCharacterPosZ()) {
                     relevanceLocation.set(playerEntityStore.getCharacterPosX(), playerEntityStore.getCharacterPosY(), playerEntityStore.getCharacterPosZ());

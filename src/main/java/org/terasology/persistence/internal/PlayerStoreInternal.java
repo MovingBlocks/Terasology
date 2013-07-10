@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class PlayerStoreInternal implements PlayerStore {
+final class PlayerStoreInternal implements PlayerStore {
     private static final String CHARACTER = "character";
 
     private final EngineEntityManager entityManager;
@@ -47,7 +47,7 @@ public class PlayerStoreInternal implements PlayerStore {
         this.entityManager = entityManager;
     }
 
-    PlayerStoreInternal(String id, EntityData.PlayerEntityStore store, TIntSet externalRefs, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
+    PlayerStoreInternal(String id, EntityData.PlayerStore store, TIntSet externalRefs, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
         this.id = id;
         this.manager = entityStoreManager;
         this.entityManager = entityManager;
@@ -64,7 +64,7 @@ public class PlayerStoreInternal implements PlayerStore {
 
     @Override
     public void save() {
-        EntityData.PlayerEntityStore.Builder playerEntityStore = EntityData.PlayerEntityStore.newBuilder();
+        EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
         playerEntityStore.setCharacterPosX(relevanceLocation.x);
         playerEntityStore.setCharacterPosY(relevanceLocation.y);
         playerEntityStore.setCharacterPosZ(relevanceLocation.z);
@@ -79,14 +79,7 @@ public class PlayerStoreInternal implements PlayerStore {
     public void restore() {
         if (entityStore != null) {
             EntityRestorer restorer = new EntityRestorer(entityManager);
-            TIntSet validRefs = new TIntHashSet();
-            if (externalRefs != null) {
-                validRefs.addAll(externalRefs);
-            }
-            for (EntityData.Entity entity : entityStore.getEntityList()) {
-                validRefs.add(entity.getId());
-            }
-            Map<String, EntityRef> refMap = restorer.restore(entityStore, validRefs);
+            Map<String, EntityRef> refMap = restorer.restore(entityStore, externalRefs);
             EntityRef character = refMap.get(CHARACTER);
             if (character != null) {
                 this.character = character;

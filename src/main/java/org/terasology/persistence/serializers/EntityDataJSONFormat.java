@@ -54,7 +54,7 @@ import java.util.Map;
 // TODO: More javadoc
 public class EntityDataJSONFormat {
 
-    public static void write(EntityData.GlobalEntityStore world, BufferedWriter writer) throws IOException {
+    public static void write(EntityData.GlobalStore world, BufferedWriter writer) throws IOException {
         newGson().toJson(world, writer);
     }
 
@@ -66,9 +66,9 @@ public class EntityDataJSONFormat {
         return newGson().toJson(entity);
     }
 
-    public static EntityData.GlobalEntityStore readWorld(BufferedReader reader) throws IOException {
+    public static EntityData.GlobalStore readWorld(BufferedReader reader) throws IOException {
         try {
-            return newGson().fromJson(reader, EntityData.GlobalEntityStore.class);
+            return newGson().fromJson(reader, EntityData.GlobalStore.class);
         } catch (JsonSyntaxException e) {
             throw new IOException("Failed to load world", e);
         }
@@ -85,7 +85,7 @@ public class EntityDataJSONFormat {
     private static Gson newGson() {
         return new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(EntityData.GlobalEntityStore.class, new WorldHandler())
+                .registerTypeAdapter(EntityData.GlobalStore.class, new WorldHandler())
                 .registerTypeAdapter(EntityData.Entity.class, new EntityHandler())
                 .registerTypeAdapter(EntityData.Prefab.class, new PrefabHandler())
                 .registerTypeAdapter(EntityData.Component.class, new ComponentHandler())
@@ -94,10 +94,10 @@ public class EntityDataJSONFormat {
                 .create();
     }
 
-    private static class WorldHandler implements JsonSerializer<EntityData.GlobalEntityStore>, JsonDeserializer<EntityData.GlobalEntityStore> {
+    private static class WorldHandler implements JsonSerializer<EntityData.GlobalStore>, JsonDeserializer<EntityData.GlobalStore> {
 
         @Override
-        public JsonElement serialize(EntityData.GlobalEntityStore src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(EntityData.GlobalStore src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             for (Map.Entry<Descriptors.FieldDescriptor, Object> field : src.getAllFields().entrySet()) {
                 result.add(field.getKey().getName(), context.serialize(field.getValue()));
@@ -106,8 +106,8 @@ public class EntityDataJSONFormat {
         }
 
         @Override
-        public EntityData.GlobalEntityStore deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            EntityData.GlobalEntityStore.Builder world = EntityData.GlobalEntityStore.newBuilder();
+        public EntityData.GlobalStore deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            EntityData.GlobalStore.Builder world = EntityData.GlobalStore.newBuilder();
             if (json.isJsonObject()) {
                 JsonObject jsonObject = json.getAsJsonObject();
                 JsonArray prefabArray = jsonObject.getAsJsonArray("prefab");

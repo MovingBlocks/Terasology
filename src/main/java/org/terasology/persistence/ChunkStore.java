@@ -1,5 +1,6 @@
 package org.terasology.persistence;
 
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
@@ -13,4 +14,8 @@ public interface ChunkStore {
     public Chunk getChunk();
 
     public void save();
+
+    public void store(EntityRef entity);
+
+    public void restoreEntities();
 }
