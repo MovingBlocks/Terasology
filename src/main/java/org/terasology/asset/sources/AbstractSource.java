@@ -19,6 +19,7 @@ package org.terasology.asset.sources;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
+import com.google.common.io.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
@@ -26,6 +27,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -86,6 +88,24 @@ public abstract class AbstractSource implements AssetSource {
     protected void addOverride(AssetUri uri, URL url) {
         logger.debug("Adding override {} with urls {}", uri, url);
         overrides.put(uri, url);
+    }
+
+    protected AssetUri getUri(Path relativePath) {
+        return getUri(sourceId, relativePath);
+    }
+
+    protected AssetUri getUri(String moduleId, Path relativePath) {
+        if (relativePath.getNameCount() > 1) {
+            Path assetPath = relativePath.subpath(0, 1);
+            Path filename = relativePath.getFileName();
+            String extension = Files.getFileExtension(filename.toString());
+            String nameOnly = filename.toString().substring(0, filename.toString().length() - extension.length() - 1);
+            AssetType assetType = AssetType.getTypeFor(assetPath.toString(), extension);
+            if (assetType != null) {
+                return assetType.getUri(moduleId, nameOnly);
+            }
+        }
+        return null;
     }
 
     protected AssetUri getUri(String relativePath) {

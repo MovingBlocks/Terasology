@@ -57,14 +57,14 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
-import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
-import org.terasology.rendering.opengl.OpenGLFont;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.opengl.OpenGLFont;
+import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLShader;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
@@ -72,16 +72,22 @@ import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * @author Immortius
@@ -142,7 +148,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initConfig() {
-        if (Config.getConfigFile().exists()) {
+        if (Files.isRegularFile(Config.getConfigFile())) {
             try {
                 config = Config.load(Config.getConfigFile());
             } catch (IOException e) {
@@ -268,10 +274,10 @@ public class TerasologyEngine implements GameEngine {
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));
+                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "linux"));
+                NativeHelper.addLibraryPath((PathManager.getInstance().getNativesPath().resolve("linux")));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -279,7 +285,7 @@ public class TerasologyEngine implements GameEngine {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "windows"));
+                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");

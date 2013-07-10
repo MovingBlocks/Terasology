@@ -31,16 +31,18 @@ import com.google.gson.JsonSerializer;
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.input.Input;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.input.Input;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.MultimapHandler;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -61,7 +63,6 @@ public final class Config {
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
-    private AdvancedConfig advanced = AdvancedConfig.createDefault();
 
 
     /**
@@ -87,10 +88,6 @@ public final class Config {
 
     public PlayerConfig getPlayer() {
         return player;
-    }
-
-    public AdvancedConfig getAdvanced() {
-        return advanced;
     }
 
     public AudioConfig getAudio() {
@@ -127,8 +124,8 @@ public final class Config {
     /**
      * @return The default configuration file location
      */
-    public static File getConfigFile() {
-        return new File(PathManager.getInstance().getHomePath(), "config.cfg");
+    public static Path getConfigFile() {
+        return PathManager.getInstance().getHomePath().resolve("config.cfg");
     }
 
     /**
@@ -138,13 +135,9 @@ public final class Config {
      * @param config
      * @throws IOException
      */
-    public static void save(File toFile, Config config) throws IOException {
-        FileWriter writer = new FileWriter(toFile);
-        try {
+    public static void save(Path toFile, Config config) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(toFile, TerasologyConstants.CHARSET)) {
             createGson().toJson(config, writer);
-        } finally {
-            // JAVA7: better closing support
-            writer.close();
         }
     }
 
@@ -155,9 +148,8 @@ public final class Config {
      * @return The loaded configuration
      * @throws IOException
      */
-    public static Config load(File fromFile) throws IOException {
-        FileReader reader = new FileReader(fromFile);
-        try {
+    public static Config load(Path fromFile) throws IOException {
+        try (Reader reader = Files.newBufferedReader(fromFile, TerasologyConstants.CHARSET)) {
             Gson gson = createGson();
             JsonElement baseConfig = gson.toJsonTree(new Config());
             JsonParser parser = new JsonParser();
@@ -168,8 +160,6 @@ public final class Config {
                 merge(baseConfig.getAsJsonObject(), config.getAsJsonObject());
                 return gson.fromJson(baseConfig, Config.class);
             }
-        } finally {
-            reader.close();
         }
     }
 
@@ -179,7 +169,6 @@ public final class Config {
                 .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
-                .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                 .setPrettyPrinting().create();
     }

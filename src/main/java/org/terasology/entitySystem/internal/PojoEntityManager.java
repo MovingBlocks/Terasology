@@ -31,6 +31,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityChangeSubscriber;
+import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.common.NullIterator;
@@ -72,6 +73,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     private ComponentTable store = new ComponentTable();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
+    private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
     private EventSystem eventSystem;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
@@ -90,7 +92,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     @Override
     public void clear() {
         for (EntityRef entityRef : entityCache.values()) {
-            ((PojoEntityRef)entityRef).invalidate();
+            ((PojoEntityRef) entityRef).invalidate();
         }
         store.clear();
         nextEntityId = 1;
@@ -377,6 +379,11 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     }
 
     @Override
+    public void subscribe(EntityDestroySubscriber subscriber) {
+        destroySubscribers.add(subscriber);
+    }
+
+    @Override
     public void unsubscribe(EntityChangeSubscriber subscriber) {
         subscribers.remove(subscriber);
     }
@@ -461,6 +468,9 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             notifyComponentRemoved(ref, comp.getClass());
         }
         destroy(ref);
+        for (EntityDestroySubscriber destroySubscriber : destroySubscribers) {
+            destroySubscriber.onEntityDestroyed(entityId);
+        }
     }
 
     private void destroy(EntityRef ref) {

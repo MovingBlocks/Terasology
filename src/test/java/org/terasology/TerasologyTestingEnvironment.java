@@ -16,6 +16,9 @@
 
 package org.terasology;
 
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.lwjgl.LWJGLException;
@@ -50,7 +53,7 @@ import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
-import java.io.File;
+import java.nio.file.FileSystem;
 
 import static org.mockito.Mockito.mock;
 
@@ -76,7 +79,9 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
-        PathManager.getInstance().useOverrideHomePath(new File("unittesthome"));
+        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
+        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
+        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
         if (!setup) {
             setup = true;
             bindLwjgl();
@@ -139,10 +144,10 @@ public abstract class TerasologyTestingEnvironment {
     public static void bindLwjgl() throws LWJGLException {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "macosx"));
+                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "linux"));
+                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("linux"));
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
                 } else {
@@ -150,7 +155,7 @@ public abstract class TerasologyTestingEnvironment {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(new File(PathManager.getInstance().getNativesPath(), "windows"));
+                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");

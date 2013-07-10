@@ -17,6 +17,8 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -29,12 +31,13 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -42,9 +45,10 @@ import java.util.Map;
  */
 public class PlayerEntityStore implements EntityStore {
     private static final String PLAYER_STORE_SUBDIR = "players";
+    private static final Logger logger = LoggerFactory.getLogger(PlayerEntityStore.class);
 
     private EngineEntityManager entityManager;
-    private File playerDataFile;
+    private Path playerDataFile;
     private EntitySerializer serializer;
     private Vector3f relevanceLocation = new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2);
     private boolean hasCharacter = false;
@@ -61,9 +65,13 @@ public class PlayerEntityStore implements EntityStore {
         helper = new OwnershipHelper(manager.getComponentLibrary());
         serializer = new EntitySerializer(manager, manager.getComponentLibrary());
         serializer.setIgnoringEntityId(false);
-        File playerSubDir = new File(PathManager.getInstance().getCurrentSavePath(), PLAYER_STORE_SUBDIR);
-        playerSubDir.mkdirs();
-        playerDataFile = new File(playerSubDir, playerId + ".dat");
+        Path playerSubDir = PathManager.getInstance().getCurrentSavePath().resolve(PLAYER_STORE_SUBDIR);
+        try {
+            Files.createDirectories(playerSubDir);
+        } catch (IOException e) {
+            logger.error("Failed to create player sub directory for {}", playerId, e);
+        }
+        playerDataFile = playerSubDir.resolve(playerId + ".dat");
     }
 
     public void beginStore() {
@@ -110,24 +118,22 @@ public class PlayerEntityStore implements EntityStore {
 
     public void endStore() throws IOException {
 
-        try (FileOutputStream out = new FileOutputStream(playerDataFile)) {
-            BufferedOutputStream bos = new BufferedOutputStream(out);
-            EntityData.PlayerEntityStore.Builder playerEntityStore = EntityData.PlayerEntityStore.newBuilder();
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerDataFile))) {
+            EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
             playerEntityStore.setStore(entityStoreBuilder);
             playerEntityStore.setCharacterPosX(relevanceLocation.x);
             playerEntityStore.setCharacterPosY(relevanceLocation.y);
             playerEntityStore.setCharacterPosZ(relevanceLocation.z);
             playerEntityStore.setHasCharacter(hasCharacter);
-            playerEntityStore.build().writeTo(bos);
-            bos.flush();
+            playerEntityStore.build().writeTo(out);
         }
         entityStoreBuilder = null;
     }
 
     public void beginRestore() throws IOException {
-        if (playerDataFile.exists()) {
-            try (InputStream in = new FileInputStream(playerDataFile)) {
-                EntityData.PlayerEntityStore playerEntityStore = EntityData.PlayerEntityStore.parseFrom(in);
+        if (Files.isRegularFile(playerDataFile)) {
+            try (InputStream in = new BufferedInputStream(Files.newInputStream(playerDataFile))) {
+                EntityData.PlayerStore playerEntityStore = EntityData.PlayerStore.parseFrom(in);
                 loadedData = playerEntityStore.getStore();
                 if (playerEntityStore.hasCharacterPosX() && playerEntityStore.hasCharacterPosY() && playerEntityStore.hasCharacterPosZ()) {
                     relevanceLocation.set(playerEntityStore.getCharacterPosX(), playerEntityStore.getCharacterPosY(), playerEntityStore.getCharacterPosZ());

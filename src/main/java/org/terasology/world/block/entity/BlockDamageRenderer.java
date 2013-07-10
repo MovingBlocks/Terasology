@@ -87,7 +87,9 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderOverlay() {
-        if (effectsTexture == null) return;
+        if (effectsTexture == null) {
+            return;
+        }
 
         ShaderManager.getInstance().enableDefaultTextured();
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());

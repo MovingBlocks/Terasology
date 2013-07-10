@@ -28,7 +28,12 @@ import java.util.List;
  */
 public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
+    private static ThreadLocal<EntityRefInterceptor> refInterceptor = new ThreadLocal<>();
     private EngineEntityManager entityManager;
+
+    public static void setReferenceInterceptor(EntityRefInterceptor interceptor) {
+        refInterceptor.set(interceptor);
+    }
 
     public EntityRefTypeHandler(EngineEntityManager engineEntityManager) {
         this.entityManager = engineEntityManager;
@@ -36,14 +41,18 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
     public EntityData.Value serialize(EntityRef value) {
         if (value.exists()) {
-            return EntityData.Value.newBuilder().addInteger((value).getId()).build();
+            if (refInterceptor.get() == null || refInterceptor.get().savingRef(value)) {
+                return EntityData.Value.newBuilder().addInteger(value.getId()).build();
+            }
         }
         return null;
     }
 
     public EntityRef deserialize(EntityData.Value value) {
         if (value.getIntegerCount() > 0) {
-            return entityManager.createEntityRefWithId(value.getInteger(0));
+            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(value.getInteger(0))) {
+                return entityManager.createEntityRefWithId(value.getInteger(0));
+            }
         }
         return EntityRef.NULL;
     }
@@ -58,7 +67,11 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
             if (!ref.exists()) {
                 result.addInteger(0);
             } else {
-                result.addInteger((ref).getId());
+                if (refInterceptor.get() == null || refInterceptor.get().savingRef(ref)) {
+                    result.addInteger((ref).getId());
+                } else {
+                    result.addInteger(0);
+                }
             }
         }
         return result.build();
@@ -67,9 +80,28 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     public List<EntityRef> deserializeList(EntityData.Value value) {
         List<EntityRef> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
         for (Integer item : value.getIntegerList()) {
-            result.add(entityManager.createEntityRefWithId(item));
+            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(item)) {
+                result.add(entityManager.createEntityRefWithId(item));
+            } else {
+                result.add(EntityRef.NULL);
+            }
         }
         return result;
+    }
+
+    public static interface EntityRefInterceptor {
+        /**
+         * @param id
+         * @return Whether to complete loading the ref. If false, EntityRef.NULL is used instead.
+         */
+        boolean loadingRef(int id);
+
+        /**
+         * @param ref The entity ref being saved
+         * @return Whether to save this reference
+         */
+        boolean savingRef(EntityRef ref);
+
     }
 
 }

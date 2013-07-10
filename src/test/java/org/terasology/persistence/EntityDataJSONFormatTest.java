@@ -25,7 +25,7 @@ import com.google.protobuf.ByteString;
 public class EntityDataJSONFormatTest {
 
     public static final String VALUE_NAME = "Name";
-    private EntityData.World.Builder worldBuilder;
+    private EntityData.GlobalStore.Builder worldBuilder;
     private EntityData.Entity.Builder entityBuilder;
     private EntityData.Prefab.Builder prefabBuilder;
     private EntityData.Component.Builder componentBuilder;
@@ -33,7 +33,7 @@ public class EntityDataJSONFormatTest {
 
     @Before
     public void setup() {
-        worldBuilder = EntityData.World.newBuilder();
+        worldBuilder = EntityData.GlobalStore.newBuilder();
         entityBuilder = EntityData.Entity.newBuilder();
         prefabBuilder = EntityData.Prefab.newBuilder();
         componentBuilder = EntityData.Component.newBuilder();
@@ -119,7 +119,7 @@ public class EntityDataJSONFormatTest {
         componentBuilder.addField(nameValueBuilder);
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(1.0), actual.getEntity(0).getComponent(0).getField(0).getValue().getDoubleList());
     }
@@ -132,7 +132,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(1f), actual.getEntity(0).getComponent(0).getField(0).getValue().getFloatList());
     }
@@ -145,7 +145,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(1), actual.getEntity(0).getComponent(0).getField(0).getValue().getIntegerList());
     }
@@ -158,7 +158,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(1,2), actual.getEntity(0).getComponent(0).getField(0).getValue().getIntegerList());
     }
@@ -171,7 +171,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(1L), actual.getEntity(0).getComponent(0).getField(0).getValue().getLongList());
     }
@@ -184,7 +184,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(true), actual.getEntity(0).getComponent(0).getField(0).getValue().getBooleanList());
     }
@@ -197,7 +197,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList("Test"), actual.getEntity(0).getComponent(0).getField(0).getValue().getStringList());
     }
@@ -210,7 +210,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals(Lists.newArrayList(1,2), actual.getEntity(0).getComponent(0).getField(0).getValue().getValue(0).getIntegerList());
     }
@@ -223,7 +223,7 @@ public class EntityDataJSONFormatTest {
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
 
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertEquals("Fred", actual.getEntity(0).getComponent(0).getField(0).getValue().getNameValue(0).getName());
         assertEquals(1, actual.getEntity(0).getComponent(0).getField(0).getValue().getNameValue(0).getValue().getInteger(0));
@@ -237,7 +237,7 @@ public class EntityDataJSONFormatTest {
         componentBuilder.addField(nameValueBuilder);
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());
-        EntityData.World actual = persistAndRetrieve(worldBuilder.build());
+        EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
         assertArrayEquals(bytes.toByteArray(), actual.getEntity(0).getComponent(0).getField(0).getValue().getBytes().toByteArray());
     }
@@ -276,13 +276,13 @@ public class EntityDataJSONFormatTest {
         assertPersist(worldBuilder);
     }
 
-    private void assertPersist(EntityData.World.Builder worldBuilder) throws IOException{
-        EntityData.World world = worldBuilder.build();
-        EntityData.World newWorld = persistAndRetrieve(world);
+    private void assertPersist(EntityData.GlobalStore.Builder worldBuilder) throws IOException{
+        EntityData.GlobalStore world = worldBuilder.build();
+        EntityData.GlobalStore newWorld = persistAndRetrieve(world);
         assertEquals(world, newWorld);
     }
 
-    private EntityData.World persistAndRetrieve(EntityData.World world) throws IOException {
+    private EntityData.GlobalStore persistAndRetrieve(EntityData.GlobalStore world) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));
         EntityDataJSONFormat.write(world, writer);

@@ -15,6 +15,11 @@
  */
 package org.terasology.persistence;
 
+import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
+
+import java.io.IOException;
+
 /**
  * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
  * it keeps track of their existence and the external references of each store, which can be invalidated.
@@ -22,7 +27,37 @@ package org.terasology.persistence;
  */
 public interface StorageManager {
 
+    /**
+     * Creates an empty player store for saving
+     * @param playerId
+     * @return The new player store
+     */
     PlayerStore createPlayerStoreForSave(String playerId);
 
-    PlayerStore loadStore(String playerId);
+    /**
+     * Loads a saved player store
+     * @param playerId
+     * @return The retrieved player store, or null if no player is saved with that id
+     */
+    PlayerStore loadPlayerStore(String playerId);
+
+    /**
+     * Creates an empty chunk store for saving
+     * @param chunk The chunk to be saved
+     * @return The new chunk store
+     */
+    ChunkStore createChunkStoreForSave(Chunk chunk);
+
+    /**
+     * Loads a saved chunk store
+     * @param chunkPos
+     *
+     */
+    ChunkStore loadChunkStore(Vector3i chunkPos);
+
+    void flush() throws IOException;
+
+    void loadGlobalEntities() throws IOException;
+
+
 }

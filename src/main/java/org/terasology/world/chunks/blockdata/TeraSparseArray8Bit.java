@@ -110,7 +110,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public final int get(int x, int y, int z) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         if (inflated == null) {
             return fill;
         }
@@ -123,8 +122,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public final int set(int x, int y, int z, int value) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
         if (inflated == null) {
             int old = fill;
             if (old == value)
@@ -154,9 +151,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public final boolean set(int x, int y, int z, int value, int expected) {
-//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
-//        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
         if (value == expected) return true;
         if (inflated == null) {
             int old = fill;

@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.world.chunks;
-
-import java.nio.ByteBuffer;
+package org.terasology.entitySystem;
 
 /**
- * The basic interface for serialization handlers.
- *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Immortius
  */
-public interface SerializationHandler<T> {
+public interface EntityDestroySubscriber {
 
-    public boolean canHandle(Class<?> clazz);
+    void onEntityDestroyed(int entityId);
 
-    public int computeMinimumBufferSize(T object);
-
-    public ByteBuffer serialize(T object, ByteBuffer buffer);
-
-    public T deserialize(ByteBuffer buffer);
 }

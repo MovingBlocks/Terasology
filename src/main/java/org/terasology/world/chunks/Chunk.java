@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.AdvancedConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.AABB;
@@ -454,10 +453,8 @@ public class Chunk implements Externalizable {
     public void deflate() {
         lock();
         try {
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
             final TeraDeflator def = new TeraStandardDeflator();
-
-            if (config.isChunkDeflationLoggingEnabled()) {
+            if (logger.isDebugEnabled()) {
                 int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
                 int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
                 int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
@@ -481,7 +478,7 @@ public class Chunk implements Externalizable {
                 double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
 
-                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, SIZE_FORMAT.format(totalSize), SIZE_FORMAT.format(totalReduced), PERCENT_FORMAT.format(totalPercent), PERCENT_FORMAT.format(blocksPercent), PERCENT_FORMAT.format(sunlightPercent), PERCENT_FORMAT.format(lightPercent), PERCENT_FORMAT.format(liquidPercent)));
+                logger.debug("chunk {}: size-before: {} bytes, size-after: {} bytes, total-deflated-by: {}%, blocks-deflated-by={}%, sunlight-deflated-by={}%, light-deflated-by={}%, liquid-deflated-by={}%", pos, SIZE_FORMAT.format(totalSize), SIZE_FORMAT.format(totalReduced), PERCENT_FORMAT.format(totalPercent), PERCENT_FORMAT.format(blocksPercent), PERCENT_FORMAT.format(sunlightPercent), PERCENT_FORMAT.format(lightPercent), PERCENT_FORMAT.format(liquidPercent));
             } else {
                 blockData = def.deflate(blockData);
                 sunlightData = def.deflate(sunlightData);

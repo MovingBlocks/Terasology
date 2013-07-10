@@ -396,6 +396,15 @@ public class EntityAwareWorldProviderTest {
         assertNull(entity.getComponent(IntegerComponent.class));
     }
 
+    @Test
+    public void componentUntouchedIfRetainRequested() {
+        worldProvider.setBlock(0, 0, 0, blockInFamilyOne, BlockManager.getAir());
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        entity.addComponent(new IntegerComponent());
+        worldProvider.setBlockRetainComponent(0, 0, 0, blockWithString, blockInFamilyOne, IntegerComponent.class);
+        assertNotNull(entity.getComponent(IntegerComponent.class));
+    }
+
     public static class LifecycleEventChecker {
         public List<EventInfo> receivedEvents = Lists.newArrayList();
 
