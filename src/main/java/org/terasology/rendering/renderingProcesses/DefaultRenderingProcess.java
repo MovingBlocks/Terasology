@@ -46,7 +46,7 @@ import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
- * The default rendering process.
+ * The Default Rendering Process class.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -72,6 +72,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     /* HDR */
     private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
+    private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
 
     /* RTs */
     private int rtFullWidth;
@@ -87,22 +88,18 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     private String currentlyBoundFboName = "";
     private FBO currentlyBoundFbo = null;
-    private int currentlyBoundTextureId = -1;
-
-    /* VARIOUS */
-    private boolean takeScreenshot = false;
-
-    private int displayListQuad = -1;
-
-    private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
-
-    private Config config = CoreRegistry.get(Config.class);
+    //private int currentlyBoundTextureId = -1;
 
     public enum FBOType {
         DEFAULT,
         HDR,
         NO_COLOR
     }
+
+    /* VARIOUS */
+    private boolean takeScreenshot = false;
+    private int displayListQuad = -1;
+    private Config config = CoreRegistry.get(Config.class);
 
     public enum StereoRenderState {
         MONO,
@@ -193,35 +190,35 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         public void bindDepthTexture() {
             //if (currentlyBoundTextureId != depthStencilTextureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
-                currentlyBoundTextureId = depthStencilTextureId;
+                //currentlyBoundTextureId = depthStencilTextureId;
             //}
         }
 
         public void bindTexture() {
             //if (currentlyBoundTextureId != textureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
-                currentlyBoundTextureId = textureId;
+                //currentlyBoundTextureId = textureId;
             //}
         }
 
         public void bindNormalsTexture() {
             //if (currentlyBoundTextureId != normalsTextureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
-                currentlyBoundTextureId = normalsTextureId;
+                //currentlyBoundTextureId = normalsTextureId;
             //}
         }
 
         public void bindLightBufferTexture() {
             //if (currentlyBoundTextureId != lightBufferTextureId) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
-                currentlyBoundTextureId = lightBufferTextureId;
+                //currentlyBoundTextureId = lightBufferTextureId;
             //}
         }
 
         public void unbindTexture() {
             //if (currentlyBoundTextureId != 0) {
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-                currentlyBoundTextureId = 0;
+                //currentlyBoundTextureId = 0;
             //}
         }
     }
@@ -269,7 +266,6 @@ public class DefaultRenderingProcess implements IPropertyProvider {
      * to zero.
      */
     private void createOrUpdateFullscreenFbos() {
-
         rtFullWidth = overwriteRtWidth;
         rtFullHeight = overwriteRtHeight;
 
@@ -768,11 +764,12 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
     public void beginRenderSceneShadowMap() {
         FBO shadowMap = getFBO("sceneShadowMap");
-        shadowMap.bind();
 
         if (shadowMap == null) {
             return;
         }
+
+        shadowMap.bind();
 
         glViewport(0, 0, shadowMap.width, shadowMap.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -846,8 +843,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
 
         if (stereoRenderState == StereoRenderState.OCULUS_LEFT_EYE
                 || stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE
-                || (stereoRenderState == StereoRenderState.MONO && takeScreenshot)
-                || (stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE && takeScreenshot)) {
+                || (stereoRenderState == StereoRenderState.MONO && takeScreenshot)) {
 
             renderFinalSceneToRT(stereoRenderState);
 
@@ -1111,11 +1107,13 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         shader.enable();
 
         FBO ssao = getFBO("ssaoBlurred");
-        shader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height);
 
         if (ssao == null) {
             return;
         }
+
+        shader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height);
+
 
         ssao.bind();
 
@@ -1429,7 +1427,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public boolean unbindFbo(String title) {
-        FBO fbo = null;
+        FBO fbo;
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.unbind();
@@ -1442,7 +1440,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public boolean bindFboTexture(String title) {
-        FBO fbo = null;
+        FBO fbo;
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.bindTexture();
@@ -1454,7 +1452,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public boolean bindFboDepthTexture(String title) {
-        FBO fbo = null;
+        FBO fbo;
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.bindDepthTexture();
@@ -1466,7 +1464,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public boolean bindFboNormalsTexture(String title) {
-        FBO fbo = null;
+        FBO fbo;
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.bindNormalsTexture();
@@ -1478,7 +1476,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
     }
 
     public boolean bindFboLightBufferTexture(String title) {
-        FBO fbo = null;
+        FBO fbo;
 
         if ((fbo = FBOs.get(title)) != null) {
             fbo.bindLightBufferTexture();
