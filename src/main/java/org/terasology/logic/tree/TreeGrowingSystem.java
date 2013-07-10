@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TreeGrowingSystem implements UpdateSubscriberSystem {
-    private final static int CHECK_INTERVAL = 10000;
+    private final static int CHECK_INTERVAL = 2000;
     @In
     private WorldProvider worldProvider;
     @In
@@ -58,7 +58,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
             for (EntityRef treeRef : treeRefs) {
                 LivingTreeComponent tree = treeRef.getComponent(LivingTreeComponent.class);
                 TreeDefinition treeDefinition = treeDefinitions.get(tree.type);
-                treeDefinition.updateTree(worldProvider, treeRef);
+                treeDefinition.updateTree(worldProvider, blockEntityRegistry, treeRef);
             }
 
             lastCheckTime = gameTimeInMs;
@@ -104,8 +104,8 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         Block greenLeaf = blockManager.getBlock("engine:GreenLeaf");
         Block oakTrunk = blockManager.getBlock("engine:OakTrunk");
 
-        float trunkAdvance = 0.5f;
-        float branchAdvance = 0.6f;
+        float trunkAdvance = 0.2f;
+        float branchAdvance = 0.2f;
 
         Map<Character, AxionElementGeneration> blockMap = Maps.newHashMap();
         blockMap.put('s', new DefaultAxionElementGeneration(oakSapling, trunkAdvance));
@@ -114,11 +114,11 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         blockMap.put('t', new DefaultAxionElementGeneration(greenLeaf, trunkAdvance));
         blockMap.put('T', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
         blockMap.put('N', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 1.7f));
+        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 1.4f));
 
         // Branch building blocks
-        blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 1.7f));
-        blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.8f));
+        blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 1.4f));
+        blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.1f));
         blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
 
         return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), (float) Math.PI/3);

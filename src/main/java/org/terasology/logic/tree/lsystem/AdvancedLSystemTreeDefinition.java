@@ -4,9 +4,11 @@ import com.google.common.collect.Maps;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.tree.LivingTreeComponent;
 import org.terasology.logic.tree.TreeDefinition;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -14,23 +16,21 @@ import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private final float MAX_ANGLE_OFFSET = (float) Math.PI / 36f;
-    private final int GROWTH_INTERVAL = 10000;
+    private final int GROWTH_INTERVAL = 2000;
 
     private Map<Character, AxionElementGeneration> blockMap;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
     private List<Block> blockPriorities;
     private float angle;
-    private float deathChanceOnGrowth = 0.05f;
+    private int minGenerations = 25;
+    private int maxGenerations = 45;
 
     public AdvancedLSystemTreeDefinition(Map<Character, AxionElementReplacement> axionElementReplacements,
                                          Map<Character, AxionElementGeneration> blockMap, List<Block> blockPriorities, float angle) {
@@ -41,18 +41,18 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     }
 
     @Override
-    public void updateTree(WorldProvider worldProvider, EntityRef treeRef) {
+    public void updateTree(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, EntityRef treeRef) {
         LSystemTreeComponent lSystemTree = treeRef.getComponent(LSystemTreeComponent.class);
 
         long time = CoreRegistry.get(Time.class).getGameTimeInMs();
         if (lSystemTree.lastGrowthTime + GROWTH_INTERVAL < time) {
             Vector3i treeLocation = treeRef.getComponent(BlockComponent.class).getPosition();
 
-            FastRandom rand = new FastRandom();
+            FastRandom rand = new FastRandom(new Random().nextLong());
 
             if (!lSystemTree.initialized) {
-                lSystemTree.branchAngle = this.angle + rand.randomFloat()*MAX_ANGLE_OFFSET;
-                lSystemTree.rotationAngle = (float) Math.PI*rand.randomPosFloat();
+                lSystemTree.branchAngle = rand.randomFloat() * MAX_ANGLE_OFFSET;
+                lSystemTree.rotationAngle = (float) Math.PI * rand.randomPosFloat();
                 lSystemTree.generation = 1;
                 lSystemTree.initialized = true;
             }
@@ -63,12 +63,16 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
 
             Map<Vector3i, Block> nextTree = generateTreeFromAxiom(nextAxion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
 
-            updateTreeInGame(worldProvider, treeLocation, currentTree, nextTree);
+            updateTreeInGame(worldProvider, blockEntityRegistry, treeLocation, currentTree, nextTree);
+
+            System.out.println("Axion: "+nextAxion);
 
             lSystemTree.axion = nextAxion;
             lSystemTree.generation++;
 
-            if (rand.randomPosFloat() < deathChanceOnGrowth) {
+            System.out.println("Generation: "+lSystemTree.generation);
+
+            if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
                 treeRef.destroy();
             } else {
                 lSystemTree.lastGrowthTime = time;
@@ -77,26 +81,47 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         }
     }
 
-    private void updateTreeInGame(WorldProvider worldProvider, Vector3i treeLocation, Map<Vector3i, Block> currentTree, Map<Vector3i, Block> nextTree) {
+    private boolean checkForDeath(int generation, float random) {
+        if (generation < minGenerations)
+            return false;
+        double deathChance = Math.pow(1f * (maxGenerations - generation) / (maxGenerations - minGenerations), 0.1);
+        System.out.println("Death chance: "+((1-deathChance)*100)+"%");
+        return (deathChance < random);
+    }
+
+    private void updateTreeInGame(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i treeLocation, Map<Vector3i, Block> currentTree, Map<Vector3i, Block> nextTree) {
         Block air = BlockManager.getAir();
+
+        int replaceCount = 0;
 
         for (Map.Entry<Vector3i, Block> newTreeBlock : nextTree.entrySet()) {
             Vector3i location = newTreeBlock.getKey();
             Block oldBlock = currentTree.remove(location);
-            if (oldBlock != null) {
+            Block newBlock = newTreeBlock.getValue();
+            if (oldBlock != null && oldBlock != newBlock) {
+                if (location.equals(Vector3i.zero())) {
+                    blockEntityRegistry.setBlockRetainComponent(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
+                            newBlock, oldBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
+                } else {
+                    worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
+                            newBlock, oldBlock);
+                }
+                replaceCount++;
+            } else if (oldBlock == null) {
                 worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                        newTreeBlock.getValue(), oldBlock);
-            } else {
-                worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                        newTreeBlock.getValue(), air);
+                        newBlock, air);
+                replaceCount++;
             }
         }
 
         for (Map.Entry<Vector3i, Block> oldTreeBlock : currentTree.entrySet()) {
             Vector3i location = oldTreeBlock.getKey();
             worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                    oldTreeBlock.getValue(), air);
+                    air, oldTreeBlock.getValue());
+            replaceCount++;
         }
+
+        System.out.println("Replaced block count: " + replaceCount);
     }
 
     private String generateNextAxion(FastRandom rand, String currentAxion) {
