@@ -14,7 +14,7 @@ public class RenderingConfig {
     private int windowHeight = 720;
     private boolean fullscreen = false;
     private int activeViewDistanceMode = 0;
-    private boolean flickeringLight = false;
+    private boolean flickeringLight = true;
     private boolean animateGrass = false;
     private boolean animateWater = false;
     private float fieldOfView = 90;
