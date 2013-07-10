@@ -15,6 +15,7 @@
  */
 package org.terasology.world;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -55,6 +56,28 @@ public interface BlockEntityRegistry {
      * @return Whether the block was changed.
      */
     boolean setBlockForceUpdateEntity(Vector3i position, Block type, Block oldType);
+
+    /**
+     * This method is the same as setBlock, except the specified components are not altered during the update
+     * @param position
+     * @param type
+     * @param oldType
+     * @param components
+     * @return Whether the block was changed
+     */
+    boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component> ... components);
+
+    /**
+     * This method is the same as setBlock, except the specified components are not altered during the update
+     * @param x
+     * @param y
+     * @param z
+     * @param type
+     * @param oldType
+     * @param components
+     * @return Whether the block was changed
+     */
+    boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component> ... components);
 
     /**
      * @param blockPosition

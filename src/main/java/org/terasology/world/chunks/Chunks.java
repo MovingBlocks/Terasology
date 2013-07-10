@@ -55,10 +55,10 @@ public final class Chunks {
         config = CoreRegistry.get(Config.class);
 
         final TeraArrays t = TeraArrays.getInstance();
-        blockDataEntry = t.getEntry(config.getAdvanced().getBlocksFactoryName());
-        sunlightDataEntry = t.getEntry(config.getAdvanced().getSunlightFactoryName());
-        lightDataEntry = t.getEntry(config.getAdvanced().getLightFactoryName());
-        extraDataEntry = t.getEntry(config.getAdvanced().getExtraFactoryName());
+        blockDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
+        sunlightDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
+        lightDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
+        extraDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
 
         modDataEntries = Maps.newHashMap();
 

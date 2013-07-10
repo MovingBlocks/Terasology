@@ -81,8 +81,6 @@ public abstract class TerasologyTestingEnvironment {
     public static void setupEnvironment() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-
-
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
         if (!setup) {
             setup = true;

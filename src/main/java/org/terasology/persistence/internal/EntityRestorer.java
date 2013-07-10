@@ -16,8 +16,6 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.Component;
@@ -33,7 +31,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
+final class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
 
     private EngineEntityManager entityManager;
     private TIntSet validRefs;
@@ -42,12 +40,17 @@ class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
         this.entityManager = entityManager;
     }
 
-    public Map<String, EntityRef> restore(EntityData.EntityStore store, TIntSet validRefs) {
-        this.validRefs = validRefs;
+    public Map<String, EntityRef> restore(EntityData.EntityStore store, TIntSet externalRefs) {
+        validRefs = new TIntHashSet();
+        if (externalRefs != null) {
+            validRefs.addAll(externalRefs);
+        }
+        for (EntityData.Entity entity : store.getEntityList()) {
+            validRefs.add(entity.getId());
+        }
 
         EntitySerializer serializer = new EntitySerializer(entityManager);
         EntityRefTypeHandler.setReferenceInterceptor(this);
-        Map<String, EntityRef> namedEntities = Maps.newHashMap();
         Map<Class<? extends Component>, Integer> idMap = Maps.newHashMap();
         for (int i = 0; i < store.getComponentClassCount(); ++i) {
             ClassMetadata<? extends Component> metadata = entityManager.getComponentLibrary().getMetadata(store.getComponentClass(i));
@@ -56,13 +59,15 @@ class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
             }
         }
         serializer.setComponentIdMapping(idMap);
-        for (int i = 0; i < store.getEntityCount(); ++i) {
-            EntityRef entity = serializer.deserialize(store.getEntity(i));
-            if (!store.getEntityName(i).isEmpty()) {
-                namedEntities.put(store.getEntityName(i), entity);
-            }
+        for (EntityData.Entity entity : store.getEntityList()) {
+            serializer.deserialize(entity);
         }
         EntityRefTypeHandler.setReferenceInterceptor(null);
+
+        Map<String, EntityRef> namedEntities = Maps.newHashMap();
+        for (int i = 0; i < store.getEntityNameCount() && i < store.getEntityNamedCount(); ++i) {
+            namedEntities.put(store.getEntityName(i), entityManager.getEntity(store.getEntityNamed(i)));
+        }
         return namedEntities;
     }
 
@@ -72,6 +77,7 @@ class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor {
     }
 
     @Override
-    public void savingRef(int id) {
+    public boolean savingRef(EntityRef ref) {
+        return true;
     }
 }

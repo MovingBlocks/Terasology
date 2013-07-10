@@ -18,7 +18,6 @@ package org.terasology.world.chunks.pipeline;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.AdvancedConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
@@ -195,10 +194,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
                 }
             }
             logger.debug("Now complete {}", pos);
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
-            if (config.isChunkDeflationEnabled()) {
-                chunk.deflate();
-            }
+            chunk.deflate();
             chunk.setChunkState(Chunk.State.COMPLETE);
             provider.onChunkIsReady(pos);
         }

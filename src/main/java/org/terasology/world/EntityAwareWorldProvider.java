@@ -52,6 +52,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,12 +86,14 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         private Block oldType;
         private Block newType;
         private boolean forceEntityUpdate;
+        private Set<Class<? extends Component>> retainComponentTypes;
 
-        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate) {
+        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate, Class<? extends Component> ... retainComponentTypes) {
             this.position.set(pos);
             this.oldType = oldType;
             this.newType = newType;
             this.forceEntityUpdate = forceEntityUpdate;
+            this.retainComponentTypes = Sets.newHashSet(retainComponentTypes);
         }
     }
 
@@ -123,7 +126,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
             if (super.setBlock(x, y, z, type, oldType)) {
-                updateBlockEntity(blockEntity, pos, oldType, type, false);
+                updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
                 return true;
             } else {
                 processOffThreadChanges();
@@ -143,7 +146,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
             if (super.setBlock(x, y, z, type, oldType)) {
-                updateBlockEntity(blockEntity, pos, oldType, type, true);
+                updateBlockEntity(blockEntity, pos, oldType, type, true, Collections.<Class<? extends Component>>emptySet());
                 return true;
             } else {
                 processOffThreadChanges();
@@ -162,18 +165,43 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         return setBlockForceUpdateEntity(position.x, position.y, position.z, type, oldType);
     }
 
-    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type, boolean forceEntityUpdate) {
+    @Override
+    public boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components) {
+        return setBlockRetainComponent(position.x, position.y, position.z, type, oldType, components);
+    }
+
+    @Override
+    public boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components) {
+        if (Thread.currentThread().equals(mainThread)) {
+            Vector3i pos = new Vector3i(x, y, z);
+            EntityRef blockEntity = getBlockEntityAt(pos);
+            if (super.setBlock(x, y, z, type, oldType)) {
+                updateBlockEntity(blockEntity, pos, oldType, type, false, Sets.newHashSet(components));
+                return true;
+            } else {
+                processOffThreadChanges();
+            }
+        } else {
+            if (super.setBlock(x, y, z, type, oldType)) {
+                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type, false, components));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type, boolean forceEntityUpdate, Set<Class<? extends Component>> retainComponents) {
         if (type.isKeepActive()) {
             temporaryBlockEntities.remove(blockEntity);
         } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
             temporaryBlockEntities.add(blockEntity);
         }
+        if (forceEntityUpdate || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily()) && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
+            updateBlockEntityComponents(blockEntity, oldType, type, retainComponents);
+        }
         EntityRef regionEntity = blockRegionLookup.get(pos);
         if (regionEntity != null) {
             regionEntity.send(new OnChangedBlock(pos, type, oldType));
-        }
-        if (forceEntityUpdate || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily()) && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
-            updateBlockEntityComponents(blockEntity, oldType, type);
         }
         blockEntity.send(new OnChangedBlock(new Vector3i(pos), type, oldType));
     }
@@ -229,13 +257,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
      * @param oldType     The previous type of the block
      * @param type        The new type of the block
      */
-    private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type) {
+    private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
         Prefab oldPrefab = entityManager.getPrefabManager().getPrefab(oldType.getPrefab());
         Prefab newPrefab = entityManager.getPrefabManager().getPrefab(type.getPrefab());
 
         for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
             if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()
-                    && (newPrefab == null || !newPrefab.hasComponent(metadata.getType()))) {
+                    && (newPrefab == null || !newPrefab.hasComponent(metadata.getType())) && !retainComponents.contains(metadata.getType())) {
                 blockEntity.removeComponent(metadata.getType());
             }
         }
@@ -260,7 +288,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                 ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                 if (!blockEntity.hasComponent(comp.getClass())) {
                     blockEntity.addComponent(metadata.clone(comp));
-                } else if (!metadata.isRetainUnalteredOnBlockChange()) {
+                } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
                     updateComponent(blockEntity, metadata, comp);
                 }
             }
@@ -436,7 +464,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                     EntityRef blockEntity = getExistingBlockEntityAt(change.position);
                     if (!blockEntity.exists()) {
                         blockEntity = createBlockEntity(change.position, change.oldType);
-                        updateBlockEntity(blockEntity, change.position, change.oldType, change.newType, change.forceEntityUpdate);
+                        updateBlockEntity(blockEntity, change.position, change.oldType, change.newType, change.forceEntityUpdate, change.retainComponentTypes);
                     }
                 }
             }

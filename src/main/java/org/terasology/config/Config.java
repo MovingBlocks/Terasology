@@ -63,7 +63,6 @@ public final class Config {
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
-    private AdvancedConfig advanced = AdvancedConfig.createDefault();
 
 
     /**
@@ -89,10 +88,6 @@ public final class Config {
 
     public PlayerConfig getPlayer() {
         return player;
-    }
-
-    public AdvancedConfig getAdvanced() {
-        return advanced;
     }
 
     public AudioConfig getAudio() {
@@ -174,7 +169,6 @@ public final class Config {
                 .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
-                .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                 .setPrettyPrinting().create();
     }

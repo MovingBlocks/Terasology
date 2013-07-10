@@ -17,6 +17,7 @@
 package org.terasology.world.chunks.blockdata;
 
 import com.google.common.base.Preconditions;
+import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import java.io.Externalizable;
@@ -34,7 +35,13 @@ import java.nio.ByteBuffer;
  */
 public abstract class TeraArray implements Externalizable {
 
-    private int sizeX, sizeY, sizeZ, sizeXZ, sizeXZHalf, sizeXYZ, sizeXYZHalf;
+    private int sizeX;
+    private int sizeY;
+    private int sizeZ;
+    private int sizeXZ;
+    private int sizeXZHalf;
+    private int sizeXYZ;
+    private int sizeXYZHalf;
 
     protected final void writeExternalHeader(ObjectOutput out) throws IOException {
         out.writeInt(sizeX);
@@ -89,13 +96,18 @@ public abstract class TeraArray implements Externalizable {
      * @author Manuel Brotz <manu.brotz@gmx.ch>
      * @see org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler
      */
-    public static interface SerializationHandler<T extends TeraArray> extends org.terasology.world.chunks.SerializationHandler<T> {
+    public static interface SerializationHandler<T extends TeraArray> {
 
         public int computeMinimumBufferSize(T array);
 
         public ByteBuffer serialize(T array, ByteBuffer buffer);
 
         public T deserialize(ByteBuffer buffer);
+
+        public boolean canHandle(Class<?> clazz);
+
+;
+
 
     }
 
@@ -222,5 +234,4 @@ public abstract class TeraArray implements Externalizable {
     public abstract int set(int x, int y, int z, int value);
 
     public abstract boolean set(int x, int y, int z, int value, int expected);
-
 }

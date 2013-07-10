@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
+final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
 
     private final EngineEntityManager entityManager;
     private final EntitySerializer serializer;
@@ -69,7 +69,10 @@ class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
             EntityRefTypeHandler.setReferenceInterceptor(null);
             entityStoreBuilder.addEntity(entityData);
-            entityStoreBuilder.addEntityName(name);
+            if (!name.isEmpty()) {
+                entityStoreBuilder.addEntityName(name);
+                entityStoreBuilder.addEntityNamed(entityData.getId());
+            }
             storedEntityIds.add(entityData.getId());
             externalReferences.remove(entityData.getId());
             entityManager.deactivateForStorage(entity);
@@ -90,9 +93,13 @@ class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
     }
 
     @Override
-    public void savingRef(int id) {
-        if (!storedEntityIds.contains(id)) {
-            externalReferences.add(id);
+    public boolean savingRef(EntityRef ref) {
+        if (!ref.isPersistent()) {
+            return false;
         }
+        if (!storedEntityIds.contains(ref.getId())) {
+            externalReferences.add(ref.getId());
+        }
+        return true;
     }
 }
