@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
+import org.terasology.components.DrowningComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.config.Config;
@@ -26,7 +27,9 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
+import org.terasology.events.BreathMeterUpdateEvent;
 import org.terasology.events.HealthChangedEvent;
+import org.terasology.events.SwimEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
@@ -55,9 +58,13 @@ import javax.vecmath.Vector4f;
 public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
     protected EntityManager entityManager;
+    private Timer timer;
 
     /* DISPLAY ELEMENTS */
     private final UIImage[] hearts;
+    private final int NUM_HEART_ICONS = 10;
+    private final UIImage[] breathBubbles;
+    private final int NUM_BUBBLE_ICONS = 10;
     private final UIImage crosshair;
     private final UILabel debugLine1;
     private final UILabel debugLine2;
@@ -75,6 +82,8 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
      * Init. the HUD.
      */
     public UIScreenHUD() {
+        timer = CoreRegistry.get(Timer.class);
+
         setId("hud");
         maximize();
 
@@ -87,10 +96,10 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             }
         });
 
-        hearts = new UIImage[10];
+        hearts = new UIImage[NUM_HEART_ICONS];
 
         // Create hearts
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NUM_HEART_ICONS; i++) {
             hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
             hearts[i].setVisible(true);
             hearts[i].setTextureSize(new Vector2f(9f, 9f));
@@ -101,6 +110,22 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
 
             addDisplayElement(hearts[i]);
+        }
+
+        breathBubbles = new UIImage[NUM_BUBBLE_ICONS];
+
+        // Create breath meter
+        for (int i = 0; i < NUM_BUBBLE_ICONS; i++){
+            breathBubbles[i] = new UIImage(Assets.getTexture("engine:icons"));
+            breathBubbles[i].setVisible(true);
+            breathBubbles[i].setTextureSize(new Vector2f(9f, 9f));
+            breathBubbles[i].setTextureOrigin(new Vector2f(16f, 18f)); // Bubble icon
+            breathBubbles[i].setSize(new Vector2f(18f, 18f));
+            breathBubbles[i].setVerticalAlign(EVerticalAlign.BOTTOM);
+            breathBubbles[i].setHorizontalAlign(EHorizontalAlign.CENTER);
+            breathBubbles[i].setPosition(new Vector2f(-18f * i + 210f, -52f));
+
+            addDisplayElement(breathBubbles[i]);
         }
 
         crosshair = new UIImage(Assets.getTexture("engine:gui"));
@@ -199,13 +224,14 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                     ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(),
                     SystemConfig.DebugRenderingStages.values()[config.getSystem().getDebugRenderingStage()].toString()));
         }
+
     }
 
     private void updateHealthBar(int currentHealth, int maxHealth) {
         float healthRatio = (float) currentHealth / maxHealth;
 
         // Show/Hide hearts relatively to the available health points of the player
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NUM_HEART_ICONS; i++) {
 
             if (i < healthRatio * 10f)
                 hearts[i].setVisible(true);
@@ -259,5 +285,41 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
     public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {
         updateHealthBar(event.getCurrentHealth(), event.getMaxHealth());
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, DrowningComponent.class})
+    public void onBreathUpdate(BreathMeterUpdateEvent event, EntityRef entity){
+        DrowningComponent drownComp = entity.getComponent(DrowningComponent.class);
+
+        if(drownComp.underWater){
+            // Calculate ratios
+            int currentBreath = (int)(timer.getTimeInMs() - drownComp.timeEnteredLiquid);
+            int maxBreath = (int)drownComp.timeBeforeDrown;
+            float remainingBreathRatio = 0f;
+            if(maxBreath != 0){
+                remainingBreathRatio = 1 - ((float)currentBreath / maxBreath);
+            }
+
+            // Show or hide bubble icons depending on the amount of remaining breath
+            for (int i = 0; i < NUM_BUBBLE_ICONS; i++){
+                if(remainingBreathRatio > 0){
+                    breathBubbles[i].setVisible(i < remainingBreathRatio * NUM_BUBBLE_ICONS);
+
+                    // Decide the correct icon to use
+                    if((remainingBreathRatio * NUM_BUBBLE_ICONS) - i < 0.5f){
+                        breathBubbles[i].setTextureOrigin(new Vector2f(25f, 18f)); // Popped bubble icon
+                    }else{
+                        breathBubbles[i].setTextureOrigin(new Vector2f(16f, 18f)); // Regular bubble icon
+                    }
+                }else{
+                    breathBubbles[i].setVisible(false);
+                }
+            }
+        }else{
+            // Hide bubbles when not underwater
+            for (int i = 0; i < NUM_BUBBLE_ICONS; i++){
+                breathBubbles[i].setVisible(false);
+            }
+        }
     }
 }

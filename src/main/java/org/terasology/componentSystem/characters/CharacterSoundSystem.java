@@ -35,6 +35,7 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.events.RespawnEvent;
 import org.terasology.events.SwimEvent;
 import org.terasology.events.VerticalCollisionEvent;
+import org.terasology.events.DrownTickEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.math.TeraMath;
@@ -207,7 +208,6 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void onIntoLiquid(IntoLiquidEvent event, EntityRef entity) {
-        //System.out.print("in liquid\n");
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
         if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
         lastSound = timer.getTimeInMs();
@@ -220,7 +220,6 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void onFromLiquid(FromLiquidEvent event, EntityRef entity) {
-        //System.out.print("out liquid\n");
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
         if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
         lastSound = timer.getTimeInMs();
@@ -228,6 +227,19 @@ public class CharacterSoundSystem implements EventHandlerSystem {
             audioManager.playSound(Assets.getSound("engine:Slime3"), event.getPosition(), characterSounds.diveVolume, AudioManager.PRIORITY_NORMAL);
         } else if (event.getLiquid().getDisplayName().compareTo("Lava") == 0) {
             audioManager.playSound(Assets.getSound("engine:FootGrass4"), event.getPosition(), characterSounds.diveVolume, AudioManager.PRIORITY_NORMAL);
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void onDrowning(DrownTickEvent event, EntityRef entity){
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (timer.getTimeInMs() - lastSound < MIN_TIME) return;
+        lastSound = timer.getTimeInMs();
+
+        if (event.getLiquid().getDisplayName().compareTo("Water") == 0) {
+            audioManager.playSound(Assets.getSound("engine:Slime3"), event.getPosition(), characterSounds.damageVolume, AudioManager.PRIORITY_NORMAL);
+        } else if (event.getLiquid().getDisplayName().compareTo("Lava") == 0) {
+            audioManager.playSound(Assets.getSound("engine:FootGrass4"), event.getPosition(), characterSounds.damageVolume, AudioManager.PRIORITY_NORMAL);
         }
     }
 
