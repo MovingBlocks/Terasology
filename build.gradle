@@ -165,7 +165,7 @@ dependencies {
 
     // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
     //TODO: Find way to avoid compiling logback.groovy to the resource dir
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
 
     // These dependencies are only needed for running tests
     testCompile group: 'junit', name: 'junit', version: '4.10'
