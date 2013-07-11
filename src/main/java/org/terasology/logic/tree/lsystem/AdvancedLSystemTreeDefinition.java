@@ -200,7 +200,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     }
 
     private void setBlock(Map<Vector3i, Block> treeInMemory, Vector3f position, Block block) {
-        Vector3i blockPosition = new Vector3i(position);
+        Vector3i blockPosition = new Vector3i(position.x+0.5f, position.y+0.5f, position.z+0.5f);
         if (blockPosition.y >= 0) {
             final Block blockAtPosition = treeInMemory.get(blockPosition);
             if (blockAtPosition == block || hasBlockWithHigherPriority(block, blockAtPosition)) {
