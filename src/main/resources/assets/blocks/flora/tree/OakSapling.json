@@ -1,7 +1,5 @@
 {
-    "tiles" : {
-        "all" : "engine:OakBark"
-    },
+    "basedOn" : "engine:plant",
     "entity" : {
         "prefab" : "engine:OakTree"
     }
