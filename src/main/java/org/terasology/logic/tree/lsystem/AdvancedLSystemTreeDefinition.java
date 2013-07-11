@@ -29,7 +29,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private Map<Character, AxionElementReplacement> axionElementReplacements;
     private List<Block> blockPriorities;
     private float angle;
-    private int minGenerations = 25;
+    private int minGenerations = 30;
     private int maxGenerations = 45;
 
     public AdvancedLSystemTreeDefinition(Map<Character, AxionElementReplacement> axionElementReplacements,
@@ -66,12 +66,12 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
 
                 updateTreeInGame(worldProvider, blockEntityRegistry, treeLocation, currentTree, nextTree);
 
-                System.out.println("Axion: " + nextAxion);
+//                System.out.println("Axion: " + nextAxion);
 
                 lSystemTree.axion = nextAxion;
                 lSystemTree.generation++;
 
-                System.out.println("Generation: " + lSystemTree.generation);
+//                System.out.println("Generation: " + lSystemTree.generation);
 
                 if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
                     treeRef.removeComponent(LSystemTreeComponent.class);
@@ -86,8 +86,8 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private boolean checkForDeath(int generation, float random) {
         if (generation < minGenerations)
             return false;
-        double deathChance = Math.pow(1f * (maxGenerations - generation) / (maxGenerations - minGenerations), 0.1);
-        System.out.println("Death chance: " + ((1 - deathChance) * 100) + "%");
+        double deathChance = Math.pow(1f * (maxGenerations - generation) / (maxGenerations - minGenerations), 0.2);
+//        System.out.println("Death chance: " + ((1 - deathChance) * 100) + "%");
         return (deathChance < random);
     }
 
@@ -123,7 +123,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
             replaceCount++;
         }
 
-        System.out.println("Replaced block count: " + replaceCount);
+//        System.out.println("Replaced block count: " + replaceCount);
     }
 
     private String generateNextAxion(FastRandom rand, String currentAxion) {

@@ -105,7 +105,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         Block oakTrunk = blockManager.getBlock("engine:OakTrunk");
 
         float trunkAdvance = 0.2f;
-        float branchAdvance = 0.2f;
+        float branchAdvance = 0.25f;
 
         Map<Character, AxionElementGeneration> blockMap = Maps.newHashMap();
         blockMap.put('s', new DefaultAxionElementGeneration(oakSapling, trunkAdvance));

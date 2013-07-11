@@ -30,18 +30,16 @@ public class SurroundAxionElementGeneration implements AxionElementGeneration {
         callback.setBlock(position, baseBlock);
         int rangeInt = (int) range;
         for (int x = -rangeInt; x <= rangeInt; x++) {
-            int y=0;
-//            for (int y = -rangeInt; y <= rangeInt; y++) {
-                for (int z = -rangeInt; z <= rangeInt; z++) {
-                    if (Math.sqrt(x * x + y * y + z * z) <= range) {
-                        Vector3f v = new Vector3f(x, y, z);
-                        rotation.transform(v);
-                        Vector3f sideVec = new Vector3f(position);
-                        sideVec.add(v);
-                        callback.setBlock(sideVec, surroundBlock);
-                    }
+            int y = 0;
+            for (int z = -rangeInt; z <= rangeInt; z++) {
+                if (Math.sqrt(x * x + y * y + z * z) <= range) {
+                    Vector3f v = new Vector3f(x, y, z);
+                    rotation.transform(v);
+                    Vector3f sideVec = new Vector3f(position);
+                    sideVec.add(v);
+                    callback.setBlock(sideVec, surroundBlock);
                 }
-//            }
+            }
         }
 
         callback.advance(advance);
