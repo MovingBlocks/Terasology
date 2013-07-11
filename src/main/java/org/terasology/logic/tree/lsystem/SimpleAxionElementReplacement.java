@@ -1,4 +1,4 @@
-package org.terasology.world.generator.tree;
+package org.terasology.logic.tree.lsystem;
 
 import java.util.ArrayList;
 import java.util.List;

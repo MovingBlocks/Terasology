@@ -1,4 +1,4 @@
-package org.terasology.world.generator.tree;
+package org.terasology.logic.tree.lsystem;
 
 public interface AxionElementReplacement {
     public String getReplacement(float random);

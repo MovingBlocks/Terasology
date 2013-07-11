@@ -1,0 +1,8 @@
+{
+    "tiles" : {
+        "all" : "engine:OakBark"
+    },
+    "entity" : {
+        "prefab" : "engine:OakTree"
+    }
+}
