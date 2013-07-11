@@ -25,8 +25,7 @@ import java.util.Map;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TreeGrowingSystem implements UpdateSubscriberSystem {
-    private final static int CHECK_INTERVAL = 2000;
-    @In
+    private final static int CHECK_INTERVAL = 1000;
     private WorldProvider worldProvider;
     @In
     private EntityManager entityManager;

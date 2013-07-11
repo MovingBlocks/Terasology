@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private final float MAX_ANGLE_OFFSET = (float) Math.PI / 36f;
-    private final int GROWTH_INTERVAL = 2000;
+    private final int GROWTH_INTERVAL = 1000;
 
     private Map<Character, AxionElementGeneration> blockMap;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
@@ -44,39 +44,41 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     public void updateTree(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, EntityRef treeRef) {
         LSystemTreeComponent lSystemTree = treeRef.getComponent(LSystemTreeComponent.class);
 
-        long time = CoreRegistry.get(Time.class).getGameTimeInMs();
-        if (lSystemTree.lastGrowthTime + GROWTH_INTERVAL < time) {
-            Vector3i treeLocation = treeRef.getComponent(BlockComponent.class).getPosition();
+        if (lSystemTree != null) {
+            long time = CoreRegistry.get(Time.class).getGameTimeInMs();
+            if (lSystemTree.lastGrowthTime + GROWTH_INTERVAL < time) {
+                Vector3i treeLocation = treeRef.getComponent(BlockComponent.class).getPosition();
 
-            FastRandom rand = new FastRandom(new Random().nextLong());
+                FastRandom rand = new FastRandom(new Random().nextLong());
 
-            if (!lSystemTree.initialized) {
-                lSystemTree.branchAngle = rand.randomFloat() * MAX_ANGLE_OFFSET;
-                lSystemTree.rotationAngle = (float) Math.PI * rand.randomPosFloat();
-                lSystemTree.generation = 1;
-                lSystemTree.initialized = true;
-            }
+                if (!lSystemTree.initialized) {
+                    lSystemTree.branchAngle = rand.randomFloat() * MAX_ANGLE_OFFSET;
+                    lSystemTree.rotationAngle = (float) Math.PI * rand.randomPosFloat();
+                    lSystemTree.generation = 1;
+                    lSystemTree.initialized = true;
+                }
 
-            Map<Vector3i, Block> currentTree = generateTreeFromAxiom(lSystemTree.axion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
+                Map<Vector3i, Block> currentTree = generateTreeFromAxiom(lSystemTree.axion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
 
-            String nextAxion = generateNextAxion(rand, lSystemTree.axion);
+                String nextAxion = generateNextAxion(rand, lSystemTree.axion);
 
-            Map<Vector3i, Block> nextTree = generateTreeFromAxiom(nextAxion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
+                Map<Vector3i, Block> nextTree = generateTreeFromAxiom(nextAxion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
 
-            updateTreeInGame(worldProvider, blockEntityRegistry, treeLocation, currentTree, nextTree);
+                updateTreeInGame(worldProvider, blockEntityRegistry, treeLocation, currentTree, nextTree);
 
-            System.out.println("Axion: "+nextAxion);
+                System.out.println("Axion: " + nextAxion);
 
-            lSystemTree.axion = nextAxion;
-            lSystemTree.generation++;
+                lSystemTree.axion = nextAxion;
+                lSystemTree.generation++;
 
-            System.out.println("Generation: "+lSystemTree.generation);
+                System.out.println("Generation: " + lSystemTree.generation);
 
-            if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
-                treeRef.destroy();
-            } else {
-                lSystemTree.lastGrowthTime = time;
-                treeRef.saveComponent(lSystemTree);
+                if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
+                    treeRef.removeComponent(LSystemTreeComponent.class);
+                } else {
+                    lSystemTree.lastGrowthTime = time;
+                    treeRef.saveComponent(lSystemTree);
+                }
             }
         }
     }
@@ -85,7 +87,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         if (generation < minGenerations)
             return false;
         double deathChance = Math.pow(1f * (maxGenerations - generation) / (maxGenerations - minGenerations), 0.1);
-        System.out.println("Death chance: "+((1-deathChance)*100)+"%");
+        System.out.println("Death chance: " + ((1 - deathChance) * 100) + "%");
         return (deathChance < random);
     }
 
