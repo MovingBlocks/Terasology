@@ -22,7 +22,7 @@ import java.util.*;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class AdvancedLSystemTreeDefinition implements TreeDefinition {
-    private final float MAX_ANGLE_OFFSET = (float) Math.PI / 36f;
+    private final float MAX_ANGLE_OFFSET = (float) Math.PI / 18f;
     private final int GROWTH_INTERVAL = 1000;
 
     private Map<Character, AxionElementGeneration> blockMap;

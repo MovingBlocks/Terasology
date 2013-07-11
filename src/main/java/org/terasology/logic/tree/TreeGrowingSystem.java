@@ -120,6 +120,6 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.1f));
         blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
 
-        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), (float) Math.PI/3);
+        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), (float) Math.PI/4);
     }
 }
