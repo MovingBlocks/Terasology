@@ -78,13 +78,12 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         final FastRandom rnd = new FastRandom();
 
         SimpleAxionElementReplacement trunkTop = new SimpleAxionElementReplacement("t");
-        trunkTop.addReplacement(0.5f, "Wt");
-        trunkTop.addReplacement(0.5f,
+        trunkTop.addReplacement(1f,
                 new SimpleAxionElementReplacement.ReplacementGenerator() {
                     @Override
                     public String generateReplacement() {
-                        int angleDeg = rnd.randomInt(180);
-                        return "W[+("+angleDeg+")&Mb][+("+angleDeg+")^Mb]t";
+                        int deg = 138+rnd.randomInt(17)-8;
+                        return "W+("+deg+")[&Mb]Wt";
                     }
                 });
 
