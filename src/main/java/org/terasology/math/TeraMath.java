@@ -517,7 +517,8 @@ public final class TeraMath {
     }
 
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
-        Matrix4f result = new Matrix4f(); result.mul(m, vm);
+        Matrix4f result = new Matrix4f(); 
+        result.mul(m, vm);
         return result;
     }
 
@@ -533,7 +534,8 @@ public final class TeraMath {
         result.m12 = mv.m12;
         result.m22 = mv.m22;
 
-        result.invert(); result.transpose();
+        result.invert();
+        result.transpose();
         return result;
     }
 
