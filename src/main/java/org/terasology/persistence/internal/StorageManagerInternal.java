@@ -30,13 +30,19 @@ import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
-import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
+import org.terasology.utilities.concurrency.AbstractTask;
+import org.terasology.utilities.concurrency.ShutdownTask;
+import org.terasology.utilities.concurrency.Task;
+import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,6 +50,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author Immortius
@@ -53,8 +61,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private static final String WORLDS_PATH = "worlds";
     private static final String PLAYER_STORE_EXTENSION = ".player";
     private static final String GLOBAL_ENTITY_STORE = "global.dat";
+    private static final int BACKGROUND_THREADS = 4;
 
     private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
+
+    private final TaskMaster<Task> storageTaskMaster;
 
     private Path playersPath;
 
@@ -63,12 +74,14 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private TIntObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TIntObjectHashMap<>();
     private Map<StoreId, StoreMetadata> storeMetadata = Maps.newHashMap();
 
-    private Map<Vector3i, ChunkStoreInternal> chunkStores = Maps.newHashMap();
+    private Map<Vector3i, ChunkStoreInternal> pendingProcessingChunkStore = Maps.newConcurrentMap();
+    private Map<Vector3i, byte[]> compressedChunkStore = Maps.newConcurrentMap();
 
     public StorageManagerInternal(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         entityManager.subscribe(this);
         playersPath = PathManager.getInstance().getCurrentSavePath().resolve(PLAYERS_PATH);
+        storageTaskMaster = TaskMaster.createFIFOTaskMaster(BACKGROUND_THREADS);
     }
 
     @Override
@@ -85,6 +98,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 }
             }
         }
+    }
+
+    @Override
+    public void shutdown() {
+        storageTaskMaster.shutdown(new ShutdownTask(), true);
     }
 
     @Override
@@ -163,22 +181,31 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     @Override
     public ChunkStore loadChunkStore(Vector3i chunkPos) {
-        ChunkStore store = chunkStores.get(chunkPos);
+        ChunkStore store = pendingProcessingChunkStore.get(chunkPos);
         if (store == null) {
-            Path chunkPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD).resolve(getChunkFilename(chunkPos));
-            if (Files.isRegularFile(chunkPath)) {
-                try (InputStream in = new BufferedInputStream(Files.newInputStream(chunkPath))) {
-                    TIntSet validRefs = null;
-                    StoreMetadata table = storeMetadata.get(new ChunkStoreId(chunkPos));
-                    if (table != null) {
-                        validRefs = table.getExternalReferences();
+            byte[] chunkData = compressedChunkStore.get(chunkPos);
+            if (chunkData == null) {
+                Path chunkPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD).resolve(getChunkFilename(chunkPos));
+                if (Files.isRegularFile(chunkPath)) {
+                    try {
+                        chunkData = Files.readAllBytes(chunkPath);
+                    } catch (IOException e) {
+                        logger.error("Failed to load chunk {}", chunkPos, e);
                     }
-                    EntityData.ChunkStore chunkData = EntityData.ChunkStore.parseFrom(in);
-                    store = new ChunkStoreInternal(chunkData, validRefs, this, entityManager);
-
-
+                }
+            }
+            if (chunkData != null) {
+                TIntSet validRefs = null;
+                StoreMetadata table = storeMetadata.get(new ChunkStoreId(chunkPos));
+                if (table != null) {
+                    validRefs = table.getExternalReferences();
+                }
+                ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
+                try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
+                    EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
+                    store = new ChunkStoreInternal(storeData, validRefs, this, entityManager);
                 } catch (IOException e) {
-                    logger.error("Failed to load chunk {}", chunkPos, e);
+                    logger.error("Failed to read existing saved chunk {}", chunkPos);
                 }
             }
         }
@@ -186,13 +213,18 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     private void flushChunkStores() throws IOException {
-        Path chunksPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD);
-        Files.createDirectories(chunksPath);
-        for (Map.Entry<Vector3i, ChunkStoreInternal> chunkStoreEntry : chunkStores.entrySet()) {
-            Path chunkPath = chunksPath.resolve(getChunkFilename(chunkStoreEntry.getKey()));
-            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
-                chunkStoreEntry.getValue().getStore().writeTo(out);
+        storageTaskMaster.shutdown(new ShutdownTask(), true);
+        try {
+            Path chunksPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD);
+            Files.createDirectories(chunksPath);
+            for (Map.Entry<Vector3i, byte[]> chunkStoreEntry : compressedChunkStore.entrySet()) {
+                Path chunkPath = chunksPath.resolve(getChunkFilename(chunkStoreEntry.getKey()));
+                try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
+                    out.write(chunkStoreEntry.getValue());
+                }
             }
+        } finally {
+            storageTaskMaster.restart();
         }
     }
 
@@ -200,12 +232,31 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return String.format("%d.%d.%d.chunk", pos.x, pos.y, pos.z);
     }
 
-    public void store(ChunkStoreInternal chunkStore, TIntSet externalRefs) {
+    public void store(final ChunkStoreInternal chunkStore, TIntSet externalRefs) {
         if (externalRefs.size() > 0) {
             StoreMetadata metadata = new StoreMetadata(new ChunkStoreId(chunkStore.getChunkPosition()), externalRefs);
             indexStoreMetadata(metadata);
         }
-        this.chunkStores.put(chunkStore.getChunkPosition(), chunkStore);
+        pendingProcessingChunkStore.put(chunkStore.getChunkPosition(), chunkStore);
+        try {
+            storageTaskMaster.put(new AbstractTask() {
+                @Override
+                public void enact() {
+                    EntityData.ChunkStore store = chunkStore.getStore();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try (GZIPOutputStream gzipOut = new GZIPOutputStream(baos)) {
+                        store.writeTo(gzipOut);
+                    } catch (IOException e) {
+                        logger.error("Failed to compress chunk {} for storage.", chunkStore.getChunkPosition(), e);
+                    }
+                    byte[] b = baos.toByteArray();
+                    compressedChunkStore.put(chunkStore.getChunkPosition(), b);
+                    pendingProcessingChunkStore.remove(chunkStore.getChunkPosition());
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while submitting chunk for storage", e);
+        }
     }
 
     private void indexStoreMetadata(StoreMetadata metadata) {

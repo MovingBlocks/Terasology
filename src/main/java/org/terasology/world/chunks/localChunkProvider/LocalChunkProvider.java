@@ -444,7 +444,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     @Override
     public void dispose() {
         pipeline.shutdown();
-        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest());
+        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
 
         for (Chunk chunk : nearCache.values()) {
             farStore.put(chunk);

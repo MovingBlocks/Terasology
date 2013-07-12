@@ -24,7 +24,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * @author Immortius
  */
-public final class TaskProcessor<T extends Task> implements Runnable {
+final class TaskProcessor<T extends Task> implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessor.class);
 

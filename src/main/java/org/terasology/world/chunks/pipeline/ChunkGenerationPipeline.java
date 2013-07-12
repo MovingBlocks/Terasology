@@ -71,8 +71,8 @@ public class ChunkGenerationPipeline {
     }
 
     public void shutdown() {
-        chunkReviewer.shutdown(new ChunkRequest(this, provider, ChunkRequest.Type.EXIT, Region3i.EMPTY));
-        chunkGenerator.shutdown(new ShutdownChunkTask());
+        chunkReviewer.shutdown(new ChunkRequest(this, provider, ChunkRequest.Type.EXIT, Region3i.EMPTY), false);
+        chunkGenerator.shutdown(new ShutdownChunkTask(), false);
     }
 
     public ChunkGeneratorManager getChunkGeneratorManager() {
