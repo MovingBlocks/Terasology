@@ -17,6 +17,7 @@ package org.terasology.entityFactory;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.components.DrowningComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
@@ -49,6 +50,8 @@ public class PlayerFactory {
         playerComponent.spawnPosition.set(spawnPosition);
         player.saveComponent(playerComponent);
         player.addComponent(new LocalPlayerComponent());
+
+        player.addComponent(new DrowningComponent());
 
         // Goodie chest
         EntityRef chest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:chest"));
