@@ -56,14 +56,14 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
         serializer.setComponentIdMapping(componentIds);
     }
 
-    public void store(EntityRef entity) {
-        store(entity, "");
+    public void store(EntityRef entity, boolean deactivate) {
+        store(entity, "", deactivate);
     }
 
-    public void store(EntityRef entity, String name) {
+    public void store(EntityRef entity, String name, boolean deactivate) {
         if (entity.isActive()) {
             for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
-                store(ownedEntity);
+                store(ownedEntity, deactivate);
             }
             EntityRefTypeHandler.setReferenceInterceptor(this);
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
@@ -75,7 +75,9 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
             }
             storedEntityIds.add(entityData.getId());
             externalReferences.remove(entityData.getId());
-            entityManager.deactivateForStorage(entity);
+            if (deactivate) {
+                entityManager.deactivateForStorage(entity);
+            }
         }
     }
 

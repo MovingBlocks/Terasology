@@ -30,6 +30,7 @@ import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.GlobalStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
@@ -77,27 +78,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private Map<Vector3i, ChunkStoreInternal> pendingProcessingChunkStore = Maps.newConcurrentMap();
     private Map<Vector3i, byte[]> compressedChunkStore = Maps.newConcurrentMap();
 
+    private EntityData.GlobalStore globalStore;
+
     public StorageManagerInternal(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         entityManager.subscribe(this);
         playersPath = PathManager.getInstance().getCurrentSavePath().resolve(PLAYERS_PATH);
         storageTaskMaster = TaskMaster.createFIFOTaskMaster(BACKGROUND_THREADS);
-    }
-
-    @Override
-    public void loadGlobalEntities() throws IOException {
-        Path globalDataFile = PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE);
-        if (Files.isRegularFile(globalDataFile)) {
-            try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
-                EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
-                GlobalStoreLoader loader = new GlobalStoreLoader(entityManager);
-                loader.load(store);
-                for (StoreMetadata refTable : loader.getStoreMetadata()) {
-                    storeMetadata.put(refTable.getId(), refTable);
-                    indexStoreMetadata(refTable);
-                }
-            }
-        }
     }
 
     @Override
@@ -112,19 +99,49 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         flushGlobalStore();
     }
 
-    private void flushGlobalStore() throws IOException {
+    @Override
+    public GlobalStore createGlobalStoreForSave() {
         GlobalStoreSaver globalStore = new GlobalStoreSaver(entityManager);
-        for (EntityRef entity : entityManager.getAllEntities()) {
-            globalStore.store(entity);
-        }
         for (StoreMetadata table : storeMetadata.values()) {
             globalStore.addStoreMetadata(table);
         }
-        EntityData.GlobalStore globalStoreData = globalStore.save();
-        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE)))) {
-            globalStoreData.writeTo(out);
+        return new GlobalStoreInternal(globalStore, this);
+    }
+
+    @Override
+    public void loadGlobalStore() throws IOException {
+        Path globalDataFile = PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE);
+        if (Files.isRegularFile(globalDataFile)) {
+            try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
+                EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
+                GlobalStoreLoader loader = new GlobalStoreLoader(entityManager);
+                loader.load(store);
+                for (StoreMetadata refTable : loader.getStoreMetadata()) {
+                    storeMetadata.put(refTable.getId(), refTable);
+                    indexStoreMetadata(refTable);
+                }
+            }
         }
     }
+
+    public void store(EntityData.GlobalStore globalStoreData) {
+        this.globalStore = globalStoreData;
+    }
+
+    private void flushGlobalStore() throws IOException {
+        if (globalStore == null) {
+            GlobalStore store = createGlobalStoreForSave();
+            for (EntityRef entity : entityManager.getAllEntities()) {
+                store.store(entity);
+            }
+            store.save();
+        }
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE)))) {
+            globalStore.writeTo(out);
+        }
+        globalStore = null;
+    }
+
 
     @Override
     public PlayerStore createPlayerStoreForSave(String playerId) {
@@ -135,7 +152,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         Files.createDirectories(playersPath);
         for (Map.Entry<String, EntityData.PlayerStore> playerStoreEntry : playerStores.entrySet()) {
             Path playerFile = playersPath.resolve(playerStoreEntry.getKey() + PLAYER_STORE_EXTENSION);
-            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerFile));) {
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerFile))) {
                 playerStoreEntry.getValue().writeTo(out);
             }
         }
@@ -226,6 +243,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         } finally {
             storageTaskMaster.restart();
         }
+        compressedChunkStore.clear();
     }
 
     private String getChunkFilename(Vector3i pos) {
@@ -283,4 +301,5 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             }
         }
     }
+
 }

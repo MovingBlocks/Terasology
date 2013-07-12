@@ -21,18 +21,12 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -41,8 +35,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.internal.StorageManagerInternal;
-import org.terasology.testUtil.WorldProviderCoreStub;
-import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -139,7 +131,7 @@ public class StorageManagerTest {
         store.save();
 
         PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
-        restored.restore();
+        restored.restoreEntities();
         assertTrue(restored.hasCharacter());
         assertEquals(character, restored.getCharacter());
     }
@@ -174,7 +166,7 @@ public class StorageManagerTest {
         entityManager.create(); // This causes the destroyed entity's id to be reused
 
         PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
-        restored.restore();
+        restored.restoreEntities();
         assertFalse(character.getComponent(EntityRefComponent.class).entityRef.exists());
     }
 
@@ -189,18 +181,23 @@ public class StorageManagerTest {
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
-        newSM.loadGlobalEntities();
+        newSM.loadGlobalStore();
         assertNotNull(newSM.loadPlayerStore(PLAYER_ID));
     }
 
     @Test
     public void globalEntitiesStoredAndRestored() throws Exception {
-        int entityId = entityManager.create(new StringComponent("Test")).getId();
+        EntityRef entity = entityManager.create(new StringComponent("Test"));
+        int entityId = entity.getId();
+        GlobalStore globalStore = esm.createGlobalStoreForSave();
+        globalStore.store(entity);
+        globalStore.save();
+
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
-        newSM.loadGlobalEntities();
+        newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
         assertEquals(1, entities.size());
@@ -215,15 +212,18 @@ public class StorageManagerTest {
         PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
         store.setCharacter(character);
         store.save();
+        GlobalStore globalStore = esm.createGlobalStoreForSave();
+        globalStore.store(someEntity);
+        globalStore.save();
 
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
-        newSM.loadGlobalEntities();
+        newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
-        restored.restore();
+        restored.restoreEntities();
         assertTrue(restored.getCharacter().getComponent(EntityRefComponent.class).entityRef.exists());
     }
 
@@ -252,11 +252,12 @@ public class StorageManagerTest {
         chunk.setBlock(0, 0, 0, testBlock);
         ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
         chunkStore.save();
-
+        esm.createGlobalStoreForSave().save();
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         assertNotNull(restored);
@@ -279,11 +280,24 @@ public class StorageManagerTest {
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         restored.restoreEntities();
         EntityRef ref = newEntityManager.getEntity(id);
         assertTrue(ref.exists());
         assertTrue(ref.isActive());
+    }
+
+    @Test
+    public void canSavePlayerWithoutUnloading() throws Exception {
+        EntityRef character = entityManager.create();
+        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
+        store.setCharacter(character);
+        store.save(false);
+
+        esm.flush();
+
+        assertTrue(character.isActive());
     }
 }

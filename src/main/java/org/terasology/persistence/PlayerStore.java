@@ -36,9 +36,15 @@ public interface PlayerStore {
     void save();
 
     /**
+     * Saves the store - call this when you have finished setting up the store.
+     * @param deactivateEntities Whether the stored entities should be deactivated
+     */
+    void save(boolean deactivateEntities);
+
+    /**
      * Restores all entities contained in this store, activating them.
      */
-    void restore();
+    void restoreEntities();
 
     /**
      * Stores the character

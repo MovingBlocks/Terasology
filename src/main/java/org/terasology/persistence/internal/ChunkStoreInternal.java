@@ -1,6 +1,6 @@
 package org.terasology.persistence.internal;
 
-import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -9,7 +9,6 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.TeraArrays;
 
 import java.util.List;
 
@@ -23,16 +22,15 @@ final class ChunkStoreInternal implements ChunkStore {
     private Chunk chunk;
 
     private EngineEntityManager entityManager;
-    private EntityStorer storer;
     private EntityData.EntityStore entityStore;
     private TIntSet externalRefs;
+    private List<EntityRef> entitiesToStore = Lists.newArrayList();
 
     public ChunkStoreInternal(Chunk chunk, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
         this.chunk = chunk;
         this.chunkPosition = new Vector3i(chunk.getPos());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
-        this.storer = new EntityStorer(entityManager);
     }
 
     public ChunkStoreInternal(EntityData.ChunkStore chunkData, TIntSet externalRefs, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
@@ -57,14 +55,24 @@ final class ChunkStoreInternal implements ChunkStore {
 
     @Override
     public void save() {
+        save(true);
+    }
+
+    @Override
+    public void save(boolean deactivateEntities) {
+        EntityStorer storer = new EntityStorer(entityManager);
+        for (EntityRef entityRef : entitiesToStore) {
+            storer.store(entityRef, deactivateEntities);
+        }
         entityStore = storer.finaliseStore();
         externalRefs = storer.getExternalReferences();
         storageManager.store(this, externalRefs);
+        entitiesToStore.clear();
     }
 
     @Override
     public void store(EntityRef entity) {
-        storer.store(entity);
+        entitiesToStore.add(entity);
     }
 
     @Override

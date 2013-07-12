@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.math.Vector3i;
+import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
@@ -26,6 +27,16 @@ import java.io.IOException;
  * @author Immortius
  */
 public interface StorageManager {
+
+    /**
+     * @return A new global store ready for saving into
+     */
+    GlobalStore createGlobalStoreForSave();
+
+    /**
+     * Loads the global store, restoring the entity manager's state and all global entities
+     */
+    void loadGlobalStore() throws IOException;
 
     /**
      * Creates an empty player store for saving
@@ -57,9 +68,5 @@ public interface StorageManager {
 
     void flush() throws IOException;
 
-    void loadGlobalEntities() throws IOException;
-
     void shutdown();
-
-
 }
