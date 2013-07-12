@@ -491,6 +491,7 @@ idea {
 				entryPointsList.appendNode('item', [index : '0', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.event.ReceiveEvent'])
 				entryPointsList.appendNode('item', [index : '1', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.In'])
 				entryPointsList.appendNode('item', [index : '2', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.RegisterSystem'])
+				entryPointsList.appendNode('item', [index : '3', class : 'java.lang.String', itemvalue : 'org.terasology.logic.console.Command'])
 			}
 		}
 	}

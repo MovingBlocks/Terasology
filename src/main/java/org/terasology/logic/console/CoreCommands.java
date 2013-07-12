@@ -35,7 +35,7 @@ import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.network.ClientComponent;
-import org.terasology.persistence.WorldPersister;
+import org.terasology.persistence.WorldDumper;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.family.BlockFamily;
@@ -125,8 +125,8 @@ public class CoreCommands implements ComponentSystem {
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
-        WorldPersister worldPersister = new WorldPersister((EngineEntityManager) entityManager);
-        worldPersister.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), WorldPersister.SaveFormat.JSON);
+        WorldDumper worldDumper = new WorldDumper((EngineEntityManager) entityManager);
+        worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
     }
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)

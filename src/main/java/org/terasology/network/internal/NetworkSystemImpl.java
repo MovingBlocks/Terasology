@@ -60,9 +60,6 @@ import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.persistence.PlayerEntityStore;
-import org.terasology.persistence.serializers.EventSerializer;
-import org.terasology.persistence.serializers.PackedEntitySerializer;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.Client;
@@ -77,6 +74,10 @@ import org.terasology.network.internal.pipelineFactory.TerasologyServerPipelineF
 import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.serializers.EventSerializer;
+import org.terasology.persistence.serializers.PackedEntitySerializer;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -84,7 +85,6 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
-import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -131,6 +131,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
     private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
     private Multimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
+    private StorageManager storageManager;
 
     // Client only
     private Server server;
@@ -467,6 +468,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         this.entityManager.subscribe(this);
         this.blockManager = CoreRegistry.get(BlockManager.class);
         this.ownershipHelper = new OwnershipHelper(entityManager.getComponentLibrary());
+        this.storageManager = CoreRegistry.get(StorageManager.class);
 
         CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
@@ -685,14 +687,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientList.remove(client);
         clientPlayerLookup.remove(client.getEntity());
         logger.info("Client disconnected: " + client.getName());
-        PlayerEntityStore playerStore = new PlayerEntityStore(client.getId(), entityManager);
-        playerStore.beginStore();
+        PlayerStore playerStore = storageManager.createPlayerStoreForSave(client.getId());
         client.getEntity().send(new DisconnectedEvent(playerStore));
-        try {
-            playerStore.endStore();
-        } catch (IOException e) {
-            logger.error("Failed to store player data for '{}'", client.getId(), e);
-        }
+        playerStore.save();
         client.disconnect();
     }
 
@@ -726,12 +723,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void connectClient(Client client) {
-        PlayerEntityStore entityStore = new PlayerEntityStore(client.getId(), entityManager);
-        try {
-            entityStore.beginRestore();
-        } catch (IOException ioe) {
-            logger.error("Failed to read player store for: '{}'", client.getId(), ioe);
-        }
+        PlayerStore entityStore = storageManager.loadPlayerStore(client.getId());
         client.getEntity().send(new ConnectedEvent(entityStore));
     }
 

@@ -17,7 +17,7 @@
 package org.terasology.network.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.persistence.PlayerEntityStore;
+import org.terasology.persistence.PlayerStore;
 
 /**
  * Event notifying that a new client has connected - sent against the client by the network system.
@@ -26,17 +26,17 @@ import org.terasology.persistence.PlayerEntityStore;
  */
 public class ConnectedEvent implements Event {
 
-    private PlayerEntityStore entityStore;
+    private PlayerStore playerStore;
 
-    public ConnectedEvent(PlayerEntityStore store) {
-        this.entityStore = store;
+    public ConnectedEvent(PlayerStore store) {
+        this.playerStore = store;
     }
 
     /**
-     * @return The PlayerEntityStore for the connecting player. It is ready to restore any stored entities.
+     * @return The PlayerStore for the connecting player. It is ready to restore any stored entities.
      */
-    public PlayerEntityStore getEntityStore() {
-        return entityStore;
+    public PlayerStore getPlayerStore() {
+        return playerStore;
     }
 
 }

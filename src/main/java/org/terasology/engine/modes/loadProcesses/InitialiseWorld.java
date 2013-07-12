@@ -23,9 +23,13 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -90,6 +94,7 @@ public class InitialiseWorld implements LoadProcess {
 
     @Override
     public boolean step() {
+        StorageManager storageManager = CoreRegistry.put(StorageManager.class, new StorageManagerInternal((EngineEntityManager)CoreRegistry.get(EntityManager.class)));
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();

@@ -180,7 +180,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             }
             return new PlayerStoreInternal(playerId, store, validRefs, this, entityManager);
         }
-        return null;
+        return new PlayerStoreInternal(playerId, this, entityManager);
     }
 
     public void store(String id, EntityData.PlayerStore playerStore, TIntSet externalReference) {

@@ -18,18 +18,11 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.persistence.WorldPersister;
+import org.terasology.persistence.StorageManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
-import org.terasology.engine.paths.PathManager;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * @author Immortius
@@ -48,15 +41,11 @@ public class LoadEntities implements LoadProcess {
 
     @Override
     public boolean step() {
-        CoreRegistry.put(WorldPersister.class, new WorldPersister((EngineEntityManager)CoreRegistry.get(EntityManager.class)));
-
-        Path entityDataFile = PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.ENTITY_DATA_FILE);
-        if (Files.isRegularFile(entityDataFile)) {
-            try {
-                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
-            } catch (IOException e) {
-                logger.error("Failed to load entity data", e);
-            }
+        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
+        try {
+            storageManager.loadGlobalStore();
+        } catch (IOException e) {
+            logger.error("Failed to load global data.", e);
         }
         return true;
     }

@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Immortius
  */
 public class GameManifest {
-    public static final String DEFAULT_FILE_NAME = "GameManifest.json";
+    public static final String DEFAULT_FILE_NAME = "manifest.json";
 
     private String title = "";
     private String seed = "";

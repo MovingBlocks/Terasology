@@ -21,7 +21,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.persistence.PlayerEntityStore;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -38,6 +37,7 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
+import org.terasology.persistence.PlayerStore;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -48,7 +48,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius
@@ -87,13 +86,13 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
             if (worldRenderer.getWorldProvider().isBlockRelevant(spawning.position)) {
-                if (spawning.entityStore == null) {
+                if (spawning.playerStore == null) {
                     spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
-                } else if (!spawning.entityStore.hasCharacter()) {
-                    spawning.entityStore.restoreAll();
+                } else if (!spawning.playerStore.hasCharacter()) {
+                    spawning.playerStore.restoreEntities();
                     spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
                 } else {
-                    restoreCharacter(spawning.clientEntity, spawning.entityStore);
+                    restoreCharacter(spawning.clientEntity, spawning.playerStore);
                 }
                 i.remove();
             }
@@ -126,14 +125,14 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onConnect(ConnectedEvent connected, EntityRef entity) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        loc.setWorldPosition(connected.getEntityStore().getRelevanceLocation());
+        loc.setWorldPosition(connected.getPlayerStore().getRelevanceLocation());
         entity.saveComponent(loc);
         worldRenderer.getChunkProvider().addRelevanceEntity(entity, 4, networkSystem.getOwner(entity));
-        if (connected.getEntityStore().hasCharacter()) {
-            if (worldRenderer.getWorldProvider().isBlockRelevant(connected.getEntityStore().getRelevanceLocation())) {
-                restoreCharacter(entity, connected.getEntityStore());
+        if (connected.getPlayerStore().hasCharacter()) {
+            if (worldRenderer.getWorldProvider().isBlockRelevant(connected.getPlayerStore().getRelevanceLocation())) {
+                restoreCharacter(entity, connected.getPlayerStore());
             } else {
-                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, connected.getEntityStore().getRelevanceLocation(), connected.getEntityStore());
+                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, connected.getPlayerStore().getRelevanceLocation(), connected.getPlayerStore());
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         } else {
@@ -147,9 +146,9 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         }
     }
 
-    private void restoreCharacter(EntityRef entity, PlayerEntityStore playerEntityStore) {
-        Map<String, EntityRef> restoredEntities = playerEntityStore.restoreAll();
-        EntityRef character = restoredEntities.get("character");
+    private void restoreCharacter(EntityRef entity, PlayerStore playerStore) {
+        playerStore.restoreEntities();
+        EntityRef character = playerStore.getCharacter();
         // TODO: adjust location to safe spot
         if (character == null) {
             spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
@@ -183,9 +182,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     public void onDisconnect(DisconnectedEvent event, EntityRef entity) {
         EntityRef character = entity.getComponent(ClientComponent.class).character;
         if (character.exists()) {
-            event.getEntityStore().setHasCharacter(true);
-            event.getEntityStore().setRelevanceLocation(character.getComponent(LocationComponent.class).getWorldPosition());
-            event.getEntityStore().store(character, "character");
+            event.getPlayerStore().setCharacter(character);
         }
     }
 
@@ -210,7 +207,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
     private static class SpawningClientInfo {
         public EntityRef clientEntity;
-        public PlayerEntityStore entityStore;
+        public PlayerStore playerStore;
         public Vector3f position;
 
         public SpawningClientInfo(EntityRef client, Vector3f position) {
@@ -218,9 +215,9 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             this.position = position;
         }
 
-        public SpawningClientInfo(EntityRef client, Vector3f position, PlayerEntityStore entityStore) {
+        public SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
             this(client, position);
-            this.entityStore = entityStore;
+            this.playerStore = playerStore;
         }
     }
 }

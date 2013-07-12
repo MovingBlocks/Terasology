@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -35,7 +33,7 @@ import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.persistence.WorldPersister;
+import org.terasology.persistence.StorageManager;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
@@ -96,18 +94,21 @@ public class StateIngame implements GameState {
         componentSystemManager.shutdown();
         guiManager.closeAllWindows();
         CoreRegistry.get(BulletPhysics.class).dispose();
-        if (saveWorld) {
+        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
+        if (storageManager != null) {
             try {
-                CoreRegistry.get(WorldPersister.class).save(PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+                storageManager.flush();
             } catch (IOException e) {
-                logger.error("Failed to save entities", e);
+                logger.error("Failed to save game", e);
             }
+            storageManager.shutdown();
         }
         entityManager.clear();
         if (worldRenderer != null) {
             worldRenderer.dispose(saveWorld);
             worldRenderer = null;
         }
+
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);

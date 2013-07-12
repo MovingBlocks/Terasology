@@ -81,7 +81,7 @@ final class GlobalStoreLoader {
 
         PrefabManager prefabManager = entityManager.getPrefabManager();
         for (EntityData.Prefab prefabData : globalStore.getPrefabList()) {
-            if (prefabManager.exists(prefabData.getName())) {
+            if (!prefabManager.exists(prefabData.getName())) {
                 if (!prefabData.hasParentName()) {
                     createPrefab(prefabData);
                 } else {
