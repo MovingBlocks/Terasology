@@ -537,12 +537,29 @@ public final class TeraMath {
         return result;
     }
 
+    /**
+     * Copies the given matrix into a newly allocated FloatBuffer.
+     * The order of the elements is such that the buffer can be used for
+     * OpenGL functions, column major.
+     * So the translation components are at index 12, 13 and 14.
+     * The first row has the following indexes: 0, 4, 8 and 12.
+     * @param m the matrix to copy
+     * @return A new FloatBuffer that
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         matrixToFloatBuffer(m, buffer);
         return buffer;
     }
 
+    /**
+     * Copies the given matrix into a newly allocated FloatBuffer.
+     * The order of the elements is such that the buffer can be used for
+     * OpenGL functions, column major.
+     * So the first row has the following indexes: 0, 3 and 6
+     * @param m the matrix to copy
+     * @return A new FloatBuffer that
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
         matrixToFloatBuffer(m, buffer);
@@ -566,6 +583,15 @@ public final class TeraMath {
         fb.flip();
     }
 
+    /**
+     * Copies the given matrix into the given FloatBuffer.
+     * The order of the elements is such that the buffer can be used for
+     * OpenGL functions, column major.
+     * So the translation components are at index 12, 13 and 14.
+     * The first row has the following indexes: 0, 4, 8 and 12.
+     * @param m the matrix to copy
+     * @param fb the buffer to copy the matrix into.
+     */
     public static void matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
         Matrix4f tempMatrix = new Matrix4f();
         tempMatrix.transpose(m);
@@ -590,6 +616,14 @@ public final class TeraMath {
         fb.flip();
     }
 
+    /**
+     * Copies the given matrix into the given FloatBuffer.
+     * The order of the elements is such that the buffer can be used for
+     * OpenGL functions, column major.
+     * So the first row has the following indexes: 0, 3 and 6
+     * @param m the matrix to copy
+     * @param fb the buffer to copy the matrix into.
+     */
     public static Matrix4f calcReflectionMatrix(float planeHeight, float playerHeight) {
         Matrix4f result = new Matrix4f();
         result.setIdentity();
@@ -600,6 +634,15 @@ public final class TeraMath {
         return result;
     }
 
+    /**
+     * Creates a 32 bit color representation of the color specified by
+     * the parameters.
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @param a alpha
+     * @return 
+     */
     public static int packColor(float r, float g, float b, float a) {
         int iR = (int) (TeraMath.clamp(r, 0.0f, 1.0f) * 255.0f);
         int iG = (int) (TeraMath.clamp(g, 0.0f, 1.0f) * 255.0f);
