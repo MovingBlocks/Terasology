@@ -48,3 +48,6 @@ entityDump.txt
 /mods/*/testClasses/
 /mods/*/build/
 /mods/*/.*
+/mods/*/*.iml
+/mods/*/*.ipr
+/mods/*/*.iws
