@@ -22,7 +22,6 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.GameManifest;
@@ -41,19 +40,11 @@ import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
-import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
-import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -74,27 +65,9 @@ public class InitialiseWorld implements LoadProcess {
         return "Initializing world...";
     }
 
-    private ChunkStore loadChunkStore(Path file) throws IOException {
-        try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(Files.newInputStream(file)))) {
-            ChunkStore cache = (ChunkStore) in.readObject();
-            if (cache instanceof ChunkStoreGZip) {
-                ((ChunkStoreGZip) cache).setup();
-                logger.info("Using old chunk store implementation without protobuf support for compatibility.");
-            } else if (cache instanceof ChunkStoreProtobuf)
-                ((ChunkStoreProtobuf) cache).setup();
-            else
-                logger.warn("Chunk store might not have been initialized: {}", cache.getClass().getName());
-
-            return cache;
-
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Unable to load chunk cache", e);
-        }
-    }
-
     @Override
     public boolean step() {
-        StorageManager storageManager = CoreRegistry.put(StorageManager.class, new StorageManagerInternal((EngineEntityManager)CoreRegistry.get(EntityManager.class)));
+        StorageManager storageManager = CoreRegistry.put(StorageManager.class, new StorageManagerInternal((EngineEntityManager) CoreRegistry.get(EntityManager.class)));
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
@@ -109,24 +82,8 @@ public class InitialiseWorld implements LoadProcess {
         chunkGeneratorManager.setWorldSeed(worldInfo.getSeed());
         chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
 
-        ChunkStore chunkStore = null;
-        Path f = PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.WORLD_DATA_FILE);
-        if (Files.isRegularFile(f)) {
-            try {
-                chunkStore = loadChunkStore(f);
-            } catch (IOException e) {
-                /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
-                   (don't have the game continue or we risk overwriting their game)
-                 */
-                logger.error("Failed to load chunk store", e);
-            }
-        }
-        if (chunkStore == null) {
-            chunkStore = new ChunkStoreGZip();
-        }
-
         // Init. a new world
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, chunkGeneratorManager);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);

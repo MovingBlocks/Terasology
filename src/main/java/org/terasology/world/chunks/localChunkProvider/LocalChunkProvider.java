@@ -35,6 +35,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.ChunkView;
@@ -50,7 +52,6 @@ import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
-import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.OnChunkGenerated;
 import org.terasology.world.chunks.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
@@ -86,7 +87,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
 
-    private ChunkStore farStore;
+    private StorageManager storageManager;
 
     private ChunkGenerationPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
@@ -107,9 +108,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private BlockManager blockManager;
     private BlockEntityRegistry registry = null;
 
-    public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
+    public LocalChunkProvider(StorageManager storageManager, ChunkGeneratorManager generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
-        this.farStore = farStore;
+        this.storageManager = storageManager;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster(8);
@@ -292,7 +293,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         }
 
                         chunk.dispose();
-                        farStore.put(chunk);
+                        ChunkStore store = storageManager.createChunkStoreForSave(chunk);
+                        // TODO: Save entities
+                        store.save();
 
                         try {
                             unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
@@ -349,7 +352,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 generateBlockEntities(chunk);
                 PerformanceMonitor.endActivity();
             }
-            // TODO: loadEntities(readyChunkPos);
+            if (readyChunkInfo.getChunkStore() != null) {
+                readyChunkInfo.getChunkStore().restoreEntities();
+            }
 
             if (!loaded) {
                 PerformanceMonitor.startActivity("Sending OnAddedBlocks");
@@ -447,23 +452,12 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
 
         for (Chunk chunk : nearCache.values()) {
-            farStore.put(chunk);
             chunk.dispose();
+            ChunkStore store = storageManager.createChunkStoreForSave(chunk);
+            // TODO: store entities?
+            store.save();
         }
         nearCache.clear();
-
-        farStore.dispose();
-        Path chunkFile = PathManager.getInstance().getCurrentSavePath().resolve(TerasologyConstants.WORLD_DATA_FILE);
-        try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkFile)); ObjectOutputStream out = new ObjectOutputStream(bos)) {
-            out.writeObject(farStore);
-        } catch (IOException e) {
-            logger.error("Error saving chunks", e);
-        }
-    }
-
-    @Override
-    public float size() {
-        return farStore.size();
     }
 
     @Override
@@ -495,17 +489,18 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 if (nearCache.get(chunkPos) != null) {
                     // This happens if the chunk is completed right before checking if it is in preparing chunks. Fun.
                     preparingChunks.remove(chunkPos);
-                } else if (farStore.contains(chunkPos)) {
+                } else if (storageManager.containsChunkStoreFor(chunkPos)) {
                     pipeline.doTask(new AbstractChunkTask(pipeline, chunkPos, this) {
                         @Override
                         public void enact() {
-                            Chunk chunk = farStore.get(getPosition());
-                            if (nearCache.putIfAbsent(getPosition(), chunk) != null) {
+                            ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
+                            Chunk chunk = chunkStore.getChunk();
+                            if (nearCache.putIfAbsent(getPosition(), chunkStore.getChunk()) != null) {
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }
                             preparingChunks.remove(getPosition());
                             if (chunk.getChunkState() == Chunk.State.COMPLETE) {
-                                readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk)));
+                                readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
                             } else {
                                 pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
                             }

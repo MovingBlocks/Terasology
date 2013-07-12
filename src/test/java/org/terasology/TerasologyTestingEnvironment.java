@@ -45,6 +45,8 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
@@ -128,6 +130,7 @@ public abstract class TerasologyTestingEnvironment {
         networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
+        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);

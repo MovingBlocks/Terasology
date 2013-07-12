@@ -15,6 +15,8 @@
  */
 package org.terasology.persistence;
 
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.game.GameManifest;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
@@ -66,7 +68,14 @@ public interface StorageManager {
      */
     ChunkStore loadChunkStore(Vector3i chunkPos);
 
+    /**
+     * @param chunkPos
+     * @return Whether the storage manager has the desired chunk store
+     */
+    boolean containsChunkStoreFor(Vector3i chunkPos);
+
     void flush() throws IOException;
 
     void shutdown();
+
 }

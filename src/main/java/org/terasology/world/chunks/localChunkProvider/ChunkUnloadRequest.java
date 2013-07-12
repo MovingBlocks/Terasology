@@ -17,7 +17,6 @@ package org.terasology.world.chunks.localChunkProvider;
 
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkStore;
 
 /**
  * @author Immortius

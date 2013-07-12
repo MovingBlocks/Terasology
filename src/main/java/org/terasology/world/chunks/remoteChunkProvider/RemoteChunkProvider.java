@@ -96,11 +96,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public float size() {
-        return chunkCache.size();
-    }
-
-    @Override
     public boolean isChunkReady(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
         return chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE;

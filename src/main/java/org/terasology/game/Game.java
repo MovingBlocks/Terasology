@@ -25,6 +25,7 @@ import org.terasology.engine.Time;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.persistence.StorageManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.family.BlockFamily;
@@ -61,28 +62,40 @@ public class Game {
     }
 
     public void save() {
-        Time time = CoreRegistry.get(Time.class);
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
+        if (storageManager != null) {
+            Time time = CoreRegistry.get(Time.class);
+            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-        ModConfig modConfig = new ModConfig();
-        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-            modConfig.addMod(mod.getModInfo().getId());
+            ModConfig modConfig = new ModConfig();
+            for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
+                modConfig.addMod(mod.getModInfo().getId());
+            }
+
+            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), modConfig);
+            List<String> registeredBlockFamilies = Lists.newArrayList();
+            for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
+                registeredBlockFamilies.add(family.getURI().toString());
+            }
+            gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
+            gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
+            gameManifest.addWorldInfo(worldProvider.getWorldInfo());
+
+            try {
+                GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);
+            } catch (IOException e) {
+                logger.error("Failed to save world manifest", e);
+            }
+
+            try {
+                storageManager.flush();
+            } catch (IOException e) {
+                logger.error("Failed to save game", e);
+            }
+            storageManager.shutdown();
         }
 
-        GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), modConfig);
-        List<String> registeredBlockFamilies = Lists.newArrayList();
-        for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
-            registeredBlockFamilies.add(family.getURI().toString());
-        }
-        gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
-        gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
-        gameManifest.addWorldInfo(worldProvider.getWorldInfo());
 
-        try {
-            GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);
-        } catch (IOException e) {
-            logger.error("Failed to save world manifest", e);
-        }
     }
 }

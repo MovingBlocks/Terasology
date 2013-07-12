@@ -12,7 +12,6 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -22,6 +21,7 @@ import org.terasology.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
 
 import static org.junit.Assert.assertEquals;
@@ -205,5 +205,4 @@ public class EntitySerializerTest {
         assertTrue(loadedEntity.exists());
         assertTrue(loadedEntity.hasComponent(MappedTypeComponent.class));
     }
-
 }

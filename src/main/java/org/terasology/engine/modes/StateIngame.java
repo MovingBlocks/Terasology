@@ -25,6 +25,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.game.Game;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.console.Console;
@@ -87,28 +88,23 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose() {
-        boolean saveWorld = CoreRegistry.get(NetworkSystem.class).getMode().isAuthority();
+        boolean save = networkSystem.getMode().isAuthority();
         networkSystem.shutdown();
         // TODO: Shutdown background threads
         eventSystem.process();
         componentSystemManager.shutdown();
         guiManager.closeAllWindows();
         CoreRegistry.get(BulletPhysics.class).dispose();
-        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
-        if (storageManager != null) {
-            try {
-                storageManager.flush();
-            } catch (IOException e) {
-                logger.error("Failed to save game", e);
-            }
-            storageManager.shutdown();
-        }
-        entityManager.clear();
         if (worldRenderer != null) {
-            worldRenderer.dispose(saveWorld);
+            worldRenderer.dispose();
             worldRenderer = null;
         }
 
+        if (save) {
+            CoreRegistry.get(Game.class).save();
+        }
+
+        entityManager.clear();
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);

@@ -62,7 +62,6 @@ import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -823,13 +822,8 @@ public final class WorldRenderer {
     /**
      * Disposes this world.
      */
-    public void dispose(boolean saveWorld) {
+    public void dispose() {
         worldProvider.dispose();
-        // TODO: Move this somewhere more sensible
-        if (saveWorld) {
-            CoreRegistry.get(Game.class).save();
-        }
-
         audioManager.stopAllSounds();
     }
 
@@ -907,7 +901,7 @@ public final class WorldRenderer {
                         image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
                     }
 
-                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(file))){
+                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(file))) {
                     ImageIO.write(image, "png", stream);
                 } catch (IOException e) {
                     logger.warn("Could not save screenshot!", e);
@@ -921,7 +915,7 @@ public final class WorldRenderer {
 
     @Override
     public String toString() {
-        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), worldProvider.getTime().getDays(), PostProcessingRenderer.getInstance().getExposure(), skysphere.getSunPosAngle(), chunkProvider.size(), statDirtyChunks, statIgnoredPhases, statVisibleChunks, statRenderedTriangles, statChunkMeshEmpty, statChunkNotReady, worldProvider.getSeed(), worldProvider.getTitle());
+        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), worldProvider.getTime().getDays(), PostProcessingRenderer.getInstance().getExposure(), skysphere.getSunPosAngle(), statDirtyChunks, statIgnoredPhases, statVisibleChunks, statRenderedTriangles, statChunkMeshEmpty, statChunkNotReady, worldProvider.getSeed(), worldProvider.getTitle());
     }
 
     public LocalPlayer getPlayer() {

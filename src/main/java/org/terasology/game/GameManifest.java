@@ -15,6 +15,7 @@
  */
 package org.terasology.game;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
@@ -26,7 +27,11 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.world.WorldInfo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -124,7 +129,9 @@ public class GameManifest {
     }
 
     public static GameManifest load(Path filePath) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
+        // TODO: If ShrinkWrap fixes its buffered reader handler, change to read directly into fromJson
+        byte[] bytes = Files.readAllBytes(filePath);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
             GameManifest result = new GsonBuilder().create().fromJson(reader, GameManifest.class);
             if (result.modConfiguration.size() == 0) {
                 for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {

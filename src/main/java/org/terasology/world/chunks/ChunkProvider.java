@@ -27,13 +27,13 @@ public interface ChunkProvider {
 
     /**
      * A local view pvoides a
+     *
      * @param centerChunkPos
      * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.
      */
     ChunkView getLocalView(Vector3i centerChunkPos);
 
     /**
-     *
      * @param blockPos
      * @param extent
      * @return A chunk view of the chunks around the given blockPos.
@@ -41,7 +41,6 @@ public interface ChunkProvider {
     ChunkView getSubviewAroundBlock(Vector3i blockPos, int extent);
 
     /**
-     *
      * @param chunkPos
      * @return A chunk view including the chunks around the given chunk
      */
@@ -119,14 +118,4 @@ public interface ChunkProvider {
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using
      */
     void dispose();
-
-    /**
-     * Returns the amount of chunks managed by this chunk provider.
-     *
-     * @return The amount of managed chunks
-     */
-    float size();
-
-
-
 }

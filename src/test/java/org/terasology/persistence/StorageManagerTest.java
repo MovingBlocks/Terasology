@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
+import com.google.gson.GsonBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -44,8 +45,11 @@ import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -66,7 +70,7 @@ public class StorageManagerTest {
 
     private ModManager modManager;
     private NetworkSystem networkSystem;
-    private StorageManager esm;
+    private StorageManagerInternal esm;
     private EngineEntityManager entityManager;
     private Block testBlock;
 
@@ -91,11 +95,16 @@ public class StorageManagerTest {
         esm = new StorageManagerInternal(entityManager);
 
         CoreRegistry.put(Config.class, new Config());
+        CoreRegistry.put(ModManager.class, new ModManager());
     }
 
     @Test
-    public void getUnstoredPlayerReturnsNothing() {
-        assertNull(esm.loadPlayerStore(PLAYER_ID));
+    public void getUnstoredPlayerReturnsNewStor() {
+        PlayerStore store = esm.loadPlayerStore(PLAYER_ID);
+        assertNotNull(store);
+        assertEquals(new Vector3f(), store.getRelevanceLocation());
+        assertFalse(store.hasCharacter());
+        assertEquals(PLAYER_ID, store.getId());
     }
 
     @Test
@@ -300,4 +309,10 @@ public class StorageManagerTest {
 
         assertTrue(character.isActive());
     }
+
+    @Test
+    public void ignoresDestroyOfUnreferencedEntity() {
+        esm.onEntityDestroyed(3);
+    }
+
 }

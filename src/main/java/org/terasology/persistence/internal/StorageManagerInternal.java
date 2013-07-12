@@ -229,10 +229,15 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return store;
     }
 
+    @Override
+    public boolean containsChunkStoreFor(Vector3i chunkPos) {
+        return pendingProcessingChunkStore.containsKey(chunkPos) || compressedChunkStore.containsKey(chunkPos) || Files.isRegularFile(getWorldPath().resolve(getChunkFilename(chunkPos)));
+    }
+
     private void flushChunkStores() throws IOException {
         storageTaskMaster.shutdown(new ShutdownTask(), true);
         try {
-            Path chunksPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD);
+            Path chunksPath = getWorldPath();
             Files.createDirectories(chunksPath);
             for (Map.Entry<Vector3i, byte[]> chunkStoreEntry : compressedChunkStore.entrySet()) {
                 Path chunkPath = chunksPath.resolve(getChunkFilename(chunkStoreEntry.getKey()));
@@ -244,6 +249,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             storageTaskMaster.restart();
         }
         compressedChunkStore.clear();
+    }
+
+    private Path getWorldPath() {
+        return PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD);
     }
 
     private String getChunkFilename(Vector3i pos) {
@@ -294,10 +303,12 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     @Override
     public void onEntityDestroyed(int entityId) {
         List<StoreMetadata> tables = externalRefHolderLookup.remove(entityId);
-        for (StoreMetadata table : tables) {
-            table.getExternalReferences().remove(entityId);
-            if (table.getExternalReferences().isEmpty()) {
-                storeMetadata.remove(table.getId());
+        if (tables != null) {
+            for (StoreMetadata table : tables) {
+                table.getExternalReferences().remove(entityId);
+                if (table.getExternalReferences().isEmpty()) {
+                    storeMetadata.remove(table.getId());
+                }
             }
         }
     }

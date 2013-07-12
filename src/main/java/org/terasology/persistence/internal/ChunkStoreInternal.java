@@ -37,7 +37,7 @@ final class ChunkStoreInternal implements ChunkStore {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
-        ChunksProtobuf.Chunk chunkDataForDecode = ChunksProtobuf.Chunk.newBuilder().setX(chunkData.getX()).setY(chunkData.getY()).setZ(chunkData.getZ()).setBlockData(chunkData.getBlockData()).setSunlightData(chunkData.getLightData()).setLightData(chunkData.getLightData()).setExtraData(chunkData.getLightData()).setState(ChunksProtobuf.State.COMPLETE).build();
+        ChunksProtobuf.Chunk chunkDataForDecode = ChunksProtobuf.Chunk.newBuilder().setX(chunkData.getX()).setY(chunkData.getY()).setZ(chunkData.getZ()).setBlockData(chunkData.getBlockData()).setSunlightData(chunkData.getSunlightData()).setLightData(chunkData.getLightData()).setExtraData(chunkData.getLiquidData()).setState(ChunksProtobuf.State.COMPLETE).build();
         this.chunk = new Chunk.ProtobufHandler().decode(chunkDataForDecode);
         this.entityStore = chunkData.getStore();
         this.externalRefs = externalRefs;
