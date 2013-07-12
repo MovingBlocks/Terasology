@@ -7,6 +7,9 @@ import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.questing.gui.UIScreenQuest;
 import org.terasology.questing.utils.ModIcons;
 
 @RegisterComponentSystem
@@ -31,7 +34,7 @@ public class QuestingCardFetchSystem implements EventHandlerSystem {
     public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);
         String stackID = item.stackId;
-        logger.info("Picked up item with id " + stackID);
+        //logger.info("Picked up item with id " + stackID);
 
         if(goal != null) {
             if(stackID.equals(goal)) {
@@ -43,6 +46,11 @@ public class QuestingCardFetchSystem implements EventHandlerSystem {
                 } else {
                     resetQuest();
                     logger.info("Quest finished! Quest goal is now {}", friendlyGoal);
+
+                    UIScreenQuest.qName.setText("Quest finished!");
+                    UIScreenQuest.qGoal.setText(" ");
+
+                    CoreRegistry.get(GUIManager.class).openWindow("journal");
                 }
             }
         }
