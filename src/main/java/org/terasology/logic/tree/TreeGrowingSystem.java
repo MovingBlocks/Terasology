@@ -82,6 +82,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
                 new SimpleAxionElementReplacement.ReplacementGenerator() {
                     @Override
                     public String generateReplacement() {
+                        // 137.5 degrees is a golden ratio
                         int deg = 138+rnd.randomInt(17)-8;
                         return "W+("+deg+")[&Mb]Wt";
                     }

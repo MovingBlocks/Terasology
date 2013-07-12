@@ -95,13 +95,14 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         Block air = BlockManager.getAir();
 
         int replaceCount = 0;
+        final Vector3i origin = Vector3i.zero();
 
         for (Map.Entry<Vector3i, Block> newTreeBlock : nextTree.entrySet()) {
             Vector3i location = newTreeBlock.getKey();
             Block oldBlock = currentTree.remove(location);
             Block newBlock = newTreeBlock.getValue();
             if (oldBlock != null && oldBlock != newBlock) {
-                if (location.equals(Vector3i.zero())) {
+                if (location.equals(origin)) {
                     blockEntityRegistry.setBlockRetainComponent(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
                             newBlock, oldBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
                 } else {
