@@ -1,0 +1,36 @@
+{
+    "persisted" : true,
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "OreoMinions:OreoBuilder",
+        "material" : "lightAndShadow:blackMinionSkin",
+        "animation" : "OreoMinions:BuilderIdle",
+        "loop" : true
+    },
+     "Minion" : {
+         "side" : "black",
+	     "Healthtotal" = 300
+   },
+	"CharacterMovement" : {
+    	"faceMovementDirection" : true
+  },
+  "Animation" : {
+		"walkAnim" = "OreoMinions:BuilderWalk",
+		"idleAnim" = "OreoMinions:BuilderIdle",
+		"attackAnim" = "OreoMinions:BuilderThor",
+		"dieAnim" = "OreoMinions:BuilderDead",
+		"fadeInAnim" = "OreoMinions:BuilderIdle",
+		"fadeOutAnim" = "OreoMinions:BuilderIdle",
+		"workAnim" = "OreoMinions:BuilderBuild",
+		"terraformAnim" = "OreoMinions:BuilderShow",
+		"randomAnim" : ["OreoMinions:BuilderWave", "OreoMinions:BuilderShow"]
+	},
+  "CharacterSound" : {
+	    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+	    "footstepVolume" : 0.7
+  },
+    "Spawnable" : {
+      "type" : "oreon"
+    }
+
+}

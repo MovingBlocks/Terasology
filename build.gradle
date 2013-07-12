@@ -29,6 +29,8 @@ import org.apache.tools.ant.filters.FixCrLfFilter;
 def DEFAULT_MOD_TXT_START = '{\n    "id" : "'
 def DEFAULT_MOD_TXT_END = '",\n    "displayName" : "",\n    "author" : "",\n    "description" : "",\n    "dependencies" : []\n}'
 
+def LWJGL_VERSION = '2.9.0'
+
 // Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
 ext {
     // Project paths
@@ -77,7 +79,7 @@ configurations {
 
 // For the "natives" configuration make it depend on the native files from LWJGL
 dependencies {
-    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
+    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
 }
 
 task extractWindowsNatives(type:Sync) {
@@ -150,8 +152,8 @@ dependencies {
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.4.1'
     compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.5'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LWJGL_VERSION
     compile group: 'io.netty', name: 'netty', version: '3.5.11.Final'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.8'
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
@@ -165,7 +167,7 @@ dependencies {
 
     // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
     //TODO: Find way to avoid compiling logback.groovy to the resource dir
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
 
     // These dependencies are only needed for running tests
     testCompile group: 'junit', name: 'junit', version: '4.10'
@@ -512,7 +514,7 @@ configurations {
 
 // Applet needs the LWJGL applet dependency
 dependencies {
-    applet group: 'org.lwjgl.lwjgl', name: 'lwjgl_util_applet', version: '2.8.5'
+    applet group: 'org.lwjgl.lwjgl', name: 'lwjgl_util_applet', version: LWJGL_VERSION
 }
 
 task distApplet(type:Sync) {

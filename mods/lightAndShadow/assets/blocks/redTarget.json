@@ -1,0 +1,9 @@
+{
+    "basedOn" : "lightAndShadow:target",
+    "categories" : ["lightSide", "stone"],
+
+    "entity" : {
+        "prefab" : "lightAndShadow:redTarget",
+        "mode" : "persistent"
+    }
+}

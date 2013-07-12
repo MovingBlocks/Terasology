@@ -19,7 +19,7 @@ public class LASGameType extends BaseGameType {
     private final static Logger logger = LoggerFactory.getLogger(LASGameType.class);
 
     public LASGameType() {
-        super(new GameTypeUri("las:game"));
+        super(new GameTypeUri("lightAndShadow:game"));
     }
 
     @Override
@@ -37,13 +37,14 @@ public class LASGameType extends BaseGameType {
         ModConfig config = new ModConfig();
         config.addMod("core");
         config.addMod("pathfinding");
+        config.addMod("OreoMinions");
         config.addMod("hunger");
         return config;
     }
 
     @Override
     public MapGeneratorUri defaultMapGenerator() {
-        return new MapGeneratorUri("las:mapgen");
+        return new MapGeneratorUri("lightAndShadow:mapgen");
     }
 
     @Override
