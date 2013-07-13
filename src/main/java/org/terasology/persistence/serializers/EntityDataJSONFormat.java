@@ -159,7 +159,7 @@ public class EntityDataJSONFormat {
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 EntityData.NameValue.Builder nameValue = EntityData.NameValue.newBuilder();
                 nameValue.setName(entry.getKey());
-                EntityData.Value value = (EntityData.Value) context.deserialize(entry.getValue(), EntityData.Value.class);
+                EntityData.Value value = context.deserialize(entry.getValue(), EntityData.Value.class);
                 nameValue.setValue(value);
                 component.addField(nameValue);
             }
@@ -177,6 +177,12 @@ public class EntityDataJSONFormat {
             }
             if (src.hasParentPrefab() && !src.getParentPrefab().isEmpty()) {
                 result.addProperty("parentPrefab", src.getParentPrefab());
+            }
+            if (src.hasAlwaysRelevant()) {
+                result.addProperty("alwaysRelevant", src.getAlwaysRelevant());
+            }
+            if (src.hasOwner()) {
+                result.addProperty("owner", src.getOwner());
             }
             for (EntityData.Component component : src.getComponentList()) {
                 result.add(component.getType(), context.serialize(component));
@@ -199,27 +205,37 @@ public class EntityDataJSONFormat {
 
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 String name = entry.getKey().toLowerCase(Locale.ENGLISH);
-                // JAVA7: Make this a switch statement
-                if (name.equals("parentprefab")) {
-                    if (entry.getValue().isJsonPrimitive()) {
-                        entity.setParentPrefab(entry.getValue().getAsString());
-                    }
-                } else if (name.equals("id")) {
-                    if (entry.getValue().isJsonPrimitive()) {
-                        entity.setId(entry.getValue().getAsInt());
-                    }
-                } else if (name.equals("removedcomponent")) {
-                    if (entry.getValue().isJsonArray()) {
-                        for (JsonElement element : entry.getValue().getAsJsonArray()) {
-                            entity.addRemovedComponent(element.getAsString());
+                switch (name) {
+                    case "parentprefab":
+                        if (entry.getValue().isJsonPrimitive()) {
+                            entity.setParentPrefab(entry.getValue().getAsString());
                         }
-                    }
-                } else {
-                    EntityData.Component.Builder component = context.deserialize(entry.getValue(), EntityData.Component.Builder.class);
-                    component.setType(entry.getKey());
-                    entity.addComponent(component);
+                        break;
+                    case "id":
+                        if (entry.getValue().isJsonPrimitive()) {
+                            entity.setId(entry.getValue().getAsInt());
+                        }
+                        break;
+                    case "removedcomponent":
+                        if (entry.getValue().isJsonArray()) {
+                            for (JsonElement element : entry.getValue().getAsJsonArray()) {
+                                entity.addRemovedComponent(element.getAsString());
+                            }
+                        }
+                        break;
+                    case "owner":
+                        if (entry.getValue().isJsonPrimitive()) {
+                            entity.setOwner(entry.getValue().getAsInt());
+                        }
+                        break;
+                    case "alwaysrelevant":
+                        entity.setAlwaysRelevant(entry.getValue().getAsBoolean());
+                        break;
+                    default:
+                        EntityData.Component.Builder component = context.deserialize(entry.getValue(), EntityData.Component.Builder.class);
+                        component.setType(entry.getKey());
+                        entity.addComponent(component);
                 }
-
             }
             return entity.build();
         }
@@ -239,6 +255,9 @@ public class EntityDataJSONFormat {
             if (src.hasPersisted()) {
                 result.addProperty("persisted", src.getPersisted());
             }
+            if (src.hasAlwaysRelevant()) {
+                result.addProperty("alwaysRelevant", src.getAlwaysRelevant());
+            }
             if (src.getRemovedComponentCount() > 0) {
                 result.add("removedComponents", context.serialize(src.getRemovedComponentList()));
             }
@@ -255,31 +274,39 @@ public class EntityDataJSONFormat {
 
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 String name = entry.getKey().toLowerCase(Locale.ENGLISH);
-                // JAVA7: Make this a switch statement
-                if (name.equals("name")) {
-                    if (entry.getValue().isJsonPrimitive()) {
-                        prefab.setName(entry.getValue().getAsString());
-                    }
-                } else if (name.equals("parent")) {
-                    if (entry.getValue().isJsonPrimitive()) {
-                        prefab.setParentName(entry.getValue().getAsString());
-                    }
-                } else if (name.equals("removedComponents")) {
-                    if (entry.getValue().isJsonPrimitive()) {
-                        prefab.addRemovedComponent(entry.getValue().getAsString());
-                    } else if (entry.getValue().isJsonArray()) {
-                        for (JsonElement element : entry.getValue().getAsJsonArray()) {
-                            prefab.addRemovedComponent(element.getAsString());
+                switch (name) {
+                    case "name":
+                        if (entry.getValue().isJsonPrimitive()) {
+                            prefab.setName(entry.getValue().getAsString());
                         }
-                    }
-                } else if (name.equals("persisted")) {
-                    prefab.setPersisted(entry.getValue().getAsBoolean());
-                } else if (entry.getValue().isJsonObject()) {
-                    EntityData.Component.Builder component = context.deserialize(entry.getValue(), EntityData.Component.Builder.class);
-                    component.setType(entry.getKey());
-                    prefab.addComponent(component);
+                        break;
+                    case "parent":
+                        if (entry.getValue().isJsonPrimitive()) {
+                            prefab.setParentName(entry.getValue().getAsString());
+                        }
+                        break;
+                    case "removedcomponents":
+                        if (entry.getValue().isJsonPrimitive()) {
+                            prefab.addRemovedComponent(entry.getValue().getAsString());
+                        } else if (entry.getValue().isJsonArray()) {
+                            for (JsonElement element : entry.getValue().getAsJsonArray()) {
+                                prefab.addRemovedComponent(element.getAsString());
+                            }
+                        }
+                        break;
+                    case "persisted":
+                        prefab.setPersisted(entry.getValue().getAsBoolean());
+                        break;
+                    case "alwaysrelevant":
+                        prefab.setAlwaysRelevant(entry.getValue().getAsBoolean());
+                        break;
+                    default:
+                        if (entry.getValue().isJsonObject()) {
+                            EntityData.Component.Builder component = context.deserialize(entry.getValue(), EntityData.Component.Builder.class);
+                            component.setType(entry.getKey());
+                            prefab.addComponent(component);
+                        }
                 }
-
             }
             return prefab.build();
         }
@@ -361,7 +388,7 @@ public class EntityDataJSONFormat {
         private void extractMap(JsonElement json, JsonDeserializationContext context, EntityData.Value.Builder value) {
             JsonObject nameValueObject = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> nameValue : nameValueObject.entrySet()) {
-                EntityData.Value innerValue = (EntityData.Value) context.deserialize(nameValue.getValue(), EntityData.Value.class);
+                EntityData.Value innerValue = context.deserialize(nameValue.getValue(), EntityData.Value.class);
                 value.addNameValue(EntityData.NameValue.newBuilder().setName(nameValue.getKey()).setValue(innerValue));
             }
         }

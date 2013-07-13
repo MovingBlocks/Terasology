@@ -18,10 +18,8 @@ package org.terasology.entitySystem.internal;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.AbstractPrefab;
@@ -41,6 +39,7 @@ public class PojoPrefab extends AbstractPrefab {
     private Map<Class<? extends Component>, Component> componentMap;
     private List<Prefab> children = Lists.newArrayList();
     private boolean persisted;
+    private boolean alwaysRelevant = true;
 
     public PojoPrefab(AssetUri uri, PrefabData data) {
         super(uri);
@@ -60,6 +59,11 @@ public class PojoPrefab extends AbstractPrefab {
     @Override
     public boolean isPersisted() {
         return persisted;
+    }
+
+    @Override
+    public boolean isAlwaysRelevant() {
+        return alwaysRelevant;
     }
 
     @Override
@@ -85,6 +89,7 @@ public class PojoPrefab extends AbstractPrefab {
     public void reload(PrefabData data) {
         this.componentMap = ImmutableMap.copyOf(data.getComponents());
         this.persisted = data.isPersisted();
+        this.alwaysRelevant = data.isAlwaysRelevant();
         this.parent = data.getParent();
         if (parent != null && parent instanceof PojoPrefab) {
             ((PojoPrefab) parent).children.add(this);

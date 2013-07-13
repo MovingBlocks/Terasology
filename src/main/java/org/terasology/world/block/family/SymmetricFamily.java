@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.family;
 
-import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.utilities.collection.NullIterator;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;

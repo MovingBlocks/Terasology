@@ -193,7 +193,7 @@ public class EntitySerializer {
                     componentMap.put(component.getClass(), componentLibrary.copy(component));
                 }
             }
-            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab(), true));
+            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab(), true, prefab.isAlwaysRelevant()));
         }
         return componentMap;
     }
@@ -205,6 +205,18 @@ public class EntitySerializer {
      * @param componentMap
      */
     private void deserializeOntoComponents(EntityData.Entity entityData, Map<Class<? extends Component>, Component> componentMap) {
+        EntityInfoComponent entityInfo = (EntityInfoComponent)componentMap.get(EntityInfoComponent.class);
+        if (entityInfo == null) {
+            entityInfo = new EntityInfoComponent();
+            componentMap.put(EntityInfoComponent.class, entityInfo);
+        }
+        if (entityData.hasOwner()) {
+            entityInfo.owner = entityManager.getEntity(entityData.getOwner());
+        }
+        if (entityData.hasAlwaysRelevant()) {
+            entityInfo.alwaysRelevant = entityData.getAlwaysRelevant();
+        }
+
         for (EntityData.Component componentData : entityData.getComponentList()) {
             ComponentMetadata<? extends Component> metadata = componentSerializer.getComponentMetadata(componentData);
             if (metadata == null || !componentSerializeCheck.serialize(metadata)) {
@@ -221,41 +233,15 @@ public class EntitySerializer {
         }
     }
 
-    public void deserializeOnto(EntityRef currentEntity, EntityData.Entity entityData) {
-        deserializeOnto(currentEntity, entityData, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
-    }
-
-    public void deserializeOnto(EntityRef currentEntity, EntityData.Entity entityData, boolean removeMissingComponents, FieldSerializeCheck<Component> fieldCheck) {
-        Set<Class<? extends Component>> presentComponents = Sets.newLinkedHashSet();
-        for (EntityData.Component componentData : entityData.getComponentList()) {
-            ComponentMetadata<? extends Component> metadata = componentSerializer.getComponentMetadata(componentData);
-            if (metadata == null || !componentSerializeCheck.serialize(metadata)) {
-                continue;
-            }
-
-            presentComponents.add(metadata.getType());
-
-            Component existingComponent = currentEntity.getComponent(metadata.getType());
-            if (existingComponent == null) {
-                currentEntity.addComponent(componentSerializer.deserialize(componentData));
-            } else {
-                componentSerializer.deserializeOnto(existingComponent, componentData, fieldCheck);
-                currentEntity.saveComponent(existingComponent);
-            }
-        }
-        if (removeMissingComponents) {
-            for (Component comp : currentEntity.iterateComponents()) {
-                if (!presentComponents.contains(comp.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(comp.getClass()))) {
-                    currentEntity.removeComponent(comp.getClass());
-                }
-            }
-        }
-    }
-
     private EntityData.Entity serializeEntityFull(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         if (!ignoringEntityId) {
             entity.setId(entityRef.getId());
+        }
+        entity.setAlwaysRelevant(entityRef.isAlwaysRelevant());
+        EntityRef owner = entityRef.getOwner();
+        if (owner.exists()) {
+            entity.setOwner(owner.getId());
         }
         for (Component component : entityRef.iterateComponents()) {
             if (!componentSerializeCheck.serialize(componentLibrary.getMetadata(component.getClass()))) {
@@ -276,6 +262,13 @@ public class EntitySerializer {
             entity.setId(entityRef.getId());
         }
         entity.setParentPrefab(prefab.getName());
+        if (entityRef.isAlwaysRelevant() != prefab.isAlwaysRelevant()) {
+            entity.setAlwaysRelevant(entityRef.isAlwaysRelevant());
+        }
+        EntityRef owner = entityRef.getOwner();
+        if (owner.exists()) {
+            entity.setOwner(owner.getId());
+        }
         Set<Class<? extends Component>> presentClasses = Sets.newHashSet();
         for (Component component : entityRef.iterateComponents()) {
             if (!componentSerializeCheck.serialize(componentLibrary.getMetadata(component.getClass()))) {

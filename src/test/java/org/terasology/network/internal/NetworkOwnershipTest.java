@@ -25,6 +25,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.mod.ModManager;
@@ -112,10 +113,11 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     @Test
     public void clientSentInitialIfOwnedEntityRegistered() {
         connectClient();
-        NetworkComponent netComp = new NetworkComponent();
+        EntityBuilder builder = entityManager.newBuilder();
+        NetworkComponent netComp = builder.addComponent(new NetworkComponent());
         netComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;
-        netComp.owner = clientEntity;
-        EntityRef entity = entityManager.create(netComp);
+        builder.setOwner(clientEntity);
+        EntityRef entity = builder.build();
 
         networkSystem.registerNetworkEntity(entity);
 
@@ -125,14 +127,15 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     @Test
     public void clientSentInitialOnlyOnce() {
-        NetworkComponent netComp = new NetworkComponent();
+        EntityBuilder builder = entityManager.newBuilder();
+        NetworkComponent netComp = builder.addComponent(new NetworkComponent());
         netComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;
-        netComp.owner = clientEntity;
-        EntityRef entity = entityManager.create(netComp);
+        builder.setOwner(clientEntity);
+        EntityRef entity = builder.build();
 
         networkSystem.registerNetworkEntity(entity);
         connectClient();
-        networkSystem.updateNetworkEntity(entity);
+        networkSystem.updateOwnership(entity);
 
         verify(client, times(1)).setNetInitial(entity.getComponent(NetworkComponent.class).getNetworkId());
     }
@@ -143,20 +146,19 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         netCompA.replicateMode = NetworkComponent.ReplicateMode.OWNER;
         EntityRef entityA = entityManager.create(netCompA);
 
-        NetworkComponent netCompB = new NetworkComponent();
+        EntityBuilder builder = entityManager.newBuilder();
+        NetworkComponent netCompB = builder.addComponent(new NetworkComponent());
         netCompB.replicateMode = NetworkComponent.ReplicateMode.OWNER;
-        netCompB.owner = entityA;
-        EntityRef entityB = entityManager.create(netCompB);
+        builder.setOwner(entityA);
+        EntityRef entityB = builder.build();
 
         networkSystem.registerNetworkEntity(entityA);
         networkSystem.registerNetworkEntity(entityB);
         connectClient();
         verify(client, times(0)).setNetInitial(entityA.getComponent(NetworkComponent.class).getNetworkId());
         verify(client, times(0)).setNetInitial(entityB.getComponent(NetworkComponent.class).getNetworkId());
-        netCompA = entityA.getComponent(NetworkComponent.class);
-        netCompA.owner = clientEntity;
-        entityA.saveComponent(netCompA);
-        networkSystem.updateNetworkEntity(entityA);
+        entityA.setOwner(clientEntity);
+        networkSystem.updateOwnership(entityA);
 
         verify(client, times(1)).setNetInitial(entityA.getComponent(NetworkComponent.class).getNetworkId());
         verify(client, times(1)).setNetInitial(entityB.getComponent(NetworkComponent.class).getNetworkId());
@@ -164,10 +166,11 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     @Test
     public void clientSendInitialForRelevantOwnedItems() {
-        NetworkComponent netCompA = new NetworkComponent();
+        EntityBuilder builder = entityManager.newBuilder();
+        NetworkComponent netCompA = builder.addComponent(new NetworkComponent());
         netCompA.replicateMode = NetworkComponent.ReplicateMode.RELEVANT;
-        netCompA.owner = clientEntity;
-        EntityRef entityA = entityManager.create(netCompA);
+        builder.setOwner(clientEntity);
+        EntityRef entityA = builder.build();
 
         networkSystem.registerNetworkEntity(entityA);
         connectClient();

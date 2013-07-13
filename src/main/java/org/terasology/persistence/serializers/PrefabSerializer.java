@@ -79,6 +79,7 @@ public class PrefabSerializer {
         if (prefab.getParent() != null) {
             prefabData.setParentName(prefab.getParent().getName());
         }
+        prefabData.setAlwaysRelevant(prefab.isAlwaysRelevant());
         prefabData.setPersisted(prefab.isPersisted());
 
         // Delta off the parent
@@ -111,6 +112,7 @@ public class PrefabSerializer {
     public PrefabData deserialize(EntityData.Prefab prefabData) {
         PrefabData result = new PrefabData();
         result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
+        result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() ? prefabData.getAlwaysRelevant() : false);
         if (prefabData.hasParentName()) {
             AssetUri parentUri = new AssetUri(AssetType.PREFAB, prefabData.getParentName());
             if (parentUri.isValid()) {

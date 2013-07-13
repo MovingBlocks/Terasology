@@ -33,7 +33,6 @@ import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
@@ -167,9 +166,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             if (characterComp != null) {
                 characterComp.controller = entity;
                 character.saveComponent(characterComp);
-                NetworkComponent netComp = character.getComponent(NetworkComponent.class);
-                netComp.owner = entity;
-                character.saveComponent(netComp);
+                character.setOwner(entity);
                 Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
             } else {
                 character.destroy();

@@ -16,6 +16,8 @@
 package org.terasology.entitySystem.internal;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.Replicate;
 
 /**
  * Component for storing entity system information on an entity
@@ -26,11 +28,16 @@ public class EntityInfoComponent implements Component {
     public String parentPrefab = "";
     public boolean persisted = true;
 
+    @Replicate
+    public EntityRef owner = EntityRef.NULL;
+    public boolean alwaysRelevant = false;
+
     public EntityInfoComponent() {
     }
 
-    public EntityInfoComponent(String parentPrefab, boolean persisted) {
+    public EntityInfoComponent(String parentPrefab, boolean persisted, boolean alwaysRelevant) {
         this.parentPrefab = parentPrefab;
         this.persisted = persisted;
+        this.alwaysRelevant = alwaysRelevant;
     }
 }

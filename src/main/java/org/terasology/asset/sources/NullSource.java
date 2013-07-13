@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.utilities.collection.NullIterator;
 
 import java.net.URL;
 import java.util.Collections;

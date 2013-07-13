@@ -16,13 +16,14 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetUri;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
 
 import java.util.Map;
 
 /**
  * An entity builder provides the ability to set up an entity before creating it. This prevents events being sent
  * for components being added or modified before it is fully set up.
+ *
  * @author Immortius
  */
 public class EntityBuilder implements MutableComponentContainer {
@@ -36,6 +37,7 @@ public class EntityBuilder implements MutableComponentContainer {
 
     /**
      * Produces an entity with the components contained in this entity builder
+     *
      * @return The built entity.
      */
     public EntityRef build() {
@@ -53,7 +55,7 @@ public class EntityBuilder implements MutableComponentContainer {
 
     @Override
     public <T extends Component> T getComponent(Class<T> componentClass) {
-        return (T) components.get(componentClass);
+        return componentClass.cast(components.get(componentClass));
     }
 
     @Override
@@ -74,7 +76,39 @@ public class EntityBuilder implements MutableComponentContainer {
 
     @Override
     public Iterable<Component> iterateComponents() {
-        return  components.values();
+        return components.values();
+    }
+
+    public boolean isPersistent() {
+        return getEntityInfo().persisted;
+    }
+
+    public void setPersistent(boolean persistent) {
+        getEntityInfo().persisted = persistent;
+    }
+
+    public boolean isAlwaysRelevant() {
+        return getEntityInfo().alwaysRelevant;
+    }
+
+    public void setAlwaysRelevant(boolean alwaysRelevant) {
+        getEntityInfo().alwaysRelevant = alwaysRelevant;
+    }
+
+    public void setOwner(EntityRef owner) {
+        getEntityInfo().owner = owner;
+    }
+
+    public EntityRef getOwner() {
+        return getEntityInfo().owner;
+    }
+
+    private EntityInfoComponent getEntityInfo() {
+        EntityInfoComponent entityInfo = getComponent(EntityInfoComponent.class);
+        if (entityInfo == null) {
+            entityInfo = addComponent(new EntityInfoComponent());
+        }
+        return entityInfo;
     }
 
 }

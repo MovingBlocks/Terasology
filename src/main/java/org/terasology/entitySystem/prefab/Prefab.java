@@ -46,4 +46,6 @@ public interface Prefab extends ComponentContainer, Asset<PrefabData> {
 
     public boolean isPersisted();
 
+    public boolean isAlwaysRelevant();
+
 }

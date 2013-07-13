@@ -8,7 +8,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.utilities.collection.NullIterator;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.internal.PojoEntityManager;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;

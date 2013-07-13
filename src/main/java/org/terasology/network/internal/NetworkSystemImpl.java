@@ -77,7 +77,7 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
-import org.terasology.persistence.serializers.PackedEntitySerializer;
+import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -110,7 +110,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private EngineEntityManager entityManager;
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer eventSerializer;
-    private PackedEntitySerializer entitySerializer;
+    private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
     private OwnershipHelper ownershipHelper;
 
@@ -325,15 +325,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public EntityRef getOwnerEntity(EntityRef entity) {
         EntityRef owner = entity;
-        NetworkComponent ownerNetComp = entity.getComponent(NetworkComponent.class);
+        //NetworkComponent ownerNetComp = entity.getComponent(NetworkComponent.class);
         int i = 0;
-        while (ownerNetComp != null && i++ < OWNER_DEPTH_LIMIT) {
-            NetworkComponent netComp = ownerNetComp.owner.getComponent(NetworkComponent.class);
-            if (netComp != null) {
-                owner = ownerNetComp.owner;
-                ownerNetComp = netComp;
+        while (i++ < OWNER_DEPTH_LIMIT) {
+            EntityRef nextOwner = owner.getOwner();
+            if (nextOwner.exists()) {
+                owner = nextOwner;
             } else {
-                ownerNetComp = null;
+                break;
             }
         }
         return owner;
@@ -376,17 +375,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     }
                     break;
             }
-            if (netComponent.owner.exists()) {
-                ownerLookup.put(entity, netComponent.owner);
-                ownedLookup.put(netComponent.owner, entity);
+            EntityRef owner = entity.getOwner();
+            if (owner.exists()) {
+                ownerLookup.put(entity, owner);
+                ownedLookup.put(owner, entity);
             }
         }
 
     }
 
-    public void updateNetworkEntity(EntityRef entity) {
+    public void updateOwnership(EntityRef entity) {
         NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
-        if (netComponent.getNetworkId() == NULL_NET_ID) {
+        if (netComponent == null || netComponent.getNetworkId() == NULL_NET_ID) {
             return;
         }
 
@@ -395,9 +395,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             lastOwnerEntity = EntityRef.NULL;
         }
 
-        if (!Objects.equal(lastOwnerEntity, netComponent.owner)) {
+        EntityRef newOwnerEntity = entity.getOwner();
+        if (!Objects.equal(lastOwnerEntity, newOwnerEntity)) {
             NetClient lastOwner = getNetOwner(lastOwnerEntity);
-            NetClient newOwner = getNetOwner(netComponent.owner);
+            NetClient newOwner = getNetOwner(newOwnerEntity);
 
             if (!Objects.equal(lastOwner, newOwner)) {
                 recursiveUpdateOwnership(entity, lastOwner, newOwner);
@@ -414,9 +415,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (lastOwnerEntity.exists()) {
                 ownedLookup.remove(lastOwnerEntity, entity);
             }
-            if (netComponent.owner.exists()) {
-                ownerLookup.put(entity, netComponent.owner);
-                ownedLookup.put(netComponent.owner, entity);
+            if (newOwnerEntity.exists()) {
+                ownerLookup.put(entity, newOwnerEntity);
+                ownedLookup.put(newOwnerEntity, entity);
             } else {
                 ownerLookup.remove(entity);
             }
@@ -490,7 +491,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
 
         eventSerializer = new EventSerializer(eventLibrary);
-        entitySerializer = new PackedEntitySerializer(entityManager, componentLibrary);
+        entitySerializer = new NetworkEntitySerializer(entityManager, componentLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -572,10 +573,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private void updatedOwnedEntities(EntityRef entity, Class<? extends Component> component, ComponentMetadata<? extends Component> metadata) {
         if (mode.isAuthority() && metadata.isReferenceOwner()) {
             for (EntityRef ownedEntity : ownershipHelper.listOwnedEntities(entity.getComponent(component))) {
-                NetworkComponent ownedNetworkComp = ownedEntity.getComponent(NetworkComponent.class);
-                if (ownedNetworkComp != null && !ownedNetworkComp.owner.equals(entity)) {
-                    ownedNetworkComp.owner = entity;
-                    ownedEntity.saveComponent(ownedNetworkComp);
+                EntityRef previousOwner = ownedEntity.getOwner();
+                if (!previousOwner.equals(entity)) {
+                    ownedEntity.setOwner(entity);
                 }
             }
         }

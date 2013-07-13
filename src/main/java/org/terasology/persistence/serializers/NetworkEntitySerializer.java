@@ -35,6 +35,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.network.NetworkComponent;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -43,15 +44,15 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class PackedEntitySerializer {
-    private static final Logger logger = LoggerFactory.getLogger(PackedEntitySerializer.class);
+public class NetworkEntitySerializer {
+    private static final Logger logger = LoggerFactory.getLogger(NetworkEntitySerializer.class);
 
     private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
     private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
 
-    public PackedEntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary) {
+    public NetworkEntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary) {
         this.entityManager = entityManager;
         this.componentLibrary = componentLibrary;
     }
@@ -87,7 +88,6 @@ public class PackedEntitySerializer {
 
     private EntityData.PackedEntity.Builder serializeEntityFull(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.PackedEntity.Builder entity = EntityData.PackedEntity.newBuilder();
-
         ByteString.Output fieldIds = ByteString.newOutput();
         ByteString.Output componentFieldCounts = ByteString.newOutput();
         for (Component component : entityRef.iterateComponents()) {

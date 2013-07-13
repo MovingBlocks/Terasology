@@ -30,6 +30,7 @@ public class PrefabData implements AssetData, MutableComponentContainer {
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
     private boolean persisted = true;
     private Prefab parent;
+    private boolean alwaysRelevant;
 
     @Override
     public <T extends Component> T addComponent(T component) {
@@ -79,5 +80,13 @@ public class PrefabData implements AssetData, MutableComponentContainer {
 
     public Prefab getParent() {
         return parent;
+    }
+
+    public boolean isAlwaysRelevant() {
+        return alwaysRelevant;
+    }
+
+    public void setAlwaysRelevant(boolean alwaysRelevant) {
+        this.alwaysRelevant = alwaysRelevant;
     }
 }

@@ -109,6 +109,26 @@ public class NetEntityRef extends EntityRef {
     }
 
     @Override
+    public boolean isAlwaysRelevant() {
+        return getActualEntityRef().isAlwaysRelevant();
+    }
+
+    @Override
+    public void setAlwaysRelevant(boolean alwaysRelevant) {
+        getActualEntityRef().setAlwaysRelevant(alwaysRelevant);
+    }
+
+    @Override
+    public EntityRef getOwner() {
+        return getActualEntityRef().getOwner();
+    }
+
+    @Override
+    public void setOwner(EntityRef owner) {
+        getActualEntityRef().setOwner(owner);
+    }
+
+    @Override
     public Prefab getParentPrefab() {
         return getActualEntityRef().getParentPrefab();
     }
@@ -120,7 +140,7 @@ public class NetEntityRef extends EntityRef {
 
     @Override
     public boolean equals(Object obj) {
-        return getActualEntityRef().equals(obj);
+        return obj == this || obj instanceof EntityRef && getActualEntityRef().equals(obj);
     }
 
     @Override

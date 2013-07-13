@@ -37,7 +37,7 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.persistence.serializers.EventSerializer;
-import org.terasology.persistence.serializers.PackedEntitySerializer;
+import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetMetricSource;
@@ -80,7 +80,7 @@ public class Server implements ChunkReadyListener {
     private NetData.ServerInfoMessage serverInfo;
 
     private EngineEntityManager entityManager;
-    private PackedEntitySerializer entitySerializer;
+    private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private BlockManagerImpl blockManager;
 
@@ -102,7 +102,7 @@ public class Server implements ChunkReadyListener {
         this.time = (EngineTime) CoreRegistry.get(Time.class);
     }
 
-    void connectToEntitySystem(EngineEntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
+    void connectToEntitySystem(EngineEntityManager entityManager, NetworkEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
         this.entityManager = entityManager;
         this.eventSerializer = eventSerializer;
         this.entitySerializer = entitySerializer;

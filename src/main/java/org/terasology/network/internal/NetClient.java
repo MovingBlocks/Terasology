@@ -40,7 +40,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.persistence.serializers.EventSerializer;
-import org.terasology.persistence.serializers.PackedEntitySerializer;
+import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayInformationComponent;
@@ -84,7 +84,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private Time time;
     private NetworkSystemImpl networkSystem;
     private Channel channel;
-    private PackedEntitySerializer entitySerializer;
+    private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private EntitySystemLibrary entitySystemLibrary;
     private NetMetricSource metricSource;
@@ -296,7 +296,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
     }
 
-    public void connected(EntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, EntitySystemLibrary entitySystemLibrary) {
+    public void connected(EntityManager entityManager, NetworkEntitySerializer entitySerializer, EventSerializer eventSerializer, EntitySystemLibrary entitySystemLibrary) {
         if (awaitingConnectMessage) {
             awaitingConnectMessage = false;
 

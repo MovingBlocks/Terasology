@@ -15,14 +15,15 @@
  */
 package org.terasology.entitySystem.internal;
 
+import com.google.common.base.Objects;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.network.NetworkComponent;
+import org.terasology.utilities.collection.NullIterator;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -43,27 +44,50 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public boolean isPersistent() {
-        if (exists()) {
-            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
-            if (info == null) {
-                info = new EntityInfoComponent();
-                addComponent(info);
-            }
-            return info.persisted;
-        }
-        return false;
+        return exists() && (!isActive() || getEntityInfo().persisted);
     }
 
     @Override
     public void setPersistent(boolean persistent) {
         if (exists()) {
-            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
-            if (info == null) {
-                info = new EntityInfoComponent();
+            EntityInfoComponent info = getEntityInfo();
+            if (info.persisted != persistent) {
                 info.persisted = persistent;
-                addComponent(info);
-            } else if (info.persisted != persistent) {
-                info.persisted = persistent;
+                saveComponent(info);
+            }
+        }
+    }
+
+    @Override
+    public boolean isAlwaysRelevant() {
+        return isActive() && getEntityInfo().alwaysRelevant;
+    }
+
+    @Override
+    public void setAlwaysRelevant(boolean alwaysRelevant) {
+        if (exists()) {
+            EntityInfoComponent info = getEntityInfo();
+            if (info.alwaysRelevant != alwaysRelevant) {
+                info.alwaysRelevant = alwaysRelevant;
+                saveComponent(info);
+            }
+        }
+    }
+
+    @Override
+    public EntityRef getOwner() {
+        if (exists()) {
+            return getEntityInfo().owner;
+        }
+        return EntityRef.NULL;
+    }
+
+    @Override
+    public void setOwner(EntityRef owner) {
+        if (exists()) {
+            EntityInfoComponent info = getEntityInfo();
+            if (!info.owner.equals(owner)) {
+                info.owner = owner;
                 saveComponent(info);
             }
         }
@@ -98,10 +122,7 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public boolean isActive() {
-        if (exists()) {
-            return entityManager.isEntityActive(id);
-        }
-        return false;
+        return exists() && entityManager.isEntityActive(id);
     }
 
     @Override
@@ -114,7 +135,7 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public <T extends Component> T addComponent(T component) {
-        if (exists()) {
+        if (isActive()) {
             return entityManager.addComponent(id, component);
         }
         return component;
@@ -122,14 +143,14 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public void removeComponent(Class<? extends Component> componentClass) {
-        if (exists()) {
+        if (isActive()) {
             entityManager.removeComponent(id, componentClass);
         }
     }
 
     @Override
     public void saveComponent(Component component) {
-        if (exists()) {
+        if (isActive()) {
             entityManager.saveComponent(id, component);
         }
     }
@@ -144,7 +165,7 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public void destroy() {
-        if (exists()) {
+        if (isActive()) {
             entityManager.destroy(id);
         }
     }
@@ -166,17 +187,14 @@ public class PojoEntityRef extends EntityRef {
         if (this == o) return true;
         if (o instanceof EntityRef) {
             EntityRef other = (EntityRef) o;
-            if (!exists() && !(other.exists())) {
-                return true;
-            }
-            return getId() == other.getId();
+            return !exists() && !(other.exists()) || getId() == other.getId();
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return !exists() ? 0 : (int) (id ^ (id >>> 32));
+        return !exists() ? 0 : Objects.hashCode(id);
     }
 
     @Override
@@ -202,5 +220,13 @@ public class PojoEntityRef extends EntityRef {
     void invalidate() {
         id = PojoEntityManager.NULL_ID;
         entityManager = null;
+    }
+
+    private EntityInfoComponent getEntityInfo() {
+        EntityInfoComponent entityInfo = getComponent(EntityInfoComponent.class);
+        if (entityInfo == null) {
+            entityInfo = addComponent(new EntityInfoComponent());
+        }
+        return entityInfo;
     }
 }

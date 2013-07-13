@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.protobuf.ChunksProtobuf;
@@ -73,6 +74,13 @@ final class ChunkStoreInternal implements ChunkStore {
     @Override
     public void store(EntityRef entity) {
         entitiesToStore.add(entity);
+    }
+
+    @Override
+    public void storeAllEntities() {
+        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
+
+        }
     }
 
     @Override

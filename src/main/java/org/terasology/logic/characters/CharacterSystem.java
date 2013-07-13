@@ -16,28 +16,25 @@
 
 package org.terasology.logic.characters;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.logic.inventory.ItemPickupFactory;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DamageEvent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.network.NetworkComponent;
+import org.terasology.logic.inventory.ItemPickupFactory;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -55,8 +52,6 @@ import javax.vecmath.Vector3f;
  */
 @RegisterSystem()
 public class CharacterSystem implements ComponentSystem {
-
-    private static final Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
 
     @In
     private BulletPhysics physics;
@@ -120,7 +115,7 @@ public class CharacterSystem implements ComponentSystem {
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onAttackRequest(AttackRequest event, EntityRef character) {
         if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getComponent(NetworkComponent.class).owner)) {
+            if (!character.equals(event.getItem().getOwner())) {
                 return;
             }
         }
@@ -181,7 +176,6 @@ public class CharacterSystem implements ComponentSystem {
         if (networkSystem.getMode().isAuthority()) {
             Vector3f impulse = event.getImpulse();
             Vector3f newPosition = event.getNewPosition();
-            ItemComponent item = itemEntity.getComponent(ItemComponent.class);
 
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 

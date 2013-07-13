@@ -34,7 +34,7 @@ import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.utilities.collection.NullIterator;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
@@ -125,7 +125,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         for (Component component : prefab.iterateComponents()) {
             builder.addComponent(componentLibrary.copy(component));
         }
-        builder.addComponent(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
+        builder.addComponent(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return builder;
     }
 
@@ -197,7 +197,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
                 loc.setWorldRotation(rotation);
             }
         }
-        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
+        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return create(components);
     }
 
@@ -217,7 +217,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
                 loc.setWorldPosition(position);
             }
         }
-        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
+        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return create(components);
     }
 
@@ -227,7 +227,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         for (Component component : prefab.iterateComponents()) {
             components.add(componentLibrary.copy(component));
         }
-        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
+        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return create(components);
     }
 

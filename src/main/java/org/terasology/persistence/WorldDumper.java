@@ -50,7 +50,7 @@ public class WorldDumper {
     public void save(Path file) throws IOException {
         final EntityData.GlobalStore world = persisterHelper.serializeWorld(true);
 
-        Path parentFile = file.getParent();
+        Path parentFile = file.toAbsolutePath().getParent();
         if (!Files.isDirectory(parentFile)) {
             Files.createDirectories(parentFile);
         }

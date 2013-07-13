@@ -60,14 +60,54 @@ public abstract class EntityRef implements MutableComponentContainer {
      */
     public abstract int getId();
 
+    /**
+     * @return Whether this entity should be saved
+     */
     public abstract boolean isPersistent();
 
+    /**
+     * Sets whether this entity should be saved
+     * @param persistent
+     */
     public abstract void setPersistent(boolean persistent);
 
+    /**
+     * @return Whether this entity should remain active even when the part of the world/owner of the entity is not
+     * relevant
+     */
+    public abstract boolean isAlwaysRelevant();
+
+    /**
+     * Sets whether the entity should remain active even when its owner or the part of the world it resides in is
+     * not relevant
+     * @param alwaysRelevant
+     */
+    public abstract void setAlwaysRelevant(boolean alwaysRelevant);
+
+    /**
+     * @return The owning entity of this entity
+     */
+    public abstract EntityRef getOwner();
+
+    /**
+     * Sets the entity that owns this entity.
+     * @param owner
+     */
+    public abstract void setOwner(EntityRef owner);
+
+    /**
+     * @return The prefab this entity is based off of
+     */
     public abstract Prefab getParentPrefab();
 
+    /**
+     * @return The AssetUri of this entity's prefab, or null if it isn't based on an entity.
+     */
     public abstract AssetUri getPrefabURI();
 
+    /**
+     * @return A full, json style description of the entity.
+     */
     public String toFullDescription() {
         EntitySerializer serializer = new EntitySerializer((EngineEntityManager) CoreRegistry.get(EntityManager.class));
         serializer.setUsingFieldIds(false);

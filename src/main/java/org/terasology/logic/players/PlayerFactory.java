@@ -24,7 +24,6 @@ import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
@@ -50,7 +49,7 @@ public class PlayerFactory {
     public EntityRef newInstance(Vector3f spawnPosition, EntityRef controller) {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
-        builder.getComponent(NetworkComponent.class).owner = controller;
+        builder.setOwner(controller);
         EntityRef transferSlot = entityManager.create("engine:transferSlot");
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);

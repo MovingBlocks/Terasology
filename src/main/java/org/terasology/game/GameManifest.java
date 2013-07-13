@@ -129,9 +129,7 @@ public class GameManifest {
     }
 
     public static GameManifest load(Path filePath) throws IOException {
-        // TODO: If ShrinkWrap fixes its buffered reader handler, change to read directly into fromJson
-        byte[] bytes = Files.readAllBytes(filePath);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
+        try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
             GameManifest result = new GsonBuilder().create().fromJson(reader, GameManifest.class);
             if (result.modConfiguration.size() == 0) {
                 for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {

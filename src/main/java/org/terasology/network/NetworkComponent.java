@@ -27,9 +27,6 @@ public class NetworkComponent implements Component {
     @Replicate
     private int networkId;
 
-    @Replicate
-    public EntityRef owner = EntityRef.NULL;
-
     public enum ReplicateMode {
         ALWAYS, // Always replicate this entity to all clients
         RELEVANT, // Replicate to client which this entity is relevant to (based on distance)

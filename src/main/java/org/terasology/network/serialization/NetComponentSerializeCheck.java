@@ -29,6 +29,6 @@ public class NetComponentSerializeCheck implements ComponentSerializeCheck {
 
     @Override
     public boolean serialize(ComponentMetadata<? extends Component> metadata) {
-        return metadata.isReplicated() && metadata.getType() != EntityInfoComponent.class;
+        return metadata.isReplicated();
     }
 }

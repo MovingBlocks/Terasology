@@ -18,6 +18,7 @@ package org.terasology.network.internal;
 
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
@@ -70,16 +71,14 @@ public class NetworkEntitySystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = NetworkComponent.class)
-    public void onNetworkComponentChanged(OnChangedComponent event, EntityRef entity) {
-
-        networkSystem.updateNetworkEntity(entity);
+    @ReceiveEvent(components = {EntityInfoComponent.class})
+    public void onOwnershipChanged(OnChangedComponent event, EntityRef entity) {
+        networkSystem.updateOwnership(entity);
     }
 
     @ReceiveEvent(components = NetworkComponent.class)
     public void onDeactivateNetworkComponent(BeforeDeactivateComponent event, EntityRef entity) {
         networkSystem.unregisterNetworkEntity(entity);
-        NetworkComponent networkComp = entity.getComponent(NetworkComponent.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)

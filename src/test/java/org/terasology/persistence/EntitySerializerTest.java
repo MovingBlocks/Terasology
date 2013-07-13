@@ -193,6 +193,18 @@ public class EntitySerializerTest {
     }
 
     @Test
+    public void testAlwaysRelevantPersisted() throws Exception {
+        EntityRef entity = entityManager.create(prefab);
+        boolean defaultSetting = entity.isAlwaysRelevant();
+        entity.setAlwaysRelevant(!defaultSetting);
+
+        EntityData.Entity entityData = entitySerializer.serialize(entity);
+        entityManager.clear();
+        EntityRef newEntity = entitySerializer.deserialize(entityData);
+        assertEquals(!defaultSetting, newEntity.isAlwaysRelevant());
+    }
+
+    @Test
     public void testMappedTypeHandling() throws Exception {
         componentLibrary.register(MappedTypeComponent.class);
 

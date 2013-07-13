@@ -21,6 +21,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.internal.PojoEntityManager;
+import org.terasology.utilities.collection.NullIterator;
 
 /**
  * Null entity implementation - acts the same as an empty entity, except you cannot add anything to it.
@@ -95,6 +96,24 @@ public class NullEntityRef extends EntityRef {
 
     @Override
     public void setPersistent(boolean persistent) {
+    }
+
+    @Override
+    public boolean isAlwaysRelevant() {
+        return false;
+    }
+
+    @Override
+    public void setAlwaysRelevant(boolean alwaysRelevant) {
+    }
+
+    @Override
+    public EntityRef getOwner() {
+        return EntityRef.NULL;
+    }
+
+    @Override
+    public void setOwner(EntityRef owner) {
     }
 
     @Override

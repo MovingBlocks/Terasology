@@ -41,4 +41,6 @@ public interface ChunkStore {
      * Restores all the entities stored with this chunk
      */
     public void restoreEntities();
+
+    void storeAllEntities();
 }
