@@ -302,6 +302,10 @@ public class MeshSorter implements Iterable<EntityRef> {
         }
     }
 
+	/**
+	 * The timer task that does the sorting in the background.
+	 * TODO stop the scheduling when required.
+	 */
     private class SortTask extends TimerTask {
         private long lastSortMoment = -1;
         private static final long SORT_DELAY_MILLIES = 200;
