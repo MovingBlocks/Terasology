@@ -61,8 +61,6 @@ void main () {
        moonHighlight *= 1.0 - (HIGHLIGHT_BLEND_START + l.y) / HIGHLIGHT_BLEND_START;
     }
 
-    float blendNight = clamp((0.707 - sunVec.y) * (1.0 - lDotV), 0.0, 1.0);
-
     vec4 skyColor = vec4(0.0, 0.0, 0.0, 1.0);
 
     /* PROCEDURAL SKY COLOR */
@@ -70,8 +68,8 @@ void main () {
     vec4 cloudsColorNight =  texture2D(texSky90, gl_TexCoord[0].xy);
 
     /* DAY AND NIGHT TEXTURES */
-    skyColor.rgb = skyDaylightBrightness * daylight * cloudsColor.rgb + skyNightBrightness * blendNight * cloudsColorNight.rgb;
-    skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb, vec3(1.0, 1.0, 1.0), blendNight);
+    skyColor.rgb = skyDaylightBrightness * daylight * cloudsColor.rgb + skyNightBrightness * cloudsColorNight.rgb;
+    skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb, vec3(1.0, 1.0, 1.0), 1.0 - daylight);
 
     skyColor.rgb += vec3((1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight);
 
