@@ -24,6 +24,10 @@ apply plugin: 'checkstyle'
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter;
+import java.text.SimpleDateFormat;
+
+def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
 
 // Template for building new copies of "mod.txt" (should really move to a file template)
 def DEFAULT_MOD_TXT_START = '{\n    "id" : "'
@@ -51,7 +55,7 @@ ext {
     env = System.getenv()
 
     // Stuff for our automatic version file setup
-    startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
+    startDateTimeString = dateTimeFormat.format(new Date())
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'

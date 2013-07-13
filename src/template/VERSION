@@ -1,6 +1,7 @@
 Terasology - Version
 ====================
 
-Version:    ${displayVersion}
-Created at: ${dateTime}
-Jenkins:    ${buildUrl}
+Version:      ${displayVersion}
+Created on:   ${dateTime}
+Download URL: ${buildUrl}
+GitHub URL:   https://github.com/MovingBlocks/Terasology/tree/${gitBranch}
