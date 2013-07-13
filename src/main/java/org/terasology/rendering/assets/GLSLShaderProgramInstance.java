@@ -44,6 +44,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector4f;
 import java.io.*;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,7 +64,9 @@ public class GLSLShaderProgramInstance {
     private TIntIntMap vertexPrograms = new TIntIntHashMap();
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
-    private TIntIntMap uniformLocationMap = new TIntIntHashMap();
+    //The following two maps do not contain a lot of elements.
+    private TIntIntMap uniformLocationMap = new TIntIntHashMap(20, 1, 0, 0);
+    private static HashMap<String, Float> prevValues = new HashMap();
 
     private int availableFeatures = 0;
     private int activeFeatures = 0;
@@ -417,6 +420,12 @@ public class GLSLShaderProgramInstance {
         return true;
     }
 
+    /**
+     * Makes sure this shader program is the current shader program in the 
+     * OpenGL state.
+     * It checks if this shader program is the active shader program in the OpenGL
+     * state, if not it sets this shader program to be the current shader program.
+     */
     public void enable() {
         GLSLShaderProgramInstance activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
 
@@ -432,13 +441,26 @@ public class GLSLShaderProgramInstance {
             if (shaderParameters != null) {
                 shaderParameters.applyParameters(this);
             }
+            prevValues.clear();
         }
     }
 
+    /**
+     * Returns the ID of teh currently active shader of this shader 
+     * program.
+     * @return the ID of teh currently active shader of this shader 
+     * program.
+     */
     public int getActiveShaderProgramId() {
         return shaderPrograms.get(activeFeatures);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param f the value to set the uniform to.
+     */
     public void setFloat(String desc, float f) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -447,10 +469,26 @@ public class GLSLShaderProgramInstance {
         }
 
         enable();
-        int id = getUniformLocation(activeShaderProgramId, desc);
-        GL20.glUniform1f(id, f);
+        boolean changed = true;
+        Float val = prevValues.get(desc);
+        if(val == null) {
+            prevValues.put(desc, f);
+        } else {
+            changed = val != f;
+        }
+        if(changed) {
+            int id = getUniformLocation(activeShaderProgramId, desc);
+            GL20.glUniform1f(id, f);
+        }
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param f1
+     * @param f2 
+     */
     public void setFloat2(String desc, float f1, float f2) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -463,6 +501,14 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform2f(id, f1, f2);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param f1
+     * @param f2
+     * @param f3 
+     */
     public void setFloat3(String desc, float f1, float f2, float f3) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -475,6 +521,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform3f(id, f1, f2, f3);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param buffer 
+     */
     public void setFloat3(String desc, FloatBuffer buffer) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -487,6 +539,15 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform3(id, buffer);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param f1
+     * @param f2
+     * @param f3
+     * @param f4 
+     */
     public void setFloat4(String desc, float f1, float f2, float f3, float f4) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -499,6 +560,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform4f(id, f1, f2, f3, f4);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param i 
+     */
     public void setInt(String desc, int i) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -511,6 +578,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform1i(id, i);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param b 
+     */
     public void setBoolean(String desc, boolean b) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -523,6 +596,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform1i(id, b ? 1 : 0);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param i 
+     */
     public void setIntForAllPermutations(String desc, int i) {
         TIntIntIterator it = shaderPrograms.iterator();
 
@@ -537,6 +616,12 @@ public class GLSLShaderProgramInstance {
         enable();
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param b 
+     */
     public void setBooleanForAllPermutations(String desc, boolean b) {
         TIntIntIterator it = shaderPrograms.iterator();
 
@@ -551,6 +636,14 @@ public class GLSLShaderProgramInstance {
         enable();
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param f1
+     * @param f2
+     * @param f3 
+     */
     public void setFloat3ForAllPermutations(String desc, float f1, float f2, float f3) {
         TIntIntIterator it = shaderPrograms.iterator();
 
@@ -565,6 +658,12 @@ public class GLSLShaderProgramInstance {
         enable();
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param buffer 
+     */
     public void setFloat2(String desc, FloatBuffer buffer) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -577,6 +676,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform2(id, buffer);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param buffer 
+     */
     public void setFloat(String desc, FloatBuffer buffer) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -589,6 +694,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniform1(id, buffer);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param vec 
+     */
     public void setFloat4(String desc, Vector4f vec) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -599,6 +710,12 @@ public class GLSLShaderProgramInstance {
         setFloat4(desc, vec.x, vec.y, vec.z, vec.w);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param floatBuffer 
+     */
     public void setMatrix4(String desc, FloatBuffer floatBuffer) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -610,7 +727,15 @@ public class GLSLShaderProgramInstance {
         int id = getUniformLocation(activeShaderProgramId, desc);
         GL20.glUniformMatrix4(id, false, floatBuffer);
     }
+    
+    private int test = 0;
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param floatBuffer 
+     */
     public void setMatrix3(String desc, FloatBuffer floatBuffer) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -623,6 +748,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniformMatrix3(id, false, floatBuffer);
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param m 
+     */
     public void setMatrix4(String desc, Matrix4f m) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -635,6 +766,12 @@ public class GLSLShaderProgramInstance {
         GL20.glUniformMatrix4(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
+    /**
+     * Sets the shader uniform of the current shader of this shader
+     * program to be the given value.
+     * @param desc the uniform name, as used in the shader program itself.
+     * @param m 
+     */
     public void setMatrix3(String desc, Matrix3f m) {
         int activeShaderProgramId = getActiveShaderProgramId();
 
@@ -647,20 +784,38 @@ public class GLSLShaderProgramInstance {
         GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
+    /**
+     * Generates a hash to be used in the custom hashmaps.
+     * @param activeShaderProgramId To make sure all uniform names are unique,
+     * the ':' character followed by the shader ID is appended before hashing 
+     * the string.
+     * @param desc the string to hash
+     * @return the hash value of desc
+     */
     private int generateHash(int activeShaderProgramId, String desc) {
-        return (desc + activeShaderProgramId).hashCode();
+        /* 
+         * Note that uniform names cannot contain the : character, hence
+         * this hashed string is unique for each uniform.
+         * But two strings may still hash to the same value. Otherwise it 
+         * would not be called a hashing, but a mapping!
+         * There
+         * 
+         * //TODO Random bug warning: two uniforms are hashed to the same value...
+         */
+        return (desc + ":" + activeShaderProgramId).hashCode();
     }
 
     private int getUniformLocation(int activeShaderProgramId, String desc) {
+        
         int hash = generateHash(activeShaderProgramId, desc);
 
-        if (uniformLocationMap.containsKey(hash)) {
-            return uniformLocationMap.get(hash);
+        int id = uniformLocationMap.get(hash);
+        
+        if (id == 0) {
+            id = GL20.glGetUniformLocation(activeShaderProgramId, desc);
+            uniformLocationMap.put(hash, id);
         }
-
-        int id = GL20.glGetUniformLocation(activeShaderProgramId, desc);
-        uniformLocationMap.put(hash, id);
-
+        
         return id;
     }
 
