@@ -1,6 +1,0 @@
-{
-    "entity" : {
-        "prefab" : "pathfinding:TargetBlock",
-        "mode" : "persistent"
-    }
-}

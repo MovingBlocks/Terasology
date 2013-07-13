@@ -1,0 +1,6 @@
+{
+    "name": "Red Target",
+    "TargetBlock": {
+        "side": "red"
+    }
+}

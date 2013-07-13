@@ -208,7 +208,11 @@ void main() {
     // ...and finally the occlusion value
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
 
-    vec3 blocklightColorValue = calcBlocklightColor(blocklightValue, flickeringLightOffset);
+    vec3 blocklightColorValue = calcBlocklightColor(blocklightValue
+#if defined (FLICKERING_LIGHT)
+        , flickeringLightOffset
+#endif
+    );
 
 #if defined (FEATURE_REFRACTIVE_PASS)
     vec3 daylightColorValue;

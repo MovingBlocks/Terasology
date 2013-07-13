@@ -76,8 +76,6 @@ public class FloorFinder {
         for (Map.Entry<WalkableBlock, Region> entry : regionMap.entrySet()) {
             entry.getKey().floor = entry.getValue().floor;
         }
-
-        map.findContour();
     }
 
     void findRegions(HeightMap map) {
