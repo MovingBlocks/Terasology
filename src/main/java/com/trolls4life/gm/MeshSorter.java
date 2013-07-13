@@ -32,6 +32,8 @@ public class MeshSorter implements Iterable<EntityRef> {
     private LinkedList<EntityRef> entities = new LinkedList<EntityRef>();
     private LocalPlayer lp;
     private List<Command> commands = new ArrayList();
+    //This timer is a simple java timer since the scheduling functionality is used
+    //Not the timing functionality, which should be done through the LWJGL timer.
     private Timer timer = new Timer();
     private SortTask sortingTask;
     private Vector3f playerPos = null;
@@ -302,10 +304,10 @@ public class MeshSorter implements Iterable<EntityRef> {
         }
     }
 
-	/**
-	 * The timer task that does the sorting in the background.
-	 * TODO stop the scheduling when required.
-	 */
+    /**
+     * The TimerTask that does the sorting work.
+     * TODO stop the scheduling when the container is supposed to be destroyed.
+     */
     private class SortTask extends TimerTask {
         private long lastSortMoment = -1;
         private static final long SORT_DELAY_MILLIES = 200;
