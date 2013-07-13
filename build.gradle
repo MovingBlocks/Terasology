@@ -125,7 +125,7 @@ task extractNatives {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Set the expected module Java level (can use a higher Java to run, but should not use features from a higher Java)
-sourceCompatibility = 1.6
+sourceCompatibility = 1.7
 
 // Add additional "source set" beyond the default (src/main/ + src/test/), in this case src/dev/ (utility)
 sourceSets {
