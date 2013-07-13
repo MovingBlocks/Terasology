@@ -44,7 +44,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     FastRandom rand = new FastRandom();
 
     Texture filmGrainNoiseTexture = Assets.getTexture("engine:noise");
-    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.05f, 0.0f, 1.0f);
+    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.025f, 0.0f, 1.0f);
 
     Property blurStart = new Property("blurStart", 0.0f, 0.0f, 1.0f);
     Property blurLength = new Property("blurLength", 0.15f, 0.0f, 1.0f);
