@@ -59,7 +59,8 @@ ext {
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'
-    displayVersion = "prealpha"
+    versionBase = rootProject.file("version.txt").text.trim()
+    displayVersion = versionBase
 }
 
 // Declare remote repositories we're interested in - library files will be fetched from here
