@@ -1,0 +1,15 @@
+{
+    "Item" : {
+            "name" : "Questing Card",
+            "icon" : "questcard",
+            "usage" : "ON_USER",
+            "consumedOnUse" : true,
+            "renderWithIcon" : true
+        },
+    "QuestingCardFetch" : {
+        "questName" : "Test this quest!",
+        "goal" : "block:engine:dirt",
+        "friendlyGoal" : "Get a dirt block.",
+        "amount" : "3"
+    }
+}

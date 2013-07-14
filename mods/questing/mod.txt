@@ -1,0 +1,7 @@
+{
+	"id" : "questing",
+	"displayName" : "Questing",
+	"author" : "nh_99",
+	"description" :
+	"A mod to add questing features."
+}
