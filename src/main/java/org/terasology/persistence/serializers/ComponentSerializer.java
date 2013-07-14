@@ -241,8 +241,6 @@ public class ComponentSerializer {
                             componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
                         }
                         changed = true;
-                    } else {
-                        logger.error("Exception serializing component type: {}, field: {} - returned null", base.getClass(), field.getName());
                     }
                 }
             }

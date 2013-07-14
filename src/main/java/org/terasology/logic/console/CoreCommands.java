@@ -41,6 +41,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -90,6 +91,11 @@ public class CoreCommands implements ComponentSystem {
             return "Switched to windowed mode";
         }
 
+    }
+
+    @Command(shortDescription = "Forces the chunk manager to purge unused chunks")
+    public void clearChunkCache() {
+        ((LocalChunkProvider)worldRenderer.getChunkProvider()).requestCleanup();
     }
 
     @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)

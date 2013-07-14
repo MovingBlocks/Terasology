@@ -18,6 +18,7 @@ package org.terasology.rendering.logic;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Owns;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -36,6 +37,7 @@ public class SkeletalMeshComponent implements Component {
     public boolean loop = false;
     public float animationRate = 1.0f;
 
+    @Owns
     public Map<String, EntityRef> boneEntities;
     public EntityRef rootBone = EntityRef.NULL;
     public float animationTime = 0;

@@ -21,6 +21,7 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,12 +60,19 @@ public final class OwnershipHelper {
         return entityRefList;
     }
 
+    @SuppressWarnings("unchecked")
     private void addOwnedEntitiesFor(Component comp, ComponentMetadata<?> componentMetadata, Collection<EntityRef> outEntityList) {
         for (FieldMetadata field : componentMetadata.iterateFields()) {
             if (field.isOwnedReference()) {
                 Object value = field.getValue(comp);
                 if (value instanceof Collection) {
                     for (EntityRef ref : ((Collection<EntityRef>) value)) {
+                        if (ref.exists()) {
+                            outEntityList.add(ref);
+                        }
+                    }
+                } else if (value instanceof Map) {
+                    for (EntityRef ref : ((Map<Object, EntityRef>)value).values()) {
                         if (ref.exists()) {
                             outEntityList.add(ref);
                         }

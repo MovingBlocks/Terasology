@@ -58,10 +58,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
-public class Chunk implements Externalizable {
+public class Chunk {
     protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
-
-    public static final long serialVersionUID = 79881925217704826L;
 
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
@@ -139,6 +137,7 @@ public class Chunk implements Externalizable {
     private ReentrantLock lock = new ReentrantLock();
     private boolean disposed = false;
 
+    private boolean ready = false;
 
     public Chunk() {
         final Chunks c = Chunks.getInstance();
@@ -172,7 +171,7 @@ public class Chunk implements Externalizable {
         dirty = true;
     }
 
-    public Chunk(Vector3i pos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
+    public Chunk(Vector3i pos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid, boolean loaded) {
         this.pos.set(Preconditions.checkNotNull(pos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.sunlightData = Preconditions.checkNotNull(sunlight);
@@ -181,6 +180,7 @@ public class Chunk implements Externalizable {
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
+        initialGenerationComplete = loaded;
     }
 
     /**
@@ -209,15 +209,15 @@ public class Chunk implements Externalizable {
         public Chunk decode(ChunksProtobuf.Chunk message) {
             Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
             if (!message.hasX() || !message.hasY() || !message.hasZ()) {
-                throw new IllegalArgumentException("Illformed protobuf message. Missing chunk position.");
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
             }
             Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
             if (!message.hasState()) {
-                throw new IllegalArgumentException("Illformed protobuf message. Missing chunk state.");
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk state.");
             }
             State state = State.lookup(message.getState());
             if (!message.hasBlockData()) {
-                throw new IllegalArgumentException("Illformed protobuf message. Missing block data.");
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
             }
 
             final TeraArrays t = TeraArrays.getInstance();
@@ -248,7 +248,7 @@ public class Chunk implements Externalizable {
             } else {
                 extraData = c.getExtraDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
             }
-            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
+            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData, state == State.COMPLETE);
         }
     }
 
@@ -416,38 +416,13 @@ public class Chunk implements Externalizable {
 
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3f dimensions = new Vector3f(0.5f * getChunkSizeX(), 0.5f * getChunkSizeY(), 0.5f * getChunkSizeZ());
-            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
-            aabb = AABB.createCenterExtent(position, dimensions);
+            Vector3f min = getChunkWorldPos().toVector3f();
+            Vector3f max = CHUNK_SIZE.toVector3f();
+            max.add(min);
+            aabb = AABB.createMinMax(min, max);
         }
 
         return aabb;
-    }
-
-    // TODO: Protobuf instead???
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt(pos.x);
-        out.writeInt(pos.y);
-        out.writeInt(pos.z);
-        out.writeObject(chunkState);
-        out.writeObject(blockData);
-        out.writeObject(sunlightData);
-        out.writeObject(lightData);
-        out.writeObject(extraData);
-        out.writeBoolean(initialGenerationComplete);
-    }
-
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        pos.x = in.readInt();
-        pos.y = in.readInt();
-        pos.z = in.readInt();
-        setDirty(true);
-        chunkState = (State) in.readObject();
-        blockData = (TeraArray) in.readObject();
-        sunlightData = (TeraArray) in.readObject();
-        lightData = (TeraArray) in.readObject();
-        extraData = (TeraArray) in.readObject();
-        initialGenerationComplete = in.readBoolean();
     }
 
     public void deflate() {
@@ -561,14 +536,27 @@ public class Chunk implements Externalizable {
         return subMeshAABB[subMesh];
     }
 
+    public void markReady() {
+        ready = true;
+    }
+
+    public void prepareForReactivation() {
+        disposed = false;
+    }
+
     public void dispose() {
         disposed = true;
+        ready = false;
         if (mesh != null) {
             for (ChunkMesh chunkMesh : mesh) {
                 chunkMesh.dispose();
             }
             mesh = null;
         }
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 
     public boolean isDisposed() {

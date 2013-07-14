@@ -63,7 +63,15 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
     public void store(EntityRef entity, String name, boolean deactivate) {
         if (entity.isActive()) {
             for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
-                store(ownedEntity, deactivate);
+                if (!ownedEntity.isAlwaysRelevant()) {
+                    if (!ownedEntity.isPersistent()) {
+                        if (deactivate) {
+                            ownedEntity.destroy();
+                        }
+                    } else {
+                        store(ownedEntity, deactivate);
+                    }
+                }
             }
             EntityRefTypeHandler.setReferenceInterceptor(this);
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());

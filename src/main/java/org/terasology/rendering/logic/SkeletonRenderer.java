@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -102,7 +103,6 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
             }
             entity.saveComponent(skeleton);
         }
-
     }
 
     @Override

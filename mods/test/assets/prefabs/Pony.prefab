@@ -1,5 +1,5 @@
 {
-    "persisted" : false,
+    "persisted" : true,
     "location" : {},
     "skeletalmesh" : {
         "mesh" : "testmod:pony",

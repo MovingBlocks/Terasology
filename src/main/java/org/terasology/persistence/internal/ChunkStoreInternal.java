@@ -5,6 +5,7 @@ import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.protobuf.ChunksProtobuf;
@@ -38,7 +39,15 @@ final class ChunkStoreInternal implements ChunkStore {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
-        ChunksProtobuf.Chunk chunkDataForDecode = ChunksProtobuf.Chunk.newBuilder().setX(chunkData.getX()).setY(chunkData.getY()).setZ(chunkData.getZ()).setBlockData(chunkData.getBlockData()).setSunlightData(chunkData.getSunlightData()).setLightData(chunkData.getLightData()).setExtraData(chunkData.getLiquidData()).setState(ChunksProtobuf.State.COMPLETE).build();
+        ChunksProtobuf.Chunk chunkDataForDecode = ChunksProtobuf.Chunk.newBuilder()
+                .setX(chunkData.getX())
+                .setY(chunkData.getY())
+                .setZ(chunkData.getZ())
+                .setBlockData(chunkData.getBlockData())
+                .setSunlightData(chunkData.getSunlightData())
+                .setLightData(chunkData.getLightData())
+                .setExtraData(chunkData.getLiquidData())
+                .setState(chunkData.getState()).build();
         this.chunk = new Chunk.ProtobufHandler().decode(chunkDataForDecode);
         this.entityStore = chunkData.getStore();
         this.externalRefs = externalRefs;
@@ -51,6 +60,7 @@ final class ChunkStoreInternal implements ChunkStore {
 
     @Override
     public Chunk getChunk() {
+        chunk.prepareForReactivation();
         return chunk;
     }
 
@@ -78,8 +88,20 @@ final class ChunkStoreInternal implements ChunkStore {
 
     @Override
     public void storeAllEntities() {
+        AABB aabb = chunk.getAABB();
         for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
-
+            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant()) {
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    if (aabb.contains(loc.getWorldPosition())) {
+                        if (entity.isPersistent()) {
+                            store(entity);
+                        } else {
+                            entity.destroy();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -101,6 +123,7 @@ final class ChunkStoreInternal implements ChunkStore {
             builder.setSunlightData(encoded.getSunlightData());
             builder.setLightData(encoded.getLightData());
             builder.setLiquidData(encoded.getExtraData());
+            builder.setState(chunk.getChunkState().getProtobufState());
             builder.setStore(entityStore);
         } finally {
             chunk.unlock();

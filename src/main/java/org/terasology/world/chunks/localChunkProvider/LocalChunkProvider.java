@@ -28,8 +28,6 @@ import gnu.trove.procedure.TByteObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -62,11 +60,6 @@ import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -108,6 +101,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private BlockManager blockManager;
     private BlockEntityRegistry registry = null;
 
+    private boolean forceCleanup = false;
+
     public LocalChunkProvider(StorageManager storageManager, ChunkGeneratorManager generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
@@ -120,6 +115,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     public void setBlockEntityRegistry(BlockEntityRegistry registry) {
         this.registry = registry;
+    }
+
+    public void requestCleanup() {
+        forceCleanup = true;
     }
 
     @Override
@@ -220,7 +219,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public void removeRelevanceEntity(EntityRef entity) {
         regionLock.writeLock().lock();
         try {
-            regions.remove(new ChunkRelevanceRegion(entity, 0));
+            regions.remove(entity);
         } finally {
             regionLock.writeLock().unlock();
         }
@@ -265,7 +264,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private void checkForUnload() {
         PerformanceMonitor.startActivity("Review cache size");
-        if (nearCache.size() > CACHE_SIZE) {
+        if (nearCache.size() > CACHE_SIZE || forceCleanup) {
+            forceCleanup = false;
             logger.debug("Compacting cache");
             Iterator<Vector3i> iterator = nearCache.keySet().iterator();
             while (iterator.hasNext()) {
@@ -285,17 +285,21 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     }
                     chunk.lock();
                     try {
+                        if (chunk.getChunkState() == Chunk.State.COMPLETE && !chunk.isReady()) {
+                            // Chunk is complete, but hasn't had events sent out/entities loaded.
+                            continue;
+                        }
                         if (chunk.getChunkState() == Chunk.State.COMPLETE) {
                             worldEntity.send(new BeforeChunkUnload(pos));
                             for (ChunkRelevanceRegion region : regions.values()) {
                                 region.chunkUnloaded(pos);
                             }
                         }
+                        ChunkStore store = storageManager.createChunkStoreForSave(chunk);
+                        store.storeAllEntities();
+                        store.save();
 
                         chunk.dispose();
-                        ChunkStore store = storageManager.createChunkStoreForSave(chunk);
-                        // TODO: Save entities
-                        store.save();
 
                         try {
                             unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
@@ -342,9 +346,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
         chunk.lock();
         try {
-            if (chunk.isDisposed()) {
-                return;
-            }
+            chunk.markReady();
             boolean loaded = chunk.isInitialGenerationComplete();
             if (!loaded) {
                 chunk.setInitialGenerationComplete();
@@ -454,7 +456,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         for (Chunk chunk : nearCache.values()) {
             chunk.dispose();
             ChunkStore store = storageManager.createChunkStoreForSave(chunk);
-            // TODO: store entities?
+            store.storeAllEntities();
             store.save();
         }
         nearCache.clear();

@@ -171,9 +171,9 @@ public class AABB {
      * @return True if containing
      */
     public boolean contains(Vector3d point) {
-        return !(max.x < point.x || min.x > point.x) &&
-                !(max.y < point.y || min.y > point.y) &&
-                !(max.z < point.z || min.z > point.z);
+        return !(max.x < point.x || min.x >= point.x) &&
+                !(max.y < point.y || min.y >= point.y) &&
+                !(max.z < point.z || min.z >= point.z);
     }
 
     /**
@@ -183,9 +183,9 @@ public class AABB {
      * @return True if containing
      */
     public boolean contains(Vector3f point) {
-        return !(max.x < point.x || min.x > point.x) &&
-                !(max.y < point.y || min.y > point.y) &&
-                !(max.z < point.z || min.z > point.z);
+        return !(max.x < point.x || min.x >= point.x) &&
+                !(max.y < point.y || min.y >= point.y) &&
+                !(max.z < point.z || min.z >= point.z);
     }
 
     /**

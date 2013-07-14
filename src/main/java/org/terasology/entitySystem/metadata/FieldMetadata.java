@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -62,7 +63,7 @@ public final class FieldMetadata {
     }
 
     private boolean isCollectionOf(Class<?> targetType, Field field) {
-        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == targetType);
+        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == targetType) || (Map.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 1) == targetType);
     }
 
     public Object deserialize(EntityData.Value value) {
