@@ -33,6 +33,13 @@ public class QuestingCardFetchSystem implements EventHandlerSystem {
     @ReceiveEvent(components = {InventoryComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);
+
+        // Make sure we have a valid item
+        if (item == null) {
+            logger.warn("Got an invalid item for entity {}", entity);
+            return;
+        }
+
         String stackID = item.stackId;
         //logger.info("Picked up item with id " + stackID);
 
