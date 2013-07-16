@@ -16,7 +16,6 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
-import com.google.gson.GsonBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -45,17 +44,13 @@ import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -92,7 +87,7 @@ public class StorageManagerTest {
         testBlock = new Block();
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
 
-        esm = new StorageManagerInternal(entityManager);
+        esm = new StorageManagerInternal(entityManager, false);
 
         CoreRegistry.put(Config.class, new Config());
         CoreRegistry.put(ModManager.class, new ModManager());
@@ -205,7 +200,7 @@ public class StorageManagerTest {
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
-        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -228,7 +223,7 @@ public class StorageManagerTest {
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
-        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -265,7 +260,7 @@ public class StorageManagerTest {
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
-        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -288,7 +283,7 @@ public class StorageManagerTest {
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(modManager, networkSystem);
-        StorageManager newSM = new StorageManagerInternal(newEntityManager);
+        StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -314,5 +309,4 @@ public class StorageManagerTest {
     public void ignoresDestroyOfUnreferencedEntity() {
         esm.onEntityDestroyed(3);
     }
-
 }

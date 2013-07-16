@@ -15,6 +15,7 @@
  */
 package org.terasology.persistence.internal;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.iterator.TIntIterator;
@@ -47,8 +48,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.nio.file.CopyOption;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -63,6 +72,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private static final String PLAYER_STORE_EXTENSION = ".player";
     private static final String GLOBAL_ENTITY_STORE = "global.dat";
     private static final int BACKGROUND_THREADS = 4;
+    private static final int CHUNK_ZIP_DIM = 32;
+    private static final ImmutableMap<String, String> CREATE_ZIP_OPTIONS = ImmutableMap.of("create", "true", "encoding", "UTF-8");
 
     private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
 
@@ -80,8 +91,15 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private EntityData.GlobalStore globalStore;
 
+    private boolean storeChunksInZips = true;
+
     public StorageManagerInternal(EngineEntityManager entityManager) {
+        this(entityManager, true);
+    }
+
+    public StorageManagerInternal(EngineEntityManager entityManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
+        this.storeChunksInZips = storeChunksInZips;
         entityManager.subscribe(this);
         playersPath = PathManager.getInstance().getCurrentSavePath().resolve(PLAYERS_PATH);
         storageTaskMaster = TaskMaster.createFIFOTaskMaster(BACKGROUND_THREADS);
@@ -202,12 +220,16 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         if (store == null) {
             byte[] chunkData = compressedChunkStore.get(chunkPos);
             if (chunkData == null) {
-                Path chunkPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD).resolve(getChunkFilename(chunkPos));
-                if (Files.isRegularFile(chunkPath)) {
-                    try {
-                        chunkData = Files.readAllBytes(chunkPath);
-                    } catch (IOException e) {
-                        logger.error("Failed to load chunk {}", chunkPos, e);
+                if (storeChunksInZips) {
+                    chunkData = loadChunkZip(chunkPos);
+                } else {
+                    Path chunkPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD).resolve(getChunkFilename(chunkPos));
+                    if (Files.isRegularFile(chunkPath)) {
+                        try {
+                            chunkData = Files.readAllBytes(chunkPath);
+                        } catch (IOException e) {
+                            logger.error("Failed to load chunk {}", chunkPos, e);
+                        }
                     }
                 }
             }
@@ -229,9 +251,41 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return store;
     }
 
+    private byte[] loadChunkZip(Vector3i chunkPos) {
+        byte[] chunkData = null;
+        Path chunkPath = getWorldPath().resolve(getChunkZipFilename(getChunkZipPosition(chunkPos)));
+        if (Files.isRegularFile(chunkPath)) {
+            try {
+                FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null);
+                Path targetChunk = chunkZip.getPath(getChunkFilename(chunkPos));
+                if (Files.isRegularFile(targetChunk)) {
+                    chunkData =  Files.readAllBytes(targetChunk);
+                }
+            } catch (IOException e) {
+                logger.error("Failed to load chunk zip {}", chunkPath, e);
+            }
+        }
+        return chunkData;
+    }
+
     @Override
     public boolean containsChunkStoreFor(Vector3i chunkPos) {
-        return pendingProcessingChunkStore.containsKey(chunkPos) || compressedChunkStore.containsKey(chunkPos) || Files.isRegularFile(getWorldPath().resolve(getChunkFilename(chunkPos)));
+        if (pendingProcessingChunkStore.containsKey(chunkPos) || compressedChunkStore.containsKey(chunkPos)) {
+            return true;
+        }
+        if (storeChunksInZips) {
+            Path chunkZipPath = getWorldPath().resolve(getChunkZipFilename(getChunkZipPosition(chunkPos)));
+            if (Files.isRegularFile(chunkZipPath)) {
+                try (FileSystem zip = FileSystems.newFileSystem(chunkZipPath, null)) {
+                    return Files.isRegularFile(zip.getPath(getChunkFilename(chunkPos)));
+                } catch (IOException e) {
+                    logger.error("Failed to access chunk zip {}", chunkZipPath, e);
+                }
+            }
+            return false;
+        } else {
+            return Files.isRegularFile(getWorldPath().resolve(getChunkFilename(chunkPos)));
+        }
     }
 
     private void flushChunkStores() throws IOException {
@@ -239,10 +293,49 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         try {
             Path chunksPath = getWorldPath();
             Files.createDirectories(chunksPath);
-            for (Map.Entry<Vector3i, byte[]> chunkStoreEntry : compressedChunkStore.entrySet()) {
-                Path chunkPath = chunksPath.resolve(getChunkFilename(chunkStoreEntry.getKey()));
-                try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
-                    out.write(chunkStoreEntry.getValue());
+            if (storeChunksInZips) {
+                Map<Vector3i, FileSystem> newChunkZips = Maps.newHashMap();
+                for (Map.Entry<Vector3i, byte[]> chunkStoreEntry : compressedChunkStore.entrySet()) {
+                    Vector3i chunkZipPos = getChunkZipPosition(chunkStoreEntry.getKey());
+                    FileSystem zip = newChunkZips.get(chunkZipPos);
+                    if (zip == null) {
+                        zip = FileSystems.newFileSystem(URI.create("jar:file:" + chunksPath.resolve(getChunkZipTempFilename(chunkZipPos)).toUri().getPath()), CREATE_ZIP_OPTIONS, null);
+                        newChunkZips.put(chunkZipPos, zip);
+                    }
+                    Path chunkPath = zip.getPath(getChunkFilename(chunkStoreEntry.getKey()));
+                    try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
+                        bos.write(chunkStoreEntry.getValue());
+                    }
+                }
+                // Copy existing, unmodified content into the zips, close them, replace previous.
+                for (Map.Entry<Vector3i, FileSystem> chunkZipEntry : newChunkZips.entrySet()) {
+                    Path oldChunkZipPath = chunksPath.resolve(getChunkZipFilename(chunkZipEntry.getKey()));
+                    final FileSystem zip = chunkZipEntry.getValue();
+                    if (Files.isRegularFile(oldChunkZipPath)) {
+                        try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, null)) {
+                            for (Path root : oldZip.getRootDirectories()) {
+                                Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+                                    @Override
+                                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                                            throws IOException {
+                                        if (!Files.isRegularFile(zip.getPath(file.toString()))) {
+                                            Files.copy(file, zip.getPath(file.toString()));
+                                        }
+                                        return FileVisitResult.CONTINUE;
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    zip.close();
+                    Files.move(chunksPath.resolve(getChunkZipTempFilename(chunkZipEntry.getKey())), chunksPath.resolve(getChunkZipFilename(chunkZipEntry.getKey())), StandardCopyOption.REPLACE_EXISTING);
+                }
+            } else {
+                for (Map.Entry<Vector3i, byte[]> chunkStoreEntry : compressedChunkStore.entrySet()) {
+                    Path chunkPath = chunksPath.resolve(getChunkFilename(chunkStoreEntry.getKey()));
+                    try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
+                        out.write(chunkStoreEntry.getValue());
+                    }
                 }
             }
         } finally {
@@ -253,6 +346,20 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private Path getWorldPath() {
         return PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD);
+    }
+
+    private Vector3i getChunkZipPosition(Vector3i chunkPos) {
+        Vector3i result = new Vector3i(chunkPos);
+        result.divide(CHUNK_ZIP_DIM);
+        return result;
+    }
+
+    private String getChunkZipFilename(Vector3i pos) {
+        return String.format("%d.%d.%d.chunks.zip", pos.x, pos.y, pos.z);
+    }
+
+    private String getChunkZipTempFilename(Vector3i pos) {
+        return String.format("%d.%d.%d.chunks.tmp", pos.x, pos.y, pos.z);
     }
 
     private String getChunkFilename(Vector3i pos) {
