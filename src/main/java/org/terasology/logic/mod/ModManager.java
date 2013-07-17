@@ -66,8 +66,8 @@ public class ModManager {
     private static final Logger logger = LoggerFactory.getLogger(ModManager.class);
 
     private Map<String, Mod> mods = Maps.newHashMap();
-    private ClassLoader activeModClassLoader;
-    private ClassLoader allModClassLoader;
+    private URLClassLoader activeModClassLoader;
+    private URLClassLoader allModClassLoader;
 
     private Reflections allReflections;
     private Reflections engineReflections;
@@ -214,12 +214,25 @@ public class ModManager {
                 urls.add(mod.getModClasspathUrl());
             }
         }
+        if (allModClassLoader != null) {
+            try {
+                allModClassLoader.close();
+            } catch (IOException e) {
+                logger.error("Failed to cloase allModClassLoader", e);
+            }
+        }
         allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
         for (Mod mod : getMods()) {
             mod.setInactiveClassLoader(allModClassLoader);
         }
 
-        activeModClassLoader = null;
+        if (activeModClassLoader != null) {
+            try {
+                activeModClassLoader.close();
+            } catch (IOException e) {
+                logger.error("Failed to close activeModClassLoader", e);
+            }
+        }
         allReflections = null;
     }
 
@@ -228,6 +241,13 @@ public class ModManager {
         for (Mod mod : getActiveMods()) {
             if (mod.isCodeMod()) {
                 urls.add(mod.getModClasspathUrl());
+            }
+        }
+        if (activeModClassLoader != null) {
+            try {
+                activeModClassLoader.close();
+            } catch (IOException e) {
+                logger.error("Failed to close activeModClassLoader", e);
             }
         }
         activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());

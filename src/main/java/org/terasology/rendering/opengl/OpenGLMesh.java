@@ -88,7 +88,8 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     @Override
     public void dispose() {
-        hasTexCoord0 = false;
+        // TODO: Fix disposal
+        /*hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;
         hasNormal = false;
@@ -100,7 +101,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         if (vboIndexBuffer != 0) {
             VertexBufferObjectManager.getInstance().putVboId(vboIndexBuffer);
             vboIndexBuffer = 0;
-        }
+        }  */
     }
 
     @Override

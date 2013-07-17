@@ -18,6 +18,7 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sun.nio.file.ExtendedCopyOption;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -255,8 +256,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         byte[] chunkData = null;
         Path chunkPath = getWorldPath().resolve(getChunkZipFilename(getChunkZipPosition(chunkPos)));
         if (Files.isRegularFile(chunkPath)) {
-            try {
-                FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null);
+            try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
                 Path targetChunk = chunkZip.getPath(getChunkFilename(chunkPos));
                 if (Files.isRegularFile(targetChunk)) {
                     chunkData =  Files.readAllBytes(targetChunk);
@@ -299,7 +299,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                     Vector3i chunkZipPos = getChunkZipPosition(chunkStoreEntry.getKey());
                     FileSystem zip = newChunkZips.get(chunkZipPos);
                     if (zip == null) {
-                        zip = FileSystems.newFileSystem(URI.create("jar:file:" + chunksPath.resolve(getChunkZipTempFilename(chunkZipPos)).toUri().getPath()), CREATE_ZIP_OPTIONS, null);
+                        Path targetPath = chunksPath.resolve(getChunkZipTempFilename(chunkZipPos));
+                        Files.deleteIfExists(targetPath);
+                        zip = FileSystems.newFileSystem(URI.create("jar:file:" + (targetPath).toUri().getPath()), CREATE_ZIP_OPTIONS, null);
                         newChunkZips.put(chunkZipPos, zip);
                     }
                     Path chunkPath = zip.getPath(getChunkFilename(chunkStoreEntry.getKey()));
@@ -328,7 +330,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                         }
                     }
                     zip.close();
-                    Files.move(chunksPath.resolve(getChunkZipTempFilename(chunkZipEntry.getKey())), chunksPath.resolve(getChunkZipFilename(chunkZipEntry.getKey())), StandardCopyOption.REPLACE_EXISTING);
+                    Path sourcePath = chunksPath.resolve(getChunkZipTempFilename(chunkZipEntry.getKey()));
+                    Path targetPath = chunksPath.resolve(getChunkZipFilename(chunkZipEntry.getKey()));
+                    Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 }
             } else {
                 for (Map.Entry<Vector3i, byte[]> chunkStoreEntry : compressedChunkStore.entrySet()) {

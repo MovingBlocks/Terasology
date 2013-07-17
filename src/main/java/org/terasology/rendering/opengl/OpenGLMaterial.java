@@ -59,8 +59,7 @@ public class OpenGLMaterial extends AbstractAsset<MaterialData> implements Mater
             if (activeMaterial == this) {
                 ShaderManager.getInstance().enableDefault();
             }
-            // TODO: Delete shader (seems to crash at the moment)
-            //GL20.glDeleteShader(shaderProgram);
+            GL20.glDeleteProgram(shaderProgram);
             shaderProgram = 0;
         }
         Util.checkGLError();
