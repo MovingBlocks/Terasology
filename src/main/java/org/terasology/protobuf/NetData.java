@@ -12,29 +12,29 @@ public final class NetData {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<NetMessage> {
 
-    // repeated .Chunk chunkInfo = 2;
+    // repeated .ChunkStore chunkInfo = 2;
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> 
+    java.util.List<org.terasology.protobuf.EntityData.ChunkStore> 
         getChunkInfoList();
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.Chunk getChunkInfo(int index);
+    org.terasology.protobuf.EntityData.ChunkStore getChunkInfo(int index);
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
     int getChunkInfoCount();
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
+    java.util.List<? extends org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> 
         getChunkInfoOrBuilderList();
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder getChunkInfoOrBuilder(
+    org.terasology.protobuf.EntityData.ChunkStoreOrBuilder getChunkInfoOrBuilder(
         int index);
 
     // repeated .InvalidateChunkMessage invalidateChunk = 3;
@@ -359,10 +359,10 @@ public final class NetData {
             }
             case 18: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                chunkInfo_ = new java.util.ArrayList<org.terasology.protobuf.ChunksProtobuf.Chunk>();
+                chunkInfo_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.ChunkStore>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              chunkInfo_.add(input.readMessage(org.terasology.protobuf.ChunksProtobuf.Chunk.PARSER, extensionRegistry));
+              chunkInfo_.add(input.readMessage(org.terasology.protobuf.EntityData.ChunkStore.PARSER, extensionRegistry));
               break;
             }
             case 26: {
@@ -568,38 +568,38 @@ public final class NetData {
     }
 
     private int bitField0_;
-    // repeated .Chunk chunkInfo = 2;
+    // repeated .ChunkStore chunkInfo = 2;
     public static final int CHUNKINFO_FIELD_NUMBER = 2;
-    private java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> chunkInfo_;
+    private java.util.List<org.terasology.protobuf.EntityData.ChunkStore> chunkInfo_;
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    public java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> getChunkInfoList() {
+    public java.util.List<org.terasology.protobuf.EntityData.ChunkStore> getChunkInfoList() {
       return chunkInfo_;
     }
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
+    public java.util.List<? extends org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> 
         getChunkInfoOrBuilderList() {
       return chunkInfo_;
     }
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
     public int getChunkInfoCount() {
       return chunkInfo_.size();
     }
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.Chunk getChunkInfo(int index) {
+    public org.terasology.protobuf.EntityData.ChunkStore getChunkInfo(int index) {
       return chunkInfo_.get(index);
     }
     /**
-     * <code>repeated .Chunk chunkInfo = 2;</code>
+     * <code>repeated .ChunkStore chunkInfo = 2;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder getChunkInfoOrBuilder(
+    public org.terasology.protobuf.EntityData.ChunkStoreOrBuilder getChunkInfoOrBuilder(
         int index) {
       return chunkInfo_.get(index);
     }
@@ -1969,23 +1969,23 @@ public final class NetData {
       }
       private int bitField0_;
 
-      // repeated .Chunk chunkInfo = 2;
-      private java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> chunkInfo_ =
+      // repeated .ChunkStore chunkInfo = 2;
+      private java.util.List<org.terasology.protobuf.EntityData.ChunkStore> chunkInfo_ =
         java.util.Collections.emptyList();
       private void ensureChunkInfoIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          chunkInfo_ = new java.util.ArrayList<org.terasology.protobuf.ChunksProtobuf.Chunk>(chunkInfo_);
+          chunkInfo_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.ChunkStore>(chunkInfo_);
           bitField0_ |= 0x00000001;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.Chunk, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder, org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> chunkInfoBuilder_;
+          org.terasology.protobuf.EntityData.ChunkStore, org.terasology.protobuf.EntityData.ChunkStore.Builder, org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> chunkInfoBuilder_;
 
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk> getChunkInfoList() {
+      public java.util.List<org.terasology.protobuf.EntityData.ChunkStore> getChunkInfoList() {
         if (chunkInfoBuilder_ == null) {
           return java.util.Collections.unmodifiableList(chunkInfo_);
         } else {
@@ -1993,7 +1993,7 @@ public final class NetData {
         }
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public int getChunkInfoCount() {
         if (chunkInfoBuilder_ == null) {
@@ -2003,9 +2003,9 @@ public final class NetData {
         }
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.Chunk getChunkInfo(int index) {
+      public org.terasology.protobuf.EntityData.ChunkStore getChunkInfo(int index) {
         if (chunkInfoBuilder_ == null) {
           return chunkInfo_.get(index);
         } else {
@@ -2013,10 +2013,10 @@ public final class NetData {
         }
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder setChunkInfo(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk value) {
+          int index, org.terasology.protobuf.EntityData.ChunkStore value) {
         if (chunkInfoBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -2030,10 +2030,10 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder setChunkInfo(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder builderForValue) {
+          int index, org.terasology.protobuf.EntityData.ChunkStore.Builder builderForValue) {
         if (chunkInfoBuilder_ == null) {
           ensureChunkInfoIsMutable();
           chunkInfo_.set(index, builderForValue.build());
@@ -2044,9 +2044,9 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public Builder addChunkInfo(org.terasology.protobuf.ChunksProtobuf.Chunk value) {
+      public Builder addChunkInfo(org.terasology.protobuf.EntityData.ChunkStore value) {
         if (chunkInfoBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -2060,10 +2060,10 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder addChunkInfo(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk value) {
+          int index, org.terasology.protobuf.EntityData.ChunkStore value) {
         if (chunkInfoBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -2077,10 +2077,10 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder addChunkInfo(
-          org.terasology.protobuf.ChunksProtobuf.Chunk.Builder builderForValue) {
+          org.terasology.protobuf.EntityData.ChunkStore.Builder builderForValue) {
         if (chunkInfoBuilder_ == null) {
           ensureChunkInfoIsMutable();
           chunkInfo_.add(builderForValue.build());
@@ -2091,10 +2091,10 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder addChunkInfo(
-          int index, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder builderForValue) {
+          int index, org.terasology.protobuf.EntityData.ChunkStore.Builder builderForValue) {
         if (chunkInfoBuilder_ == null) {
           ensureChunkInfoIsMutable();
           chunkInfo_.add(index, builderForValue.build());
@@ -2105,10 +2105,10 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder addAllChunkInfo(
-          java.lang.Iterable<? extends org.terasology.protobuf.ChunksProtobuf.Chunk> values) {
+          java.lang.Iterable<? extends org.terasology.protobuf.EntityData.ChunkStore> values) {
         if (chunkInfoBuilder_ == null) {
           ensureChunkInfoIsMutable();
           super.addAll(values, chunkInfo_);
@@ -2119,7 +2119,7 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder clearChunkInfo() {
         if (chunkInfoBuilder_ == null) {
@@ -2132,7 +2132,7 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
       public Builder removeChunkInfo(int index) {
         if (chunkInfoBuilder_ == null) {
@@ -2145,16 +2145,16 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.Chunk.Builder getChunkInfoBuilder(
+      public org.terasology.protobuf.EntityData.ChunkStore.Builder getChunkInfoBuilder(
           int index) {
         return getChunkInfoFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder getChunkInfoOrBuilder(
+      public org.terasology.protobuf.EntityData.ChunkStoreOrBuilder getChunkInfoOrBuilder(
           int index) {
         if (chunkInfoBuilder_ == null) {
           return chunkInfo_.get(index);  } else {
@@ -2162,9 +2162,9 @@ public final class NetData {
         }
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public java.util.List<? extends org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
+      public java.util.List<? extends org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> 
            getChunkInfoOrBuilderList() {
         if (chunkInfoBuilder_ != null) {
           return chunkInfoBuilder_.getMessageOrBuilderList();
@@ -2173,33 +2173,33 @@ public final class NetData {
         }
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.Chunk.Builder addChunkInfoBuilder() {
+      public org.terasology.protobuf.EntityData.ChunkStore.Builder addChunkInfoBuilder() {
         return getChunkInfoFieldBuilder().addBuilder(
-            org.terasology.protobuf.ChunksProtobuf.Chunk.getDefaultInstance());
+            org.terasology.protobuf.EntityData.ChunkStore.getDefaultInstance());
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.Chunk.Builder addChunkInfoBuilder(
+      public org.terasology.protobuf.EntityData.ChunkStore.Builder addChunkInfoBuilder(
           int index) {
         return getChunkInfoFieldBuilder().addBuilder(
-            index, org.terasology.protobuf.ChunksProtobuf.Chunk.getDefaultInstance());
+            index, org.terasology.protobuf.EntityData.ChunkStore.getDefaultInstance());
       }
       /**
-       * <code>repeated .Chunk chunkInfo = 2;</code>
+       * <code>repeated .ChunkStore chunkInfo = 2;</code>
        */
-      public java.util.List<org.terasology.protobuf.ChunksProtobuf.Chunk.Builder> 
+      public java.util.List<org.terasology.protobuf.EntityData.ChunkStore.Builder> 
            getChunkInfoBuilderList() {
         return getChunkInfoFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.Chunk, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder, org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder> 
+          org.terasology.protobuf.EntityData.ChunkStore, org.terasology.protobuf.EntityData.ChunkStore.Builder, org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> 
           getChunkInfoFieldBuilder() {
         if (chunkInfoBuilder_ == null) {
           chunkInfoBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.Chunk, org.terasology.protobuf.ChunksProtobuf.Chunk.Builder, org.terasology.protobuf.ChunksProtobuf.ChunkOrBuilder>(
+              org.terasology.protobuf.EntityData.ChunkStore, org.terasology.protobuf.EntityData.ChunkStore.Builder, org.terasology.protobuf.EntityData.ChunkStoreOrBuilder>(
                   chunkInfo_,
                   ((bitField0_ & 0x00000001) == 0x00000001),
                   getParentForChildren(),
@@ -18838,67 +18838,67 @@ public final class NetData {
   static {
     java.lang.String[] descriptorData = {
       "\n\020NetMessage.proto\032\020EntityData.proto\032\014Ch" +
-      "unks.proto\"\222\005\n\nNetMessage\022\031\n\tchunkInfo\030\002" +
-      " \003(\0132\006.Chunk\0220\n\017invalidateChunk\030\003 \003(\0132\027." +
-      "InvalidateChunkMessage\022(\n\013blockChange\030\004 " +
-      "\003(\0132\023.BlockChangeMessage\022*\n\014createEntity" +
-      "\030\005 \003(\0132\024.CreateEntityMessage\022*\n\014removeEn" +
-      "tity\030\006 \003(\0132\024.RemoveEntityMessage\022*\n\014upda" +
-      "teEntity\030\007 \003(\0132\024.UpdateEntityMessage\022\034\n\005" +
-      "event\030\010 \003(\0132\r.EventMessage\022\014\n\004time\030\t \001(\003" +
-      "\022,\n\rclientConnect\030\017 \001(\0132\025.ClientConnectM",
-      "essage\022&\n\nserverInfo\030\020 \001(\0132\022.ServerInfoM" +
-      "essage\022<\n\025blockFamilyRegistered\030\021 \003(\0132\035." +
-      "BlockFamilyRegisteredMessage\022\'\n\016handshak" +
-      "eHello\030d \001(\0132\017.HandshakeHello\022/\n\022newIden" +
-      "tityRequest\030e \001(\0132\023.NewIdentityRequest\022-" +
-      "\n\021provisionIdentity\030f \001(\0132\022.ProvisionIde" +
-      "ntity\0225\n\025handshakeVerification\030g \001(\0132\026.H" +
-      "andshakeVerification*\t\010\210\'\020\200\200\200\200\002\"a\n\016Hands" +
-      "hakeHello\022\016\n\006random\030\001 \001(\014\022!\n\013certificate" +
-      "\030\002 \001(\0132\014.Certificate\022\021\n\ttimestamp\030\003 \001(\022*",
-      "\t\010\210\'\020\200\200\200\200\002\"H\n\022NewIdentityRequest\022\027\n\017preM" +
-      "asterSecret\030\001 \001(\014\022\016\n\006random\030\002 \001(\014*\t\010\210\'\020\200" +
-      "\200\200\200\002\"=\n\021ProvisionIdentity\022\035\n\025encryptedCe" +
-      "rtificates\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"]\n\016Certifica" +
-      "teSet\022\'\n\021publicCertificate\030\001 \001(\0132\014.Certi" +
-      "ficate\022\027\n\017privateExponent\030\002 \001(\014*\t\010\210\'\020\200\200\200" +
-      "\200\002\"5\n\025HandshakeVerification\022\021\n\tsignature" +
-      "\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"Z\n\013Certificate\022\n\n\002id\030\001" +
-      " \001(\t\022\017\n\007modulus\030\002 \001(\014\022\020\n\010exponent\030\003 \001(\014\022" +
-      "\021\n\tsignature\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"L\n\034BlockFa",
-      "milyRegisteredMessage\022\020\n\010blockUri\030\001 \003(\t\022" +
-      "\017\n\007blockId\030\002 \003(\005*\t\010\210\'\020\200\200\200\200\002\"?\n\026Invalidat" +
-      "eChunkMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iDat" +
-      "a*\t\010\210\'\020\200\200\200\200\002\"M\n\022BlockChangeMessage\022\032\n\003po" +
-      "s\030\001 \001(\0132\r.Vector3iData\022\020\n\010newBlock\030\002 \001(\005" +
-      "*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t" +
-      "\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(\005\"[\n\024ClientConnectMes" +
-      "sage\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\031\n\021v" +
-      "iewDistanceLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\323\002\n\021Se" +
-      "rverInfoMessage\022\033\n\006module\030\001 \003(\0132\013.Module",
-      "Info\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003" +
-      " \003(\t\022%\n\tcomponent\030\004 \003(\0132\022.SerializationI" +
-      "nfo\022!\n\005event\030\005 \003(\0132\022.SerializationInfo\022\023" +
-      "\n\007assetId\030\006 \003(\005B\002\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n" +
-      "\023registerBlockFamily\030\010 \003(\t\022\035\n\tworldInfo\030" +
-      "\t \003(\0132\n.WorldInfo\022\017\n\007version\030\017 \001(\t\022\020\n\010ga" +
-      "meName\030\020 \001(\t\022\020\n\010clientId\030\021 \001(\005\022\014\n\004time\030\022" +
-      " \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005title\030\001 " +
-      "\001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Serializ" +
-      "ationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tf",
-      "ieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010\210\'\020\200\200" +
-      "\200\200\002\")\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'" +
-      "\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022\035\n\006entity\030" +
-      "\001 \001(\0132\r.PackedEntity\022\037\n\010blockPos\030\002 \001(\0132\r" +
-      ".Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023UpdateEntity" +
-      "Message\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\r" +
-      "\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEntity" +
-      "Message\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014Eve" +
-      "ntMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n\005event\030\002 \001" +
-      "(\0132\006.Event\022%\n\016targetBlockPos\030\003 \001(\0132\r.Vec",
-      "tor3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.terasology.p" +
-      "rotobufB\007NetDataH\001"
+      "unks.proto\"\227\005\n\nNetMessage\022\036\n\tchunkInfo\030\002" +
+      " \003(\0132\013.ChunkStore\0220\n\017invalidateChunk\030\003 \003" +
+      "(\0132\027.InvalidateChunkMessage\022(\n\013blockChan" +
+      "ge\030\004 \003(\0132\023.BlockChangeMessage\022*\n\014createE" +
+      "ntity\030\005 \003(\0132\024.CreateEntityMessage\022*\n\014rem" +
+      "oveEntity\030\006 \003(\0132\024.RemoveEntityMessage\022*\n" +
+      "\014updateEntity\030\007 \003(\0132\024.UpdateEntityMessag" +
+      "e\022\034\n\005event\030\010 \003(\0132\r.EventMessage\022\014\n\004time\030" +
+      "\t \001(\003\022,\n\rclientConnect\030\017 \001(\0132\025.ClientCon",
+      "nectMessage\022&\n\nserverInfo\030\020 \001(\0132\022.Server" +
+      "InfoMessage\022<\n\025blockFamilyRegistered\030\021 \003" +
+      "(\0132\035.BlockFamilyRegisteredMessage\022\'\n\016han" +
+      "dshakeHello\030d \001(\0132\017.HandshakeHello\022/\n\022ne" +
+      "wIdentityRequest\030e \001(\0132\023.NewIdentityRequ" +
+      "est\022-\n\021provisionIdentity\030f \001(\0132\022.Provisi" +
+      "onIdentity\0225\n\025handshakeVerification\030g \001(" +
+      "\0132\026.HandshakeVerification*\t\010\210\'\020\200\200\200\200\002\"a\n\016" +
+      "HandshakeHello\022\016\n\006random\030\001 \001(\014\022!\n\013certif" +
+      "icate\030\002 \001(\0132\014.Certificate\022\021\n\ttimestamp\030\003",
+      " \001(\022*\t\010\210\'\020\200\200\200\200\002\"H\n\022NewIdentityRequest\022\027\n" +
+      "\017preMasterSecret\030\001 \001(\014\022\016\n\006random\030\002 \001(\014*\t" +
+      "\010\210\'\020\200\200\200\200\002\"=\n\021ProvisionIdentity\022\035\n\025encryp" +
+      "tedCertificates\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"]\n\016Cert" +
+      "ificateSet\022\'\n\021publicCertificate\030\001 \001(\0132\014." +
+      "Certificate\022\027\n\017privateExponent\030\002 \001(\014*\t\010\210" +
+      "\'\020\200\200\200\200\002\"5\n\025HandshakeVerification\022\021\n\tsign" +
+      "ature\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"Z\n\013Certificate\022\n\n" +
+      "\002id\030\001 \001(\t\022\017\n\007modulus\030\002 \001(\014\022\020\n\010exponent\030\003" +
+      " \001(\014\022\021\n\tsignature\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"L\n\034Bl",
+      "ockFamilyRegisteredMessage\022\020\n\010blockUri\030\001" +
+      " \003(\t\022\017\n\007blockId\030\002 \003(\005*\t\010\210\'\020\200\200\200\200\002\"?\n\026Inva" +
+      "lidateChunkMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector" +
+      "3iData*\t\010\210\'\020\200\200\200\200\002\"M\n\022BlockChangeMessage\022" +
+      "\032\n\003pos\030\001 \001(\0132\r.Vector3iData\022\020\n\010newBlock\030" +
+      "\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 " +
+      "\001(\005\022\t\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(\005\"[\n\024ClientConne" +
+      "ctMessage\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t" +
+      "\022\031\n\021viewDistanceLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\323" +
+      "\002\n\021ServerInfoMessage\022\033\n\006module\030\001 \003(\0132\013.M",
+      "oduleInfo\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockN" +
+      "ame\030\003 \003(\t\022%\n\tcomponent\030\004 \003(\0132\022.Serializa" +
+      "tionInfo\022!\n\005event\030\005 \003(\0132\022.SerializationI" +
+      "nfo\022\023\n\007assetId\030\006 \003(\005B\002\020\001\022\020\n\010assetUri\030\007 \003" +
+      "(\t\022\033\n\023registerBlockFamily\030\010 \003(\t\022\035\n\tworld" +
+      "Info\030\t \003(\0132\n.WorldInfo\022\017\n\007version\030\017 \001(\t\022" +
+      "\020\n\010gameName\030\020 \001(\t\022\020\n\010clientId\030\021 \001(\005\022\014\n\004t" +
+      "ime\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005tit" +
+      "le\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Ser" +
+      "ializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005",
+      "\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010" +
+      "\210\'\020\200\200\200\200\002\")\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t" +
+      "*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022\035\n\006en" +
+      "tity\030\001 \001(\0132\r.PackedEntity\022\037\n\010blockPos\030\002 " +
+      "\001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023UpdateE" +
+      "ntityMessage\022\035\n\006entity\030\001 \001(\0132\r.PackedEnt" +
+      "ity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023RemoveE" +
+      "ntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i" +
+      "\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n\005even" +
+      "t\030\002 \001(\0132\006.Event\022%\n\016targetBlockPos\030\003 \001(\0132",
+      "\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.terasol" +
+      "ogy.protobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

@@ -277,7 +277,7 @@ public class Server implements ChunkReadyListener {
     }
 
     private void processReceivedChunks(NetData.NetMessage message) {
-        for (ChunksProtobuf.Chunk chunkInfo : message.getChunkInfoList()) {
+        for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
             Chunk chunk = Chunks.getInstance().decode(chunkInfo);
             chunkQueue.offer(chunk);
         }

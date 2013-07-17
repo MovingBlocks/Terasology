@@ -39,16 +39,8 @@ final class ChunkStoreInternal implements ChunkStore {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
-        ChunksProtobuf.Chunk chunkDataForDecode = ChunksProtobuf.Chunk.newBuilder()
-                .setX(chunkData.getX())
-                .setY(chunkData.getY())
-                .setZ(chunkData.getZ())
-                .setBlockData(chunkData.getBlockData())
-                .setSunlightData(chunkData.getSunlightData())
-                .setLightData(chunkData.getLightData())
-                .setExtraData(chunkData.getLiquidData())
-                .setState(chunkData.getState()).build();
-        this.chunk = new Chunk.ProtobufHandler().decode(chunkDataForDecode);
+
+        this.chunk = new Chunk.ProtobufHandler().decode(chunkData);
         this.entityStore = chunkData.getStore();
         this.externalRefs = externalRefs;
     }
@@ -111,23 +103,13 @@ final class ChunkStoreInternal implements ChunkStore {
     }
 
     public EntityData.ChunkStore getStore() {
-        EntityData.ChunkStore.Builder builder = EntityData.ChunkStore.newBuilder();
-        builder.setX(chunkPosition.x);
-        builder.setY(chunkPosition.y);
-        builder.setZ(chunkPosition.z);
-
         chunk.lock();
         try {
-            ChunksProtobuf.Chunk encoded = new Chunk.ProtobufHandler().encode(chunk, false);
-            builder.setBlockData(encoded.getBlockData());
-            builder.setSunlightData(encoded.getSunlightData());
-            builder.setLightData(encoded.getLightData());
-            builder.setLiquidData(encoded.getExtraData());
-            builder.setState(chunk.getChunkState().getProtobufState());
-            builder.setStore(entityStore);
+            EntityData.ChunkStore.Builder encoded = new Chunk.ProtobufHandler().encode(chunk, false);
+            encoded.setStore(entityStore);
+            return encoded.build();
         } finally {
             chunk.unlock();
         }
-        return builder.build();
     }
 }

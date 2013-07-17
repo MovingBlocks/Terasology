@@ -10,7 +10,7 @@ option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
 message NetMessage {
-    repeated Chunk chunkInfo = 2;
+    repeated ChunkStore chunkInfo = 2;
     repeated InvalidateChunkMessage invalidateChunk = 3;
     repeated BlockChangeMessage blockChange = 4;
     repeated CreateEntityMessage createEntity = 5;

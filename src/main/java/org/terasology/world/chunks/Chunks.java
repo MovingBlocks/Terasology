@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.blockdata.TeraArrays;
 
 import java.util.Map;
@@ -89,11 +90,11 @@ public final class Chunks {
         modDataEntries.put(id, entry);
     }
 
-    public final ChunksProtobuf.Chunk encode(Chunk chunk, boolean coreOnly) {
-        return handler.encode(chunk, coreOnly);
+    public final EntityData.ChunkStore encode(Chunk chunk, boolean coreOnly) {
+        return handler.encode(chunk, coreOnly).build();
     }
 
-    public final Chunk decode(ChunksProtobuf.Chunk message) {
+    public final Chunk decode(EntityData.ChunkStore message) {
         return handler.decode(message);
     }
 

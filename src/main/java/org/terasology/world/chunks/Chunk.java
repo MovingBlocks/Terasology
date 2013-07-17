@@ -25,7 +25,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -39,10 +39,6 @@ import org.terasology.world.chunks.internal.ChunkBlockIteratorImpl;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
@@ -65,15 +61,15 @@ public class Chunk {
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
     public static enum State {
-        ADJACENCY_GENERATION_PENDING(ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING),
-        INTERNAL_LIGHT_GENERATION_PENDING(ChunksProtobuf.State.INTERNAL_LIGHT_GENERATION_PENDING),
-        LIGHT_PROPAGATION_PENDING(ChunksProtobuf.State.LIGHT_PROPAGATION_PENDING),
-        FULL_LIGHT_CONNECTIVITY_PENDING(ChunksProtobuf.State.FULL_LIGHT_CONNECTIVITY_PENDING),
-        COMPLETE(ChunksProtobuf.State.COMPLETE);
+        ADJACENCY_GENERATION_PENDING(EntityData.ChunkState.ADJACENCY_GENERATION_PENDING),
+        INTERNAL_LIGHT_GENERATION_PENDING(EntityData.ChunkState.INTERNAL_LIGHT_GENERATION_PENDING),
+        LIGHT_PROPAGATION_PENDING(EntityData.ChunkState.LIGHT_PROPAGATION_PENDING),
+        FULL_LIGHT_CONNECTIVITY_PENDING(EntityData.ChunkState.FULL_LIGHT_CONNECTIVITY_PENDING),
+        COMPLETE(EntityData.ChunkState.COMPLETE);
 
-        private final ChunksProtobuf.State protobufState;
+        private final EntityData.ChunkState protobufState;
 
-        private static final Map<ChunksProtobuf.State, State> lookup;
+        private static final Map<EntityData.ChunkState, State> lookup;
 
         static {
             lookup = Maps.newHashMap();
@@ -82,15 +78,15 @@ public class Chunk {
             }
         }
 
-        private State(ChunksProtobuf.State protobufState) {
+        private State(EntityData.ChunkState protobufState) {
             this.protobufState = Preconditions.checkNotNull(protobufState);
         }
 
-        public final ChunksProtobuf.State getProtobufState() {
+        public final EntityData.ChunkState getProtobufState() {
             return protobufState;
         }
 
-        public static final State lookup(ChunksProtobuf.State state) {
+        public static State lookup(EntityData.ChunkState state) {
             State result = lookup.get(Preconditions.checkNotNull(state, "The parameter 'state' must not be null"));
             if (result == null)
                 throw new IllegalStateException("Unable to lookup the supplied state: " + state);
@@ -191,22 +187,22 @@ public class Chunk {
      */
     public static class ProtobufHandler {
 
-        public ChunksProtobuf.Chunk encode(Chunk chunk, boolean coreOnly) {
+        public EntityData.ChunkStore.Builder encode(Chunk chunk, boolean coreOnly) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
             final TeraArrays t = TeraArrays.getInstance();
-            final ChunksProtobuf.Chunk.Builder b = ChunksProtobuf.Chunk.newBuilder()
+            final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
                     .setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
                     .setState(chunk.chunkState.protobufState)
                     .setBlockData(t.encode(chunk.blockData));
             if (!coreOnly) {
                 b.setSunlightData(t.encode(chunk.sunlightData))
                         .setLightData(t.encode(chunk.lightData))
-                        .setExtraData(t.encode(chunk.extraData));
+                        .setLiquidData(t.encode(chunk.extraData));
             }
-            return b.build();
+            return b;
         }
 
-        public Chunk decode(ChunksProtobuf.Chunk message) {
+        public Chunk decode(EntityData.ChunkStore message) {
             Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
             if (!message.hasX() || !message.hasY() || !message.hasZ()) {
                 throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
@@ -243,8 +239,8 @@ public class Chunk {
                 }
             }
             TeraArray extraData;
-            if (message.hasExtraData()) {
-                extraData = t.decode(message.getExtraData());
+            if (message.hasLiquidData()) {
+                extraData = t.decode(message.getLiquidData());
             } else {
                 extraData = c.getExtraDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
             }

@@ -90,6 +90,115 @@ public final class EntityData {
     // @@protoc_insertion_point(enum_scope:StoreType)
   }
 
+  /**
+   * Protobuf enum {@code ChunkState}
+   */
+  public enum ChunkState
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>ADJACENCY_GENERATION_PENDING = 0;</code>
+     */
+    ADJACENCY_GENERATION_PENDING(0, 0),
+    /**
+     * <code>INTERNAL_LIGHT_GENERATION_PENDING = 1;</code>
+     */
+    INTERNAL_LIGHT_GENERATION_PENDING(1, 1),
+    /**
+     * <code>LIGHT_PROPAGATION_PENDING = 2;</code>
+     */
+    LIGHT_PROPAGATION_PENDING(2, 2),
+    /**
+     * <code>FULL_LIGHT_CONNECTIVITY_PENDING = 3;</code>
+     */
+    FULL_LIGHT_CONNECTIVITY_PENDING(3, 3),
+    /**
+     * <code>COMPLETE = 4;</code>
+     */
+    COMPLETE(4, 4),
+    ;
+
+    /**
+     * <code>ADJACENCY_GENERATION_PENDING = 0;</code>
+     */
+    public static final int ADJACENCY_GENERATION_PENDING_VALUE = 0;
+    /**
+     * <code>INTERNAL_LIGHT_GENERATION_PENDING = 1;</code>
+     */
+    public static final int INTERNAL_LIGHT_GENERATION_PENDING_VALUE = 1;
+    /**
+     * <code>LIGHT_PROPAGATION_PENDING = 2;</code>
+     */
+    public static final int LIGHT_PROPAGATION_PENDING_VALUE = 2;
+    /**
+     * <code>FULL_LIGHT_CONNECTIVITY_PENDING = 3;</code>
+     */
+    public static final int FULL_LIGHT_CONNECTIVITY_PENDING_VALUE = 3;
+    /**
+     * <code>COMPLETE = 4;</code>
+     */
+    public static final int COMPLETE_VALUE = 4;
+
+
+    public final int getNumber() { return value; }
+
+    public static ChunkState valueOf(int value) {
+      switch (value) {
+        case 0: return ADJACENCY_GENERATION_PENDING;
+        case 1: return INTERNAL_LIGHT_GENERATION_PENDING;
+        case 2: return LIGHT_PROPAGATION_PENDING;
+        case 3: return FULL_LIGHT_CONNECTIVITY_PENDING;
+        case 4: return COMPLETE;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<ChunkState>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<ChunkState>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<ChunkState>() {
+            public ChunkState findValueByNumber(int number) {
+              return ChunkState.valueOf(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return org.terasology.protobuf.EntityData.getDescriptor().getEnumTypes().get(1);
+    }
+
+    private static final ChunkState[] VALUES = values();
+
+    public static ChunkState valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int index;
+    private final int value;
+
+    private ChunkState(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:ChunkState)
+  }
+
   public interface ValueOrBuilder extends
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Value> {
@@ -11823,15 +11932,15 @@ public final class EntityData {
      */
     int getZ();
 
-    // optional .State state = 5;
+    // optional .ChunkState state = 5;
     /**
-     * <code>optional .State state = 5;</code>
+     * <code>optional .ChunkState state = 5;</code>
      */
     boolean hasState();
     /**
-     * <code>optional .State state = 5;</code>
+     * <code>optional .ChunkState state = 5;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.State getState();
+    org.terasology.protobuf.EntityData.ChunkState getState();
 
     // optional .TeraArray block_data = 6;
     /**
@@ -11970,7 +12079,7 @@ public final class EntityData {
             }
             case 40: {
               int rawValue = input.readEnum();
-              org.terasology.protobuf.ChunksProtobuf.State value = org.terasology.protobuf.ChunksProtobuf.State.valueOf(rawValue);
+              org.terasology.protobuf.EntityData.ChunkState value = org.terasology.protobuf.EntityData.ChunkState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
               } else {
@@ -12141,19 +12250,19 @@ public final class EntityData {
       return z_;
     }
 
-    // optional .State state = 5;
+    // optional .ChunkState state = 5;
     public static final int STATE_FIELD_NUMBER = 5;
-    private org.terasology.protobuf.ChunksProtobuf.State state_;
+    private org.terasology.protobuf.EntityData.ChunkState state_;
     /**
-     * <code>optional .State state = 5;</code>
+     * <code>optional .ChunkState state = 5;</code>
      */
     public boolean hasState() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional .State state = 5;</code>
+     * <code>optional .ChunkState state = 5;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.State getState() {
+    public org.terasology.protobuf.EntityData.ChunkState getState() {
       return state_;
     }
 
@@ -12250,7 +12359,7 @@ public final class EntityData {
       x_ = 0;
       y_ = 0;
       z_ = 0;
-      state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+      state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
       blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       sunlightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       lightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
@@ -12512,7 +12621,7 @@ public final class EntityData {
         bitField0_ = (bitField0_ & ~0x00000004);
         z_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+        state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
         bitField0_ = (bitField0_ & ~0x00000010);
         if (blockDataBuilder_ == null) {
           blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
@@ -12943,24 +13052,24 @@ public final class EntityData {
         return this;
       }
 
-      // optional .State state = 5;
-      private org.terasology.protobuf.ChunksProtobuf.State state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+      // optional .ChunkState state = 5;
+      private org.terasology.protobuf.EntityData.ChunkState state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
       /**
-       * <code>optional .State state = 5;</code>
+       * <code>optional .ChunkState state = 5;</code>
        */
       public boolean hasState() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional .State state = 5;</code>
+       * <code>optional .ChunkState state = 5;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.State getState() {
+      public org.terasology.protobuf.EntityData.ChunkState getState() {
         return state_;
       }
       /**
-       * <code>optional .State state = 5;</code>
+       * <code>optional .ChunkState state = 5;</code>
        */
-      public Builder setState(org.terasology.protobuf.ChunksProtobuf.State value) {
+      public Builder setState(org.terasology.protobuf.EntityData.ChunkState value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -12970,11 +13079,11 @@ public final class EntityData {
         return this;
       }
       /**
-       * <code>optional .State state = 5;</code>
+       * <code>optional .ChunkState state = 5;</code>
        */
       public Builder clearState() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+        state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
         onChanged();
         return this;
       }
@@ -16608,25 +16717,29 @@ public final class EntityData {
       "\200\200\002\"\220\001\n\013PlayerStore\022\033\n\005store\030\001 \001(\0132\014.Ent" +
       "ityStore\022\025\n\rcharacterPosX\030\017 \001(\002\022\025\n\rchara" +
       "cterPosY\030\020 \001(\002\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n" +
-      "\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\360\001\n\nChunk" +
+      "\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\365\001\n\nChunk" +
       "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\t\n\001x\030" +
-      "\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001z\030\004 \001(\021\022\025\n\005state\030\005 \001" +
-      "(\0162\006.State\022\036\n\nblock_data\030\006 \001(\0132\n.TeraArr" +
-      "ay\022!\n\rsunlight_data\030\007 \001(\0132\n.TeraArray\022\036\n" +
-      "\nlight_data\030\010 \001(\0132\n.TeraArray\022\037\n\013liquid_" +
-      "data\030\t \001(\0132\n.TeraArray*\t\010\210\'\020\200\200\200\200\002\"\204\001\n\023En",
-      "tityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.StoreT" +
-      "ype\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016storeInteg" +
-      "erId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002\020\001*\t\010" +
-      "\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030\001 \003(\013" +
-      "2\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017co" +
-      "mponent_class\030\003 \003(\t\022\026\n\016next_entity_id\030\020 " +
-      "\001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013pref" +
-      "ab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030\023 \003(\013" +
-      "2\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4\n\tSto" +
-      "reType\022\023\n\017PlayerStoreType\020\001\022\022\n\016ChunkStor",
-      "eType\020\002B\'\n\027org.terasology.protobufB\nEnti" +
-      "tyDataH\001"
+      "\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001z\030\004 \001(\021\022\032\n\005state\030\005 \001" +
+      "(\0162\013.ChunkState\022\036\n\nblock_data\030\006 \001(\0132\n.Te" +
+      "raArray\022!\n\rsunlight_data\030\007 \001(\0132\n.TeraArr" +
+      "ay\022\036\n\nlight_data\030\010 \001(\0132\n.TeraArray\022\037\n\013li" +
+      "quid_data\030\t \001(\0132\n.TeraArray*\t\010\210\'\020\200\200\200\200\002\"\204",
+      "\001\n\023EntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.S" +
+      "toreType\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016store" +
+      "IntegerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002" +
+      "\020\001*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030" +
+      "\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022" +
+      "\027\n\017component_class\030\003 \003(\t\022\026\n\016next_entity_" +
+      "id\030\020 \001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n" +
+      "\013prefab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030" +
+      "\023 \003(\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4" +
+      "\n\tStoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016Chun",
+      "kStoreType\020\002*\247\001\n\nChunkState\022 \n\034ADJACENCY" +
+      "_GENERATION_PENDING\020\000\022%\n!INTERNAL_LIGHT_" +
+      "GENERATION_PENDING\020\001\022\035\n\031LIGHT_PROPAGATIO" +
+      "N_PENDING\020\002\022#\n\037FULL_LIGHT_CONNECTIVITY_P" +
+      "ENDING\020\003\022\014\n\010COMPLETE\020\004B\'\n\027org.terasology" +
+      ".protobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
