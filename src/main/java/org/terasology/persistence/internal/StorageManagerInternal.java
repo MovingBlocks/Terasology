@@ -355,6 +355,15 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private Vector3i getChunkZipPosition(Vector3i chunkPos) {
         Vector3i result = new Vector3i(chunkPos);
         result.divide(CHUNK_ZIP_DIM);
+        if (chunkPos.x < 0) {
+            result.x -= 1;
+        }
+        if (chunkPos.y < 0) {
+            result.y -= 1;
+        }
+        if (chunkPos.z < 0) {
+            result.z -= 1;
+        }
         return result;
     }
 
