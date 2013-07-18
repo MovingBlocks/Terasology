@@ -59,6 +59,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import java.util.LinkedList;
 import java.util.List;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.input.events.KeyDownEvent;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported
@@ -72,8 +74,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
     private Mesh gelatinousCubeMesh;
     private WorldRenderer worldRenderer;
-    private MeshSorterCollection opaqueMeshSorter = new MeshSorterCollection();
-    private MeshSorterCollection gelatinousMeshSorter = new MeshSorterCollection();
+    private NearestSortingList opaqueMeshSorter = new NearestSortingList();
+    private NearestSortingList gelatinousMeshSorter = new NearestSortingList();
+    private List<Material> materials = new LinkedList();
 
     private Multimap<Material, EntityRef> opaqueMesh = ArrayListMultimap.create();
     //private Multimap<Material, EntityRef> translucentMesh = HashMultimap.create();
@@ -81,7 +84,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     //private int batchVertexBuffer;
     //private int batchIndexBuffer;
     private boolean batch = false;
-    private boolean sortedRender = true;
+    private boolean renderNearest = true;
     private int maxOpaqueMeshesWhenSorting = 20;
     private int maxGenlatinousMeshesWhenSorting = 20;
     public int lastRendered;
@@ -107,12 +110,28 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         gelatinousMeshSorter.stop();
     }
 
-    /*
-     * @ReceiveEvent(components = {LocalPlayerComponent.class}) public void
-     * onKeyDown(KeyDownEvent event, EntityRef entity) { if
-     * (event.getKeyCharacter() == ';') { batch = !batch; } }
+    /**
+     * Used for toggling the rendering mode between nearest and all.
+     * TODO: replace this keylistener with a text command or allow the user to
+     * change the command
+     * @param event
+     * @param entity 
      */
-    
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onKeyDown(KeyDownEvent event, EntityRef entity) {
+        if (event.getKeyCharacter() == ';') {
+            renderNearest = !renderNearest;
+            if(! renderNearest) {
+                gelatinousMeshSorter.stop();
+                opaqueMeshSorter.stop();
+            } else {
+                gelatinousMeshSorter.initialize();
+                opaqueMeshSorter.initialize();
+            }
+        }
+    }
+
+     
     @ReceiveEvent(components = {MeshComponent.class})
     public void onNewMesh(AddComponentEvent event, EntityRef entity) {
         if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
@@ -145,7 +164,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderAlphaBlend() {
-        if(sortedRender) {
+        if(renderNearest) {
             renderAlphaBlendSorted();
         } else {
             renderAlphaBlendAll();
@@ -153,10 +172,10 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     }
 
     public void render() {
-        if (sortedRender) {
-            renderSorted();
+        if (renderNearest) {
+            renderNearest();
         } else {
-            renderFromMaterialMap();
+            renderAll();
         }
     }
 
@@ -227,7 +246,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
      * This is the old render method, as written by begla. Should be removed
      * when the material map is removed from this class.
      */
-    private void renderFromMaterialMap() {
+    private void renderAll() {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -359,7 +378,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
      * amount of meshes to render. - slightly worse performance on same amount
      * of meshes to render.
      */
-    private void renderSorted() {
+    private void renderNearest() {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -372,10 +391,10 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
         EntityRef[] nearest = opaqueMeshSorter.getNearest(maxOpaqueMeshesWhenSorting);
-        List<Material> materials = new LinkedList();
         /**
          * Get the materials to iterate over.
          */
+        materials.clear();
         for (EntityRef entity : nearest) {
             MeshComponent component = entity.getComponent(MeshComponent.class);
             if (component.mesh == null) {

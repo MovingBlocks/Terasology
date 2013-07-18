@@ -65,7 +65,7 @@ public class GLSLShaderProgramInstance {
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
     //The following two maps do not contain a lot of elements.
-    private TIntIntMap uniformLocationMap = new TIntIntHashMap(20, 1, 0, 0);
+    private HashMap<String, Integer> uniformLocationMap = new HashMap(50, 0.8f);
     private static HashMap<String, Float> prevValues = new HashMap();
 
     private int availableFeatures = 0;
@@ -296,6 +296,7 @@ public class GLSLShaderProgramInstance {
         vertexPrograms.clear();
 
         uniformLocationMap.clear();
+        prevValues.clear();
         disposed = true;
     }
 
@@ -477,6 +478,7 @@ public class GLSLShaderProgramInstance {
             changed = val != f;
         }
         if(changed) {
+            prevValues.put(desc, f);
             int id = getUniformLocation(activeShaderProgramId, desc);
             GL20.glUniform1f(id, f);
         }
@@ -784,43 +786,21 @@ public class GLSLShaderProgramInstance {
         GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
-    /**
-     * Generates a hash to be used in the custom hashmaps.
-     * @param activeShaderProgramId To make sure all uniform names are unique,
-     * the ':' character followed by the shader ID is appended before hashing 
-     * the string.
-     * @param desc the string to hash
-     * @return the hash value of desc
-     */
-    private int generateHash(int activeShaderProgramId, String desc) {
-        /* 
-         * Note that uniform names cannot contain the : character, hence
-         * this hashed string is unique for each uniform.
-         * But two strings may still hash to the same value. Otherwise it 
-         * would not be called a hashing, but a mapping!
-         * There
-         * 
-         * //TODO Random bug warning: two uniforms are hashed to the same value...
-         */
-        return (desc + ":" + activeShaderProgramId).hashCode();
-    }
-
     private int getUniformLocation(int activeShaderProgramId, String desc) {
         
-        int hash = generateHash(activeShaderProgramId, desc);
-
-        int id = uniformLocationMap.get(hash);
+        Integer id = uniformLocationMap.get(desc + ":" + getActiveShaderProgramId());
         
-        if (id == 0) {
+        if(id == null) {
             id = GL20.glGetUniformLocation(activeShaderProgramId, desc);
-            uniformLocationMap.put(hash, id);
+            //The ';' character ensures uniqueness.
+            uniformLocationMap.put(desc + ":" + activeShaderProgramId, id);
         }
         
         return id;
     }
 
     public boolean wasSet(String desc) {
-        return uniformLocationMap.containsKey(generateHash(getActiveShaderProgramId(), desc));
+        return uniformLocationMap.containsKey(desc + ":" + getActiveShaderProgramId());
     }
 
     public void setCamera(Camera camera) {

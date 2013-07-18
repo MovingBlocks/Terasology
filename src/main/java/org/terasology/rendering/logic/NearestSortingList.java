@@ -35,8 +35,8 @@ import org.terasology.logic.LocalPlayer;
  *
  * @author XanHou
  */
-public class MeshSorterCollection implements Iterable<EntityRef> {
-    private static final Logger logger = LoggerFactory.getLogger(MeshSorterCollection.class);
+public class NearestSortingList implements Iterable<EntityRef> {
+    private static final Logger logger = LoggerFactory.getLogger(NearestSortingList.class);
     private LinkedList<EntityRef> entities = new LinkedList<EntityRef>();
     private LocalPlayer lp;
     private final List<Command> commands = new ArrayList();
@@ -98,10 +98,12 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
      *          IlligalArgumentException is thrown.
      */
     public synchronized void add(EntityRef e) {
-        logger.warn("Ädding entity without LocationComponent to Container that sorts on Location");
+        if(e.getComponent(LocationComponent.class) == null) {
+            logger.warn("Ädding entity without LocationComponent to Container that sorts on Location");
+        }
         //new entities are inserted to make sure that new entities are drawn first.
         //Since it is likely the players wants to see new entities over existing ones
-        //And it is likely new entities spawn neat the player.
+        //And it is likely new entities spawn near the player.
         entities.add(0, e);
         if (sorting) {
             commands.add(new AddCommand(e));

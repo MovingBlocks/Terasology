@@ -273,11 +273,6 @@ public class TerasologyEngine implements GameEngine {
         return threadPool.getActiveCount();
     }
 
-    @Override
-    public GameState getCurrentGameState() {
-        return currentState;
-    }
-
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:

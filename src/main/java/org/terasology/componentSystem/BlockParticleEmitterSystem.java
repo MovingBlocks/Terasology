@@ -44,11 +44,13 @@ import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.management.BlockManager;
 
 import static org.lwjgl.opengl.GL11.*;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.rendering.logic.MeshSorterCollection;
+import org.terasology.input.events.KeyDownEvent;
+import org.terasology.rendering.logic.NearestSortingList;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -59,7 +61,7 @@ import org.terasology.rendering.logic.MeshSorterCollection;
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float REL_PARTICLE_TEX_SIZE = 0.25f;
-    private MeshSorterCollection sorter = new MeshSorterCollection();
+    private NearestSortingList sorter = new NearestSortingList();
 
     @In
     private EntityManager entityManager;
@@ -74,6 +76,26 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     private FastRandom random = new FastRandom();
     private int displayList =  0;
     private int maxDrawnParticles = 10;
+    private boolean renderNearest = true;
+    
+    /**
+     * Used for toggling the rendering mode between nearest and all.
+     * TODO: replace this keylistener with a text command or allow the user to
+     * change the command
+     * @param event
+     * @param entity 
+     */
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onKeyDown(KeyDownEvent event, EntityRef entity) {
+        if (event.getKeyCharacter() == ';') {
+            renderNearest = !renderNearest;
+            if(! renderNearest) {
+                sorter.stop();
+            } else {
+                sorter.initialize();
+            }
+        }
+    }
 
     public void initialise() {
         if (displayList == 0) {
@@ -184,12 +206,66 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     public void renderAlphaBlend() {
+        if(renderNearest) {
+            renderNearest();
+        } else {
+            renderAll();
+        }
+    }
+    
+    private void renderAll() {
         ShaderManager.getInstance().enableShader("particle");
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        //for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
+            LocationComponent location = entity.getComponent(LocationComponent.class);
+            Vector3f worldPos = location.getWorldPosition();
+
+            if (!worldProvider.isBlockActive(worldPos)) {
+                continue;
+            }
+
+            BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
+
+            if (particleEffect.texture == null) {
+                Texture terrainTex = Assets.getTexture("engine:terrain");
+                if (terrainTex == null) {
+                    return;
+                }
+
+                GL13.glActiveTexture(GL13.GL_TEXTURE0);
+                glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
+            } else {
+                GL13.glActiveTexture(GL13.GL_TEXTURE0);
+                glBindTexture(GL11.GL_TEXTURE_2D, particleEffect.texture.getId());
+            }
+
+            if (particleEffect.blendMode == BlockParticleEffectComponent.ParticleBlendMode.ADD) {
+                glBlendFunc(GL_ONE, GL_ONE);
+            }
+
+            if (particleEffect.blockType != null) {
+                renderBlockParticles(worldPos, cameraPosition, particleEffect);
+            } else {
+                renderParticles(worldPos, cameraPosition, particleEffect);
+            }
+
+            if (particleEffect.blendMode == BlockParticleEffectComponent.ParticleBlendMode.ADD) {
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            }
+        }
+
+        glEnable(GL11.GL_CULL_FACE);
+    }
+    
+    private void renderNearest() {
+        ShaderManager.getInstance().enableShader("particle");
+        glDisable(GL11.GL_CULL_FACE);
+
+        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+
         for(EntityRef entity : sorter.getNearest(maxDrawnParticles)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();

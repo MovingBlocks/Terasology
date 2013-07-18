@@ -44,7 +44,6 @@ public class CoreRegistry {
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
-        //TODO allow multiple loop-ups to happen concurrently, but only a single put without any look-ups at a time.
         return type.cast(store.get(type));
     }
 

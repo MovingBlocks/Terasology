@@ -63,11 +63,6 @@ public interface GameEngine {
      * @param newState
      */
     void changeState(GameState newState);
-    
-    /**
-     * @return The reference to the current GameState. Can be null.
-     */
-    GameState getCurrentGameState();
 
     // TODO: Move task system elsewhere? Need to support saving queued/unfinished tasks too, when the world
     // shuts down
