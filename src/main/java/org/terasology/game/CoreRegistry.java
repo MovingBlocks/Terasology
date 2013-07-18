@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
  * @author Immortius <immortius@gmail.com>
  */
 public class CoreRegistry {
-    private static Map<Class<? extends Object>, Object> store = Maps.newConcurrentMap();
+    private static Map<Class<? extends Object>, Object> store = Maps.newHashMap();
 
     /**
      * Registers a core system
