@@ -20,17 +20,17 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * Registry giving access to major singleton systems, via the interface they fulfil.
+ * Registry giving access to major singleton systems, via the interface they fulfill.
  *
  * @author Immortius <immortius@gmail.com>
  */
 public class CoreRegistry {
-    private static Map<Class<? extends Object>, Object> store = Maps.newHashMap();
+    private static Map<Class<? extends Object>, Object> store = Maps.newConcurrentMap();
 
     /**
      * Registers a core system
      *
-     * @param type   The interface which the system fulfils
+     * @param type   The interface which the system fulfills
      * @param object The system itself
      * @param <T>
      */
@@ -44,6 +44,7 @@ public class CoreRegistry {
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
+        //TODO allow multiple loop-ups to happen concurrently, but only a single put without any look-ups at a time.
         return type.cast(store.get(type));
     }
 

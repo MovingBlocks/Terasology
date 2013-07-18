@@ -15,6 +15,11 @@
 /.settings/
 /bin/
 
+# Ignore Netbeans
+/nbproject/private/
+/nbbuild/
+/dist/
+
 # Ignore OS generated files
 *.directory
 *~

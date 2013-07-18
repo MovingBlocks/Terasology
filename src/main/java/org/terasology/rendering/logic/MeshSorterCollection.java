@@ -1,4 +1,4 @@
-package com.trolls4life.gm;
+package org.terasology.rendering.logic;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,9 @@ import java.util.TimerTask;
 import javax.vecmath.Vector3f;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.modes.GameState;
 import org.terasology.logic.LocalPlayer;
 
 /**
@@ -20,10 +23,19 @@ import org.terasology.logic.LocalPlayer;
  *
  * The sorting is done asynchronous from the usages of the data, meaning there
  * is no performance loss if an additional cpu-core is present.
+ * 
+ * When retrieving Entities from this container, no guarantees are given on the
+ * sorting of the entities. This class only tries to keep the elements sorted,
+ * but does not guarantee it.
+ * 
+ * It it therefor use full for keeping track of the entities with a Mesh attached
+ * to them to keep track of what Entities to draw.
+ * The advantage is that the sorting does not cause a performance issue, since
+ * it is done asynchronously from the main thread.
  *
- * @author Rednax
+ * @author XanHou
  */
-public class MeshSorter implements Iterable<EntityRef> {
+public class MeshSorterCollection implements Iterable<EntityRef> {
     private LinkedList<EntityRef> entities = new LinkedList<EntityRef>();
     private LocalPlayer lp;
     private final List<Command> commands = new ArrayList();
@@ -34,11 +46,13 @@ public class MeshSorter implements Iterable<EntityRef> {
     private Vector3f playerPos = null;
     private DistanceComparator comparator = new DistanceComparator();
     private boolean sorting = false;
+    private GameState gameState;
 
-    public MeshSorter(LocalPlayer localPlayer) {
+    public MeshSorterCollection(LocalPlayer localPlayer) {
         lp = localPlayer;
         sortingTask = new SortTask();
         timer.schedule(sortingTask, 0);
+        gameState = CoreRegistry.get(GameEngine.class).getCurrentGameState();
     }
 
     /**
@@ -336,13 +350,18 @@ public class MeshSorter implements Iterable<EntityRef> {
 
         @Override
         public void run() {
-            sort();
-            long finishTime = System.currentTimeMillis();
-            long delay = SORT_DELAY_MILLIES - finishTime;
-            if (delay < 0) {
-                delay = 0;
+            if(CoreRegistry.get(GameEngine.class).getCurrentGameState() == gameState) {
+                sort();
             }
-            timer.schedule(this, delay);
+            //The sorting is expected to take some time. In the meanwhile, the current gamestate may have changed.
+            if(CoreRegistry.get(GameEngine.class).getCurrentGameState() == gameState) {
+                long finishTime = System.currentTimeMillis();
+                long delay = SORT_DELAY_MILLIES - finishTime;
+                if (delay < 0) {
+                    delay = 0;
+                }
+                timer.schedule(this, delay);
+            }
         }
     }
 }
