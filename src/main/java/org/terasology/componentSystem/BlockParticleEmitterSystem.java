@@ -48,7 +48,6 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.rendering.logic.MeshSorterCollection;
 
 /**
