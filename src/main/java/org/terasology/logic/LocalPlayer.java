@@ -65,8 +65,9 @@ public class LocalPlayer {
             output.x = 0;
             output.y = 0;
             output.z = 0;
+        } else {
+            location.getWorldPosition(output);
         }
-        location.getWorldPosition(output);
     }
 
     public Quat4f getViewRotation() {

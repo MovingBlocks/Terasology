@@ -44,6 +44,12 @@ import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.management.BlockManager;
 
 import static org.lwjgl.opengl.GL11.*;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.rendering.logic.MeshSorterCollection;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -51,9 +57,10 @@ import static org.lwjgl.opengl.GL11.*;
 // TODO: Generalise for non-block particles
 // TODO: Dispose display list
 @RegisterComponentSystem(headedOnly = true)
-public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
+public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float REL_PARTICLE_TEX_SIZE = 0.25f;
+    private MeshSorterCollection sorter = new MeshSorterCollection();
 
     @In
     private EntityManager entityManager;
@@ -67,6 +74,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
     private FastRandom random = new FastRandom();
     private int displayList =  0;
+    private int maxDrawnParticles = 10;
 
     public void initialise() {
         if (displayList == 0) {
@@ -75,11 +83,22 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             drawParticle();
             glEndList();
         }
+        sorter.initialize();
+    }
+    
+    @ReceiveEvent(components = {BlockParticleEffectComponent.class}, priority = EventPriority.PRIORITY_LOW)
+    public void onParticleEffect(AddComponentEvent event, EntityRef entity) {
+        if (entity.getComponent(LocationComponent.class) == null) {
+            return;
+        } else {
+            sorter.add(entity);
+        }
     }
 
     @Override
     public void shutdown() {
         glDeleteLists(displayList, 1);
+        sorter.stop();
     }
 
     public void update(float delta) {
@@ -91,6 +110,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 p.lifeRemaining -= delta;
                 if (p.lifeRemaining <= 0) {
                     iterator.remove();
+                    sorter.remove(entity);
                 } else {
                     updateVelocity(entity, particleEffect, p, delta);
                     updatePosition(p, delta);
@@ -170,7 +190,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        //for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for(EntityRef entity : sorter.getNearest(maxDrawnParticles)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 

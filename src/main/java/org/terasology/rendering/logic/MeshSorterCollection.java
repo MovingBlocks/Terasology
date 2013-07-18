@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import javax.vecmath.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
@@ -23,44 +26,56 @@ import org.terasology.logic.LocalPlayer;
  *
  * The sorting is done asynchronous from the usages of the data, meaning there
  * is no performance loss if an additional cpu-core is present.
- * 
+ *
  * When retrieving Entities from this container, no guarantees are given on the
  * sorting of the entities. This class only tries to keep the elements sorted,
  * but does not guarantee it.
- * 
- * It it therefor use full for keeping track of the entities with a Mesh attached
- * to them to keep track of what Entities to draw.
- * The advantage is that the sorting does not cause a performance issue, since
- * it is done asynchronously from the main thread.
+ *
+ * It it therefor use full for keeping track of the entities with a Mesh
+ * attached to them to keep track of what Entities to draw. The advantage is
+ * that the sorting does not cause a performance issue, since it is done
+ * asynchronously from the main thread.
  *
  * @author XanHou
  */
 public class MeshSorterCollection implements Iterable<EntityRef> {
+    private static final Logger logger = LoggerFactory.getLogger(MeshSorterCollection.class);
     private LinkedList<EntityRef> entities = new LinkedList<EntityRef>();
     private LocalPlayer lp;
     private final List<Command> commands = new ArrayList();
     //This timer is a simple java timer since the scheduling functionality is used
-    //Not the timing functionality, which should be done through the LWJGL timer.
-    private Timer timer = new Timer();
+    //Not the timing functionality, which should be done through the LWJGL/TS timer.
+    private Timer timer;
     private SortTask sortingTask;
-    private Vector3f playerPos = null;
+    private Thread sortingThread;
+    private Vector3f playerPos = new Vector3f();
     private DistanceComparator comparator = new DistanceComparator();
+    /**
+     * True while the background sorting process is active, different from the
+     * active boolean because active is also true when a sorting run is
+     * scheduled.
+     */
     private boolean sorting = false;
-    private GameState gameState;
-
-    public MeshSorterCollection(LocalPlayer localPlayer) {
-        lp = localPlayer;
-        sortingTask = new SortTask();
-        timer.schedule(sortingTask, 0);
-        gameState = CoreRegistry.get(GameEngine.class).getCurrentGameState();
-    }
+    /**
+     * When the background process that sorts the elements is running, this
+     * boolean is true.
+     */
+    private boolean active = false;
+    /**
+     * The delay in ms to wait between each sorting run.
+     */
+    private long sortDelayMS = 50;
+    /**
+     * Used for temp storage to reduce memory load.
+     */
+    private static final Vector3f temp = new Vector3f();
 
     /**
      * Returns the amount of elements in this list.
      *
      * @return
      */
-    public synchronized int size() {
+    public int size() {
         return entities.size();
     }
 
@@ -73,10 +88,6 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
     }
 
     public boolean contains(EntityRef e) {
-        if (!e.hasComponent(LocationComponent.class)) {
-            throw new IllegalArgumentException("Trying to find an Entity without"
-                    + " a location component in a container that only stores entities with a location component?!");
-        }
         return entities.contains(e);
     }
 
@@ -90,10 +101,7 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
      *          IlligalArgumentException is thrown.
      */
     public synchronized void add(EntityRef e) {
-        if (!e.hasComponent(LocationComponent.class)) {
-            throw new IllegalArgumentException("Trying to add an Entity without"
-                    + " a location component to a container that only stores entities with a location component?!");
-        }
+        logger.warn("Ädding entity without LocationComponent to Container that sorts on Location");
         //new entities are inserted to make sure that new entities are drawn first.
         //Since it is likely the players wants to see new entities over existing ones
         //And it is likely new entities spawn neat the player.
@@ -111,10 +119,6 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
      *          LocationComponent it cannot reside in this container.
      */
     public synchronized void remove(EntityRef e) {
-        if (!e.hasComponent(LocationComponent.class)) {
-            throw new IllegalArgumentException("Trying to remove an Entity without"
-                    + " a location component from a container that only stores entities with a location component?!");
-        }
         entities.remove(e);
         if (sorting) {
             commands.add(new RemoveCommand(e));
@@ -212,24 +216,60 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
     }
 
     /**
-     * Checks if this container is still in a proper state.
-     * This method can be used for testing.
-     * @return Should always return true, unless there is a bug in this class.
+     * Calling this method starts the background sorting. If never called, the
+     * elements in this container are never sorted!
      */
-    public boolean invariantHolds() {
-        //All of the Entities must have a LocationComponent:
-        for (EntityRef e : cloneEntities()) {
-            if (e.getComponent(LocationComponent.class) == null) {
-                return false;
-            }
-        }
-        return true;
+    public synchronized void initialize() {
+        timer = new Timer();
+        sortingTask = new SortTask();
+        timer.scheduleAtFixedRate(sortingTask, sortDelayMS, sortDelayMS);
+        active = true;
     }
 
+    /**
+     * Stops the background sorting without deleting clearing this container.
+     * This is required for proper clean-up.
+     *
+     * Note that if a sorting process is running while this method is called,
+     * the sorting process finishes sorting this method will wait for it to
+     * finish. Afterwards the sorting is not scheduled again until the
+     * initialize method is called again.
+     *
+     * Note that calling stop() and clear() can be done in any order and the
+     * specified behaviour will be exactly the same. If there is a difference it
+     * is an insignificant performance loss or win if.
+     */
+    public synchronized void stop() {
+        timer.cancel();
+        timer.purge();
+        if(sortingThread == null) {
+            timer = null;
+        } else {
+            try {
+                sortingThread.join();
+            } catch (InterruptedException ex) {
+                logger.error("Joining of sorting thread was interrupted!");
+            }
+            timer = null;
+        }
+    }
+
+    /**
+     * Although it has the exact same function as getEntries(), it reads easier
+     * inside this class when the word 'clone' is used, rather than 'get'.
+     *
+     * @return A copy of the entities in this container.
+     */
     private synchronized LinkedList<EntityRef> cloneEntities() {
         return (LinkedList<EntityRef>) entities.clone();
     }
 
+    /**
+     * These two actions needed to happen atomically and the easier method was
+     * to put them in a synchronized method.
+     *
+     * @return cloneEntities()
+     */
     private synchronized LinkedList<EntityRef> cloneAndSetSorting() {
         sorting = true;
         return cloneEntities();
@@ -241,6 +281,10 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
      */
     private void sort() {
         lp.getPosition(playerPos);
+        if(!commands.isEmpty()) {
+            logger.warn("The commands list was not emptied properly!");
+            commands.clear();
+        }
         /**
          * Note that while cloneAndSetSorting() and processQueue() are
          * synchronized, this method itself and the sorting are not. This means
@@ -248,7 +292,16 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
          * operations.
          */
         LinkedList<EntityRef> newEnts = cloneAndSetSorting();
-        Collections.sort(newEnts, comparator);
+        
+        //System.err.println("sorting " + newEnts.size() + " etities based on playerloc: " + playerPos.x + ", "+playerPos.y+ ", "+playerPos.z);
+        
+        try {
+            Collections.sort(newEnts, comparator);
+        } catch (IllegalArgumentException ex) {
+            logger.warn("Entities destroyed during sorting process. Sorting is skipped this round.");
+            clearQueue();
+            return;
+        }
         processQueue(newEnts);
     }
 
@@ -262,10 +315,20 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
         //Note that the commands are executed in the order they are added to the
         //list.
         for (Command c : commands) {
+            //System.err.println("Executing " + c.getClass().getSimpleName());
             c.executeOn(newEntities);
         }
+        commands.clear();
         entities = newEntities;
         sorting = false;
+    }
+    
+    /**
+     * Clear the command queue in a synchronized way. Used when the sorting
+     * fails.
+     */
+    private synchronized void clearQueue() {
+        commands.clear();
     }
 
     /**
@@ -315,13 +378,19 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
      * closer the object when sorting.
      */
     private class DistanceComparator implements Comparator<EntityRef> {
+        
         @Override
         public int compare(EntityRef o1, EntityRef o2) {
             LocationComponent loc1 = o1.getComponent(LocationComponent.class);
             LocationComponent loc2 = o2.getComponent(LocationComponent.class);
 
-            Vector3f temp = null;
-
+            if(loc1 == null || loc2 == null) {
+                return 0;
+            } else if(loc1 == null) {
+                return 1;
+            } else if (loc2 == null) {
+                return -1;
+            }
             loc1.getWorldPosition(temp);
             temp.sub(playerPos);
             float dis1 = temp.lengthSquared();
@@ -346,21 +415,22 @@ public class MeshSorterCollection implements Iterable<EntityRef> {
      */
     private class SortTask extends TimerTask {
         private long lastSortMoment = -1;
-        private static final long SORT_DELAY_MILLIES = 200;
 
         @Override
         public void run() {
-            if(CoreRegistry.get(GameEngine.class).getCurrentGameState() == gameState) {
-                sort();
-            }
-            //The sorting is expected to take some time. In the meanwhile, the current gamestate may have changed.
-            if(CoreRegistry.get(GameEngine.class).getCurrentGameState() == gameState) {
-                long finishTime = System.currentTimeMillis();
-                long delay = SORT_DELAY_MILLIES - finishTime;
-                if (delay < 0) {
-                    delay = 0;
+            try {
+                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                lp = localPlayer;
+                if(localPlayer != null) {
+                    sort();
                 }
-                timer.schedule(this, delay);
+            } catch (Exception ex) {
+                /**
+                 * We don't want the failure of the sorter to cause the entire
+                 * game to crash. Instead we shall output an error to the
+                 * logger and continue.
+                 */
+                logger.error("Uncaught exception in sorting thread: " + ex.toString());
             }
         }
     }
