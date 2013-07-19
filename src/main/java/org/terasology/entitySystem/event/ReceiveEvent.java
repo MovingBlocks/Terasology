@@ -37,7 +37,7 @@ public @interface ReceiveEvent {
     /**
      * What components that the entity must have for this method to be invoked
      */
-    Class<? extends Component>[] components();
+    Class<? extends Component>[] components() default {};
 
     RegisterMode netFilter() default RegisterMode.ALWAYS;
 

@@ -19,6 +19,8 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
@@ -43,6 +45,7 @@ import javax.vecmath.Vector3f;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(HealthSystem.class);
 
     @In
     private EntityManager entityManager;
@@ -188,6 +191,8 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
     @ReceiveEvent(components = {HealthComponent.class})
     public void onCrash(HorizontalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
+
+        logger.info("Horizontal hit: {}", event.getVelocity());
 
         Vector3f vel = new Vector3f(event.getVelocity());
         vel.y = 0;

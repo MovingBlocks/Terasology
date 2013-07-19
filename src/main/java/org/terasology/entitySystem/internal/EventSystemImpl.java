@@ -20,6 +20,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -55,6 +56,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -144,24 +146,37 @@ public class EventSystemImpl implements EventSystem {
                 if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode(), false)) {
                     continue;
                 }
+                Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
                 method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
 
-                if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1])) {
-                    logger.debug("Found method: " + method.toString());
-                    ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
-                    if (receiveEventAnnotation.components().length == 0) {
-                        generalHandlers.put((Class<? extends Event>) types[0], handlerInfo);
-                    } else {
-                        for (Class<? extends Component> c : receiveEventAnnotation.components()) {
-                            addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
-                            for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
-                                addEventHandler(childType, handlerInfo, c);
-                            }
+                logger.debug("Found method: " + method.toString());
+                if (!Event.class.isAssignableFrom(types[0]) || !EntityRef.class.isAssignableFrom(types[1])) {
+                    logger.error("Invalid event handler method: {}", method.getName());
+                    return;
+                }
+
+                requiredComponents.addAll(Arrays.asList(receiveEventAnnotation.components()));
+                List<Class<? extends Component>> componentParams = Lists.newArrayList();
+                for (int i = 2; i < types.length; ++i) {
+                    if (!Component.class.isAssignableFrom(types[i])) {
+                        logger.error("Invalid event handler method: {} - {} is not a component class", method.getName(), types[i]);
+                        return;
+                    }
+                    requiredComponents.add((Class<? extends Component>) types[i]);
+                    componentParams.add((Class<? extends Component>) types[i]);
+                }
+
+                ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), requiredComponents, componentParams);
+                if (requiredComponents.isEmpty()) {
+                    generalHandlers.put((Class<? extends Event>) types[0], handlerInfo);
+                } else {
+                    for (Class<? extends Component> c : requiredComponents) {
+                        addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
+                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
+                            addEventHandler(childType, handlerInfo, c);
                         }
                     }
-                } else {
-                    logger.error("Invalid event handler method: {}", method.getName());
                 }
             }
         }
@@ -359,18 +374,20 @@ public class EventSystemImpl implements EventSystem {
     private class ReflectedEventHandlerInfo implements EventHandlerInfo {
         private ComponentSystem handler;
         private Method method;
-        private Class<? extends Component>[] components;
+        private ImmutableList<Class<? extends Component>> filterComponents;
+        private ImmutableList<Class<? extends Component>> componentParams;
         private int priority;
 
-        public ReflectedEventHandlerInfo(ComponentSystem handler, Method method, int priority, Class<? extends Component>... components) {
+        public ReflectedEventHandlerInfo(ComponentSystem handler, Method method, int priority, Collection<Class<? extends Component>> filterComponents, Collection<Class<? extends Component>> componentParams) {
             this.handler = handler;
             this.method = method;
-            this.components = Arrays.copyOf(components, components.length);
+            this.filterComponents = ImmutableList.copyOf(filterComponents);
+            this.componentParams = ImmutableList.copyOf(componentParams);
             this.priority = priority;
         }
 
         public boolean isValidFor(EntityRef entity) {
-            for (Class<? extends Component> component : components) {
+            for (Class<? extends Component> component : filterComponents) {
                 if (!entity.hasComponent(component)) {
                     return false;
                 }
@@ -380,7 +397,13 @@ public class EventSystemImpl implements EventSystem {
 
         public void invoke(EntityRef entity, Event event) {
             try {
-                method.invoke(handler, event, entity);
+                Object[] params = new Object[2 + componentParams.size()];
+                params[0] = event;
+                params[1] = entity;
+                for (int i = 0; i < componentParams.size(); ++i) {
+                    params[i + 2] = entity.getComponent(componentParams.get(i));
+                }
+                method.invoke(handler, params);
             } catch (IllegalAccessException ex) {
                 logger.error("Failed to invoke event", ex);
             } catch (IllegalArgumentException ex) {

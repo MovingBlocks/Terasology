@@ -24,7 +24,7 @@ import javax.vecmath.Vector3f;
  */
 public class VerticalCollisionEvent extends CollisionEvent {
 
-    public VerticalCollisionEvent(Vector3f velocity, Vector3f location) {
-        super(velocity, location);
+    public VerticalCollisionEvent(Vector3f location, Vector3f velocity) {
+        super(location, velocity);
     }
 }

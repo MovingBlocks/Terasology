@@ -311,7 +311,7 @@ public class BulletCharacterMover implements CharacterMover {
                     Vector3f landVelocity = new Vector3f(state.getVelocity());
                     landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
                     logger.debug("Landed at " + landVelocity);
-                    entity.send(new VerticalCollisionEvent(landVelocity, state.getPosition()));
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
                 }
                 state.setGrounded(true);
             }
