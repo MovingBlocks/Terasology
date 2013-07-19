@@ -17,6 +17,7 @@
 package org.terasology.asset;
 
 import org.terasology.audio.Sound;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.Shader;
@@ -227,6 +228,10 @@ public final class Assets {
      */
     public static MeshAnimation getAnimation(String module, String assetName) {
         return get(new AssetUri(AssetType.ANIMATION, module, assetName), MeshAnimation.class);
+    }
+
+    public static Prefab getPrefab(String simpleUri) {
+        return get(new AssetUri(AssetType.PREFAB, simpleUri), Prefab.class);
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {

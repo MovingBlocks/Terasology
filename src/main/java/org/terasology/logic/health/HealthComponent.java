@@ -30,6 +30,7 @@ public final class HealthComponent implements Component {
     @Replicate
     public float waitBeforeRegen = 0.0f;
 
+    // TODO: Should these be in a separate component?
     @Replicate
     public float fallingDamageSpeedThreshold = 20;
     @Replicate
@@ -39,9 +40,7 @@ public final class HealthComponent implements Component {
     public int currentHealth = 20;
 
     // Regen info
-    // TODO: Switch to a system that requires less updates
-    public float timeSinceLastDamage = 0.0f;
-    public float partialRegen = 0.0f;
+    public long nextRegenTick = 0;
 
     public HealthComponent() {
     }

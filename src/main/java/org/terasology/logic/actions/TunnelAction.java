@@ -23,17 +23,16 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.items.BlockItemFactory;
-import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
 
@@ -96,7 +95,7 @@ public class TunnelAction implements ComponentSystem {
                     if (currentBlock.isDestructible()) {
                         if (random.randomInt(6) == 0) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
-                            blockEntity.send(new DamageEvent(1000, EntityRef.NULL));
+                            blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.DIRECT.get(), EntityRef.NULL));
                         }
 
                         blockCounter--;

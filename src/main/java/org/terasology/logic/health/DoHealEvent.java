@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.logic.health;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * This event (or a subtype) is sent whenever health changes
+ * Send this event to an entity to heal it.
  *
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @author Immortius
  */
-public class HealthChangedEvent implements Event {
+public class DoHealEvent implements Event {
+    private int amount;
     private EntityRef instigator;
-    private int change;
 
-    public HealthChangedEvent(EntityRef instigator, int change) {
+    public DoHealEvent(int amount) {
+        this(amount, EntityRef.NULL);
+    }
+
+    public DoHealEvent(int amount, EntityRef instigator) {
+        this.amount = amount;
         this.instigator = instigator;
-        this.change = change;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 
     public EntityRef getInstigator() {
         return instigator;
-    }
-
-    /**
-     * @return The amount by which health changed. This is capped, so if the entity received 9999 damage and only had 10 health, it will be -10.
-     */
-    public int getHealthChange() {
-        return change;
     }
 }

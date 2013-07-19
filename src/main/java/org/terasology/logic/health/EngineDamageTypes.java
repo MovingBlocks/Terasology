@@ -15,23 +15,32 @@
  */
 package org.terasology.logic.health;
 
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * Event sent upon an entity reaching full health if previously on less than full health.
+ * Helper enum for getting engine damage type prefabs.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public class FullHealthEvent implements Event {
-    private EntityRef instigator;
+public enum EngineDamageTypes {
+    /**
+     * Raw damage in the most absolute form.
+     */
+    DIRECT("engine:directDamage"),
+    PHYSICAL("engine:physicalDamage"),
+    /**
+     * This is used if healing is flipped to damage (like the old healing hurts undead gimmick)
+     */
+    HEALING("engine:healingDamage");
 
-    public FullHealthEvent(EntityRef instigator) {
-        this.instigator = instigator;
+    private String prefabId;
+    private EngineDamageTypes(String prefabId) {
+        this.prefabId = prefabId;
     }
 
-    public EntityRef getInstigator() {
-        return instigator;
+    public Prefab get() {
+        return Assets.getPrefab(prefabId);
     }
 
 }

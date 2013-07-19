@@ -22,7 +22,8 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
@@ -96,7 +97,7 @@ public class ExplosionAction implements ComponentSystem {
 
                 /* PHYSICS */
                 if (currentBlock.isDestructible()) {
-                    blockEntityRegistry.getEntityAt(blockPos).send(new DamageEvent(1000, EntityRef.NULL));
+                    blockEntityRegistry.getEntityAt(blockPos).send(new DoDamageEvent(1000, EngineDamageTypes.DIRECT.get(), EntityRef.NULL));
                 }
             }
         }

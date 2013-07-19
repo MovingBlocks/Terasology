@@ -16,13 +16,28 @@
 package org.terasology.logic.health;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.network.OwnerEvent;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
+ * Sent when an entity reaches zero health
+ *
  * @author Immortius <immortius@gmail.com>
  */
-public class NoHealthEvent extends HealthChangedEvent {
-    public NoHealthEvent(EntityRef instigator, int maximumHealth) {
-        super(instigator, 0, maximumHealth);
+public class NoHealthEvent implements Event {
+    private EntityRef instigator;
+    private Prefab damageType;
+
+    public NoHealthEvent(EntityRef instigator, Prefab damageType) {
+        this.instigator = instigator;
+        this.damageType = damageType;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
+    }
+
+    public Prefab getDamageType() {
+        return damageType;
     }
 }

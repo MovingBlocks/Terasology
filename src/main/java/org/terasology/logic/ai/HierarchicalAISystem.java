@@ -27,7 +27,8 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
-import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
@@ -137,7 +138,7 @@ public class HierarchicalAISystem implements ComponentSystem,
                 if (distanceToPlayer <= ai.attackDistance) {
                     if (tempTime - lastAttack > ai.damageFrequency) {
                         localPlayer.getCharacterEntity().send(
-                                new DamageEvent(ai.damage, entity));
+                                new DoDamageEvent(ai.damage, EngineDamageTypes.PHYSICAL.get(), entity));
                         lastAttack = CoreRegistry.get(Time.class).getGameTimeInMs();
                     }
                 }

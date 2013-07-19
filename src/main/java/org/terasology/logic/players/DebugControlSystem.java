@@ -23,7 +23,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
@@ -103,7 +103,7 @@ public class DebugControlSystem implements ComponentSystem {
                     event.consume();
                     break;
                 case Keyboard.KEY_K:
-                    entity.send(new DamageEvent(9999, null));
+                    entity.send(new DoDamageEvent(9999, null));
                     break;
                 case Keyboard.KEY_H:
                     for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {

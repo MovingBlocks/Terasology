@@ -171,10 +171,11 @@ public class PojoEntityRef extends EntityRef {
     }
 
     @Override
-    public void send(Event event) {
+    public <T extends Event> T send(T event) {
         if (exists()) {
             entityManager.getEventSystem().send(this, event);
         }
+        return event;
     }
 
     @Override

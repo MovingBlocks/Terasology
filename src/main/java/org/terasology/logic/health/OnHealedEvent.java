@@ -15,31 +15,24 @@
  */
 package org.terasology.logic.health;
 
-import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * This event is sent after an entity is healed
+ *
+ * @author Immortius
  */
-public class DamageEvent implements Event {
-    private int amount;
-    private EntityRef instigator;
+public class OnHealedEvent extends HealthChangedEvent {
 
-    public DamageEvent(int amount) {
-        this.amount = amount;
-        instigator = EntityRef.NULL;
+    private int fullAmount;
+
+    public OnHealedEvent(int fullAmount, int changeAmount, EntityRef instigator) {
+        super(instigator, changeAmount);
+        this.fullAmount = fullAmount;
     }
 
-    public DamageEvent(int amount, EntityRef instigator) {
-        this.amount = amount;
-        this.instigator = instigator;
+    public int getHealAmount() {
+        return fullAmount;
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public EntityRef getInstigator() {
-        return instigator;
-    }
 }

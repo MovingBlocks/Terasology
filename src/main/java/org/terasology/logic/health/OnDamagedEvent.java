@@ -13,34 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.logic.health;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * This event (or a subtype) is sent whenever health changes
+ * This event is sent after damage has been dealt to an entity.
  *
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @author Immortius
  */
-public class HealthChangedEvent implements Event {
-    private EntityRef instigator;
-    private int change;
+public class OnDamagedEvent extends HealthChangedEvent {
+    private Prefab damageType;
+    private int fullAmount;
 
-    public HealthChangedEvent(EntityRef instigator, int change) {
-        this.instigator = instigator;
-        this.change = change;
+    public OnDamagedEvent(int fullAmount, int change, Prefab damageType, EntityRef instigator) {
+        super(instigator, change);
+        this.fullAmount = fullAmount;
+        this.damageType = damageType;
     }
 
-    public EntityRef getInstigator() {
-        return instigator;
+    public int getDamageAmount() {
+        return fullAmount;
     }
 
-    /**
-     * @return The amount by which health changed. This is capped, so if the entity received 9999 damage and only had 10 health, it will be -10.
-     */
-    public int getHealthChange() {
-        return change;
+    public Prefab getType() {
+        return damageType;
     }
+
 }

@@ -29,7 +29,8 @@ import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.DamageEvent;
+import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
@@ -144,7 +145,7 @@ public class CharacterSystem implements ComponentSystem {
                 }
             }
 
-            result.getEntity().send(new DamageEvent(damage, character));
+            result.getEntity().send(new DoDamageEvent(damage, EngineDamageTypes.PHYSICAL.get(), character));
         }
     }
 

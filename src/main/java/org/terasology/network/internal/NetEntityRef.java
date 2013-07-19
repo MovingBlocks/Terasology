@@ -89,8 +89,9 @@ public class NetEntityRef extends EntityRef {
     }
 
     @Override
-    public void send(Event event) {
+    public <T extends Event> T send(T event) {
         getActualEntityRef().send(event);
+        return event;
     }
 
     @Override

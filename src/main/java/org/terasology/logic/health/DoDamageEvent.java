@@ -17,21 +17,34 @@ package org.terasology.logic.health;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * @author Immortius
+ * This event should be sent to cause damage to an entity.
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-public class HealEvent implements Event {
+public class DoDamageEvent implements Event {
     private int amount;
+    private Prefab damageType;
     private EntityRef instigator;
 
-    public HealEvent(int amount) {
-        this.amount = amount;
-        instigator = EntityRef.NULL;
+    public DoDamageEvent(int amount) {
+        this(amount, EngineDamageTypes.DIRECT.get(), EntityRef.NULL);
     }
 
-    public HealEvent(int amount, EntityRef instigator) {
+    public DoDamageEvent(int amount, Prefab damageType) {
+        this(amount, damageType, EntityRef.NULL);
+    }
+
+    /**
+     * @param amount     The amount of damage being caused
+     * @param damageType       The type of the damage being dealt
+     * @param instigator The instigator of the damage (which entity caused it)
+     */
+    public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator) {
         this.amount = amount;
+        this.damageType = damageType;
         this.instigator = instigator;
     }
 
@@ -41,5 +54,9 @@ public class HealEvent implements Event {
 
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public Prefab getDamageType() {
+        return damageType;
     }
 }

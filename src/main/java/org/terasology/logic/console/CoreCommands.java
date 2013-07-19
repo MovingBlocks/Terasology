@@ -29,6 +29,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.CameraTargetSystem;
+import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.ItemPickupFactory;
@@ -103,7 +104,7 @@ public class CoreCommands implements ComponentSystem {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
-            clientComp.character.send(new NoHealthEvent(clientComp.character, health.maxHealth));
+            clientComp.character.send(new NoHealthEvent(clientComp.character, EngineDamageTypes.DIRECT.get()));
         }
     }
 

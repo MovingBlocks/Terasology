@@ -52,7 +52,7 @@ public abstract class EntityRef implements MutableComponentContainer {
      *
      * @param event
      */
-    public abstract void send(Event event);
+    public abstract <T extends Event> T send(T event);
 
     /**
      * @return The identifier of this entity. Should be avoided where possible and the EntityRef

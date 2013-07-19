@@ -81,7 +81,8 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public void send(Event event) {
+    public <T extends Event> T send(T event) {
+        return event;
     }
 
     @Override
