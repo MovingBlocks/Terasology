@@ -13,12 +13,14 @@
         "regenRate" : 3,
         "waitBeforeRegen" : 10,
         "excessSpeedDamageMultiplier" : 20,
-        "fallingDamageSpeedThreshold" : 15
+        "fallingDamageSpeedThreshold" : 15,
+        "horizontalDamageSpeedThreshold" : 100
     },
     "CharacterMovement" : {
         "groundFriction" : 16,
         "maxGroundSpeed" : 3,
         "distanceBetweenFootsteps" : 1.5,
+        "distanceBetweenSwimStrokes" : 2.5,
         "height" : 1.6,
         "radius" : 0.3,
         "jumpSpeed" : 12
@@ -35,7 +37,20 @@
         "detectGroups" : ["engine:debris"]
     },
     "CharacterSound" : {
-        "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"]
+        "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"],
+        "damageSounds"  : ["engine:HeartBeat"],
+        "landingSounds" :["engine:Land"],
+        "deathSounds" :["engine:Death"],
+        "swimSounds" : ["engine:Slime4"],
+        "enterWaterSounds" : ["engine:Slime1"],
+        "leaveWaterSounds" : ["engine:Slime3"],
+        "footstepVolume" : 0.5,
+        "damageVolume" : 0.25,
+        "deathVolume" : 1.0,
+        "respawnVolume" : 1.0,
+        "swimmingVolume" : 0.25,
+        "diveVolume" : 0.5,
+        "landingVolume" : 0.25
     },
     "Inventory" : {
         "itemSlots": [

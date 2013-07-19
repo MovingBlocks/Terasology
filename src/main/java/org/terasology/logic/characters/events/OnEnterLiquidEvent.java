@@ -16,17 +16,19 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.event.Event;
-
-import javax.vecmath.Vector3f;
+import org.terasology.world.block.Block;
 
 /**
- * @author Immortius <immortius@gmail.com>
- * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * @author Immortius
  */
-public class HorizontalCollisionEvent extends CollisionEvent {
+public class OnEnterLiquidEvent implements Event {
+    private Block liquid;
 
-    public HorizontalCollisionEvent(Vector3f velocity, Vector3f location) {
-        super(velocity, location);
+    public OnEnterLiquidEvent(Block liquid) {
+        this.liquid = liquid;
     }
 
+    public Block getLiquid() {
+        return liquid;
+    }
 }

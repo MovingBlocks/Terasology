@@ -27,6 +27,25 @@ import java.util.List;
 public final class CharacterSoundComponent implements Component {
 
     public List<Sound> footstepSounds = Lists.newArrayList();
+    public List<Sound> damageSounds = Lists.newArrayList();
+    public List<Sound> landingSounds = Lists.newArrayList();
+    public List<Sound> jumpSounds = Lists.newArrayList();
+    public List<Sound> deathSounds = Lists.newArrayList();
+    public List<Sound> respawnSounds = Lists.newArrayList();
+    // TODO: put these on components on the liquid block prefabs instead (for per-liquid swim sounds)
+    public List<Sound> swimSounds = Lists.newArrayList();
+    public List<Sound> enterWaterSounds = Lists.newArrayList();
+    public List<Sound> leaveWaterSounds = Lists.newArrayList();
+
     public float footstepVolume = 1.0f;
+    public float damageVolume = 1.0f;
+    public float jumpVolume = 1.0f;
+    public float landingVolume = 1.0f;
+    public float deathVolume = 1.0f;
+    public float respawnVolume = 1.0f;
+    public float swimmingVolume = 1.0f;
+    public float diveVolume = 1.0f;
+
+    public long lastSoundTime = 0;
 
 }

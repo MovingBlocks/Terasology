@@ -17,6 +17,8 @@ package org.terasology.logic.players;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -28,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
@@ -72,6 +75,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonRenderer implements RenderSystem {
+    private static final Logger logger = LoggerFactory.getLogger(FirstPersonRenderer.class);
 
     @In
     private WorldProvider worldProvider;
@@ -122,7 +126,7 @@ public class FirstPersonRenderer implements RenderSystem {
         if (charMoveComp == null) {
             return;
         }
-        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
+        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta, (float) java.lang.Math.PI / 8f, 0.05f);
         float handMovementAnimationOffset = character.handAnimation;
 
         UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
@@ -227,8 +231,8 @@ public class FirstPersonRenderer implements RenderSystem {
         glDisable(GL11.GL_BLEND);
     }
 
-    private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {
-        return (float) java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
+    private float calcBobbingOffset(float counter, float phaseOffset, float amplitude) {
+        return (float) java.lang.Math.sin(2 * Math.PI * counter + phaseOffset) * amplitude;
     }
 
 

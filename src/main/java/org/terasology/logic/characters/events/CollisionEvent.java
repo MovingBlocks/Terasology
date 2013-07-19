@@ -20,13 +20,22 @@ import org.terasology.entitySystem.event.Event;
 import javax.vecmath.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
- * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * @author Immortius
  */
-public class HorizontalCollisionEvent extends CollisionEvent {
+public class CollisionEvent implements Event {
+    private Vector3f velocity;
+    private Vector3f location;
 
-    public HorizontalCollisionEvent(Vector3f velocity, Vector3f location) {
-        super(velocity, location);
+    public CollisionEvent(Vector3f velocity, Vector3f location) {
+        this.velocity = new Vector3f(velocity);
+        this.location = new Vector3f(location);
     }
 
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+
+    public Vector3f getLocation() {
+        return location;
+    }
 }

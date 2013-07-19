@@ -18,17 +18,28 @@ package org.terasology.logic.characters;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.FootstepEvent;
+import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
+import org.terasology.logic.characters.events.OnEnterLiquidEvent;
+import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
+import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.HealthComponent;
+import org.terasology.logic.health.NoHealthEvent;
+import org.terasology.logic.health.OnDamagedEvent;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.utilities.procedural.FastRandom;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -36,7 +47,11 @@ import org.terasology.utilities.procedural.FastRandom;
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem implements ComponentSystem {
 
+    private static final long MIN_TIME = 10;
     private FastRandom random = new FastRandom();
+
+    @In
+    private Time time;
 
     @In
     private AudioManager audioManager;
@@ -50,42 +65,136 @@ public class CharacterSoundSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
-    public void footstep(FootstepEvent event, EntityRef entity) {
-        if (random == null) return;
+    public void onFootstep(FootstepEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            Sound sound = random.randomItem(characterSounds.footstepSounds);
+            entity.send(new PlaySoundEvent(entity, sound, characterSounds.footstepVolume));
+            characterSounds.lastSoundTime = time.getGameTimeInMs();
+            entity.saveComponent(characterSounds);
+        }
+    }
 
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        if (location != null) {
-            CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-            if (characterSounds.footstepSounds.size() > 0) {
-                Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.footstepVolume));
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void onJump(JumpEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            Sound sound = null;
+            if (characterSounds.jumpSounds.size() > 0) {
+                sound = random.randomItem(characterSounds.jumpSounds);
+            } else if (characterSounds.footstepSounds.size() > 0) {
+                sound = random.randomItem(characterSounds.footstepSounds);
+            }
+            if (sound != null) {
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.jumpVolume));
+                characterSounds.lastSoundTime = time.getGameTimeInMs();
+                entity.saveComponent(characterSounds);
             }
         }
     }
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
-    public void jump(JumpEvent event, EntityRef entity) {
-        if (random == null) return;
-
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        if (location != null) {
-            CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-            if (characterSounds.footstepSounds.size() > 0) {
-                Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                entity.send(new PlaySoundEvent(entity, sound, 0.8f));
-            }
+    public void onLanded(VerticalCollisionEvent event, EntityRef entity) {
+        if (event.getVelocity().y > 0f) {
+            return;
         }
-    }
-
-    @ReceiveEvent(components = {CharacterSoundComponent.class})
-    public void landed(VerticalCollisionEvent event, EntityRef entity) {
-        if (random == null || event.getVelocity().y > 0f) return;
 
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
-        if (characterSounds.footstepSounds.size() > 0) {
-            Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-            entity.send(new PlaySoundEvent(entity, sound, 1.0f));
+        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            Sound sound = null;
+            if (characterSounds.landingSounds.size() > 0) {
+                sound = random.randomItem(characterSounds.landingSounds);
+            } else if (characterSounds.footstepSounds.size() > 0) {
+                sound = random.randomItem(characterSounds.footstepSounds);
+            }
+            if (sound != null) {
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume));
+                characterSounds.lastSoundTime = time.getGameTimeInMs();
+                entity.saveComponent(characterSounds);
+            }
         }
     }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class, HealthComponent.class})
+    public void onCrash(HorizontalCollisionEvent event, EntityRef entity) {
+        Vector3f horizVelocity = new Vector3f(event.getVelocity());
+        horizVelocity.y = 0;
+        float velocity = horizVelocity.length();
+
+        if (velocity > entity.getComponent(HealthComponent.class).horizontalDamageSpeedThreshold) {
+            CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+            if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+                Sound sound = random.randomItem(characterSounds.landingSounds);
+                if (sound != null) {
+                    entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume));
+                    characterSounds.lastSoundTime = time.getGameTimeInMs();
+                    entity.saveComponent(characterSounds);
+                }
+            }
+        }
+    }
+
+    @ReceiveEvent(components =  {CharacterSoundComponent.class})
+    public void onDamaged(OnDamagedEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs() && characterSounds.damageSounds.size() > 0) {
+            Sound sound = random.randomItem(characterSounds.damageSounds);
+            entity.send(new PlaySoundEvent(entity, sound, characterSounds.damageVolume));
+            characterSounds.lastSoundTime = time.getGameTimeInMs();
+            entity.saveComponent(characterSounds);
+        }
+    }
+
+    @ReceiveEvent(components =  {CharacterSoundComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.deathSounds.size() > 0) {
+            Sound sound = random.randomItem(characterSounds.deathSounds);
+            entity.send(new PlaySoundEvent(entity, sound, characterSounds.deathVolume));
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void onRespawn(OnPlayerSpawnedEvent event, EntityRef character) {
+        CharacterSoundComponent characterSounds = character.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.respawnSounds.size() > 0) {
+            Sound sound = random.randomItem(characterSounds.respawnSounds);
+            character.send(new PlaySoundEvent(character, sound, characterSounds.respawnVolume));
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void onSwimStroke(SwimStrokeEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.swimSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            Sound sound = random.randomItem(characterSounds.swimSounds);
+            entity.send(new PlaySoundEvent(entity, sound, characterSounds.swimmingVolume));
+            characterSounds.lastSoundTime = time.getGameTimeInMs();
+            entity.saveComponent(characterSounds);
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void onEnterLiquid(OnEnterLiquidEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            Sound sound = random.randomItem(characterSounds.enterWaterSounds);
+            entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
+            characterSounds.lastSoundTime = time.getGameTimeInMs();
+            entity.saveComponent(characterSounds);
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void onLeaveLiquid(OnLeaveLiquidEvent event, EntityRef entity) {
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            Sound sound = random.randomItem(characterSounds.leaveWaterSounds);
+            entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
+            characterSounds.lastSoundTime = time.getGameTimeInMs();
+            entity.saveComponent(characterSounds);
+        }
+    }
+
 
 }

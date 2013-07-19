@@ -31,6 +31,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.NoHealthEvent;
+import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -202,7 +203,7 @@ public class DoorSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {DoorComponent.class, LocationComponent.class})
-    public void onDamaged(DoDamageEvent event, EntityRef entity) {
+    public void onDamaged(OnDamagedEvent event, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         DoorComponent doorComponent = entity.getComponent(DoorComponent.class);
         Vector3f center = location.getWorldPosition();

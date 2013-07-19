@@ -175,9 +175,9 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComponent.setVelocity(a.getVelocity());
         movementComponent.grounded = a.isGrounded();
         if (b.getFootstepDelta() < a.getFootstepDelta()) {
-            movementComponent.footstepDelta = t * (movementComponent.distanceBetweenFootsteps + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
-            if (movementComponent.footstepDelta > movementComponent.distanceBetweenFootsteps) {
-                movementComponent.footstepDelta -= movementComponent.distanceBetweenFootsteps;
+            movementComponent.footstepDelta = t * (1 + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
+            if (movementComponent.footstepDelta > 1) {
+                movementComponent.footstepDelta -= 1;
             }
         } else {
             movementComponent.footstepDelta = t * (b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();

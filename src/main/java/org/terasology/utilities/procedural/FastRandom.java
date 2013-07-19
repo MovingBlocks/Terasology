@@ -18,6 +18,7 @@ package org.terasology.utilities.procedural;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
@@ -76,6 +77,13 @@ public class FastRandom {
 
     public int randomIntAbs(int range) {
         return TeraMath.fastAbs(randomInt() % range);
+    }
+
+    public <T> T randomItem(List<T> list) {
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(randomIntAbs(list.size()));
     }
 
     /**

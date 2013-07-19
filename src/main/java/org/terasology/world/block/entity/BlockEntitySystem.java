@@ -19,6 +19,7 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.ItemPickupFactory;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -113,7 +114,7 @@ public class BlockEntitySystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)
-    public void onDamaged(DoDamageEvent event, EntityRef entity) {
+    public void onDamaged(OnDamagedEvent event, EntityRef entity) {
         entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
         if (!entity.hasComponent(BlockDamagedComponent.class)) {
             entity.addComponent(new BlockDamagedComponent());

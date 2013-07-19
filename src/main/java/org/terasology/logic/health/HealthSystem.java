@@ -28,11 +28,15 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.characters.events.CollisionEvent;
+import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -175,6 +179,22 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
 
         if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
             int damage = (int) ((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
+            if (damage > 0) {
+                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, health);
+            }
+        }
+    }
+
+    @ReceiveEvent(components = {HealthComponent.class})
+    public void onCrash(HorizontalCollisionEvent event, EntityRef entity) {
+        HealthComponent health = entity.getComponent(HealthComponent.class);
+
+        Vector3f vel = new Vector3f(event.getVelocity());
+        vel.y = 0;
+        float speed = vel.length();
+
+        if (speed > health.horizontalDamageSpeedThreshold) {
+            int damage = (int) ((speed - health.horizontalDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
                 checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, health);
             }

@@ -60,6 +60,7 @@ public final class CharacterMovementComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float groundFriction = 8.0f;
     public float distanceBetweenFootsteps = 1f;
+    public float distanceBetweenSwimStrokes = 1f;
     public boolean faceMovementDirection = false;
 
     // Current movement mode

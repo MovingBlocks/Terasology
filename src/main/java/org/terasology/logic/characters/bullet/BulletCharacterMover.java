@@ -30,6 +30,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
+import org.terasology.logic.characters.events.OnEnterLiquidEvent;
+import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
+import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -100,7 +103,7 @@ public class BulletCharacterMover implements CharacterMover {
         if (worldProvider.isBlockRelevant(initial.getPosition())) {
             updatePosition(characterMovementComponent, result, input, entity);
             if (result.getMode() != MovementMode.GHOSTING) {
-                checkSwimming(characterMovementComponent, result);
+                checkSwimming(characterMovementComponent, result, initial, entity, input.isFirstRun());
             }
         }
         result.setTime(initial.getTime() + input.getDeltaMs());
@@ -111,6 +114,7 @@ public class BulletCharacterMover implements CharacterMover {
         return result;
     }
 
+    @SuppressWarnings("SuspiciousNameCombination")
     private void updateRotation(CharacterMovementComponent movementComp, CharacterStateEvent result, CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
@@ -129,7 +133,7 @@ public class BulletCharacterMover implements CharacterMover {
      * @param movementComp
      * @param state
      */
-    private void checkSwimming(final CharacterMovementComponent movementComp, final CharacterStateEvent state) {
+    private void checkSwimming(final CharacterMovementComponent movementComp, final CharacterStateEvent state, final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
@@ -140,11 +144,19 @@ public class BulletCharacterMover implements CharacterMover {
         boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
         boolean newSwimming = topUnderwater && bottomUnderwater;
 
-        // Boost when leaving water
-        if (!newSwimming && state.getMode() == MovementMode.SWIMMING && state.getVelocity().y > 0) {
-            state.getVelocity().y += 8;
+        if (newSwimming != (state.getMode() == MovementMode.SWIMMING)) {
+            if (firstRun) {
+                if (newSwimming) {
+                    entity.send(new OnEnterLiquidEvent(worldProvider.getBlock(state.getPosition())));
+                } else {
+                    entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
+                }
+            }
+            if (!newSwimming  && state.getVelocity().y > 0) {
+                state.getVelocity().y += 8;
+            }
+            state.setMode((newSwimming) ? MovementMode.SWIMMING : MovementMode.WALKING);
         }
-        state.setMode((newSwimming) ? MovementMode.SWIMMING : MovementMode.WALKING);
     }
 
     private void updatePosition(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
@@ -204,6 +216,13 @@ public class BulletCharacterMover implements CharacterMover {
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
+            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenSwimStrokes);
+            if (state.getFootstepDelta() > 1) {
+                state.setFootstepDelta(state.getFootstepDelta() - 1);
+                if (input.isFirstRun()) {
+                    entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
+                }
+            }
         }
     }
 
@@ -315,14 +334,14 @@ public class BulletCharacterMover implements CharacterMover {
             entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
         }
         if (state.isGrounded()) {
-            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length());
-            if (input.isFirstRun() && state.getFootstepDelta() > movementComp.distanceBetweenFootsteps) {
-                state.setFootstepDelta(state.getFootstepDelta() - movementComp.distanceBetweenFootsteps);
-                entity.send(new FootstepEvent());
+            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
+            if (state.getFootstepDelta() > 1) {
+                state.setFootstepDelta(state.getFootstepDelta() - 1);
+                if (input.isFirstRun()) {
+                    entity.send(new FootstepEvent());
+                }
             }
         }
-
-
     }
 
     private MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final PairCachingGhostObject collider) {

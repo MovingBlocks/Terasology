@@ -261,7 +261,7 @@ public void onRun(RunButton event, EntityRef entity) {
         QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
-        if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
+        if (stepDelta < 0) stepDelta += 1;
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
 
