@@ -138,10 +138,6 @@ jar {
     }
 }
 
-compileJava {
-	dependsOn extractNatives 
-}
-
 task sourceJar(type: Jar) {
     description = "Create a JAR with all sources (main: java, resources)"
     manifest.attributes("Implementation-Title": project.name)
@@ -157,6 +153,8 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 test {
+	dependsOn extractNatives 
+
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
     ignoreFailures = true
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests

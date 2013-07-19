@@ -34,6 +34,19 @@ public class ClasspathSource implements AssetSource {
 
     private AssetSource source;
 
+    public ClasspathSource(String id, URL sourceUrl, String baseAssetsPath, String baseOverridesPath) {
+        try {
+            Path codePath = Paths.get(sourceUrl.toURI());
+            if (Files.isRegularFile(codePath)) {
+                source = new ArchiveSource(id, codePath.toFile(), baseAssetsPath, baseOverridesPath);
+            } else {
+                source = new DirectorySource(id, codePath.resolve(baseAssetsPath), codePath.resolve(baseOverridesPath));
+            }
+        } catch (Throwable e) {
+            throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
+        }
+    }
+
     public ClasspathSource(String id, CodeSource cs, String baseAssetsPath, String baseOverridesPath) {
         if (cs == null) {
             throw new IllegalStateException("Can't access assets: CodeSource is null");

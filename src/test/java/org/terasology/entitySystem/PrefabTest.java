@@ -19,6 +19,8 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 
+import java.net.URL;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +42,9 @@ public class PrefabTest {
         modManager.applyActiveMods();
         CoreRegistry.put(ModManager.class, modManager);
         AssetType.registerAssetTypes();
-        AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", PrefabTest.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+        URL url = getClass().getClassLoader().getResource("testResources");
+        url = new URL(url.toString().substring(0, url.toString().length() - "testResources".length() - 1));
+        AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", url, ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         EntityManager em = new EntitySystemBuilder().build(modManager, networkSystem);
