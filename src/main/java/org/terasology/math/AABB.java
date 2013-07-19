@@ -197,12 +197,24 @@ public class AABB {
     public Vector3f closestPointOnAABBToPoint(Vector3f p) {
         Vector3f r = new Vector3f(p);
 
-        if (p.x < min.x) r.x = min.x;
-        if (p.x > max.x) r.x = max.x;
-        if (p.y < min.y) r.y = min.y;
-        if (p.y > max.y) r.y = max.y;
-        if (p.z < min.z) r.z = min.z;
-        if (p.z > max.z) r.z = max.z;
+        if (p.x < min.x) {
+            r.x = min.x;
+        }
+        if (p.x > max.x) {
+            r.x = max.x;
+        }
+        if (p.y < min.y) {
+            r.y = min.y;
+        }
+        if (p.y > max.y) {
+            r.y = max.y;
+        }
+        if (p.z < min.z) {
+            r.z = min.z;
+        }
+        if (p.z > max.z) {
+            r.z = max.z;
+        }
 
         return r;
     }
@@ -262,12 +274,24 @@ public class AABB {
     public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
         ArrayList<Vector3f> normals = new ArrayList<Vector3f>();
 
-        if (pointOnAABB.z == min.z && testZ) normals.add(new Vector3f(0, 0, -1));
-        if (pointOnAABB.z == max.z && testZ) normals.add(new Vector3f(0, 0, 1));
-        if (pointOnAABB.x == min.x && testX) normals.add(new Vector3f(-1, 0, 0));
-        if (pointOnAABB.x == max.x && testX) normals.add(new Vector3f(1, 0, 0));
-        if (pointOnAABB.y == min.y && testY) normals.add(new Vector3f(0, -1, 0));
-        if (pointOnAABB.y == max.y && testY) normals.add(new Vector3f(0, 1, 0));
+        if (pointOnAABB.z == min.z && testZ) {
+            normals.add(new Vector3f(0, 0, -1));
+        }
+        if (pointOnAABB.z == max.z && testZ) {
+            normals.add(new Vector3f(0, 0, 1));
+        }
+        if (pointOnAABB.x == min.x && testX) {
+            normals.add(new Vector3f(-1, 0, 0));
+        }
+        if (pointOnAABB.x == max.x && testX) {
+            normals.add(new Vector3f(1, 0, 0));
+        }
+        if (pointOnAABB.y == min.y && testY) {
+            normals.add(new Vector3f(0, -1, 0));
+        }
+        if (pointOnAABB.y == max.y && testY) {
+            normals.add(new Vector3f(0, 1, 0));
+        }
 
         float minDistance = Float.MAX_VALUE;
         Vector3f closestNormal = new Vector3f();
@@ -296,18 +320,24 @@ public class AABB {
      * @return The center point
      */
     public Vector3f centerPointForNormal(Vector3f normal) {
-        if (normal.x == 1 && normal.y == 0 && normal.z == 0)
+        if (normal.x == 1 && normal.y == 0 && normal.z == 0) {
             return new Vector3f(max.x, getCenter().y, getCenter().z);
-        if (normal.x == -1 && normal.y == 0 && normal.z == 0)
+        }
+        if (normal.x == -1 && normal.y == 0 && normal.z == 0) {
             return new Vector3f(min.x, getCenter().y, getCenter().z);
-        if (normal.x == 0 && normal.y == 0 && normal.z == 1)
+        }
+        if (normal.x == 0 && normal.y == 0 && normal.z == 1) {
             return new Vector3f(getCenter().x, getCenter().y, max.z);
-        if (normal.x == 0 && normal.y == 0 && normal.z == -1)
+        }
+        if (normal.x == 0 && normal.y == 0 && normal.z == -1) {
             return new Vector3f(getCenter().x, getCenter().y, min.z);
-        if (normal.x == 0 && normal.y == 1 && normal.z == 0)
+        }
+        if (normal.x == 0 && normal.y == 1 && normal.z == 0) {
             return new Vector3f(getCenter().x, max.y, getCenter().z);
-        if (normal.x == 0 && normal.y == -1 && normal.z == 0)
+        }
+        if (normal.x == 0 && normal.y == -1 && normal.z == 0) {
             return new Vector3f(getCenter().x, min.y, getCenter().z);
+        }
 
         return new Vector3f();
     }
@@ -400,7 +430,6 @@ public class AABB {
         if (tmin > tmax) {
             return false;
         }
-
 
         return true;
     }

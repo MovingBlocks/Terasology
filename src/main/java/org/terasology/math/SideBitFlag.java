@@ -48,8 +48,9 @@ public final class SideBitFlag {
 
     public static byte getSides(Set<Side> sides) {
         byte result = 0;
-        for (Side side : sides)
+        for (Side side : sides) {
             result += sideBits.get(side);
+        }
         return result;
     }
 
@@ -57,8 +58,9 @@ public final class SideBitFlag {
         byte result = 0;
         for (Side side : sides) {
             final byte sideBit = sideBits.get(side);
-            if ((result & sideBit) > 0)
+            if ((result & sideBit) > 0) {
                 throw new IllegalArgumentException("Cannot have multiples of the same side");
+            }
             result += sideBit;
         }
         return result;

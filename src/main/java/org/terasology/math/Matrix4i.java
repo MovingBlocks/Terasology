@@ -24,22 +24,22 @@ import java.util.Arrays;
  */
 public class Matrix4i implements Serializable {
 
-    public static final int m00 = 0;
-    public static final int m01 = 1;
-    public static final int m02 = 2;
-    public static final int m03 = 3;
-    public static final int m10 = 4;
-    public static final int m11 = 5;
-    public static final int m12 = 6;
-    public static final int m13 = 7;
-    public static final int m20 = 8;
-    public static final int m21 = 9;
-    public static final int m22 = 10;
-    public static final int m23 = 11;
-    public static final int m30 = 12;
-    public static final int m31 = 13;
-    public static final int m32 = 14;
-    public static final int m33 = 15;
+    public static final int M00 = 0;
+    public static final int M01 = 1;
+    public static final int M02 = 2;
+    public static final int M03 = 3;
+    public static final int M10 = 4;
+    public static final int M11 = 5;
+    public static final int M12 = 6;
+    public static final int M13 = 7;
+    public static final int M20 = 8;
+    public static final int M21 = 9;
+    public static final int M22 = 10;
+    public static final int M23 = 11;
+    public static final int M30 = 12;
+    public static final int M31 = 13;
+    public static final int M32 = 14;
+    public static final int M33 = 15;
 
     public final int tmp[] = new int[16];
     public final int val[] = new int[16];
@@ -91,22 +91,22 @@ public class Matrix4i implements Serializable {
      * @return This matrix for chaining
      */
     private Matrix4i set(int[] values) {
-        val[m00] = values[m00];
-        val[m10] = values[m10];
-        val[m20] = values[m20];
-        val[m30] = values[m30];
-        val[m01] = values[m01];
-        val[m11] = values[m11];
-        val[m21] = values[m21];
-        val[m31] = values[m31];
-        val[m02] = values[m02];
-        val[m12] = values[m12];
-        val[m22] = values[m22];
-        val[m32] = values[m32];
-        val[m03] = values[m03];
-        val[m13] = values[m13];
-        val[m23] = values[m23];
-        val[m33] = values[m33];
+        val[M00] = values[M00];
+        val[M10] = values[M10];
+        val[M20] = values[M20];
+        val[M30] = values[M30];
+        val[M01] = values[M01];
+        val[M11] = values[M11];
+        val[M21] = values[M21];
+        val[M31] = values[M31];
+        val[M02] = values[M02];
+        val[M12] = values[M12];
+        val[M22] = values[M22];
+        val[M32] = values[M32];
+        val[M03] = values[M03];
+        val[M13] = values[M13];
+        val[M23] = values[M23];
+        val[M33] = values[M33];
         return this;
     }
 
@@ -120,22 +120,22 @@ public class Matrix4i implements Serializable {
      * @param pos   The translation vector
      */
     public void set(Vector3i xAxis, Vector3i yAxis, Vector3i zAxis, Vector3i pos) {
-        val[m00] = xAxis.x;
-        val[m10] = xAxis.y;
-        val[m20] = xAxis.z;
-        val[m01] = yAxis.x;
-        val[m11] = yAxis.y;
-        val[m21] = yAxis.z;
-        val[m02] = -zAxis.x;
-        val[m12] = -zAxis.y;
-        val[m22] = -zAxis.z;
-        val[m03] = pos.x;
-        val[m13] = pos.y;
-        val[m23] = pos.z;
-        val[m30] = 0;
-        val[m31] = 0;
-        val[m32] = 0;
-        val[m33] = 1;
+        val[M00] = xAxis.x;
+        val[M10] = xAxis.y;
+        val[M20] = xAxis.z;
+        val[M01] = yAxis.x;
+        val[M11] = yAxis.y;
+        val[M21] = yAxis.z;
+        val[M02] = -zAxis.x;
+        val[M12] = -zAxis.y;
+        val[M22] = -zAxis.z;
+        val[M03] = pos.x;
+        val[M13] = pos.y;
+        val[M23] = pos.z;
+        val[M30] = 0;
+        val[M31] = 0;
+        val[M32] = 0;
+        val[M33] = 1;
     }
 
     /**
@@ -154,25 +154,25 @@ public class Matrix4i implements Serializable {
      * @return this matrix for chaining
      */
     public Matrix4i rotX(float angle) {
-        val[m00] = 1;
-        val[m01] = 0;
-        val[m02] = 0;
-        val[m03] = 0;
+        val[M00] = 1;
+        val[M01] = 0;
+        val[M02] = 0;
+        val[M03] = 0;
 
-        val[m10] = 0;
-        val[m11] = (int) Math.cos(angle);
-        val[m12] = (int) Math.sin(angle);
-        val[m13] = 0;
+        val[M10] = 0;
+        val[M11] = (int) Math.cos(angle);
+        val[M12] = (int) Math.sin(angle);
+        val[M13] = 0;
 
-        val[m20] = 0;
-        val[m21] = -(int) Math.sin(angle);
-        val[m22] = (int) Math.cos(angle);
-        val[m23] = 0;
+        val[M20] = 0;
+        val[M21] = -(int) Math.sin(angle);
+        val[M22] = (int) Math.cos(angle);
+        val[M23] = 0;
 
-        val[m30] = 0;
-        val[m31] = 0;
-        val[m32] = 0;
-        val[m33] = 1;
+        val[M30] = 0;
+        val[M31] = 0;
+        val[M32] = 0;
+        val[M33] = 1;
         return this;
     }
 
@@ -183,25 +183,25 @@ public class Matrix4i implements Serializable {
      * @return this matrix for chaining
      */
     public Matrix4i rotY(float angle) {
-        val[m00] = (int) Math.round(Math.cos(angle));
-        val[m01] = 0;
-        val[m02] = (int) Math.round(Math.sin(angle));
-        val[m03] = 0;
+        val[M00] = (int) Math.round(Math.cos(angle));
+        val[M01] = 0;
+        val[M02] = (int) Math.round(Math.sin(angle));
+        val[M03] = 0;
 
-        val[m10] = 0;
-        val[m11] = 1;
-        val[m12] = 0;
-        val[m13] = 0;
+        val[M10] = 0;
+        val[M11] = 1;
+        val[M12] = 0;
+        val[M13] = 0;
 
-        val[m20] = -(int) Math.round(Math.sin(angle));
-        val[m21] = 0;
-        val[m22] = (int) Math.round(Math.cos(angle));
-        val[m23] = 0;
+        val[M20] = -(int) Math.round(Math.sin(angle));
+        val[M21] = 0;
+        val[M22] = (int) Math.round(Math.cos(angle));
+        val[M23] = 0;
 
-        val[m30] = 0;
-        val[m31] = 0;
-        val[m32] = 0;
-        val[m33] = 1;
+        val[M30] = 0;
+        val[M31] = 0;
+        val[M32] = 0;
+        val[M33] = 1;
         return this;
     }
 
@@ -212,25 +212,25 @@ public class Matrix4i implements Serializable {
      * @return this matrix for chaining
      */
     public Matrix4i rotZ(float angle) {
-        val[m00] = (int) Math.cos(angle);
-        val[m01] = -(int) Math.sin(angle);
-        val[m02] = 0;
-        val[m03] = 0;
+        val[M00] = (int) Math.cos(angle);
+        val[M01] = -(int) Math.sin(angle);
+        val[M02] = 0;
+        val[M03] = 0;
 
-        val[m10] = (int) Math.sin(angle);
-        val[m11] = (int) Math.cos(angle);
-        val[m12] = 0;
-        val[m13] = 0;
+        val[M10] = (int) Math.sin(angle);
+        val[M11] = (int) Math.cos(angle);
+        val[M12] = 0;
+        val[M13] = 0;
 
-        val[m20] = 0;
-        val[m21] = 0;
-        val[m22] = 1;
-        val[m23] = 0;
+        val[M20] = 0;
+        val[M21] = 0;
+        val[M22] = 1;
+        val[M23] = 0;
 
-        val[m30] = 0;
-        val[m31] = 0;
-        val[m32] = 0;
-        val[m33] = 1;
+        val[M30] = 0;
+        val[M31] = 0;
+        val[M32] = 0;
+        val[M33] = 1;
         return this;
     }
 
@@ -242,9 +242,9 @@ public class Matrix4i implements Serializable {
      * @return This matrix for chaining
      */
     public Matrix4i translate(Vector3i vector) {
-        val[m03] += vector.x;
-        val[m13] += vector.y;
-        val[m23] += vector.z;
+        val[M03] += vector.x;
+        val[M13] += vector.y;
+        val[M23] += vector.z;
         return this;
     }
 
@@ -258,9 +258,9 @@ public class Matrix4i implements Serializable {
      * @return This matrix for chaining
      */
     public Matrix4i translate(int dx, int dy, int dz) {
-        val[m03] += dx;
-        val[m13] += dy;
-        val[m23] += dz;
+        val[M03] += dx;
+        val[M13] += dy;
+        val[M23] += dz;
         return this;
     }
 
@@ -270,22 +270,22 @@ public class Matrix4i implements Serializable {
      * @return This matrix for chaining
      */
     public Matrix4i identity() {
-        val[m00] = 1;
-        val[m01] = 0;
-        val[m02] = 0;
-        val[m03] = 0;
-        val[m10] = 0;
-        val[m11] = 1;
-        val[m12] = 0;
-        val[m13] = 0;
-        val[m20] = 0;
-        val[m21] = 0;
-        val[m22] = 1;
-        val[m23] = 0;
-        val[m30] = 0;
-        val[m31] = 0;
-        val[m32] = 0;
-        val[m33] = 1;
+        val[M00] = 1;
+        val[M01] = 0;
+        val[M02] = 0;
+        val[M03] = 0;
+        val[M10] = 0;
+        val[M11] = 1;
+        val[M12] = 0;
+        val[M13] = 0;
+        val[M20] = 0;
+        val[M21] = 0;
+        val[M22] = 1;
+        val[M23] = 0;
+        val[M30] = 0;
+        val[M31] = 0;
+        val[M32] = 0;
+        val[M33] = 1;
         return this;
     }
 
@@ -303,38 +303,38 @@ public class Matrix4i implements Serializable {
      * @return This matrix for chaining.
      */
     public Matrix4i mul(Matrix4i m1) {
-        tmp[m00] = val[m00] * m1.val[m00] + val[m01] * m1.val[m10] + val[m02] * m1.val[m20] + val[m03]
-                * m1.val[m30];
-        tmp[m01] = val[m00] * m1.val[m01] + val[m01] * m1.val[m11] + val[m02] * m1.val[m21] + val[m03]
-                * m1.val[m31];
-        tmp[m02] = val[m00] * m1.val[m02] + val[m01] * m1.val[m12] + val[m02] * m1.val[m22] + val[m03]
-                * m1.val[m32];
-        tmp[m03] = val[m00] * m1.val[m03] + val[m01] * m1.val[m13] + val[m02] * m1.val[m23] + val[m03]
-                * m1.val[m33];
-        tmp[m10] = val[m10] * m1.val[m00] + val[m11] * m1.val[m10] + val[m12] * m1.val[m20] + val[m13]
-                * m1.val[m30];
-        tmp[m11] = val[m10] * m1.val[m01] + val[m11] * m1.val[m11] + val[m12] * m1.val[m21] + val[m13]
-                * m1.val[m31];
-        tmp[m12] = val[m10] * m1.val[m02] + val[m11] * m1.val[m12] + val[m12] * m1.val[m22] + val[m13]
-                * m1.val[m32];
-        tmp[m13] = val[m10] * m1.val[m03] + val[m11] * m1.val[m13] + val[m12] * m1.val[m23] + val[m13]
-                * m1.val[m33];
-        tmp[m20] = val[m20] * m1.val[m00] + val[m21] * m1.val[m10] + val[m22] * m1.val[m20] + val[m23]
-                * m1.val[m30];
-        tmp[m21] = val[m20] * m1.val[m01] + val[m21] * m1.val[m11] + val[m22] * m1.val[m21] + val[m23]
-                * m1.val[m31];
-        tmp[m22] = val[m20] * m1.val[m02] + val[m21] * m1.val[m12] + val[m22] * m1.val[m22] + val[m23]
-                * m1.val[m32];
-        tmp[m23] = val[m20] * m1.val[m03] + val[m21] * m1.val[m13] + val[m22] * m1.val[m23] + val[m23]
-                * m1.val[m33];
-        tmp[m30] = val[m30] * m1.val[m00] + val[m31] * m1.val[m10] + val[m32] * m1.val[m20] + val[m33]
-                * m1.val[m30];
-        tmp[m31] = val[m30] * m1.val[m01] + val[m31] * m1.val[m11] + val[m32] * m1.val[m21] + val[m33]
-                * m1.val[m31];
-        tmp[m32] = val[m30] * m1.val[m02] + val[m31] * m1.val[m12] + val[m32] * m1.val[m22] + val[m33]
-                * m1.val[m32];
-        tmp[m33] = val[m30] * m1.val[m03] + val[m31] * m1.val[m13] + val[m32] * m1.val[m23] + val[m33]
-                * m1.val[m33];
+        tmp[M00] = val[M00] * m1.val[M00] + val[M01] * m1.val[M10] + val[M02] * m1.val[M20] + val[M03]
+                * m1.val[M30];
+        tmp[M01] = val[M00] * m1.val[M01] + val[M01] * m1.val[M11] + val[M02] * m1.val[M21] + val[M03]
+                * m1.val[M31];
+        tmp[M02] = val[M00] * m1.val[M02] + val[M01] * m1.val[M12] + val[M02] * m1.val[M22] + val[M03]
+                * m1.val[M32];
+        tmp[M03] = val[M00] * m1.val[M03] + val[M01] * m1.val[M13] + val[M02] * m1.val[M23] + val[M03]
+                * m1.val[M33];
+        tmp[M10] = val[M10] * m1.val[M00] + val[M11] * m1.val[M10] + val[M12] * m1.val[M20] + val[M13]
+                * m1.val[M30];
+        tmp[M11] = val[M10] * m1.val[M01] + val[M11] * m1.val[M11] + val[M12] * m1.val[M21] + val[M13]
+                * m1.val[M31];
+        tmp[M12] = val[M10] * m1.val[M02] + val[M11] * m1.val[M12] + val[M12] * m1.val[M22] + val[M13]
+                * m1.val[M32];
+        tmp[M13] = val[M10] * m1.val[M03] + val[M11] * m1.val[M13] + val[M12] * m1.val[M23] + val[M13]
+                * m1.val[M33];
+        tmp[M20] = val[M20] * m1.val[M00] + val[M21] * m1.val[M10] + val[M22] * m1.val[M20] + val[M23]
+                * m1.val[M30];
+        tmp[M21] = val[M20] * m1.val[M01] + val[M21] * m1.val[M11] + val[M22] * m1.val[M21] + val[M23]
+                * m1.val[M31];
+        tmp[M22] = val[M20] * m1.val[M02] + val[M21] * m1.val[M12] + val[M22] * m1.val[M22] + val[M23]
+                * m1.val[M32];
+        tmp[M23] = val[M20] * m1.val[M03] + val[M21] * m1.val[M13] + val[M22] * m1.val[M23] + val[M23]
+                * m1.val[M33];
+        tmp[M30] = val[M30] * m1.val[M00] + val[M31] * m1.val[M10] + val[M32] * m1.val[M20] + val[M33]
+                * m1.val[M30];
+        tmp[M31] = val[M30] * m1.val[M01] + val[M31] * m1.val[M11] + val[M32] * m1.val[M21] + val[M33]
+                * m1.val[M31];
+        tmp[M32] = val[M30] * m1.val[M02] + val[M31] * m1.val[M12] + val[M32] * m1.val[M22] + val[M33]
+                * m1.val[M32];
+        tmp[M33] = val[M30] * m1.val[M03] + val[M31] * m1.val[M13] + val[M32] * m1.val[M23] + val[M33]
+                * m1.val[M33];
         return this.set(tmp);
     }
 
@@ -344,22 +344,22 @@ public class Matrix4i implements Serializable {
      * @return This matrix for chaining
      */
     public Matrix4i transpose() {
-        tmp[m00] = val[m00];
-        tmp[m01] = val[m10];
-        tmp[m02] = val[m20];
-        tmp[m03] = val[m30];
-        tmp[m10] = val[m01];
-        tmp[m11] = val[m11];
-        tmp[m12] = val[m21];
-        tmp[m13] = val[m31];
-        tmp[m20] = val[m02];
-        tmp[m21] = val[m12];
-        tmp[m22] = val[m22];
-        tmp[m23] = val[m32];
-        tmp[m30] = val[m03];
-        tmp[m31] = val[m13];
-        tmp[m32] = val[m23];
-        tmp[m33] = val[m33];
+        tmp[M00] = val[M00];
+        tmp[M01] = val[M10];
+        tmp[M02] = val[M20];
+        tmp[M03] = val[M30];
+        tmp[M10] = val[M01];
+        tmp[M11] = val[M11];
+        tmp[M12] = val[M21];
+        tmp[M13] = val[M31];
+        tmp[M20] = val[M02];
+        tmp[M21] = val[M12];
+        tmp[M22] = val[M22];
+        tmp[M23] = val[M32];
+        tmp[M30] = val[M03];
+        tmp[M31] = val[M13];
+        tmp[M32] = val[M23];
+        tmp[M33] = val[M33];
         return this.set(tmp);
     }
 
@@ -369,25 +369,25 @@ public class Matrix4i implements Serializable {
      * @return the determinate
      */
     public float determinant() {
-        float fA0 = val[m00] * val[m11] - val[m01] * val[m10];
-        float fA1 = val[m00] * val[m12] - val[m02] * val[m10];
-        float fA2 = val[m00] * val[m13] - val[m03] * val[m10];
-        float fA3 = val[m01] * val[m12] - val[m02] * val[m11];
-        float fA4 = val[m01] * val[m13] - val[m03] * val[m11];
-        float fA5 = val[m02] * val[m13] - val[m03] * val[m12];
-        float fB0 = val[m20] * val[m31] - val[m21] * val[m30];
-        float fB1 = val[m20] * val[m32] - val[m22] * val[m30];
-        float fB2 = val[m20] * val[m33] - val[m23] * val[m30];
-        float fB3 = val[m21] * val[m32] - val[m22] * val[m31];
-        float fB4 = val[m21] * val[m33] - val[m23] * val[m31];
-        float fB5 = val[m22] * val[m33] - val[m23] * val[m32];
+        float fA0 = val[M00] * val[M11] - val[M01] * val[M10];
+        float fA1 = val[M00] * val[M12] - val[M02] * val[M10];
+        float fA2 = val[M00] * val[M13] - val[M03] * val[M10];
+        float fA3 = val[M01] * val[M12] - val[M02] * val[M11];
+        float fA4 = val[M01] * val[M13] - val[M03] * val[M11];
+        float fA5 = val[M02] * val[M13] - val[M03] * val[M12];
+        float fB0 = val[M20] * val[M31] - val[M21] * val[M30];
+        float fB1 = val[M20] * val[M32] - val[M22] * val[M30];
+        float fB2 = val[M20] * val[M33] - val[M23] * val[M30];
+        float fB3 = val[M21] * val[M32] - val[M22] * val[M31];
+        float fB4 = val[M21] * val[M33] - val[M23] * val[M31];
+        float fB5 = val[M22] * val[M33] - val[M23] * val[M32];
         float fDet = fA0 * fB5 - fA1 * fB4 + fA2 * fB3 + fA3 * fB2 - fA4 * fB1 + fA5 * fB0;
         return fDet;
     }
 
 
     public Vector3i getTranslation() {
-        return new Vector3i(val[m03], val[m13], val[m23]);
+        return new Vector3i(val[M03], val[M13], val[M23]);
     }
 
     /**
@@ -398,9 +398,9 @@ public class Matrix4i implements Serializable {
      * @param z value of the translation on the z axis
      */
     public void setTranslation(int x, int y, int z) {
-        val[m03] = x;
-        val[m13] = y;
-        val[m23] = z;
+        val[M03] = x;
+        val[M13] = y;
+        val[M23] = z;
     }
 
     /**
@@ -409,9 +409,9 @@ public class Matrix4i implements Serializable {
      * @param translation the new values for the translation.
      */
     public void setTranslation(Vector3i translation) {
-        val[m03] = translation.x;
-        val[m13] = translation.y;
-        val[m23] = translation.z;
+        val[M03] = translation.x;
+        val[M13] = translation.y;
+        val[M23] = translation.z;
     }
 
     /**
@@ -425,9 +425,9 @@ public class Matrix4i implements Serializable {
     public Vector3i transform(Vector3i vec, Vector3i dest) {
         if (dest == null)
             dest = new Vector3i();
-        int x = val[m00] * vec.x + val[m01] * vec.y + val[m02] * vec.z;
-        int y = val[m10] * vec.x + val[m11] * vec.y + val[m12] * vec.z;
-        int z = val[m20] * vec.x + val[m21] * vec.y + val[m22] * vec.z;
+        int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z;
+        int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z;
+        int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z;
         dest.x = x;
         dest.y = y;
         dest.z = z;
@@ -445,9 +445,9 @@ public class Matrix4i implements Serializable {
     public Vector3i transformPoint(Vector3i vec, Vector3i dest) {
         if (dest == null)
             dest = new Vector3i();
-        int x = val[m00] * vec.x + val[m01] * vec.y + val[m02] * vec.z + val[m03];
-        int y = val[m10] * vec.x + val[m11] * vec.y + val[m12] * vec.z + val[m13];
-        int z = val[m20] * vec.x + val[m21] * vec.y + val[m22] * vec.z + val[m23];
+        int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z + val[M03];
+        int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z + val[M13];
+        int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z + val[M23];
         dest.x = x;
         dest.y = y;
         dest.z = z;
@@ -462,9 +462,9 @@ public class Matrix4i implements Serializable {
      * @return the transformed vector (for chaining)
      */
     public Vector3i transformPoint(Vector3i vec) {
-        int x = val[m00] * vec.x + val[m01] * vec.y + val[m02] * vec.z + val[m03];
-        int y = val[m10] * vec.x + val[m11] * vec.y + val[m12] * vec.z + val[m13];
-        int z = val[m20] * vec.x + val[m21] * vec.y + val[m22] * vec.z + val[m23];
+        int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z + val[M03];
+        int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z + val[M13];
+        int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z + val[M23];
         vec.x = x;
         vec.y = y;
         vec.z = z;
@@ -481,40 +481,40 @@ public class Matrix4i implements Serializable {
     public String toString() {
         StringBuilder result = new StringBuilder("Matrix4i\n[\n");
         result.append(" ");
-        result.append(val[m00]);
+        result.append(val[M00]);
         result.append("  ");
-        result.append(val[m01]);
+        result.append(val[M01]);
         result.append("  ");
-        result.append(val[m02]);
+        result.append(val[M02]);
         result.append("  ");
-        result.append(val[m03]);
+        result.append(val[M03]);
         result.append(" \n");
         result.append(" ");
-        result.append(val[m10]);
+        result.append(val[M10]);
         result.append("  ");
-        result.append(val[m11]);
+        result.append(val[M11]);
         result.append("  ");
-        result.append(val[m12]);
+        result.append(val[M12]);
         result.append("  ");
-        result.append(val[m13]);
+        result.append(val[M13]);
         result.append(" \n");
         result.append(" ");
-        result.append(val[m20]);
+        result.append(val[M20]);
         result.append("  ");
-        result.append(val[m21]);
+        result.append(val[M21]);
         result.append("  ");
-        result.append(val[m22]);
+        result.append(val[M22]);
         result.append("  ");
-        result.append(val[m23]);
+        result.append(val[M23]);
         result.append(" \n");
         result.append(" ");
-        result.append(val[m30]);
+        result.append(val[M30]);
         result.append("  ");
-        result.append(val[m31]);
+        result.append(val[M31]);
         result.append("  ");
-        result.append(val[m32]);
+        result.append(val[M32]);
         result.append("  ");
-        result.append(val[m33]);
+        result.append(val[M33]);
         result.append(" \n]");
         return result.toString();
     }

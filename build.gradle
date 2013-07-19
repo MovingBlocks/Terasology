@@ -138,6 +138,10 @@ jar {
     }
 }
 
+compileJava {
+	dependsOn extractNatives 
+}
+
 task sourceJar(type: Jar) {
     description = "Create a JAR with all sources (main: java, resources)"
     manifest.attributes("Implementation-Title": project.name)

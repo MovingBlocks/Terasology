@@ -78,8 +78,12 @@ public class Region3i implements Iterable<Vector3i> {
     }
 
     public static Region3i createEncompassing(Region3i a, Region3i b) {
-        if (a.isEmpty()) return b;
-        if (b.isEmpty()) return a;
+        if (a.isEmpty()) {
+            return b;
+        }
+        if (b.isEmpty()) {
+            return a;
+        }
         Vector3i min = a.min();
         min.min(b.min());
         Vector3i max = a.max();
@@ -233,7 +237,9 @@ public class Region3i implements Iterable<Vector3i> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
+        if (obj == this) {
+            return true;
+        }
         if (obj instanceof Region3i) {
             Region3i other = (Region3i) obj;
             return min.equals(other.min) && size.equals(other.size);

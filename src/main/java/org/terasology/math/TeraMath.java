@@ -84,34 +84,38 @@ public final class TeraMath {
      * Clamps a given value to be an element of [0..1].
      */
     public static double clamp(double value) {
-        if (value > 1.0)
+        if (value > 1.0) {
             return 1.0;
-        if (value < 0.0)
+        } else if (value < 0.0) {
             return 0.0;
+        }
         return value;
     }
 
     public static double clamp(double value, double min, double max) {
-        if (value > max)
+        if (value > max) {
             return max;
-        if (value < min)
+        } else if (value < min) {
             return min;
+        }
         return value;
     }
 
     public static float clamp(float value, float min, float max) {
-        if (value > max)
+        if (value > max) {
             return max;
-        if (value < min)
+        } else if (value < min) {
             return min;
+        }
         return value;
     }
 
     public static int clamp(int value, int min, int max) {
-        if (value > max)
+        if (value > max) {
             return max;
-        if (value < min)
+        } else if (value < min) {
             return min;
+        }
         return value;
     }
 
@@ -156,21 +160,14 @@ public final class TeraMath {
      * Maps any given value to be positive only.
      */
     public static int mapToPositive(int x) {
-        if (x >= 0)
-            return x * 2;
-
-        return -x * 2 - 1;
+        return (x >= 0) ? x * 2 : -x * 2 - 1;
     }
 
     /**
      * Recreates the original value after applying "mapToPositive".
      */
     public static int redoMapToPositive(int x) {
-        if (x % 2 == 0) {
-            return x / 2;
-        }
-
-        return -(x / 2) - 1;
+        return (x % 2 == 0) ? x / 2 : -(x / 2) - 1;
     }
 
     /**
@@ -368,17 +365,21 @@ public final class TeraMath {
         FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
         glGetFloat(type, matrix);
 
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
                 target.setElement(j, i, matrix.get());
+            }
+        }
     }
 
     public static FloatBuffer matrixToBuffer(Matrix4f mat) {
         FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
                 matrixBuffer.put(mat.getElement(j, i));
+            }
+        }
 
         matrixBuffer.flip();
         return matrixBuffer;
