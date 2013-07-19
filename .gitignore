@@ -1,37 +1,52 @@
-/SAVED_WORLDS
-/worlds
-/saves
-/screenshots
-/screens
-/logs
-/out
-/target
-/build
-/dev
-.DS_Store
-/Terasology.iml
-/Terasology.ipr
-/Terasology.iws
-/.idea
+# Ignore gradle
+/.gradle/
+/build/
+/mods/*/build
+
+# Ignore IntelliJ
+/out/
+*.iml
+*.ipr
+*.iws
+
+# Ignore Eclipse
+/.checkstyle
 /.classpath
 /.project
 /.settings
-/.checkstyle
-/.gradle
-/bin
-/unittesthome
-/data/console/consolelog.json
-/mods/*/classes
-/mods/*/testClasses
-/mods/*/build
-/mods/*/.*
+/bin/
+
+# Ignore OS generated files
+*.directory
 *~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Ignore Terasology output
+*.log
+/saves/
+/screenshots/
+/logs/
 config.cfg
 entityDump.txt
 
-# Ignore error logs 
-*.log
+# Historical Output
 
-#Ignore linux directory files
-*.directory
+/SAVED_WORLDS/
+/worlds/
+/screens/
+/unittesthome/
 
+# Ignore natives (extracted to project root during setup)
+/natives/
+
+# Mod outputs
+/mods/*/classes/
+/mods/*/testClasses/
+/mods/*/.*
