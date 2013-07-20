@@ -78,7 +78,7 @@
         <!-- ************************** -->
         <module name="LineLength">		
 		    <property name="severity" value="warning"/>
-			<property name="max" value="120"/>
+			<property name="max" value="200"/>
 	    </module>
 		<!-- Checks for the number of types declared at the outer (or root) level in a file. -->
 		<module name="OuterTypeNumber"/>
@@ -112,7 +112,7 @@
         <!-- Checks for the placement of left curly braces ('{') for code blocks. Default: eol -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#LeftCurly -->
         <module name="LeftCurly">
-			 <property name="maxLineLength" value="120"/>
+			 <property name="maxLineLength" value="200"/>
 		</module>
         <!-- Checks for braces around code blocks. -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#NeedBraces -->

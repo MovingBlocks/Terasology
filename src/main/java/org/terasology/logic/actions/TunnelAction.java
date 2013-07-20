@@ -42,7 +42,7 @@ import javax.vecmath.Vector3f;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TunnelAction implements ComponentSystem {
 
-    private static int MAX_DESTROYED_BLOCKS = 100;
+    private static final int MAX_DESTROYED_BLOCKS = 100;
 
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
@@ -101,8 +101,9 @@ public class TunnelAction implements ComponentSystem {
                         blockCounter--;
                     }
 
-                    if (blockCounter <= 0)
+                    if (blockCounter <= 0) {
                         return;
+                    }
                 }
             }
         }

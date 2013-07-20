@@ -178,9 +178,8 @@ public class InputSystem implements ComponentSystem {
                 if (bind != null) {
                     bind.updateBindState(buttonDown, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
                 }
-            }
-            //mouse wheel
-            else if (Mouse.getEventDWheel() != 0) {
+            } else if (Mouse.getEventDWheel() != 0) {
+                //mouse wheel
                 int wheelMoved = Mouse.getEventDWheel();
                 boolean consumed = sendMouseWheelEvent(wheelMoved / 120, delta);
 
