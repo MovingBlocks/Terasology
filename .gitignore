@@ -1,3 +1,10 @@
+# Ignore general
+/.*
+!.gitignore
+*~
+._*
+*.bak
+
 # Ignore gradle
 /.gradle/
 /build/
@@ -10,21 +17,16 @@
 *.iws
 
 # Ignore Eclipse
-/.checkstyle
-/.classpath
-/.project
-/.settings
 /bin/
 
-# Ignore OS generated files
+# Ignore Linux
 *.directory
-*~
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
+
+#Ignore OSX
+Icon
 Icon?
+
+#Ignore Windows
 ehthumbs.db
 Thumbs.db
 
@@ -37,7 +39,6 @@ config.cfg
 entityDump.txt
 
 # Historical Output
-
 /SAVED_WORLDS/
 /worlds/
 /screens/

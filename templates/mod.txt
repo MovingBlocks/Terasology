@@ -1,0 +1,8 @@
+{
+    "id" : "${id}",
+    "version" : "",
+    "author" : "",
+    "displayName" : "",
+    "description" : "",
+    "dependencies" : []
+}

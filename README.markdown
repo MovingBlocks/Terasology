@@ -1,7 +1,7 @@
 Terasology
 ==========
 
-![Terasology](https://raw.github.com/MovingBlocks/Terasology/develop/src/main/resources/assets/textures/menuBackground.png "Terasology")
+![Terasology](/src/main/resources/assets/textures/menuBackground.jpg "Terasology")
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
@@ -16,7 +16,7 @@ Setup
 
 Terasology requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
 
-Download the latest stable version [here from GitHub](https://github.com/downloads/MovingBlocks/Terasology/TerasologyStable.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
+Download the latest [stable version here](http://jenkins.movingblocks.net/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
 
 You can use one of the default launch scripts to start the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
 
@@ -31,8 +31,8 @@ Note that these instructions are meant for the stable release. The latest develo
 * [Space] - Jump
 * [Double Space] - God mode (fly / no-clip)
 * [Shift] - Hold to run
-* [Left click] - Activate left click action (default = place block)
-* [Right click] - Activate right click action (default = remove block)
+* [Left click] - Activate left click action (default = remove block)
+* [Right click] - Activate right click action (default = place block)
 * [Mouse wheel up/down] - Cycle through toolbar slots
 * [1..0] - Change the active toolbar slot
 * [I] - Toggle inventory screen
@@ -50,9 +50,15 @@ Debug Features
 Only works when the F3 debug mode is enabled (and may come and go)
 
 * [Arrow up/down] - Adjust the current time in small steps
+* [Arrow left/right] - Adjust the current time in larger steps
+* [R] - Debug render wire-frame
 * [P] - Activate first-person player camera
 * [O] - Activate animated spawning point camera
 * [K] - Don't try this :-)
+* [F4] - Different debug metrics
+* [F6] - Debug rendering enabled
+* [F7] - Cycle debug rendering stage
+* [F8] - Debug render chunk bounding boxes
 
 Tools
 --------
@@ -61,9 +67,9 @@ May move slot or disappear as development continues
 
 * Axe / Pickaxe - Faster right-click removal of some blocks
 * Torch - Shiny! Place with left click
-* Minituarizer - Left click one block, then another, then somewhere else to "clone" your selection in a tiny accurate representation
 * Explosion tool - Big bada boom!
 * Railgun  - Bigger bada boom, in a straight line!
+* Goodie chest - place it and open with 'e' for assorted goodies
 
 Console Commands
 --------
@@ -109,24 +115,24 @@ Contributors
 
 (Listed by primary team)
 
-* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber
-* Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk
+* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber, Panserbjoern
+* Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei
-* General: Janred, Josh, MrBarsack, Philaxx, Stuthulhu, t3hk0d3
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, MiJyn, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, 3000Lane, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
-* Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly
-* World Team: B!0HAX, ddr2, Nym Traveel, Skaldarnar, Tenson
+* Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx
+* World Team: B!0HAX, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann
 
 
 Soundtrack and Sound Effects
 --------
 
+* Primary soundtrack by ChrisK - https://soundcloud.com/chriskoebke
 * Sunrise, Afternoon and Sunset composed by Karina Kireev.
 * Dimlight, Resurface and Other Side composed and produced by Exile.
 * Door Open sound by Pagancow, from FreeSound.org
 * Door Close sound by Fresco, from FreeSound.org
 * Other sound effects created by Exile.
-* Additional music by ChrisK
 
 Additional Notes
 --------
