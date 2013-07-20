@@ -37,6 +37,7 @@ public interface PlayerStore {
 
     /**
      * Saves the store - call this when you have finished setting up the store.
+     *
      * @param deactivateEntities Whether the stored entities should be deactivated
      */
     void save(boolean deactivateEntities);
@@ -48,12 +49,14 @@ public interface PlayerStore {
 
     /**
      * Stores the character
+     *
      * @param character
      */
     void setCharacter(EntityRef character);
 
     /**
      * Retrieves the player's character entity
+     *
      * @return The restored character's EntityRef
      */
     EntityRef getCharacter();

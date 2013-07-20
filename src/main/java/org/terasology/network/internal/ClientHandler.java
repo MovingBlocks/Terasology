@@ -37,6 +37,7 @@ import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
 /**
  * This Netty handler is used on the client side to send and receive messages.
+ *
  * @author Immortius
  */
 public class ClientHandler extends SimpleChannelUpstreamHandler {
@@ -63,7 +64,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
         if (message.hasServerInfo()) {
-            ((EngineTime)CoreRegistry.get(Time.class)).setGameTime(message.getTime());
+            ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
             receivedServerInfo(message.getServerInfo());
         }
         server.queueMessage(message);

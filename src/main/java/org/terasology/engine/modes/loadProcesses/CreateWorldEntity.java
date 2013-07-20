@@ -16,12 +16,12 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.world.WorldComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldComponent;
 
 import java.util.Iterator;
 

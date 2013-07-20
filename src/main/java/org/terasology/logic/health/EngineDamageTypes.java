@@ -35,6 +35,7 @@ public enum EngineDamageTypes {
     HEALING("engine:healingDamage");
 
     private String prefabId;
+
     private EngineDamageTypes(String prefabId) {
         this.prefabId = prefabId;
     }

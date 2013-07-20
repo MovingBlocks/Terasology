@@ -16,8 +16,8 @@
 package org.terasology.world.block.family;
 
 import gnu.trove.map.TByteObjectMap;
-import org.terasology.math.SideBitFlag;
 import org.terasology.math.Side;
+import org.terasology.math.SideBitFlag;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;

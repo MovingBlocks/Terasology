@@ -46,7 +46,7 @@ public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
 
     @Override
     public boolean next() {
-        pos.x ++;
+        pos.x++;
         if (pos.x >= endPos.x) {
             pos.x = 0;
             pos.y++;

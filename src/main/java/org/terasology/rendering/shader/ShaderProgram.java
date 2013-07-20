@@ -22,7 +22,6 @@ import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.opengl.OpenGLShader;
 
 import java.io.BufferedReader;

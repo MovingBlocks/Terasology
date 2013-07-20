@@ -88,7 +88,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         private boolean forceEntityUpdate;
         private Set<Class<? extends Component>> retainComponentTypes;
 
-        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate, Class<? extends Component> ... retainComponentTypes) {
+        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate, Class<? extends Component>... retainComponentTypes) {
             this.position.set(pos);
             this.oldType = oldType;
             this.newType = newType;

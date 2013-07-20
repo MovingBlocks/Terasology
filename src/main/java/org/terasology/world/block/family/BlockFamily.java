@@ -44,12 +44,11 @@ public interface BlockFamily {
     /**
      * Get the block that is appropriate for placement in the given situation
      *
-     *
      * @param worldProvider
      * @param blockEntityRegistry
-     *@param location
-     * @param attachmentSide The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
-     * @param direction      A secondary direction after the attachment side that determines the facing of the block.   @return The appropriate block
+     * @param location
+     * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
+     * @param direction           A secondary direction after the attachment side that determines the facing of the block.   @return The appropriate block
      */
     Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
 

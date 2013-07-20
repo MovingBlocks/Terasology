@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**

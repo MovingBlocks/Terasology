@@ -25,6 +25,7 @@ public interface InventoryManager {
 
     /**
      * Moves all items from one inventory to another, as far as possible
+     *
      * @param fromInventory
      * @param toInventory
      */
@@ -84,7 +85,8 @@ public interface InventoryManager {
     int getStackSize(EntityRef item);
 
     /**
-     *  This version of setStackSize will destroy the item if newStackSize is <=0
+     * This version of setStackSize will destroy the item if newStackSize is <=0
+     *
      * @param inventoryEntity
      * @param item
      * @param newStackSize

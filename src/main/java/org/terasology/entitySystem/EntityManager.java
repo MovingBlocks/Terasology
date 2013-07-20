@@ -15,14 +15,13 @@
  */
 package org.terasology.entitySystem;
 
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -32,18 +31,21 @@ public interface EntityManager {
 
     /**
      * Creates an EntityBuilder.
+     *
      * @return A new entity builder
      */
     EntityBuilder newBuilder();
 
     /**
      * Creates an EntityBuilder, from a prefab
+     *
      * @return A new entity builder
      */
     EntityBuilder newBuilder(String prefabName);
 
     /**
      * Creates an EntityBuilder, from a prefab
+     *
      * @return A new entity builder
      */
     EntityBuilder newBuilder(Prefab prefab);
@@ -76,6 +78,7 @@ public interface EntityManager {
     EntityRef create(Prefab prefab);
 
     // TODO: Review. Probably better to move these into a static helper
+
     /**
      * @param prefab
      * @param position
@@ -91,7 +94,6 @@ public interface EntityManager {
     EntityRef create(Prefab prefab, Vector3f position);
 
     /**
-     *
      * @param prefab
      * @param position
      * @param rotation
@@ -114,6 +116,7 @@ public interface EntityManager {
 
     /**
      * Creates a copy of the components of an entity.
+     *
      * @param original
      * @return A map of components types to components copied from the target entity.
      */

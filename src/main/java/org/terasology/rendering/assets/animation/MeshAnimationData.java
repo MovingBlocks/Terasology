@@ -35,8 +35,8 @@ public class MeshAnimationData implements AssetData {
     private float timePerFrame;
 
     /**
-     * @param boneNames The names of the bones this animation expects
-     * @param boneParents The indices of the parent of each bone in the boneNames list, NO_PARENT for no parent.
+     * @param boneNames    The names of the bones this animation expects
+     * @param boneParents  The indices of the parent of each bone in the boneNames list, NO_PARENT for no parent.
      * @param frames
      * @param timePerFrame
      */

@@ -72,7 +72,7 @@ public final class OwnershipHelper {
                         }
                     }
                 } else if (value instanceof Map) {
-                    for (EntityRef ref : ((Map<Object, EntityRef>)value).values()) {
+                    for (EntityRef ref : ((Map<Object, EntityRef>) value).values()) {
                         if (ref.exists()) {
                             outEntityList.add(ref);
                         }

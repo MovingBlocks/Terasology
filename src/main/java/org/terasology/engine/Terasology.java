@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 

@@ -18,8 +18,6 @@ package org.terasology.config;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 
-import java.security.SecurityPermission;
-
 /**
  *
  */

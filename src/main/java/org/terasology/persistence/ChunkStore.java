@@ -21,6 +21,7 @@ import org.terasology.world.chunks.Chunk;
 
 /**
  * A chunk store is used to save a chunk and its entity contents.
+ *
  * @author Immortius
  */
 public interface ChunkStore {
@@ -42,12 +43,14 @@ public interface ChunkStore {
 
     /**
      * Saves the chunk store
+     *
      * @param deactivateEntities Whether the contained entities should be deactivated
      */
     public void save(boolean deactivateEntities);
 
     /**
      * Stores an entity into this chunk store
+     *
      * @param entity
      */
     public void store(EntityRef entity);

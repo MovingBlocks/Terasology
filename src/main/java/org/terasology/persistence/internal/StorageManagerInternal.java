@@ -18,7 +18,6 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.nio.file.ExtendedCopyOption;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -50,7 +49,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.file.CopyOption;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -259,7 +257,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
                 Path targetChunk = chunkZip.getPath(getChunkFilename(chunkPos));
                 if (Files.isRegularFile(targetChunk)) {
-                    chunkData =  Files.readAllBytes(targetChunk);
+                    chunkData = Files.readAllBytes(targetChunk);
                 }
             } catch (IOException e) {
                 logger.error("Failed to load chunk zip {}", chunkPath, e);

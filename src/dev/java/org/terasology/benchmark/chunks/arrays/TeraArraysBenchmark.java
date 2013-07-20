@@ -19,18 +19,18 @@ public final class TeraArraysBenchmark {
  
     private TeraArraysBenchmark() {}
     
-    private static final byte[][] inflated8Bit = new byte[256][];
-    private static final byte[] deflated8Bit = new byte[256];
+    private static final byte[][] INFLATED_8_BIT = new byte[256][];
+    private static final byte[] DEFLATED_8_BIT = new byte[256];
     
-    private static final byte[][] inflated4Bit = new byte[256][];
-    private static final byte[] deflated4Bit = new byte[256];
+    private static final byte[][] INFLATED_4_BIT = new byte[256][];
+    private static final byte[] DEFLATED_4_BIT = new byte[256];
 
     static {
-        for (int i = 0; i < inflated8Bit.length; i++) {
-            inflated8Bit[i] = new byte[256];
+        for (int i = 0; i < INFLATED_8_BIT.length; i++) {
+            INFLATED_8_BIT[i] = new byte[256];
         }
-        for (int i = 0; i < inflated4Bit.length; i++) {
-            inflated4Bit[i] = new byte[128];
+        for (int i = 0; i < INFLATED_4_BIT.length; i++) {
+            INFLATED_4_BIT[i] = new byte[128];
         }
     }
     
@@ -49,14 +49,14 @@ public final class TeraArraysBenchmark {
 //
 //        benchmarks.add(new BenchmarkTeraArrayRead(new TeraDenseArray8Bit(16, 256, 16)));
 //        benchmarks.add(new BenchmarkTeraArrayRead(new TeraDenseArray4Bit(16, 256, 16)));
-//        benchmarks.add(new BenchmarkTeraArrayRead(new TeraSparseArray8Bit(16, 256, 16, inflated8Bit, deflated8Bit)));
-//        benchmarks.add(new BenchmarkTeraArrayRead(new TeraSparseArray4Bit(16, 256, 16, inflated4Bit, deflated4Bit)));
+//        benchmarks.add(new BenchmarkTeraArrayRead(new TeraSparseArray8Bit(16, 256, 16, INFLATED_8_BIT, DEFLATED_8_BIT)));
+//        benchmarks.add(new BenchmarkTeraArrayRead(new TeraSparseArray4Bit(16, 256, 16, INFLATED_4_BIT, DEFLATED_4_BIT)));
 //
 //
 //        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraDenseArray8Bit(16, 256, 16)));
 //        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraDenseArray4Bit(16, 256, 16)));
-//        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraSparseArray8Bit(16, 256, 16, inflated8Bit, deflated8Bit)));
-//        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraSparseArray4Bit(16, 256, 16, inflated4Bit, deflated4Bit)));
+//        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraSparseArray8Bit(16, 256, 16, INFLATED_8_BIT, DEFLATED_8_BIT)));
+//        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraSparseArray4Bit(16, 256, 16, INFLATED_4_BIT, DEFLATED_4_BIT)));
 
         Benchmarks.execute(benchmarks, new PrintToConsoleCallback());
         

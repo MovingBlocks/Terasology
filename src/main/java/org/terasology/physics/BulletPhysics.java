@@ -40,15 +40,15 @@ import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.world.OnChangedBlock;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockComponent;
 

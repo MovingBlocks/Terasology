@@ -9,7 +9,7 @@ package org.terasology.benchmark;
 public interface BenchmarkCallback {
     
     public void begin(Benchmark benchmark, int benchmarkIndex, int benchmarkCount);
-    
+
     public void warmup(Benchmark benchmark, boolean finished);
     
     public void progress(Benchmark benchmark, double percent);
@@ -21,5 +21,5 @@ public interface BenchmarkCallback {
     public void error(BenchmarkError.Type type, Exception e, BenchmarkResult result);
     
     public void fatal(Exception e);
-    
+
 }

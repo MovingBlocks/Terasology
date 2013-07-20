@@ -16,8 +16,8 @@
 
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 import javax.vecmath.Vector3f;
@@ -46,12 +46,15 @@ public class DropItemRequest implements Event {
     public EntityRef getItem() {
         return item;
     }
+
     public EntityRef getInventoryEntity() {
         return inventory;
     }
+
     public Vector3f getNewPosition() {
         return newPosition;
     }
+
     public Vector3f getImpulse() {
         return impulse;
     }

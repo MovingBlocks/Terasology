@@ -33,6 +33,7 @@ public @interface BroadcastEvent {
     /**
      * If true and applied to a subclass of NetworkEvent, the event will not be sent to the client owning the instigator
      * entity.
+     *
      * @return Whether the event should not be sent to its instigator
      */
     public boolean skipInstigator() default false;

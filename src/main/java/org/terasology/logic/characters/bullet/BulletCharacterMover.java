@@ -27,6 +27,11 @@ import com.bulletphysics.linearmath.Transform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMover;
+import org.terasology.logic.characters.CharacterStateEvent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
@@ -34,11 +39,6 @@ import org.terasology.logic.characters.events.OnEnterLiquidEvent;
 import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterMover;
-import org.terasology.logic.characters.CharacterStateEvent;
-import org.terasology.logic.characters.MovementMode;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.MovedEvent;
@@ -152,7 +152,7 @@ public class BulletCharacterMover implements CharacterMover {
                     entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
                 }
             }
-            if (!newSwimming  && state.getVelocity().y > 0) {
+            if (!newSwimming && state.getVelocity().y > 0) {
                 state.getVelocity().y += 8;
             }
             state.setMode((newSwimming) ? MovementMode.SWIMMING : MovementMode.WALKING);

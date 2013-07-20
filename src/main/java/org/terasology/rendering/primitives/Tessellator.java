@@ -149,7 +149,7 @@ public class Tessellator {
     }
 
     public Mesh generateMesh(AssetUri uri) {
-        Mesh result =  Assets.generateAsset(uri, meshData, Mesh.class);
+        Mesh result = Assets.generateAsset(uri, meshData, Mesh.class);
         meshData = new MeshData();
         return result;
     }

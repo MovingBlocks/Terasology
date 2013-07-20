@@ -18,6 +18,7 @@ package org.terasology.network;
 
 /**
  * Interface for providers of sources of network metric information
+ *
  * @author Immortius
  */
 /* TODO: Produce a better metric system that doesn't rely on a single user calling it at set intervals (metric information

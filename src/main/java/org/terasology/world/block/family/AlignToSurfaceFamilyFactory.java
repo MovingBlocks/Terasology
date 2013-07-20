@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import org.terasology.asset.AssetUri;
@@ -24,7 +23,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockDefinition;
 
-import java.util.List;
 import java.util.Map;
 
 @RegisterBlockFamilyFactory("alignToSurface")

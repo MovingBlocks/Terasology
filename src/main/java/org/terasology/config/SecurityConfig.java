@@ -16,7 +16,14 @@
 package org.terasology.config;
 
 import com.google.common.collect.Maps;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 
@@ -65,7 +72,7 @@ public class SecurityConfig {
         clientCertificates.put(serverCertificate, identity);
     }
 
-    public static class Handler  implements JsonSerializer<SecurityConfig>, JsonDeserializer<SecurityConfig> {
+    public static class Handler implements JsonSerializer<SecurityConfig>, JsonDeserializer<SecurityConfig> {
 
         public static final String SERVER_PUBLIC_CERTIFICATE = "serverPublicCertificate";
         public static final String SERVER_PRIVATE_CERTIFICATE = "serverPrivateCertificate";

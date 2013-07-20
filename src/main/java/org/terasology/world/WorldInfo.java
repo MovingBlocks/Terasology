@@ -16,21 +16,6 @@
 
 package org.terasology.world;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.GsonBuilder;
-import org.terasology.config.ModConfig;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Summary information on a world.
  *

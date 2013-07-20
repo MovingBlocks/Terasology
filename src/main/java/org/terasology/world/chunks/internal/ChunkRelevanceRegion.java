@@ -18,8 +18,8 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;

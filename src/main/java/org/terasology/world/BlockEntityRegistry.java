@@ -30,6 +30,7 @@ public interface BlockEntityRegistry {
     /**
      * This method returns the block entity at the given location, but will not produce a temporary entity if
      * one isn't currently in memory.
+     *
      * @param blockPosition
      * @return The block entity for the location if it exists, or the null entity
      */
@@ -38,6 +39,7 @@ public interface BlockEntityRegistry {
     /**
      * This method is the same as setBlock, except if the old and new block types are part of the same family the
      * entity will be force updated (usually they are not in this situation).
+     *
      * @param x
      * @param y
      * @param z
@@ -50,6 +52,7 @@ public interface BlockEntityRegistry {
     /**
      * This method is the same as setBlock, except if the old and new block types are part of the same family the
      * entity will be force updated (usually they are not in this situation).
+     *
      * @param position
      * @param type
      * @param oldType
@@ -59,16 +62,18 @@ public interface BlockEntityRegistry {
 
     /**
      * This method is the same as setBlock, except the specified components are not altered during the update
+     *
      * @param position
      * @param type
      * @param oldType
      * @param components
      * @return Whether the block was changed
      */
-    boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component> ... components);
+    boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components);
 
     /**
      * This method is the same as setBlock, except the specified components are not altered during the update
+     *
      * @param x
      * @param y
      * @param z
@@ -77,7 +82,7 @@ public interface BlockEntityRegistry {
      * @param components
      * @return Whether the block was changed
      */
-    boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component> ... components);
+    boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components);
 
     /**
      * @param blockPosition

@@ -21,12 +21,12 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.icons.Icon;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Vector2f;
 

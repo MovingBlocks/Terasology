@@ -17,7 +17,6 @@
 package org.terasology.world.chunks.blockdata;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import java.io.Externalizable;
@@ -106,7 +105,7 @@ public abstract class TeraArray implements Externalizable {
 
         public boolean canHandle(Class<?> clazz);
 
-;
+        ;
 
 
     }

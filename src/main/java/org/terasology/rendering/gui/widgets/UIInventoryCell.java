@@ -17,12 +17,12 @@ package org.terasology.rendering.gui.widgets;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
-import org.terasology.logic.common.DisplayInformationComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.players.LocalPlayer;

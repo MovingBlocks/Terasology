@@ -6,6 +6,7 @@ import java.util.List;
 
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * BenchmarkResult records the results and the errors of the execution of one particular benchmark.
@@ -16,7 +17,7 @@ import com.google.common.base.Preconditions;
  */
 public abstract class BenchmarkResult {
     
-    private final List<Column<?>> columns = new LinkedList<Column<?>>();
+    private final List<Column<?>> columns = Lists.newLinkedList();
 
     private final Class<?> benchmarkClass;
     private final String title;
@@ -24,25 +25,27 @@ public abstract class BenchmarkResult {
     private final long[] starttime;
     private final long[] runtime;
     private boolean aborted;
-    private final List<BenchmarkError> errors = new LinkedList<BenchmarkError>();
+    private final List<BenchmarkError> errors = Lists.newLinkedList();
 
     public static enum Alignment {
-        Left {
+        LEFT {
             @Override
             public String pad(String value, int size) {
                 String result = (value == null ? "" : value);
-                while (result.length() < size) 
+                while (result.length() < size) {
                     result = result + " ";
+                }
                 return result;
             }
         },
         
-        Right {
+        RIGHT {
             @Override
             public String pad(String value, int size) {
                 String result = (value == null ? "" : value);
-                while (result.length() < size) 
+                while (result.length() < size) {
                     result = " " + result;
+                }
                 return result;
             }
         };
@@ -50,7 +53,7 @@ public abstract class BenchmarkResult {
         public abstract String pad(String value, int size);
     }
     
-    public static abstract class Column<T extends BenchmarkResult> {
+    public abstract static class Column<T extends BenchmarkResult> {
         
         private final int reps;
         private final String[] cache;
@@ -86,7 +89,9 @@ public abstract class BenchmarkResult {
                 int max = name.length();
                 for (int i = 0; i < reps; i++) {
                     String v = getValue(i);
-                    if (v.length() > max) max = v.length();
+                    if (v.length() > max) {
+                        max = v.length();
+                    }
                 }
                 hasMaxWidth = true;
                 maxWidth = max;

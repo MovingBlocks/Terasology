@@ -20,7 +20,6 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
-import org.terasology.world.WorldInfo;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;

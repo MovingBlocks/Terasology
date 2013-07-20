@@ -18,9 +18,9 @@ package org.terasology.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
@@ -29,6 +29,7 @@ import org.terasology.network.ClientComponent;
 
 /**
  * This system provides the ability to chat with a "say" command. Chat messages are broadcast to all players.
+ *
  * @author Immortius
  */
 @RegisterSystem

@@ -32,7 +32,7 @@ import java.util.List;
  * @author Immortius
  */
 @RegisterSystem
-public class ConsoleSystem implements ComponentSystem{
+public class ConsoleSystem implements ComponentSystem {
 
     @In
     private Console console;

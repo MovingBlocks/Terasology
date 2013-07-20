@@ -16,10 +16,10 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.WorldRenderer;

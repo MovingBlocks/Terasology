@@ -21,6 +21,7 @@ import org.terasology.world.BlockEntityRegistry;
 /**
  * This event informs of the addition of new blocks. It is sent against a block type entity of the blocks involved,
  * with the positions of those blocks.
+ *
  * @author Immortius
  */
 public class OnAddedBlocks extends BlockLifecycleEvent {

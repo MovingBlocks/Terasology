@@ -23,10 +23,10 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 
 import java.util.Iterator;
 

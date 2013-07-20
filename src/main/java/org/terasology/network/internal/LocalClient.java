@@ -16,18 +16,19 @@
 
 package org.terasology.network.internal;
 
-import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.config.Config;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.world.chunks.Chunk;
 
 /**
  * A local client.
+ *
  * @author Immortius
  */
 public class LocalClient extends AbstractClient {

@@ -16,8 +16,8 @@
 
 package org.terasology.input;
 
-import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Immortius

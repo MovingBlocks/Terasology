@@ -16,10 +16,10 @@
 package org.terasology.world.block.items;
 
 import org.terasology.entitySystem.EntityBuilder;
-import org.terasology.rendering.logic.LightComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**

@@ -30,7 +30,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.events.CollisionEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.console.Command;

@@ -25,15 +25,15 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
 import org.terasology.logic.inventory.events.MoveItemAmountRequest;
 import org.terasology.logic.inventory.events.MoveItemRequest;
@@ -251,7 +251,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
 
     @Override
     public void setStackSize(EntityRef inventoryEntity, EntityRef item, int newStackSize) {
-         setStackSize(item,item.getComponent(ItemComponent.class) , newStackSize, inventoryEntity);
+        setStackSize(item, item.getComponent(ItemComponent.class), newStackSize, inventoryEntity);
     }
 
     @Override
@@ -551,7 +551,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     }
 
     private void setStackSize(EntityRef item, ItemComponent component, int newStackSize) {
-        setStackSize(item,component,newStackSize, EntityRef.NULL);
+        setStackSize(item, component, newStackSize, EntityRef.NULL);
     }
 
     private void setStackSize(EntityRef item, ItemComponent component, int newStackSize, EntityRef inventoryEntity) {
@@ -563,8 +563,8 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
         }
 
         //destroy item if new stack size is 0
-        if(newStackSize <=0 && inventoryEntity != EntityRef.NULL) {
-            destroyItem(inventoryEntity,item);
+        if (newStackSize <= 0 && inventoryEntity != EntityRef.NULL) {
+            destroyItem(inventoryEntity, item);
         }
 
     }

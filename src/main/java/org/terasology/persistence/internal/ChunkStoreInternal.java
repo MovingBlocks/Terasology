@@ -23,7 +23,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
-import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 

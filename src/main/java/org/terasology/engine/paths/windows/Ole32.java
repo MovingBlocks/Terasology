@@ -24,7 +24,7 @@ import com.sun.jna.win32.W32APIOptions;
 /**
  * @author Immortius
  */
-public interface Ole32 extends StdCallLibrary{
+public interface Ole32 extends StdCallLibrary {
 
     Ole32 INSTANCE = (Ole32) Native.loadLibrary(
             "Ole32", Ole32.class, W32APIOptions.UNICODE_OPTIONS);

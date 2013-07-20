@@ -32,7 +32,7 @@ public class AllSidesFamily extends AbstractBlockFamily implements SideDefinedBl
     public AllSidesFamily(BlockUri uri, Iterable<String> categories, Block archetypeBlock, Map<Side, Block> sideBlocks) {
         super(uri, categories);
 
-        for (Map.Entry<Side, Block> blockBySide : sideBlocks.entrySet()){
+        for (Map.Entry<Side, Block> blockBySide : sideBlocks.entrySet()) {
             final Side side = blockBySide.getKey();
             final Block block = blockBySide.getValue();
             if (block == null) {

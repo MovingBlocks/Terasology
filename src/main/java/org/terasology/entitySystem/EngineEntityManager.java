@@ -25,8 +25,9 @@ public interface EngineEntityManager extends EntityManager {
 
     /**
      * Creates an entity but doesn't send any lifecycle events.
-     *
+     * <p/>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
+     *
      * @param components
      * @return The newly created entity ref.
      */
@@ -34,8 +35,9 @@ public interface EngineEntityManager extends EntityManager {
 
     /**
      * Destroys an entity without sending lifecycle events.
-     *
+     * <p/>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
+     *
      * @param entity
      */
     void destroyEntityWithoutEvents(EntityRef entity);
@@ -43,6 +45,7 @@ public interface EngineEntityManager extends EntityManager {
     /**
      * Allows the creation of an entity with a given id - this is used
      * when loading persisted entities
+     *
      * @param id
      * @param components
      * @return The entityRef for the newly created entity
@@ -51,6 +54,7 @@ public interface EngineEntityManager extends EntityManager {
 
     /**
      * Creates an entity ref with the given id. This is used when loading components with references.
+     *
      * @param id
      * @return The entityRef for the given id
      */
@@ -58,18 +62,21 @@ public interface EngineEntityManager extends EntityManager {
 
     /**
      * This is used to persist the entity manager's state
+     *
      * @return The id that will be used for the next entity (after freed ids are used)
      */
     int getNextId();
 
     /**
      * Sets the next id the entity manager will use. This is used when restoring the entity manager's state.
+     *
      * @param id
      */
     void setNextId(int id);
 
     /**
      * A list of freed ids. This is used when persisting the entity manager's state
+     *
      * @return A list of freed ids that are available for reuse.
      */
     TIntSet getFreedIds();
@@ -81,30 +88,35 @@ public interface EngineEntityManager extends EntityManager {
 
     /**
      * Removes an entity while keeping its id in use - this allows it to be stored
+     *
      * @param entity
      */
     void deactivateForStorage(EntityRef entity);
 
     /**
      * Subscribes to all changes related to entities. Used by engine systems.
+     *
      * @param subscriber
      */
     void subscribe(EntityChangeSubscriber subscriber);
 
     /**
      * Subscribe for notification the destruction of entities.
+     *
      * @param subscriber
      */
     void subscribe(EntityDestroySubscriber subscriber);
 
     /**
      * Unsubscribes from changes relating to entities. Used by engine systems.
+     *
      * @param subscriber
      */
     void unsubscribe(EntityChangeSubscriber subscriber);
 
     /**
      * Sets the event system the entity manager will use to propagate life cycle events.
+     *
      * @param system
      */
     void setEventSystem(EventSystem system);

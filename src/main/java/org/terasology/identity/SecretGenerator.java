@@ -56,6 +56,7 @@ public final class SecretGenerator {
 
     /**
      * Generates a secret from another secret, a seed, and a label
+     *
      * @param secret
      * @param label
      * @param seed
@@ -82,7 +83,7 @@ public final class SecretGenerator {
 
         byte[] masterSecret = new byte[md5Result.length];
         for (int i = 0; i < masterSecret.length; ++i) {
-            masterSecret[i] = (byte)(md5Result[i] ^ sha1Result[i]);
+            masterSecret[i] = (byte) (md5Result[i] ^ sha1Result[i]);
         }
 
         return masterSecret;

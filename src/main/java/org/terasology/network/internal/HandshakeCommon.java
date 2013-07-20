@@ -32,6 +32,7 @@ public final class HandshakeCommon {
 
     /**
      * Generates the master secret, a common secret between the server and client used to generate a symmetric encryption key
+     *
      * @param preMasterSecret
      * @param clientRandom
      * @param serverRandom
@@ -43,6 +44,7 @@ public final class HandshakeCommon {
 
     /**
      * Generates a symmetric encryption key from the master secret
+     *
      * @param masterSecret
      * @param clientRandom
      * @param serverRandom
@@ -54,6 +56,7 @@ public final class HandshakeCommon {
 
     /**
      * Create a set of data to sign to bu
+     *
      * @param serverHello
      * @param clientHello
      * @return

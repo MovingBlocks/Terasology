@@ -19,8 +19,8 @@ import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.internal.PojoEntityManager;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.utilities.collection.NullIterator;
 
 /**

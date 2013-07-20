@@ -19,7 +19,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.network.NetworkComponent;

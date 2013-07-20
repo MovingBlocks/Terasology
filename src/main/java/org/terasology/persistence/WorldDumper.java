@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence;
 
-import com.google.protobuf.TextFormat;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
@@ -23,20 +22,14 @@ import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
  * Used to create a dump of the current state of the world (specifically, entities)
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class WorldDumper {

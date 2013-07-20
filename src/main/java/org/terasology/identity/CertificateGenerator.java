@@ -16,11 +16,18 @@
 package org.terasology.identity;
 
 import java.math.BigInteger;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -44,6 +51,7 @@ public class CertificateGenerator {
 
     /**
      * Generates a self-signed certificate. These are used to identify servers.
+     *
      * @return A matched pair of public and private certificates.
      */
     public CertificatePair generateSelfSigned() {
@@ -76,6 +84,7 @@ public class CertificateGenerator {
     /**
      * Generates a certificate signed by the given signer - a server will typically generate client identity certificates
      * signed by its certificate.
+     *
      * @param signingCertificate
      * @return A matched pair of public and private certificates.
      */

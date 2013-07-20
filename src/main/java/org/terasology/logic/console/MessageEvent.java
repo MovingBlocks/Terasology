@@ -17,7 +17,6 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.logic.console.Message;
 
 /**
  * @author Immortius

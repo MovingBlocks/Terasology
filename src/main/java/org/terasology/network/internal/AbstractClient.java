@@ -16,14 +16,15 @@
 
 package org.terasology.network.internal;
 
-import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 
 /**
  * The common behaviour of all clients - whether local or remote
+ *
  * @author Immortius
  */
 public abstract class AbstractClient implements Client {

@@ -17,8 +17,8 @@
 package org.terasology.logic.characters;
 
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 

@@ -36,10 +36,10 @@ public final class FilesUtil {
      */
     public static final DirectoryStream.Filter<Path> DIRECTORY_FILTER =
             new DirectoryStream.Filter<Path>() {
-        public boolean accept(Path file) throws IOException {
-            return Files.isDirectory(file);
-        }
-    };
+                public boolean accept(Path file) throws IOException {
+                    return Files.isDirectory(file);
+                }
+            };
 
     /**
      * Note: Keep an eye out for recursive delete being added to the core Java API in the future - there are certain

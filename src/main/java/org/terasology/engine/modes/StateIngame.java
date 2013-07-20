@@ -34,12 +34,9 @@ import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.persistence.StorageManager;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
-
-import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;

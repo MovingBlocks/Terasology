@@ -23,7 +23,6 @@ public interface BlockFamilyFactory {
     /**
      * Called by the Block Loader to create a block family.
      *
-     *
      * @param blockBuilder
      * @param blockDefUri
      * @param blockDefinition

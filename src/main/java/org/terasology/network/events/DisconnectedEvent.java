@@ -21,6 +21,7 @@ import org.terasology.persistence.PlayerStore;
 
 /**
  * Event notifying of a client disconnecting.
+ *
  * @author Immortius
  */
 public class DisconnectedEvent implements Event {

@@ -20,7 +20,7 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * This event is sent when an entity is created or a component added to an existing entity.
- *
+ * <p/>
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  */

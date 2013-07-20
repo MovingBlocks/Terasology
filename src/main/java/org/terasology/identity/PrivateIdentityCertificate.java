@@ -21,7 +21,13 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 
@@ -47,6 +53,7 @@ public class PrivateIdentityCertificate {
 
     /**
      * Produces a signature for data that can be verified as by the paired public certificate.
+     *
      * @param dataToSign
      * @return The signature
      */
@@ -68,6 +75,7 @@ public class PrivateIdentityCertificate {
 
     /**
      * Decrypts data encrypted by the paired public certificate
+     *
      * @param data
      * @return The decrypted data
      * @throws BadEncryptedDataException If the data could not be decrypted due to an error with the data.

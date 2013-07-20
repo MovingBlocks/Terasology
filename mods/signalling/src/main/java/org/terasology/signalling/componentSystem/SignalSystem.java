@@ -79,7 +79,7 @@ public class SignalSystem implements UpdateSubscriberSystem, NetworkTopologyList
         signalProducers = Maps.newHashMap();
         signalConsumers = Maps.newHashMap();
         signalConductors = Maps.newHashMap();
-        System.out.println("Initialized SignalSystem");
+        logger.info("Initialized SignalSystem");
     }
 
     @Override

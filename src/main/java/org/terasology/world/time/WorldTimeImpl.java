@@ -15,16 +15,11 @@
  */
 package org.terasology.world.time;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.world.WorldComponent;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -94,7 +89,7 @@ public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
     public void update(float delta) {
         long deltaMs = time.getDeltaInMs();
         if (deltaMs > 0) {
-            deltaMs = (long)(deltaMs * WORLD_TIME_MULTIPLIER);
+            deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
             long startTime = worldTime.getAndAdd(deltaMs);
             long timeInDay = startTime % DAY_LENGTH;
             if (timeInDay < 0) {

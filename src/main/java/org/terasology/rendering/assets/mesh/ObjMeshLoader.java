@@ -18,8 +18,6 @@ package org.terasology.rendering.assets.mesh;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;

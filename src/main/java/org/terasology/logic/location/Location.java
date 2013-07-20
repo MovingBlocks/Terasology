@@ -16,10 +16,10 @@
 
 package org.terasology.logic.location;
 
-import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
 import javax.vecmath.Quat4f;
@@ -44,6 +44,7 @@ public class Location implements ComponentSystem {
     /**
      * Attaches an entity to another entity. Both must have location components.
      * This method sets the child's relative offset and rotation to the
+     *
      * @param parent
      * @param child
      * @param offset
@@ -70,6 +71,7 @@ public class Location implements ComponentSystem {
     /**
      * Attaches an entity to another entity. Both must have location components. The child maintains its previous position
      * and rotation but follows the parent.
+     *
      * @param parent
      * @param child
      */
@@ -108,9 +110,9 @@ public class Location implements ComponentSystem {
     public void onDestroyed(BeforeRemoveComponent event, EntityRef entity) {
         LocationComponent parentLoc = entity.getComponent(LocationComponent.class);
         if (parentLoc == null)
-        if (parentLoc.parent != null) {
-            removeChild(parentLoc.parent, entity);
-        }
+            if (parentLoc.parent != null) {
+                removeChild(parentLoc.parent, entity);
+            }
         Iterator<EntityRef> childIterator = parentLoc.getChildren().iterator();
         while (childIterator.hasNext()) {
             EntityRef child = childIterator.next();

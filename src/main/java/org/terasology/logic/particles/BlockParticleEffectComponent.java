@@ -22,7 +22,6 @@ import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.io.Serializable;
 import java.util.List;
 
 /**

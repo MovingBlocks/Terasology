@@ -15,15 +15,9 @@
  */
 package org.terasology.persistence.internal;
 
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.persistence.GlobalStore;
 import org.terasology.protobuf.EntityData;
-
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 
 /**
  * @author Immortius

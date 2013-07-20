@@ -17,10 +17,10 @@
 package org.terasology.input;
 
 import com.google.common.base.Objects;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;

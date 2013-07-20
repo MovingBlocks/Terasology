@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 /**
  * Used to provide the name of a Command's params (since the names are otherwise unavailable)
+ *
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)

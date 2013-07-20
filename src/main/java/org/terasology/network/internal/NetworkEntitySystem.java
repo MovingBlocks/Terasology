@@ -16,17 +16,17 @@
 
 package org.terasology.network.internal;
 
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
@@ -38,9 +38,10 @@ import org.terasology.world.chunks.ChunkConstants;
 /**
  * This system handles a number of events relevant to the Network System:
  * <ul>
- *     <li>Notifies the network system when network entities are created, destroyed or updated</li>
- *     <li>Notifies the network system when a client requests a change of view range</li>
+ * <li>Notifies the network system when network entities are created, destroyed or updated</li>
+ * <li>Notifies the network system when a client requests a change of view range</li>
  * </ul>
+ *
  * @author Immortius
  */
 public class NetworkEntitySystem implements ComponentSystem {

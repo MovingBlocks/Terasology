@@ -18,9 +18,9 @@ package org.terasology.entitySystem.internal;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 
 import java.util.Collection;
 import java.util.Locale;

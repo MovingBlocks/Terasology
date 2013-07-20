@@ -21,9 +21,10 @@ import org.terasology.entitySystem.event.Event;
 /**
  * This event occurs after an entity is created, an entity is loaded or a component is added to an entity. This occurs
  * after OnAddedComponent where relevant.
- *
+ * <p/>
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class OnActivatedComponent implements Event {

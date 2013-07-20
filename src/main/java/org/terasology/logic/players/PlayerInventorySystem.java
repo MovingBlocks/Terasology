@@ -16,9 +16,9 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.*;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Time;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;

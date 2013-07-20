@@ -19,11 +19,6 @@ import gnu.trove.list.TFloatList;
 import org.terasology.asset.Asset;
 import org.terasology.math.AABB;
 
-import static org.lwjgl.opengl.GL11.glColorPointer;
-import static org.lwjgl.opengl.GL11.glNormalPointer;
-import static org.lwjgl.opengl.GL11.glTexCoordPointer;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
-
 public interface Mesh extends Asset<MeshData> {
 
     public static final int VERTEX_SIZE = 3;

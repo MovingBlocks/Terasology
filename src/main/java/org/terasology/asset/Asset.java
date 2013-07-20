@@ -40,6 +40,7 @@ public interface Asset<T extends AssetData> {
 
     /**
      * Reloads this assets using the new data.
+     *
      * @param data
      */
     void reload(T data);

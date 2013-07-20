@@ -16,12 +16,12 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.internal.NetworkSystemImpl;
 
 /**

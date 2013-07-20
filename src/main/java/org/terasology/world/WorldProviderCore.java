@@ -59,7 +59,6 @@ public interface WorldProviderCore {
     void unregisterListener(WorldChangeListener listener);
 
     /**
-     *
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
@@ -101,15 +100,15 @@ public interface WorldProviderCore {
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
-     *
+     * <p/>
      * This method takes the expected value of the previous block in this position - this allows it to check the block
      * hasn't been changed (potentially by another thread). If it has changed then no change occurs. It is recommended
      * that this is used to ensure that the block being changed is in an acceptable state for the change.
      *
-     * @param x    The X-coordinate
-     * @param y    The Y-coordinate
-     * @param z    The Z-coordinate
-     * @param type The type of the block to set
+     * @param x       The X-coordinate
+     * @param y       The Y-coordinate
+     * @param z       The Z-coordinate
+     * @param type    The type of the block to set
      * @param oldType The expected type of the block being replaced.
      * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
      */
@@ -118,7 +117,7 @@ public interface WorldProviderCore {
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
-     *
+     * <p/>
      * This method forces the change regardless of the previous value. It should generally be avoided except in situations where
      * the change must absolutely occur regardless of the type of block being changed.
      *

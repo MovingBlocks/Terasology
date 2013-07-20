@@ -31,19 +31,19 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.PickupComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.players.LocalPlayer;
@@ -53,8 +53,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -286,7 +286,7 @@ public class MeshRenderer implements RenderSystem {
                             if (lastMesh != null) {
                                 lastMesh.postRender();
                             }
-                            lastMesh = (OpenGLMesh)meshComp.mesh;
+                            lastMesh = (OpenGLMesh) meshComp.mesh;
                             lastMesh.preRender();
                         }
                         glPushMatrix();
@@ -317,7 +317,7 @@ public class MeshRenderer implements RenderSystem {
                     AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
                     if (worldRenderer.isAABBVisible(aabb)) {
-                        indexOffset = ((OpenGLMesh)meshComp.mesh).addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
+                        indexOffset = ((OpenGLMesh) meshComp.mesh).addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
                     }
 
                     if (indexOffset > 100) {

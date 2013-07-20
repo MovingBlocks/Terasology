@@ -16,7 +16,6 @@
 package org.terasology.persistence.internal;
 
 import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -64,7 +63,7 @@ final class PlayerStoreInternal implements PlayerStore {
 
     @Override
     public void save() {
-       save(true);
+        save(true);
     }
 
     @Override

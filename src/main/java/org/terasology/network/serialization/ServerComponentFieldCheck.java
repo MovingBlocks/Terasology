@@ -18,12 +18,13 @@ package org.terasology.network.serialization;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.persistence.serializers.FieldSerializeCheck;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.ReplicationCheck;
+import org.terasology.persistence.serializers.FieldSerializeCheck;
 
 /**
  * Determines which fields should be sent and received by the server
+ *
  * @author Immortius
  */
 public class ServerComponentFieldCheck implements FieldSerializeCheck<Component> {

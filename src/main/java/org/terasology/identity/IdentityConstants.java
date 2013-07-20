@@ -51,5 +51,6 @@ public final class IdentityConstants {
     public static final int SYMMETRIC_ENCRYPTION_KEY_LENGTH = 16;
 
 
-    private IdentityConstants() {}
+    private IdentityConstants() {
+    }
 }

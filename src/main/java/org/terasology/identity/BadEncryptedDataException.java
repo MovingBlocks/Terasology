@@ -20,7 +20,8 @@ package org.terasology.identity;
  */
 public class BadEncryptedDataException extends Exception {
 
-    public BadEncryptedDataException() {}
+    public BadEncryptedDataException() {
+    }
 
     public BadEncryptedDataException(String message) {
         super(message);

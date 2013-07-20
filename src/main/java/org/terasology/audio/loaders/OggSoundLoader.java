@@ -29,8 +29,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static org.lwjgl.openal.AL10.alGenBuffers;
-
 /**
  * @author Immortius
  */

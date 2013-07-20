@@ -66,7 +66,7 @@ public class CoreRegistry {
     }
 
     public static void clear() {
-        Iterator<Map.Entry<Class<?>,Object>> iterator = store.entrySet().iterator();
+        Iterator<Map.Entry<Class<?>, Object>> iterator = store.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Class<?>, Object> entry = iterator.next();
             if (!permStore.contains(entry.getKey())) {

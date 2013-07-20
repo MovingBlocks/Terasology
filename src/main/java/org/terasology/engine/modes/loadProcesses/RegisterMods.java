@@ -22,7 +22,6 @@ import org.terasology.engine.modes.LoadProcess;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.world.WorldInfo;
 
 /**
  * @author Immortius

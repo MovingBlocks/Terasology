@@ -32,7 +32,6 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
@@ -51,7 +50,8 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.vecmath.*;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

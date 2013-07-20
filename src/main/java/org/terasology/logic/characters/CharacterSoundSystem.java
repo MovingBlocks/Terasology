@@ -32,7 +32,6 @@ import org.terasology.logic.characters.events.OnEnterLiquidEvent;
 import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;

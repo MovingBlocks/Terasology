@@ -45,7 +45,7 @@ public class BlockTypeClientSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components=BlockTypeComponent.class)
+    @ReceiveEvent(components = BlockTypeComponent.class)
     public void onReceivedTypeEntity(OnAddedComponent event, EntityRef entity) {
         Block block = entity.getComponent(BlockTypeComponent.class).block;
         if (block != null) {

@@ -16,8 +16,8 @@
 package org.terasology.entitySystem.event;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.systems.ComponentSystem;
 
 /**
  * Event system propagates events to registered handlers

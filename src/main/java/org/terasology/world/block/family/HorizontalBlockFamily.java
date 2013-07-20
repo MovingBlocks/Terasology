@@ -42,7 +42,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
      * @param categories The set of categories this block family belongs to
      */
     public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
-            this(uri, Side.FRONT, blocks, categories);
+        this(uri, Side.FRONT, blocks, categories);
     }
 
     public HorizontalBlockFamily(BlockUri uri, Side archetypeSide, Map<Side, Block> blocks, Iterable<String> categories) {

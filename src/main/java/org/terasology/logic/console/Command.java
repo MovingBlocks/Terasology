@@ -26,6 +26,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Commands methods can have an EntityRef parameter at the end, which will be populated with the entity of the
  * client calling the command.
+ *
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)

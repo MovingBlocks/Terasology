@@ -18,10 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.game.GameManifest;
-import org.terasology.persistence.StorageManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.persistence.StorageManager;
 
 import java.io.IOException;
 

@@ -15,7 +15,6 @@
  */
 package org.terasology.game;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
@@ -27,11 +26,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.world.WorldInfo;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;

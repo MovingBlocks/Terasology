@@ -39,7 +39,7 @@ public class DoDamageEvent implements Event {
 
     /**
      * @param amount     The amount of damage being caused
-     * @param damageType       The type of the damage being dealt
+     * @param damageType The type of the damage being dealt
      * @param instigator The instigator of the damage (which entity caused it)
      */
     public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator) {

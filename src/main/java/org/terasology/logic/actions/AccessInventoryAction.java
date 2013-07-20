@@ -15,17 +15,17 @@
  */
 package org.terasology.logic.actions;
 
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.inventory.events.OpenInventoryEvent;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.events.OpenInventoryEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;

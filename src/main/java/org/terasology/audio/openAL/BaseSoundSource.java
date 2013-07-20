@@ -18,8 +18,6 @@ package org.terasology.audio.openAL;
 import org.lwjgl.openal.AL10;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
 

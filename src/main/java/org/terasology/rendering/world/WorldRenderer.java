@@ -30,7 +30,6 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.game.Game;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;

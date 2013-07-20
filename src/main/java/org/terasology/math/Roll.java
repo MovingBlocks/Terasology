@@ -17,8 +17,9 @@ package org.terasology.math;
 
 /**
  * Enumeration for Roll.
- *
+ * <p/>
  * Pitch, yaw and roll enumerations are all very similar, but separated to allow for safer usage in Rotation.
+ *
  * @author Immortius
  */
 public enum Roll {

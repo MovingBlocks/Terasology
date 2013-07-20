@@ -43,7 +43,6 @@ public interface BlockShape extends Asset<BlockShapeData> {
     boolean isBlockingSide(Side side);
 
     /**
-     *
      * @param rot
      * @return The collision shape for the given rotation
      */

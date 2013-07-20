@@ -16,16 +16,15 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.config.Config;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.binds.ForwardsMovementAxis;
@@ -42,6 +41,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
@@ -53,8 +53,8 @@ import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.regions.BlockRegionComponent;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
@@ -207,12 +207,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-public void onRun(RunButton event, EntityRef entity) {
-    run = event.isDown();
-    event.consume();
-}
+    public void onRun(RunButton event, EntityRef entity) {
+        run = event.isDown();
+        event.consume();
+    }
 
-@Override
+    @Override
     public void renderOverlay() {
         // TODO: Don't render if not in first person?
         // Display the block the player is aiming at
@@ -295,7 +295,7 @@ public void onRun(RunButton event, EntityRef entity) {
         return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
     }
 
-   @Override
+    @Override
     public void renderOpaque() {
 
     }

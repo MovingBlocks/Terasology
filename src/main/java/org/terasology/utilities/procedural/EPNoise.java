@@ -114,8 +114,8 @@ public class EPNoise implements Noise {
 			 * .fastFloor((Math.asin(rand.randomDouble()%3)/Math.asin(3))*256);
 			 * j = (j < 0) ? -j : j; break;
 			 */
-			/*
-			 * case 10: // creates j = rand.randomInt(); j = (j < 0) ? -j : j; j
+            /*
+             * case 10: // creates j = rand.randomInt(); j = (j < 0) ? -j : j; j
 			 * = (int) Math.atan((double) j) % 256; break;
 			 */
 
@@ -132,7 +132,7 @@ public class EPNoise implements Noise {
             }
 
 			/*if (verbose && type != -1) {
-				System.out.print("noise generator type:" + type + "\n");
+                System.out.print("noise generator type:" + type + "\n");
 				System.out.print("value:" + j + "\n");
 			}*/
 

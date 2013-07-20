@@ -16,8 +16,8 @@
 
 package org.terasology.logic.chat;
 
-import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
@@ -25,6 +25,7 @@ import org.terasology.network.OwnerEvent;
 
 /**
  * A chat message
+ *
  * @author Immortius
  */
 @OwnerEvent

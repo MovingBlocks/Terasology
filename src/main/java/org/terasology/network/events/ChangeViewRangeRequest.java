@@ -21,6 +21,7 @@ import org.terasology.network.ServerEvent;
 
 /**
  * A request for a change of view range - should be sent against the player's client entity.
+ *
  * @author Immortius
  */
 @ServerEvent
@@ -32,7 +33,6 @@ public class ChangeViewRangeRequest implements Event {
     }
 
     /**
-     *
      * @param newRangeMode The view range mode (not distance)
      */
     public ChangeViewRangeRequest(int newRangeMode) {

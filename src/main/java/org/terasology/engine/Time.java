@@ -18,9 +18,10 @@ package org.terasology.engine;
 /**
  * The timer manages all time in the game.
  * <ol>
- *     <li>Delta time (how long is passing in the current update cycle)</li>
- *     <li>Game time (how long the world has been played in real time, starting at 0)</li>
+ * <li>Delta time (how long is passing in the current update cycle)</li>
+ * <li>Game time (how long the world has been played in real time, starting at 0)</li>
  * </ol>
+ *
  * @author Immortius
  */
 public interface Time {

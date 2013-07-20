@@ -29,7 +29,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -42,9 +41,9 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.regions.BlockRegionComponent;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Vector3f;
 

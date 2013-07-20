@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block.family;
 
-import org.terasology.math.Direction;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;

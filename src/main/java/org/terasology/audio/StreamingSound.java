@@ -16,8 +16,6 @@
 
 package org.terasology.audio;
 
-import org.terasology.asset.Asset;
-
 /**
  *
  */

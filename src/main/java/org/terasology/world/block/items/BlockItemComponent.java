@@ -16,8 +16,6 @@
 package org.terasology.world.block.items;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Owns;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.family.BlockFamily;

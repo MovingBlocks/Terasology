@@ -23,8 +23,10 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.world.WorldInfo;
-import org.terasology.world.block.family.*;
+import org.terasology.world.block.family.BlockFamilyFactory;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 
 import java.util.Set;
 

@@ -17,8 +17,8 @@ package org.terasology.audio.nullAudio;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StaticSound;
+import org.terasology.audio.StaticSoundData;
 
 /**
  * @author Immortius

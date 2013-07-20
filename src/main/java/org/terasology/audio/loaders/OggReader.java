@@ -58,8 +58,8 @@ public class OggReader extends FilterInputStream {
     public static final int FORMAT_STEREO16 = 2;
 
     // temp vars
-    private float[][][] _pcm = new float[1][][];
-    private int[] _index;
+    private float[][][] pcm = new float[1][][];
+    private int[] index;
 
     // end of stream
     private boolean eos = false;
@@ -110,7 +110,7 @@ public class OggReader extends FilterInputStream {
         super(input);
         try {
             initVorbis();
-            _index = new int[info.channels];
+            index = new int[info.channels];
         } catch (Exception e) {
             e.printStackTrace();
             eos = true;
@@ -254,8 +254,9 @@ public class OggReader extends FilterInputStream {
         int bytesRead = 0;
         while (bytesRead < n) {
             int res = read();
-            if (res == -1)
+            if (res == -1) {
                 break;
+            }
             bytesRead++;
         }
         return bytesRead;
@@ -401,8 +402,8 @@ public class OggReader extends FilterInputStream {
         // (-1.<=range<=1.) to whatever PCM format and write it out
         int convOff = 0;
         int samples;
-        while ((samples = dspState.synthesis_pcmout(_pcm, _index)) > 0) {
-            float[][] pcm = _pcm[0];
+        while ((samples = dspState.synthesis_pcmout(pcm, index)) > 0) {
+            float[][] pcm = this.pcm[0];
             int bout = (samples < convsize ? samples : convsize);
 
             // convert floats to 16 bit signed ints (host order) and interleave
@@ -410,7 +411,7 @@ public class OggReader extends FilterInputStream {
                 int ptr = (i << 1) + convOff;
 
 
-                int mono = _index[i];
+                int mono = index[i];
 
                 for (int j = 0; j < bout; j++) {
                     int val = (int) (pcm[i][mono + j] * 32767);

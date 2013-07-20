@@ -20,7 +20,6 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

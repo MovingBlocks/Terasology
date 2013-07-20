@@ -16,12 +16,12 @@
 package org.terasology.entitySystem;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.entitySystem.common.NullEntityRef;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
-import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.common.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.persistence.serializers.EntitySerializer;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -67,19 +67,21 @@ public abstract class EntityRef implements MutableComponentContainer {
 
     /**
      * Sets whether this entity should be saved
+     *
      * @param persistent
      */
     public abstract void setPersistent(boolean persistent);
 
     /**
      * @return Whether this entity should remain active even when the part of the world/owner of the entity is not
-     * relevant
+     *         relevant
      */
     public abstract boolean isAlwaysRelevant();
 
     /**
      * Sets whether the entity should remain active even when its owner or the part of the world it resides in is
      * not relevant
+     *
      * @param alwaysRelevant
      */
     public abstract void setAlwaysRelevant(boolean alwaysRelevant);
@@ -91,6 +93,7 @@ public abstract class EntityRef implements MutableComponentContainer {
 
     /**
      * Sets the entity that owns this entity.
+     *
      * @param owner
      */
     public abstract void setOwner(EntityRef owner);

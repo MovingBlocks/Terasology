@@ -20,14 +20,14 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -80,11 +80,11 @@ public class BlockItemSystem implements ComponentSystem {
         BlockFamily type = blockItem.blockFamily;
         Side surfaceSide = Side.inDirection(event.getHitNormal());
         Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
-        
+
         Vector3i targetBlock = event.getTarget().getComponent(BlockComponent.class).getPosition();
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
-        
+
         Block block = type.getBlockForPlacement(worldProvider, blockEntityRegistry, placementPos, surfaceSide, secondaryDirection);
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {

@@ -17,13 +17,13 @@ package org.terasology.engine.modes;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.manager.GUIManager;

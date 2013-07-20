@@ -22,7 +22,7 @@ import org.terasology.entitySystem.Component;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface ComponentLibrary extends ClassLibrary<Component, ComponentMetadata<? extends Component> > {
+public interface ComponentLibrary extends ClassLibrary<Component, ComponentMetadata<? extends Component>> {
 
     /**
      * @param clazz

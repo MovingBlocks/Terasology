@@ -18,6 +18,7 @@ package org.terasology.network.exceptions;
 
 /**
  * Exception when hosting a game fails.
+ *
  * @author Immortius
  */
 public class HostingFailedException extends Exception {

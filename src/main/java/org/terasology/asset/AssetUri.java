@@ -114,8 +114,9 @@ public final class AssetUri implements Comparable<AssetUri> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
+        if (obj == this) {
             return true;
+        }
         if (obj instanceof AssetUri) {
             AssetUri other = (AssetUri) obj;
             return Objects.equal(type, other.type) && Objects.equal(normalisedPackageName, other.normalisedPackageName) && Objects.equal(normalisedAssetName, other.normalisedAssetName);

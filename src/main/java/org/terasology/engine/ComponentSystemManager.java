@@ -20,13 +20,13 @@ import com.google.common.collect.Maps;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.Share;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.network.NetworkMode;
 

@@ -35,7 +35,6 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.network.NetworkComponent;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

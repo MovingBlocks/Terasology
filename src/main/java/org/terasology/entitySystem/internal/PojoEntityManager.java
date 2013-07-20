@@ -34,7 +34,6 @@ import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityDestroySubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.utilities.collection.NullIterator;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
@@ -46,6 +45,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.utilities.collection.NullIterator;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

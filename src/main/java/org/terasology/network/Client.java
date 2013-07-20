@@ -22,6 +22,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 
 /**
  * A client is the connection between a player (local or remote) and the game.
+ *
  * @author Immortius
  */
 public interface Client extends ChunkRegionListener {

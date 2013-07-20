@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * Rotation provides easy access to 90 degree increments of rotations - intended for block-related rotations.
- *
+ * <p/>
  * Uses the fly weight pattern to cache the 64 combinations of rotation.
  *
  * @author Immortius <immortius@gmail.com>
@@ -56,7 +56,7 @@ public class Rotation {
         return rotations.get(indexFor(yaw, pitch, Roll.NONE));
     }
 
-    public static Rotation rotate (Pitch pitch, Roll roll) {
+    public static Rotation rotate(Pitch pitch, Roll roll) {
         return rotations.get(indexFor(Yaw.NONE, pitch, roll));
     }
 

@@ -26,12 +26,10 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.persistence.StorageManager;
-import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 

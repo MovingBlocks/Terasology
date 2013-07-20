@@ -16,11 +16,11 @@
 
 package org.terasology.logic.common.lifespan;
 
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 
 /**
  * @author Immortius

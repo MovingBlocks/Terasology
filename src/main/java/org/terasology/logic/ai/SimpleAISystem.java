@@ -15,18 +15,18 @@
  */
 package org.terasology.logic.ai;
 
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.events.HorizontalCollisionEvent;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.events.HorizontalCollisionEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;

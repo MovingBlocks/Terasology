@@ -20,8 +20,8 @@ import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StaticSound;
+import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 

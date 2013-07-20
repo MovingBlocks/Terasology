@@ -16,8 +16,6 @@
 package org.terasology.entitySystem.prefab;
 
 import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
 
 import java.util.List;

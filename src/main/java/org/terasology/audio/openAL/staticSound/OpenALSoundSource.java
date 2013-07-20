@@ -23,7 +23,11 @@ import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.SoundPool;
 import org.terasology.audio.openAL.SoundSource;
 
-import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.AL10.AL_FALSE;
+import static org.lwjgl.openal.AL10.AL_LOOPING;
+import static org.lwjgl.openal.AL10.AL_TRUE;
+import static org.lwjgl.openal.AL10.alGetSourcei;
+import static org.lwjgl.openal.AL10.alSourcei;
 
 /**
  *

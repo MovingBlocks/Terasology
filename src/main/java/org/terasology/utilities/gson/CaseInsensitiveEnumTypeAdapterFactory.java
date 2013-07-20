@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * A Gson Adapter factory for supporting enums in a case-insensitive manner
+ *
  * @author Immortius
  */
 public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory {

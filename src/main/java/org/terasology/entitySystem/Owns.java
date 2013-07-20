@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * <p/>
  * This means:
  * <ul>
- *     <li>The owned entity will be persisted and restored along with its owner.</li>
+ * <li>The owned entity will be persisted and restored along with its owner.</li>
  * </ul>
  */
 @Retention(RetentionPolicy.RUNTIME)

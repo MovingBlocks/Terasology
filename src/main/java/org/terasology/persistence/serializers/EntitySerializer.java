@@ -205,7 +205,7 @@ public class EntitySerializer {
      * @param componentMap
      */
     private void deserializeOntoComponents(EntityData.Entity entityData, Map<Class<? extends Component>, Component> componentMap) {
-        EntityInfoComponent entityInfo = (EntityInfoComponent)componentMap.get(EntityInfoComponent.class);
+        EntityInfoComponent entityInfo = (EntityInfoComponent) componentMap.get(EntityInfoComponent.class);
         if (entityInfo == null) {
             entityInfo = new EntityInfoComponent();
             componentMap.put(EntityInfoComponent.class, entityInfo);

@@ -23,13 +23,13 @@ import com.google.common.collect.Table;
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.PrefabLoader;
-import org.terasology.rendering.assets.font.FontLoader;
-import org.terasology.rendering.assets.shader.GLSLShaderLoader;
-import org.terasology.rendering.assets.material.MaterialLoader;
-import org.terasology.rendering.assets.mesh.ObjMeshLoader;
-import org.terasology.rendering.assets.texture.PNGTextureLoader;
 import org.terasology.rendering.assetLoaders.md5.MD5AnimationLoader;
 import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
+import org.terasology.rendering.assets.font.FontLoader;
+import org.terasology.rendering.assets.material.MaterialLoader;
+import org.terasology.rendering.assets.mesh.ObjMeshLoader;
+import org.terasology.rendering.assets.shader.GLSLShaderLoader;
+import org.terasology.rendering.assets.texture.PNGTextureLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 

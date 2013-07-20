@@ -21,8 +21,6 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.ShaderManager;
@@ -30,7 +28,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.opengl.OpenGLShader;
 
 import java.nio.FloatBuffer;
 import java.util.Map;

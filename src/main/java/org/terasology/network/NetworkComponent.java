@@ -17,7 +17,6 @@
 package org.terasology.network;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius

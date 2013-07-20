@@ -30,6 +30,7 @@ import static org.terasology.protobuf.NetData.NetMessage;
 
 /**
  * This Netty handler is used to send and receive messages on the server end
+ *
  * @author Immortius
  */
 public class ServerHandler extends SimpleChannelUpstreamHandler {

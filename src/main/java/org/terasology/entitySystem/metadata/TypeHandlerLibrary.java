@@ -30,7 +30,6 @@ import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;

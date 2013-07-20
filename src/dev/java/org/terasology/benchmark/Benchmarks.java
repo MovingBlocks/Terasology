@@ -33,19 +33,27 @@ public final class Benchmarks {
             benchmark.setup();
         } catch (Exception e) {
             result.addError(BenchmarkError.Type.Setup, e);
-            if (callback != null) callback.error(BenchmarkError.Type.Setup, e, result);
+            if (callback != null) {
+                callback.error(BenchmarkError.Type.Setup, e, result);
+            }
             return result;
         }
         
         try {
-            if (callback != null) callback.warmup(benchmark, false);
+            if (callback != null) {
+                callback.warmup(benchmark, false);
+            }
             for (int i = 0; i < benchmark.getWarmupRepetitions(); ++i) {
                 benchmark.run();
             }
-            if (callback != null) callback.warmup(benchmark, true);
+            if (callback != null) {
+                callback.warmup(benchmark, true);
+            }
         } catch (Exception e) {
             result.addError(BenchmarkError.Type.Warmup, e);
-            if (callback != null) callback.error(BenchmarkError.Type.Warmup, e, result);
+            if (callback != null) {
+                callback.error(BenchmarkError.Type.Warmup, e, result);
+            }
             return result;
         }
         
@@ -64,7 +72,9 @@ public final class Benchmarks {
             } catch (Exception e) {
                 aborted = true;
                 result.addError(BenchmarkError.Type.PreRun, e);
-                if (callback != null) callback.error(BenchmarkError.Type.PreRun, e, result);
+                if (callback != null) {
+                    callback.error(BenchmarkError.Type.PreRun, e, result);
+                }
                 break;
             }
             
@@ -77,21 +87,27 @@ public final class Benchmarks {
                     }
                     reps -= repsPart;
                     repsSoFar += repsPart;
-                    if (callback != null) callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
+                    if (callback != null) {
+                        callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
+                    }
                 }
                 if (reps <= repsPart) {
                     for (int i = 0; i < reps; ++i) {
                         benchmark.run();
                     }
                     repsSoFar += reps;
-                    if (callback != null) callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
+                    if (callback != null) {
+                        callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
+                    }
                 }
                 elapsed = elapsed(start, TimeUnit.NANOSECONDS);
                 result.setRunTime(repIndex, TimeUnit.MILLISECONDS.convert(elapsed, TimeUnit.NANOSECONDS));
             } catch (Exception e) {
                 aborted = true;
                 result.addError(BenchmarkError.Type.Run, e);
-                if (callback != null) callback.error(BenchmarkError.Type.Run, e, result);
+                if (callback != null) {
+                    callback.error(BenchmarkError.Type.Run, e, result);
+                }
                 break;
             }
                         
@@ -100,7 +116,9 @@ public final class Benchmarks {
             } catch (Exception e) {
                 aborted = true;
                 result.addError(BenchmarkError.Type.PostRun, e);
-                if (callback != null) callback.error(BenchmarkError.Type.PostRun, e, result);
+                if (callback != null) {
+                    callback.error(BenchmarkError.Type.PostRun, e, result);
+                }
                 break;
             }
             
@@ -111,15 +129,18 @@ public final class Benchmarks {
             benchmark.finish(aborted); 
         } catch (Exception e) {
             result.addError(BenchmarkError.Type.Finish, e);
-            if (callback != null) callback.error(BenchmarkError.Type.Finish, e, result);
+            if (callback != null) {
+                callback.error(BenchmarkError.Type.Finish, e, result);
+            }
         }
 
-        if (callback != null)
+        if (callback != null) {
             if (result.isAborted()) {
                 callback.aborted(result);
             } else {
                 callback.success(result);
             }
+        }
         
         return result;
     }
@@ -141,19 +162,24 @@ public final class Benchmarks {
                 benchmarkIndex++;
             }
         } catch (Exception e) {
-            if (callback != null)
+            if (callback != null) {
                 callback.fatal(e);
+            }
         }
         
         return results;
     }
     
     public static StringBuilder printResults(List<BenchmarkResult> results, StringBuilder b) {
-        if (b == null) b = new StringBuilder();
+        if (b == null) {
+            b = new StringBuilder();
+        }
         final int resultCount = results.size();
         int resultIndex = 1;
         for (BenchmarkResult result : results) {
-            if (resultIndex > 1) b.append("\n");
+            if (resultIndex > 1) {
+                b.append("\n");
+            }
             b.append("Benchmark " + resultIndex + " / " + resultCount + ": " + result.getTitle() + "\n");
             printResult(result, b);
             resultIndex++;
@@ -162,7 +188,9 @@ public final class Benchmarks {
     }
     
     public static StringBuilder printResult(BenchmarkResult result, StringBuilder b) {
-        if (b == null) b = new StringBuilder();
+        if (b == null) {
+            b = new StringBuilder();
+        }
         BenchmarkResult.Column<?>[] columns = getColumns(result);
         printFieldTitles(result, columns, b);
         for (int repIndex = 0; repIndex < result.getRepetitions(); repIndex++) {
@@ -184,7 +212,11 @@ public final class Benchmarks {
     private static void printFieldTitles(BenchmarkResult result, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
-            if (first) first = false; else b.append(" | ");
+            if (first) {
+                first = false;
+            } else {
+                b.append(" | ");
+            }
             b.append(col.alignment.pad(col.name, col.computeMaxWidth()));
         }
         b.append("\n");
@@ -193,7 +225,11 @@ public final class Benchmarks {
     private static void printFieldValues(BenchmarkResult result, int repIndex, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
-            if (first) first = false; else b.append(" | ");
+            if (first) {
+                first = false;
+            } else {
+                b.append(" | ");
+            }
             b.append(col.alignment.pad(col.getValue(repIndex), col.computeMaxWidth()));
         }
         b.append("\n");

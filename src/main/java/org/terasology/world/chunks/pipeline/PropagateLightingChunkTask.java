@@ -19,10 +19,8 @@ package org.terasology.world.chunks.pipeline;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
-import org.terasology.world.RegionalChunkView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.lighting.LightPropagator;
 

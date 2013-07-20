@@ -42,6 +42,7 @@ public final class TimeLwjgl implements EngineTime {
 
     /**
      * Increments time
+     *
      * @return The number of update cycles to run
      */
     public Iterator<Float> tick() {
@@ -51,7 +52,7 @@ public final class TimeLwjgl implements EngineTime {
             logger.warn("Delta too great ({}), capping to {}", newDelta, UPDATE_CAP);
             newDelta = UPDATE_CAP;
         }
-        int updateCycles = (int)((newDelta - 1) / MAX_UPDATE_CYCLE_LENGTH) + 1;
+        int updateCycles = (int) ((newDelta - 1) / MAX_UPDATE_CYCLE_LENGTH) + 1;
         last.set(now);
         avgDelta = avgDelta * DECAY_RATE + newDelta * ONE_MINUS_DECAY_RATE;
 

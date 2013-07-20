@@ -11,7 +11,7 @@ import java.text.NumberFormat;
  */
 public class PrintToConsoleCallback implements BenchmarkCallback {
     
-    private static final NumberFormat pf = new DecimalFormat("##0.0");
+    private static final NumberFormat PERCENT_FORMAT = new DecimalFormat("##0.0");
 
     @Override
     public void begin(Benchmark benchmark, int benchmarkIndex, int benchmarkCount) {
@@ -20,15 +20,16 @@ public class PrintToConsoleCallback implements BenchmarkCallback {
 
     @Override
     public void warmup(Benchmark benchmark, boolean finished) {
-        if (finished) 
+        if (finished) {
             System.out.print("Go! ");
-        else
+        } else {
             System.out.print("Warmup... ");
+        }
     }
 
     @Override
     public void progress(Benchmark benchmark, double percent) {
-        System.out.print(pf.format(percent) + "% ");
+        System.out.print(PERCENT_FORMAT.format(percent) + "% ");
     }
 
     @Override

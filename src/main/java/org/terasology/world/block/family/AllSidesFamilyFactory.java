@@ -17,7 +17,10 @@ package org.terasology.world.block.family;
 
 import com.google.gson.JsonObject;
 import org.terasology.asset.AssetUri;
-import org.terasology.math.*;
+import org.terasology.math.Pitch;
+import org.terasology.math.Rotation;
+import org.terasology.math.Side;
+import org.terasology.math.Yaw;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockDefinition;

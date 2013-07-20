@@ -23,6 +23,7 @@ import java.util.EnumMap;
 
 /**
  * An enumeration of the axis of the world from the player perspective. There is also
+ *
  * @author Immortius
  */
 public enum Direction {

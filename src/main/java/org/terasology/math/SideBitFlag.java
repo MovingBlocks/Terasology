@@ -34,12 +34,12 @@ public final class SideBitFlag {
     private static TObjectByteMap<Side> sideBits = new TObjectByteHashMap<>();
 
     static {
-        sideBits.put(Side.TOP,      (byte) 0b000001);
-        sideBits.put(Side.LEFT,     (byte) 0b000010);
-        sideBits.put(Side.FRONT,    (byte) 0b000100);
-        sideBits.put(Side.BOTTOM,   (byte) 0b001000);
-        sideBits.put(Side.RIGHT,    (byte) 0b010000);
-        sideBits.put(Side.BACK,     (byte) 0b100000);
+        sideBits.put(Side.TOP, (byte) 0b000001);
+        sideBits.put(Side.LEFT, (byte) 0b000010);
+        sideBits.put(Side.FRONT, (byte) 0b000100);
+        sideBits.put(Side.BOTTOM, (byte) 0b001000);
+        sideBits.put(Side.RIGHT, (byte) 0b010000);
+        sideBits.put(Side.BACK, (byte) 0b100000);
     }
 
     public static byte getReverse(byte sides) {

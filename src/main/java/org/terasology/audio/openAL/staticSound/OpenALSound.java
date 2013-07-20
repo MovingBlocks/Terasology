@@ -18,11 +18,17 @@ package org.terasology.audio.openAL.staticSound;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StaticSound;
+import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.openAL.OpenALException;
 
-import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.AL10.AL_BITS;
+import static org.lwjgl.openal.AL10.AL_CHANNELS;
+import static org.lwjgl.openal.AL10.AL_FREQUENCY;
+import static org.lwjgl.openal.AL10.AL_SIZE;
+import static org.lwjgl.openal.AL10.alDeleteBuffers;
+import static org.lwjgl.openal.AL10.alGenBuffers;
+import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALSound extends AbstractAsset<StaticSoundData> implements StaticSound {
 

@@ -19,6 +19,7 @@ import org.terasology.network.OwnerEvent;
 
 /**
  * Use to send console messages to a client
+ *
  * @author Immortius
  */
 @OwnerEvent

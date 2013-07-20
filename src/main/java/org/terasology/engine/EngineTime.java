@@ -32,6 +32,7 @@ public interface EngineTime extends Time {
 
     /**
      * Sets the game time.
+     *
      * @param time
      */
     void setGameTime(long time);
@@ -44,6 +45,7 @@ public interface EngineTime extends Time {
     /**
      * Updates the timer with the desired time from the server. The game time won't immediately be updated - instead
      * the update will be applied over a number of ticks to smooth the resynchronization.
+     *
      * @param targetTime
      */
     void updateTimeFromServer(long targetTime);

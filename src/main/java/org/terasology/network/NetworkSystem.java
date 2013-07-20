@@ -16,8 +16,8 @@
 
 package org.terasology.network;
 
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.internal.Server;
@@ -27,6 +27,7 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
  * Interface for the network system
+ *
  * @author Immortius
  */
 // TODO: Refactor the core gameplay components like the list of players into a separate system.

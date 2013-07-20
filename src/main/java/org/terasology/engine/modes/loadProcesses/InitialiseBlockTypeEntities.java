@@ -18,9 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.world.block.typeEntity.BlockTypeEntityGenerator;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
+import org.terasology.world.block.typeEntity.BlockTypeEntityGenerator;
 
 /**
  * @author Immortius

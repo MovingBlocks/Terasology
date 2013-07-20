@@ -150,7 +150,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     private void checkReadyToDoInternalLighting(Chunk chunk) {
         Vector3i pos = chunk.getPos();
         if (chunk != null && chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
-            if (CoreRegistry.get(NetworkSystem.class).getMode().isAuthority())  {
+            if (CoreRegistry.get(NetworkSystem.class).getMode().isAuthority()) {
                 for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                     if (!adjPos.equals(pos)) {
                         Chunk adjChunk = provider.getChunkForProcessing(adjPos);
