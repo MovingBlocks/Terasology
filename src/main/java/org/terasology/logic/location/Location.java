@@ -32,7 +32,6 @@ import java.util.Iterator;
 @RegisterSystem
 public class Location implements ComponentSystem {
 
-
     @Override
     public void initialise() {
     }
@@ -106,14 +105,12 @@ public class Location implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = LocationComponent.class)
-    public void onDestroyed(BeforeRemoveComponent event, EntityRef entity) {
-        LocationComponent parentLoc = entity.getComponent(LocationComponent.class);
-        if (parentLoc == null)
-            if (parentLoc.parent != null) {
-                removeChild(parentLoc.parent, entity);
-            }
-        Iterator<EntityRef> childIterator = parentLoc.getChildren().iterator();
+    @ReceiveEvent()
+    public void onDestroyed(BeforeRemoveComponent event, EntityRef entity, LocationComponent location) {
+        if (location.parent.exists()) {
+            removeChild(location.parent, entity);
+        }
+        Iterator<EntityRef> childIterator = location.getChildren().iterator();
         while (childIterator.hasNext()) {
             EntityRef child = childIterator.next();
             LocationComponent childLoc = child.getComponent(LocationComponent.class);

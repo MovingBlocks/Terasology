@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.math.TeraMath;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 
@@ -27,6 +28,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Component represent the location and facing of an entity in the world
@@ -165,17 +167,14 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        LocationComponent component = (LocationComponent) o;
-
-        if (Float.compare(component.scale, scale) != 0) return false;
-        if (parent != null ? !parent.equals(component.parent) : component.parent != null) return false;
-        if (position != null ? !position.equals(component.position) : component.position != null) return false;
-        if (rotation != null ? !rotation.equals(component.rotation) : component.rotation != null) return false;
-
-        return true;
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof LocationComponent) {
+            LocationComponent other = (LocationComponent) o;
+            return other.scale == scale && Objects.equals(parent, other.parent) && Objects.equals(position, other.position) && Objects.equals(rotation, other.rotation);
+        }
+        return false;
     }
 
     @Override

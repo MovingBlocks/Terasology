@@ -125,15 +125,15 @@ public class HierarchicalAISystem implements ComponentSystem,
             double distanceToPlayer = dist.lengthSquared();
 
             ai.inDanger = false;
-            if (ai.dieIfPlayerFar)
-                if (distanceToPlayer > ai.dieDistance)
-                    entity.destroy();
+            if (ai.dieIfPlayerFar && distanceToPlayer > ai.dieDistance) {
+                entity.destroy();
+            }
 
             //----------------danger behavior----------
 
             // if our AI is aggressive or hunter go and hunt player else run away
             // if wild
-            if (ai.aggressive)
+            if (ai.aggressive) {
                 // TODO fix this to proper attacking
                 if (distanceToPlayer <= ai.attackDistance) {
                     if (tempTime - lastAttack > ai.damageFrequency) {
@@ -142,17 +142,18 @@ public class HierarchicalAISystem implements ComponentSystem,
                         lastAttack = CoreRegistry.get(Time.class).getGameTimeInMs();
                     }
                 }
+            }
 
             //update
             if (tempTime - ai.lastChangeOfDangerAt > dangerChangeTime) {
                 dangerChangeTime = (long) (TeraMath.fastAbs(ai.dangerUpdateTime
                         * random.randomDouble() * ai.hectic));
-                if (ai.hunter)
+                if (ai.hunter) {
                     if (distanceToPlayer > ai.playerdistance
                             && distanceToPlayer < ai.playerSense) {
                         // Head to player
                         Vector3f tempTarget = localPlayer.getPosition();
-                        if (ai.forgiving != 0)
+                        if (ai.forgiving != 0) {
                             ai.movementTarget.set(new Vector3f(
                                     (tempTarget.x + random.randomFloat()
                                             * ai.forgiving),
@@ -160,19 +161,21 @@ public class HierarchicalAISystem implements ComponentSystem,
                                             * ai.forgiving),
                                     (tempTarget.z + random.randomFloat()
                                             * ai.forgiving)));
-                        else
+                        } else {
                             ai.movementTarget.set(tempTarget);
+                        }
                         ai.inDanger = true;
                         entity.saveComponent(ai);
 
                         // System.out.print("\nhunting palyer\n");
                     }
+                }
                 // run opposite direction
-                if (ai.wild)
+                if (ai.wild) {
                     if (distanceToPlayer > ai.panicDistance
                             && distanceToPlayer < ai.runDistance) {
                         Vector3f tempTarget = localPlayer.getPosition();
-                        if (ai.forgiving != 0)
+                        if (ai.forgiving != 0) {
                             ai.movementTarget.set(new Vector3f(
                                     (tempTarget.x * -1 + random.randomFloat()
                                             * ai.forgiving),
@@ -180,14 +183,16 @@ public class HierarchicalAISystem implements ComponentSystem,
                                             * ai.forgiving),
                                     (tempTarget.z * -1 + random.randomFloat()
                                             * ai.forgiving)));
-                        else
+                        } else {
                             ai.movementTarget
                                     .set(new Vector3f(tempTarget.x * -1,
                                             tempTarget.y * -1, tempTarget.z
                                             * -1));
+                        }
                         entity.saveComponent(ai);
                         ai.inDanger = true;
                     }
+                }
                 ai.lastChangeOfDangerAt = CoreRegistry.get(Time.class)
                         .getGameTimeInMs();
             }
@@ -253,10 +258,11 @@ public class HierarchicalAISystem implements ComponentSystem,
                     ai.movementTarget.set(worldPos.x + random.randomFloat()
                             * 500, targetY, worldPos.z + random.randomFloat()
                             * 500);
-                } else
+                } else {
                     ai.movementTarget.set(worldPos.x + random.randomFloat()
                             * 500, worldPos.y,
                             worldPos.z + random.randomFloat() * 500);
+                }
                 ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                 entity.saveComponent(ai);
                 // System.out.print("direction changed\n");
