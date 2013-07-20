@@ -267,7 +267,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         loc.setWorldPosition(new Vector3f(2, 0, 0));
         Location.attachChild(parentEntity, entity);
         Location locationSystem = new Location();
-        locationSystem.onDestroyed(BeforeRemoveComponent.newInstance(), parentEntity);
+        locationSystem.onDestroyed(BeforeRemoveComponent.newInstance(), parentEntity, parent);
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(null);
         when(parentEntity.exists()).thenReturn(false);
 

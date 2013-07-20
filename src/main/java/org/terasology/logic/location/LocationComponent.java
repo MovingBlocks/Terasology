@@ -179,11 +179,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     @Override
     public int hashCode() {
-        int result = position != null ? position.hashCode() : 0;
-        result = 31 * result + (rotation != null ? rotation.hashCode() : 0);
-        result = 31 * result + (scale != +0.0f ? Float.floatToIntBits(scale) : 0);
-        result = 31 * result + (parent != null ? parent.hashCode() : 0);
-        return result;
+        return Objects.hash(position, rotation, scale, parent);
     }
 
     @Override
