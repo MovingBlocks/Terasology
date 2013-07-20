@@ -225,9 +225,11 @@
         <!-- See http://checkstyle.sourceforge.net/config_design.html -->
         <!-- *********************** -->
         <!-- Checks visibility of class members. Only static final members may be public. -->
+        <!--
         <module name="VisibilityModifier">
             <property name="severity" value="warning"/>
         </module>
+        -->
         <!-- Checks that a class which has only private constructors is declared as final. -->
         <module name="FinalClass">
             <property name="severity" value="warning"/>
