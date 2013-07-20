@@ -32,7 +32,9 @@ public abstract class AbstractPrefab extends AbstractAsset<PrefabData> implement
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         if (o instanceof Prefab) {
             return Objects.equal(getURI(), ((Prefab) o).getURI());
         }

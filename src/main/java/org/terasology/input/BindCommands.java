@@ -49,7 +49,7 @@ public class BindCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY")
-    public String AZERTY() {
+    public String azerty() {
         inputSystem.linkBindButtonToKey(Keyboard.KEY_Z, "engine:forwards");
         inputSystem.linkBindButtonToKey(Keyboard.KEY_S, "engine:backwards");
         inputSystem.linkBindButtonToKey(Keyboard.KEY_Q, "engine:left");
@@ -58,7 +58,7 @@ public class BindCommands implements ComponentSystem {
     }
 
     @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout")
-    public String NEO() {
+    public String neo() {
         inputSystem.linkBindButtonToKey(Keyboard.KEY_V, "engine:forwards");
         inputSystem.linkBindButtonToKey(Keyboard.KEY_I, "engine:backwards");
         inputSystem.linkBindButtonToKey(Keyboard.KEY_U, "engine:left");

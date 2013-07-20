@@ -28,8 +28,8 @@ import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData> implements StreamingSound {
-    private final static int BUFFER_POOL_SIZE = 3;
-    private final static int BUFFER_SIZE = 4096 * 8;
+    private static final int BUFFER_POOL_SIZE = 3;
+    private static final int BUFFER_SIZE = 4096 * 8;
 
     private StreamingSoundData stream;
     protected int[] buffers = new int[0];
@@ -52,7 +52,8 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
             return false;
         }
 
-        AL10.alBufferData(buffer, stream.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, dataBuffer, stream.getSamplingRate());
+        AL10.alBufferData(buffer, stream.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16,
+                dataBuffer, stream.getSamplingRate());
         OpenALException.checkState("Uploading buffer data");
 
         this.lastUpdatedBuffer = buffer;

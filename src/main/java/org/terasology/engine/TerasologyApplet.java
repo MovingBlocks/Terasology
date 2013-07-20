@@ -114,8 +114,9 @@ public final class TerasologyApplet extends Applet {
 
     @Override
     public void destroy() {
-        if (engine != null)
+        if (engine != null) {
             engine.shutdown();
+        }
         try {
             gameThread.join();
         } catch (InterruptedException e) {

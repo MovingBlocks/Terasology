@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public abstract class BaseSoundPool implements SoundPool {
 
-    private final static int DEFAULT_POOL_SIZE = 32;
+    private static final int DEFAULT_POOL_SIZE = 32;
 
     private float volume;
 

@@ -185,7 +185,9 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         if (o instanceof EntityRef) {
             EntityRef other = (EntityRef) o;
             return !exists() && !(other.exists()) || getId() == other.getId();

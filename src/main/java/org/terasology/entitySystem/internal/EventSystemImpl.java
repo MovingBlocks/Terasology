@@ -340,8 +340,9 @@ public class EventSystemImpl implements EventSystem {
         Set<EventHandlerInfo> result = Sets.newHashSet();
         result.addAll(generalHandlers.get(eventType));
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
-        if (handlers == null)
+        if (handlers == null) {
             return result;
+        }
 
         for (Class<? extends Component> compClass : handlers.keySet()) {
             if (entity.hasComponent(compClass)) {

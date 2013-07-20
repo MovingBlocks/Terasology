@@ -23,8 +23,8 @@ import java.beans.PropertyChangeSupport;
  * @author Immortius
  */
 public class AudioConfig {
-    public final static String SOUND_VOLUME = "soundVolume";
-    public final static String MUSIC_VOLUME = "musicVolume";
+    public static final String SOUND_VOLUME = "soundVolume";
+    public static final String MUSIC_VOLUME = "musicVolume";
 
     private float soundVolume = 1.0f;
     private float musicVolume = 0.1f;

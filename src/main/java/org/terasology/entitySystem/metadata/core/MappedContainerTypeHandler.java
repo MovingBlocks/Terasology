@@ -44,7 +44,9 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
     }
 
     public EntityData.Value serialize(T value) {
-        if (value == null) return null;
+        if (value == null) {
+            return null;
+        }
 
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
 

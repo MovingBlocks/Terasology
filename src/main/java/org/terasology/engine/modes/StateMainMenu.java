@@ -40,8 +40,6 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 /**
  * The class implements the main game menu.
  * <p/>
- * TODO: Add screen "Multiplayer"
- * TODO: Add animated background
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
@@ -49,13 +47,10 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
  * @version 0.3
  */
 public class StateMainMenu implements GameState {
-    private GameEngine _gameInstance = null;
-
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private InputSystem inputSystem;
     private ComponentSystemManager componentSystemManager;
-    private CameraTargetSystem cameraTargetSystem;
     private GUIManager guiManager;
 
     private String messageOnLoad = "";
@@ -70,7 +65,6 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void init(GameEngine gameEngine) {
-        _gameInstance = gameEngine;
 
         //lets get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), CoreRegistry.get(NetworkSystem.class));
@@ -81,7 +75,7 @@ public class StateMainMenu implements GameState {
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
 
-        cameraTargetSystem = new CameraTargetSystem();
+        CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 

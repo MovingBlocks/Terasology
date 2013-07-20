@@ -49,7 +49,7 @@ public abstract class BaseLibraryImpl<T, U extends ClassMetadata<? extends T>> i
         }
     }
 
-    protected abstract <CLAZZ extends T> U createMetadata(Class<CLAZZ> clazz, String... names);
+    protected abstract <CLASS extends T> U createMetadata(Class<CLASS> clazz, String... names);
 
     @Override
     @SuppressWarnings("unchecked")

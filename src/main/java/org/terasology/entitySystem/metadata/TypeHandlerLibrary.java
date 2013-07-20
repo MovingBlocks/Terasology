@@ -70,14 +70,15 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
 
     public <T> void populateFields(Class<T> forClass, ClassMetadata<T> info, boolean replicateFieldsByDefault) {
         for (Field field : Reflections.getAllFields(forClass, Predicates.alwaysTrue())) {
-            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
+            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
+            }
+
             field.setAccessible(true);
             TypeHandler typeHandler = getHandlerFor(field.getGenericType(), 0);
             if (typeHandler == null) {
                 logger.error("Unsupported field type in component type {}, {} : {}", forClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
-
                 info.addField(new FieldMetadata(field, typeHandler, replicateFieldsByDefault));
             }
         }
@@ -93,9 +94,8 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
 
         if (Enum.class.isAssignableFrom(typeClass)) {
             return new EnumTypeHandler(typeClass);
-        }
-        // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
-        else if (List.class.isAssignableFrom(typeClass)) {
+        } else if (List.class.isAssignableFrom(typeClass)) {
+            // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
             Type parameter = ReflectionUtil.getTypeParameter(type, 0);
             if (parameter != null) {
                 TypeHandler innerHandler = getHandlerFor(parameter, depth);
@@ -105,9 +105,9 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             }
             logger.error("List field is not parameterized, or holds unsupported type");
             return null;
-        }
-        // For sets:
-        else if (Set.class.isAssignableFrom(typeClass)) {
+
+        } else if (Set.class.isAssignableFrom(typeClass)) {
+            // For sets:
             Type parameter = ReflectionUtil.getTypeParameter(type, 0);
             if (parameter != null) {
                 TypeHandler innerHandler = getHandlerFor(parameter, depth);
@@ -117,9 +117,9 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             }
             logger.error("Set field is not parameterized, or holds unsupported type");
             return null;
-        }
-        // For Maps, createEntityRef the handler for the value type (and maybe key too?)
-        else if (Map.class.isAssignableFrom(typeClass)) {
+
+        } else if (Map.class.isAssignableFrom(typeClass)) {
+            // For Maps, createEntityRef the handler for the value type (and maybe key too?)
             Type keyParameter = ReflectionUtil.getTypeParameter(type, 0);
             Type contentsParameter = ReflectionUtil.getTypeParameter(type, 1);
             if (keyParameter != null && contentsParameter != null && String.class == keyParameter) {
@@ -129,13 +129,13 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 }
             }
             logger.error("Map field is not parameterized, does not have a String key, or holds unsupported values");
-        }
-        // For know types, just use the handler
-        else if (typeHandlers.containsKey(typeClass)) {
+
+        } else if (typeHandlers.containsKey(typeClass)) {
+            // For know types, just use the handler
             return typeHandlers.get(typeClass);
-        }
-        // For unknown types annotated by MappedContainer annotation, map them
-        else if (depth <= MAX_SERIALIZATION_DEPTH && !Modifier.isAbstract(typeClass.getModifiers()) && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
+
+        } else if (depth <= MAX_SERIALIZATION_DEPTH && !Modifier.isAbstract(typeClass.getModifiers()) && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
+            // For unknown types annotated by MappedContainer annotation, map them
             if (typeClass.getAnnotation(MappedContainer.class) == null) {
                 logger.error("Unable to register field of type {}: not a supported type or MappedContainer", typeClass.getSimpleName());
                 return null;
@@ -150,8 +150,9 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
 
             MappedContainerTypeHandler mappedHandler = new MappedContainerTypeHandler(typeClass);
             for (Field field : typeClass.getDeclaredFields()) {
-                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
+                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                     continue;
+                }
 
                 field.setAccessible(true);
                 TypeHandler handler = getHandlerFor(field.getGenericType(), depth + 1);

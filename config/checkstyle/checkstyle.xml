@@ -7,7 +7,7 @@
     <module name="SuppressionFilter">
         <property name="file" value="${samedir}/suppressions.xml"/>
     </module>
-
+	
     <!-- Checks whether files end with a new line. -->
     <!-- See http://checkstyle.sourceforge.net/config_misc.html#NewlineAtEndOfFile -->
     <module name="NewlineAtEndOfFile"/>
@@ -22,8 +22,10 @@
         <!-- Checks for Naming Conventions -->
         <!-- See http://checkstyle.sourceforge.net/config_naming.html -->
         <!-- ***************************** -->
-		<!-- class type parameters : ^[A-Z]$ -->
-		<module name="ClassTypeParameterName"/>
+		<!-- class type parameters : ^[A-Z]*$ -->
+		<module name="ClassTypeParameterName">
+		    <property name="format" value="^[A-Z]*$"/>
+		</module>
         <!-- constants (static, final fields) : ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
 		<!-- Unfortunately this module is too inclusive - static final fields are not necessarily constants! -->
         <module name="ConstantName">
@@ -37,8 +39,10 @@
         <module name="MemberName"/>
         <!-- methods : ^[a-z][a-zA-Z0-9]*$ -->
         <module name="MethodName"/>
-		<!-- method type parameters : ^[A-Z]$ -->
-		<module name="MethodTypeParameterName"/>
+		<!-- method type parameters : ^[A-Z]*$ -->
+		<module name="MethodTypeParameterName">
+			<property name="format" value="^[A-Z]*$"/>
+		</module>
         <!-- packages : ^[a-z]+(\.[a-zA-Z_][a-zA-Z0-9_]*)*$ -->
         <module name="PackageName"/>
         <!-- parameters : ^[a-z][a-zA-Z0-9]*$ -->
@@ -136,6 +140,6 @@
         <!-- Checks that the outer type name and the file name match. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#OuterTypeFilename -->
         <module name="OuterTypeFilename"/>
-
+		
     </module>
 </module>

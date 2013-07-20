@@ -16,6 +16,7 @@
 package org.terasology.audio.openAL;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
@@ -57,9 +58,9 @@ public class OpenALManager implements AudioManager {
     /**
      * For faster distance check *
      */
-    private final static float MAX_DISTANCE_SQUARED = MAX_DISTANCE * MAX_DISTANCE;
+    private static final float MAX_DISTANCE_SQUARED = MAX_DISTANCE * MAX_DISTANCE;
 
-    protected Map<String, SoundPool> pools = new HashMap<String, SoundPool>();
+    protected Map<String, SoundPool> pools = Maps.newHashMap();
 
     private Vector3f listenerPosition = new Vector3f();
 

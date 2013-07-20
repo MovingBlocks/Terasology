@@ -5,4 +5,5 @@
 
 <suppressions>
     <suppress checks="." files="org[\\/]terasology[\\/]protobuf[\\/].*"/>
+    <suppress checks="MethodNameCheck" files="org[\\/]terasology[\\/]engine[\\/]paths[\\/]windows.*"/>
 </suppressions>

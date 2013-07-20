@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.internal;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.TIntObjectMap;
@@ -34,7 +35,7 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 class ComponentTable {
-    private Map<Class, TIntObjectMap<Component>> store = new HashMap<Class, TIntObjectMap<Component>>();
+    private Map<Class, TIntObjectMap<Component>> store = Maps.newConcurrentMap();
 
     public <T extends Component> T get(int entityId, Class<T> componentClass) {
         TIntObjectMap<Component> entityMap = store.get(componentClass);
@@ -73,9 +74,7 @@ class ComponentTable {
 
     public int getComponentCount(Class<? extends Component> componentClass) {
         TIntObjectMap<Component> map = store.get(componentClass);
-        if (map == null)
-            return 0;
-        return map.size();
+        return (map == null) ? 0 : map.size();
     }
 
     public Iterable<Component> iterateComponents(int entityId) {
