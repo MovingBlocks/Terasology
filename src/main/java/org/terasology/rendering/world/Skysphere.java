@@ -38,8 +38,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Skysphere implements IPropertyProvider {
 
-    private Property colorExp = new Property("colorExp", 14.0f, 0.0f, 100.0f);
-    private Property turbidity = new Property("turbidity", 8.0f, 2.0f, 32.0f);
+    private Property colorExp = new Property("colorExp", 0.01f, 0.01f, 100.0f);
+    private Property turbidity = new Property("turbidity", 9.0f, 2.0f, 32.0f);
     private float sunPosAngle = 0.1f;
 
     private static int displayListSphere = -1;
