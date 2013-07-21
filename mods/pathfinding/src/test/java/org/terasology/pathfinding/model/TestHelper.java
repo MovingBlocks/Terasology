@@ -363,6 +363,11 @@ public class TestHelper {
         @Override
         public void dispose() {
         }
+
+        @Override
+        public  float getFog(float x, float z) {
+            return 0.0f;
+        }
     }
 
     public interface Runner {
