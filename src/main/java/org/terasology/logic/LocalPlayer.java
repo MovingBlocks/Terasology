@@ -58,6 +58,18 @@ public class LocalPlayer {
         }
         return location.getWorldPosition();
     }
+    
+    public Vector3f getPosition(Vector3f output) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        if (location == null) {
+            output.x = 0;
+            output.y = 0;
+            output.z = 0;
+        } else {
+            location.getWorldPosition(output);
+        }
+        return output;
+    }
 
     public Quat4f getViewRotation() {
         LocalPlayerComponent character = getEntity().getComponent(LocalPlayerComponent.class);
