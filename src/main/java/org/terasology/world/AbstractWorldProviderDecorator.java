@@ -135,4 +135,9 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     public void dispose() {
         base.dispose();
     }
+
+    @Override
+    public float getFog(float x, float z) {
+        return base.getFog(x, z);
+    }
 }

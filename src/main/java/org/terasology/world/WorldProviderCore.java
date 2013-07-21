@@ -171,6 +171,8 @@ public interface WorldProviderCore {
 
     public void setTimeInDays(float time);
 
+    public float getFog(float x, float z);
+
     /**
      * Disposes this world provider.
      */

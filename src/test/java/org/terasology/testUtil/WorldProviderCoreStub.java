@@ -159,4 +159,9 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     public void dispose() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public float getFog(float x, float z) {
+        return 0.f; //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

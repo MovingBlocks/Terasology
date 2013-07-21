@@ -46,11 +46,6 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
     }
 
     @Override
-    public float getFog(float time) {
-        return (float) TeraMath.clamp(fogNoise.fBm(time * 0.372891, time * 0.578291, time * 0.78319) * 10.0, 0.0, 15.0);
-    }
-
-    @Override
     public Biome getBiomeAt(int x, int z) {
         double temp = getTemperatureAt(x, z);
         double humidity = getHumidityAt(x, z) * temp;
@@ -71,5 +66,30 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
     @Override
     public Biome getBiomeAt(float x, float z) {
         return getBiomeAt(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(z + 0.5f));
+    }
+
+    @Override
+    public float getFogAt(int x, int z) {
+        Biome currentBiome = getBiomeAt(x, z);
+
+        switch (currentBiome) {
+            case DESERT:
+                return 0.0f;
+            case FOREST:
+                return 0.9f;
+            case PLAINS:
+                return 0.0f;
+            case SNOW:
+                return 1.0f;
+            case MOUNTAINS:
+                return 0.95f;
+            default:
+                return 0.0f;
+        }
+    }
+
+    @Override
+    public float getFogAt(float x, float z) {
+        return getFogAt(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
 }

@@ -35,7 +35,6 @@ public interface WorldBiomeProvider {
         }
     }
 
-
     /**
      * Returns the humidity at the given position.
      *
@@ -54,8 +53,6 @@ public interface WorldBiomeProvider {
      */
     public float getTemperatureAt(int x, int z);
 
-    public float getFog(float time);
-
     /*
     * Returns the biome type at the given position.
     */
@@ -63,5 +60,7 @@ public interface WorldBiomeProvider {
 
     public Biome getBiomeAt(float x, float z);
 
+    public float getFogAt(int x, int z);
 
+    public float getFogAt(float x, float z);
 }

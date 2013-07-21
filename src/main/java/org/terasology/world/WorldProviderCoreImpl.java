@@ -26,6 +26,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.PerlinNoise;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -35,8 +36,6 @@ import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.lighting.LightingUtil;
 import org.terasology.world.lighting.PropagationComparison;
 import org.terasology.world.liquid.LiquidData;
-
-import java.util.List;
 
 /**
  * @author Immortius
@@ -50,6 +49,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private WorldBiomeProvider biomeProvider;
     private ChunkProvider chunkProvider;
+
+    private PerlinNoise fogNoise;
 
     private long timeOffset;
 
@@ -66,6 +67,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.mapGeneratorUri = mapGeneratorUri;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
+        this.fogNoise = new PerlinNoise(seed.hashCode() + 42*42);
+        this.fogNoise.setOctaves(8);
+
         setTime(time);
     }
 
@@ -252,6 +256,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public void setTimeInDays(float time) {
         setTime((long) (time * DAY_NIGHT_LENGTH_IN_MS));
+    }
+
+    @Override
+    public float getFog(float x, float z) {
+        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.fBm(getTimeInDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * biomeProvider.getFogAt(x, z);
     }
 
     @Override

@@ -98,4 +98,9 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     public byte getTotalLight(Vector3i pos) {
         return core.getTotalLight(pos.x, pos.y, pos.z);
     }
+
+    @Override
+    public float getFog(float x, float z) {
+        return core.getFog(x, z);
+    }
 }

@@ -116,4 +116,6 @@ public interface WorldProvider extends WorldProviderCore {
 
     public byte getTotalLight(Vector3i pos);
 
+    public float getFog(float x, float z);
+
 }
