@@ -77,6 +77,10 @@ public final class LocationComponent implements Component {
         return scale;
     }
 
+    /**
+     * Creates a new vector and puts the world location in it.
+     * @return a newly allocated vector with the world location.
+     */
     public Vector3f getWorldPosition() {
         return getWorldPosition(new Vector3f());
     }
