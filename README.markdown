@@ -16,7 +16,9 @@ Setup
 
 Terasology requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
 
-Download the latest [stable version here](http://jenkins.movingblocks.net/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
+For easy setup you can use our launcher - [download it here](http://jenkins.movingblocks.net/job/TerasologyLauncherStable/lastSuccessfulBuild/artifact/build/distributions/TerasologyLauncher.zip)
+
+For direct downloads you can get the latest [stable version here](http://jenkins.movingblocks.net/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
 
 You can use one of the default launch scripts to start the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
 
@@ -39,6 +41,7 @@ Note that these instructions are meant for the stable release. The latest develo
 * [F] - Toggle viewing distance (near, moderate, far, ultra)
 * [Tab] - Toggle developer console
 * [Escape] - Show/hide the game menu screen
+* [F1] - Toggle window focus
 * [F3] - Toggle debug mode and information
 * [F5] - Show block picker GUI element
 
@@ -82,7 +85,7 @@ Press Tab to toggle the in-game console. Block names and some other things are n
 * /giveBlock "Rutile" 42 - Gives 42 Rutile blocks (colorful mineral)
 * /giveBlock "Clay" "Slope" - Gives you 16 clay blocks in the "slope" shape
 * /giveBlock "Marble" "Stair" 99 - Gives you 99 marble stair blocks
-* /giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, destroy, pick up, place elsewhere, find same stuff in it!
+* /giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
 * /giveBlock "TNT" - Gives you 16 TNT blocks you can place and activate ('E') to blow up
 * /listBlocks - Lists all actively used blocks (have been loaded for the world)
 * /listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
@@ -103,6 +106,8 @@ Run any commands in the project root directory
 
 You may also need to tweak IDE settings further for your convenience. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
 
+Note that by default stored data (config, saves, etc) is sent to a user profile directory like Saved Games under Windows, even when running from source. Add `-homedir` to a run configuration to use the project dir instead.
+
 Credits
 --------
 
@@ -115,13 +120,13 @@ Contributors
 
 (Listed by primary team)
 
-* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber, Panserbjoern
+* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber, Panserbjoern, MarcinSc, Synopia
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk, Maternal
-* Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, MiJyn, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, 3000Lane, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW
+* Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, MiJyn, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, 3000Lane, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Xanhou, Eliwood, nh_99, jobernolte, emenifee
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx
-* World Team: B!0HAX, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann
+* World Team: B!0HAX, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt
 
 
 Soundtrack and Sound Effects

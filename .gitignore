@@ -3,34 +3,42 @@
 /build/
 
 # Ignore IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
 /out/
-/Terasology.iml
-/Terasology.ipr
-/Terasology.iws
 
 # Ignore Eclipse
-/.checkstyle
-/.classpath
-/.project
-/.settings/
+.project
+.metadata
+.settings/
+.checkstyle
+.classpath
+*.bak
 /bin/
 
-# Ignore Netbeans
-/nbproject/private/
-/nbbuild/
-/dist/
-
-# Ignore OS generated files
-*.directory
+# Ignore Linux
+.*
+!.gitignore
 *~
+
+# Ignore OSX
 .DS_Store
 .DS_Store?
+.AppleDouble
+.LSOverride
+Icon
+Icon?
 ._*
 .Spotlight-V100
 .Trashes
-Icon?
-ehthumbs.db
+
+# Ignore Windows
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
 # Ignore output stuff
 *.log
@@ -52,7 +60,3 @@ entityDump.txt
 /mods/*/classes/
 /mods/*/testClasses/
 /mods/*/build/
-/mods/*/.*
-/mods/*/*.iml
-/mods/*/*.ipr
-/mods/*/*.iws

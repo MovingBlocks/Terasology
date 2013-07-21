@@ -65,10 +65,10 @@ void main () {
 
     /* PROCEDURAL SKY COLOR */
     vec4 cloudsColor = texture2D(texSky180, gl_TexCoord[0].xy);
-    vec4 cloudsColorNight =  texture2D(texSky90, gl_TexCoord[0].xy);
+    vec4 cloudsColorNight = texture2D(texSky90, gl_TexCoord[0].xy);
 
     /* DAY AND NIGHT TEXTURES */
-    skyColor.rgb = skyDaylightBrightness * daylight * cloudsColor.rgb + skyNightBrightness * cloudsColorNight.rgb;
+    skyColor.rgb = skyDaylightBrightness * daylight * cloudsColor.rgb + (1.0 - daylight) * skyNightBrightness * cloudsColorNight.rgb;
     skyColor.rgb *= mix(convertColorYxy(colorYxy, colorExp).rgb, vec3(1.0, 1.0, 1.0), 1.0 - daylight);
 
     skyColor.rgb += vec3((1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight);
