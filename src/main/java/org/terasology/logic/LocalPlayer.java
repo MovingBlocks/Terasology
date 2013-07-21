@@ -59,7 +59,7 @@ public class LocalPlayer {
         return location.getWorldPosition();
     }
     
-    public void getPosition(Vector3f output) {
+    public Vector3f getPosition(Vector3f output) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location == null) {
             output.x = 0;
@@ -68,6 +68,7 @@ public class LocalPlayer {
         } else {
             location.getWorldPosition(output);
         }
+        return output;
     }
 
     public Quat4f getViewRotation() {

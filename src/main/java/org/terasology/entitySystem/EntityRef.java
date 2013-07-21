@@ -38,9 +38,6 @@ public abstract class EntityRef {
     public abstract boolean hasComponent(Class<? extends Component> component);
 
     /**
-     * Example usage: ((LocalPlayer) localPlayer).getEntity().getComponent(LocationComponent).
-     * This retrieves the location component of the local player 
-     * (or whatever you put in the localPlayer variable).
      * @param componentClass
      * @param <T>
      * @return The requested component, or null if the entity doesn't have a component of this class

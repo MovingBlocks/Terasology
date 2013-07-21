@@ -20,7 +20,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * Registry giving access to major singleton systems, via the interface they fulfill.
+ * Registry giving access to major singleton systems, via the interface they fulfil.
  *
  * @author Immortius <immortius@gmail.com>
  */
@@ -30,7 +30,7 @@ public class CoreRegistry {
     /**
      * Registers a core system
      *
-     * @param type   The interface which the system fulfills
+     * @param type   The interface which the system fulfils
      * @param object The system itself
      * @param <T>
      */

@@ -61,6 +61,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.input.events.KeyDownEvent;
+import org.terasology.logic.LocalPlayer;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported
@@ -100,8 +101,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
         //batchVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
         //batchIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        opaqueMeshSorter.initialize();
-        gelatinousMeshSorter.initialize();
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        opaqueMeshSorter.initialize(playerEntity);
+        gelatinousMeshSorter.initialize(playerEntity);
     }
 
     @Override
@@ -125,8 +127,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                 gelatinousMeshSorter.stop();
                 opaqueMeshSorter.stop();
             } else {
-                gelatinousMeshSorter.initialize();
-                opaqueMeshSorter.initialize();
+                EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+                opaqueMeshSorter.initialize(playerEntity);
+                gelatinousMeshSorter.initialize(playerEntity);
             }
         }
     }

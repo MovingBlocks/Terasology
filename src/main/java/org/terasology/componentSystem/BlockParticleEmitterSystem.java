@@ -49,7 +49,9 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyDownEvent;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.logic.NearestSortingList;
 
 /**
@@ -92,7 +94,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             if(! renderNearest) {
                 sorter.stop();
             } else {
-                sorter.initialize();
+                EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+                sorter.initialize(playerEntity);
             }
         }
     }
@@ -104,7 +107,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             drawParticle();
             glEndList();
         }
-        sorter.initialize();
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        sorter.initialize(playerEntity);
     }
     
     @ReceiveEvent(components = {BlockParticleEffectComponent.class}, priority = EventPriority.PRIORITY_LOW)

@@ -17,7 +17,6 @@ package org.terasology.rendering.logic;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +33,7 @@ import org.terasology.logic.LocalPlayer;
 
 /**
  * This data structure takes Entities with a location in the world and sorts
- * them based on their distance to the player.
+ * them based on their distance to an other entity.
  *
  * The sorting is done asynchronous from the usages of the data, meaning there
  * is no performance loss if an additional cpu-core is present.
@@ -43,25 +42,20 @@ import org.terasology.logic.LocalPlayer;
  * sorting of the entities. This class only tries to keep the elements sorted,
  * but does not guarantee it.
  *
- * It it therefor use full for keeping track of the entities with a Mesh
- * attached to them to keep track of what Entities to draw. The advantage is
- * that the sorting does not cause a performance issue, since it is done
- * asynchronously from the main thread.
+ * It it therefor use full for graphics purposes, to keep track of the nearest
+ * entities to draw.
  *
  * @author XanHou
  */
 public class NearestSortingList implements Iterable<EntityRef> {
     private static final Logger logger = LoggerFactory.getLogger(NearestSortingList.class);
     private LinkedList<EntityRef> entities = new LinkedList<EntityRef>();
-    private LocalPlayer lp;
     private final List<Command> commands = new ArrayList();
     //This timer is a simple java timer since the scheduling functionality is used
     //Not the timing functionality, which should be done through the LWJGL/TS timer.
     private Timer timer;
     private SortTask sortingTask;
     private Thread sortingThread;
-    private Vector3f playerPos = new Vector3f();
-    private DistanceComparator comparator = new DistanceComparator();
     /**
      * True while the background sorting process is active, different from the
      * active boolean because active is also true when a sorting run is
@@ -69,18 +63,18 @@ public class NearestSortingList implements Iterable<EntityRef> {
      */
     private boolean sorting = false;
     /**
-     * When the background process that sorts the elements is running, this
-     * boolean is true.
-     */
-    private boolean active = false;
-    /**
      * The delay in ms to wait between each sorting run.
      */
-    private long sortDelayMS = 50;
+    private long sortPeriod = 50;
+
     /**
-     * Used for temp storage to reduce memory load.
+     * Default value is 50 milliseconds.
+     * @return the amount of milliseconds between the start of two consecutive
+     *         sorting runs. (Unless sorting takes longer than this value in ms.)
      */
-    private static final Vector3f temp = new Vector3f();
+    public long getSortPeriod() {
+        return sortPeriod;
+    }
 
     /**
      * Returns the amount of elements in this list.
@@ -113,7 +107,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      *          IlligalArgumentException is thrown.
      */
     public synchronized void add(EntityRef e) {
-        if(e.getComponent(LocationComponent.class) == null) {
+        if (e.getComponent(LocationComponent.class) == null) {
             logger.warn("Ädding entity without LocationComponent to Container that sorts on Location");
         }
         //new entities are inserted to make sure that new entities are drawn first.
@@ -232,12 +226,58 @@ public class NearestSortingList implements Iterable<EntityRef> {
     /**
      * Calling this method starts the background sorting. If never called, the
      * elements in this container are never sorted!
+     * @param origin The entity to sort around. When using the getNearest 
+     * methods, this container has tried to put entities nearer to the entity
+     * given here at a lower index.
      */
-    public synchronized void initialize() {
+    public synchronized void initialize(EntityRef origin) {
+        initialize(origin, 50, 0);
+    }
+    
+    /**
+     * Initializes the background sorting without starting the sorting
+     * yet. This can later be done with the continueSorting() method.
+     * @param origin The entity to sort around. When using the getNearest 
+     * methods, this container has tried to put entities nearer to the entity
+     * given here at a lower index.
+     */
+    public synchronized void initializeAndPause(EntityRef origin) {
+        if(sortingTask != null || timer != null) {
+            logger.error("Mis-usages of intialize detected! Initizing again"
+                    + " before stopping the sorting process. Sorting is "
+                    + "stopped now, but it should be done by the user of "
+                    + "this class.");
+            stop();
+        }
+        sortingTask = new SortTask(origin);
+    }
+    
+    /**
+     * Same as initialize(), but allows the user to specify an amount
+     * of milliseconds to wait before the first sorting run.
+     * @param origin
+     * @param startSorting delay before the first sorting run. The frequency of
+     * sorting runs can be set with the setSortDelayMS(long) method.
+     */
+    public synchronized void initialize(EntityRef origin, long period, long initialDelay) {
+        if(sortingTask != null || timer != null) {
+            logger.error("Mis-usages of intialize detected! Initizing again"
+                    + " before stopping the sorting process. Sorting is "
+                    + "stopped now, but it should be done by the user of "
+                    + "this class.");
+            stop();
+        }
+        sortPeriod = period;
         timer = new Timer();
-        sortingTask = new SortTask();
-        timer.scheduleAtFixedRate(sortingTask, sortDelayMS, sortDelayMS);
-        active = true;
+        sortingTask = new SortTask(origin);
+        timer.scheduleAtFixedRate(sortingTask, initialDelay, sortPeriod);
+    }
+    
+    /**
+     * @return true if this container has been initialized, false otherwise. Initialized contianers have started sorting.
+     */
+    public boolean intialized() {
+        return sortingTask != null;
     }
 
     /**
@@ -254,18 +294,21 @@ public class NearestSortingList implements Iterable<EntityRef> {
      * is an insignificant performance loss or win if.
      */
     public synchronized void stop() {
-        timer.cancel();
-        timer.purge();
-        if(sortingThread == null) {
+        if(timer != null) {
+            //stopping a paused instance
+            timer.cancel();
+            timer.purge();
             timer = null;
-        } else {
+        }
+        if (sortingThread != null) {
             try {
                 sortingThread.join();
             } catch (InterruptedException ex) {
                 logger.error("Joining of sorting thread was interrupted!");
             }
-            timer = null;
         }
+        sortingThread = null;
+        sortingTask = null;
     }
 
     /**
@@ -290,42 +333,14 @@ public class NearestSortingList implements Iterable<EntityRef> {
     }
 
     /**
-     * Sorts the entities of this container. Can be executed concurrently with
-     * the other operations on this container.
-     */
-    private void sort() {
-        lp.getPosition(playerPos);
-        if(!commands.isEmpty()) {
-            logger.warn("The commands list was not emptied properly!");
-            commands.clear();
-        }
-        /**
-         * Note that while cloneAndSetSorting() and processQueue() are
-         * synchronized, this method itself and the sorting are not. This means
-         * that the actual sorting can be done concurrently with any other
-         * operations.
-         */
-        LinkedList<EntityRef> newEnts = cloneAndSetSorting();
-        
-        //System.err.println("sorting " + newEnts.size() + " etities based on playerloc: " + playerPos.x + ", "+playerPos.y+ ", "+playerPos.z);
-        
-        try {
-            Collections.sort(newEnts, comparator);
-        } catch (IllegalArgumentException ex) {
-            logger.warn("Entities destroyed during sorting process. Sorting is skipped this round.");
-            clearQueue();
-            return;
-        }
-        processQueue(newEnts);
-    }
-
-    /**
      * Updates the sorted list with all changes made while sorting before
      * swapping the lists.
      *
-     * @param newEntities the newly sorted list with entities.
+     * @param newEntities the newly sorted list with entities. All changes will
+     *                    be applied to this list before the entities of this
+     *                    collection are set to this list.
      */
-    private synchronized void processQueue(LinkedList<EntityRef> newEntities) {
+    private synchronized void processQueueAndSetEntities(LinkedList<EntityRef> newEntities) {
         //Note that the commands are executed in the order they are added to the
         //list.
         for (Command c : commands) {
@@ -336,7 +351,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
         entities = newEntities;
         sorting = false;
     }
-    
+
     /**
      * Clear the command queue in a synchronized way. Used when the sorting
      * fails.
@@ -387,65 +402,68 @@ public class NearestSortingList implements Iterable<EntityRef> {
     }
 
     /**
-     * Comparator that compares the distances to the player of two Entities.
-     * Closer is smaller, hence return -1, which results in lower index for
-     * closer the object when sorting.
-     */
-    private class DistanceComparator implements Comparator<EntityRef> {
-        
-        @Override
-        public int compare(EntityRef o1, EntityRef o2) {
-            LocationComponent loc1 = o1.getComponent(LocationComponent.class);
-            LocationComponent loc2 = o2.getComponent(LocationComponent.class);
-
-            if(loc1 == null || loc2 == null) {
-                return 0;
-            } else if(loc1 == null) {
-                return 1;
-            } else if (loc2 == null) {
-                return -1;
-            }
-            loc1.getWorldPosition(temp);
-            temp.sub(playerPos);
-            float dis1 = temp.lengthSquared();
-
-            loc2.getWorldPosition(temp);
-            temp.sub(playerPos);
-            float dis2 = temp.lengthSquared();
-
-            if (dis1 < dis2) {
-                return -1;
-            } else if (dis2 < dis1) {
-                return 1;
-            } else { //dis1 == dis2
-                return 0;
-            }
-        }
-    }
-
-    /**
-     * The TimerTask that does the sorting work. TODO stop the scheduling when
-     * the container is supposed to be destroyed.
+     * The TimerTask that does the sorting work.
      */
     private class SortTask extends TimerTask {
-        private long lastSortMoment = -1;
+        private DistanceComparator comparator = new DistanceComparator();
+        private Vector3f playerPos = new Vector3f();
+        private EntityRef originEntity;
+
+        /**
+         * @param origin The entities of a NearestSortingCollection will be
+         *               sorted based on their distance to this entity.
+         */
+        public SortTask(EntityRef origin) {
+            originEntity = origin;
+        }
 
         @Override
         public void run() {
+            sortingThread = Thread.currentThread();
             try {
-                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                lp = localPlayer;
-                if(localPlayer != null) {
-                    sort();
-                }
+                sort();
             } catch (Exception ex) {
                 /**
                  * We don't want the failure of the sorter to cause the entire
-                 * game to crash. Instead we shall output an error to the
-                 * logger and continue.
+                 * game to crash. Instead we shall output an error to the logger
+                 * and continue.
                  */
                 logger.error("Uncaught exception in sorting thread: " + ex.toString());
             }
+        }
+
+        /**
+         * Sorts the entities of this container. Can be executed concurrently
+         * with the other operations on this container.
+         */
+        private void sort() {
+            LocationComponent loc = originEntity.getComponent(LocationComponent.class);
+            if (loc == null) {
+                //If the given entity has no location yet, we cannot sort.
+                return;
+            }
+            comparator.setOrigin(playerPos);
+            if (!commands.isEmpty()) {
+                logger.warn("The commands list was not emptied properly!");
+                commands.clear();
+            }
+
+            /**
+             * Note that while cloneAndSetSorting() and
+             * processQueueAndSetEntities() are synchronized, this method itself
+             * and the sorting are not. This means that the actual sorting can
+             * be done concurrently with any other operations.
+             */
+            LinkedList<EntityRef> newEnts = cloneAndSetSorting();
+
+            try {
+                Collections.sort(newEnts, comparator);
+            } catch (IllegalArgumentException ex) {
+                logger.warn("Entities destroyed during sorting process. Sorting is skipped this round.");
+                clearQueue();
+                return;
+            }
+            processQueueAndSetEntities(newEnts);
         }
     }
 }
