@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.primitives;
 
 /**
- * Water is like Lava, just a tad less hot
+ * @author Immortius
  */
-{
-    "liquid" : true,
-    "water" : true,
-    "shape" : "engine:TrimmedLoweredCube",
-    "hardness" : 0,
-    "attachmentAllowed" : false,
-    "translucent" : true,
-    "targetable" : false,
-    "penetrable" : true,
-    "shadowCasting" : true
+public enum ChunkVertexFlag {
+    BLOCK_HINT_NORMAL(0),
+    BLOCK_HINT_WATER(1),
+    BLOCK_HINT_LAVA(2),
+    BLOCK_HINT_COLOR_MASK(3),
+    BLOCK_HINT_WAVING(4),
+    BLOCK_HINT_WAVING_BLOCK(5);
+
+    private int value;
+
+    private ChunkVertexFlag(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 }

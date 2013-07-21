@@ -384,6 +384,8 @@ public class BlockLoader implements BlockBuilderHelper {
     private Block createRawBlock(BlockDefinition def, String defaultName) {
         Block block = new Block();
         block.setLiquid(def.liquid);
+        block.setWater(def.water);
+        block.setLava(def.lava);
         block.setHardness(def.hardness);
         block.setAttachmentAllowed(def.attachmentAllowed);
         block.setReplacementAllowed(def.replacementAllowed);

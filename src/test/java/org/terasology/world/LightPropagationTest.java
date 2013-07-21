@@ -61,7 +61,7 @@ public class LightPropagationTest extends TerasologyTestingEnvironment {
         view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         view.lock();
         propagator = new LightPropagator(view);
-        BlockManagerImpl blockManager = new BlockManagerImpl(Lists.<String>newArrayList(), Maps.<String, Byte>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
+        BlockManagerImpl blockManager = new BlockManagerImpl(Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
 
         air = BlockManager.getAir();

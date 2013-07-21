@@ -69,6 +69,8 @@ public class BlockDefinition {
     public String shape = "";
     public List<String> shapes = Lists.newArrayList();
     public String rotation = null;
+    public boolean water = false;
+    public boolean lava = false;
 
     public static class Tiles {
         public EnumMap<BlockPart, String> map = Maps.newEnumMap(BlockPart.class);

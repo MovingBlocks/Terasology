@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.primitives;
 
-import com.bulletphysics.collision.shapes.IndexedMesh;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
@@ -46,6 +45,7 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
 /**
  * Chunk meshes are used to store the vertex data of tessellated chunks.
  */
+@SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkMesh {
 
     /**
@@ -54,12 +54,13 @@ public class ChunkMesh {
     public static class VertexElements {
 
         public VertexElements() {
-            vertCount = 0;
+            vertexCount = 0;
             normals = new TFloatArrayList();
             vertices = new TFloatArrayList();
             tex = new TFloatArrayList();
             color = new TFloatArrayList();
             indices = new TIntArrayList();
+            flags = new TIntArrayList();
         }
 
         public final TFloatList normals;
@@ -67,7 +68,8 @@ public class ChunkMesh {
         public final TFloatList tex;
         public final TFloatList color;
         public final TIntList indices;
-        public int vertCount;
+        public final TIntList flags;
+        public int vertexCount;
 
         public ByteBuffer finalVertices;
         public IntBuffer finalIndices;
@@ -82,54 +84,63 @@ public class ChunkMesh {
         BILLBOARD(2),
         WATER_AND_ICE(3);
 
-        private int _meshIndex;
+        private int meshIndex;
 
         private RENDER_TYPE(int index) {
-            _meshIndex = index;
+            meshIndex = index;
         }
 
         public int getIndex() {
-            return _meshIndex;
+            return meshIndex;
         }
     }
 
     public enum RENDER_PHASE {
         OPAQUE,
-        BILLBOARD_AND_TRANSLUCENT,
-        WATER_AND_ICE;
+        ALPHA_REJECT,
+        REFRACTIVE,
+        Z_PRE_PASS
     }
 
     /* CONST */
-    private static final int STRIDE = (3 + 3 + 3 + 3 + 4) * 4;
+    public static final int SIZE_VERTEX = 3;
+    public static final int SIZE_TEX0 = 3;
+    public static final int SIZE_TEX1 = 3;
+    public static final int SIZE_COLOR = 1;
+    public static final int SIZE_NORMAL = 3;
+
     private static final int OFFSET_VERTEX = 0;
-    private static final int OFFSET_TEX_0 = (3 * 4);
-    private static final int OFFSET_TEX_1 = ((3 + 3) * 4);
-    private static final int OFFSET_COLOR = ((3 + 3 + 3) * 4);
-    private static final int OFFSET_NORMAL = ((3 + 3 + 3 + 4) * 4);
+    private static final int OFFSET_TEX_0 = OFFSET_VERTEX + SIZE_VERTEX * 4;
+    private static final int OFFSET_TEX_1 = OFFSET_TEX_0 + SIZE_TEX0 * 4;
+    private static final int OFFSET_COLOR = OFFSET_TEX_1 + SIZE_TEX1 * 4;
+    private static final int OFFSET_NORMAL = OFFSET_COLOR + SIZE_COLOR * 4;
+    private static final int STRIDE = OFFSET_NORMAL + SIZE_NORMAL * 4;
 
     /* VERTEX DATA */
-    private final int[] _vertexBuffers = new int[4];
-    private final int[] _idxBuffers = new int[4];
-    private final int[] _vertexCount = new int[4];
+    private final int[] vertexBuffers = new int[4];
+    private final int[] idxBuffers = new int[4];
+    private final int[] vertexCount = new int[4];
 
     /* STATS */
-    private int _triangleCount = -1;
+    private int triangleCount = -1;
 
     /* TEMPORARY DATA */
-    public VertexElements[] _vertexElements = new VertexElements[4];
+    public VertexElements[] vertexElements = new VertexElements[4];
 
-    /* BULLET PHYSICS */
-    public IndexedMesh _indexedMesh;
-    private boolean _disposed = false;
+    private boolean disposed = false;
 
     /* CONCURRENCY */
-    public ReentrantLock _lock = new ReentrantLock();
+    public ReentrantLock lock = new ReentrantLock();
+
+    /* MEASUREMENTS */
+    private int timeToGenerateBlockVertices = 0;
+    private int timeToGenerateOptimizedBuffers = 0;
 
     public ChunkMesh() {
-        _vertexElements[0] = new VertexElements();
-        _vertexElements[1] = new VertexElements();
-        _vertexElements[2] = new VertexElements();
-        _vertexElements[3] = new VertexElements();
+        vertexElements[0] = new VertexElements();
+        vertexElements[1] = new VertexElements();
+        vertexElements[2] = new VertexElements();
+        vertexElements[3] = new VertexElements();
     }
 
     /**
@@ -138,21 +149,23 @@ public class ChunkMesh {
      * @return True if something was generated
      */
     public boolean generateVBOs() {
-        if (_lock.tryLock()) {
+        if (lock.tryLock()) {
             try {
                 // IMPORTANT: A mesh can only be generated once.
-                if (_vertexElements == null || _disposed)
+                if (vertexElements == null || disposed) {
                     return false;
+                }
 
-                for (int i = 0; i < _vertexBuffers.length; i++)
+                for (int i = 0; i < vertexBuffers.length; i++) {
                     generateVBO(i);
+                }
 
                 // Free unused space on the heap
-                _vertexElements = null;
+                vertexElements = null;
                 // Calculate the final amount of triangles
-                _triangleCount = (_vertexCount[0] + _vertexCount[1] + _vertexCount[2] + _vertexCount[3]) / 3;
+                triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
             } finally {
-                _lock.unlock();
+                lock.unlock();
             }
 
             return true;
@@ -162,53 +175,49 @@ public class ChunkMesh {
     }
 
     private void generateVBO(int id) {
-        if (_lock.tryLock()) {
-            try {
-                if (!_disposed && _vertexElements[id].finalIndices.limit() > 0 && _vertexElements[id].finalVertices.limit() > 0) {
-                    _vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
-                    _idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
-                    _vertexCount[id] = _vertexElements[id].finalIndices.limit();
+        if (!disposed && vertexElements[id].finalIndices.limit() > 0 && vertexElements[id].finalVertices.limit() > 0) {
+            vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
+            idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
+            vertexCount[id] = vertexElements[id].finalIndices.limit();
 
-                    VertexBufferObjectManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].finalIndices, GL15.GL_STATIC_DRAW);
-                    VertexBufferObjectManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].finalVertices, GL15.GL_STATIC_DRAW);
-                } else {
-                    _vertexBuffers[id] = 0;
-                    _idxBuffers[id] = 0;
-                    _vertexCount[id] = 0;
-                }
-            } finally {
-                _lock.unlock();
-            }
+            VertexBufferObjectManager.getInstance().bufferVboElementData(idxBuffers[id], vertexElements[id].finalIndices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectManager.getInstance().bufferVboData(vertexBuffers[id], vertexElements[id].finalVertices, GL15.GL_STATIC_DRAW);
+        } else {
+            vertexBuffers[id] = 0;
+            idxBuffers[id] = 0;
+            vertexCount[id] = 0;
         }
+
     }
 
     private void renderVbo(int id) {
-        if (_lock.tryLock()) {
+        if (lock.tryLock()) {
             try {
-                if (_vertexBuffers[id] <= 0 || _disposed)
+                if (vertexBuffers[id] <= 0 || disposed) {
                     return;
+                }
 
                 glEnableClientState(GL_VERTEX_ARRAY);
                 glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                 glEnableClientState(GL_COLOR_ARRAY);
                 glEnableClientState(GL_NORMAL_ARRAY);
 
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, _idxBuffers[id]);
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, _vertexBuffers[id]);
+                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
+                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
 
-                glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
+                glVertexPointer(SIZE_VERTEX, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
 
                 GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-                glTexCoordPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
+                glTexCoordPointer(SIZE_TEX0, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
 
                 GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-                glTexCoordPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
+                glTexCoordPointer(SIZE_TEX1, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
 
-                glColorPointer(4, GL11.GL_FLOAT, STRIDE, OFFSET_COLOR);
+                glColorPointer(SIZE_COLOR * 4, GL11.GL_UNSIGNED_BYTE, STRIDE, OFFSET_COLOR);
 
                 glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
 
-                GL11.glDrawElements(GL11.GL_TRIANGLES, _vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
 
                 glDisableClientState(GL_NORMAL_ARRAY);
                 glDisableClientState(GL_COLOR_ARRAY);
@@ -218,7 +227,7 @@ public class ChunkMesh {
                 GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
                 GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
             } finally {
-                _lock.unlock();
+                lock.unlock();
             }
         }
     }
@@ -228,66 +237,77 @@ public class ChunkMesh {
             case OPAQUE:
                 renderVbo(0);
                 break;
-            case BILLBOARD_AND_TRANSLUCENT:
+            case ALPHA_REJECT:
                 renderVbo(1);
                 glDisable(GL_CULL_FACE);
                 renderVbo(2);
                 glEnable(GL_CULL_FACE);
                 break;
-            case WATER_AND_ICE:
+            case REFRACTIVE:
                 renderVbo(3);
                 break;
         }
     }
 
     public void dispose() {
-        _lock.lock();
-
+        lock.lock();
         try {
-            if (!_disposed) {
-                for (int i = 0; i < _vertexBuffers.length; i++) {
-                    int id = _vertexBuffers[i];
+            if (!disposed) {
+                for (int i = 0; i < vertexBuffers.length; i++) {
+                    int id = vertexBuffers[i];
 
                     VertexBufferObjectManager.getInstance().putVboId(id);
-                    _vertexBuffers[i] = 0;
+                    vertexBuffers[i] = 0;
 
-                    id = _idxBuffers[i];
+                    id = idxBuffers[i];
 
                     VertexBufferObjectManager.getInstance().putVboId(id);
-                    _idxBuffers[i] = 0;
+                    idxBuffers[i] = 0;
                 }
 
-                _disposed = true;
-                _vertexElements = null;
-                _indexedMesh = null;
+                disposed = true;
+                vertexElements = null;
             }
         } finally {
-            _lock.unlock();
+            lock.unlock();
         }
     }
 
-    public boolean isGenerated() {
-        return _vertexElements == null;
-    }
-
     public boolean isDisposed() {
-        return _disposed;
+        return disposed;
     }
 
     public int triangleCount(RENDER_PHASE phase) {
-        if (phase == RENDER_PHASE.OPAQUE)
-            return _vertexCount[0] / 3;
-        else if (phase == RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT)
-            return (_vertexCount[1] + _vertexCount[2]) / 3;
-        else
-            return _vertexCount[3] / 3;
+        if (phase == RENDER_PHASE.OPAQUE) {
+            return vertexCount[0] / 3;
+        } else if (phase == RENDER_PHASE.ALPHA_REJECT) {
+            return (vertexCount[1] + vertexCount[2]) / 3;
+        } else {
+            return vertexCount[3] / 3;
+        }
     }
 
     public int triangleCount() {
-        return _triangleCount;
+        return triangleCount;
     }
 
     public boolean isEmpty() {
-        return _triangleCount == 0;
+        return triangleCount == 0;
+    }
+
+    public void setTimeToGenerateBlockVertices(int timeToGenerateBlockVertices) {
+        this.timeToGenerateBlockVertices = timeToGenerateBlockVertices;
+    }
+
+    public int getTimeToGenerateBlockVertices() {
+        return timeToGenerateBlockVertices;
+    }
+
+    public void setTimeToGenerateOptimizedBuffers(int timeToGenerateOptimizedBuffers) {
+        this.timeToGenerateOptimizedBuffers = timeToGenerateOptimizedBuffers;
+    }
+
+    public int getTimeToGenerateOptimizedBuffers() {
+        return timeToGenerateOptimizedBuffers;
     }
 }

@@ -22,6 +22,7 @@
  */
 {
     "liquid" : true,
+    "lava" : true,
     "shape" : "engine:trimmedLoweredCube",
     // Let the lava shine!
     "luminance" : 15,

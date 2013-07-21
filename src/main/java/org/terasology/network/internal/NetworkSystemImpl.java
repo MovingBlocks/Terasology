@@ -742,7 +742,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
             }
         }
-        for (Map.Entry<String, Byte> blockMapping : blockManager.getBlockIdMap().entrySet()) {
+        for (Map.Entry<String, Short> blockMapping : blockManager.getBlockIdMap().entrySet()) {
             serverInfoMessageBuilder.addBlockId(blockMapping.getValue());
             serverInfoMessageBuilder.addBlockName(blockMapping.getKey());
         }

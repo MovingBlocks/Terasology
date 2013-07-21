@@ -18,8 +18,6 @@ package org.terasology.world.chunks;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.blockdata.TeraArrays;
@@ -35,13 +33,11 @@ import java.util.Map;
  * Mods can register chunk data extensions through the method {@code Chunks.register(String, TeraArrays.Entry)}.
  *
  * @author Manuel Brotz <manu.brotz@gmx.ch>
- * @todo Finish support for chunk data extensions.
  */
+// TODO: Finish support for chunk data extensions.
 public final class Chunks {
 
     private static final Chunks instance = new Chunks();
-
-    private final Config config;
 
     private final TeraArrays.Entry blockDataEntry;
     private final TeraArrays.Entry sunlightDataEntry;
@@ -53,10 +49,8 @@ public final class Chunks {
     private final Chunk.ProtobufHandler handler;
 
     private Chunks() {
-        config = CoreRegistry.get(Config.class);
-
         final TeraArrays t = TeraArrays.getInstance();
-        blockDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
+        blockDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray16Bit);
         sunlightDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
         lightDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
         extraDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
@@ -98,7 +92,7 @@ public final class Chunks {
         return handler.decode(message);
     }
 
-    public static final Chunks getInstance() {
+    public static Chunks getInstance() {
         return instance;
     }
 }

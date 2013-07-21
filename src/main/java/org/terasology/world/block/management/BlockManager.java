@@ -21,7 +21,6 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 
-import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public abstract class BlockManager {
         AIR.setShadowCasting(false);
         AIR.setAttachmentAllowed(false);
         AIR.setHardness((byte) 0);
-        AIR.setId((byte) 0);
+        AIR.setId((short) 0);
         AIR.setDisplayName("Air");
         AIR.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, AIR_ID));
         AIR_FAMILY = new SymmetricFamily(AIR.getURI(), AIR);
@@ -71,7 +70,7 @@ public abstract class BlockManager {
     /**
      * @return A map of the mapping between Block Uris and Ids
      */
-    public abstract Map<String, Byte> getBlockIdMap();
+    public abstract Map<String, Short> getBlockIdMap();
 
     /**
      * @param category
@@ -112,7 +111,7 @@ public abstract class BlockManager {
      * @param id
      * @return Retrieves the Block with the given id, or null if there isn't one
      */
-    public abstract Block getBlock(byte id);
+    public abstract Block getBlock(short id);
 
     /**
      * @return An iterable over the list of registered (in use) block uris
@@ -157,17 +156,6 @@ public abstract class BlockManager {
      * @return The number of block families
      */
     public abstract int getBlockFamilyCount();
-
-    /**
-     * @return A float buffer containing the coordinates of waving blocks.
-     */
-    public abstract FloatBuffer calcCoordinatesForWavingBlocks();
-
-    /**
-     * @param uri
-     * @return A float buffer containing the coordinates of the texture for the given block
-     */
-    public abstract FloatBuffer calcCoordinate(String uri);
 
     /**
      * @param uri

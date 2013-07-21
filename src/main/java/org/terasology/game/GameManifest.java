@@ -43,7 +43,7 @@ public class GameManifest {
     private String seed = "";
     private long time = 0;
     private List<String> registeredBlockFamilies = Lists.newArrayList();
-    private Map<String, Byte> blockIdMap = Maps.newHashMap();
+    private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worldInfo = Maps.newHashMap();
     private ModConfig modConfiguration = new ModConfig();
 
@@ -93,11 +93,11 @@ public class GameManifest {
         this.registeredBlockFamilies = registeredBlockFamilies;
     }
 
-    public Map<String, Byte> getBlockIdMap() {
+    public Map<String, Short> getBlockIdMap() {
         return blockIdMap;
     }
 
-    public void setBlockIdMap(Map<String, Byte> blockIdMap) {
+    public void setBlockIdMap(Map<String, Short> blockIdMap) {
         this.blockIdMap = blockIdMap;
     }
 

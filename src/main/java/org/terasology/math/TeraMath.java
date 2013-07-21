@@ -16,14 +16,9 @@
 
 package org.terasology.math;
 
-import org.lwjgl.BufferUtils;
 import org.terasology.world.chunks.Chunk;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.nio.FloatBuffer;
-
-import static org.lwjgl.opengl.GL11.glGetFloat;
 
 /**
  * Collection of math functions.
@@ -51,7 +46,7 @@ public final class TeraMath {
     }
 
     /**
-     * Returns the absolute value.
+     * Returns the absolute value (float variant)
      *
      * @param d
      * @return the absolute value
@@ -61,20 +56,32 @@ public final class TeraMath {
     }
 
     /**
-     * Returns the absolute value.
+     * Returns the absolute value (double variant).
      *
      * @param d
-     * @return
+     * @return the absolute value of d
      */
     public static double fastAbs(double d) {
         return (d >= 0) ? d : -d;
     }
 
+    /**
+     * Fast floor function
+     *
+     * @param d
+     * @return
+     */
     public static double fastFloor(double d) {
         int i = (int) d;
         return (d < 0 && d != i) ? i - 1 : i;
     }
 
+    /**
+     * Fast floor function
+     *
+     * @param d
+     * @return
+     */
     public static float fastFloor(float d) {
         int i = (int) d;
         return (d < 0 && d != i) ? i - 1 : i;
@@ -82,6 +89,9 @@ public final class TeraMath {
 
     /**
      * Clamps a given value to be an element of [0..1].
+     *
+     * @param value
+     * @return
      */
     public static double clamp(double value) {
         if (value > 1.0) {
@@ -92,6 +102,14 @@ public final class TeraMath {
         return value;
     }
 
+    /**
+     * Clamps a given value to be an element of [min..max].
+     *
+     * @param value
+     * @param min
+     * @param max
+     * @return
+     */
     public static double clamp(double value, double min, double max) {
         if (value > max) {
             return max;
@@ -101,6 +119,14 @@ public final class TeraMath {
         return value;
     }
 
+    /**
+     * Clamps a given value to be an element of [min..max].
+     *
+     * @param value
+     * @param min
+     * @param max
+     * @return
+     */
     public static float clamp(float value, float min, float max) {
         if (value > max) {
             return max;
@@ -110,6 +136,14 @@ public final class TeraMath {
         return value;
     }
 
+    /**
+     * Clamps a given value to be an element of [min..max].
+     *
+     * @param value
+     * @param min
+     * @param max
+     * @return
+     */
     public static int clamp(int value, int min, int max) {
         if (value > max) {
             return max;
@@ -238,6 +272,12 @@ public final class TeraMath {
         return (z >> chunkPowerZ);
     }
 
+    /**
+     * Returns the chunk position of a given coordinate
+     *
+     * @param z The Z-coordinate of the block
+     * @return The Z-coordinate of the chunk
+     */
     public static int calcChunkPosZ(int z) {
         return calcChunkPosZ(z, Chunk.POWER_Z);
     }
@@ -361,30 +401,7 @@ public final class TeraMath {
         return (val >= 0 && val != i) ? i + 1 : i;
     }
 
-    public static void readMatrix(int type, Matrix4f target) {
-        FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
-        glGetFloat(type, matrix);
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                target.setElement(j, i, matrix.get());
-            }
-        }
-    }
-
-    public static FloatBuffer matrixToBuffer(Matrix4f mat) {
-        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                matrixBuffer.put(mat.getElement(j, i));
-            }
-        }
-
-        matrixBuffer.flip();
-        return matrixBuffer;
-    }
-
+    // TODO: This doesn't belong in this class, move it.
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
         Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
@@ -393,4 +410,6 @@ public final class TeraMath {
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }
+
+
 }

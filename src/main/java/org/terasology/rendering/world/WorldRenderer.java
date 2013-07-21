@@ -406,12 +406,12 @@ public final class WorldRenderer {
                 else
                     statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.WATER_AND_ICE) > 0)
+                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.REFRACTIVE) > 0)
                     renderQueueChunksSortedWater.add(c);
                 else
                     statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0 && i < MAX_BILLBOARD_CHUNKS)
+                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.ALPHA_REJECT) > 0 && i < MAX_BILLBOARD_CHUNKS)
                     renderQueueChunksSortedBillboards.add(c);
                 else
                     statIgnoredPhases++;
@@ -555,7 +555,7 @@ public final class WorldRenderer {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         while (renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+            renderChunk(renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera);
 
         PerformanceMonitor.endActivity();
 
@@ -584,10 +584,10 @@ public final class WorldRenderer {
 
                 if (j == 0) {
                     glColorMask(false, false, false, false);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.REFRACTIVE, camera);
                 } else {
                     glColorMask(true, true, true, true);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.REFRACTIVE, camera);
                 }
             }
         }
@@ -631,7 +631,7 @@ public final class WorldRenderer {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
             for (Chunk c : renderQueueChunksSortedBillboards) {
-                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.ALPHA_REJECT, camera);
             }
             glDisable(GL_BLEND);
             glDisable(GL_LIGHT0);

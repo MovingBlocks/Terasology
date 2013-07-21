@@ -22,9 +22,9 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TByteObjectMap;
-import gnu.trove.map.hash.TByteObjectHashMap;
-import gnu.trove.procedure.TByteObjectProcedure;
+import gnu.trove.map.TShortObjectMap;
+import gnu.trove.map.hash.TShortObjectHashMap;
+import gnu.trove.procedure.TShortObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
@@ -92,7 +92,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private final Set<Vector3i> preparingChunks = Sets.newSetFromMap(Maps.<Vector3i, Boolean>newConcurrentMap());
     private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
-    private final BlockingQueue<TByteObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
 
     private EntityRef worldEntity = EntityRef.NULL;
 
@@ -247,12 +247,12 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private void deactivateBlocks() {
-        List<TByteObjectMap<TIntList>> deactivatedBlockSets = Lists.newArrayListWithExpectedSize(deactivateBlocksQueue.size());
+        List<TShortObjectMap<TIntList>> deactivatedBlockSets = Lists.newArrayListWithExpectedSize(deactivateBlocksQueue.size());
         deactivateBlocksQueue.drainTo(deactivatedBlockSets);
-        for (TByteObjectMap<TIntList> deactivatedBlockSet : deactivatedBlockSets) {
-            deactivatedBlockSet.forEachEntry(new TByteObjectProcedure<TIntList>() {
+        for (TShortObjectMap<TIntList> deactivatedBlockSet : deactivatedBlockSets) {
+            deactivatedBlockSet.forEachEntry(new TShortObjectProcedure<TIntList>() {
                 @Override
-                public boolean execute(byte id, TIntList positions) {
+                public boolean execute(short id, TIntList positions) {
                     if (positions.size() > 0) {
                         blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
                     }
@@ -360,9 +360,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
             if (!loaded) {
                 PerformanceMonitor.startActivity("Sending OnAddedBlocks");
-                readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TByteObjectProcedure<TIntList>() {
+                readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TShortObjectProcedure<TIntList>() {
                     @Override
-                    public boolean execute(byte id, TIntList positions) {
+                    public boolean execute(short id, TIntList positions) {
                         if (positions.size() > 0) {
                             blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
                         }
@@ -373,9 +373,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             }
 
             PerformanceMonitor.startActivity("Sending OnActivateBlocks");
-            readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TByteObjectProcedure<TIntList>() {
+            readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TShortObjectProcedure<TIntList>() {
                 @Override
-                public boolean execute(byte id, TIntList positions) {
+                public boolean execute(short id, TIntList positions) {
                     if (positions.size() > 0) {
                         blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
                     }
@@ -414,8 +414,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
     }
 
-    private TByteObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
-        TByteObjectMap<TIntList> batchBlockMap = new TByteObjectHashMap<>();
+    private TShortObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
+        TShortObjectMap<TIntList> batchBlockMap = new TShortObjectHashMap<>();
         for (Block block : blockManager.listRegisteredBlocks()) {
             if (block.isLifecycleEventsRequired()) {
                 batchBlockMap.put(block.getId(), new TIntArrayList());

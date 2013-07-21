@@ -128,7 +128,7 @@ public class Block {
         }
     }
 
-    private byte id = 0x0;
+    private short id = 0x0;
     private String displayName = "Untitled block";
     private BlockUri uri;
     private BlockFamily family = null;
@@ -144,6 +144,10 @@ public class Block {
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
+
+    // Special liquid flags (TODO: clean this up)
+    private boolean water = false;
+    private boolean lava = false;
 
     // Rendering related
     private boolean invisible = false;
@@ -194,11 +198,11 @@ public class Block {
         }
     }
 
-    public byte getId() {
+    public short getId() {
         return id;
     }
 
-    public void setId(byte id) {
+    public void setId(short id) {
         this.id = id;
     }
 
@@ -256,6 +260,22 @@ public class Block {
 
     public void setLiquid(boolean liquid) {
         this.liquid = liquid;
+    }
+
+    public boolean isWater() {
+        return water;
+    }
+
+    public void setWater(boolean water) {
+        this.water = water;
+    }
+
+    public boolean isLava() {
+        return lava;
+    }
+
+    public void setLava(boolean lava) {
+        this.lava = lava;
     }
 
     /**

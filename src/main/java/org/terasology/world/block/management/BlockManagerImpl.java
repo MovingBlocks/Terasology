@@ -24,10 +24,15 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.iterator.TObjectShortIterator;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.TObjectByteMap;
+import gnu.trove.map.TObjectShortMap;
+import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.map.hash.TObjectShortHashMap;
+import gnu.trove.map.hash.TShortObjectHashMap;
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +65,8 @@ public class BlockManagerImpl extends BlockManager {
 
     // This is the id we assign to blocks whose mappings are missing. This shouldn't happen, but in case it does
     // we set them to the last id (don't want to use 0 as they would override air)
-    private static final byte UNKNOWN_ID = (byte) 255;
-    private static final int MAX_ID = 255;
+    private static final short UNKNOWN_ID = (short) 65535;
+    private static final int MAX_ID = 65534;
 
     /* Families */
     private final Set<BlockUri> freeformBlockUris = Sets.newHashSet();
@@ -73,21 +78,21 @@ public class BlockManagerImpl extends BlockManager {
 
         /* Blocks */
         private final Map<BlockUri, Block> blocksByUri;
-        private final TByteObjectMap<Block> blocksById;
-        private final TObjectByteMap<BlockUri> idByUri;
+        private final TShortObjectMap<Block> blocksById;
+        private final TObjectShortMap<BlockUri> idByUri;
 
         public RegisteredState() {
             this.registeredFamilyByUri = Maps.newHashMap();
             this.blocksByUri = Maps.newHashMap();
-            this.blocksById = new TByteObjectHashMap<>();
-            this.idByUri = new TObjectByteHashMap<>();
+            this.blocksById = new TShortObjectHashMap<>();
+            this.idByUri = new TObjectShortHashMap<>();
         }
 
         public RegisteredState(RegisteredState oldState) {
             this.registeredFamilyByUri = Maps.newHashMap(oldState.registeredFamilyByUri);
             this.blocksByUri = Maps.newHashMap(oldState.blocksByUri);
-            this.blocksById = new TByteObjectHashMap<>(oldState.blocksById);
-            this.idByUri = new TObjectByteHashMap<>(oldState.idByUri);
+            this.blocksById = new TShortObjectHashMap<>(oldState.blocksById);
+            this.idByUri = new TObjectShortHashMap<>(oldState.idByUri);
         }
     }
 
@@ -103,10 +108,10 @@ public class BlockManagerImpl extends BlockManager {
     private int nextId = 1;
 
     public BlockManagerImpl(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
-        this(Lists.<String>newArrayList(), Maps.<String, Byte>newHashMap(), true, blockFamilyFactoryRegistry);
+        this(Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, blockFamilyFactoryRegistry);
     }
 
-    public BlockManagerImpl(List<String> registeredBlockFamilies, Map<String, Byte> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+    public BlockManagerImpl(List<String> registeredBlockFamilies, Map<String, Short> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
         blockLoader = new BlockLoader(blockFamilyFactoryRegistry);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
@@ -133,7 +138,7 @@ public class BlockManagerImpl extends BlockManager {
             }
             if (family != null) {
                 for (Block block : family.getBlocks()) {
-                    Byte id = knownBlockMappings.get(block.getURI().toString());
+                    Short id = knownBlockMappings.get(block.getURI().toString());
                     if (id != null) {
                         block.setId(id);
                     } else {
@@ -279,9 +284,9 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     @Override
-    public Map<String, Byte> getBlockIdMap() {
-        Map<String, Byte> result = Maps.newHashMapWithExpectedSize(registeredBlockInfo.get().idByUri.size());
-        TObjectByteIterator<BlockUri> iterator = registeredBlockInfo.get().idByUri.iterator();
+    public Map<String, Short> getBlockIdMap() {
+        Map<String, Short> result = Maps.newHashMapWithExpectedSize(registeredBlockInfo.get().idByUri.size());
+        TObjectShortIterator<BlockUri> iterator = registeredBlockInfo.get().idByUri.iterator();
         while (iterator.hasNext()) {
             iterator.advance();
             result.put(iterator.key().toString(), iterator.value());
@@ -350,7 +355,7 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     @Override
-    public Block getBlock(byte id) {
+    public Block getBlock(short id) {
         Block result = registeredBlockInfo.get().blocksById.get(id);
         if (result == null) {
             return getAir();
@@ -396,51 +401,6 @@ public class BlockManagerImpl extends BlockManager {
     @Override
     public int getBlockFamilyCount() {
         return registeredBlockInfo.get().registeredFamilyByUri.size();
-    }
-
-    @Override
-    public FloatBuffer calcCoordinatesForWavingBlocks() {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(NUM_WAVING_TEXTURES * 2);
-
-        int counter = 0;
-        for (BlockFamily b : registeredBlockInfo.get().registeredFamilyByUri.values()) {
-            if (b.getArchetypeBlock().isWaving()) {
-                // TODO: Don't use random block part
-                Vector2f pos = b.getArchetypeBlock().getPrimaryAppearance().getTextureAtlasPos(BlockPart.TOP);
-                buffer.put(pos.x);
-                buffer.put(pos.y);
-                counter++;
-            }
-            if (counter >= NUM_WAVING_TEXTURES) {
-                break;
-            }
-        }
-
-        while (counter < NUM_WAVING_TEXTURES) {
-            buffer.put(-1);
-            buffer.put(-1);
-            counter++;
-        }
-
-        buffer.flip();
-        return buffer;
-    }
-
-    @Override
-    public FloatBuffer calcCoordinate(String uri) {
-        BlockUri blockUri = new BlockUri(uri);
-        Block block = getBlock(blockUri);
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(2);
-
-        if (!block.isInvisible()) {
-            // TODO: Don't use random block part
-            Vector2f position = block.getPrimaryAppearance().getTextureAtlasPos(BlockPart.LEFT);
-            buffer.put(position.x);
-            buffer.put(position.y);
-        }
-
-        buffer.flip();
-        return buffer;
     }
 
     @Override
