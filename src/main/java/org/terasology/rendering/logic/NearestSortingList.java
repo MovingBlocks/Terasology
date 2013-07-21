@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 
 /**
  * This data structure takes Entities with a location in the world and sorts
