@@ -42,7 +42,7 @@ uniform mat4 invProjMatrix;
 uniform sampler2D texSceneClouds;
 # endif
 
-#define SHADOW_MAP_BIAS 0.003
+#define SHADOW_MAP_BIAS 0.01
 
 uniform sampler2D texSceneShadowMap;
 uniform mat4 lightViewProjMatrix;
