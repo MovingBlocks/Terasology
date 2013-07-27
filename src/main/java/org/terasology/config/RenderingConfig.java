@@ -21,6 +21,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.events.ChangeViewRangeRequest;
+import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -31,34 +32,35 @@ public class RenderingConfig {
     private int windowWidth = 1280;
     private int windowHeight = 720;
     private boolean fullscreen = false;
-    private int viewDistanceNear = 8;
-    private int viewDistanceModerate = 16;
-    private int viewDistanceFar = 32;
-    private int viewDistanceUltra = 48;
-    private int activeViewDistanceMode = 0;
-    private int maxChunkVBOs = 512;
-    private boolean flickeringLight = false;
+    private ViewDistance viewDistance = ViewDistance.NEAR;
+    private boolean flickeringLight = true;
     private boolean animateGrass = false;
     private boolean animateWater = false;
-    private boolean refractiveWater = false;
-    private int oceanOctaves = 8;
     private float fieldOfView = 90;
     private boolean cameraBobbing = true;
     private boolean renderPlacingBox = true;
-    private int blurIntensity = 3;
+    private int blurIntensity = 2;
     private boolean reflectiveWater = false;
-    private boolean vignette = false;
+    private boolean vignette = true;
     private boolean motionBlur = false;
     private boolean ssao = false;
-    private boolean filmGrain = false;
+    private boolean filmGrain = true;
     private boolean outline = true;
     private boolean lightShafts = false;
-    private boolean eyeAdapting = false;
+    private boolean eyeAdaptation = true;
     private boolean bloom = false;
+    private boolean dynamicShadows = false;
+    private boolean oculusVrSupport = false;
+    private int maxTextureAtlasResolution = 4096;
+    private int maxChunksUsedForShadowMapping = 1024;
+    private int shadowMapResolution = 1024;
+    private boolean normalMapping = false;
+    private boolean parallaxMapping = false;
+    private boolean dynamicShadowsPcfFiltering = false;
+    private boolean volumetricFog = false;
+    private boolean cloudShadows = false;
 
-    public int getBlurRadius() {
-        return Math.max(1, blurIntensity);
-    }
+    private RenderingDebugConfig debug = new RenderingDebugConfig();
 
     public PixelFormat getPixelFormat() {
         return pixelFormat;
@@ -96,64 +98,22 @@ public class RenderingConfig {
         this.fullscreen = fullscreen;
     }
 
-    public int getViewDistanceNear() {
-        return viewDistanceNear;
+    public ViewDistance getViewDistance() {
+        return viewDistance;
     }
 
-    public void setViewDistanceNear(int viewDistanceNear) {
-        this.viewDistanceNear = viewDistanceNear;
-    }
+    public void setViewDistance(ViewDistance viewDistance) {
+        this.viewDistance = viewDistance;
 
-    public int getViewDistanceModerate() {
-        return viewDistanceModerate;
-    }
-
-    public void setViewDistanceModerate(int viewDistanceModerate) {
-        this.viewDistanceModerate = viewDistanceModerate;
-    }
-
-    public int getViewDistanceFar() {
-        return viewDistanceFar;
-    }
-
-    public void setViewDistanceFar(int viewDistanceFar) {
-        this.viewDistanceFar = viewDistanceFar;
-    }
-
-    public int getViewDistanceUltra() {
-        return viewDistanceUltra;
-    }
-
-    public void setViewDistanceUltra(int viewDistanceUltra) {
-        this.viewDistanceUltra = viewDistanceUltra;
-    }
-
-    public int getActiveViewDistanceMode() {
-        return activeViewDistanceMode;
-    }
-
-    public void setActiveViewDistanceMode(int activeViewDistanceMode) {
-        this.activeViewDistanceMode = activeViewDistanceMode;
         // TODO: Remove this, switch to a property change listener
-
-        int chunksToLoad = getActiveViewingDistance() * getActiveViewingDistance();
-        setMaxChunkVBOs(chunksToLoad >= 512 ? 512 : chunksToLoad);
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
-            player.getClientEntity().send(new ChangeViewRangeRequest(activeViewDistanceMode));
+            player.getClientEntity().send(new ChangeViewRangeRequest(viewDistance));
         }
         if (worldRenderer != null) {
-            worldRenderer.changeViewDistance(getActiveViewingDistance());
+            worldRenderer.changeViewDistance(viewDistance);
         }
-    }
-
-    public int getMaxChunkVBOs() {
-        return maxChunkVBOs;
-    }
-
-    public void setMaxChunkVBOs(int maxChunkVBOs) {
-        this.maxChunkVBOs = maxChunkVBOs;
     }
 
     public boolean isFlickeringLight() {
@@ -180,20 +140,12 @@ public class RenderingConfig {
         this.animateWater = animateWater;
     }
 
-    public boolean isRefractiveWater() {
-        return refractiveWater;
+    public boolean isDynamicShadows() {
+        return dynamicShadows;
     }
 
-    public void setRefractiveWater(boolean refractiveWater) {
-        this.refractiveWater = refractiveWater;
-    }
-
-    public int getOceanOctaves() {
-        return oceanOctaves;
-    }
-
-    public void setOceanOctaves(int oceanOctaves) {
-        this.oceanOctaves = oceanOctaves;
+    public void setDynamicShadows(boolean dynamicShadows) {
+        this.dynamicShadows = dynamicShadows;
     }
 
     public float getFieldOfView() {
@@ -218,6 +170,10 @@ public class RenderingConfig {
 
     public void setRenderPlacingBox(boolean renderPlacingBox) {
         this.renderPlacingBox = renderPlacingBox;
+    }
+
+    public int getBlurRadius() {
+        return Math.max(1, blurIntensity);
     }
 
     public int getBlurIntensity() {
@@ -245,7 +201,7 @@ public class RenderingConfig {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur;
+        return motionBlur && !oculusVrSupport;
     }
 
     public void setMotionBlur(boolean motionBlur) {
@@ -284,12 +240,12 @@ public class RenderingConfig {
         this.lightShafts = lightShafts;
     }
 
-    public boolean isEyeAdapting() {
-        return eyeAdapting;
+    public boolean isEyeAdaptation() {
+        return eyeAdaptation;
     }
 
-    public void setEyeAdapting(boolean eyeAdapting) {
-        this.eyeAdapting = eyeAdapting;
+    public void setEyeAdaptation(boolean eyeAdaptation) {
+        this.eyeAdaptation = eyeAdaptation;
     }
 
     public boolean isBloom() {
@@ -300,16 +256,79 @@ public class RenderingConfig {
         this.bloom = bloom;
     }
 
-    public int getActiveViewingDistance() {
-        switch (activeViewDistanceMode) {
-            case 1:
-                return viewDistanceModerate;
-            case 2:
-                return viewDistanceFar;
-            case 3:
-                return viewDistanceUltra;
-            default:
-                return viewDistanceNear;
-        }
+    public boolean isOculusVrSupport() {
+        return oculusVrSupport;
+    }
+
+    public void setOculusVrSupport(boolean oculusVrSupport) {
+        this.oculusVrSupport = oculusVrSupport;
+    }
+
+    public int getMaxTextureAtlasResolution() {
+        return maxTextureAtlasResolution;
+    }
+
+    public void setMaxTextureAtlasResolution(int maxTextureAtlasResolution) {
+        this.maxTextureAtlasResolution = maxTextureAtlasResolution;
+    }
+
+    public int getMaxChunksUsedForShadowMapping() {
+        return maxChunksUsedForShadowMapping;
+    }
+
+    public void setMaxChunksUsedForShadowMapping(int maxChunksUsedForShadowMapping) {
+        this.maxChunksUsedForShadowMapping = maxChunksUsedForShadowMapping;
+    }
+
+    public int getShadowMapResolution() {
+        return shadowMapResolution;
+    }
+
+    public void setShadowMapResolution(int shadowMapResolution) {
+        this.shadowMapResolution = shadowMapResolution;
+    }
+
+    public boolean isNormalMapping() {
+        return normalMapping;
+    }
+
+    public void setNormalMapping(boolean normalMapping) {
+        this.normalMapping = normalMapping;
+    }
+
+    public boolean isParallaxMapping() {
+        return parallaxMapping;
+    }
+
+    public void setParallaxMapping(boolean parallaxMapping) {
+        this.parallaxMapping = parallaxMapping;
+    }
+
+    public boolean isDynamicShadowsPcfFiltering() {
+        return dynamicShadowsPcfFiltering;
+    }
+
+    public void setDynamicShadowsPcfFiltering(boolean dynamicShadowsPcfFiltering) {
+        this.dynamicShadowsPcfFiltering = dynamicShadowsPcfFiltering;
+    }
+
+    public boolean isVolumetricFog() {
+        return volumetricFog;
+    }
+
+    public void setVolumetricFog(boolean volumetricFog) {
+        this.volumetricFog = volumetricFog;
+    }
+
+    public boolean isCloudShadows() {
+        return cloudShadows;
+    }
+
+    public void setCloudShadows(boolean cloudShadows) {
+        this.cloudShadows = cloudShadows;
+    }
+
+    public RenderingDebugConfig getDebug() {
+        return debug;
     }
 }

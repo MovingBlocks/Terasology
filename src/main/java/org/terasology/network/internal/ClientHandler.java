@@ -91,7 +91,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
         ctx.getChannel().write(NetMessage.newBuilder()
                 .setClientConnect(ClientConnectMessage.newBuilder()
                         .setName(config.getPlayer().getName())
-                        .setViewDistanceLevel(config.getRendering().getActiveViewDistanceMode())
+                        .setViewDistanceLevel(config.getRendering().getViewDistance().getIndex())
                 ).build());
     }
 }

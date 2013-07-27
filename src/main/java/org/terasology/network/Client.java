@@ -18,6 +18,7 @@ package org.terasology.network;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.chunks.ChunkRegionListener;
 
 /**
@@ -40,9 +41,9 @@ public interface Client extends ChunkRegionListener {
 
     void send(Event event, EntityRef target);
 
-    int getViewDistance();
+    ViewDistance getViewDistance();
 
     boolean isLocal();
 
-    void setViewDistanceMode(int newViewRange);
+    void setViewDistanceMode(ViewDistance viewDistance);
 }

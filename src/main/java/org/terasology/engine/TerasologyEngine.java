@@ -40,14 +40,14 @@ import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -63,10 +63,11 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
+import org.terasology.rendering.opengl.GLSLMaterial;
+import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLFont;
-import org.terasology.rendering.opengl.OpenGLMaterial;
 import org.terasology.rendering.opengl.OpenGLMesh;
-import org.terasology.rendering.opengl.OpenGLShader;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
@@ -292,6 +293,11 @@ public class TerasologyEngine implements GameEngine {
                 } else {
                     System.loadLibrary("OpenAL32");
                 }
+                try {
+                    OculusVrHelper.loadNatives();
+                } catch (UnsatisfiedLinkError e) {
+                    logger.warn("Could not load optional TeraOVR native libraries - Oculus support disabled");
+                }
                 break;
             default:
                 logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());
@@ -341,13 +347,13 @@ public class TerasologyEngine implements GameEngine {
         AssetManager.getInstance().setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
             @Override
             public Shader buildAsset(AssetUri uri, ShaderData data) {
-                return new OpenGLShader(uri, data);
+                return new GLSLShader(uri, data);
             }
         });
         AssetManager.getInstance().setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
             @Override
             public Material buildAsset(AssetUri uri, MaterialData data) {
-                return new OpenGLMaterial(uri, data);
+                return new GLSLMaterial(uri, data);
             }
         });
         AssetManager.getInstance().setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
@@ -368,14 +374,19 @@ public class TerasologyEngine implements GameEngine {
                 return new MeshAnimationImpl(uri, data);
             }
         });
+        CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
+
     }
 
     private void checkOpenGL() {
-        boolean canRunGame = GLContext.getCapabilities().OpenGL20
-                & GLContext.getCapabilities().OpenGL11
+        boolean canRunGame = GLContext.getCapabilities().OpenGL11
                 & GLContext.getCapabilities().OpenGL12
                 & GLContext.getCapabilities().OpenGL14
-                & GLContext.getCapabilities().OpenGL15;
+                & GLContext.getCapabilities().OpenGL15
+                & GLContext.getCapabilities().GL_ARB_framebuffer_object
+                & GLContext.getCapabilities().GL_ARB_texture_float
+                & GLContext.getCapabilities().GL_ARB_half_float_pixel
+                & GLContext.getCapabilities().GL_ARB_shader_objects;
 
         if (!canRunGame) {
             logger.error("Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
@@ -416,8 +427,8 @@ public class TerasologyEngine implements GameEngine {
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+        CoreRegistry.get(ShaderManager.class).initShaders();
 
-        ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
     }
 

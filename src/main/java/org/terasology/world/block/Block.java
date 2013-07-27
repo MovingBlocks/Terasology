@@ -25,15 +25,16 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
@@ -68,7 +69,7 @@ public class Block {
     private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this
-    private static final EnumMap<BlockPart, Float> DIRECTION_LIT_LEVEL = new EnumMap<BlockPart, Float>(BlockPart.class);
+    private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
 
     /**
      * Different color sources for blocks.
@@ -156,8 +157,8 @@ public class Block {
     private boolean shadowCasting = true;
     private boolean waving = false;
     private byte luminance = 0;
-    private EnumMap<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
-    private EnumMap<BlockPart, Vector4f> colorOffset = new EnumMap<BlockPart, Vector4f>(BlockPart.class);
+    private Map<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, Vector4f> colorOffset = Maps.newEnumMap(BlockPart.class);
 
     // Collision related
     private boolean penetrable = false;
@@ -478,7 +479,6 @@ public class Block {
     /**
      * @return Can player craft on this block?
      */
-
     public boolean isCraftPlace() {
         return craftPlace;
     }
@@ -611,24 +611,23 @@ public class Block {
         return getBounds(new Vector3i(floatPos, 0.5f));
     }
 
-    public void renderWithLightValue(float light) {
+    public void renderWithLightValue(float sunlight, float blockLight) {
         if (isInvisible())
             return;
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
-        shader.enable();
-        shader.setFloat("light", light);
+        Material mat = Assets.getMaterial("engine:block");
+        mat.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+
+        mat.enable();
+        mat.setFloat("sunlight", sunlight);
+        mat.setFloat("blockLight", blockLight);
 
         if (mesh == null) {
             generateMesh();
-            if (mesh == null) {
-                return;
-            }
         } else if (mesh.isDisposed()) {
             logger.error("Cannot render disposed mesh");
             return;
         }
-
 
         if (!isDoubleSided() || !glIsEnabled(GL11.GL_CULL_FACE)) {
             mesh.render();
@@ -637,6 +636,8 @@ public class Block {
             mesh.render();
             glEnable(GL11.GL_CULL_FACE);
         }
+
+        mat.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void generateMesh() {

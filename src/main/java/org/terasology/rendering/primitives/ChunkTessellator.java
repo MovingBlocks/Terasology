@@ -286,15 +286,15 @@ public final class ChunkTessellator {
         Block block = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
-        ChunkVertexFlag vertexFlag = ChunkVertexFlag.BLOCK_HINT_NORMAL;
+        ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
         if (block.isWater()) {
-            vertexFlag = ChunkVertexFlag.BLOCK_HINT_WATER;
+            vertexFlag = ChunkVertexFlag.WATER;
         } else if (block.isLava()) {
-            vertexFlag = ChunkVertexFlag.BLOCK_HINT_LAVA;
+            vertexFlag = ChunkVertexFlag.LAVA;
         } else if (block.isWaving() && block.isDoubleSided()) {
-            vertexFlag = ChunkVertexFlag.BLOCK_HINT_WAVING;
+            vertexFlag = ChunkVertexFlag.WAVING;
         } else if (block.isWaving() && !block.isDoubleSided()) {
-            vertexFlag = ChunkVertexFlag.BLOCK_HINT_WAVING_BLOCK;
+            vertexFlag = ChunkVertexFlag.WAVING_BLOCK;
         }
 
         // Gather adjacent blocks
@@ -310,17 +310,17 @@ public final class ChunkTessellator {
         /*
          * Determine the render process.
          */
-        ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.TRANSLUCENT;
+        ChunkMesh.RenderType renderType = ChunkMesh.RenderType.TRANSLUCENT;
 
         if (!block.isTranslucent()) {
-            renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
+            renderType = ChunkMesh.RenderType.OPAQUE;
         }
         // TODO: Review special case, or alternatively compare uris.
         if (block.isWater() || block.getURI().toString().equals("engine:ice")) {
-            renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
+            renderType = ChunkMesh.RenderType.WATER_AND_ICE;
         }
         if (block.isDoubleSided()) {
-            renderType = ChunkMesh.RENDER_TYPE.BILLBOARD;
+            renderType = ChunkMesh.RenderType.BILLBOARD;
         }
 
         if (blockAppearance.getPart(BlockPart.CENTER) != null) {
@@ -371,7 +371,7 @@ public final class ChunkTessellator {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                 if (block.getURI().toString().equals("engine:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), ChunkVertexFlag.BLOCK_HINT_COLOR_MASK);
+                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), ChunkVertexFlag.COLOR_MASK);
                 } else {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlag);
                 }

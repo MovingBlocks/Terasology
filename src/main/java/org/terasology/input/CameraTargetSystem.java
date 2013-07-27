@@ -22,6 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -53,6 +54,7 @@ public class CameraTargetSystem implements ComponentSystem {
     private Vector3f hitPosition = new Vector3f();
     private Vector3f hitNormal = new Vector3f();
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private float eyeFocusDistance = 0;
 
     @Override
     public void initialise() {
@@ -86,7 +88,7 @@ public class CameraTargetSystem implements ComponentSystem {
         this.filter = Arrays.copyOf(filter, filter.length);
     }
 
-    public void update() {
+    public void update(float delta) {
         // Repair lost target
         // TODO: Improvements to temporary chunk handling will remove the need for this
         if (!target.exists() && targetBlockPos != null && blockRegistry != null) {
@@ -103,6 +105,7 @@ public class CameraTargetSystem implements ComponentSystem {
 
         BulletPhysics physicsRenderer = CoreRegistry.get(BulletPhysics.class);
         HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE, filter);
+        updateEyeDistance(hitInfo, delta);
         Vector3i newBlockPos = null;
 
         EntityRef newTarget = EntityRef.NULL;
@@ -124,6 +127,21 @@ public class CameraTargetSystem implements ComponentSystem {
         targetBlockPos = newBlockPos;
     }
 
+    private void updateEyeDistance(HitResult hitInfo, float delta) {
+        if (hitInfo.isHit()) {
+            Vector3f playerToTargetRay = new Vector3f();
+            playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getPosition());
+
+            if (eyeFocusDistance == Float.MAX_VALUE) {
+                eyeFocusDistance = playerToTargetRay.length();
+            } else {
+                eyeFocusDistance = TeraMath.lerpf(eyeFocusDistance, playerToTargetRay.length(), delta * 20.0f);
+            }
+        } else {
+            eyeFocusDistance = Float.MAX_VALUE;
+        }
+    }
+
     public String toString() {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         if (targetBlockPos != null) {
@@ -137,5 +155,9 @@ public class CameraTargetSystem implements ComponentSystem {
             return new Vector3i(targetBlockPos);
         }
         return new Vector3i(hitPosition, 0.5f);
+    }
+
+    public float getEyeFocusDistance() {
+        return eyeFocusDistance;
     }
 }

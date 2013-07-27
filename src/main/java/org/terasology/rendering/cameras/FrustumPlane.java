@@ -22,7 +22,10 @@ package org.terasology.rendering.cameras;
  */
 public class FrustumPlane {
 
-    private double a, b, c, d;
+    private float a;
+    private float b;
+    private float c;
+    private float d;
 
     /**
      * Init. a new view frustum with the default values in place.
@@ -35,7 +38,7 @@ public class FrustumPlane {
      * Init. a new view frustum with a given plane equation.
      * ax + by + cy + d = 0
      */
-    public FrustumPlane(double a, double b, double c, double d) {
+    public FrustumPlane(float a, float b, float c, float d) {
         this.a = a;
         this.b = b;
         this.c = c;
@@ -53,35 +56,35 @@ public class FrustumPlane {
         d /= t;
     }
 
-    public double getA() {
+    public float getA() {
         return a;
     }
 
-    public void setA(double a) {
+    public void setA(float a) {
         this.a = a;
     }
 
-    public double getB() {
+    public float getB() {
         return b;
     }
 
-    public void setB(double b) {
+    public void setB(float b) {
         this.b = b;
     }
 
-    public double getC() {
+    public float getC() {
         return c;
     }
 
-    void setC(double c) {
+    void setC(float c) {
         this.c = c;
     }
 
-    public double getD() {
+    public float getD() {
         return d;
     }
 
-    public void setD(double d) {
+    public void setD(float d) {
         this.d = d;
     }
 }

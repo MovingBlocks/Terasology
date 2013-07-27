@@ -20,6 +20,16 @@ package org.terasology.rendering.assets.shader;
  * @author Immortius
  */
 public enum ParamType {
-    sampler2D,
-    samplerCube;
+    sampler2D(true),
+    samplerCube(true);
+
+    private boolean texture;
+
+    private ParamType(boolean texture) {
+        this.texture = texture;
+    }
+
+    public boolean isTexture() {
+        return texture;
+    }
 }

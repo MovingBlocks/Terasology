@@ -49,7 +49,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
-import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -57,7 +58,6 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**
@@ -72,10 +72,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private Time time;
 
     private WorldProvider worldProvider;
-    private DefaultCamera playerCamera;
+    private Camera playerCamera;
 
     private long lastTimeSpacePressed;
-    private long lastInteraction, lastTimeThrowInteraction;
+    private long lastInteraction;
+    private long lastTimeThrowInteraction;
 
     @In
     private Config config;
@@ -108,7 +109,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void shutdown() {
     }
 
-    public void setPlayerCamera(DefaultCamera camera) {
+    public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
     }
 
@@ -253,24 +254,28 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
 
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         // The camera position is the player's position plus the eye offset
-        Vector3d cameraPosition = new Vector3d();
-        cameraPosition.add(new Vector3d(position), new Vector3d(0, characterComponent.eyeOffset, 0));
+        Vector3f cameraPosition = new Vector3f();
+        cameraPosition.add(new Vector3f(position), new Vector3f(0, characterComponent.eyeOffset, 0));
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = Direction.FORWARD.getVector3f();
         QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
-        if (stepDelta < 0) stepDelta += 1;
+        if (stepDelta < 0) {
+            stepDelta += 1;
+        }
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
 
-        if (config.getRendering().isCameraBobbing()) {
-            playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-            playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
-        } else {
-            playerCamera.setBobbingRotationOffsetFactor(0.0f);
-            playerCamera.setBobbingVerticalOffsetFactor(0.0f);
+        if (playerCamera.isBobbingAllowed()) {
+            if (config.getRendering().isCameraBobbing()) {
+                ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
+                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
+            } else {
+                ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(0.0f);
+                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(0.0f);
+            }
         }
 
         if (charMovementComp.mode == MovementMode.GHOSTING) {
@@ -301,12 +306,16 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
 
     }
 
     @Override
     public void renderFirstPerson() {
+    }
+
+    @Override
+    public void renderShadows() {
     }
 
 }

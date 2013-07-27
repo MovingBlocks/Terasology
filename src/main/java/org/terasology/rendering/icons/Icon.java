@@ -336,8 +336,6 @@ public class Icon {
         if (_blockFamily == null) {
             _element.renderTransformed();
         } else {
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-
             GL11.glPushMatrix();
             glTranslatef(4f, 0f, 0f);
             GL11.glScalef(20f, 20f, 20f);
@@ -346,11 +344,9 @@ public class Icon {
             glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
             Block block = _blockFamily.getArchetypeBlock();
-            block.renderWithLightValue(1.0f);
+            block.renderWithLightValue(1.0f, 1.0f);
 
             GL11.glPopMatrix();
-
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
         }
     }
 

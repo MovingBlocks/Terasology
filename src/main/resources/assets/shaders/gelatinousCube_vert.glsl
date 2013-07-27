@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-uniform float tick;
-
 varying vec3 normal;
-varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
 
 void main()
 {
-	vec4 vertexPos =  ftransform();
+	vec4 vertexProjPos =  ftransform();
     gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_FrontColor = gl_Color;
 
-    vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
+    vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
     normal = gl_NormalMatrix * gl_Normal;
 
-    vertexPos.y += cos(tick * 0.01 + vertexPos.x * 0.1) * sin(tick * 0.01 + vertexPos.x * 0.1 + 0.483921) * 0.25;
+    vertexProjPos.y += cos(tick * 0.01 + vertexProjPos.x * 0.1) * sin(tick * 0.01 + vertexProjPos.x * 0.1 + 0.483921) * 0.25;
 
-    gl_Position = vertexPos;
+    gl_Position = vertexProjPos;
 }

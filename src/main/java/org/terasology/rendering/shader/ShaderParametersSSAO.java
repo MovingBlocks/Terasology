@@ -1,0 +1,142 @@
+/*
+ * Copyright 2013 Moving Blocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.terasology.rendering.shader;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.math.TeraMath;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.procedural.FastRandom;
+
+import javax.vecmath.Vector3f;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
+
+/**
+ * Shader parameters for the Post-processing shader program.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ */
+public class ShaderParametersSSAO extends ShaderParametersBase {
+
+    public static final int SSAO_KERNEL_ELEMENTS = 16;
+    public static final int SSAO_NOISE_SIZE = 4;
+
+    private static final FastRandom rand = new FastRandom(0xD3ADBEEF);
+
+    private float ssaoStrength = 2.0f;
+    private float ssaoRad = 2.0f;
+
+    private FloatBuffer ssaoSamples = null;
+
+    @Override
+    public void initialParameters(Material material) {
+        if (ssaoSamples == null) {
+            ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS * 3);
+
+            for (int i = 0; i < SSAO_KERNEL_ELEMENTS; ++i) {
+                Vector3f vec = new Vector3f();
+                vec.x = rand.randomFloat();
+                vec.y = rand.randomFloat();
+                vec.z = rand.randomPosFloat();
+
+                vec.normalize();
+                vec.scale(rand.randomPosFloat());
+                float scale = i / (float) SSAO_KERNEL_ELEMENTS;
+                scale = TeraMath.lerpf(0.1f, 1.0f, scale * scale);
+
+                vec.scale(scale);
+
+                ssaoSamples.put(vec.x);
+                ssaoSamples.put(vec.y);
+                ssaoSamples.put(vec.z);
+            }
+
+            ssaoSamples.flip();
+        }
+        material.setFloat3("ssaoSamples", ssaoSamples);
+    }
+
+    @Override
+    public void applyParameters(Material program) {
+        super.applyParameters(program);
+
+        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
+
+        int texId = 0;
+
+        if (scene != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            scene.bindDepthTexture();
+            program.setInt("texDepth", texId++, true);
+            GL13.glActiveTexture(GL13.GL_TEXTURE1);
+            scene.bindNormalsTexture();
+            program.setInt("texNormals", texId++, true);
+        }
+
+        Texture ssaoNoiseTexture = updateNoiseTexture();
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
+        program.setInt("texNoise", texId++, true);
+
+        program.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
+
+        if (CoreRegistry.get(WorldRenderer.class) != null) {
+            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            if (activeCamera != null) {
+                program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+                program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+            }
+        }
+    }
+
+    private Texture updateNoiseTexture() {
+        Texture texture = AssetManager.getInstance().tryLoadAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), Texture.class);
+        if (texture == null) {
+            ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
+
+            for (int i = 0; i < SSAO_NOISE_SIZE * SSAO_NOISE_SIZE; ++i) {
+                Vector3f noiseVector = new Vector3f(rand.randomFloat(), rand.randomFloat(), 0.0f);
+                noiseVector.normalize();
+
+                noiseValues.put((byte) ((noiseVector.x * 0.5 + 0.5) * 255.0f));
+                noiseValues.put((byte) ((noiseVector.y * 0.5 + 0.5) * 255.0f));
+                noiseValues.put((byte) ((noiseVector.z * 0.5 + 0.5) * 255.0f));
+                noiseValues.put((byte) 0x0);
+            }
+
+            noiseValues.flip();
+
+            texture = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, new ByteBuffer[]{noiseValues}, Texture.WrapMode.Repeat, Texture.FilterMode.Nearest), Texture.class);
+        }
+        return texture;
+    }
+
+}

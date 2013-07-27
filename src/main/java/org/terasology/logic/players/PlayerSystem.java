@@ -110,7 +110,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
 
             Client clientListener = networkSystem.getOwner(clientEntity);
-            int distance = clientListener.getViewDistance();
+            int distance = clientListener.getViewDistance().getChunkDistance();
             if (!clientListener.isLocal()) {
                 distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
             }
@@ -153,7 +153,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
         } else {
             Client clientListener = networkSystem.getOwner(entity);
-            int distance = clientListener.getViewDistance();
+            int distance = clientListener.getViewDistance().getChunkDistance();
             if (!clientListener.isLocal()) {
                 distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
             }

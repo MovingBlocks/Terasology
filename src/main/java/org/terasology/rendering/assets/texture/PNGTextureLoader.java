@@ -17,11 +17,13 @@
 package org.terasology.rendering.assets.texture;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
+import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
     private static class TextureMetadata {
         Texture.FilterMode filterMode;
         Texture.WrapMode wrapMode;
+        Texture.Type type;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(PNGTextureLoader.class);
@@ -45,7 +48,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
     private Gson gson;
 
     public PNGTextureLoader() {
-        gson = new Gson();
+        gson = new GsonBuilder().registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory()).create();
     }
 
     @Override
@@ -77,6 +80,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
 
             Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
             Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
+            Texture.Type type = Texture.Type.TEXTURE2D;
 
             // TODO: Change asset loader setup so that the default filter mode can be set per asset location
             if (urls.get(0).toString().contains("/fonts/")) {
@@ -85,27 +89,53 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
 
             for (URL url : urls) {
                 if (url.toString().endsWith(".json")) {
-                    InputStreamReader reader = null;
-                    try {
-                        reader = new InputStreamReader(url.openStream());
+                    try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
                         TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
-                        if (metadata.filterMode != null) filterMode = metadata.filterMode;
-                        if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
-                    } finally {
-                        // JAVA7: Replace with new handling
-                        if (reader != null) {
-                            try {
-                                reader.close();
-                            } catch (IOException e) {
-                                logger.error("Error closing {}", url.toString(), e);
-                            }
+                        if (metadata.filterMode != null) {
+                            filterMode = metadata.filterMode;
+                        }
+                        if (metadata.wrapMode != null) {
+                            wrapMode = metadata.wrapMode;
+                        }
+                        if (metadata.type != null) {
+                            type = metadata.type;
                         }
                     }
                     break;
                 }
             }
 
-            return new TextureData(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
+            if (type == Texture.Type.TEXTURE3D) {
+                final int byteLength = 4 * 16 * 16 * 16;
+                final int strideX = 16 * 4;
+                final int strideY = 16 * 16 * 4;
+                final int strideZ = 4;
+
+                if (width % height != 0 || width / height != height) {
+                    throw new RuntimeException("3D texture must be cubic (height^3) - width must thus be a multiple of height");
+                }
+
+                ByteBuffer alignedBuffer = ByteBuffer.allocateDirect(byteLength);
+
+                for (int x = 0; x < height; x++) {
+                    for (int y = 0; y < height; y++) {
+                        for (int z = 0; z < height; z++) {
+                            final int index = x * strideX + z * strideZ + strideY * y;
+
+                            alignedBuffer.put(data.get(index));
+                            alignedBuffer.put(data.get(index + 1));
+                            alignedBuffer.put(data.get(index + 2));
+                            alignedBuffer.put(data.get(index + 3));
+                        }
+                    }
+                }
+
+                alignedBuffer.flip();
+
+                return new TextureData(height, height, height, new ByteBuffer[]{alignedBuffer}, wrapMode, filterMode);
+            } else {
+                return new TextureData(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
+            }
         } finally {
             pngStream.close();
         }

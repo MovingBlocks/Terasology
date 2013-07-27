@@ -19,20 +19,26 @@ package org.terasology.rendering.primitives;
  * @author Immortius
  */
 public enum ChunkVertexFlag {
-    BLOCK_HINT_NORMAL(0),
-    BLOCK_HINT_WATER(1),
-    BLOCK_HINT_LAVA(2),
-    BLOCK_HINT_COLOR_MASK(3),
-    BLOCK_HINT_WAVING(4),
-    BLOCK_HINT_WAVING_BLOCK(5);
+    NORMAL(0, "BLOCK_HINT_NORMAL"),
+    WATER(1, "BLOCK_HINT_WATER"),
+    LAVA(2, "BLOCK_HINT_LAVA"),
+    COLOR_MASK(3, "BLOCK_HINT_GRASS"),
+    WAVING(4, "BLOCK_HINT_WAVING"),
+    WAVING_BLOCK(5, "BLOCK_HINT_WAVING_BLOCK");
 
     private int value;
+    private String defineName;
 
-    private ChunkVertexFlag(int value) {
+    private ChunkVertexFlag(int value, String defineName) {
         this.value = value;
+        this.defineName = defineName;
     }
 
     public int getValue() {
         return value;
+    }
+
+    public String getDefineName() {
+        return defineName;
     }
 }

@@ -78,4 +78,9 @@ public interface Texture extends Asset<TextureData> {
 
     // TODO: This shouldn't be on texture
     int getId();
+
+    public enum Type {
+        TEXTURE2D,
+        TEXTURE3D
+    }
 }

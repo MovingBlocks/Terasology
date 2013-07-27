@@ -24,6 +24,7 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.rendering.world.ViewDistance;
 
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.NetMessage;
@@ -71,7 +72,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler {
     private void receivedConnect(ClientConnectMessage message) {
         if (client.isAwaitingConnectMessage()) {
             client.setName(message.getName());
-            client.setViewDistanceMode(message.getViewDistanceLevel());
+            client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));
             networkSystem.addClient(client);
         }
     }

@@ -123,6 +123,14 @@ public class AssetManager {
         } */
     }
 
+    public <T extends Asset> T tryLoadAsset(AssetUri uri, Class<T> type) {
+        Asset result = loadAsset(uri, false);
+        if (type.isInstance(result)) {
+            return type.cast(result);
+        }
+        return null;
+    }
+
     public Asset tryLoadAsset(AssetUri uri) {
         return loadAsset(uri, false);
     }
@@ -292,6 +300,16 @@ public class AssetManager {
                 return new TypedAssetIterator(type);
             }
         };
+    }
+
+    public <T> Iterable<T> listLoadedAssets(final AssetType type, Class<T> assetClass) {
+        List<T> results = Lists.newArrayList();
+        for (Map.Entry<AssetUri, Asset> entry : assetCache.entrySet()) {
+            if (entry.getKey().getAssetType() == type && assetClass.isInstance(entry.getValue())) {
+                results.add(assetClass.cast(entry.getValue()));
+            }
+        }
+        return results;
     }
 
     public Iterable<String> listModuleNames() {

@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.math.TeraMath;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 

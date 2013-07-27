@@ -18,6 +18,7 @@ package org.terasology.network.events;
 
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
+import org.terasology.rendering.world.ViewDistance;
 
 /**
  * A request for a change of view range - should be sent against the player's client entity.
@@ -27,19 +28,19 @@ import org.terasology.network.ServerEvent;
 @ServerEvent
 public class ChangeViewRangeRequest implements Event {
 
-    private int newViewRange;
+    private ViewDistance newViewRange;
 
     protected ChangeViewRangeRequest() {
     }
 
     /**
-     * @param newRangeMode The view range mode (not distance)
+     * @param viewDistance The view range mode (not distance)
      */
-    public ChangeViewRangeRequest(int newRangeMode) {
-        newViewRange = newRangeMode;
+    public ChangeViewRangeRequest(ViewDistance viewDistance) {
+        newViewRange = viewDistance;
     }
 
-    public int getNewViewRange() {
+    public ViewDistance getNewViewRange() {
         return newViewRange;
     }
 }

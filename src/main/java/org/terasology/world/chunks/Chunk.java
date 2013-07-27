@@ -551,6 +551,15 @@ public class Chunk {
         }
     }
 
+    public void disposeMesh() {
+        if (mesh != null) {
+            for (ChunkMesh chunkMesh : mesh) {
+                chunkMesh.dispose();
+            }
+            mesh = null;
+        }
+    }
+
     public boolean isReady() {
         return ready;
     }

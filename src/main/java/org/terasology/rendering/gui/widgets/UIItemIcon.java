@@ -30,6 +30,14 @@ import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Vector2f;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 /**
  * Displays an item as an icon with an optional stack count.
  */
@@ -129,13 +137,13 @@ public class UIItemIcon extends UIDisplayContainer {
     }
 
     private void renderIcon(Icon icon) {
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glPushMatrix();
-        GL11.glTranslatef(20f, 20f, 0f);
+        glEnable(GL11.GL_DEPTH_TEST);
+        glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        glPushMatrix();
+        glTranslatef(20f, 20f, 0f);
         icon.render();
-        GL11.glPopMatrix();
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        glPopMatrix();
+        glDisable(GL11.GL_DEPTH_TEST);
     }
 
     private void renderBlockIcon(BlockFamily blockFamily) {
@@ -144,28 +152,26 @@ public class UIItemIcon extends UIDisplayContainer {
             return;
         }
 
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glPushMatrix();
+        glEnable(GL11.GL_DEPTH_TEST);
+        glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        glPushMatrix();
 
-        GL11.glTranslatef(20f, 20f, 0f);
+        glTranslatef(20f, 20f, 0f);
 
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPushMatrix();
-        GL11.glTranslatef(4f, 0f, 0f);
+        glTranslatef(4f, 0f, 0f);
         GL11.glScalef(20f, 20f, 20f);
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
         Block block = blockFamily.getArchetypeBlock();
-        block.renderWithLightValue(1.0f);
+        block.renderWithLightValue(1.0f, 1.0f);
 
         GL11.glPopMatrix();
 
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glPopMatrix();
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        glPopMatrix();
+        glDisable(GL11.GL_DEPTH_TEST);
     }
 
 }

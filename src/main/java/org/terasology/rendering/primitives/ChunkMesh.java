@@ -22,7 +22,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.rendering.VertexBufferObjectManager;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -78,7 +78,7 @@ public class ChunkMesh {
     /**
      * Possible rendering types.
      */
-    public enum RENDER_TYPE {
+    public enum RenderType {
         OPAQUE(0),
         TRANSLUCENT(1),
         BILLBOARD(2),
@@ -86,7 +86,7 @@ public class ChunkMesh {
 
         private int meshIndex;
 
-        private RENDER_TYPE(int index) {
+        private RenderType(int index) {
             meshIndex = index;
         }
 
@@ -95,7 +95,7 @@ public class ChunkMesh {
         }
     }
 
-    public enum RENDER_PHASE {
+    public enum RenderPhase {
         OPAQUE,
         ALPHA_REJECT,
         REFRACTIVE,
@@ -232,7 +232,7 @@ public class ChunkMesh {
         }
     }
 
-    public void render(RENDER_PHASE type) {
+    public void render(RenderPhase type) {
         switch (type) {
             case OPAQUE:
                 renderVbo(0);
@@ -277,10 +277,10 @@ public class ChunkMesh {
         return disposed;
     }
 
-    public int triangleCount(RENDER_PHASE phase) {
-        if (phase == RENDER_PHASE.OPAQUE) {
+    public int triangleCount(RenderPhase phase) {
+        if (phase == RenderPhase.OPAQUE) {
             return vertexCount[0] / 3;
-        } else if (phase == RENDER_PHASE.ALPHA_REJECT) {
+        } else if (phase == RenderPhase.ALPHA_REJECT) {
             return (vertexCount[1] + vertexCount[2]) / 3;
         } else {
             return vertexCount[3] / 3;

@@ -18,10 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.assets.material.Material;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -30,24 +27,14 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersGelCube implements IShaderParameters {
-
-    private Texture slimeTex = Assets.getTexture("engine:slime");
+public class ShaderParametersGelCube extends ShaderParametersBase {
 
     @Override
-    public void applyParameters(ShaderProgram program) {
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        WorldRenderer worldRendererd = CoreRegistry.get(WorldRenderer.class);
+    public void applyParameters(Material program) {
+        super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL11.GL_TEXTURE_2D, slimeTex.getId());
-
-        if (localPlayer != null) {
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
-        }
-        if (worldRendererd != null) {
-            program.setFloat("tick", (float) worldRendererd.getTick());
-        }
+        glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:slime").getId());
     }
 
 }

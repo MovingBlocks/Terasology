@@ -18,10 +18,9 @@
 // #define REINHARD_TONEMAP
 // #define BURGESS_TONEMAP
 
-#define EXPOSURE_BIAS 2.0
-
 uniform sampler2D texScene;
 uniform float exposure = 1.0;
+uniform float whitePoint = W;
 
 void main(){
     vec4 color = srgbToLinear(texture2D(texScene, gl_TexCoord[0].xy));
@@ -33,8 +32,8 @@ void main(){
 
 #ifdef UNCHARTED_2_TONEMAP
     color.rgb *= exposure;
-    vec3 adjColor = uncharted2Tonemap(EXPOSURE_BIAS*color.rgb);
-    vec3 whiteScale = 1.0/uncharted2Tonemap(vec3(W));
+    vec3 adjColor = uncharted2Tonemap(color.rgb);
+    vec3 whiteScale = 1.0/uncharted2Tonemap(vec3(whitePoint));
     vec3 finalColor = adjColor*whiteScale;
     color.rgb = finalColor;
 #endif
@@ -46,5 +45,5 @@ void main(){
     color.rgb = finalColor;
 #endif
 
-    gl_FragColor = linearToSrgb(color);
+    gl_FragData[0].rgba = linearToSrgb(color);
 }

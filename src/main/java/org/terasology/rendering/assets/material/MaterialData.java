@@ -22,6 +22,8 @@ import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Immortius
  */
@@ -33,6 +35,7 @@ public class MaterialData implements AssetData {
     private Map<String, Integer> intParams = Maps.newHashMap();
 
     public MaterialData(Shader shader) {
+        checkNotNull(shader);
         this.shader = shader;
     }
 
@@ -71,6 +74,11 @@ public class MaterialData implements AssetData {
     public void setParam(String parmName, int value) {
         this.intParams.put(parmName, value);
     }
+
+    public void setParam(String parmName, boolean value) {
+        this.intParams.put(parmName, (value) ? 1 : 0);
+    }
+
 
     public void setTextureParams(Map<String, Texture> textures) {
         this.textures.clear();

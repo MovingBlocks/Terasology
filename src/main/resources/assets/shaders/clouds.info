@@ -1,6 +1,0 @@
-{
-    "params" : [
-        { "name" : "texture",
-          "type" : "sampler2D" }
-    ]
-}

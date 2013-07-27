@@ -18,7 +18,6 @@ package org.terasology.rendering;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -90,7 +89,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
      * @param lineThickness The thickness of the line
      */
     public void render(float lineThickness) {
-        ShaderManager.getInstance().enableDefault();
+        CoreRegistry.get(ShaderManager.class).enableDefault();
 
         glPushMatrix();
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
@@ -102,7 +101,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
     }
 
     public void renderSolid() {
-        ShaderManager.getInstance().enableDefault();
+        CoreRegistry.get(ShaderManager.class).enableDefault();
 
         glPushMatrix();
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
@@ -114,7 +113,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
     }
 
     public void renderLocally(float lineThickness) {
-        ShaderManager.getInstance().enableDefault();
+        CoreRegistry.get(ShaderManager.class).enableDefault();
 
         if (displayListWire == -1) {
             generateDisplayListWire();
@@ -130,7 +129,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
     }
 
     public void renderSolidLocally() {
-        ShaderManager.getInstance().enableDefault();
+        CoreRegistry.get(ShaderManager.class).enableDefault();
 
         if (displayListSolid == -1) {
             generateDisplayListSolid();

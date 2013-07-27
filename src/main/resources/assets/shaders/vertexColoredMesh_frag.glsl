@@ -19,7 +19,6 @@ uniform sampler2D textureAtlas;
 uniform float light;
 uniform vec3 colorOffset;
 uniform bool textured;
-uniform bool carryingTorch;
 uniform float alpha;
 
 varying vec3 normal;
@@ -29,15 +28,9 @@ void main(){
     vec4 color;
 
     color = gl_Color;
-    float torchlight = 0.0;
-
-    // Apply torchlight
-    if (carryingTorch) {
-        torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)), vertexWorldPos.xyz);
-    }
 
     // Apply light
-    color.rgb *= clamp(light + torchlight, 0.0, 1.0);
+    color.rgb *= clamp(light, 0.0, 1.0);
 
     color.a = alpha;
 

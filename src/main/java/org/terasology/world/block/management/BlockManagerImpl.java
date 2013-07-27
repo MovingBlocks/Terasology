@@ -23,31 +23,25 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.iterator.TObjectShortIterator;
-import gnu.trove.map.TByteObjectMap;
-import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;
-import gnu.trove.map.hash.TByteObjectHashMap;
-import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
-import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.loader.FreeformFamily;
+import org.terasology.world.block.loader.WorldAtlasBuilder;
 
-import javax.vecmath.Vector2f;
-import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -113,7 +107,7 @@ public class BlockManagerImpl extends BlockManager {
 
     public BlockManagerImpl(List<String> registeredBlockFamilies, Map<String, Short> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
-        blockLoader = new BlockLoader(blockFamilyFactoryRegistry);
+        blockLoader = new BlockLoader(blockFamilyFactoryRegistry, new WorldAtlasBuilder(CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution()));
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
         for (BlockFamily family : blockDefinitions.families) {
@@ -411,5 +405,10 @@ public class BlockManagerImpl extends BlockManager {
     @Override
     public Iterable<Block> listRegisteredBlocks() {
         return ImmutableList.copyOf(registeredBlockInfo.get().blocksById.valueCollection());
+    }
+
+    @Override
+    public float getRelativeTileSize() {
+        return ((float) blockLoader.getAtlasBuilder().getTileSize()) / blockLoader.getAtlasBuilder().getAtlasSize();
     }
 }

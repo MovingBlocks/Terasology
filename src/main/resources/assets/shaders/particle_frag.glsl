@@ -17,28 +17,26 @@
 uniform sampler2D textureAtlas;
 
 uniform float light = 1.0;
-uniform float texOffsetX = 0.0;
-uniform float texOffsetY = 0.0;
+uniform vec2 texOffset = vec2(0.0, 0.0);
+uniform vec2 texScale = vec2(1.0, 1.0);
 
-uniform vec3 colorOffset = vec3(1.0, 1.0, 1.0);
+uniform vec4 colorOffset = vec4(1.0, 1.0, 1.0, 1.0);
 
-uniform bool carryingTorch = false;
+varying vec3 normal;
+varying vec4 vertexViewPos;
 
-varying vec4 vertexWorldPos;
+void main() {
+    vec4 color = texture2D(textureAtlas, gl_TexCoord[0].xy * texScale.xy + texOffset.xy);
 
-void main(){
-    vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0].x + texOffsetX , gl_TexCoord[0].y + texOffsetY ));
+#if defined (FEATURE_ALPHA_REJECT)
+    if (color.a < 0.1) {
+        discard;
+    }
+#endif
 
-    float torchlight = 0.0;
+    // Particles are currently renderer using forward rendering
+    color.rgb *= light;
 
-    // Apply torchlight
-    if (carryingTorch)
-        torchlight = calcTorchlight(1.0, vertexWorldPos.xyz);
-
-    color.rgb *= colorOffset.rgb;
-
-    float lightValue = expLightValue(light);
-    color.rgb *= clamp(lightValue + torchlight, 0.0, 1.0);
-
-    gl_FragColor = color;
+    gl_FragData[0].a = color.a * colorOffset.a;
+    gl_FragData[0].rgb = color.rgb * colorOffset.rgb * gl_FragData[0].a;
 }

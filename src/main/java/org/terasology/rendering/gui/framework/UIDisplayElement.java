@@ -23,7 +23,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.gui.animation.Animation;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
@@ -137,7 +137,7 @@ public abstract class UIDisplayElement {
     }
 
     public void renderTransformed() {
-        ShaderManager.getInstance().enableDefault();
+        CoreRegistry.get(ShaderManager.class).enableDefault();
 
         if (isVisible()) {
 

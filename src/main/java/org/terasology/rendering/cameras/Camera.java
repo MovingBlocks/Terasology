@@ -17,31 +17,60 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.math.TeraMath;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * Provides global access to fonts.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+
+/**
+ * Camera base class.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ */
 public abstract class Camera {
 
     /* CAMERA PARAMETERS */
-    protected final Vector3f _position = new Vector3f(0, 0, 0);
-    protected final Vector3f _up = new Vector3f(0, 1, 0);
-    protected final Vector3f _viewingDirection = new Vector3f(1, 0, 0);
+    protected final Vector3f position = new Vector3f(0, 0, 0);
+    protected final Vector3f up = new Vector3f(0, 1, 0);
+    protected final Vector3f viewingDirection = new Vector3f(1, 0, 0);
 
-    protected float _targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
-    protected float _activeFov = _targetFov / 4f;
+    protected float zNear = 0.1f;
+    // TODO: This is too large, but many properties have to be adjusted if it changes
+    protected float zFar = 5000.0f;
+
+    protected float targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
+    protected float activeFov = targetFov / 4f;
 
     /* VIEW FRUSTUM */
-    protected final ViewFrustum _viewFrustum = new ViewFrustum();
+    protected final ViewFrustum viewFrustum = new ViewFrustum();
+    protected final ViewFrustum viewFrustumReflected = new ViewFrustum();
 
-    protected boolean _reflected = false;
+    /* MATRICES */
+    protected Matrix4f projectionMatrix = new Matrix4f();
+    protected Matrix4f inverseProjectionMatrix = new Matrix4f();
+    protected Matrix4f normViewMatrix = new Matrix4f();
+    protected Matrix4f viewMatrix = new Matrix4f();
+    protected Matrix4f viewProjectionMatrix = new Matrix4f();
+    protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f reflectionMatrix = new Matrix4f();
+
+    protected Matrix4f viewMatrixReflected = new Matrix4f();
+    protected Matrix4f normViewMatrixReflected = new Matrix4f();
+
+    /* USED FOR DIRTY CHECKS */
+    protected Vector3f cachedPosition = new Vector3f();
+    protected Vector3f cachedViewigDirection = new Vector3f();
+    protected float cachedFov = 0.0f, cachedZNear = 0.0f, cachedZFar = 0.0f;
+
+    /* ETC */
+    private boolean reflected = false;
 
     /**
      * Applies the projection and modelview matrix.
@@ -49,13 +78,7 @@ public abstract class Camera {
     public void lookThrough() {
         loadProjectionMatrix();
         loadModelViewMatrix();
-
-        if (_reflected) {
-            glTranslatef(0.0f, 2f * ((float) -_position.y + 32f), 0.0f);
-            glScalef(1.0f, -1.0f, 1.0f);
-        }
     }
-
 
     /**
      * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like bobbing) .
@@ -63,72 +86,141 @@ public abstract class Camera {
     public void lookThroughNormalized() {
         loadProjectionMatrix();
         loadNormalizedModelViewMatrix();
+    }
 
-        if (_reflected) {
-            glScalef(1.0f, -1.0f, 1.0f);
+    public void updateFrustum() {
+        if (getViewMatrix() == null || getProjectionMatrix() == null) {
+            return;
         }
+
+        viewFrustum.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrix), TeraMath.matrixToFloatBuffer(projectionMatrix));
+        viewFrustumReflected.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrixReflected), TeraMath.matrixToFloatBuffer(projectionMatrix));
     }
 
-    public abstract void loadProjectionMatrix(float fov);
+    public abstract boolean isBobbingAllowed();
 
-    public void loadProjectionMatrix() {
-        loadProjectionMatrix(_activeFov);
-    }
+    public abstract void loadProjectionMatrix();
 
     public abstract void loadModelViewMatrix();
 
     public abstract void loadNormalizedModelViewMatrix();
 
-    public Vector3f getPosition() {
-        return _position;
-    }
+    public abstract void updateMatrices();
 
-    public Vector3f getViewingDirection() {
-        return _viewingDirection;
-    }
-
-    public Vector3f getUp() {
-        return _up;
-    }
-
-    public ViewFrustum getViewFrustum() {
-        return _viewFrustum;
-    }
+    public abstract void updateMatrices(float fov);
 
     public void update(float delta) {
-        double diff = Math.abs(_activeFov - _targetFov);
+        double diff = Math.abs(activeFov - targetFov);
         if (diff < 1.0) {
-            _activeFov = _targetFov;
+            activeFov = targetFov;
             return;
         }
-        if (_activeFov < _targetFov) {
-            _activeFov += 50.0 * delta;
-            if (_activeFov >= _targetFov) {
-                _activeFov = _targetFov;
+        if (activeFov < targetFov) {
+            activeFov += 50.0 * delta;
+            if (activeFov >= targetFov) {
+                activeFov = targetFov;
             }
-        } else if (_activeFov > _targetFov) {
-            _activeFov -= 50.0 * delta;
-            if (_activeFov <= _targetFov) {
-                _activeFov = _targetFov;
+        } else if (activeFov > targetFov) {
+            activeFov -= 50.0 * delta;
+            if (activeFov <= targetFov) {
+                activeFov = targetFov;
             }
         }
     }
 
     public void extendFov(float fov) {
-        _targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView() + fov;
+        targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView() + fov;
     }
 
     public void resetFov() {
-        _targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
+        targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
     }
 
     public void setReflected(boolean reflected) {
-        _reflected = reflected;
+        this.reflected = reflected;
+    }
+
+    public void updatePrevViewProjectionMatrix() {
+        prevViewProjectionMatrix.set(viewProjectionMatrix);
     }
 
     public float getClipHeight() {
-        if (_reflected)
-            return 31.5f;
-        return 0;
+        return 31.5f;
+    }
+
+    public Matrix4f getViewMatrix() {
+        if (!reflected) {
+            return viewMatrix;
+        }
+
+        return viewMatrixReflected;
+    }
+
+    public Matrix4f getNormViewMatrix() {
+        if (!reflected) {
+            return normViewMatrix;
+        }
+
+        return normViewMatrixReflected;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
+    public Matrix4f getViewProjectionMatrix() {
+        return viewProjectionMatrix;
+    }
+
+    public Matrix4f getInverseProjectionMatrix() {
+        return inverseProjectionMatrix;
+    }
+
+    public Matrix4f getInverseViewProjectionMatrix() {
+        return inverseViewProjectionMatrix;
+    }
+
+    public Matrix4f getPrevViewProjectionMatrix() {
+        return prevViewProjectionMatrix;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public Vector3f getViewingDirection() {
+        return viewingDirection;
+    }
+
+    public Vector3f getUp() {
+        return up;
+    }
+
+    public ViewFrustum getViewFrustum() {
+        return viewFrustum;
+    }
+
+    public ViewFrustum getViewFrustumReflected() {
+        return viewFrustumReflected;
+    }
+
+    public float getzNear() {
+        return zNear;
+    }
+
+    public void setzNear(float zNear) {
+        this.zNear = zNear;
+    }
+
+    public float getzFar() {
+        return zFar;
+    }
+
+    public void setzFar(float zFar) {
+        this.zFar = zFar;
+    }
+
+    public boolean isReflected() {
+        return reflected;
     }
 }

@@ -19,7 +19,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.logic.manager.ShaderManager;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontCharacter;
 import org.terasology.rendering.assets.font.FontData;
@@ -53,7 +54,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         if (isDisposed()) {
             return;
         }
-        ShaderManager.getInstance().enableDefaultTextured();
+        CoreRegistry.get(ShaderManager.class).enableDefaultTextured();
 
         Texture bound = null;
 

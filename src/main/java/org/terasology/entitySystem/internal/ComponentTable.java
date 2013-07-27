@@ -25,7 +25,6 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.Component;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

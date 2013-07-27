@@ -53,12 +53,33 @@ import java.util.List;
 public class WorldAtlasBuilder {
     private static final Logger logger = LoggerFactory.getLogger(WorldAtlasBuilder.class);
 
-    private static final int MAX_TILES = 256;
+    private static final int MAX_TILES = 65536;
+    private static final Color UNIT_Z_COLOR = new Color(0.5f, 0.5f, 1.0f, 1.0f);
+    private static final Color TRANSPARENT_COLOR = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+    private static final Color BLACK_COLOR = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+
+    private int maxAtlasSize = 4096;
     private int atlasSize = 256;
     private int tileSize = 16;
 
-    private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
+    private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<>();
     private List<TileData> tiles = Lists.newArrayList();
+    private List<TileData> tilesNormal = Lists.newArrayList();
+    private List<TileData> tilesHeight = Lists.newArrayList();
+
+    private TileData defaultNormal = null;
+    private TileData defaultHeight = null;
+
+    /**
+     * @param maxAtlasSize The maximum dimensions of the atlas (both width and height, in pixels)
+     */
+    public WorldAtlasBuilder(int maxAtlasSize) {
+        this.maxAtlasSize = maxAtlasSize;
+    }
+
+    public int getTileSize() {
+        return tileSize;
+    }
 
     public int getAtlasSize() {
         return atlasSize;
@@ -69,12 +90,36 @@ public class WorldAtlasBuilder {
     }
 
     public void buildAtlas() {
+        calculateAtlasSizes();
+
         int numMipMaps = getNumMipmaps();
+        ByteBuffer[] data = createAtlasMipmaps(numMipMaps, TRANSPARENT_COLOR, tiles, "tiles.png");
+        ByteBuffer[] dataNormal = createAtlasMipmaps(numMipMaps, UNIT_Z_COLOR, tilesNormal, "tilesNormal.png");
+        ByteBuffer[] dataHeight = createAtlasMipmaps(numMipMaps, BLACK_COLOR, tilesHeight, "tilesHeight.png");
+
+        TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
+
+        TextureData terrainNormalData = new TextureData(atlasSize, atlasSize, dataNormal, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainNorm = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainNormal"), terrainNormalData, Texture.class);
+
+        TextureData terrainHeightData = new TextureData(atlasSize, atlasSize, dataHeight, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainHeight = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainHeight"), terrainHeightData, Texture.class);
+
+        MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));
+        terrainMatData.setParam("textureAtlas", terrainTex);
+        terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
+        terrainMatData.setParam("textured", true);
+        Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
+        Util.checkGLError();
+    }
+
+    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<TileData> tilesToImage, String screenshotName) {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
-            BufferedImage image = generateAtlas(i);
+            BufferedImage image = generateAtlas(i, tilesToImage, initialColor);
             if (i == 0) {
-                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve("tiles.png")))) {
+                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
                     ImageIO.write(image, "png", stream);
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
@@ -92,23 +137,40 @@ public class WorldAtlasBuilder {
                 logger.error("Failed to create atlas texture");
             }
         }
-
-        Util.checkGLError();
-        TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
-        Util.checkGLError();
-        Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
-        Util.checkGLError();
-        MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));
-        Util.checkGLError();
-        terrainMatData.setParam("textureAtlas", terrainTex);
-        terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
-        terrainMatData.setParam("textured", 1);
-        Util.checkGLError();
-        Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
-        Util.checkGLError();
+        return data;
     }
 
-    private BufferedImage generateAtlas(int mipMapLevel) {
+    // The atlas is configured using the following constraints...
+    // 1.   The overall tile size is the size of the largest tile loaded
+    // 2.   The atlas will never be larger than 4096*4096 px
+    // 3.   The tile size gets adjusted if the tiles won't fit into the atlas using the overall tile size
+    //      (the tile size gets halved until all tiles will fit into the atlas)
+    // 4.   The size of the atlas is always a power of two - as is the tile size
+    private void calculateAtlasSizes() {
+        tileSize = 16;
+        for (TileData tile : tiles) {
+            if (tile.getImage().getWidth() > tileSize) {
+                tileSize = tile.getImage().getWidth();
+            }
+        }
+
+        atlasSize = 1;
+        while (atlasSize * atlasSize < tiles.size()) {
+            atlasSize *= 2;
+        }
+        atlasSize = atlasSize * tileSize;
+
+        if (atlasSize > maxAtlasSize) {
+            atlasSize = maxAtlasSize;
+            int maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+            while (maxTiles < tiles.size()) {
+                tileSize >>= 1;
+                maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
+            }
+        }
+    }
+
+    private BufferedImage generateAtlas(int mipMapLevel, List<TileData> tiles, Color clearColor) {
         int size = atlasSize / (1 << mipMapLevel);
         int textureSize = tileSize / (1 << mipMapLevel);
         int tilesPerDim = atlasSize / tileSize;
@@ -116,16 +178,15 @@ public class WorldAtlasBuilder {
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
 
-        if (tiles.size() > MAX_TILES) {
-            logger.error("Too many tiles, culling overflow");
-        }
-
-        for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
-            TileData tile = tiles.get(index);
-
+        g.setColor(clearColor);
+        g.fillRect(0, 0, size, size);
+        for (int index = 0; index < tiles.size(); ++index) {
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
-            g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+            TileData tile = tiles.get(index);
+            if (tile != null) {
+                g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+            }
         }
 
         return result;
@@ -161,15 +222,51 @@ public class WorldAtlasBuilder {
     }
 
     private int indexTile(AssetUri uri, boolean warnOnError) {
+        if (tiles.size() == MAX_TILES) {
+            logger.error("Maximum tiles exceeded");
+            return 0;
+        }
         TileData tile = AssetManager.tryLoadAssetData(uri, TileData.class);
         if (tile != null) {
-            int index = tiles.size();
-            tiles.add(tile);
-            tileIndexes.put(uri, index);
-            return index;
+            if (checkTile(tile)) {
+                int index = tiles.size();
+                tiles.add(tile);
+                addNormal(uri);
+                addHeightMap(uri);
+                tileIndexes.put(uri, index);
+                return index;
+            } else {
+                logger.error("Invalid tile {}, must be a square with power-of-two sides.", uri);
+                return 0;
+            }
         } else if (warnOnError) {
             logger.warn("Unable to resolve block tile '{}'", uri);
         }
         return 0;
+    }
+
+    private boolean checkTile(TileData tile) {
+        return tile.getImage().getWidth() == tile.getImage().getHeight()
+                && TeraMath.isPowerOfTwo(tile.getImage().getWidth());
+    }
+
+    private void addNormal(AssetUri uri) {
+        String name = uri.getSimpleString() + "Normal";
+        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        if (tile != null) {
+            tilesNormal.add(tile);
+        } else {
+            tilesNormal.add(defaultNormal);
+        }
+    }
+
+    private void addHeightMap(AssetUri uri) {
+        String name = uri.getSimpleString() + "Height";
+        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        if (tile != null) {
+            tilesHeight.add(tile);
+        } else {
+            tilesHeight.add(defaultHeight);
+        }
     }
 }

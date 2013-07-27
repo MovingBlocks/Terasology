@@ -78,10 +78,11 @@ public class BlockLoader implements BlockBuilderHelper {
     private BlockShape loweredShape;
     private BlockShape trimmedLoweredShape;
 
-    private WorldAtlasBuilder atlasBuilder = new WorldAtlasBuilder();
+    private final WorldAtlasBuilder atlasBuilder;
     private BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
-    public BlockLoader(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+    public BlockLoader(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, WorldAtlasBuilder atlasBuilder) {
+        this.atlasBuilder = atlasBuilder;
         parser = new JsonParser();
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())

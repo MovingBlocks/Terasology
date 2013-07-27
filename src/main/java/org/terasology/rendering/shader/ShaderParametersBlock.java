@@ -18,8 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -29,14 +28,18 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersBlock implements IShaderParameters {
+// TODO: Put these values in a material and use that.
+public class ShaderParametersBlock extends ShaderParametersBase {
 
     public ShaderParametersBlock() {
     }
 
     @Override
-    public void applyParameters(ShaderProgram program) {
+    public void applyParameters(Material program) {
+        super.applyParameters(program);
+
         Texture terrainTex = Assets.getTexture("engine:terrain");
+
         if (terrainTex == null) {
             return;
         }
@@ -44,12 +47,9 @@ public class ShaderParametersBlock implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
-
-        program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
-        program.setInt("textured", 1);
-        program.setFloat("alpha", 1f);
+        program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f, true);
+        program.setBoolean("textured", true, true);
+        program.setFloat("alpha", 1.0f, true);
     }
 
 }

@@ -54,6 +54,7 @@ import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
+import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -104,7 +105,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private boolean awaitingConnectMessage = true;
     private String name = "Unknown";
     private long lastReceivedTime = 0;
-    private int viewDistance = 0;
+    private ViewDistance viewDistance = ViewDistance.NEAR;
     private float chunkSendCounter = 1.0f;
 
     private float chunkSendRate = 0.05469f;
@@ -330,17 +331,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public int getViewDistance() {
-        switch (viewDistance) {
-            case 1:
-                return config.getRendering().getViewDistanceModerate();
-            case 2:
-                return config.getRendering().getViewDistanceFar();
-            case 3:
-                return config.getRendering().getViewDistanceUltra();
-            default:
-                return config.getRendering().getViewDistanceNear();
-        }
+    public ViewDistance getViewDistance() {
+        return viewDistance;
     }
 
     @Override
@@ -507,8 +499,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         return metricSource;
     }
 
-    public void setViewDistanceMode(int newViewRange) {
-        this.viewDistance = newViewRange;
+    public void setViewDistanceMode(ViewDistance distanceMode) {
+        this.viewDistance = distanceMode;
     }
 
     public void blockFamilyRegistered(BlockFamily family) {

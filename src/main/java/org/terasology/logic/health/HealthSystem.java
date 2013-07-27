@@ -191,8 +191,6 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
     public void onCrash(HorizontalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
 
-        logger.info("Horizontal hit: {}", event.getVelocity());
-
         Vector3f vel = new Vector3f(event.getVelocity());
         vel.y = 0;
         float speed = vel.length();

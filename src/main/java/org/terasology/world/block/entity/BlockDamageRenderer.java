@@ -25,9 +25,10 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -91,13 +92,18 @@ public class BlockDamageRenderer implements RenderSystem {
             return;
         }
 
-        ShaderManager.getInstance().enableDefaultTextured();
+        Material defaultTextured = Assets.getMaterial("engine:defaultTextured");
+        defaultTextured.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        defaultTextured.enable();
+
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
+
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.getEntitiesWith(BlockDamagedComponent.class, HealthComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(HealthComponent.class, BlockComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth == health.maxHealth) {
                 continue;
@@ -115,7 +121,10 @@ public class BlockDamageRenderer implements RenderSystem {
                 renderHealth(blockPos, health, cameraPosition);
             }
         }
+
         glDisable(GL11.GL_BLEND);
+
+        defaultTextured.removeFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
     private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
@@ -147,10 +156,14 @@ public class BlockDamageRenderer implements RenderSystem {
     }
 
     @Override
+    public void renderShadows() {
+    }
+
+    @Override
     public void renderOpaque() {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
     }
 }

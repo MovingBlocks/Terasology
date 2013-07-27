@@ -17,6 +17,8 @@ package org.terasology.engine.modes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.TeraOVR;
+import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
@@ -35,6 +37,8 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
+import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 
@@ -81,10 +85,25 @@ public class StateIngame implements GameState {
         networkSystem = CoreRegistry.get(NetworkSystem.class);
 
         guiManager.openWindow(MenuControlSystem.HUD);
+
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+                && OculusVrHelper.isNativeLibraryLoaded()) {
+
+            logger.info("Trying to initialize Oculus SDK...");
+            TeraOVR.initSDK();
+
+            logger.info("Updating Oculus projection parameters from device...");
+            OculusVrHelper.updateFromDevice();
+        }
     }
 
     @Override
     public void dispose() {
+        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport() && OculusVrHelper.isNativeLibraryLoaded()) {
+            logger.info("Shutting down Oculus SDK...");
+            TeraOVR.clear();
+        }
+
         boolean save = networkSystem.getMode().isAuthority();
         networkSystem.shutdown();
         // TODO: Shutdown background threads
@@ -127,7 +146,7 @@ public class StateIngame implements GameState {
 
     @Override
     public void handleInput(float delta) {
-        cameraTargetSystem.update();
+        cameraTargetSystem.update(delta);
         inputSystem.update(delta);
     }
 
@@ -140,7 +159,12 @@ public class StateIngame implements GameState {
         glLoadIdentity();
 
         if (worldRenderer != null) {
-            worldRenderer.render();
+            if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.MONO);
+            } else {
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE);
+                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_RIGHT_EYE);
+            }
         }
 
         /* UI */

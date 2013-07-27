@@ -26,11 +26,13 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
+import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -91,15 +93,7 @@ public class DebugControlSystem implements ComponentSystem {
         if (debugEnabled) {
             switch (event.getKey()) {
                 case Keyboard.KEY_R:
-                    worldRenderer.setWireframe(!worldRenderer.isWireframe());
-                    event.consume();
-                    break;
-                case Keyboard.KEY_P:
-                    worldRenderer.setCameraMode(WorldRenderer.CAMERA_MODE.PLAYER);
-                    event.consume();
-                    break;
-                case Keyboard.KEY_O:
-                    worldRenderer.setCameraMode(WorldRenderer.CAMERA_MODE.SPAWN);
+                    config.getRendering().getDebug().setWireframe(!config.getRendering().getDebug().isWireframe());
                     event.consume();
                     break;
                 case Keyboard.KEY_K:
@@ -110,6 +104,19 @@ public class DebugControlSystem implements ComponentSystem {
                         element.setVisible(!element.isVisible());
                     }
 
+                    event.consume();
+                    break;
+                case Keyboard.KEY_F6:
+                    config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
+                    event.consume();
+                    break;
+                case Keyboard.KEY_F7:
+                    config.getRendering().getDebug().cycleStage();
+                    entity.send(new ConsoleMessageEvent("Set debug stage to: " + config.getRendering().getDebug().getStage()));
+                    event.consume();
+                    break;
+                case Keyboard.KEY_F8:
+                    config.getSystem().setRenderChunkBoundingBoxes(!config.getSystem().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
             }
@@ -129,10 +136,11 @@ public class DebugControlSystem implements ComponentSystem {
                 metrics.toggleMode();
                 event.consume();
                 break;
+
         }
     }
 
     private void toggleViewingDistance() {
-        config.getRendering().setActiveViewDistanceMode((config.getRendering().getActiveViewDistanceMode() + 1) % 4);
+        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
     }
 }

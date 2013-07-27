@@ -18,13 +18,13 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Time;
-import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.rendering.opengl.DefaultRenderingProcess;
+
+import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -33,51 +33,114 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersChunk implements IShaderParameters {
-    private Texture lava = Assets.getTexture("engine:custom_lava_still");
-    private Texture water = Assets.getTexture("engine:water_normal");
-    private Texture effects = Assets.getTexture("engine:effects");
+public class ShaderParametersChunk extends ShaderParametersBase {
+    float waveIntens = 1.5f;
+    float waveIntensFalloff = 0.85f;
+    float waveSize = 0.1f;
+    float waveSizeFalloff = 1.25f;
+    float waveSpeed = 0.1f;
+    float waveSpeedFalloff = 0.95f;
 
-    public void applyParameters(ShaderProgram program) {
+    float waveOverallScale = 1.0f;
+
+    float waterRefraction = 0.04f;
+    float waterFresnelBias = 0.01f;
+    float waterFresnelPow = 2.5f;
+    float waterNormalBias = 25.0f;
+    float waterTint = 0.24f;
+
+    float waterOffsetY = 0.0f;
+
+    float waterSpecExp = 512.0f;
+
+    float parallaxBias = 0.05f;
+    float parallaxScale = 0.05f;
+
+    public void applyParameters(Material program) {
+        super.applyParameters(program);
+
         Texture terrain = Assets.getTexture("engine:terrain");
-        if (terrain == null) {
+        Texture terrainNormal = Assets.getTexture("engine:terrainNormal");
+        Texture terrainHeight = Assets.getTexture("engine:terrainHeight");
+
+        Texture water = Assets.getTexture("engine:waterStill");
+        Texture lava = Assets.getTexture("engine:lavaStill");
+        Texture waterNormal = Assets.getTexture("engine:waterNormal");
+        Texture waterNormalAlt = Assets.getTexture("engine:waterNormalAlt");
+        Texture effects = Assets.getTexture("engine:effects");
+
+        if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
             return;
         }
 
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        Time time = CoreRegistry.get(Time.class);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE4);
-        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
+        program.setInt("textureAtlas", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
+        program.setInt("textureWater", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
+        program.setInt("textureLava", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.getId());
+        program.setInt("textureWaterNormal", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.getId());
+        program.setInt("textureWaterNormalAlt", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
+        program.setInt("textureEffects", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneReflected");
+        program.setInt("textureWaterReflection", texId++, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
+        program.setInt("texSceneOpaque", texId++, true);
 
-        program.setInt("textureLava", 1);
-        program.setInt("textureWaterNormal", 2);
-        program.setInt("textureEffects", 3);
-        program.setInt("textureWaterReflection", 4);
-        program.setInt("textureAtlas", 0);
+        if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.getId());
+            program.setInt("textureAtlasNormal", texId++, true);
 
-        program.setFloat("blockScale", 1.0f);
-
-        if (worldRenderer != null) {
-            program.setFloat("daylight", (float) worldRenderer.getDaylight());
-            program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
+            if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()) {
+                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+                glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.getId());
+                program.setInt("textureAtlasHeight", texId++, true);
+            }
         }
 
-        if (localPlayer != null) {
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
+        Vector4f lightingSettingsFrag = new Vector4f();
+        lightingSettingsFrag.z = waterSpecExp;
+        program.setFloat4("lightingSettingsFrag", lightingSettingsFrag, true);
+
+        Vector4f waterSettingsFrag = new Vector4f();
+        waterSettingsFrag.x = waterNormalBias;
+        waterSettingsFrag.y = waterRefraction;
+        waterSettingsFrag.z = waterFresnelBias;
+        waterSettingsFrag.w = waterFresnelPow;
+        program.setFloat4("waterSettingsFrag", waterSettingsFrag, true);
+
+        Vector4f alternativeWaterSettingsFrag = new Vector4f();
+        alternativeWaterSettingsFrag.x = waterTint;
+        program.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag, true);
+
+        if (CoreRegistry.get(Config.class).getRendering().isAnimateWater()) {
+            program.setFloat("waveIntensFalloff", waveIntensFalloff, true);
+            program.setFloat("waveSizeFalloff", waveSizeFalloff, true);
+            program.setFloat("waveSize", waveSize, true);
+            program.setFloat("waveSpeedFalloff", waveSpeedFalloff, true);
+            program.setFloat("waveSpeed", waveSpeed, true);
+            program.setFloat("waveIntens", waveIntens, true);
+            program.setFloat("waterOffsetY", waterOffsetY, true);
+            program.setFloat("waveOverallScale", waveOverallScale, true);
         }
 
-        if (time != null) {
-            program.setFloat("time", worldRenderer.getWorldProvider().getTime().getDays());
+        if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()
+                && CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
+            program.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
     }
+
 }

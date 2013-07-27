@@ -22,9 +22,11 @@ public interface RenderSystem extends ComponentSystem {
 
     public void renderOpaque();
 
-    public void renderTransparent();
+    public void renderAlphaBlend();
 
     public void renderOverlay();
 
     public void renderFirstPerson();
+
+    public void renderShadows();
 }

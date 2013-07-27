@@ -24,6 +24,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.chunks.Chunk;
 
 /**
@@ -75,8 +76,8 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public int getViewDistance() {
-        return config.getRendering().getActiveViewingDistance();
+    public ViewDistance getViewDistance() {
+        return config.getRendering().getViewDistance();
     }
 
     @Override
@@ -85,7 +86,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public void setViewDistanceMode(int newViewRange) {
+    public void setViewDistanceMode(ViewDistance newViewRange) {
         // Handled by Configuration change
     }
 

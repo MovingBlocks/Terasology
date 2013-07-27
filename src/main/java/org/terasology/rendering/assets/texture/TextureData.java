@@ -29,12 +29,41 @@ public class TextureData implements AssetData {
 
     private int width;
     private int height;
+    private int depth = 1;
     private Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
     private Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
+    private Texture.Type type = Texture.Type.TEXTURE2D;
     private ByteBuffer[] data;
 
-    public TextureData(int width, int height, ByteBuffer data, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
-        this(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
+    public TextureData(int width, int height, int depth, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.wrapMode = wrapMode;
+        this.filterMode = filterMode;
+        this.type = Texture.Type.TEXTURE3D;
+        this.data = Arrays.copyOf(mipmaps, mipmaps.length);
+
+        if (width <= 0 || height <= 0 || depth <= 0) {
+            throw new IllegalArgumentException("Width, height and depth must be positive");
+        }
+        if (mipmaps.length == 0) {
+            throw new IllegalArgumentException("Must supply at least one mipmap");
+        }
+        if (mipmaps[0].limit() != width * height * depth * BYTES_PER_PIXEL) {
+            throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height * depth)");
+        }
+        if (mipmaps.length > 1 && !(TeraMath.isPowerOfTwo(width) && TeraMath.isPowerOfTwo(height) && TeraMath.isPowerOfTwo(depth))) {
+            throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
+        }
+        for (int i = 1; i < mipmaps.length; ++i) {
+            int mipWidth = width >> i;
+            int mipHeight = height >> i;
+            int mipDepth = depth >> i;
+            if (mipWidth * mipHeight * mipDepth * BYTES_PER_PIXEL != mipmaps[i].limit()) {
+                throw new IllegalArgumentException("Mipmap has wrong dimensions");
+            }
+        }
     }
 
     public TextureData(int width, int height, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
@@ -43,6 +72,7 @@ public class TextureData implements AssetData {
         this.wrapMode = wrapMode;
         this.filterMode = filterMode;
         this.data = Arrays.copyOf(mipmaps, mipmaps.length);
+        this.type = Texture.Type.TEXTURE2D;
 
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Width and height must be positive");
@@ -71,6 +101,14 @@ public class TextureData implements AssetData {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public Texture.Type getType() {
+        return type;
     }
 
     public Texture.WrapMode getWrapMode() {

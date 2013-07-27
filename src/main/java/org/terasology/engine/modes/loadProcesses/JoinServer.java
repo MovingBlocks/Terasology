@@ -64,7 +64,7 @@ public class JoinServer implements LoadProcess {
 
             Map<String, Short> blockMap = Maps.newHashMap();
             for (int i = 0; i < serverInfo.getBlockIdCount(); ++i) {
-                blockMap.put(serverInfo.getBlockName(i), (short)serverInfo.getBlockId(i));
+                blockMap.put(serverInfo.getBlockName(i), (short) serverInfo.getBlockId(i));
             }
             gameManifest.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
             gameManifest.setBlockIdMap(blockMap);

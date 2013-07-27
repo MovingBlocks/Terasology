@@ -19,6 +19,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
@@ -27,9 +28,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -153,8 +153,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         particle.position.z += particle.velocity.z * delta;
     }
 
-    public void renderTransparent() {
-        ShaderManager.getInstance().enableShader("particle");
+    public void renderAlphaBlend() {
+        Assets.getMaterial("engine:particle").enable();
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -220,13 +220,13 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             displayLists.put(blockType, displayList);
         }
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
+        Material shader = Assets.getMaterial("engine:particle");
 
         Vector4f color = blockType.getArchetypeBlock().calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
-        shader.setFloat3("colorOffset", color.x, color.y, color.z);
-        shader.setFloat("texOffsetX", particle.texOffset.x);
-        shader.setFloat("texOffsetY", particle.texOffset.y);
-        shader.setFloat("light", light);
+        shader.setFloat3("colorOffset", color.x, color.y, color.z, true);
+        shader.setFloat("texOffsetX", particle.texOffset.x, true);
+        shader.setFloat("texOffsetY", particle.texOffset.y, true);
+        shader.setFloat("light", light, true);
 
         glCallList(displayList);
     }
@@ -250,13 +250,19 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
     }
 
+    @Override
     public void renderOpaque() {
     }
 
+    @Override
     public void renderOverlay() {
     }
 
+    @Override
     public void renderFirstPerson() {
+    }
 
+    @Override
+    public void renderShadows() {
     }
 }

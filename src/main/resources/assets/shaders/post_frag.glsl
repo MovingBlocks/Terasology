@@ -15,80 +15,113 @@
  */
 
 uniform sampler2D texScene;
-uniform sampler2D texBloom;
-#ifndef NO_BLUR
-uniform sampler2D texBlur;
-#endif
-uniform sampler2D texVignette;
 uniform sampler2D texDepth;
 
-uniform bool swimming;
+// TODO: Move me some place else
+#define COLOR_GRADING
 
-#if 0
-uniform float fogIntensity = 0.1;
-uniform float fogLinearIntensity = 0.1;
+#ifdef COLOR_GRADING
+uniform sampler3D texColorGradingLut;
 #endif
 
-uniform float viewingDistance;
+#if !defined (NO_BLUR)
+uniform sampler2D texBlur;
+uniform float blurFocusDistance;
+uniform float blurStart;
+uniform float blurLength;
+#endif
 
-#define Z_NEAR 0.1
-#define BLUR_START 0.6
-#define BLUR_LENGTH 0.05
+#ifdef FILM_GRAIN
+uniform sampler2D texNoise;
 
-float linDepth() {
-    float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
-    return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - z * (viewingDistance - Z_NEAR));
-}
+uniform vec2 noiseSize;
+uniform vec2 renderTargetSize;
+
+uniform float noiseOffset;
+uniform float grainIntensity;
+#endif
+
+#ifdef MOTION_BLUR
+uniform mat4 invViewProjMatrix;
+uniform mat4 prevViewProjMatrix;
+#endif
 
 void main() {
-#ifndef NO_BLUR
+#if !defined (NO_BLUR)
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
-    float depth = linDepth();
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
 
 #ifndef NO_BLUR
+    float depthLin = linDepthViewingDistance(currentDepth);
     float blur = 0.0;
 
-    if (depth > BLUR_START && !swimming)
-       blur = clamp((depth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
-    else if (swimming)
+    float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;
+    if (depthLin > finalBlurStart && !swimming) {
+       blur = clamp((depthLin - finalBlurStart) / blurLength, 0.0, 1.0);
+    } else if (swimming) {
        blur = 1.0;
+    }
 #endif
 
-    /* COLOR AND BLOOM */
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
-    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
 
-    color = clamp(color + colorBloom, 0.0, 1.0);
-#ifndef NO_BLUR
-    colorBlur = clamp(colorBlur , 0.0, 1.0);
+#if defined (MOTION_BLUR)
+    vec4 screenSpaceNorm = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth, 1.0);
+    vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
 #endif
 
-    /* FINAL MIX */
+#ifdef MOTION_BLUR
+    vec4 worldSpacePos = invViewProjMatrix * screenSpacePos;
+    vec4 normWorldSpacePos = worldSpacePos / worldSpacePos.w;
+    vec4 prevScreenSpacePos = prevViewProjMatrix * normWorldSpacePos;
+    prevScreenSpacePos /= prevScreenSpacePos.w;
+
+    vec2 velocity = (screenSpacePos.xy - prevScreenSpacePos.xy) / 16.0;
+    velocity = clamp(velocity, vec2(-0.025), vec2(0.025));
+
+    vec2 blurTexCoord = gl_TexCoord[0].xy;
+    blurTexCoord += velocity;
+    for(int i = 1; i < MOTION_BLUR_SAMPLES; ++i, blurTexCoord += velocity)
+    {
+      vec4 currentColor = texture2D(texScene, blurTexCoord);
+# ifndef NO_BLUR
+      vec4 currentColorBlur = texture2D(texBlur, blurTexCoord);
+# endif
+
+      color += currentColor;
+# ifndef NO_BLUR
+      colorBlur += currentColorBlur;
+# endif
+    }
+
+    color /= MOTION_BLUR_SAMPLES;
+# ifndef NO_BLUR
+    colorBlur /= MOTION_BLUR_SAMPLES;
+# endif
+#endif
+
 #ifndef NO_BLUR
     vec4 finalColor = mix(color, colorBlur, blur);
 #else
     vec4 finalColor = color;
 #endif
 
-#if 0
-    if (fogIntensity > 0.0 || fogLinearIntensity > 0.0) {
-        float fogDensity = depth * fogIntensity;
-        float fog = clamp((1.0 - 1.0 / pow(2.71828, fogDensity * fogDensity)) + depth * fogLinearIntensity, 0.0, 1.0);
-        finalColor = mix(finalColor, vec4(1.0), fog);
-    }
+#ifdef FILM_GRAIN
+    vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
+    finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0f, 1.0f);
 #endif
 
-    /* VIGNETTE */
-    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
+    // In the case the color is > 1.0 or < 0.0 despite tonemapping
+    finalColor.rgb = clamp(finalColor.rgb, 0.0, 1.0);
 
-    if (!swimming) {
-        finalColor.rgb *= vig;
-    } else {
-        finalColor.rgb *= vig * vig * vig;
-        finalColor.rgb *= vec3(0.1, 0.2, 0.2);
-    }
+#ifdef COLOR_GRADING
+    vec3 lutScale = vec3(15.0 / 16.0);
+    vec3 lutOffset = vec3(1.0 / 32.0);
 
-    gl_FragColor = finalColor;
+    finalColor.rgb = texture3D(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
+#endif
+
+    gl_FragData[0].rgba = finalColor;
 }

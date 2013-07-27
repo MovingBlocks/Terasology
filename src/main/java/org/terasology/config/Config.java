@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.input.Input;
+import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.MultimapHandler;
 
@@ -170,6 +171,7 @@ public final class Config {
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
+                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .setPrettyPrinting().create();
     }
 

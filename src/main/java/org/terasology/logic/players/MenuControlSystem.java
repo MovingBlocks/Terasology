@@ -31,7 +31,7 @@ import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
 /**
  * @author Immortius
@@ -84,7 +84,7 @@ public class MenuControlSystem implements ComponentSystem {
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey()) {
             case Keyboard.KEY_F12:
-                CoreRegistry.get(WorldRenderer.class).printScreen();
+                DefaultRenderingProcess.getInstance().takeScreenshot();
                 break;
         }
     }

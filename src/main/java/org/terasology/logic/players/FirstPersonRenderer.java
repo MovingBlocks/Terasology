@@ -33,20 +33,18 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.TeraMath;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
@@ -55,14 +53,7 @@ import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_GREATER;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glAlphaFunc;
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
@@ -111,7 +102,7 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     @Override
-    public void renderTransparent() {
+    public void renderAlphaBlend() {
 
     }
 
@@ -144,14 +135,21 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     @Override
+    public void renderShadows() {
+    }
+
+    @Override
     public void renderOverlay() {
 
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        Material shader = Assets.getMaterial("engine:block");
+        shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+
         shader.enable();
-        shader.setFloat("light", worldRenderer.getRenderingLightValue());
+        shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
+        shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
         glBindTexture(GL11.GL_TEXTURE_2D, handTex.getId());
 
         glPushMatrix();
@@ -164,14 +162,20 @@ public class FirstPersonRenderer implements RenderSystem {
         handMesh.render();
 
         glPopMatrix();
+
+        shader.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        Material shader = Assets.getMaterial("engine:block");
+        shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+
         shader.enable();
 
-        shader.setInt("textured", 0);
-        shader.setFloat("light", worldRenderer.getRenderingLightValue());
+        shader.setBoolean("textured", false, true);
+
+        shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
+        shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
 
         glPushMatrix();
 
@@ -180,6 +184,7 @@ public class FirstPersonRenderer implements RenderSystem {
         glRotatef(-20f, 1.0f, 0.0f, 0.0f);
         glRotatef(-80f, 0.0f, 1.0f, 0.0f);
         glRotatef(45f, 0.0f, 0.0f, 1.0f);
+        glScalef(0.75f, 0.75f, 0.75f);
 
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
@@ -191,6 +196,8 @@ public class FirstPersonRenderer implements RenderSystem {
         itemMesh.render();
 
         glPopMatrix();
+
+        shader.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
@@ -198,36 +205,32 @@ public class FirstPersonRenderer implements RenderSystem {
         Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        Material shader = Assets.getMaterial("engine:block");
+        shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+
         shader.enable();
-
-        // Apply biome and overall color offset
-        Vector4f color = activeBlock.calcColorOffsetFor(BlockPart.CENTER, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
-        shader.setFloat3("colorOffset", color.x, color.y, color.z);
-
-        glEnable(GL11.GL_BLEND);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glAlphaFunc(GL_GREATER, 0.1f);
-        if (activeBlock.isTranslucent()) {
-            glEnable(GL11.GL_ALPHA_TEST);
-        }
 
         glPushMatrix();
 
         glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
         glRotatef(-25f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
-        glTranslatef(0f, 0.25f, 0f);
+        glTranslatef(0f, 0.1f, 0f);
+        glScalef(0.75f, 0.75f, 0.75f);
 
-        activeBlock.renderWithLightValue(worldRenderer.getRenderingLightValue());
+        float blockLight = worldRenderer.getBlockLightValue();
+        float sunlight = worldRenderer.getSunlightValue();
+
+        //  Blocks with a luminance > 0.0 shouldn't be affected by block light
+        if (blockFamily.getArchetypeBlock().getLuminance() > 0.0) {
+            blockLight = 1.0f;
+        }
+
+        activeBlock.renderWithLightValue(sunlight, blockLight);
 
         glPopMatrix();
 
-        if (activeBlock.isTranslucent()) {
-            glDisable(GL11.GL_ALPHA_TEST);
-        }
-        glDisable(GL11.GL_BLEND);
+        shader.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude) {
