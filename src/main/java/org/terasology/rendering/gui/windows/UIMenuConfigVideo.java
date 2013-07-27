@@ -66,10 +66,11 @@ public class UIMenuConfigVideo extends UIWindow {
         public void click(UIDisplayElement element, int button) {
             UIStateButton b = (UIStateButton) element;
 
-            if (button == 0)
+            if (button == 0) {
                 b.nextState();
-            else if (button == 1)
+            } else if (button == 1) {
                 b.previousState();
+            }
         }
     };
 
@@ -258,10 +259,11 @@ public class UIMenuConfigVideo extends UIWindow {
                 UIStateButton button = (UIStateButton) element;
                 TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
 
-                if (button.getState() == 0)
+                if (button.getState() == 0) {
                     te.setFullscreen(false);
-                else
+                } else {
                     te.setFullscreen(true);
+                }
             }
         };
         fullscreenButton.addState("Fullscreen: Off", fullscreenStateAction);
@@ -369,14 +371,15 @@ public class UIMenuConfigVideo extends UIWindow {
         viewingDistanceButton.setState(config.getRendering().getViewDistance().getIndex());
         blurIntensityButton.setState(config.getRendering().getBlurIntensity());
 
-        if (config.getRendering().isAnimateWater())
+        if (config.getRendering().isAnimateWater()) {
             graphicsQualityButton.setState(3);
-        else if (config.getRendering().isLightShafts())
+        } else if (config.getRendering().isLightShafts()) {
             graphicsQualityButton.setState(2);
-        else if (config.getRendering().isBloom())
+        } else if (config.getRendering().isBloom()) {
             graphicsQualityButton.setState(1);
-        else
+        } else {
             graphicsQualityButton.setState(0);
+        }
 
         if (config.getRendering().isAnimateGrass()) {
             animateGrassButton.setState(1);

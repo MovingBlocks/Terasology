@@ -30,7 +30,7 @@ import javax.vecmath.Vector2f;
 public class UIScreenLoading extends UIWindow {
 
     final UIImage background;
-    final UIProgressBar _progressBar;
+    final UIProgressBar progressBar;
 
     public UIScreenLoading() {
         setId("loading");
@@ -41,19 +41,19 @@ public class UIScreenLoading extends UIWindow {
         background = new UIImage(Assets.getTexture("engine:menuBackground"));
         background.setVisible(true);
 
-        _progressBar = new UIProgressBar();
-        _progressBar.setSize(new Vector2f(256f, 15f));
-        _progressBar.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _progressBar.setVerticalAlign(EVerticalAlign.BOTTOM);
-        _progressBar.setPosition(new Vector2f(0f, -80f));
-        _progressBar.setVisible(true);
+        progressBar = new UIProgressBar();
+        progressBar.setSize(new Vector2f(256f, 15f));
+        progressBar.setHorizontalAlign(EHorizontalAlign.CENTER);
+        progressBar.setVerticalAlign(EVerticalAlign.BOTTOM);
+        progressBar.setPosition(new Vector2f(0f, -80f));
+        progressBar.setVisible(true);
 
         addDisplayElement(background);
-        addDisplayElement(_progressBar);
+        addDisplayElement(progressBar);
     }
 
     public void updateStatus(String string, float percent) {
-        _progressBar.setValue((int) percent);
-        _progressBar.setText(string);
+        progressBar.setValue((int) percent);
+        progressBar.setText(string);
     }
 }

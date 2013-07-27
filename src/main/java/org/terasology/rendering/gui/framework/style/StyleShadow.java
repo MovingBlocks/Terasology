@@ -96,8 +96,9 @@ public class StyleShadow extends UIDisplayContainer implements Style {
 
     @Override
     public void render() {
-        if (mesh == null)
+        if (mesh == null) {
             return;
+        }
 
         if (mesh.isDisposed()) {
             return;

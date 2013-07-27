@@ -35,7 +35,7 @@ final class RunningThreadsMode extends MetricsMode {
 
     @Override
     public void updateLines(List<UILabel> lines) {
-        final SortedSet<String> threads = new TreeSet<String>();
+        final SortedSet<String> threads = new TreeSet<>();
         PerformanceMonitor.getRunningThreads().forEachEntry(new TObjectIntProcedure<String>() {
             public boolean execute(String s, int i) {
                 threads.add(String.format("%s (%d)", s, i));
@@ -47,7 +47,9 @@ final class RunningThreadsMode extends MetricsMode {
             lines.get(line).setVisible(true);
             lines.get(line).setText(thread);
             line++;
-            if (line >= lines.size()) break;
+            if (line >= lines.size()) {
+                break;
+            }
         }
         for (; line < lines.size(); line++) {
             lines.get(line).setVisible(false);

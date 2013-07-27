@@ -26,11 +26,11 @@ import java.util.ArrayList;
 // TODO: merge into WorldTime
 public class WorldTimeEventManager {
 
-    protected final ArrayList<WorldTimeEvent> _worldTimeEvents = new ArrayList<WorldTimeEvent>();
-    protected final WorldProvider _parent;
+    protected final ArrayList<WorldTimeEvent> worldTimeEvents = new ArrayList<WorldTimeEvent>();
+    protected final WorldProvider parent;
 
     public WorldTimeEventManager(WorldProvider parent) {
-        _parent = parent;
+        this.parent = parent;
     }
 
     /**
@@ -39,7 +39,7 @@ public class WorldTimeEventManager {
      * @param e The time event
      */
     public void addWorldTimeEvent(WorldTimeEvent e) {
-        _worldTimeEvents.add(e);
+        worldTimeEvents.add(e);
     }
 
     /**
@@ -48,26 +48,29 @@ public class WorldTimeEventManager {
      * @param e The time event
      */
     public void removeWorldTimeEvent(WorldTimeEvent e) {
-        _worldTimeEvents.remove(e);
+        worldTimeEvents.remove(e);
     }
 
     /**
      * Executes all time events which event times equal a specified delta value.
      */
     public void fireWorldTimeEvents() {
-        for (int i = _worldTimeEvents.size() - 1; i >= 0; i--) {
-            final WorldTimeEvent event = _worldTimeEvents.get(i);
+        for (int i = worldTimeEvents.size() - 1; i >= 0; i--) {
+            final WorldTimeEvent event = worldTimeEvents.get(i);
 
-            if (event.getExecutionTime() > _parent.getTime().getDays() % 1.0)
+            if (event.getExecutionTime() > parent.getTime().getDays() % 1.0) {
                 event.setCanFire(true);
+            }
 
-            if (event.getExecutionTime() <= _parent.getTime().getDays() % 1.0 && event.canFire()) {
+            if (event.getExecutionTime() <= parent.getTime().getDays() % 1.0 && event.canFire()) {
                 event.setCanFire(false);
                 event.execute();
             }
 
-            if (!event.isRepeatingEvent())
-                _worldTimeEvents.remove(i);
+            if (!event.isRepeatingEvent()) {
+                worldTimeEvents.remove(i);
+            }
+
         }
     }
 

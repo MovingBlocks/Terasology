@@ -130,14 +130,16 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 lineNum++;
-                if (line.isEmpty())
+                if (line.isEmpty()) {
                     continue;
+                }
                 String[] prefixSplit = line.trim().split("\\s+", 2);
                 String prefix = prefixSplit[0];
 
                 // Comment
-                if ("#".equals(prefix))
+                if ("#".equals(prefix)) {
                     continue;
+                }
 
                 if (prefixSplit.length < 2) {
                     throw new IOException(String.format("Incomplete statement"));

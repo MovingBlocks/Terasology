@@ -71,8 +71,9 @@ public class LocalPlayer {
 
     public boolean isCarryingTorch() {
         CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character == null)
+        if (character == null) {
             return false;
+        }
 
         return CoreRegistry.get(SlotBasedInventoryManager.class).getItemInSlot(getCharacterEntity(), character.selectedTool).hasComponent(LightComponent.class);
     }

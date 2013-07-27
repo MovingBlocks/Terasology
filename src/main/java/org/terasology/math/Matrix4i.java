@@ -423,8 +423,9 @@ public class Matrix4i implements Serializable {
      * @return the transformed vector (for chaining)
      */
     public Vector3i transform(Vector3i vec, Vector3i dest) {
-        if (dest == null)
+        if (dest == null) {
             dest = new Vector3i();
+        }
         int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z;
         int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z;
         int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z;
@@ -443,8 +444,9 @@ public class Matrix4i implements Serializable {
      * @return the transformed vector (for chaining)
      */
     public Vector3i transformPoint(Vector3i vec, Vector3i dest) {
-        if (dest == null)
+        if (dest == null) {
             dest = new Vector3i();
+        }
         int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z + val[M03];
         int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z + val[M13];
         int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z + val[M23];
@@ -521,12 +523,18 @@ public class Matrix4i implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Matrix4i)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Matrix4i)) {
+            return false;
+        }
 
         Matrix4i matrix4i = (Matrix4i) o;
 
-        if (!Arrays.equals(val, matrix4i.val)) return false;
+        if (!Arrays.equals(val, matrix4i.val)) {
+            return false;
+        }
 
         return true;
     }

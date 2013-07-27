@@ -32,7 +32,7 @@ public class OculusVrHelper {
     private static float eyeToScreenDistance = 0.041f;
     private static float lensSeparationDistance = 0.0635f;
     private static float interpupillaryDistance = 0.064f;
-    private static final float[] distortionParams = {1.0f, 0.22f, 0.24f, 0.0f};
+    private static final float[] DISTORTION_PARAMS = {1.0f, 0.22f, 0.24f, 0.0f};
 
     private static float halfScreenDistance;
     private static float viewCenter;
@@ -74,10 +74,10 @@ public class OculusVrHelper {
             lensSeparationDistance = TeraOVR.getLensSeparationDistance();
             interpupillaryDistance = TeraOVR.getInterpupillaryDistance();
 
-            distortionParams[0] = TeraOVR.getDistortitionK0();
-            distortionParams[1] = TeraOVR.getDistortitionK1();
-            distortionParams[2] = TeraOVR.getDistortitionK2();
-            distortionParams[3] = TeraOVR.getDistortitionK3();
+            DISTORTION_PARAMS[0] = TeraOVR.getDistortitionK0();
+            DISTORTION_PARAMS[1] = TeraOVR.getDistortitionK1();
+            DISTORTION_PARAMS[2] = TeraOVR.getDistortitionK2();
+            DISTORTION_PARAMS[3] = TeraOVR.getDistortitionK3();
 
             lastPitch = TeraOVR.getPitch();
             lastRoll = TeraOVR.getRoll();
@@ -133,7 +133,7 @@ public class OculusVrHelper {
     }
 
     public static float[] getDistortionParams() {
-        return distortionParams;
+        return DISTORTION_PARAMS;
     }
 
     public static float getHalfScreenDistance() {

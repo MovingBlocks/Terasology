@@ -15,6 +15,8 @@
  */
 package org.terasology.performanceMonitor.impl;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import gnu.trove.TCollections;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.TObjectIntMap;
@@ -27,9 +29,8 @@ import gnu.trove.procedure.TObjectIntProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
 import org.lwjgl.Sys;
 
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Active implementation of Performance Monitor
@@ -42,77 +43,77 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     private static final int RETAINED_CYCLES = 60;
     private static final double DECAY_RATE = 0.98;
 
-    private Stack<Activity> _activityStack;
-    private List<TObjectLongMap<String>> _metricData;
-    private TObjectLongMap<String> _currentData;
-    private TObjectLongMap<String> _runningTotals;
-    private TObjectIntMap<String> _runningThreads;
-    private TObjectIntMap<String> _stoppedThreads;
-    private long _timerTicksPerSecond;
-    private TObjectDoubleMap<String> _spikeData;
-    private double _timeFactor;
-    private TObjectIntMap<String> _lastRunningThreads;
+    private Deque<Activity> activityStack;
+    private List<TObjectLongMap<String>> metricData;
+    private TObjectLongMap<String> currentData;
+    private TObjectLongMap<String> runningTotals;
+    private TObjectIntMap<String> runningThreads;
+    private TObjectIntMap<String> stoppedThreads;
+    private long timerTicksPerSecond;
+    private TObjectDoubleMap<String> spikeData;
+    private double timeFactor;
+    private TObjectIntMap<String> lastRunningThreads;
 
-    private Thread _mainThread;
+    private Thread mainThread;
 
     public PerformanceMonitorImpl() {
-        _activityStack = new Stack<Activity>();
-        _metricData = new LinkedList<TObjectLongMap<String>>();
-        _runningTotals = new TObjectLongHashMap<String>();
-        _timerTicksPerSecond = Sys.getTimerResolution();
-        _currentData = new TObjectLongHashMap<String>();
-        _spikeData = new TObjectDoubleHashMap<String>();
-        _runningThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
-        _stoppedThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
-        _lastRunningThreads = new TObjectIntHashMap<String>();
-        _timeFactor = 1000.0 / _timerTicksPerSecond;
-        _mainThread = Thread.currentThread();
+        activityStack = Queues.newArrayDeque();
+        metricData = Lists.newLinkedList();
+        runningTotals = new TObjectLongHashMap<>();
+        timerTicksPerSecond = Sys.getTimerResolution();
+        currentData = new TObjectLongHashMap<>();
+        spikeData = new TObjectDoubleHashMap<>();
+        runningThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
+        stoppedThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
+        lastRunningThreads = new TObjectIntHashMap<>();
+        timeFactor = 1000.0 / timerTicksPerSecond;
+        mainThread = Thread.currentThread();
 
     }
 
     public void rollCycle() {
-        _metricData.add(_currentData);
-        _spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
+        metricData.add(currentData);
+        spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
             public boolean execute(String s, double v) {
-                _spikeData.put(s, v * DECAY_RATE);
+                spikeData.put(s, v * DECAY_RATE);
                 return true;
             }
         });
 
-        _currentData.forEachEntry(new TObjectLongProcedure<String>() {
+        currentData.forEachEntry(new TObjectLongProcedure<String>() {
             public boolean execute(String s, long v) {
-                _runningTotals.adjustOrPutValue(s, v, v);
-                double time = v * _timeFactor;
-                double prev = _spikeData.get(s);
+                runningTotals.adjustOrPutValue(s, v, v);
+                double time = v * timeFactor;
+                double prev = spikeData.get(s);
                 if (time > prev) {
-                    _spikeData.put(s, time);
+                    spikeData.put(s, time);
                 }
                 return true;
             }
         });
 
-        while (_metricData.size() > RETAINED_CYCLES) {
-            _metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
+        while (metricData.size() > RETAINED_CYCLES) {
+            metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
                 public boolean execute(String s, long v) {
-                    _runningTotals.adjustValue(s, -v);
+                    runningTotals.adjustValue(s, -v);
                     return true;
                 }
             });
-            _metricData.remove(0);
+            metricData.remove(0);
         }
-        _currentData = new TObjectLongHashMap<String>();
+        currentData = new TObjectLongHashMap<String>();
 
-        _runningThreads.forEachEntry(new TObjectIntProcedure<String>() {
+        runningThreads.forEachEntry(new TObjectIntProcedure<String>() {
             public boolean execute(String s, int i) {
-                _lastRunningThreads.adjustOrPutValue(s, i, i);
+                lastRunningThreads.adjustOrPutValue(s, i, i);
                 return true;
             }
         });
-        TObjectIntMap<String> temp = _runningThreads;
+        TObjectIntMap<String> temp = runningThreads;
         temp.clear();
-        _runningThreads = _stoppedThreads;
-        _stoppedThreads = temp;
-        _lastRunningThreads.retainEntries(new TObjectIntProcedure<String>() {
+        runningThreads = stoppedThreads;
+        stoppedThreads = temp;
+        lastRunningThreads.retainEntries(new TObjectIntProcedure<String>() {
             public boolean execute(String s, int i) {
                 return i > 0;
             }
@@ -121,38 +122,40 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     }
 
     public void startActivity(String activity) {
-        if (Thread.currentThread() != _mainThread)
+        if (Thread.currentThread() != mainThread) {
             return;
+        }
         Activity newActivity = new Activity();
         newActivity.name = activity;
         newActivity.startTime = Sys.getTime();
-        if (!_activityStack.isEmpty()) {
-            Activity currentActivity = _activityStack.peek();
+        if (!activityStack.isEmpty()) {
+            Activity currentActivity = activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
         }
 
-        _activityStack.push(newActivity);
+        activityStack.push(newActivity);
     }
 
     public void endActivity() {
-        if (Thread.currentThread() != _mainThread || _activityStack.empty())
+        if (Thread.currentThread() != mainThread || activityStack.isEmpty()) {
             return;
+        }
 
-        Activity oldActivity = _activityStack.pop();
+        Activity oldActivity = activityStack.pop();
         long time = Sys.getTime();
         long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
-        _currentData.adjustOrPutValue(oldActivity.name, total, total);
+        currentData.adjustOrPutValue(oldActivity.name, total, total);
 
-        if (!_activityStack.isEmpty()) {
-            Activity currentActivity = _activityStack.peek();
+        if (!activityStack.isEmpty()) {
+            Activity currentActivity = activityStack.peek();
             currentActivity.resumeTime = time;
         }
     }
 
     public TObjectDoubleMap<String> getRunningMean() {
         final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
-        final double factor = _timeFactor / _metricData.size();
-        _runningTotals.forEachEntry(new TObjectLongProcedure<String>() {
+        final double factor = timeFactor / metricData.size();
+        runningTotals.forEachEntry(new TObjectLongProcedure<String>() {
             public boolean execute(String s, long l) {
                 if (l > 0) {
                     result.put(s, l * factor);
@@ -164,19 +167,19 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     }
 
     public TObjectDoubleMap<String> getDecayingSpikes() {
-        return _spikeData;
+        return spikeData;
     }
 
     public void startThread(String name) {
-        _runningThreads.adjustOrPutValue(name, 1, 1);
+        runningThreads.adjustOrPutValue(name, 1, 1);
     }
 
     public void endThread(String name) {
-        _stoppedThreads.adjustOrPutValue(name, -1, -1);
+        stoppedThreads.adjustOrPutValue(name, -1, -1);
     }
 
     public TObjectIntMap<String> getRunningThreads() {
-        return _lastRunningThreads;
+        return lastRunningThreads;
     }
 
     private static class Activity {

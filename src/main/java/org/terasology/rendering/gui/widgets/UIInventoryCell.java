@@ -179,9 +179,8 @@ public class UIInventoryCell extends UIDisplayContainer {
                 //move item to the transfer slot
                 if (wheel > 0) {
                     takeAmount(amount);
-                }
-                //get item from transfer slot
-                else {
+                } else {
+                    //get item from transfer slot
                     giveAmount(amount);
                 }
             }

@@ -503,24 +503,24 @@ public final class TeraMath {
     public static Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
         Matrix4f m = new Matrix4f();
 
-        float r_l = right - left;
-        float t_b = top - bottom;
-        float f_n = far - near;
+        float lateral = right - left;
+        float vertical = top - bottom;
+        float forward = far - near;
         float tx = -(right + left) / (right - left);
         float ty = -(top + bottom) / (top - bottom);
         float tz = -(far + near) / (far - near);
 
-        m.m00 = 2.0f / r_l;
+        m.m00 = 2.0f / lateral;
         m.m10 = 0.0f;
         m.m20 = 0.0f;
         m.m30 = tx;
         m.m01 = 0.0f;
-        m.m11 = 2.0f / t_b;
+        m.m11 = 2.0f / vertical;
         m.m21 = 0.0f;
         m.m31 = ty;
         m.m02 = 0.0f;
         m.m12 = 0.0f;
-        m.m22 = -2.0f / f_n;
+        m.m22 = -2.0f / forward;
         m.m32 = tz;
         m.m03 = 0.0f;
         m.m13 = 0.0f;

@@ -66,8 +66,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         int cropWidth = 0;
         int cropHeight = 0;
 
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
 
         //Cut the elements
         if (cropContainer) {
@@ -113,8 +114,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     public void update() {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
 
         super.update();
 
@@ -130,8 +132,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     public void layout() {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
 
         super.layout();
 
@@ -148,8 +151,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     @Override
     public void processBindButton(BindButtonEvent event) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
 
         super.processBindButton(event);
 
@@ -161,8 +165,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     @Override
     public void processKeyboardInput(KeyEvent event) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
 
         super.processKeyboardInput(event);
 
@@ -174,8 +179,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     @Override
     public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
-        if (!isVisible())
+        if (!isVisible()) {
             return consumed;
+        }
 
         //cancel mouse click event if the click is out of the cropped area
         if (cropContainer) {

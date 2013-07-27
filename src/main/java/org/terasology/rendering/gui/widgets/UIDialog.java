@@ -137,8 +137,9 @@ public class UIDialog extends UIWindow {
     public void layout() {
         super.layout();
 
-        if (topBar != null)
+        if (topBar != null) {
             topBar.resize();
+        }
     }
 
     @Override

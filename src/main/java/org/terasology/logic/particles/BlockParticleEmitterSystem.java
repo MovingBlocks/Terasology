@@ -142,8 +142,9 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f pos = location.getWorldPosition();
             pos.add(particle.position);
-            if (worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).getId() != 0x0)
+            if (!worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).isPenetrable()) {
                 particle.velocity.y = 0;
+            }
         }
     }
 
@@ -200,10 +201,11 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         // And undo all rotations and scaling
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (i == j)
+                if (i == j) {
                     model.put(i * 4 + j, 1.0f);
-                else
+                } else {
                     model.put(i * 4 + j, 0.0f);
+                }
             }
         }
 

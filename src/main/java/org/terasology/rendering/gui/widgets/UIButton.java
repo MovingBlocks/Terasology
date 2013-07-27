@@ -40,13 +40,12 @@ import java.util.Map;
  */
 public class UIButton extends UIDisplayContainer {
 
-    private final UILabel _label;
+    private final UILabel label;
 
     public enum ButtonType {NORMAL, TOGGLE}
 
-    ;
-    private boolean _toggleState = false;
-    private ButtonType _buttonType;
+    private boolean toggleState = false;
+    private ButtonType buttonType;
 
     private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
@@ -60,7 +59,7 @@ public class UIButton extends UIDisplayContainer {
     public UIButton(Vector2f size, ButtonType buttonType) {
         setSize(size);
 
-        _buttonType = buttonType;
+        this.buttonType = buttonType;
 
         //default button
         setTexture("engine:gui_menu");
@@ -74,8 +73,8 @@ public class UIButton extends UIDisplayContainer {
         addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void leave(UIDisplayElement element) {
-                if (_buttonType == ButtonType.TOGGLE) {
-                    if (_toggleState) {
+                if (UIButton.this.buttonType == ButtonType.TOGGLE) {
+                    if (toggleState) {
                         setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
                     } else {
                         setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
@@ -93,7 +92,7 @@ public class UIButton extends UIDisplayContainer {
             @Override
             public void enter(UIDisplayElement element) {
                 CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:click"), 1.0f);
-                if (_buttonType == ButtonType.NORMAL) {
+                if (UIButton.this.buttonType == ButtonType.NORMAL) {
                     setBackgroundImage(states.get("hover")[0], states.get("hover")[1]);
                 }
             }
@@ -107,7 +106,7 @@ public class UIButton extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                if (_buttonType == ButtonType.NORMAL) {
+                if (UIButton.this.buttonType == ButtonType.NORMAL) {
                     setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
                 }
             }
@@ -115,8 +114,8 @@ public class UIButton extends UIDisplayContainer {
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (intersect) {
-                    if (_buttonType == ButtonType.TOGGLE) {
-                        setToggleState(!_toggleState);
+                    if (UIButton.this.buttonType == ButtonType.TOGGLE) {
+                        setToggleState(!toggleState);
                     } else {
                         setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
                     }
@@ -129,23 +128,23 @@ public class UIButton extends UIDisplayContainer {
             }
         });
 
-        _label = new UILabel("Untitled");
-        _label.addChangedListener(new ChangedListener() {
+        label = new UILabel("Untitled");
+        label.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
                 layout();
             }
         });
-        _label.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _label.setVerticalAlign(EVerticalAlign.CENTER);
-        _label.setVisible(true);
-        _label.setTextShadow(true);
+        label.setHorizontalAlign(EHorizontalAlign.CENTER);
+        label.setVerticalAlign(EVerticalAlign.CENTER);
+        label.setVisible(true);
+        label.setTextShadow(true);
 
-        addDisplayElement(_label);
+        addDisplayElement(label);
     }
 
     public UILabel getLabel() {
-        return _label;
+        return label;
     }
 
     /**
@@ -200,7 +199,7 @@ public class UIButton extends UIDisplayContainer {
     }
 
     public boolean getToggleState() {
-        return _toggleState;
+        return toggleState;
     }
 
     /**
@@ -209,10 +208,10 @@ public class UIButton extends UIDisplayContainer {
      * @param state True to set the pressed state.
      */
     public void setToggleState(boolean state) {
-        if (_toggleState != state) {
-            _toggleState = state;
+        if (toggleState != state) {
+            toggleState = state;
 
-            if (_toggleState) {
+            if (toggleState) {
                 setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
             } else {
                 setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);

@@ -70,10 +70,11 @@ public class UIMenuConfigAudio extends UIWindow {
             @Override
             public void changed(UIDisplayElement element) {
                 UISlider slider = (UISlider) element;
-                if (slider.getValue() > 0)
+                if (slider.getValue() > 0) {
                     slider.setText("Sound Volume: " + String.valueOf(slider.getValue()));
-                else
+                } else {
                     slider.setText("Sound Volume: Off");
+                }
 
                 config.setSoundVolume(slider.getValue() / 100f);
             }
@@ -87,10 +88,11 @@ public class UIMenuConfigAudio extends UIWindow {
             @Override
             public void changed(UIDisplayElement element) {
                 UISlider slider = (UISlider) element;
-                if (slider.getValue() > 0)
+                if (slider.getValue() > 0) {
                     slider.setText("Music Volume: " + String.valueOf(slider.getValue()));
-                else
+                } else {
                     slider.setText("Music Volume: Off");
+                }
 
                 config.setMusicVolume(slider.getValue() / 100f);
             }

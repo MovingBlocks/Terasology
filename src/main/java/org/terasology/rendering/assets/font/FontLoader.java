@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  */
 public class FontLoader implements AssetLoader<FontData> {
 
-    private final static String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
+    private static final String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
 
     // Common patterns
     private Pattern lineHeightPattern = Pattern.compile("lineHeight=" + INTEGER_PATTERN);

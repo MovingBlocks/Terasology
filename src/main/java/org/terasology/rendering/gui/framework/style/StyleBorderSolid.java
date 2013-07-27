@@ -52,7 +52,7 @@ public class StyleBorderSolid extends UIDisplayContainer implements Style {
         setCrop(false);
     }
 
-    private float RGBtoColor(int v) {
+    private float rgbToColor(int v) {
         return (float) v / 255.0f;
     }
 
@@ -131,7 +131,7 @@ public class StyleBorderSolid extends UIDisplayContainer implements Style {
             b = sum & 0x000000FF;
         }
 
-        this.color = new Color(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), RGBtoColor(a));
+        this.color = new Color(rgbToColor(r), rgbToColor(g), rgbToColor(b), rgbToColor(a));
     }
 
     public Vector4f getWidth() {

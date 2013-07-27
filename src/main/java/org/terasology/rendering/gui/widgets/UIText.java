@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -92,11 +93,11 @@ public class UIText extends UIDisplayContainerScrollable {
     */
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
+    private final List<ChangedListener> changedListeners = Lists.newArrayList();
+    private final List<SelectionListener> selectionListeners = Lists.newArrayList();
 
     //wrapping
-    private final List<Integer> wrapPosition = new ArrayList<Integer>();
+    private final List<Integer> wrapPosition = Lists.newArrayList();
 
     //selection
     private int cursorPosition = -1;
@@ -131,9 +132,8 @@ public class UIText extends UIDisplayContainerScrollable {
                         //delete selection
                         if (selectionStart != selectionEnd) {
                             deleteSelection();
-                        }
-                        //delete at cursor position
-                        else if (cursorPosition > 0) {
+                        } else if (cursorPosition > 0) {
+                            //delete at cursor position
                             int pos = getWrapOffset(cursorPosition);
                             replaceText(pos - 1, pos, "");
 
@@ -149,9 +149,8 @@ public class UIText extends UIDisplayContainerScrollable {
                         //delete selection
                         if (selectionStart != selectionEnd) {
                             deleteSelection();
-                        }
-                        //delete at cursor position
-                        else if (cursorPosition < text.getText().length()) {
+                        } else if (cursorPosition < text.getText().length()) {
+                            //delete at cursor position
                             int pos = getWrapOffset(cursorPosition);
                             replaceText(pos, pos + 1, "");
 
@@ -168,9 +167,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     clearSelection();
                     setCursorToTextPosition(text.getText().length());
                     event.consume();
-                }
-                //move cursor left
-                else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
+                } else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
+                    //move cursor left
                     clearSelection();
                     if (ctrlKeyPressed) {
                         setCursorToTextPosition(findNextChar(cursorPosition, ' ', true));
@@ -179,18 +177,16 @@ public class UIText extends UIDisplayContainerScrollable {
                     }
 
                     event.consume();
-                }
-                //move cursor right
-                else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
+                } else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
+                    //move cursor right
                     clearSelection();
                     if (ctrlKeyPressed) {
                         setCursorToTextPosition(findNextChar(cursorPosition, ' ', false));
                     } else {
                         setCursorToTextPosition(cursorPosition + 1);
                     }
-                }
-                //move cursor up
-                else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
+                } else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
+                    //move cursor up
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
 
@@ -199,9 +195,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     setCursorToTextPosition(toTextPosition(pos));
 
                     event.consume();
-                }
-                //move cursor down
-                else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
+                } else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
+                    //move cursor down
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
 
@@ -210,39 +205,33 @@ public class UIText extends UIDisplayContainerScrollable {
                     setCursorToTextPosition(toTextPosition(pos));
 
                     event.consume();
-                }
-                //left/right control pressed
-                else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
+                } else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
+                    //left/right control pressed
                     ctrlKeyPressed = event.isDown();
 
                     event.consume();
-                }
-                //cut selection
-                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
+                    //cut selection
                     cut();
 
                     event.consume();
-                }
-                //copy selection
-                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
+                    //copy selection
                     copy();
 
                     event.consume();
-                }
-                //paste selection
-                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
+                    //paste selection
                     paste();
 
                     event.consume();
-                }
-                //select all
-                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
+                    //select all
                     setSelection(0, text.getText().length());
 
                     event.consume();
-                }
-                //add character
-                else if (event.isDown()) {
+                } else if (event.isDown()) {
+                    //add character
                     char c = Keyboard.getEventCharacter();
 
                     if (c == '\r') {
@@ -512,9 +501,8 @@ public class UIText extends UIDisplayContainerScrollable {
                 if ((cursor.getSize().y + cursor.getPosition().y - getScrollPosition() / 2) > (getSize().y / 2f)) {
                     float additionalSpacing = getPadding().z + 5f;
                     scrollTo(cursor.getPosition().y * 2 + cursor.getSize().y - getSize().y + additionalSpacing);
-                }
-                //cursor is on top of the input area
-                else if (cursor.getPosition().y - getScrollPosition() / 2 < 0) {
+                } else if (cursor.getPosition().y - getScrollPosition() / 2 < 0) {
+                    //cursor is on top of the input area
                     float additionalSpacing = getPadding().x + 5f;
                     scrollTo(cursor.getPosition().y * 2 - additionalSpacing);
                 }
@@ -522,9 +510,8 @@ public class UIText extends UIDisplayContainerScrollable {
                 //cursor is right from input area
                 if ((cursor.getPosition().x + text.getPosition().x / 2 + getPadding().y) > (getSize().x / 2f)) {
                     text.setPosition(new Vector2f(-(cursor.getPosition().x * 2 - getSize().x + getPadding().y + getPadding().w), 0f));
-                }
-                //cursor is left from input area
-                else if ((cursor.getPosition().x + text.getPosition().x / 2) < 0) {
+                } else if ((cursor.getPosition().x + text.getPosition().x / 2) < 0) {
+                    //cursor is left from input area
                     text.setPosition(new Vector2f(-cursor.getPosition().x * 2, 0f));
                 }
             }
@@ -551,13 +538,11 @@ public class UIText extends UIDisplayContainerScrollable {
         //clicked bottom of text container
         if (mousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
             return text.getText().length();
-        }
-        //clicked top of text container
-        else if (mousePos.y <= textAbsPos.y) {
+        } else if (mousePos.y <= textAbsPos.y) {
+            //clicked top of text container
             return 0;
-        }
-        //calculate the cursor position
-        else {
+        } else {
+            //calculate the cursor position
             for (int i = 0; i < text.getText().length(); ) {
                 //first calculate the height
                 if (calcTextHeight(text.getText().substring(0, i)) >= relative.y) {
@@ -738,9 +723,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     return i;
                 }
             }
-        }
-        //forward search
-        else {
+        } else {
+            //forward search
             for (int i = index; i < str.length(); i++) {
                 if (str.charAt(i) == ch || i == (str.length() - 1)) {
                     return i + 1;
@@ -821,9 +805,8 @@ public class UIText extends UIDisplayContainerScrollable {
             wrapText.replace(wrapText.length() - 1, wrapText.length(), "");
 
             return wrapText.toString();
-        }
-        //single line
-        else {
+        } else {
+            //single line
             return text;
         }
     }

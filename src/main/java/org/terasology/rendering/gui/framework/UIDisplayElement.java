@@ -196,8 +196,9 @@ public abstract class UIDisplayElement {
      * @param consumed   True if the input event was already consumed by another widget.
      */
     public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
-        if (!isVisible())
+        if (!isVisible()) {
             return consumed;
+        }
 
         if (mouseMoveListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0 || doubleClickListeners.size() > 0) {
             if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
@@ -375,9 +376,8 @@ public abstract class UIDisplayElement {
         //recalculate position x relative to parent if unit is percentage
         if (unitPositionX == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
             getPosition().x += parent.getSize().x * positionOriginal.x / 100f;
-        }
-        //recalculate position x absolute to display if unit is percentage
-        else if (unitPositionX == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+        } else if (unitPositionX == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+            //recalculate position x absolute to display if unit is percentage
             getPosition().x += Display.getWidth() * positionOriginal.x / 100f;
         } else {
             getPosition().x += positionOriginal.x;
@@ -386,9 +386,8 @@ public abstract class UIDisplayElement {
         //recalculate position x relative to parent if unit is percentage
         if (unitPositionY == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
             getPosition().y += parent.getSize().y * positionOriginal.y / 100f;
-        }
-        //recalculate position x absolute to display if unit is percentage
-        else if (unitPositionY == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+        } else if (unitPositionY == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+            //recalculate position x absolute to display if unit is percentage
             getPosition().y += Display.getHeight() * positionOriginal.y / 100f;
         } else {
             getPosition().y += positionOriginal.y;
@@ -401,18 +400,16 @@ public abstract class UIDisplayElement {
         //recalculate width relative to parent if unit is percentage
         if (unitSizeX == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
             getSize().x = parent.getSize().x * size.x / 100f;
-        }
-        //recalculate width absolute to display if unit is percentage
-        else if (unitSizeX == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+        } else if (unitSizeX == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+            //recalculate width absolute to display if unit is percentage
             getSize().x = Display.getWidth() * size.x / 100f;
         }
 
         //recalculate height relative to parent if unit is percentage
         if (unitSizeY == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
             getSize().y = parent.getSize().y * size.y / 100f;
-        }
-        //recalculate height absolute to display if unit is percentage
-        else if (unitSizeY == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+        } else if (unitSizeY == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
+            //recalculate height absolute to display if unit is percentage
             getSize().y = Display.getHeight() * size.y / 100f;
         }
     }

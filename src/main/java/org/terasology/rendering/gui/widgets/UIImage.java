@@ -77,14 +77,15 @@ public class UIImage extends UIDisplayContainer {
         setTexture(texture);
     }
 
-    private float RGBtoColor(int v) {
+    private float rbgToColor(int v) {
         return (float) v / 255.0f;
     }
 
     @Override
     public void render() {
-        if (mesh == null)
+        if (mesh == null) {
             return;
+        }
 
         if (mesh.isDisposed()) {
             logger.error("Disposed mesh encountered!");
@@ -216,7 +217,7 @@ public class UIImage extends UIDisplayContainer {
             b = sum & 0x000000FF;
         }
 
-        setColor(new Color(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), RGBtoColor(a)));
+        setColor(new Color(rbgToColor(r), rbgToColor(g), rbgToColor(b), rbgToColor(a)));
     }
 
     private void generateMesh(Color color) {

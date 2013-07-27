@@ -33,59 +33,59 @@ import java.util.List;
  */
 public class Rotation {
 
-    private static final TByteObjectMap<Rotation> rotations;
-    private static final ImmutableList<Rotation> horizontal;
+    private static final TByteObjectMap<Rotation> ROTATIONS;
+    private static final ImmutableList<Rotation> HORIZONTAL_ROTATIONS;
 
     public static Rotation none() {
-        return rotations.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE));
+        return ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE));
     }
 
     public static Rotation rotate(Pitch pitch) {
-        return rotations.get(indexFor(Yaw.NONE, pitch, Roll.NONE));
+        return ROTATIONS.get(indexFor(Yaw.NONE, pitch, Roll.NONE));
     }
 
     public static Rotation rotate(Yaw yaw) {
-        return rotations.get(indexFor(yaw, Pitch.NONE, Roll.NONE));
+        return ROTATIONS.get(indexFor(yaw, Pitch.NONE, Roll.NONE));
     }
 
     public static Rotation rotate(Roll roll) {
-        return rotations.get(indexFor(Yaw.NONE, Pitch.NONE, roll));
+        return ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, roll));
     }
 
     public static Rotation rotate(Yaw yaw, Pitch pitch) {
-        return rotations.get(indexFor(yaw, pitch, Roll.NONE));
+        return ROTATIONS.get(indexFor(yaw, pitch, Roll.NONE));
     }
 
     public static Rotation rotate(Pitch pitch, Roll roll) {
-        return rotations.get(indexFor(Yaw.NONE, pitch, roll));
+        return ROTATIONS.get(indexFor(Yaw.NONE, pitch, roll));
     }
 
     public static Rotation rotate(Yaw yaw, Roll roll) {
-        return rotations.get(indexFor(yaw, Pitch.NONE, roll));
+        return ROTATIONS.get(indexFor(yaw, Pitch.NONE, roll));
     }
 
     public static Rotation rotate(Yaw yaw, Pitch pitch, Roll roll) {
-        return rotations.get(indexFor(yaw, pitch, roll));
+        return ROTATIONS.get(indexFor(yaw, pitch, roll));
     }
 
     public static List<Rotation> horizontalRotations() {
-        return horizontal;
+        return HORIZONTAL_ROTATIONS;
     }
 
     static {
-        rotations = new TByteObjectHashMap<>();
+        ROTATIONS = new TByteObjectHashMap<>();
         for (Pitch pitch : Pitch.values()) {
             for (Yaw yaw : Yaw.values()) {
                 for (Roll roll : Roll.values()) {
-                    rotations.put(indexFor(yaw, pitch, roll), new Rotation(yaw, pitch, roll));
+                    ROTATIONS.put(indexFor(yaw, pitch, roll), new Rotation(yaw, pitch, roll));
                 }
             }
         }
-        horizontal = ImmutableList.of(
-                rotations.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE)),
-                rotations.get(indexFor(Yaw.CLOCKWISE_90, Pitch.NONE, Roll.NONE)),
-                rotations.get(indexFor(Yaw.CLOCKWISE_180, Pitch.NONE, Roll.NONE)),
-                rotations.get(indexFor(Yaw.CLOCKWISE_270, Pitch.NONE, Roll.NONE)));
+        HORIZONTAL_ROTATIONS = ImmutableList.of(
+                ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE)),
+                ROTATIONS.get(indexFor(Yaw.CLOCKWISE_90, Pitch.NONE, Roll.NONE)),
+                ROTATIONS.get(indexFor(Yaw.CLOCKWISE_180, Pitch.NONE, Roll.NONE)),
+                ROTATIONS.get(indexFor(Yaw.CLOCKWISE_270, Pitch.NONE, Roll.NONE)));
     }
 
     private static byte indexFor(Yaw yaw, Pitch pitch, Roll roll) {
@@ -145,6 +145,6 @@ public class Rotation {
     }
 
     public static Iterable<Rotation> values() {
-        return rotations.valueCollection();
+        return ROTATIONS.valueCollection();
     }
 }

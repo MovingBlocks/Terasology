@@ -76,8 +76,9 @@ public final class SideBitFlag {
                 new TObjectByteProcedure<Side>() {
                     @Override
                     public boolean execute(Side a, byte b) {
-                        if ((b & sidesBit) > 0)
+                        if ((b & sidesBit) > 0) {
                             result.add(a);
+                        }
 
                         return true;
                     }

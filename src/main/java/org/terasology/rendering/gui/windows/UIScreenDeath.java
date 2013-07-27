@@ -39,10 +39,10 @@ import javax.vecmath.Vector2f;
  */
 public class UIScreenDeath extends UIWindow {
 
-    private final UILabel _meassage;
-    private final UIButton _respawnButton;
-    private final UIButton _exitButton;
-    private final UIButton _mainMenuButton;
+    private final UILabel meassage;
+    private final UIButton respawnButton;
+    private final UIButton exitButton;
+    private final UIButton mainMenuButton;
 
     public UIScreenDeath() {
         setId("death");
@@ -61,52 +61,52 @@ public class UIScreenDeath extends UIWindow {
             }
         });
 
-        _meassage = new UILabel("You are dead");
-        _meassage.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _meassage.setPosition(new Vector2f(0f, 300f));
-        _meassage.setVisible(true);
+        meassage = new UILabel("You are dead");
+        meassage.setHorizontalAlign(EHorizontalAlign.CENTER);
+        meassage.setPosition(new Vector2f(0f, 300f));
+        meassage.setVisible(true);
 
-        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _respawnButton.getLabel().setText("Respawn");
-        _respawnButton.addClickListener(new ClickListener() {
+        respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        respawnButton.getLabel().setText("Respawn");
+        respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 respawn();
                 setVisible(false);
             }
         });
-        _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
-        _respawnButton.setVisible(true);
+        respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
+        respawnButton.setVisible(true);
 
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _mainMenuButton.getLabel().setText("Return to Main Menu");
-        _mainMenuButton.addClickListener(new ClickListener() {
+        mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        mainMenuButton.getLabel().setText("Return to Main Menu");
+        mainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
             }
         });
-        _mainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
-        _mainMenuButton.setVisible(true);
+        mainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
+        mainMenuButton.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _exitButton.getLabel().setText("Exit Terasology");
-        _exitButton.addClickListener(new ClickListener() {
+        exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        exitButton.getLabel().setText("Exit Terasology");
+        exitButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
-        _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
-        _exitButton.setVisible(true);
+        exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
+        exitButton.setVisible(true);
 
-        addDisplayElement(_meassage);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_respawnButton);
-        addDisplayElement(_mainMenuButton);
+        addDisplayElement(meassage);
+        addDisplayElement(exitButton);
+        addDisplayElement(respawnButton);
+        addDisplayElement(mainMenuButton);
     }
 
     private void respawn() {

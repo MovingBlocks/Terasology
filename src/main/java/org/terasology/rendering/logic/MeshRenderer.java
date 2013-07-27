@@ -167,7 +167,9 @@ public class MeshRenderer implements RenderSystem {
         for (EntityRef entity : gelatinous) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null) continue;
+            if (location == null) {
+                continue;
+            }
 
             Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();

@@ -215,8 +215,9 @@ public class UIMenuSingleplayer extends UIWindow {
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         for (Path savedGameDir : savedGamePaths) {
             Path gameManifest = savedGameDir.resolve(GameManifest.DEFAULT_FILE_NAME);
-            if (!Files.isRegularFile(gameManifest))
+            if (!Files.isRegularFile(gameManifest)) {
                 continue;
+            }
             try {
                 GameManifest info = GameManifest.load(gameManifest);
                 if (!info.getTitle().isEmpty()) {

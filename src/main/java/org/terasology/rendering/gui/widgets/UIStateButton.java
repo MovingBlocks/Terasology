@@ -28,7 +28,7 @@ import java.util.LinkedList;
  *         TODO integrate into UIButton
  */
 public class UIStateButton extends UIButton {
-    private final LinkedList<ButtonState> states = new LinkedList<ButtonState>();
+    private final LinkedList<ButtonState> states = new LinkedList<>();
     private int currentState = -1;
 
     private class ButtonState {
@@ -65,10 +65,12 @@ public class UIStateButton extends UIButton {
      */
     public void removeState(int stateID) {
         if (states.size() > 0) {
-            if (stateID < 0)
+            if (stateID < 0) {
                 stateID = 0;
-            if (stateID >= states.size())
+            }
+            if (stateID >= states.size()) {
                 stateID = states.size() - 1;
+            }
 
             states.remove(stateID);
 
@@ -88,16 +90,19 @@ public class UIStateButton extends UIButton {
      */
     public void setState(int stateID) {
         if (states.size() > 0) {
-            if (stateID < 0)
+            if (stateID < 0) {
                 stateID = 0;
-            if (stateID >= states.size())
+            }
+            if (stateID >= states.size()) {
                 stateID = states.size() - 1;
+            }
 
             getLabel().setText(states.get(stateID).name);
             currentState = stateID;
 
-            if (states.get(stateID).action != null)
+            if (states.get(stateID).action != null) {
                 states.get(stateID).action.action(this);
+            }
         }
     }
 
@@ -117,8 +122,9 @@ public class UIStateButton extends UIButton {
         if (states.size() > 0) {
             int nextState = currentState + 1;
 
-            if (nextState >= states.size())
+            if (nextState >= states.size()) {
                 nextState = 0;
+            }
 
             setState(nextState);
         }
@@ -131,8 +137,9 @@ public class UIStateButton extends UIButton {
         if (states.size() > 0) {
             int prevState = currentState - 1;
 
-            if (prevState < 0)
+            if (prevState < 0) {
                 prevState = states.size() - 1;
+            }
 
             setState(prevState);
         }

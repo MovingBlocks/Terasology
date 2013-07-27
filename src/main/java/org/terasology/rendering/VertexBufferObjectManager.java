@@ -30,15 +30,15 @@ import java.nio.IntBuffer;
  */
 public class VertexBufferObjectManager {
 
-    private static VertexBufferObjectManager _instance = null;
-    private final TIntArrayList _vertexBufferObjectPool = new TIntArrayList();
+    private static VertexBufferObjectManager instance = null;
+    private final TIntArrayList vertexBufferObjectPool = new TIntArrayList();
 
     public static VertexBufferObjectManager getInstance() {
-        if (_instance == null) {
-            _instance = new VertexBufferObjectManager();
+        if (instance == null) {
+            instance = new VertexBufferObjectManager();
         }
 
-        return _instance;
+        return instance;
     }
 
     private IntBuffer createVbos(int size) {
@@ -48,8 +48,8 @@ public class VertexBufferObjectManager {
     }
 
     public synchronized int getVboId() {
-        while (_vertexBufferObjectPool.size() > 0) {
-            int id = _vertexBufferObjectPool.removeAt(_vertexBufferObjectPool.size() - 1);
+        while (vertexBufferObjectPool.size() > 0) {
+            int id = vertexBufferObjectPool.removeAt(vertexBufferObjectPool.size() - 1);
             GL15.glDeleteBuffers(id);
         }
 
@@ -58,7 +58,7 @@ public class VertexBufferObjectManager {
 
     public synchronized void putVboId(int vboId) {
         if (vboId > 0) {
-            _vertexBufferObjectPool.add(vboId);
+            vertexBufferObjectPool.add(vboId);
         }
     }
 

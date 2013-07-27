@@ -24,8 +24,8 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * @author Immortius <immortius@gmail.com>
  */
 public class NullPerformanceMonitor implements IPerformanceMonitor {
-    private TObjectDoubleMap<String> _metrics = new TObjectDoubleHashMap<String>();
-    private TObjectIntMap<String> _threads = new TObjectIntHashMap<String>();
+    private TObjectDoubleMap<String> metrics = new TObjectDoubleHashMap<>();
+    private TObjectIntMap<String> threads = new TObjectIntHashMap<>();
 
     public void startThread(String name) {
     }
@@ -43,15 +43,15 @@ public class NullPerformanceMonitor implements IPerformanceMonitor {
     }
 
     public TObjectDoubleMap<String> getRunningMean() {
-        return _metrics;
+        return metrics;
     }
 
     public TObjectDoubleMap<String> getDecayingSpikes() {
-        return _metrics;
+        return metrics;
     }
 
     public TObjectIntMap<String> getRunningThreads() {
-        return _threads;
+        return threads;
     }
 
 }

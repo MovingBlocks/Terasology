@@ -34,10 +34,10 @@ import org.terasology.performanceMonitor.impl.PerformanceMonitorImpl;
  * @author Immortius <immortius@gmail.com>
  */
 public class PerformanceMonitor {
-    private static IPerformanceMonitor _instance;
+    private static IPerformanceMonitor instance;
 
     static {
-        _instance = new NullPerformanceMonitor();
+        instance = new NullPerformanceMonitor();
     }
 
     /**
@@ -47,26 +47,26 @@ public class PerformanceMonitor {
      * @param activity The name of the activity stating.
      */
     public static void startActivity(String activity) {
-        _instance.startActivity(activity);
+        instance.startActivity(activity);
     }
 
     /**
      * Indicates the end of the last started activity.
      */
     public static void endActivity() {
-        _instance.endActivity();
+        instance.endActivity();
     }
 
     public static void startThread(String name) {
-        _instance.startThread(name);
+        instance.startThread(name);
     }
 
     public static void endThread(String name) {
-        _instance.endThread(name);
+        instance.endThread(name);
     }
 
     public static TObjectIntMap<String> getRunningThreads() {
-        return _instance.getRunningThreads();
+        return instance.getRunningThreads();
     }
 
 
@@ -74,21 +74,21 @@ public class PerformanceMonitor {
      * Should be called once per frame, drops old information and updates the metrics.
      */
     public static void rollCycle() {
-        _instance.rollCycle();
+        instance.rollCycle();
     }
 
     /**
      * @return A mapping of activities to a running mean of time it has taken over a number of frames.
      */
     public static TObjectDoubleMap<String> getRunningMean() {
-        return _instance.getRunningMean();
+        return instance.getRunningMean();
     }
 
     /**
      * @return A mapping of activities to the largest cost over recent frames, decayed by time.
      */
     public static TObjectDoubleMap<String> getDecayingSpikes() {
-        return _instance.getDecayingSpikes();
+        return instance.getDecayingSpikes();
     }
 
     /**
@@ -99,10 +99,10 @@ public class PerformanceMonitor {
      * @param enabled Turns the performance monitoring system on or off.
      */
     public static void setEnabled(boolean enabled) {
-        if (enabled && !(_instance instanceof PerformanceMonitorImpl)) {
-            _instance = new PerformanceMonitorImpl();
-        } else if (!enabled && !(_instance instanceof NullPerformanceMonitor)) {
-            _instance = new NullPerformanceMonitor();
+        if (enabled && !(instance instanceof PerformanceMonitorImpl)) {
+            instance = new PerformanceMonitorImpl();
+        } else if (!enabled && !(instance instanceof NullPerformanceMonitor)) {
+            instance = new NullPerformanceMonitor();
         }
     }
 

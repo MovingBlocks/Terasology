@@ -39,14 +39,14 @@ import javax.vecmath.Vector2f;
  */
 public class UIMenuPause extends UIWindow {
 
-    final UIImage _title;
+    final UIImage title;
 
-    final UIButton _exitButton;
-    final UIButton _mainMenuButton;
-    final UIButton _respawnButton;
-    final UIButton _backToGameButton;
+    final UIButton exitButton;
+    final UIButton mainMenuButton;
+    final UIButton respawnButton;
+    final UIButton backToGameButton;
 
-    final UILabel _version;
+    final UILabel version;
 
     public UIMenuPause() {
         setId("pause");
@@ -56,32 +56,32 @@ public class UIMenuPause extends UIWindow {
         setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         maximize();
 
-        _title = new UIImage(Assets.getTexture("engine:terasology"));
-        _title.setSize(new Vector2f(512f, 128f));
-        _title.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _title.setPosition(new Vector2f(0f, 128f));
-        _title.setVisible(true);
+        title = new UIImage(Assets.getTexture("engine:terasology"));
+        title.setSize(new Vector2f(512f, 128f));
+        title.setHorizontalAlign(EHorizontalAlign.CENTER);
+        title.setPosition(new Vector2f(0f, 128f));
+        title.setVisible(true);
 
-        _version = new UILabel("Pre Alpha");
-        _version.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _version.setPosition(new Vector2f(0f, 230f));
-        _version.setVisible(true);
+        version = new UILabel("Pre Alpha");
+        version.setHorizontalAlign(EHorizontalAlign.CENTER);
+        version.setPosition(new Vector2f(0f, 230f));
+        version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _exitButton.getLabel().setText("Exit Terasology");
-        _exitButton.addClickListener(new ClickListener() {
+        exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        exitButton.getLabel().setText("Exit Terasology");
+        exitButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
-        _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
-        _exitButton.setVisible(true);
+        exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
+        exitButton.setVisible(true);
 
-        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _respawnButton.getLabel().setText("Respawn");
-        _respawnButton.addClickListener(new ClickListener() {
+        respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        respawnButton.getLabel().setText("Respawn");
+        respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnRequestEvent());
@@ -89,39 +89,39 @@ public class UIMenuPause extends UIWindow {
                 setVisible(false);
             }
         });
-        _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
-        _respawnButton.setVisible(true);
+        respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
+        respawnButton.setVisible(true);
 
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _mainMenuButton.getLabel().setText("Return to Main Menu");
-        _mainMenuButton.addClickListener(new ClickListener() {
+        mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        mainMenuButton.getLabel().setText("Return to Main Menu");
+        mainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
             }
         });
-        _mainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
-        _mainMenuButton.setVisible(true);
+        mainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
+        mainMenuButton.setVisible(true);
 
-        _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _backToGameButton.getLabel().setText("Back to game");
-        _backToGameButton.addClickListener(new ClickListener() {
+        backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        backToGameButton.getLabel().setText("Back to game");
+        backToGameButton.addClickListener(new ClickListener() {
             public void click(UIDisplayElement element, int button) {
                 setVisible(false);
             }
         });
-        _backToGameButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _backToGameButton.setPosition(new Vector2f(0f, 300f));
-        _backToGameButton.setVisible(true);
+        backToGameButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        backToGameButton.setPosition(new Vector2f(0f, 300f));
+        backToGameButton.setVisible(true);
 
 
-        addDisplayElement(_title);
-        addDisplayElement(_version);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_respawnButton);
-        addDisplayElement(_mainMenuButton);
-        addDisplayElement(_backToGameButton);
+        addDisplayElement(title);
+        addDisplayElement(version);
+        addDisplayElement(exitButton);
+        addDisplayElement(respawnButton);
+        addDisplayElement(mainMenuButton);
+        addDisplayElement(backToGameButton);
     }
 }

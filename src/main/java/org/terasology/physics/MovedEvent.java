@@ -28,11 +28,11 @@ import javax.vecmath.Vector3f;
  */
 public class MovedEvent implements Event {
     private Vector3f delta;
-    private Vector3f final_position;
+    private Vector3f finalPosition;
 
-    public MovedEvent(Vector3f delta, Vector3f final_position) {
+    public MovedEvent(Vector3f delta, Vector3f finalPosition) {
         this.delta = delta;
-        this.final_position = final_position;
+        this.finalPosition = finalPosition;
     }
 
     public Vector3f getDelta() {
@@ -40,6 +40,6 @@ public class MovedEvent implements Event {
     }
 
     public Vector3f getPosition() {
-        return final_position;
+        return finalPosition;
     }
 }

@@ -88,17 +88,15 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                         commandHistory.add(message);
                         commandCursor = commandHistory.size();
                         console.execute(message, localPlayer.getClientEntity());
-                    }
-                    //message history previous
-                    else if (event.getKey() == Keyboard.KEY_UP) {
+                    } else if (event.getKey() == Keyboard.KEY_UP) {
+                        //message history previous
                         if (commandCursor > 0) {
                             commandCursor--;
                             inputBox.setText(commandHistory.get(commandCursor));
                             inputBox.setCursorEnd();
                         }
-                    }
-                    //message history next
-                    else if (event.getKey() == Keyboard.KEY_DOWN) {
+                    } else if (event.getKey() == Keyboard.KEY_DOWN) {
+                        //message history next
                         if (commandCursor < commandHistory.size()) {
                             commandCursor++;
                             if (commandCursor == commandHistory.size()) {
@@ -108,9 +106,8 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                             }
                             inputBox.setCursorEnd();
                         }
-                    }
-                    //guess command
-                    else if (event.getKey() == Keyboard.KEY_TAB && !inputBox.getText().trim().isEmpty()) {
+                    } else if (event.getKey() == Keyboard.KEY_TAB && !inputBox.getText().trim().isEmpty()) {
+                        //guess command
                         String message = inputBox.getText().trim();
 
                         String commandName = message.substring(1);
@@ -128,9 +125,8 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                         if (matches.size() == 1) {
                             inputBox.setText(matches.get(0).getName());
                             inputBox.setCursorEnd();
-                        }
-                        //multiple matches found
-                        else if (matches.size() > 1) {
+                        } else if (matches.size() > 1) {
+                            //multiple matches found
                             //add list of available commands
                             String commandMatches = "";
                             for (CommandInfo cmd : matches) {

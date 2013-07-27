@@ -58,7 +58,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -71,14 +70,14 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
 
     private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
-    private final Deque<RigidBodyRequest> _insertionQueue = new LinkedList<RigidBodyRequest>();
-    private final Deque<RigidBody> _removalQueue = new LinkedList<RigidBody>();
+    private final Deque<RigidBodyRequest> insertionQueue = Lists.newLinkedList();
+    private final Deque<RigidBody> removalQueue = Lists.newLinkedList();
 
-    private final CollisionDispatcher _dispatcher;
-    private final BroadphaseInterface _broadphase;
-    private final CollisionConfiguration _defaultCollisionConfiguration;
-    private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
-    private final DiscreteDynamicsWorld _discreteDynamicsWorld;
+    private final CollisionDispatcher dispatcher;
+    private final BroadphaseInterface broadphase;
+    private final CollisionConfiguration defaultCollisionConfiguration;
+    private final SequentialImpulseConstraintSolver sequentialImpulseConstraintSolver;
+    private final DiscreteDynamicsWorld discreteDynamicsWorld;
     private final BlockEntityRegistry blockEntityRegistry;
     private final CollisionGroupManager collisionGroupManager;
     private final PhysicsWorldWrapper wrapper;
@@ -87,13 +86,13 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
     public BulletPhysics(WorldProvider world) {
         collisionGroupManager = CoreRegistry.get(CollisionGroupManager.class);
 
-        _broadphase = new DbvtBroadphase();
-        _broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
-        _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
-        _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
-        _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
-        _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
-        _discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
+        broadphase = new DbvtBroadphase();
+        broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
+        defaultCollisionConfiguration = new DefaultCollisionConfiguration();
+        dispatcher = new CollisionDispatcher(defaultCollisionConfiguration);
+        sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
+        discreteDynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
+        discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);
 
@@ -106,16 +105,16 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         RigidBody rigidBody = new RigidBody(blockConsInf);
         rigidBody.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.getCollisionFlags());
-        _discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
+        discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
     }
 
     public void dispose() {
-        _discreteDynamicsWorld.destroy();
+        discreteDynamicsWorld.destroy();
         wrapper.dispose();
     }
 
     public DynamicsWorld getWorld() {
-        return _discreteDynamicsWorld;
+        return discreteDynamicsWorld;
     }
 
     // TODO: Wrap ghost object?
@@ -145,28 +144,28 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         result.setWorldTransform(startTransform);
         result.setCollisionShape(shape);
         result.setCollisionFlags(collisionFlags);
-        _discreteDynamicsWorld.addCollisionObject(result, groups, filters);
+        discreteDynamicsWorld.addCollisionObject(result, groups, filters);
         return result;
     }
 
     public void addRigidBody(RigidBody body) {
-        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short) (CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.SENSOR_TRIGGER)));
+        insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short) (CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.SENSOR_TRIGGER)));
     }
 
     public void addRigidBody(RigidBody body, List<CollisionGroup> groups, List<CollisionGroup> filter) {
-        _insertionQueue.add(new RigidBodyRequest(body, combineGroups(groups), combineGroups(filter)));
+        insertionQueue.add(new RigidBodyRequest(body, combineGroups(groups), combineGroups(filter)));
     }
 
     public void addRigidBody(RigidBody body, short groups, short filter) {
-        _insertionQueue.add(new RigidBodyRequest(body, groups, (short) (filter | CollisionFilterGroups.SENSOR_TRIGGER)));
+        insertionQueue.add(new RigidBodyRequest(body, groups, (short) (filter | CollisionFilterGroups.SENSOR_TRIGGER)));
     }
 
     public void removeRigidBody(RigidBody body) {
-        _removalQueue.add(body);
+        removalQueue.add(body);
     }
 
     public void removeCollider(GhostObject collider) {
-        _discreteDynamicsWorld.removeCollisionObject(collider);
+        discreteDynamicsWorld.removeCollisionObject(collider);
     }
 
     public Iterable<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
@@ -174,7 +173,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         BoxShape shape = new BoxShape(area.getExtents());
         GhostObject scanObject = createCollider(area.getCenter(), shape, CollisionFilterGroups.SENSOR_TRIGGER, combineGroups(collisionFilter), CollisionFlags.NO_CONTACT_RESPONSE);
         // This in particular is overkill
-        _broadphase.calculateOverlappingPairs(_dispatcher);
+        broadphase.calculateOverlappingPairs(dispatcher);
         List<EntityRef> result = Lists.newArrayList();
         for (int i = 0; i < scanObject.getNumOverlappingObjects(); ++i) {
             CollisionObject other = scanObject.getOverlappingObject(i);
@@ -194,7 +193,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
 
         CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
         closest.collisionFilterGroup = CollisionFilterGroups.SENSOR_TRIGGER;
-        _discreteDynamicsWorld.rayTest(from, to, closest);
+        discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
             return new HitResult(blockEntityRegistry.getEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
         } else if (closest.userData instanceof EntityRef) {
@@ -213,7 +212,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
         closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
         closest.collisionFilterMask = filter;
-        _discreteDynamicsWorld.rayTest(from, to, closest);
+        discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
             return new HitResult(blockEntityRegistry.getEntityAt((Vector3i) closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
         } else if (closest.userData instanceof EntityRef) {
@@ -228,14 +227,14 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
         Vector3f max = event.getBlockPosition().toVector3f();
         max.add(new Vector3f(0.6f, 0.6f, 0.6f));
-        _discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
+        discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }
 
     public void update(float delta) {
         processQueuedBodies();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            _discreteDynamicsWorld.stepSimulation(delta, 8);
+            discreteDynamicsWorld.stepSimulation(delta, 8);
             PerformanceMonitor.endActivity();
         } catch (Exception e) {
             logger.error("Error running simulation step.", e);
@@ -243,13 +242,13 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
     }
 
     private synchronized void processQueuedBodies() {
-        while (!_insertionQueue.isEmpty()) {
-            RigidBodyRequest request = _insertionQueue.poll();
-            _discreteDynamicsWorld.addRigidBody(request.body, request.groups, request.filter);
+        while (!insertionQueue.isEmpty()) {
+            RigidBodyRequest request = insertionQueue.poll();
+            discreteDynamicsWorld.addRigidBody(request.body, request.groups, request.filter);
         }
-        while (!_removalQueue.isEmpty()) {
-            RigidBody body = _removalQueue.poll();
-            _discreteDynamicsWorld.removeRigidBody(body);
+        while (!removalQueue.isEmpty()) {
+            RigidBody body = removalQueue.poll();
+            discreteDynamicsWorld.removeRigidBody(body);
         }
     }
 

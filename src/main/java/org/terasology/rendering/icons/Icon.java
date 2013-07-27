@@ -36,10 +36,10 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class Icon {
     private static Map<String, Icon> icons;
 
-    private UIImage _element;
-    private BlockFamily _blockFamily;
-    private int _x;
-    private int _y;
+    private UIImage element;
+    private BlockFamily blockFamily;
+    private int x;
+    private int y;
     private Texture terrainTex;
 
     /**
@@ -48,8 +48,8 @@ public class Icon {
      * @param blockFamily
      */
     public Icon(BlockFamily blockFamily) {
-        _element = null;
-        _blockFamily = blockFamily;
+        element = null;
+        this.blockFamily = blockFamily;
         setAtlasPosition(0, 0);
         terrainTex = Assets.getTexture("engine:terrain");
     }
@@ -58,13 +58,13 @@ public class Icon {
      * Creates an Icon for a non-BlockFamily class
      */
     public Icon() {
-        _element = new UIImage(Assets.getTexture("engine:items"));
-        _blockFamily = null;
+        element = new UIImage(Assets.getTexture("engine:items"));
+        blockFamily = null;
 
-        _element.setSize(new Vector2f(32, 32));
-        _element.setTextureSize(new Vector2f(16, 16));
-        _element.setVisible(true);
-        _element.setPosition(new Vector2f(-10f, -16f));
+        element.setSize(new Vector2f(32, 32));
+        element.setTextureSize(new Vector2f(16, 16));
+        element.setVisible(true);
+        element.setPosition(new Vector2f(-10f, -16f));
 
         setAtlasPosition(0, 0);
     }
@@ -333,8 +333,8 @@ public class Icon {
      * Draw the icon.
      */
     public void render() {
-        if (_blockFamily == null) {
-            _element.renderTransformed();
+        if (blockFamily == null) {
+            element.renderTransformed();
         } else {
             GL11.glPushMatrix();
             glTranslatef(4f, 0f, 0f);
@@ -343,7 +343,7 @@ public class Icon {
             GL11.glRotatef(-16f, 0f, 1f, 0f);
             glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
-            Block block = _blockFamily.getArchetypeBlock();
+            Block block = blockFamily.getArchetypeBlock();
             block.renderWithLightValue(1.0f, 1.0f);
 
             GL11.glPopMatrix();
@@ -354,25 +354,25 @@ public class Icon {
      * @return x-offset in icon sheet
      */
     public int getX() {
-        return _x;
+        return x;
     }
 
     /**
      * @return y-offset in icon sheet
      */
     public int getY() {
-        return _y;
+        return y;
     }
 
     private void setAtlasPosition(int x, int y) {
-        _x = x;
-        _y = y;
+        this.x = x;
+        this.y = y;
 
-        if (_element == null) {
+        if (element == null) {
             return;
         }
 
-        _element.setTextureOrigin(new Vector2f(x * 16f, y * 16f));
+        element.setTextureOrigin(new Vector2f(x * 16f, y * 16f));
     }
 }
 

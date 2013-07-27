@@ -190,9 +190,8 @@ public class UILabel extends UIDisplayContainer {
             wrapText.replace(wrapText.length() - 1, wrapText.length(), "");
 
             return wrapText.toString();
-        }
-        //no wrap
-        else {
+        } else {
+            //no wrap
             return text;
         }
     }

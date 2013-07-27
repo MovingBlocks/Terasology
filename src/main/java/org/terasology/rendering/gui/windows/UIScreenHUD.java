@@ -212,10 +212,11 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         // Show/Hide hearts relatively to the available health points of the player
         for (int i = 0; i < 10; i++) {
 
-            if (i < healthRatio * 10f)
+            if (i < healthRatio * 10f) {
                 hearts[i].setVisible(true);
-            else
+            } else {
                 hearts[i].setVisible(false);
+            }
 
             // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
             //Show Poisoned Status with Green Hearts:

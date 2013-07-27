@@ -28,31 +28,31 @@ import java.util.Map;
  * Icons for showing status effects in the buff bar.
  */
 public class BuffIcon {
-    private static Map<String, BuffIcon> bufficons;
-    private UIImage _element;
-    private int _x;
-    private int _y;
+    private static Map<String, BuffIcon> buffIcons;
+    private UIImage element;
+    private int x;
+    private int y;
 
     public BuffIcon() {
-        _element = new UIImage(Assets.getTexture("engine:buffs"));
-        _element.setSize(new Vector2f(32, 32));
-        _element.setTextureSize(new Vector2f(16, 16));
-        _element.setVisible(true);
-        _element.setPosition(new Vector2f(-10f, -16f));
+        element = new UIImage(Assets.getTexture("engine:buffs"));
+        element.setSize(new Vector2f(32, 32));
+        element.setTextureSize(new Vector2f(16, 16));
+        element.setVisible(true);
+        element.setPosition(new Vector2f(-10f, -16f));
 
         setAtlasPosition(0, 0);
     }
 
     public static BuffIcon get(String name) {
-        if (bufficons == null) {
+        if (buffIcons == null) {
             loadIcons();
         }
 
-        return bufficons.get(name.toLowerCase(Locale.ENGLISH));
+        return buffIcons.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     private static void loadIcons() {
-        bufficons = new HashMap<String, BuffIcon>();
+        buffIcons = new HashMap<String, BuffIcon>();
         //* BUFFS & DE·BUFFS *//
         BuffIcon poisoned = new BuffIcon();
         BuffIcon cured = new BuffIcon();
@@ -67,31 +67,31 @@ public class BuffIcon {
         speed.setAtlasPosition(0, 1);
         maxspeed.setAtlasPosition(1, 1);
 
-        bufficons.put("poisoned", poisoned);
-        bufficons.put("cured", cured);
-        bufficons.put("speed", speed);
-        bufficons.put("maxspeed", maxspeed);
+        buffIcons.put("poisoned", poisoned);
+        buffIcons.put("cured", cured);
+        buffIcons.put("speed", speed);
+        buffIcons.put("maxspeed", maxspeed);
 
     }
 
     //@return x-offset in icon sheet
     public int getX() {
-        return _x;
+        return x;
     }
 
     //@return y-offset in icon sheet
     public int getY() {
-        return _y;
+        return y;
     }
 
     private void setAtlasPosition(int x, int y) {
-        _x = x;
-        _y = y;
+        this.x = x;
+        this.y = y;
 
-        if (_element == null) {
+        if (element == null) {
             return;
         }
 
-        _element.setTextureOrigin(new Vector2f(x * 16f, y * 16f));
+        element.setTextureOrigin(new Vector2f(x * 16f, y * 16f));
     }
 }
