@@ -451,12 +451,12 @@ public final class WorldRenderer {
         statIgnoredPhases = 0;
 
         int processedChunks = 0;
-
         for (int i = 0; i < chunksInProximity.size(); i++) {
             Chunk c = chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
 
-            if (i < TeraMath.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024) && config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
+            if (i < TeraMath.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024)
+                    && config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
                 if (isChunkVisibleLight(c) && isChunkValidForRender(c)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueueChunksOpaqueShadow.add(c);
@@ -473,31 +473,39 @@ public final class WorldRenderer {
                     } else {
                         statIgnoredPhases++;
                     }
+
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.REFRACTIVE) > 0) {
                         renderQueueChunksAlphaBlend.add(c);
                     } else {
                         statIgnoredPhases++;
                     }
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0) {
-                        renderQueueChunksAlphaBlend.add(c);
+
+                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0 && i < MAX_BILLBOARD_CHUNKS) {
+                        renderQueueChunksAlphaReject.add(c);
                     } else {
                         statIgnoredPhases++;
                     }
+
                     statVisibleChunks++;
+
                     if (statVisibleChunks < MAX_ANIMATED_CHUNKS) {
                         c.setAnimated(true);
                     } else {
                         c.setAnimated(false);
                     }
                 }
+
                 if (isChunkVisibleReflection(c)) {
                     renderQueueChunksOpaqueReflection.add(c);
                 }
+
+                // Process all chunks in the area, not only the visible ones
                 if (processChunkUpdates && processChunkUpdate(c)) {
                     processedChunks++;
                 }
             }
         }
+
         return processedChunks;
     }
 
@@ -722,17 +730,16 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        // Make sure the water surface is rendered if the player is swimming
-        boolean headUnderWater = isUnderWater();
-        if (headUnderWater) {
-            glDisable(GL11.GL_CULL_FACE);
-        }
-
         /*
         * THIRD CHUNK PASS: REFRACTIVE CHUNKS
         */
         PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
         DefaultRenderingProcess.getInstance().beginRenderSceneTransparent();
+        // Make sure the water surface is rendered if the player is swimming
+        boolean headUnderWater = isUnderWater();
+        if (headUnderWater) {
+            glDisable(GL11.GL_CULL_FACE);
+        }
         while (renderQueueChunksAlphaBlend.size() > 0) {
             renderChunk(renderQueueChunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, camera, ChunkRenderMode.DEFAULT);
         }
