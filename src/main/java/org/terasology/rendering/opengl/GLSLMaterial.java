@@ -208,7 +208,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void addFeatureIfAvailable(ShaderProgramFeature feature) {
+    public void activateFeature(ShaderProgramFeature feature) {
         if (shader.getAvailableFeatures().contains(feature)) {
             activeFeatures.add(feature);
             activeFeaturesMask = ShaderProgramFeature.getBitset(activeFeatures);
@@ -219,7 +219,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void removeFeature(ShaderProgramFeature feature) {
+    public void deactivateFeature(ShaderProgramFeature feature) {
         if (activeFeatures.remove(feature)) {
             activeFeaturesMask = ShaderProgramFeature.getBitset(activeFeatures);
             activeFeaturesChanged = true;
@@ -227,9 +227,9 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void removeFeatures(ShaderProgramFeature... features) {
+    public void deactivateFeatures(ShaderProgramFeature... features) {
         for (ShaderProgramFeature feature : Arrays.asList(features)) {
-            removeFeature(feature);
+            deactivateFeature(feature);
         }
     }
 

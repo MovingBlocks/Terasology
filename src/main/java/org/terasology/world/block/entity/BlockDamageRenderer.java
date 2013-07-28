@@ -93,7 +93,7 @@ public class BlockDamageRenderer implements RenderSystem {
         }
 
         Material defaultTextured = Assets.getMaterial("engine:defaultTextured");
-        defaultTextured.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        defaultTextured.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
         defaultTextured.enable();
 
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
@@ -124,7 +124,7 @@ public class BlockDamageRenderer implements RenderSystem {
 
         glDisable(GL11.GL_BLEND);
 
-        defaultTextured.removeFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        defaultTextured.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
     private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {

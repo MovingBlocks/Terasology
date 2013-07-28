@@ -234,21 +234,21 @@ public interface Material extends Asset<MaterialData> {
      *
      * @param feature
      */
-    void addFeatureIfAvailable(ShaderProgramFeature feature);
+    void activateFeature(ShaderProgramFeature feature);
 
     /**
      * Deactivates a feature of this material if active
      *
      * @param feature
      */
-    void removeFeature(ShaderProgramFeature feature);
+    void deactivateFeature(ShaderProgramFeature feature);
 
     /**
      * Deactivates a set of features of this material
      *
      * @param features
      */
-    void removeFeatures(ShaderProgramFeature... features);
+    void deactivateFeatures(ShaderProgramFeature... features);
 
     void bindTextures();
 }

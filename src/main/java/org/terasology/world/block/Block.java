@@ -616,7 +616,7 @@ public class Block {
             return;
 
         Material mat = Assets.getMaterial("engine:block");
-        mat.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         mat.enable();
         mat.setFloat("sunlight", sunlight);
@@ -637,7 +637,7 @@ public class Block {
             glEnable(GL11.GL_CULL_FACE);
         }
 
-        mat.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void generateMesh() {

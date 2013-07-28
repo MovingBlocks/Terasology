@@ -58,6 +58,7 @@ public class RenderingDebugConfig {
     private boolean firstPersonElementsHidden = false;
     private boolean hudHidden = false;
     private boolean wireframe = false;
+    private boolean renderChunkBoundingBoxes = false;
 
     public boolean isWireframe() {
         return wireframe;
@@ -101,6 +102,14 @@ public class RenderingDebugConfig {
 
     public void setHudHidden(boolean hudHidden) {
         this.hudHidden = hudHidden;
+    }
+
+    public boolean isRenderChunkBoundingBoxes() {
+        return renderChunkBoundingBoxes;
+    }
+
+    public void setRenderChunkBoundingBoxes(boolean renderChunkBoundingBoxes) {
+        this.renderChunkBoundingBoxes = renderChunkBoundingBoxes;
     }
 
 }

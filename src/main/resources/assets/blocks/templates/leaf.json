@@ -22,5 +22,6 @@
     "attachmentAllowed" : false,
     "hardness" : 1,
     "colorSource" : "foliage_lut",
-    "debrisOnDestroy" : false
+    "debrisOnDestroy" : false,
+    "waving" : true
 }

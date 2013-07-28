@@ -73,6 +73,7 @@ import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -389,7 +390,9 @@ public class TerasologyEngine implements GameEngine {
                 & GLContext.getCapabilities().GL_ARB_shader_objects;
 
         if (!canRunGame) {
-            logger.error("Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
+            String message = "Your GPU driver is not supporting the mandatory versions or extensions of OpenGL. Considered updating your GPU drivers? Exiting...";
+            logger.error(message);
+            JOptionPane.showMessageDialog(null, message, "Mandatory OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
 

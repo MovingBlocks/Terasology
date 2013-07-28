@@ -116,7 +116,7 @@ public class DebugControlSystem implements ComponentSystem {
                     event.consume();
                     break;
                 case Keyboard.KEY_F8:
-                    config.getSystem().setRenderChunkBoundingBoxes(!config.getSystem().isRenderChunkBoundingBoxes());
+                    config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
             }

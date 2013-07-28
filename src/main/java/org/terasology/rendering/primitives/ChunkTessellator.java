@@ -148,7 +148,7 @@ public final class ChunkTessellator {
                 mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].tex.get(cTex + 1));
 
                 /* FLAGS */
-                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].tex.get(mesh.vertexElements[j].flags.get(cFlags)));
+                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].flags.get(cFlags));
 
                 float[] result = new float[3];
                 Vector3f normal = new Vector3f(mesh.vertexElements[j].normals.get(i), mesh.vertexElements[j].normals.get(i + 1), mesh.vertexElements[j].normals.get(i + 2));

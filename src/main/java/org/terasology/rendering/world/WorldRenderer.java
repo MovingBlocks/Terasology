@@ -788,9 +788,9 @@ public final class WorldRenderer {
 
         if (!geometryOnly) {
             if (lightComponent.lightType == LightComponent.LightType.POINT) {
-                program.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_LIGHT_POINT);
+                program.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
             } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
+                program.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
             }
         }
         program.enable();
@@ -832,9 +832,9 @@ public final class WorldRenderer {
 
         if (!geometryOnly) {
             if (lightComponent.lightType == LightComponent.LightType.POINT) {
-                program.removeFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
+                program.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
             } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.removeFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
+                program.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
             }
         }
 
@@ -847,7 +847,7 @@ public final class WorldRenderer {
         skysphere.render(camera);
 
         Material chunkShader = Assets.getMaterial("engine:chunk");
-        chunkShader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         if (config.getRendering().isReflectiveWater()) {
             camera.lookThrough();
@@ -859,7 +859,7 @@ public final class WorldRenderer {
             }
         }
 
-        chunkShader.removeFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
         PerformanceMonitor.endActivity();
     }
 
@@ -893,9 +893,9 @@ public final class WorldRenderer {
                 shader.enable();
 
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                    shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+                    shader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
                 } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                    shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+                    shader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
 
                 shader.setFloat3("chunkPositionWorld", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
@@ -920,7 +920,7 @@ public final class WorldRenderer {
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!chunk.getMesh()[i].isEmpty()) {
-                    if (config.getSystem().isRenderChunkBoundingBoxes()) {
+                    if (config.getRendering().getDebug().isRenderChunkBoundingBoxes()) {
                         AABBRenderer aabbRenderer = new AABBRenderer(chunk.getSubMeshAABB(i));
                         aabbRenderer.renderLocally(1f);
                         statRenderedTriangles += 12;
@@ -937,9 +937,9 @@ public final class WorldRenderer {
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                    shader.removeFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+                    shader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
                 } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                    shader.removeFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+                    shader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
             }
 

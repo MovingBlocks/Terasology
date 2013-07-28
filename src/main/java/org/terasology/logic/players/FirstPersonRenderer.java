@@ -145,7 +145,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
         Material shader = Assets.getMaterial("engine:block");
-        shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
         shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
@@ -163,12 +163,12 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        shader.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
         Material shader = Assets.getMaterial("engine:block");
-        shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
 
@@ -197,7 +197,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        shader.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
@@ -206,7 +206,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         // Adjust the brightness of the block according to the current position of the player
         Material shader = Assets.getMaterial("engine:block");
-        shader.addFeatureIfAvailable(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
 
@@ -230,7 +230,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
 
-        shader.removeFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude) {

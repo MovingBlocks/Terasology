@@ -25,7 +25,6 @@ public class SystemConfig {
     private int verticalChunkMeshSegments = 1;
 
     private boolean debugEnabled;
-    private boolean renderChunkBoundingBoxes;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;
@@ -57,13 +56,5 @@ public class SystemConfig {
 
     public void setDebugEnabled(boolean debugEnabled) {
         this.debugEnabled = debugEnabled;
-    }
-
-    public boolean isRenderChunkBoundingBoxes() {
-        return renderChunkBoundingBoxes;
-    }
-
-    public void setRenderChunkBoundingBoxes(boolean renderChunkBoundingBoxes) {
-        this.renderChunkBoundingBoxes = renderChunkBoundingBoxes;
     }
 }
