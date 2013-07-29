@@ -61,12 +61,11 @@ public class PropertyPanel extends JPanel {
         removeAll();
 
         if (activePropertyProvider != null) {
-            List<Property> properties = new ArrayList<Property>();
-            activePropertyProvider.addPropertiesToList(properties);
+            List<Property<?>> properties = activePropertyProvider.getProperties();
 
             setLayout(new GridLayout(properties.size() >= 16 ? properties.size() : 16, 1));
 
-            Iterator<Property> it = properties.iterator();
+            Iterator<Property<?>> it = properties.iterator();
             while (it.hasNext()) {
                 Property property = it.next();
 

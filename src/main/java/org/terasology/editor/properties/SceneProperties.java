@@ -15,6 +15,7 @@
  */
 package org.terasology.editor.properties;
 
+import com.google.common.collect.Lists;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.Skysphere;
@@ -27,14 +28,16 @@ import java.util.List;
  */
 public class SceneProperties implements PropertyProvider {
     @Override
-    public void addPropertiesToList(List<Property> properties) {
+    public List<Property<?>> getProperties() {
+        List<Property<?>> result = Lists.newArrayList();
         Skysphere skysphere = CoreRegistry.get(WorldRenderer.class).getSkysphere();
         if (skysphere != null) {
-            new ReflectionProvider(skysphere).addPropertiesToList(properties);
+            result.addAll(new ReflectionProvider(skysphere).getProperties());
         }
         DefaultRenderingProcess postRenderer = DefaultRenderingProcess.getInstance();
         if (postRenderer != null) {
-            new ReflectionProvider(postRenderer).addPropertiesToList(properties);
+            result.addAll(new ReflectionProvider(postRenderer).getProperties());
         }
+        return result;
     }
 }

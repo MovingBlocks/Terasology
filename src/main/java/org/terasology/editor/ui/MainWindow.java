@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.editor.TeraEd;
+import org.terasology.editor.properties.PropertyProvider;
 import org.terasology.editor.properties.ReflectionProvider;
 import org.terasology.engine.StateChangeSubscriber;
 import org.terasology.rendering.opengl.GLSLMaterial;
@@ -120,18 +121,21 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         shaderPropertiesMenu.removeAll();
         for (GLSLMaterial material : AssetManager.getInstance().listLoadedAssets(AssetType.MATERIAL, GLSLMaterial.class)) {
             if (material.getShaderParameters() != null) {
-                final GLSLMaterial finalMat = material;
-                String programName = material.getURI().toString();
-                JMenuItem menuItem = new JMenuItem(programName);
-                menuItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        propertyPanel.setActivePropertyProvider(new ReflectionProvider(finalMat.getShaderParameters()));
-                        propertyPanel.setTitle(finalMat.getURI().toString());
-                    }
-                });
-                shaderPropertyMenuEntries.add(menuItem);
-                shaderPropertiesMenu.add(menuItem);
+                GLSLMaterial finalMat = material;
+                final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters());
+                if (!provider.getProperties().isEmpty()) {
+                    final String programName = material.getURI().toString();
+                    JMenuItem menuItem = new JMenuItem(programName);
+                    menuItem.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            propertyPanel.setActivePropertyProvider(provider);
+                            propertyPanel.setTitle(programName);
+                        }
+                    });
+                    shaderPropertyMenuEntries.add(menuItem);
+                    shaderPropertiesMenu.add(menuItem);
+                }
             }
         }
     }

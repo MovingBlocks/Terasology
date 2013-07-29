@@ -23,8 +23,7 @@ import java.util.List;
 public interface PropertyProvider {
     /**
      * Adds the properties of this Object to the given property list.
-     *
-     * @param properties
+     * @return a list of the properties of this object
      */
-    public abstract void addPropertiesToList(List<Property> properties);
+    List<Property<?>> getProperties();
 }

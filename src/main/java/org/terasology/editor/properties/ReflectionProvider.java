@@ -32,7 +32,7 @@ import static org.reflections.ReflectionUtils.withType;
  * @author Immortius
  */
 public class ReflectionProvider implements PropertyProvider {
-    private List<Property> properties = Lists.newArrayList();
+    private List<Property<?>> properties = Lists.newArrayList();
 
     public ReflectionProvider(Object target) {
         for (Field field : getAllFields(target.getClass(), and(withAnnotation(EditorRange.class), or(withType(Float.TYPE), withType(Float.class))))) {
@@ -44,7 +44,7 @@ public class ReflectionProvider implements PropertyProvider {
     }
 
     @Override
-    public void addPropertiesToList(List<Property> properties) {
-        properties.addAll(this.properties);
+    public List<Property<?>> getProperties() {
+        return properties;
     }
 }
