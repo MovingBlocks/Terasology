@@ -18,6 +18,7 @@ package org.terasology.rendering.world;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.asset.Assets;
+import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
@@ -41,7 +42,9 @@ import static org.lwjgl.opengl.GL11.glNewList;
  */
 public class Skysphere {
 
+    @EditorRange(min = 0.0f, max = 100.0f)
     private float colorExp = 14.0f;
+    @EditorRange(min = 2.0f, max = 32.0f)
     private float turbidity = 8.0f;
     private float sunPosAngle = 0.1f;
 

@@ -18,10 +18,12 @@ package org.terasology.logic.particles;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.MappedContainer;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.util.List;
 
 /**
@@ -29,9 +31,21 @@ import java.util.List;
  */
 // TODO: Generalise for non-block particles?
 public final class BlockParticleEffectComponent implements Component {
-    public BlockFamily blockType;
+
+    public enum ParticleBlendMode {
+        OPAQUE,
+        ADD
+    }
+
+    // Can be null for non-block particles
+    public BlockFamily blockType = null;
+    // If no texture is specified, the default block texture atlas is used
+    public Texture texture = null;
+
     public int spawnCount = 16;
     public boolean destroyEntityOnCompletion;
+    public Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    public ParticleBlendMode blendMode = ParticleBlendMode.OPAQUE;
 
     // Initial conditions
     public Vector3f spawnRange = new Vector3f();
@@ -40,6 +54,9 @@ public final class BlockParticleEffectComponent implements Component {
     public float maxSize = 1.0f;
     public float minLifespan = 0.0f;
     public float maxLifespan = 1.0f;
+
+    public boolean randBlockTexDisplacement = false;
+    public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
 
     // Lifetime conditions
     public Vector3f targetVelocity = new Vector3f();
@@ -55,16 +72,18 @@ public final class BlockParticleEffectComponent implements Component {
         public float size = 1.0f;
         public float lifeRemaining = 1.0f;
         public Vector2f texOffset = new Vector2f(0, 0);
+        public Vector2f texSize = new Vector2f(1, 1);
+        public Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        public Particle() {
-        }
-
-        public Particle(Particle other) {
-            this.velocity.set(other.velocity);
-            this.position.set(other.position);
-            this.size = other.size;
-            this.lifeRemaining = other.lifeRemaining;
-            this.texOffset.set(other.texOffset);
+        public Particle clone() {
+            Particle particle = new Particle();
+            particle.velocity.set(velocity);
+            particle.position.set(position);
+            particle.size = size;
+            particle.lifeRemaining = lifeRemaining;
+            particle.texOffset.set(texOffset);
+            particle.texSize.set(texSize);
+            return particle;
         }
     }
 }

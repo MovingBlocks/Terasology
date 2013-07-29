@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
+import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
@@ -32,8 +33,9 @@ import javax.vecmath.Vector4f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersCombine extends ShaderParametersBase {
-
+    @EditorRange(min = 0.001f, max = 0.005f)
     private float outlineDepthThreshold = 0.001f;
+    @EditorRange(min = 0.0f, max = 1.0f)
     private float outlineThickness = 0.65f;
 
     private float skyInscatteringLength = 0.25f;

@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
@@ -34,26 +35,42 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveIntens = 1.5f;
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveIntensFalloff = 0.85f;
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveSize = 0.1f;
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveSizeFalloff = 1.25f;
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveSpeed = 0.1f;
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveSpeedFalloff = 0.95f;
 
+    @EditorRange(min = 0.0f, max = 2.0f)
     float waveOverallScale = 1.0f;
 
+    @EditorRange(min = 0.0f, max = 1.0f)
     float waterRefraction = 0.04f;
+    @EditorRange(min = 0.0f, max = 0.1f)
     float waterFresnelBias = 0.01f;
+    @EditorRange(min = 0.0f, max = 10.0f)
     float waterFresnelPow = 2.5f;
+    @EditorRange(min = 1.0f, max = 100.0f)
     float waterNormalBias = 25.0f;
+    @EditorRange(min = 0.0f, max = 1.0f)
     float waterTint = 0.24f;
 
+    @EditorRange(min = 0.0f, max = 5.0f)
     float waterOffsetY = 0.0f;
 
+    @EditorRange(min = 0.0f, max = 1024.0f)
     float waterSpecExp = 512.0f;
 
+    @EditorRange(min = 0.0f, max = 0.5f)
     float parallaxBias = 0.05f;
+    @EditorRange(min = 0.0f, max = 0.50f)
     float parallaxScale = 0.05f;
 
     public void applyParameters(Material program) {

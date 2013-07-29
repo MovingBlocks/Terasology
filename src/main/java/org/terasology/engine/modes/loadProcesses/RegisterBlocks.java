@@ -16,11 +16,13 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
@@ -43,14 +45,16 @@ public class RegisterBlocks implements LoadProcess {
     @Override
     public boolean step() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        WorldAtlas atlas = new WorldAtlas(CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution());
+        CoreRegistry.put(WorldAtlas.class, atlas);
+
         BlockManagerImpl blockManager;
         if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerImpl(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true, CoreRegistry.get(BlockFamilyFactoryRegistry.class));
+            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true, CoreRegistry.get(BlockFamilyFactoryRegistry.class));
             blockManager.subscribe(CoreRegistry.get(NetworkSystem.class));
         } else {
-            blockManager = new BlockManagerImpl(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false, CoreRegistry.get(BlockFamilyFactoryRegistry.class));
+            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false, CoreRegistry.get(BlockFamilyFactoryRegistry.class));
         }
-        blockManager.buildAtlas();
         CoreRegistry.put(BlockManager.class, blockManager);
 
         return true;

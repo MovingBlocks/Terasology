@@ -68,7 +68,7 @@ public final class PathManager {
         }
         // If terasology.jar's location could not be resolved (maybe running from an IDE) then fallback on working path
         if (installPath == null) {
-            installPath = Paths.get("");
+            installPath = Paths.get("").toAbsolutePath();
         }
         homePath = installPath;
     }

@@ -39,6 +39,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
@@ -83,7 +84,7 @@ public class StorageManagerTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = new EntitySystemBuilder().build(modManager, networkSystem);
 
-        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new DefaultBlockFamilyFactoryRegistry()));
+        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry()));
         testBlock = new Block();
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
 

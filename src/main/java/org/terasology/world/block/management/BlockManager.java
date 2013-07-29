@@ -165,9 +165,4 @@ public abstract class BlockManager {
 
     public abstract Iterable<Block> listRegisteredBlocks();
 
-    public abstract float getRelativeTileSize();
-
-    public float getRelativeTileSizeWithOffset() {
-        return getRelativeTileSize() - 0.01f;
-    }
 }

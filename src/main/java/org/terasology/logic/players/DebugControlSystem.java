@@ -17,8 +17,10 @@
 package org.terasology.logic.players;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -44,6 +46,9 @@ import org.terasology.world.WorldProvider;
 public class DebugControlSystem implements ComponentSystem {
 
     private UIScreenMetrics metrics;
+
+    @In
+    private GameEngine engine;
 
     @In
     private WorldProvider world;
@@ -123,6 +128,11 @@ public class DebugControlSystem implements ComponentSystem {
         }
 
         switch (event.getKey()) {
+            case Keyboard.KEY_F1:
+                engine.setFocus(!engine.hasFocus());
+                Mouse.setGrabbed(engine.hasFocus());
+                event.consume();
+                break;
             case Keyboard.KEY_F3:
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();

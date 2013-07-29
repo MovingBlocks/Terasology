@@ -84,6 +84,10 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
         reload(data);
     }
 
+    public ShaderParameters getShaderParameters() {
+        return shaderParameters;
+    }
+
     public void setShaderParameters(ShaderParameters param) {
         this.shaderParameters = param;
         param.initialParameters(this);
@@ -119,15 +123,23 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void reload(MaterialData data) {
-        dispose();
-
-        shader = (GLSLShader) data.getShader();
+    public void recompile() {
         shaderPrograms.put(0, shader.linkShaderProgram(0));
         for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
             int featureMask = ShaderProgramFeature.getBitset(permutation);
             shaderPrograms.put(featureMask, shader.linkShaderProgram(featureMask));
         }
+        if (shaderParameters != null) {
+            shaderParameters.initialParameters(this);
+        }
+    }
+
+    @Override
+    public void reload(MaterialData data) {
+        dispose();
+
+        shader = (GLSLShader) data.getShader();
+        recompile();
 
         for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
             setTexture(entry.getKey(), entry.getValue());

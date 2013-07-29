@@ -21,6 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -57,6 +58,9 @@ public class InputSystem implements ComponentSystem {
 
     @In
     private Config config;
+
+    @In
+    private GameEngine engine;
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();
@@ -166,6 +170,9 @@ public class InputSystem implements ComponentSystem {
     }
 
     private void processMouseInput(float delta) {
+        if (!engine.hasFocus()) {
+            return;
+        }
         //process mouse clicks
         while (Mouse.next()) {
             //left/right/middle mouse click

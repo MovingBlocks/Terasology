@@ -56,6 +56,7 @@ public class RegisterMods implements LoadProcess {
         }
 
         modManager.applyActiveMods();
+        AssetManager.getInstance().clear();
         AssetManager.getInstance().applyOverrides();
         return true;
     }

@@ -78,11 +78,11 @@ public class BlockLoader implements BlockBuilderHelper {
     private BlockShape loweredShape;
     private BlockShape trimmedLoweredShape;
 
-    private final WorldAtlasBuilder atlasBuilder;
+    private final WorldAtlas atlas;
     private BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
-    public BlockLoader(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, WorldAtlasBuilder atlasBuilder) {
-        this.atlasBuilder = atlasBuilder;
+    public BlockLoader(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, WorldAtlas atlas) {
+        this.atlas = atlas;
         parser = new JsonParser();
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
@@ -116,7 +116,6 @@ public class BlockLoader implements BlockBuilderHelper {
                     BlockDefinition blockDef = createBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
                     if (isShapelessBlockFamily(blockDef)) {
-                        atlasBuilder.addToAtlas(getDefaultTile(blockDef, blockDefUri));
                         result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockDef.categories));
                     } else {
                         if (blockDef.liquid) {
@@ -139,10 +138,6 @@ public class BlockLoader implements BlockBuilderHelper {
         }
         result.shapelessDefinitions.addAll(loadAutoBlocks());
         return result;
-    }
-
-    public WorldAtlasBuilder getAtlasBuilder() {
-        return atlasBuilder;
     }
 
     @Override
@@ -196,7 +191,6 @@ public class BlockLoader implements BlockBuilderHelper {
                 logger.debug("Loading auto block {}", blockTileUri);
                 BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
                 result.add(new FreeformFamily(uri));
-                atlasBuilder.addToAtlas(blockTileUri);
             }
         }
         return result;
@@ -358,11 +352,11 @@ public class BlockLoader implements BlockBuilderHelper {
         Map<BlockPart, Vector2f> textureAtlasPositions = Maps.newEnumMap(BlockPart.class);
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
-            Vector2f atlasPos = atlasBuilder.getTexCoords(tileUris.get(part), shape.getMeshPart(part) != null);
+            Vector2f atlasPos = atlas.getTexCoords(tileUris.get(part), shape.getMeshPart(part) != null);
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, atlas.getRelativeTileSizeWithOffset()));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);
@@ -378,7 +372,7 @@ public class BlockLoader implements BlockBuilderHelper {
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.none().getQuat4f()).mapTexCoords(atlasBuilder.getTexCoords(tileUris.get(part), true), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.none().getQuat4f()).mapTexCoords(atlas.getTexCoords(tileUris.get(part), true), atlas.getRelativeTileSizeWithOffset()));
         }
     }
 

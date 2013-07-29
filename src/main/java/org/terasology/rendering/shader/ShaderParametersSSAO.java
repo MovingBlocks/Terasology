@@ -22,6 +22,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
@@ -50,7 +51,9 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     private static final FastRandom rand = new FastRandom(0xD3ADBEEF);
 
+    @EditorRange(min = 0.01f, max = 12.0f)
     private float ssaoStrength = 2.0f;
+    @EditorRange(min = 0.1f, max = 25.0f)
     private float ssaoRad = 2.0f;
 
     private FloatBuffer ssaoSamples = null;

@@ -39,7 +39,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.ChunkVertexFlag;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.loader.WorldAtlas;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
@@ -174,10 +174,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         String preProcessorPreamble = "#version 120\n";
 
         // TODO: Implement a system for this - this has gotten way out of hand.
-        if (CoreRegistry.get(BlockManager.class) != null) {
-            preProcessorPreamble += "#define TEXTURE_OFFSET " + CoreRegistry.get(BlockManager.class).getRelativeTileSize() + "\n";
+        if (CoreRegistry.get(WorldAtlas.class) != null) {
+            preProcessorPreamble += "#define TEXTURE_OFFSET " + CoreRegistry.get(WorldAtlas.class).getRelativeTileSize() + "\n";
         } else {
-            preProcessorPreamble += "#define TEXTURE_OFFSET 0.0625\n";
+            preProcessorPreamble += "#define TEXTURE_OFFSET 0.06125\n";
         }
         preProcessorPreamble += "#define BLOCK_LIGHT_POW " + WorldRenderer.BLOCK_LIGHT_POW + "\n";
         preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";

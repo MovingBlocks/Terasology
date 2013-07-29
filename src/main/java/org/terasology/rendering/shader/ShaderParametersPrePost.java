@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
@@ -36,9 +37,12 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
+    @EditorRange(min = 0.0f, max = 0.1f)
     float aberrationOffsetX = 0.0f;
+    @EditorRange(min = 0.0f, max = 0.1f)
     float aberrationOffsetY = 0.0f;
 
+    @EditorRange(min = 0.0f, max = 1.0f)
     float bloomFactor = 0.5f;
 
     @Override

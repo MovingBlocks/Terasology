@@ -16,6 +16,7 @@
 
 package org.terasology.engine;
 
+import com.google.common.collect.Sets;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -74,10 +75,12 @@ import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -110,6 +113,11 @@ public class TerasologyEngine implements GameEngine {
     private EngineTime time;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
+    private Canvas customViewPort = null;
+    private boolean hibernationAllowed = false;
+    private boolean gameFocused = true;
+    private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
+
     public TerasologyEngine() {
     }
 
@@ -135,7 +143,7 @@ public class TerasologyEngine implements GameEngine {
         initTimer(); // Dependent on LWJGL
         initManagers();
         updateInputConfig();
-        CoreRegistry.putPermanently(GUIManager.class, new GUIManager());
+        CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
         initSecurity();
         initialised = true;
     }
@@ -201,13 +209,13 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void run(GameState initialState) {
+        CoreRegistry.putPermanently(GameEngine.class, this);
         if (!initialised) {
             init();
         }
         changeState(initialState);
         running = true;
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-        CoreRegistry.putPermanently(GameEngine.class, this);
 
         mainLoop();
 
@@ -321,6 +329,7 @@ public class TerasologyEngine implements GameEngine {
     private void initDisplay() {
         try {
             setDisplayMode();
+            Display.setParent(customViewPort);
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             Display.create(config.getRendering().getPixelFormat());
         } catch (LWJGLException e) {
@@ -467,7 +476,7 @@ public class TerasologyEngine implements GameEngine {
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
-            if (!Display.isActive() && currentState.isHibernationAllowed()) {
+            if (!Display.isActive() && isHibernationAllowed()) {
                 time.setPaused(true);
                 Iterator<Float> updateCycles = time.tick();
                 while (updateCycles.hasNext()) {
@@ -544,6 +553,9 @@ public class TerasologyEngine implements GameEngine {
         }
         currentState = newState;
         newState.init(this);
+        for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
+            subscriber.onStateChange();
+        }
     }
 
     private void setDisplayMode() {
@@ -572,5 +584,35 @@ public class TerasologyEngine implements GameEngine {
             resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
         }
+    }
+
+    public boolean isHibernationAllowed() {
+        return hibernationAllowed && currentState.isHibernationAllowed();
+    }
+
+    public void setHibernationAllowed(boolean allowed) {
+        this.hibernationAllowed = allowed;
+    }
+
+    public boolean hasFocus() {
+        return gameFocused && Display.isActive();
+    }
+
+    public void setFocus(boolean focused) {
+        gameFocused = focused;
+    }
+
+    @Override
+    public void subscribeToStateChange(StateChangeSubscriber subscriber) {
+        stateChangeSubscribers.add(subscriber);
+    }
+
+    @Override
+    public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
+        stateChangeSubscribers.remove(subscriber);
+    }
+
+    public void setCustomViewport(Canvas canvas) {
+        this.customViewPort = canvas;
     }
 }

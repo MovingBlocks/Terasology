@@ -63,9 +63,6 @@ import static org.lwjgl.opengl.GL11.glIsEnabled;
  */
 // TODO: Make this immutable, add a block builder class?
 public class Block {
-    public static final float TEXTURE_OFFSET = 0.0625f;
-    public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
-
     private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this

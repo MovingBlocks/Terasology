@@ -80,5 +80,17 @@ public interface GameEngine {
      */
     int getActiveTaskCount();
 
+    boolean isHibernationAllowed();
+
+    void setHibernationAllowed(boolean allowed);
+
+    // TODO: This probably should be elsewhere?
+    boolean hasFocus();
+
+    void setFocus(boolean focused);
+
+    void subscribeToStateChange(StateChangeSubscriber subscriber);
+
+    void unsubscribeToStateChange(StateChangeSubscriber subscriber);
 
 }

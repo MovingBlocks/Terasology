@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
@@ -110,16 +111,25 @@ public class DefaultRenderingProcess {
     private static DefaultRenderingProcess instance = null;
 
     /* PROPERTIES */
+    @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
+    @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrMaxExposure = 8.0f;
+    @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrMaxExposureNight = 1.0f;
+    @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrMinExposure = 1.0f;
+    @EditorRange(min = 0.0f, max = 4.0f)
     private float hdrTargetLuminance = 1.0f;
+    @EditorRange(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
+    @EditorRange(min = 0.0f, max = 5.0f)
     private float bloomHighPassThreshold = 0.5f;
+    @EditorRange(min = 0.0f, max = 32.0f)
     private float bloomBlurRadius = 12.0f;
 
+    @EditorRange(min = 0.0f, max = 16.0f)
     private float overallBlurRadiusFactor = 0.8f;
 
     /* HDR */

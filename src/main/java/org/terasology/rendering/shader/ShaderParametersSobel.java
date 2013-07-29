@@ -16,6 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.editor.EditorRange;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
@@ -26,7 +27,9 @@ import org.terasology.rendering.opengl.DefaultRenderingProcess;
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
 
+    @EditorRange(min = 0.0f, max = 16.0f)
     float pixelOffsetX = 1.0f;
+    @EditorRange(min = 0.0f, max = 16.0f)
     float pixelOffsetY = 1.0f;
 
     @Override

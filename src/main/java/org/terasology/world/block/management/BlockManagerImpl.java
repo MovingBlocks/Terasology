@@ -31,8 +31,6 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
@@ -40,7 +38,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.loader.FreeformFamily;
-import org.terasology.world.block.loader.WorldAtlasBuilder;
+import org.terasology.world.block.loader.WorldAtlas;
 
 import java.util.List;
 import java.util.Locale;
@@ -101,13 +99,13 @@ public class BlockManagerImpl extends BlockManager {
     private boolean generateNewIds = false;
     private int nextId = 1;
 
-    public BlockManagerImpl(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
-        this(Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, blockFamilyFactoryRegistry);
+    public BlockManagerImpl(WorldAtlas atlas, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+        this(atlas, Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, blockFamilyFactoryRegistry);
     }
 
-    public BlockManagerImpl(List<String> registeredBlockFamilies, Map<String, Short> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+    public BlockManagerImpl(WorldAtlas atlas, List<String> registeredBlockFamilies, Map<String, Short> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
-        blockLoader = new BlockLoader(blockFamilyFactoryRegistry, new WorldAtlasBuilder(CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution()));
+        blockLoader = new BlockLoader(blockFamilyFactoryRegistry, atlas);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
         for (BlockFamily family : blockDefinitions.families) {
@@ -191,10 +189,6 @@ public class BlockManagerImpl extends BlockManager {
         } else {
             logger.error("Block family not available: {}", familyUri);
         }
-    }
-
-    public void buildAtlas() {
-        blockLoader.getAtlasBuilder().buildAtlas();
     }
 
     /**
@@ -407,8 +401,4 @@ public class BlockManagerImpl extends BlockManager {
         return ImmutableList.copyOf(registeredBlockInfo.get().blocksById.valueCollection());
     }
 
-    @Override
-    public float getRelativeTileSize() {
-        return ((float) blockLoader.getAtlasBuilder().getTileSize()) / blockLoader.getAtlasBuilder().getAtlasSize();
-    }
 }

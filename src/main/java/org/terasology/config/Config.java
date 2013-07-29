@@ -167,7 +167,7 @@ public final class Config {
     private static Gson createGson() {
         return new GsonBuilder()
                 .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
-                .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
+                .registerTypeAdapter(Multimap.class, new MultimapHandler<>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())

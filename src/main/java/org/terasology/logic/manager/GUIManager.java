@@ -21,6 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -71,8 +72,10 @@ public class GUIManager implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(GUIManager.class);
     private UIDisplayRenderer renderer;
     private Map<String, Class<? extends UIWindow>> registeredWindows = Maps.newHashMap();
+    private GameEngine engine;
 
-    public GUIManager() {
+    public GUIManager(GameEngine engine) {
+        this.engine = engine;
         renderer = new UIDisplayRenderer();
         renderer.setVisible(true);
 
@@ -323,7 +326,7 @@ public class GUIManager implements ComponentSystem {
      * Check whether the mouse of the current focused window is visible and can be moved on the display.
      */
     public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null) {
+        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasFocus()) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);

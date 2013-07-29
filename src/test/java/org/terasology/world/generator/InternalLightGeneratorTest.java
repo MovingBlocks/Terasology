@@ -27,6 +27,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
@@ -44,7 +45,7 @@ public class InternalLightGeneratorTest {
 
     @Before
     public void setup() {
-        BlockManagerImpl blockManager = new BlockManagerImpl(new DefaultBlockFamilyFactoryRegistry());
+        BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = BlockManager.getAir();
         solidBlock = new Block();

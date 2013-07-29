@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.editor;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A flower that can emit a glow (bloomed version)
- * @author (art) eleazzaar
+ * @author Immortius
  */
-{
-    "author" : "eleazzaar",
-    "basedOn" : "engine:plant",
-    "luminance" : 6,
-    "waving" : true
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface EditorRange {
+    float min() default 0;
+
+    float max() default 1;
 }

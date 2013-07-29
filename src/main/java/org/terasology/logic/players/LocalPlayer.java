@@ -16,16 +16,13 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
-import org.terasology.rendering.logic.LightComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -67,15 +64,6 @@ public class LocalPlayer {
             return new Quat4f(0, 0, 0, 1);
         }
         return location.getWorldRotation();
-    }
-
-    public boolean isCarryingTorch() {
-        CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character == null) {
-            return false;
-        }
-
-        return CoreRegistry.get(SlotBasedInventoryManager.class).getItemInSlot(getCharacterEntity(), character.selectedTool).hasComponent(LightComponent.class);
     }
 
     public EntityRef getCharacterEntity() {

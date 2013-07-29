@@ -32,7 +32,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.world.block.Block;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
@@ -50,8 +49,8 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class WorldAtlasBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(WorldAtlasBuilder.class);
+public class WorldAtlas {
+    private static final Logger logger = LoggerFactory.getLogger(WorldAtlas.class);
 
     private static final int MAX_TILES = 65536;
     private static final Color UNIT_Z_COLOR = new Color(0.5f, 0.5f, 1.0f, 1.0f);
@@ -73,8 +72,12 @@ public class WorldAtlasBuilder {
     /**
      * @param maxAtlasSize The maximum dimensions of the atlas (both width and height, in pixels)
      */
-    public WorldAtlasBuilder(int maxAtlasSize) {
+    public WorldAtlas(int maxAtlasSize) {
         this.maxAtlasSize = maxAtlasSize;
+        for (AssetUri tile : AssetManager.getInstance().listAssets(AssetType.BLOCK_TILE)) {
+            indexTile(tile, false);
+        }
+        buildAtlas();
     }
 
     public int getTileSize() {
@@ -85,11 +88,91 @@ public class WorldAtlasBuilder {
         return atlasSize;
     }
 
+    public float getRelativeTileSize() {
+        return ((float) getTileSize()) / (float) getAtlasSize();
+    }
+
+    public float getRelativeTileSizeWithOffset() {
+        return getRelativeTileSize() - 0.01f;
+    }
+
     public int getNumMipmaps() {
         return TeraMath.sizeOfPower(tileSize) + 1;
     }
 
-    public void buildAtlas() {
+    /**
+     * Obtains the tex coords of a block tile. If it isn't part of the atlas it is added to the atlas.
+     *
+     * @param uri         The uri of the block tile of interest.
+     * @param warnOnError Whether a warning should be logged if the asset canot be found
+     * @return The tex coords of the tile in the atlas.
+     */
+    public Vector2f getTexCoords(AssetUri uri, boolean warnOnError) {
+        return getTexCoords(getTileIndex(uri, warnOnError));
+    }
+
+    private Vector2f getTexCoords(int id) {
+        int tilesPerDim = atlasSize / tileSize;
+        return new Vector2f((id % tilesPerDim) * getRelativeTileSize(), (id / tilesPerDim) * getRelativeTileSize());
+    }
+
+    private int getTileIndex(AssetUri uri, boolean warnOnError) {
+        if (tileIndexes.containsKey(uri)) {
+            return tileIndexes.get(uri);
+        }
+        return indexTile(uri, warnOnError);
+    }
+
+    private int indexTile(AssetUri uri, boolean warnOnError) {
+        if (tiles.size() == MAX_TILES) {
+            logger.error("Maximum tiles exceeded");
+            return 0;
+        }
+        TileData tile = AssetManager.tryLoadAssetData(uri, TileData.class);
+        if (tile != null) {
+            if (checkTile(tile)) {
+                int index = tiles.size();
+                tiles.add(tile);
+                addNormal(uri);
+                addHeightMap(uri);
+                tileIndexes.put(uri, index);
+                return index;
+            } else {
+                logger.error("Invalid tile {}, must be a square with power-of-two sides.", uri);
+                return 0;
+            }
+        } else if (warnOnError) {
+            logger.warn("Unable to resolve block tile '{}'", uri);
+        }
+        return 0;
+    }
+
+    private boolean checkTile(TileData tile) {
+        return tile.getImage().getWidth() == tile.getImage().getHeight()
+                && TeraMath.isPowerOfTwo(tile.getImage().getWidth());
+    }
+
+    private void addNormal(AssetUri uri) {
+        String name = uri.getSimpleString() + "Normal";
+        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        if (tile != null) {
+            tilesNormal.add(tile);
+        } else {
+            tilesNormal.add(defaultNormal);
+        }
+    }
+
+    private void addHeightMap(AssetUri uri) {
+        String name = uri.getSimpleString() + "Height";
+        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        if (tile != null) {
+            tilesHeight.add(tile);
+        } else {
+            tilesHeight.add(defaultHeight);
+        }
+    }
+
+    private void buildAtlas() {
         calculateAtlasSizes();
 
         int numMipMaps = getNumMipmaps();
@@ -190,83 +273,5 @@ public class WorldAtlasBuilder {
         }
 
         return result;
-    }
-
-    public void addToAtlas(AssetUri uri) {
-        if (!tileIndexes.containsKey(uri)) {
-            indexTile(uri, true);
-        }
-    }
-
-    /**
-     * Obtains the tex coords of a block tile. If it isn't part of the atlas it is added to the atlas.
-     *
-     * @param uri         The uri of the block tile of interest.
-     * @param warnOnError Whether a warning should be logged if the asset canot be found
-     * @return The tex coords of the tile in the atlas.
-     */
-    public Vector2f getTexCoords(AssetUri uri, boolean warnOnError) {
-        return getTexCoords(getTileIndex(uri, warnOnError));
-    }
-
-    private Vector2f getTexCoords(int id) {
-        int tilesPerDim = atlasSize / tileSize;
-        return new Vector2f((id % tilesPerDim) * Block.TEXTURE_OFFSET, (id / tilesPerDim) * Block.TEXTURE_OFFSET);
-    }
-
-    private int getTileIndex(AssetUri uri, boolean warnOnError) {
-        if (tileIndexes.containsKey(uri)) {
-            return tileIndexes.get(uri);
-        }
-        return indexTile(uri, warnOnError);
-    }
-
-    private int indexTile(AssetUri uri, boolean warnOnError) {
-        if (tiles.size() == MAX_TILES) {
-            logger.error("Maximum tiles exceeded");
-            return 0;
-        }
-        TileData tile = AssetManager.tryLoadAssetData(uri, TileData.class);
-        if (tile != null) {
-            if (checkTile(tile)) {
-                int index = tiles.size();
-                tiles.add(tile);
-                addNormal(uri);
-                addHeightMap(uri);
-                tileIndexes.put(uri, index);
-                return index;
-            } else {
-                logger.error("Invalid tile {}, must be a square with power-of-two sides.", uri);
-                return 0;
-            }
-        } else if (warnOnError) {
-            logger.warn("Unable to resolve block tile '{}'", uri);
-        }
-        return 0;
-    }
-
-    private boolean checkTile(TileData tile) {
-        return tile.getImage().getWidth() == tile.getImage().getHeight()
-                && TeraMath.isPowerOfTwo(tile.getImage().getWidth());
-    }
-
-    private void addNormal(AssetUri uri) {
-        String name = uri.getSimpleString() + "Normal";
-        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
-        if (tile != null) {
-            tilesNormal.add(tile);
-        } else {
-            tilesNormal.add(defaultNormal);
-        }
-    }
-
-    private void addHeightMap(AssetUri uri) {
-        String name = uri.getSimpleString() + "Height";
-        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
-        if (tile != null) {
-            tilesHeight.add(tile);
-        } else {
-            tilesHeight.add(defaultHeight);
-        }
     }
 }

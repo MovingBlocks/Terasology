@@ -48,7 +48,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -57,6 +56,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -287,6 +287,14 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     private void flushChunkStores() throws IOException {
+        // This is a little bit of a hack to get around a JAVA 7 bug (hopefully fixed in JAVA 8
+        FileSystemProvider zipProvider = null;
+        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+            if ("jar".equalsIgnoreCase(provider.getScheme())) {
+                zipProvider = provider;
+            }
+        }
+
         storageTaskMaster.shutdown(new ShutdownTask(), true);
         try {
             Path chunksPath = getWorldPath();
@@ -299,7 +307,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                     if (zip == null) {
                         Path targetPath = chunksPath.resolve(getChunkZipTempFilename(chunkZipPos));
                         Files.deleteIfExists(targetPath);
-                        zip = FileSystems.newFileSystem(URI.create("jar:file:" + (targetPath).toUri().getPath()), CREATE_ZIP_OPTIONS, null);
+                        zip = zipProvider.newFileSystem(targetPath, CREATE_ZIP_OPTIONS);
                         newChunkZips.put(chunkZipPos, zip);
                     }
                     Path chunkPath = zip.getPath(getChunkFilename(chunkStoreEntry.getKey()));

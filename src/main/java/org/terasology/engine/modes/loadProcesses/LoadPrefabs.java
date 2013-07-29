@@ -19,7 +19,6 @@ package org.terasology.engine.modes.loadProcesses;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -54,7 +53,6 @@ public class LoadPrefabs implements LoadProcess {
 
     @Override
     public int begin() {
-        AssetManager.getInstance().clear();
         prefabManager = CoreRegistry.get(PrefabManager.class);
         prefabs = Assets.list(AssetType.PREFAB).iterator();
         return Lists.newArrayList(Assets.list(AssetType.PREFAB)).size();

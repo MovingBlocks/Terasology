@@ -52,6 +52,7 @@ import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
+import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 
@@ -98,7 +99,7 @@ public abstract class TerasologyTestingEnvironment {
             DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
             blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
             blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AlignToSurfaceFamilyFactory());
-            blockManager = new BlockManagerImpl(blockFamilyFactoryRegistry);
+            blockManager = new BlockManagerImpl(new WorldAtlas(4096), blockFamilyFactoryRegistry);
             CoreRegistry.put(BlockManager.class, blockManager);
 
             config = new Config();

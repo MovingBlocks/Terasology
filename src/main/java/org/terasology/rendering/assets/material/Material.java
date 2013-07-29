@@ -33,6 +33,8 @@ import java.nio.FloatBuffer;
  */
 public interface Material extends Asset<MaterialData> {
 
+    void recompile();
+
     /**
      * Enables the material for rendering
      */

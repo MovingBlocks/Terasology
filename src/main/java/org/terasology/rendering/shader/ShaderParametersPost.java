@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.rendering.assets.material.Material;
@@ -40,9 +41,12 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
     FastRandom rand = new FastRandom();
 
+    @EditorRange(min = 0.0f, max = 1.0f)
     float filmGrainIntensity = 0.025f;
 
+    @EditorRange(min = 0.0f, max = 1.0f)
     float blurStart = 0.0f;
+    @EditorRange(min = 0.0f, max = 1.0f)
     float blurLength = 0.15f;
 
     @Override
