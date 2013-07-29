@@ -14,13 +14,13 @@ import static org.junit.Assert.assertEquals;
 public class MasterSecretGeneratorTests {
 
     @Test
-    public void MD5HashTest() {
+    public void md5HashTest() {
         byte[] rawbytes = SecretGenerator.phashMD5(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 80);
         assertEquals(80, rawbytes.length);
     }
 
     @Test
-    public void SHA1HashTest() {
+    public void sha1HashTest() {
         byte[] rawbytes = SecretGenerator.phashSHA1(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 80);
         assertEquals(80, rawbytes.length);
     }

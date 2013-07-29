@@ -43,6 +43,8 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
     private static final Logger logger = LoggerFactory.getLogger(MainWindow.class);
 
+    private TeraEd teraEd;
+
     private BorderLayout borderLayout;
     private Viewport viewport;
     private PropertyPanel propertyPanel;
@@ -66,7 +68,8 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         return viewport;
     }
 
-    public MainWindow() {
+    public MainWindow(TeraEd teraEd) {
+        this.teraEd = teraEd;
         this.addWindowListener(this);
 
         viewport = new Viewport();
@@ -143,9 +146,9 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == fileMenuExitItem) {
-            TeraEd.getEngine().shutdown();
+            teraEd.getEngine().shutdown();
         } else if (e.getSource() == propertiesMenuScene) {
-            propertyPanel.setActivePropertyProvider(TeraEd.getSceneProperties());
+            propertyPanel.setActivePropertyProvider(teraEd.getSceneProperties());
             propertyPanel.setTitle("Scene Properties");
         }
     }
@@ -156,7 +159,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
     @Override
     public void windowClosing(WindowEvent e) {
-        TeraEd.getEngine().shutdown();
+        teraEd.getEngine().shutdown();
     }
 
     @Override

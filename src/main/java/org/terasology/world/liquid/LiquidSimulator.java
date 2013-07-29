@@ -52,8 +52,8 @@ import java.util.concurrent.TimeUnit;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class LiquidSimulator implements ComponentSystem {
 
-    private static int NUM_THREADS = 2;
-    private static byte MAX_LIQUID_DEPTH = 0x7;
+    private static final int NUM_THREADS = 2;
+    private static final byte MAX_LIQUID_DEPTH = 0x7;
     public static final int PROPAGATION_DELAY = 200;
 
     private static final Logger logger = LoggerFactory.getLogger(LiquidSimulator.class);
@@ -244,7 +244,7 @@ public class LiquidSimulator implements ComponentSystem {
     /**
      * Map of outgoing amounts of water, by number of available spaces (0-4) and depth (0-7)
      */
-    private static byte[][] OUTGOING_FLOW = new byte[][]{
+    private static final byte[][] OUTGOING_FLOW = new byte[][]{
             // No where to go
             {0, 0, 0, 0, 0, 0, 0, 0},
             // One space

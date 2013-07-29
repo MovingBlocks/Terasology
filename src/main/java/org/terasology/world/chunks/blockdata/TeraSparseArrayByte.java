@@ -45,23 +45,25 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     protected void initialize() {
     }
 
-    protected static abstract class SerializationHandler<T extends TeraSparseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
+    protected abstract static class SerializationHandler<T extends TeraSparseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
 
         protected abstract T createArray(int sizeX, int sizeY, int sizeZ);
 
         @Override
         protected int internalComputeMinimumBufferSize(T array) {
             final byte[][] inf = array.inflated;
-            if (inf == null)
+            if (inf == null) {
                 return 2;
-            else {
+            } else {
                 final int sizeY = array.getSizeY(), rowSize = array.rowSize();
                 int result = 1;
-                for (int y = 0; y < sizeY; y++)
-                    if (inf[y] == null)
+                for (int y = 0; y < sizeY; y++) {
+                    if (inf[y] == null) {
                         result += 2;
-                    else
+                    } else {
                         result += 1 + rowSize;
+                    }
+                }
                 return result;
             }
         }
@@ -102,9 +104,9 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
             final byte[] def = array.deflated = new byte[sizeY];
             for (int y = 0; y < sizeY; y++) {
                 final byte hasRow = buffer.get();
-                if (hasRow == 0)
+                if (hasRow == 0) {
                     def[y] = buffer.get();
-                else {
+                } else {
                     final byte[] row = inf[y] = new byte[rowSize];
                     buffer.get(row, 0, rowSize);
                 }
@@ -136,20 +138,23 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
 
     @Override
     public final int getEstimatedMemoryConsumptionInBytes() {
-        if (inflated == null)
+        if (inflated == null) {
             return 9;
+        }
         int result = 9 + getSizeY() + (getSizeY() * 4);
         for (int i = 0; i < getSizeY(); i++) {
-            if (inflated[i] != null)
+            if (inflated[i] != null) {
                 result += 12 + rowSize();
+            }
         }
         return result;
     }
 
     @Override
     public final TeraArray copy() {
-        if (inflated == null)
+        if (inflated == null) {
             return createSparse(fill);
+        }
         byte[][] inf = new byte[getSizeY()][];
         byte[] def = new byte[getSizeY()];
         for (int y = 0; y < getSizeY(); y++) {

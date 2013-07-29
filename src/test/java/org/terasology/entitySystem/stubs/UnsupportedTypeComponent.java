@@ -28,7 +28,7 @@ public class UnsupportedTypeComponent implements Component {
         private UnsupportedType() {};
     }
 
-    public static abstract class UnsupportedType2 {
+    public abstract static class UnsupportedType2 {
 
     }
 

@@ -65,16 +65,18 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         @Override
         protected int internalComputeMinimumBufferSize(TeraSparseArray16Bit array) {
             final short[][] inf = array.inflated;
-            if (inf == null)
+            if (inf == null) {
                 return 3;
-            else {
+            } else {
                 final int sizeY = array.getSizeY(), rowSize = array.getSizeXZ() * 2;
                 int result = 1;
-                for (int y = 0; y < sizeY; y++)
-                    if (inf[y] == null)
+                for (int y = 0; y < sizeY; y++) {
+                    if (inf[y] == null) {
                         result += 3;
-                    else
+                    } else {
                         result += 1 + rowSize;
+                    }
+                }
                 return result;
             }
         }
@@ -115,9 +117,9 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
             final short[] def = array.deflated = new short[sizeY];
             for (int y = 0; y < sizeY; y++) {
                 final byte hasRow = buffer.get();
-                if (hasRow == 0)
+                if (hasRow == 0) {
                     def[y] = buffer.getShort();
-                else {
+                } else {
                     final short[] row = inf[y] = new short[rowSize];
                     getRow(row, rowSize, buffer);
                 }
@@ -172,8 +174,9 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
 
     @Override
     public TeraArray copy() {
-        if (inflated == null)
+        if (inflated == null) {
             return new TeraSparseArray16Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
+        }
         short[][] inf = new short[getSizeY()][];
         short[] def = new short[getSizeY()];
         for (int y = 0; y < getSizeY(); y++) {
@@ -193,12 +196,14 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
 
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
-        if (inflated == null)
+        if (inflated == null) {
             return 10;
+        }
         int result = 10 + (getSizeY() * 2) + (getSizeY() * 4);
         for (int i = 0; i < getSizeY(); i++) {
-            if (inflated[i] != null)
+            if (inflated[i] != null) {
                 result += 12 + (getSizeXZ() * 2);
+            }
         }
         return result;
     }
@@ -210,11 +215,13 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
 
     @Override
     public int get(int x, int y, int z) {
-        if (inflated == null)
+        if (inflated == null) {
             return fill;
+        }
         short[] row = inflated[y];
-        if (row != null)
+        if (row != null) {
             return row[pos(x, z)];
+        }
         return deflated[y];
     }
 
@@ -222,9 +229,9 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     public int set(int x, int y, int z, int value) {
         if (inflated == null) {
             int old = fill;
-            if (old == value)
+            if (old == value) {
                 return old;
-            else {
+            } else {
                 this.inflated = new short[getSizeY()][];
                 this.deflated = new short[getSizeY()];
                 Arrays.fill(deflated, fill);
@@ -238,8 +245,9 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
             return old;
         }
         int old = deflated[y];
-        if (old == value)
+        if (old == value) {
             return old;
+        }
         row = inflated[y] = new short[getSizeXZ()];
         Arrays.fill(row, deflated[y]);
         int pos = pos(x, z);
@@ -249,12 +257,14 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
 
     @Override
     public boolean set(int x, int y, int z, int value, int expected) {
-        if (value == expected) return true;
+        if (value == expected) {
+            return true;
+        }
         if (inflated == null) {
             int old = fill;
-            if (old == value)
+            if (old == value) {
                 return true;
-            else {
+            } else {
                 this.inflated = new short[getSizeY()][];
                 this.deflated = new short[getSizeY()];
                 Arrays.fill(deflated, fill);

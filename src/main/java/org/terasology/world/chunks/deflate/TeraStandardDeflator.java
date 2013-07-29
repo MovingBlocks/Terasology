@@ -60,9 +60,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
      */
 
     // TODO dynamically calculate DEFLATE_MINIMUM_*, they only work for chunks with dimension 16x256x16
-    protected final static int DEFLATE_MINIMUM_16BIT = 8;
-    protected final static int DEFLATE_MINIMUM_8BIT = 16;
-    protected final static int DEFLATE_MINIMUM_4BIT = 31;
+    protected static final int DEFLATE_MINIMUM_16BIT = 8;
+    protected static final int DEFLATE_MINIMUM_8BIT = 16;
+    protected static final int DEFLATE_MINIMUM_4BIT = 31;
 
     public TeraStandardDeflator() {
     }
@@ -100,8 +100,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
                     break;
                 }
             }
-            if (packable)
+            if (packable) {
                 return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, first);
+            }
         }
         if (packed > DEFLATE_MINIMUM_16BIT) {
             return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, inflated, deflated);
@@ -142,8 +143,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
                     break;
                 }
             }
-            if (packable)
+            if (packable) {
                 return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, first);
+            }
         }
         if (packed > DEFLATE_MINIMUM_8BIT) {
             return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
@@ -184,8 +186,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
                     break;
                 }
             }
-            if (packable)
+            if (packable) {
                 return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ, first);
+            }
         }
         if (packed > DEFLATE_MINIMUM_4BIT) {
             return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ, inflated, deflated);

@@ -20,13 +20,13 @@ package org.terasology.world;
  */
 public abstract class WorldTimeEvent {
 
-    private final double _executionTime;
-    private final boolean _repeatingEvent;
-    private boolean _canFire;
+    private final double executionTime;
+    private final boolean repeatingEvent;
+    private boolean canFire;
 
     public WorldTimeEvent(double executionTime, boolean repeatingEvent) {
-        _executionTime = executionTime;
-        _repeatingEvent = repeatingEvent;
+        this.executionTime = executionTime;
+        this.repeatingEvent = repeatingEvent;
     }
 
     public void execute() {
@@ -36,18 +36,18 @@ public abstract class WorldTimeEvent {
     public abstract void run();
 
     public double getExecutionTime() {
-        return _executionTime;
+        return executionTime;
     }
 
     public boolean isRepeatingEvent() {
-        return _repeatingEvent;
+        return repeatingEvent;
     }
 
     public void setCanFire(boolean canFire) {
-        _canFire = canFire;
+        this.canFire = canFire;
     }
 
     public boolean canFire() {
-        return _canFire;
+        return canFire;
     }
 }

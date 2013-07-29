@@ -151,11 +151,13 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     @Override
     public final int get(int x, int y, int z) {
         int pos = pos(x, z);
-        if (inflated == null)
+        if (inflated == null) {
             return rowGet(pos, fill);
+        }
         byte[] row = inflated[y];
-        if (row != null)
+        if (row != null) {
             return rowGet(row, pos);
+        }
         return rowGet(pos, deflated[y]);
     }
 
@@ -164,20 +166,22 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         int pos = pos(x, z);
         if (inflated == null) {
             int old = rowGet(pos, fill);
-            if (old == value)
+            if (old == value) {
                 return old;
-            else {
+            } else {
                 this.inflated = new byte[getSizeY()][];
                 this.deflated = new byte[getSizeY()];
                 Arrays.fill(deflated, fill);
             }
         }
         byte[] row = inflated[y];
-        if (row != null)
+        if (row != null) {
             return rowSetGetOld(row, pos, value);
+        }
         int old = rowGet(pos, deflated[y]);
-        if (old == value)
+        if (old == value) {
             return old;
+        }
         row = inflated[y] = new byte[rowSize()];
         Arrays.fill(row, deflated[y]);
         return rowSetGetOld(row, pos, value);
@@ -185,13 +189,15 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
     @Override
     public final boolean set(int x, int y, int z, int value, int expected) {
-        if (value == expected) return true;
+        if (value == expected) {
+            return true;
+        }
         int pos = pos(x, z);
         if (inflated == null) {
             int old = rowGet(pos, fill);
-            if (old == value)
+            if (old == value) {
                 return true;
-            else {
+            } else {
                 this.inflated = new byte[getSizeY()][];
                 this.deflated = new byte[getSizeY()];
                 Arrays.fill(deflated, fill);

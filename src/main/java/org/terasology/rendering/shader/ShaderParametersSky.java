@@ -58,11 +58,11 @@ public class ShaderParametersSky extends ShaderParametersBase {
 
         Vector4f theta = new Vector4f(1, thetaSun, thetaSun * thetaSun, thetaSun * thetaSun * thetaSun);
 
-        float Y = (4.0453f * turbidity - 4.9710f) * (float) Math.tan(chi) - 0.2155f * turbidity + 2.4192f;
+        float why = (4.0453f * turbidity - 4.9710f) * (float) Math.tan(chi) - 0.2155f * turbidity + 2.4192f;
         float x = t2 * cx1.dot(theta) + turbidity * cx2.dot(theta) + cx3.dot(theta);
         float y = t2 * cy1.dot(theta) + turbidity * cy2.dot(theta) + cy3.dot(theta);
 
-        return new Vector3d(Y, x, y);
+        return new Vector3d(why, x, y);
     }
 
     @Override

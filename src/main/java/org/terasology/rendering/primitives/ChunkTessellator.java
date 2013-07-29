@@ -69,10 +69,9 @@ public final class ChunkTessellator {
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     Block block = chunkView.getBlock(x, y, z);
 
-                    if (block == null || block.isInvisible())
-                        continue;
-
-                    generateBlockVertices(chunkView, mesh, x, y, z, biomeTemp, biomeHumidity);
+                    if (block != null && !block.isInvisible()) {
+                        generateBlockVertices(chunkView, mesh, x, y, z, biomeTemp, biomeHumidity);
+                    }
                 }
             }
         }
@@ -103,10 +102,9 @@ public final class ChunkTessellator {
                 for (int y = 0; y < MiniatureChunk.SIZE_Y; y++) {
                     Block block = miniatureChunk.getBlock(x, y, z);
 
-                    if (block == null || block.isInvisible())
-                        continue;
-
-                    generateBlockVertices(localChunkView, mesh, x, y, z, 0.0f, 0.0f);
+                    if (block != null && !block.isInvisible()) {
+                        generateBlockVertices(localChunkView, mesh, x, y, z, 0.0f, 0.0f);
+                    }
                 }
             }
         }
@@ -388,7 +386,9 @@ public final class ChunkTessellator {
      */
     private boolean isSideVisibleForBlockTypes(Block blockToCheck, Block currentBlock, Side side) {
         // Liquids can be transparent but there should be no visible adjacent faces
-        if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
+        if (currentBlock.isLiquid() && blockToCheck.isLiquid()) {
+            return false;
+        }
 
         return blockToCheck.isInvisible() ||
                 !blockToCheck.isFullSide(side.reverse()) ||

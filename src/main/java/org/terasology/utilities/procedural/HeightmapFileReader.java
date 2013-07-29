@@ -51,7 +51,9 @@ public class HeightmapFileReader {
             index++;
             min = a < min ? a : min;
             max = a > max ? a : max;
-            if (index / 512 > 511) break;
+            if (index / 512 > 511) {
+                break;
+            }
         }
         return (theMap);
     }

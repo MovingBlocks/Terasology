@@ -38,7 +38,7 @@ public class ComponentMetadataTest {
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(StringComponent.class);
         ClassMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
-        assertNull(metadata.getField("staticValue"));
+        assertNull(metadata.getField("STATIC_VALUE"));
     }
 
     @Test

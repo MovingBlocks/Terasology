@@ -33,8 +33,9 @@ public abstract class TeraVisitingDeflator extends TeraDeflator {
     @Override
     public final TeraArray deflate(TeraArray in) {
         TeraArray result = Preconditions.checkNotNull(in).deflate(this);
-        if (result != null)
+        if (result != null) {
             return result;
+        }
         return in;
     }
 

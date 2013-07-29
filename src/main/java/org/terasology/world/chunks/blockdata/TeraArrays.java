@@ -43,7 +43,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @SuppressWarnings("rawtypes")
 public final class TeraArrays {
 
-    private static final TeraArrays instance = new TeraArrays();
+    private static final TeraArrays INSTANCE = new TeraArrays();
 
     private final ReadWriteLock lock;
     private final Map<Class, Entry> arrayClasses;
@@ -93,37 +93,44 @@ public final class TeraArrays {
     public final ChunksProtobuf.TeraArray encode(TeraArray array) {
         Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
         final Entry entry = getEntry(array.getClass());
-        if (entry == null)
+        if (entry == null) {
             throw new IllegalArgumentException("Unable to encode the supplied array of class: " + array.getClass().getName());
+        }
         final ChunksProtobuf.TeraArray.Builder b = ChunksProtobuf.TeraArray.newBuilder();
         final ByteBuffer buf = entry.handler.serialize(array, null);
         buf.rewind();
         b.setData(ByteString.copyFrom(buf));
         b.setType(entry.protobufType);
-        if (entry.protobufType == ChunksProtobuf.Type.Unknown)
+        if (entry.protobufType == ChunksProtobuf.Type.Unknown) {
             b.setClassName(entry.arrayClassName);
+        }
         return b.build();
     }
 
     public final TeraArray decode(ChunksProtobuf.TeraArray message) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
-        if (!message.hasType())
+        if (!message.hasType()) {
             throw new IllegalArgumentException("Illformed protobuf message. Missing type information.");
+        }
         final ChunksProtobuf.Type type = message.getType();
         final Entry entry;
         if (type == ChunksProtobuf.Type.Unknown) {
-            if (!message.hasClassName())
+            if (!message.hasClassName()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing class name.");
+            }
             entry = getEntry(message.getClassName());
-            if (entry == null)
+            if (entry == null) {
                 throw new IllegalArgumentException("Unable to decode protobuf message. No entry found for class name: " + message.getClassName());
+            }
         } else {
             entry = getEntry(type);
-            if (entry == null)
+            if (entry == null) {
                 throw new IllegalArgumentException("Unable to decode protobuf message. No entry found for type: " + type);
+            }
         }
-        if (!message.hasData())
+        if (!message.hasData()) {
             throw new IllegalArgumentException("Illformed protobuf message. Missing byte sequence.");
+        }
         final ByteString data = message.getData();
         return entry.handler.deserialize(data.asReadOnlyByteBuffer());
     }
@@ -221,6 +228,6 @@ public final class TeraArrays {
     }
 
     public static final TeraArrays getInstance() {
-        return instance;
+        return INSTANCE;
     }
 }

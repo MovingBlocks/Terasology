@@ -47,10 +47,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 
         @Override
         protected TeraDenseArray8Bit createArray(int sizeX, int sizeY, int sizeZ, byte[] data) {
-            if (data == null)
+            if (data == null) {
                 return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
-            else
+            } else {
                 return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ, data);
+            }
         }
     }
 

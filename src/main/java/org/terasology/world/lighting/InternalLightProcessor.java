@@ -76,7 +76,9 @@ public class InternalLightProcessor {
 
     private static void spreadLightInternal(Chunk chunk, int x, int y, int z, Block block) {
         byte lightValue = chunk.getLight(x, y, z);
-        if (lightValue <= 1) return;
+        if (lightValue <= 1) {
+            return;
+        }
 
         // TODO: use custom bounds checked iterator for this
         for (Side adjDir : Side.values()) {
@@ -113,7 +115,9 @@ public class InternalLightProcessor {
             }
         }
 
-        if (lightValue <= 1) return;
+        if (lightValue <= 1) {
+            return;
+        }
 
         for (Side adjDir : Side.horizontalSides()) {
             int adjX = x + adjDir.getVector3i().x;

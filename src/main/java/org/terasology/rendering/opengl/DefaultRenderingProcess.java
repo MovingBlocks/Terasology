@@ -286,7 +286,7 @@ public class DefaultRenderingProcess {
         }
     }
 
-    private Map<String, FBO> FBOs = Maps.newHashMap();
+    private Map<String, FBO> fboLookup = Maps.newHashMap();
 
     /**
      * Returns (and creates – if necessary) the static instance
@@ -360,7 +360,7 @@ public class DefaultRenderingProcess {
         rtWidth32 = rtHeight16 / 2;
         rtHeight32 = rtWidth16 / 2;
 
-        FBO scene = FBOs.get("sceneOpaque");
+        FBO scene = fboLookup.get("sceneOpaque");
         final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
 
         if (!recreate) {
@@ -401,8 +401,8 @@ public class DefaultRenderingProcess {
     }
 
     public void deleteFBO(String title) {
-        if (FBOs.containsKey(title)) {
-            FBO fbo = FBOs.get(title);
+        if (fboLookup.containsKey(title)) {
+            FBO fbo = fboLookup.get(title);
 
             EXTFramebufferObject.glDeleteFramebuffersEXT(fbo.fboId);
             EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
@@ -615,7 +615,7 @@ public class DefaultRenderingProcess {
 
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
 
-        FBOs.put(title, fbo);
+        fboLookup.put(title, fbo);
         return fbo;
     }
 
@@ -1435,7 +1435,7 @@ public class DefaultRenderingProcess {
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
 
-                for (int x = 0; x < fboSceneFinal.width; x++)
+                for (int x = 0; x < fboSceneFinal.width; x++) {
                     for (int y = 0; y < fboSceneFinal.height; y++) {
                         int i = (x + fboSceneFinal.width * y) * 4;
                         int r = buffer.get(i) & 0xFF;
@@ -1443,6 +1443,7 @@ public class DefaultRenderingProcess {
                         int b = buffer.get(i + 2) & 0xFF;
                         image.setRGB(x, fboSceneFinal.height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
                     }
+                }
 
                 try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
                     ImageIO.write(image, "png", out);
@@ -1467,7 +1468,7 @@ public class DefaultRenderingProcess {
     }
 
     public FBO getFBO(String title) {
-        FBO fbo = FBOs.get(title);
+        FBO fbo = fboLookup.get(title);
 
         if (fbo == null) {
             logger.error("Failed to retrieve FBO '" + title + "'!");
@@ -1479,7 +1480,7 @@ public class DefaultRenderingProcess {
     public boolean bindFbo(String title) {
         FBO fbo;
 
-        if ((fbo = FBOs.get(title)) != null) {
+        if ((fbo = fboLookup.get(title)) != null) {
             fbo.bind();
             currentlyBoundFboName = title;
             return true;
@@ -1492,7 +1493,7 @@ public class DefaultRenderingProcess {
     public boolean unbindFbo(String title) {
         FBO fbo;
 
-        if ((fbo = FBOs.get(title)) != null) {
+        if ((fbo = fboLookup.get(title)) != null) {
             fbo.unbind();
             currentlyBoundFboName = "";
             return true;
@@ -1505,7 +1506,7 @@ public class DefaultRenderingProcess {
     public boolean bindFboTexture(String title) {
         FBO fbo;
 
-        if ((fbo = FBOs.get(title)) != null) {
+        if ((fbo = fboLookup.get(title)) != null) {
             fbo.bindTexture();
             return true;
         }
@@ -1517,7 +1518,7 @@ public class DefaultRenderingProcess {
     public boolean bindFboDepthTexture(String title) {
         FBO fbo;
 
-        if ((fbo = FBOs.get(title)) != null) {
+        if ((fbo = fboLookup.get(title)) != null) {
             fbo.bindDepthTexture();
             return true;
         }
@@ -1529,7 +1530,7 @@ public class DefaultRenderingProcess {
     public boolean bindFboNormalsTexture(String title) {
         FBO fbo;
 
-        if ((fbo = FBOs.get(title)) != null) {
+        if ((fbo = fboLookup.get(title)) != null) {
             fbo.bindNormalsTexture();
             return true;
         }
@@ -1541,7 +1542,7 @@ public class DefaultRenderingProcess {
     public boolean bindFboLightBufferTexture(String title) {
         FBO fbo;
 
-        if ((fbo = FBOs.get(title)) != null) {
+        if ((fbo = fboLookup.get(title)) != null) {
             fbo.bindLightBufferTexture();
             return true;
         }
@@ -1558,8 +1559,8 @@ public class DefaultRenderingProcess {
             return;
         }
 
-        FBOs.put(title, fbo2);
-        FBOs.put(title + "PingPong", fbo1);
+        fboLookup.put(title, fbo2);
+        fboLookup.put(title + "PingPong", fbo1);
     }
 
 }

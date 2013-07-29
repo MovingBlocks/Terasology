@@ -49,7 +49,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public static final int SSAO_KERNEL_ELEMENTS = 16;
     public static final int SSAO_NOISE_SIZE = 4;
 
-    private static final FastRandom rand = new FastRandom(0xD3ADBEEF);
+    private static final FastRandom RAND = new FastRandom(0xD3ADBEEF);
 
     @EditorRange(min = 0.01f, max = 12.0f)
     private float ssaoStrength = 2.0f;
@@ -65,12 +65,12 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
             for (int i = 0; i < SSAO_KERNEL_ELEMENTS; ++i) {
                 Vector3f vec = new Vector3f();
-                vec.x = rand.randomFloat();
-                vec.y = rand.randomFloat();
-                vec.z = rand.randomPosFloat();
+                vec.x = RAND.randomFloat();
+                vec.y = RAND.randomFloat();
+                vec.z = RAND.randomPosFloat();
 
                 vec.normalize();
-                vec.scale(rand.randomPosFloat());
+                vec.scale(RAND.randomPosFloat());
                 float scale = i / (float) SSAO_KERNEL_ELEMENTS;
                 scale = TeraMath.lerpf(0.1f, 1.0f, scale * scale);
 
@@ -126,7 +126,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
 
             for (int i = 0; i < SSAO_NOISE_SIZE * SSAO_NOISE_SIZE; ++i) {
-                Vector3f noiseVector = new Vector3f(rand.randomFloat(), rand.randomFloat(), 0.0f);
+                Vector3f noiseVector = new Vector3f(RAND.randomFloat(), RAND.randomFloat(), 0.0f);
                 noiseVector.normalize();
 
                 noiseValues.put((byte) ((noiseVector.x * 0.5 + 0.5) * 255.0f));

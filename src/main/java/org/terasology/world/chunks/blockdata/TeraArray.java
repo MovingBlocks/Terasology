@@ -118,7 +118,7 @@ public abstract class TeraArray implements Externalizable {
      * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.SerializationHandler
      * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
      */
-    protected static abstract class BasicSerializationHandler<T extends TeraArray> implements SerializationHandler<T> {
+    protected abstract static class BasicSerializationHandler<T extends TeraArray> implements SerializationHandler<T> {
 
         protected abstract int internalComputeMinimumBufferSize(T array);
 
@@ -153,8 +153,9 @@ public abstract class TeraArray implements Externalizable {
         public final T deserialize(ByteBuffer buffer) {
             Preconditions.checkNotNull(buffer, "The parameter 'buffer' must not be null");
             final int length = buffer.getInt();
-            if (buffer.remaining() < length)
+            if (buffer.remaining() < length) {
                 throw new BufferUnderflowException();
+            }
             final int sizeX = buffer.getInt();
             final int sizeY = buffer.getInt();
             final int sizeZ = buffer.getInt();
@@ -178,7 +179,9 @@ public abstract class TeraArray implements Externalizable {
         sizeXYZHalf = sizeXYZ / 2;
         Preconditions.checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
         Preconditions.checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
-        if (initialize) initialize();
+        if (initialize) {
+            initialize();
+        }
     }
 
     public final int getSizeX() {

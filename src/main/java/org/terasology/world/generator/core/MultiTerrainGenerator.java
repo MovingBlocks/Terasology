@@ -53,10 +53,6 @@ public class MultiTerrainGenerator implements ChunkGenerator {
     private final Block snow;
     private final Block dirt;
 
-    // for making some parts change now and then
-    private static int counter;
-    private static final int maxInt = Integer.MAX_VALUE;
-
     public MultiTerrainGenerator() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
@@ -101,9 +97,6 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 
             // cave
             pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
-
-
-            counter = 0;//Integer.MIN_VALUE;
         }
     }
 
@@ -116,9 +109,9 @@ public class MultiTerrainGenerator implements ChunkGenerator {
     public void generateChunk(Chunk c) {
         double[][][] densityMap = new double[Chunk.SIZE_X + 1][Chunk.SIZE_Y + 1][Chunk.SIZE_Z + 1];
 
-		/*
+        /*
          * Create the density map at a lower sample rate.
-		 */
+         */
         for (int x = 0; x <= Chunk.SIZE_X; x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= Chunk.SIZE_Z; z += SAMPLE_RATE_3D_HOR) {
                 for (int y = 0; y <= Chunk.SIZE_Y; y += SAMPLE_RATE_3D_VERT) {
@@ -157,8 +150,9 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 
                         if (y == 32) {
                             // Ice layer
-                            if (type == WorldBiomeProvider.Biome.SNOW)
+                            if (type == WorldBiomeProvider.Biome.SNOW) {
                                 c.setBlock(x, y, z, ice);
+                            }
                         }
                     }
 
@@ -167,28 +161,30 @@ public class MultiTerrainGenerator implements ChunkGenerator {
                     if ((dens >= 0 && dens < 32)) {
 
                         // Some block was set...
-                        if (firstBlockHeight == -1)
+                        if (firstBlockHeight == -1) {
                             firstBlockHeight = y;
+                        }
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y,
-                                c.getBlockWorldPosZ(z)) > -0.7)
-                            GenerateOuterLayer(x, y, z, firstBlockHeight, c,
-                                    type);
-                        else
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.7) {
+                            generateOuterLayer(x, y, z, firstBlockHeight, c, type);
+                        } else {
                             c.setBlock(x, y, z, air);
+                        }
 
                         continue;
                     } else if (dens >= 32) {
 
                         // Some block was set...
-                        if (firstBlockHeight == -1)
+                        if (firstBlockHeight == -1) {
                             firstBlockHeight = y;
+                        }
 
                         if (calcCaveDensity(c.getBlockWorldPosX(x), y,
-                                c.getBlockWorldPosZ(z)) > -0.6)
-                            GenerateInnerLayer(x, y, z, c, type);
-                        else
+                                c.getBlockWorldPosZ(z)) > -0.6) {
+                            generateInnerLayer(x, y, z, c, type);
+                        } else {
                             c.setBlock(x, y, z, air);
+                        }
 
                         continue;
                     }
@@ -200,14 +196,14 @@ public class MultiTerrainGenerator implements ChunkGenerator {
         }
     }
 
-    private void GenerateInnerLayer(int x, int y, int z, Chunk c,
+    private void generateInnerLayer(int x, int y, int z, Chunk c,
                                     WorldBiomeProvider.Biome type) {
         // TODO: GENERATE MINERALS HERE - config waiting at
         // org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
         c.setBlock(x, y, z, stone);
     }
 
-    private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight,
+    private void generateOuterLayer(int x, int y, int z, int firstBlockHeight,
                                     Chunk c, WorldBiomeProvider.Biome type) {
         // TODO Add more complicated layers
         // And we need more biomes
@@ -325,7 +321,6 @@ public class MultiTerrainGenerator implements ChunkGenerator {
         //returned to original
         int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
         double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
-        counter++;
 
         return -y
                 + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath

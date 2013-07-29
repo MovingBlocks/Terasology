@@ -43,7 +43,7 @@ public final class ChunkUpdateManager {
     private static final int MAX_THREADS = CoreRegistry.get(Config.class).getSystem().getMaxThreads();
 
     /* CHUNK UPDATES */
-    private static final Set<Chunk> currentlyProcessedChunks = Sets.newSetFromMap(new ConcurrentHashMap<Chunk, Boolean>());
+    private final Set<Chunk> currentlyProcessedChunks = Sets.newSetFromMap(new ConcurrentHashMap<Chunk, Boolean>());
 
     private final ChunkTessellator tessellator;
     private final WorldProvider worldProvider;
@@ -78,13 +78,20 @@ public final class ChunkUpdateManager {
         CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider));
     }
 
+    private void finishedProcessing(Chunk c) {
+        currentlyProcessedChunks.remove(c);
+    }
+
+
     private static class ChunkUpdater implements Runnable {
 
         private Chunk c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
+        private ChunkUpdateManager chunkUpdateManager;
 
-        public ChunkUpdater(Chunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider) {
+        public ChunkUpdater(Chunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkUpdateManager chunkUpdateManager) {
+            this.chunkUpdateManager = chunkUpdateManager;
             this.c = chunk;
             this.tessellator = tessellator;
             this.worldProvider = worldProvider;
@@ -103,7 +110,7 @@ public final class ChunkUpdateManager {
                 c.setPendingMesh(newMeshes);
 
             }
-            currentlyProcessedChunks.remove(c);
+            chunkUpdateManager.finishedProcessing(c);
             // Clean these up because the task executor holds the object in memory.
             c = null;
             tessellator = null;

@@ -124,9 +124,9 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public final int set(int x, int y, int z, int value) {
         if (inflated == null) {
             int old = fill;
-            if (old == value)
+            if (old == value) {
                 return old;
-            else {
+            } else {
                 this.inflated = new byte[getSizeY()][];
                 this.deflated = new byte[getSizeY()];
                 Arrays.fill(deflated, fill);
@@ -140,8 +140,9 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
             return old;
         }
         int old = deflated[y];
-        if (old == value)
+        if (old == value) {
             return old;
+        }
         row = inflated[y] = new byte[rowSize()];
         Arrays.fill(row, deflated[y]);
         int pos = pos(x, z);
@@ -151,7 +152,9 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public final boolean set(int x, int y, int z, int value, int expected) {
-        if (value == expected) return true;
+        if (value == expected) {
+            return true;
+        }
         if (inflated == null) {
             int old = fill;
             if (old == value) {

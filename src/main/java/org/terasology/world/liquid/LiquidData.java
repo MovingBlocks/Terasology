@@ -61,7 +61,9 @@ public class LiquidData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         if (o instanceof LiquidData) {
             LiquidData other = (LiquidData) o;
             if (depth == other.depth) {

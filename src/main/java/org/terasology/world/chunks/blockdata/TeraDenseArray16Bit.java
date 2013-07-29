@@ -50,18 +50,19 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         @Override
         protected int internalComputeMinimumBufferSize(TeraDenseArray16Bit array) {
             final short[] data = array.data;
-            if (data == null)
+            if (data == null) {
                 return 4;
-            else
+            } else {
                 return 4 + data.length * 2;
+            }
         }
 
         @Override
         protected void internalSerialize(TeraDenseArray16Bit array, ByteBuffer buffer) {
             final short[] data = array.data;
-            if (data == null)
+            if (data == null) {
                 buffer.putInt(0);
-            else {
+            } else {
                 buffer.putInt(data.length);
                 final ShortBuffer sbuffer = buffer.asShortBuffer();
                 sbuffer.put(data);
@@ -138,10 +139,11 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
 
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
-        if (data == null)
+        if (data == null) {
             return 4;
-        else
+        } else {
             return 16 + data.length * 2;
+        }
     }
 
     @Override

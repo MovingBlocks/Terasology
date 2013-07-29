@@ -27,11 +27,11 @@ public class PerlinNoise implements Noise {
     private static final double LACUNARITY = 2.1379201;
     private static final double H = 0.836281;
 
-    private double[] _spectralWeights;
+    private double[] spectralWeights;
 
-    private final int[] _noisePermutations;
-    private boolean _recomputeSpectralWeights = true;
-    private int _octaves = 9;
+    private final int[] noisePermutations;
+    private boolean recomputeSpectralWeights = true;
+    private int octaves = 9;
 
     /**
      * Init. a new generator with a given seed value.
@@ -41,26 +41,28 @@ public class PerlinNoise implements Noise {
     public PerlinNoise(int seed) {
         FastRandom rand = new FastRandom(seed);
 
-        _noisePermutations = new int[512];
-        int[] _noiseTable = new int[256];
+        noisePermutations = new int[512];
+        int[] noiseTable = new int[256];
 
         // Init. the noise table
-        for (int i = 0; i < 256; i++)
-            _noiseTable[i] = i;
+        for (int i = 0; i < 256; i++) {
+            noiseTable[i] = i;
+        }
 
         // Shuffle the array
         for (int i = 0; i < 256; i++) {
             int j = rand.randomInt() % 256;
             j = (j < 0) ? -j : j;
 
-            int swap = _noiseTable[i];
-            _noiseTable[i] = _noiseTable[j];
-            _noiseTable[j] = swap;
+            int swap = noiseTable[i];
+            noiseTable[i] = noiseTable[j];
+            noiseTable[j] = swap;
         }
 
         // Finally replicate the noise permutations in the remaining 256 index positions
-        for (int i = 0; i < 256; i++)
-            _noisePermutations[i] = _noisePermutations[i + 256] = _noiseTable[i];
+        for (int i = 0; i < 256; i++) {
+            noisePermutations[i] = noisePermutations[i + 256] = noiseTable[i];
+        }
 
     }
 
@@ -73,24 +75,30 @@ public class PerlinNoise implements Noise {
      * @return The noise value
      */
     public double noise(double x, double y, double z) {
-        int X = (int) TeraMath.fastFloor(x) & 255, Y = (int) TeraMath.fastFloor(y) & 255, Z = (int) TeraMath.fastFloor(z) & 255;
+        int xInt = (int) TeraMath.fastFloor(x) & 255;
+        int yInt = (int) TeraMath.fastFloor(y) & 255;
+        int zInt = (int) TeraMath.fastFloor(z) & 255;
 
         x -= TeraMath.fastFloor(x);
         y -= TeraMath.fastFloor(y);
         z -= TeraMath.fastFloor(z);
 
         double u = fade(x), v = fade(y), w = fade(z);
-        int A = _noisePermutations[X] + Y, AA = _noisePermutations[A] + Z, AB = _noisePermutations[(A + 1)] + Z,
-                B = _noisePermutations[(X + 1)] + Y, BA = _noisePermutations[B] + Z, BB = _noisePermutations[(B + 1)] + Z;
+        int a = noisePermutations[xInt] + yInt;
+        int aa = noisePermutations[a] + zInt;
+        int ab = noisePermutations[(a + 1)] + zInt;
+        int b = noisePermutations[(xInt + 1)] + yInt;
+        int ba = noisePermutations[b] + zInt;
+        int bb = noisePermutations[(b + 1)] + zInt;
 
-        return lerp(w, lerp(v, lerp(u, grad(_noisePermutations[AA], x, y, z),
-                grad(_noisePermutations[BA], x - 1, y, z)),
-                lerp(u, grad(_noisePermutations[AB], x, y - 1, z),
-                        grad(_noisePermutations[BB], x - 1, y - 1, z))),
-                lerp(v, lerp(u, grad(_noisePermutations[(AA + 1)], x, y, z - 1),
-                        grad(_noisePermutations[(BA + 1)], x - 1, y, z - 1)),
-                        lerp(u, grad(_noisePermutations[(AB + 1)], x, y - 1, z - 1),
-                                grad(_noisePermutations[(BB + 1)], x - 1, y - 1, z - 1))));
+        return lerp(w, lerp(v, lerp(u, grad(noisePermutations[aa], x, y, z),
+                grad(noisePermutations[ba], x - 1, y, z)),
+                lerp(u, grad(noisePermutations[ab], x, y - 1, z),
+                        grad(noisePermutations[bb], x - 1, y - 1, z))),
+                lerp(v, lerp(u, grad(noisePermutations[(aa + 1)], x, y, z - 1),
+                        grad(noisePermutations[(ba + 1)], x - 1, y, z - 1)),
+                        lerp(u, grad(noisePermutations[(ab + 1)], x, y - 1, z - 1),
+                                grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1))));
     }
 
     /**
@@ -104,17 +112,18 @@ public class PerlinNoise implements Noise {
     public double fBm(double x, double y, double z) {
         double result = 0.0;
 
-        if (_recomputeSpectralWeights) {
-            _spectralWeights = new double[_octaves];
+        if (recomputeSpectralWeights) {
+            spectralWeights = new double[octaves];
 
-            for (int i = 0; i < _octaves; i++)
-                _spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
+            for (int i = 0; i < octaves; i++) {
+                spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
+            }
 
-            _recomputeSpectralWeights = false;
+            recomputeSpectralWeights = false;
         }
 
-        for (int i = 0; i < _octaves; i++) {
-            result += noise(x, y, z) * _spectralWeights[i];
+        for (int i = 0; i < octaves; i++) {
+            result += noise(x, y, z) * spectralWeights[i];
 
             x *= LACUNARITY;
             y *= LACUNARITY;
@@ -139,11 +148,11 @@ public class PerlinNoise implements Noise {
     }
 
     public void setOctaves(int octaves) {
-        _octaves = octaves;
-        _recomputeSpectralWeights = true;
+        this.octaves = octaves;
+        recomputeSpectralWeights = true;
     }
 
     public int getOctaves() {
-        return _octaves;
+        return octaves;
     }
 }

@@ -26,7 +26,7 @@ public class MappedTypeComponent implements Component {
 
     @MappedContainer
     public static class InnerType {
-        public static final int staticValue = 2;
+        public static final int STATIC_VALUE = 2;
     }
 
     public InnerType val = new InnerType();

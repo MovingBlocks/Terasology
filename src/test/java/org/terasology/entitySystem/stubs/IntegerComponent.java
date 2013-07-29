@@ -16,12 +16,18 @@ public final class IntegerComponent implements Component {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         IntegerComponent that = (IntegerComponent) o;
 
-        if (value != that.value) return false;
+        if (value != that.value) {
+            return false;
+        }
 
         return true;
     }

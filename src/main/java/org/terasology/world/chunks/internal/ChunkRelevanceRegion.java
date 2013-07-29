@@ -155,7 +155,9 @@ public class ChunkRelevanceRegion {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) return true;
+        if (o == this) {
+            return true;
+        }
         if (o instanceof ChunkRelevanceRegion) {
             ChunkRelevanceRegion other = (ChunkRelevanceRegion) o;
             return Objects.equal(other.entity, entity);

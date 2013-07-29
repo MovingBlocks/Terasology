@@ -100,15 +100,15 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
      */
     public void generateChunk(Chunk c) {
 
-        int hm_x = (((c.getChunkWorldPosX() / Chunk.SIZE_X) % 512) + 512) % 512;
-        int hm_z = (((c.getChunkWorldPosZ() / Chunk.SIZE_Z) % 512) + 512) % 512;
+        int hmX = (((c.getChunkWorldPosX() / Chunk.SIZE_X) % 512) + 512) % 512;
+        int hmZ = (((c.getChunkWorldPosZ() / Chunk.SIZE_Z) % 512) + 512) % 512;
 
         double scaleFactor = 0.05 * Chunk.SIZE_Y;
 
-        double p00 = heightmap[hm_x][hm_z] * scaleFactor;
-        double p10 = heightmap[(hm_x - 1 + 512) % 512][(hm_z) % 512] * scaleFactor;
-        double p11 = heightmap[(hm_x - 1 + 512) % 512][(hm_z + 1 + 512) % 512] * scaleFactor;
-        double p01 = heightmap[(hm_x) % 512][(hm_z + 1 + 512) % 512] * scaleFactor;
+        double p00 = heightmap[hmX][hmZ] * scaleFactor;
+        double p10 = heightmap[(hmX - 1 + 512) % 512][(hmZ) % 512] * scaleFactor;
+        double p11 = heightmap[(hmX - 1 + 512) % 512][(hmZ + 1 + 512) % 512] * scaleFactor;
+        double p01 = heightmap[(hmX) % 512][(hmZ + 1 + 512) % 512] * scaleFactor;
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {

@@ -58,7 +58,7 @@ import java.util.Locale;
  */
 public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
     private Gson gson;
-    private static BoxShape CUBE_SHAPE = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+    private static final BoxShape CUBE_SHAPE = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
 
     public JsonBlockShapeLoader() {
         gson = new GsonBuilder()
@@ -204,8 +204,12 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         private ColliderInfo processAABBShape(JsonDeserializationContext context, JsonObject colliderDef) {
             Vector3f offset = context.deserialize(colliderDef.get(POSITION), Vector3f.class);
             Vector3f extent = context.deserialize(colliderDef.get(EXTENTS), Vector3f.class);
-            if (offset == null) throw new JsonParseException("AABB Collider missing position");
-            if (extent == null) throw new JsonParseException("AABB Collider missing extents");
+            if (offset == null) {
+                throw new JsonParseException("AABB Collider missing position");
+            }
+            if (extent == null) {
+                throw new JsonParseException("AABB Collider missing extents");
+            }
             extent.absolute();
 
             return new ColliderInfo(offset, new BoxShape(extent));
@@ -214,7 +218,9 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {
             Vector3f offset = context.deserialize(colliderDef.get(POSITION), Vector3f.class);
             float radius = colliderDef.get(RADIUS).getAsFloat();
-            if (offset == null) throw new JsonParseException("Sphere Collider missing position");
+            if (offset == null) {
+                throw new JsonParseException("Sphere Collider missing position");
+            }
 
             return new ColliderInfo(offset, new SphereShape(radius));
         }
@@ -239,10 +245,18 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             final Vector3f[] normals = context.deserialize(meshObj.get("normals"), Vector3f[].class);
             final Vector2f[] texCoords = context.deserialize(meshObj.get("texcoords"), Vector2f[].class);
 
-            if (vertices == null) throw new JsonParseException("Vertices missing");
-            if (normals == null) throw new JsonParseException("Normals missing");
-            if (texCoords == null) throw new JsonParseException("Texcoords missing");
-            if (!meshObj.has("faces")) throw new JsonParseException("Faces missing");
+            if (vertices == null) {
+                throw new JsonParseException("Vertices missing");
+            }
+            if (normals == null) {
+                throw new JsonParseException("Normals missing");
+            }
+            if (texCoords == null) {
+                throw new JsonParseException("Texcoords missing");
+            }
+            if (!meshObj.has("faces")) {
+                throw new JsonParseException("Faces missing");
+            }
 
             if (vertices.length != normals.length || vertices.length != texCoords.length) {
                 throw new JsonParseException("vertices, normals and texcoords must have the same length");
@@ -269,8 +283,9 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             indices.forEach(new TIntProcedure() {
                 @Override
                 public boolean execute(int value) {
-                    if (value < 0 || value >= vertices.length)
+                    if (value < 0 || value >= vertices.length) {
                         throw new JsonParseException("Face value out of range: " + value + ", max vertex is " + (vertices.length - 1));
+                    }
                     return true;
                 }
             });

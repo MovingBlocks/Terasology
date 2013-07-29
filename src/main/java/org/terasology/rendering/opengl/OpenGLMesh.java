@@ -146,8 +146,12 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             glTexCoordPointer(TEX_COORD_1_SIZE, GL11.GL_FLOAT, stride, texCoord1Offset);
         }
 
-        if (hasColor) glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
-        if (hasNormal) glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+        if (hasColor) {
+            glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
+        }
+        if (hasNormal) {
+            glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+        }
     }
 
     public void postRender() {

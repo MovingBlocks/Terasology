@@ -34,13 +34,17 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public final class TeraEd extends JWindow {
 
-    private static MainWindow mainWindow;
-    private static TerasologyEngine engine;
-    private static final Logger logger = LoggerFactory.getLogger(TeraEd.class);
+    private MainWindow mainWindow;
+    private TerasologyEngine engine;
+    private final Logger logger = LoggerFactory.getLogger(TeraEd.class);
 
-    private static final SceneProperties sceneProperties = new SceneProperties();
+    private final SceneProperties sceneProperties = new SceneProperties();
 
     public static void main(String[] args) {
+        new TeraEd().run();
+    }
+
+    public void run() {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
         try {
@@ -55,7 +59,7 @@ public final class TeraEd extends JWindow {
         }
 
         engine = new TerasologyEngine();
-        mainWindow = new MainWindow();
+        mainWindow = new MainWindow(this);
 
         try {
             PathManager.getInstance().useDefaultHomePath();
@@ -73,15 +77,15 @@ public final class TeraEd extends JWindow {
         System.exit(0);
     }
 
-    public static GameEngine getEngine() {
+    public GameEngine getEngine() {
         return engine;
     }
 
-    public static MainWindow getMainWindow() {
+    public MainWindow getMainWindow() {
         return mainWindow;
     }
 
-    public static SceneProperties getSceneProperties() {
+    public SceneProperties getSceneProperties() {
         return sceneProperties;
     }
 }

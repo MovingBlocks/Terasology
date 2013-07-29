@@ -609,8 +609,9 @@ public class Block {
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {
-        if (isInvisible())
+        if (isInvisible()) {
             return;
+        }
 
         Material mat = Assets.getMaterial("engine:block");
         mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);

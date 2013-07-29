@@ -37,7 +37,7 @@ import java.util.Map;
 // TODO: Finish support for chunk data extensions.
 public final class Chunks {
 
-    private static final Chunks instance = new Chunks();
+    private static final Chunks INSTANCE = new Chunks();
 
     private final TeraArrays.Entry blockDataEntry;
     private final TeraArrays.Entry sunlightDataEntry;
@@ -93,6 +93,6 @@ public final class Chunks {
     }
 
     public static Chunks getInstance() {
-        return instance;
+        return INSTANCE;
     }
 }

@@ -1,0 +1,28 @@
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>.\Terasology.jar</jar>
+  <outfile>C:\Users\bg\Desktop\TeraEd.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon></icon>
+  <classPath>
+    <mainClass>org.terasology.editor.TeraEd</mainClass>
+    <cp>Terasology.jar</cp>
+  </classPath>
+  <jre>
+    <path></path>
+    <minVersion>1.6.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <initialHeapSize>128</initialHeapSize>
+    <maxHeapSize>1024</maxHeapSize>
+  </jre>
+</launch4jConfig>

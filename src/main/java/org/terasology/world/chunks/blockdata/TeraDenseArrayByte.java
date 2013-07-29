@@ -46,25 +46,26 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         this.data = new byte[dataSize()];
     }
 
-    protected static abstract class SerializationHandler<T extends TeraDenseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
+    protected abstract static class SerializationHandler<T extends TeraDenseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
 
         protected abstract T createArray(int sizeX, int sizeY, int sizeZ, byte[] data);
 
         @Override
         protected int internalComputeMinimumBufferSize(T array) {
             final byte[] data = array.data;
-            if (data == null)
+            if (data == null) {
                 return 4;
-            else
+            } else {
                 return 4 + data.length;
+            }
         }
 
         @Override
         protected void internalSerialize(T array, ByteBuffer buffer) {
             final byte[] data = array.data;
-            if (data == null)
+            if (data == null) {
                 buffer.putInt(0);
-            else {
+            } else {
                 buffer.putInt(data.length);
                 buffer.put(data);
             }
@@ -102,10 +103,11 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     @Override
     public final int getEstimatedMemoryConsumptionInBytes() {
-        if (data == null)
+        if (data == null) {
             return 4;
-        else
+        } else {
             return 16 + data.length;
+        }
     }
 
     @Override

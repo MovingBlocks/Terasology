@@ -137,7 +137,8 @@ public abstract class TerasologyTestingEnvironment {
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
         prefabLoadStep.begin();
-        while (!prefabLoadStep.step()) ;
+        while (!prefabLoadStep.step()) {
+        }
         CoreRegistry.get(ComponentSystemManager.class).initialise();
     }
 

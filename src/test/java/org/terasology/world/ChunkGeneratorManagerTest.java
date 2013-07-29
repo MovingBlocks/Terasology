@@ -30,7 +30,7 @@ import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
  */
 public class ChunkGeneratorManagerTest {
 
-    private final static String SEED = "Seed";
+    private static final String SEED = "Seed";
 
     @Test
     public void registeredGeneratorsReceivesSeed() {

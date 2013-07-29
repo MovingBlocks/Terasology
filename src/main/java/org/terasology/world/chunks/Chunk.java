@@ -69,12 +69,12 @@ public class Chunk {
 
         private final EntityData.ChunkState protobufState;
 
-        private static final Map<EntityData.ChunkState, State> lookup;
+        private static final Map<EntityData.ChunkState, State> LOOKUP;
 
         static {
-            lookup = Maps.newHashMap();
+            LOOKUP = Maps.newHashMap();
             for (State s : State.values()) {
-                lookup.put(s.protobufState, s);
+                LOOKUP.put(s.protobufState, s);
             }
         }
 
@@ -87,9 +87,10 @@ public class Chunk {
         }
 
         public static State lookup(EntityData.ChunkState state) {
-            State result = lookup.get(Preconditions.checkNotNull(state, "The parameter 'state' must not be null"));
-            if (result == null)
+            State result = LOOKUP.get(Preconditions.checkNotNull(state, "The parameter 'state' must not be null"));
+            if (result == null) {
                 throw new IllegalStateException("Unable to lookup the supplied state: " + state);
+            }
             return result;
         }
     }

@@ -308,8 +308,9 @@ public final class WorldRenderer {
                 return 1;
             }
 
-            if (distance == distance2)
+            if (distance == distance2) {
                 return 0;
+            }
 
             return distance2 > distance ? -1 : 1;
         }
@@ -328,8 +329,9 @@ public final class WorldRenderer {
                 return -1;
             }
 
-            if (distance == distance2)
+            if (distance == distance2) {
                 return 0;
+            }
 
             return distance2 > distance ? 1 : -1;
         }
@@ -362,12 +364,13 @@ public final class WorldRenderer {
         worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                if (getPlayerPosition().y < 50)
+                if (getPlayerPosition().y < 50) {
                     audioManager.playMusic(Assets.getMusic("engine:SpacialWinds"));
-                else if (getPlayerPosition().y > 175)
+                } else if (getPlayerPosition().y > 175) {
                     audioManager.playMusic(Assets.getMusic("engine:Heaven"));
-                else
+                } else {
                     audioManager.playMusic(Assets.getMusic("engine:Sunrise"));
+                }
             }
         });
 
@@ -376,12 +379,13 @@ public final class WorldRenderer {
             @Override
             public void run() {
                 //TODO get beter tck instead afternoon
-                if (getPlayerPosition().y < 50)
+                if (getPlayerPosition().y < 50) {
                     audioManager.playMusic(Assets.getMusic("engine:DwarfForge"));
-                else if (getPlayerPosition().y > 175)
+                } else if (getPlayerPosition().y > 175) {
                     audioManager.playMusic(Assets.getMusic("engine:SpaceExplorers"));
-                else
+                } else {
                     audioManager.playMusic(Assets.getMusic("engine:Afternoon"));
+                }
             }
         });
 
@@ -389,12 +393,13 @@ public final class WorldRenderer {
         worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                if (getPlayerPosition().y < 50)
+                if (getPlayerPosition().y < 50) {
                     audioManager.playMusic(Assets.getMusic("engine:OrcFortress"));
-                else if (getPlayerPosition().y > 175)
+                } else if (getPlayerPosition().y > 175) {
                     audioManager.playMusic(Assets.getMusic("engine:PeacefulWorld"));
-                else
+                } else {
                     audioManager.playMusic(Assets.getMusic("engine:Sunset"));
+                }
             }
         });
 
@@ -402,12 +407,13 @@ public final class WorldRenderer {
         worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-                if (getPlayerPosition().y < 50)
+                if (getPlayerPosition().y < 50) {
                     audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                else if (getPlayerPosition().y > 175)
+                } else if (getPlayerPosition().y > 175) {
                     audioManager.playMusic(Assets.getMusic("engine:ShootingStars"));
-                else
+                } else {
                     audioManager.playMusic(Assets.getMusic("engine:Dimlight"));
+                }
             }
         });
 
@@ -415,12 +421,13 @@ public final class WorldRenderer {
         worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
             @Override
             public void run() {
-                if (getPlayerPosition().y < 50)
+                if (getPlayerPosition().y < 50) {
                     audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                else if (getPlayerPosition().y > 175)
+                } else if (getPlayerPosition().y > 175) {
                     audioManager.playMusic(Assets.getMusic("engine:NightTheme"));
-                else
+                } else {
                     audioManager.playMusic(Assets.getMusic("engine:OtherSide"));
+                }
             }
         });
 
@@ -428,12 +435,13 @@ public final class WorldRenderer {
         worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-                if (getPlayerPosition().y < 50)
+                if (getPlayerPosition().y < 50) {
                     audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                else if (getPlayerPosition().y > 175)
+                } else if (getPlayerPosition().y > 175) {
                     audioManager.playMusic(Assets.getMusic("engine:Heroes"));
-                else
+                } else {
                     audioManager.playMusic(Assets.getMusic("engine:Resurface"));
+                }
             }
         });
     }
@@ -650,7 +658,7 @@ public final class WorldRenderer {
 
         /*
          * FIRST PERSON VIEW
-		 */
+         */
         if (activeCamera != null && !config.getRendering().getDebug().isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
 
@@ -868,8 +876,9 @@ public final class WorldRenderer {
 
         camera.lookThrough();
 
-        while (renderQueueChunksOpaqueShadow.size() > 0)
+        while (renderQueueChunksOpaqueShadow.size() > 0) {
             renderChunk(renderQueueChunksOpaqueShadow.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.SHADOW_MAP);
+        }
 
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderShadows();
@@ -1091,8 +1100,9 @@ public final class WorldRenderer {
      */
     public final int maxHeightAt(int x, int z) {
         for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
-            if (!worldProvider.getBlock(x, y, z).isInvisible())
+            if (!worldProvider.getBlock(x, y, z).isInvisible()) {
                 return y;
+            }
         }
 
         return 0;

@@ -45,6 +45,7 @@ ext {
     destDirMainOutput = 'mainOutput'
     destDirMods = "distributions/$subDirMods"
     mainClassName = 'org.terasology.engine.Terasology'
+	mainClassNameEditor = 'org.terasology.editor.TeraEd'
     jarFileName = 'Terasology.jar'
     templatesDir = file('templates')
     
@@ -380,6 +381,17 @@ task run(type:JavaExec) {
     dependsOn assembleMainOutput
     dependsOn modClasses
     main = mainClassName
+    classpath "$buildDir/$destDirMainOutput"
+    classpath configurations.runtime
+}
+
+task runTeraEd(type:JavaExec) {
+    description = "Run 'TeraEd' to customize shader settings while the game is running"
+
+    dependsOn extractNatives
+    dependsOn assembleMainOutput
+    dependsOn modClasses
+    main = mainClassNameEditor
     classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
 }

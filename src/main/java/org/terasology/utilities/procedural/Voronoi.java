@@ -47,10 +47,10 @@ public class Voronoi {
             1, 4, 2, 3, 3, 4, 2, 5, 4, 2, 4, 2, 2, 2, 4, 5, 3, 2
     };
 
-    private static final float densityAdjustment = 0.39815f;
-    private static final float inverseDensityAdjustment = 1.0f / densityAdjustment;
+    private static final float DENSITY_ADJUSTMENT = 0.39815f;
+    private static final float INVERSE_DENSITY_ADJUSTMENT = 1.0f / DENSITY_ADJUSTMENT;
 
-    public void VoronoiDiagram2D(Random random) {
+    public Voronoi(Random random) {
         offset = new Vector2f(99999 * random.nextFloat(), 99999 * random.nextFloat());
     }
 
@@ -65,7 +65,7 @@ public class Voronoi {
             results[i].distance = Float.MAX_VALUE;
         }
 
-        at.scale(densityAdjustment);
+        at.scale(DENSITY_ADJUSTMENT);
         at.add(offset);
 
         int cellX = TeraMath.floorToInt(at.x);
@@ -108,8 +108,8 @@ public class Voronoi {
         }
 
         for (int i = 0; i < results.length; i++) {
-            results[i].delta.scale(inverseDensityAdjustment);
-            results[i].distance *= inverseDensityAdjustment * inverseDensityAdjustment;
+            results[i].delta.scale(INVERSE_DENSITY_ADJUSTMENT);
+            results[i].distance *= INVERSE_DENSITY_ADJUSTMENT * INVERSE_DENSITY_ADJUSTMENT;
         }
 
         return results;

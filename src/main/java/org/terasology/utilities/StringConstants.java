@@ -21,7 +21,7 @@ package org.terasology.utilities;
  */
 public final class StringConstants {
     // JAVA7: Replace with System.lineSeparator()
-    public final static String NEW_LINE = System.getProperty("line.separator");
+    public static final String NEW_LINE = System.getProperty("line.separator");
 
     private StringConstants() {
     }
