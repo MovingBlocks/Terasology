@@ -75,7 +75,7 @@ public final class ChunkUpdateManager {
     private void executeChunkUpdate(final Chunk c) {
         currentlyProcessedChunks.add(c);
 
-        CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider));
+        CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider, this));
     }
 
     private void finishedProcessing(Chunk c) {
