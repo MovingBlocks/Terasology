@@ -269,8 +269,7 @@ public final class WorldRenderer {
         mainDirectionalLight.lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
         mainDirectionalLight.lightAmbientIntensity = 1.0f;
         mainDirectionalLight.lightDiffuseIntensity = 2.0f;
-        mainDirectionalLight.lightSpecularIntensity = 0.1f;
-        mainDirectionalLight.lightSpecularPower = 10.0f;
+        mainDirectionalLight.lightSpecularIntensity = 0.0f;
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(localPlayerCamera);

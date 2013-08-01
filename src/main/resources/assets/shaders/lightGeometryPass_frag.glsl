@@ -116,6 +116,8 @@ void main() {
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     lambTerm *= shadowTerm;
+    specTerm *= shadowTerm;
+
     ambTerm *= clamp(shadowTerm, 0.25, 1.0);
 #endif
 
@@ -127,7 +129,7 @@ void main() {
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
     vec3 color = calcSunlightColorDeferred(normalBuffer.a, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
 #else
-    vec3 color = vec3(0.0);
+    vec3 color = vec3(1.0, 0.0, 1.0);
 #endif
 
 #if defined (FEATURE_LIGHT_POINT)
