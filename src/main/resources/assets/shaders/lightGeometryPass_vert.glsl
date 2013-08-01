@@ -15,7 +15,6 @@
  */
 
 varying vec4 vertexProjPos;
-varying vec3 eyeVec;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -29,8 +28,6 @@ void main()
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
     vertexProjPos = gl_Vertex;
 #endif
-
-    eyeVec = -normalize(viewMatrix * gl_Vertex).xyz;
 
 	gl_Position = vertexProjPos;
     gl_TexCoord[0] = gl_MultiTexCoord0;

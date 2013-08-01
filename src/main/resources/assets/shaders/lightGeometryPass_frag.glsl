@@ -15,7 +15,6 @@
  */
 
 varying vec4 vertexProjPos;
-varying vec3 eyeVec;
 
 uniform vec3 lightViewPos;
 
@@ -99,13 +98,21 @@ void main() {
     // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
     vec3 viewSpacePos = reconstructViewPos(depth, projectedPos, invProjMatrix);
 
-    vec3 lightDir = lightViewPos.xyz - viewSpacePos;
+    vec3 lightDir;
+#if defined (FEATURE_LIGHT_POINT)
+    lightDir = lightViewPos.xyz - viewSpacePos;
+#else if defined (FEATURE_LIGHT_DIRECTIONAL)
+    lightDir = lightViewPos.xyz;
+#endif
+
+    vec3 eyeVec = -normalize(viewSpacePos.xyz).xyz;
+
     float lightDist = length(lightDir);
     vec3 lightDirNorm = lightDir / lightDist;
 
     float ambTerm = lightAmbientIntensity;
     float lambTerm = calcLambLight(normal, lightDirNorm);
-    float specTerm  = calcSpecLight(normal, lightDirNorm, eyeVec, lightSpecularPower);
+    float specTerm  = calcSpecLightNormalized(normal, lightDirNorm, eyeVec, lightSpecularPower);
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     lambTerm *= shadowTerm;

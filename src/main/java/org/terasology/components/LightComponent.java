@@ -32,8 +32,8 @@ public class LightComponent implements Component {
     public Vector3f lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
     public Vector3f lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
 
-    public float lightDiffuseIntensity = 2.0f;
-    public float lightSpecularIntensity = 0.1f;
+    public float lightDiffuseIntensity = 1.0f;
+    public float lightSpecularIntensity = 0.5f;
     public float lightAmbientIntensity = 1.0f;
 
     public float lightSpecularPower = 4.0f;

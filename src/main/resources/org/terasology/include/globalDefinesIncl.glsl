@@ -31,6 +31,7 @@
 #define BLOCK_AMB 2.0
 
 #define EPSILON 0.000001
+#define PI 3.14159265359
 
 #define A 0.15
 #define B 0.50
