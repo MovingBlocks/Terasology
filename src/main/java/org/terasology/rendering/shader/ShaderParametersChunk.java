@@ -53,7 +53,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
     Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 5.0f);
 
-    Property waterSpecExp = new Property("waterSpecExp", 512.0f, 0.0f, 1024.0f);
+    Property waterSpecExp = new Property("waterSpecExp", 200.0f, 0.0f, 1024.0f);
 
     Property parallaxBias = new Property("parallaxBias", 0.05f, 0.0f, 0.5f);
     Property parallaxScale = new Property("parallaxScale", 0.05f, 0.0f, 0.5f);

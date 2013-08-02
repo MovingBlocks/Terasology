@@ -153,8 +153,8 @@ void main()
     }
 #endif
 
-#ifdef FEATURE_REFRACTIVE_PASS
-# ifdef ANIMATED_WATER
+#if defined (FEATURE_REFRACTIVE_PASS)
+# if defined (ANIMATED_WATER)
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
