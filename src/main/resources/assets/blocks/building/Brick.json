@@ -18,6 +18,5 @@
  * Brick is Brick
  */
 {
-    "mass" : 128,
-    "shapes" : ["engine:cube","engine:stair"]
+    "mass" : 128
 }

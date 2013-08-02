@@ -163,7 +163,7 @@ public final class PathManager {
         if (Files.isSameFile(homeModPath, installModPath)) {
             modPaths = ImmutableList.of(homeModPath);
         } else {
-            modPaths = ImmutableList.of(homeModPath, installModPath);
+            modPaths = ImmutableList.of(installModPath, homeModPath);
         }
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);

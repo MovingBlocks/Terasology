@@ -86,6 +86,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 }
                 break;
             case TEXTURE3D:
+                Util.checkGLError();
                 id = glGenTextures();
                 logger.debug("Bound texture '{}' - {}", getURI(), id);
                 glBindTexture(GL12.GL_TEXTURE_3D, id);
