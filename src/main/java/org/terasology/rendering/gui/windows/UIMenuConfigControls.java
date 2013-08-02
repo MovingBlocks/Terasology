@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import com.google.common.collect.Lists;
+import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
@@ -165,7 +166,7 @@ public final class UIMenuConfigControls extends UIWindow {
         title.setPosition(new Vector2f(0f, 28f));
         title.setVisible(true);
 
-        subtitle = new UILabel("Control Settings");
+        subtitle = new UILabel("Control Settings", Color.black);
         subtitle.setHorizontalAlign(EHorizontalAlign.CENTER);
         subtitle.setPosition(new Vector2f(0f, 128f));
         subtitle.setVisible(true);
@@ -198,7 +199,7 @@ public final class UIMenuConfigControls extends UIWindow {
             button.addClickListener(editButtonClick);
             button.setVisible(true);
             inputButtons.add(button);
-            UILabel label = new UILabel(def.displayText);
+            UILabel label = new UILabel(def.displayText, Color.black);
             label.setVisible(true);
             inputLabels.add(label);
 

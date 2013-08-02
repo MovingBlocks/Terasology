@@ -96,6 +96,7 @@
 		"fullSide" : false
 	},
 	"collision" : {
+	    "symmetric" : true,
 		"colliders" : [
 			{
 				"type" : "AABB",

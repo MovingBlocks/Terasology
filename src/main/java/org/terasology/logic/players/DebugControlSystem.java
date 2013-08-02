@@ -26,6 +26,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.binds.HideHUDButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.ConsoleMessageEvent;
@@ -66,6 +67,18 @@ public class DebugControlSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
+    public void onHideHUD(HideHUDButton event, EntityRef entity) {
+        if (event.isDown()) {
+            for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+                element.setVisible(!element.isVisible());
+            }
+            config.getRendering().getDebug().setFirstPersonElementsHidden(!config.getRendering().getDebug().isFirstPersonElementsHidden());
+
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
@@ -103,13 +116,6 @@ public class DebugControlSystem implements ComponentSystem {
                     break;
                 case Keyboard.KEY_K:
                     entity.send(new DoDamageEvent(9999, null));
-                    break;
-                case Keyboard.KEY_H:
-                    for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                        element.setVisible(!element.isVisible());
-                    }
-
-                    event.consume();
                     break;
                 case Keyboard.KEY_F6:
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());

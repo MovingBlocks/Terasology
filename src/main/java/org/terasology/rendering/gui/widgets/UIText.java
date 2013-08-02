@@ -185,6 +185,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     } else {
                         setCursorToTextPosition(cursorPosition + 1);
                     }
+
+                    event.consume();
                 } else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
                     //move cursor up
                     //TODO better solution here the behavior is kinda wrong

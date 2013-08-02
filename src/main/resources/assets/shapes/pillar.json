@@ -50,6 +50,7 @@
 		"fullSide" : false
 	},
 	"collision" : {
+	    "symmetric" : true,
 		"convexHull" : true
 	}
 }
