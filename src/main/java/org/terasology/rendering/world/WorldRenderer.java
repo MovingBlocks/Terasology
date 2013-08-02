@@ -260,9 +260,10 @@ public final class WorldRenderer {
                     for (int x = r.minX(); x < r.maxX(); ++x) {
                         for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = chunkProvider.getChunk(x, 0, y);
-                            chunksInProximity.remove(c);
-
-                            c.disposeMesh();
+                            if (c != null) {
+                                chunksInProximity.remove(c);
+                                c.disposeMesh();
+                            }
                         }
                     }
                 }

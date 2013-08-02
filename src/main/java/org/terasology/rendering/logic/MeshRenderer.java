@@ -269,8 +269,6 @@ public class MeshRenderer implements RenderSystem {
                 lastMesh.postRender();
             }
         }
-
-        glPopMatrix();
     }
 
     @Override

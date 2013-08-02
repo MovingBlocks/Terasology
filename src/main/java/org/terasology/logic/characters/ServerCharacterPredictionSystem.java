@@ -34,6 +34,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.bullet.BulletCharacterMover;
+import org.terasology.logic.characters.events.ToggleNoClipEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
@@ -114,6 +115,21 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
         }
         characterStates.remove(entity);
         lastInputEvent.remove(entity);
+    }
+
+    @ReceiveEvent()
+    public void onToggleNoClip(ToggleNoClipEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
+        CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
+        CharacterStateEvent lastState = stateBuffer.getLast();
+        CharacterStateEvent newState = new CharacterStateEvent(lastState);
+        newState.setSequenceNumber(lastState.getSequenceNumber());
+        if (lastState.getMode() != MovementMode.GHOSTING) {
+            newState.setMode(MovementMode.GHOSTING);
+        } else {
+            newState.setMode(MovementMode.WALKING);
+        }
+        stateBuffer.add(newState);
+        CharacterStateEvent.setToState(character, newState);
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
