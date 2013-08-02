@@ -390,6 +390,10 @@ public final class ChunkTessellator {
             return false;
         }
 
+        if (currentBlock.isWaving() != blockToCheck.isWaving()) {
+            return true;
+        }
+
         return blockToCheck.isInvisible() ||
                 !blockToCheck.isFullSide(side.reverse()) ||
                 (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
