@@ -138,7 +138,6 @@ public class Block {
     private boolean liquid = false;
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed = false;
-    private boolean craftPlace = true;
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
@@ -160,6 +159,7 @@ public class Block {
     // Collision related
     private boolean penetrable = false;
     private boolean targetable = true;
+    private boolean climbable = false;
 
     // Physics
     private float mass = 10;
@@ -334,6 +334,14 @@ public class Block {
         this.targetable = targetable;
     }
 
+    public boolean isClimbable() {
+        return climbable;
+    }
+
+    public void setClimbable(boolean value) {
+        this.climbable = value;
+    }
+
     /**
      * @return Whether this block waves in the wind
      */
@@ -471,17 +479,6 @@ public class Block {
 
     public void setDebrisOnDestroy(boolean debrisOnDestroy) {
         this.debrisOnDestroy = debrisOnDestroy;
-    }
-
-    /**
-     * @return Can player craft on this block?
-     */
-    public boolean isCraftPlace() {
-        return craftPlace;
-    }
-
-    public void setCraftPlace(boolean craftPlace) {
-        this.craftPlace = craftPlace;
     }
 
     public float getMass() {

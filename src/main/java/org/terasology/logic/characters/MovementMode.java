@@ -21,6 +21,7 @@ package org.terasology.logic.characters;
  */
 public enum MovementMode {
     WALKING,
+    CLIMBING,
     SWIMMING,
     GHOSTING
 }

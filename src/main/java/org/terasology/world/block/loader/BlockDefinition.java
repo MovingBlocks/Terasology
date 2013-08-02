@@ -31,7 +31,6 @@ import java.util.List;
 public class BlockDefinition {
     public String displayName = "";
     public boolean liquid = false;
-    public boolean craftPlace = true;
     public byte hardness = 0x3;
 
     public boolean attachmentAllowed = true;
@@ -40,6 +39,7 @@ public class BlockDefinition {
 
     public boolean penetrable = false;
     public boolean targetable = true;
+    public boolean climbable = false;
 
     public boolean invisible = false;
     public boolean translucent = false;

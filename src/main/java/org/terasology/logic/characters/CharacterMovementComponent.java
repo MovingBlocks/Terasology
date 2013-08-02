@@ -48,6 +48,8 @@ public final class CharacterMovementComponent implements Component {
     public float runFactor = 1.5f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public float jumpSpeed = 10.0f;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public float maxClimbSpeed = 3.0f;
 
     // Movement settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)

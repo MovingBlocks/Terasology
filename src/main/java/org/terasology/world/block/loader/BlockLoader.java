@@ -387,13 +387,13 @@ public class BlockLoader implements BlockBuilderHelper {
         block.setSupportRequired(def.supportRequired);
         block.setPenetrable(def.penetrable);
         block.setTargetable(def.targetable);
+        block.setClimbable(def.climbable);
         block.setInvisible(def.invisible);
         block.setTranslucent(def.translucent);
         block.setDoubleSided(def.doubleSided);
         block.setShadowCasting(def.shadowCasting);
         block.setWaving(def.waving);
         block.setLuminance(def.luminance);
-        block.setCraftPlace(def.craftPlace);
         if (!def.displayName.isEmpty()) {
             block.setDisplayName(def.displayName);
         } else {

@@ -78,6 +78,8 @@ public class BulletCharacterMover implements CharacterMover {
     public static final float UNDERWATER_GRAVITY = 0.25f;
     public static final float UNDERWATER_INERTIA = 2.0f;
 
+    public static final float CLIMB_GRAVITY = 0f;
+
     public static final float GHOST_INERTIA = 4f;
 
     private static final float CHECK_FORWARD_DIST = 0.05f;
@@ -103,7 +105,7 @@ public class BulletCharacterMover implements CharacterMover {
         if (worldProvider.isBlockRelevant(initial.getPosition())) {
             updatePosition(characterMovementComponent, result, input, entity);
             if (result.getMode() != MovementMode.GHOSTING) {
-                checkSwimming(characterMovementComponent, result, initial, entity, input.isFirstRun());
+                checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
             }
         }
         result.setTime(initial.getTime() + input.getDeltaMs());
@@ -127,13 +129,17 @@ public class BulletCharacterMover implements CharacterMover {
 
 
     /**
-     * Updates whether a character is underwater. A higher and lower point of the character is tested for being in water,
+     * Updates whether a character should change movement mode (from being underwater or in a ladder). A higher and lower point of the character is tested for being in water,
      * only if both points are in water does the character count as swimming.
      *
      * @param movementComp
      * @param state
      */
-    private void checkSwimming(final CharacterMovementComponent movementComp, final CharacterStateEvent state, final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+    private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state, final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+        if (state.getMode() == MovementMode.GHOSTING) {
+            return;
+        }
+
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
@@ -143,19 +149,47 @@ public class BulletCharacterMover implements CharacterMover {
         boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
         boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
         boolean newSwimming = topUnderwater && bottomUnderwater;
+        boolean newClimbing = false;
+        if (!newSwimming) {
+            Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos)};
+            float factor = 0.18f;
 
-        if (newSwimming != (state.getMode() == MovementMode.SWIMMING)) {
-            if (firstRun) {
-                if (newSwimming) {
-                    entity.send(new OnEnterLiquidEvent(worldProvider.getBlock(state.getPosition())));
-                } else {
-                    entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
+            sides[0].x += factor * movementComp.radius;
+            sides[1].x -= factor * movementComp.radius;
+            sides[2].z += factor * movementComp.radius;
+            sides[3].z -= factor * movementComp.radius;
+            sides[4].y -= movementComp.height;
+            for (Vector3f side : sides) {
+                if (worldProvider.getBlock(side).isClimbable()) {
+                    newClimbing = true;
+                    break;
                 }
             }
-            if (!newSwimming && state.getVelocity().y > 0) {
-                state.getVelocity().y += 8;
+        }
+
+        if (newSwimming) {
+            if (state.getMode() != MovementMode.SWIMMING) {
+                if (firstRun) {
+                    entity.send(new OnEnterLiquidEvent(worldProvider.getBlock(state.getPosition())));
+                }
+                state.setMode(MovementMode.SWIMMING);
             }
-            state.setMode((newSwimming) ? MovementMode.SWIMMING : MovementMode.WALKING);
+        } else if (state.getMode() == MovementMode.SWIMMING) {
+            if (firstRun) {
+                entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
+            }
+            if (newClimbing) {
+                state.setMode(MovementMode.CLIMBING);
+                state.getVelocity().y = 0;
+            } else {
+                if (state.getVelocity().y > 0) {
+                    state.getVelocity().y += 8;
+                }
+                state.setMode(MovementMode.WALKING);
+            }
+        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
+            state.getVelocity().y = 0;
+            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
         }
     }
 
@@ -170,9 +204,79 @@ public class BulletCharacterMover implements CharacterMover {
             case WALKING:
                 walk(movementComp, state, input, entity);
                 break;
+            case CLIMBING:
+                climb(movementComp, state, input, entity);
+                break;
             default:
                 walk(movementComp, state, input, entity);
                 break;
+        }
+    }
+
+    private void climb(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
+        Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
+        float lengthSquared = desiredVelocity.lengthSquared();
+        if (lengthSquared > 1) {
+            desiredVelocity.normalize();
+        }
+        float maxSpeed = movementComp.maxClimbSpeed;
+        if (input.isRunning()) {
+            maxSpeed *= movementComp.runFactor;
+        }
+        desiredVelocity.scale(maxSpeed);
+        desiredVelocity.y -= CLIMB_GRAVITY;
+
+        Vector3f velocityDiff = new Vector3f(desiredVelocity);
+        velocityDiff.sub(state.getVelocity());
+        velocityDiff.scale(Math.min(movementComp.groundFriction * input.getDelta(), 1.0f));
+
+        Vector3f endVelocity = new Vector3f(state.getVelocity());
+        endVelocity.x += velocityDiff.x;
+        endVelocity.y += velocityDiff.y;
+        endVelocity.z += velocityDiff.z;
+
+        Vector3f moveDelta = new Vector3f(endVelocity);
+        moveDelta.scale(input.getDelta());
+
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, movementComp.collider);
+        Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
+        distanceMoved.sub(state.getPosition());
+
+        state.getPosition().set(moveResult.getFinalPosition());
+        if (input.isFirstRun() && distanceMoved.length() > 0) {
+            entity.send(new MovedEvent(distanceMoved, state.getPosition()));
+        }
+        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
+
+        if (moveResult.isBottomHit()) {
+            if (!state.isGrounded()) {
+                if (input.isFirstRun()) {
+                    Vector3f landVelocity = new Vector3f(state.getVelocity());
+                    landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
+                }
+                state.setGrounded(true);
+            }
+            endVelocity.y = 0;
+        } else {
+            if (moveResult.isTopHit() && endVelocity.y > 0) {
+                endVelocity.y = 0;
+            }
+            state.setGrounded(false);
+        }
+        state.getVelocity().set(endVelocity);
+
+        if (input.isFirstRun() && moveResult.isHorizontalHit()) {
+            entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
+        }
+        if (state.isGrounded()) {
+            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
+            if (state.getFootstepDelta() > 1) {
+                state.setFootstepDelta(state.getFootstepDelta() - 1);
+                if (input.isFirstRun()) {
+                    entity.send(new FootstepEvent());
+                }
+            }
         }
     }
 
@@ -320,7 +424,9 @@ public class BulletCharacterMover implements CharacterMover {
             if (input.isJumpRequested()) {
                 state.setGrounded(false);
                 endVelocity.y += movementComp.jumpSpeed;
-                entity.send(new JumpEvent());
+                if (input.isFirstRun()) {
+                    entity.send(new JumpEvent());
+                }
             }
         } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
