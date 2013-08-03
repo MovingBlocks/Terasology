@@ -29,6 +29,7 @@ import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -65,8 +66,8 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
         logger.info("Initialising World"); //Why is this methode called twice?
         try {
             heightmap = HeightmapFileReader.readFile("Heightmap.txt", "\n");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            logger.error("Failed to read heightmap", e);
         }
         heightmap = shiftArray(rotateArray(heightmap), -50, -100);
         //try also other combinations with shift and rotate

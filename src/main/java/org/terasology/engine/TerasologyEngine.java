@@ -43,9 +43,12 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.monitoring.ThreadActivity;
+import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.gui.AdvancedMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.VertexBufferObjectManager;
@@ -145,6 +148,10 @@ public class TerasologyEngine implements GameEngine {
         updateInputConfig();
         CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
         initSecurity();
+
+        if (config.getSystem().isMonitoringEnabled()) {
+            new AdvancedMonitor().setVisible(true);
+        }
         initialised = true;
     }
 
@@ -264,13 +271,14 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public void run() {
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                PerformanceMonitor.startThread(name);
-                try {
+                Thread.currentThread().setName("Engine-Task-Pool");
+                try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
                     task.run();
                 } catch (RejectedExecutionException e) {
+                    ThreadMonitor.addError(e);
                     logger.error("Thread submitted after shutdown requested: {}", name);
-                } finally {
-                    PerformanceMonitor.endThread(name);
+                } catch (Throwable e) {
+                    ThreadMonitor.addError(e);
                 }
             }
         });
@@ -438,7 +446,9 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(Game.class, new Game(time));
 
         AssetType.registerAssetTypes();
-        AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+        ClasspathSource source = new ClasspathSource(ModManager.ENGINE_PACKAGE,
+                getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY);
+        AssetManager.getInstance().addAssetSource(source);
         CoreRegistry.get(ShaderManager.class).initShaders();
 
         VertexBufferObjectManager.getInstance();

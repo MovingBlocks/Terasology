@@ -27,6 +27,8 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ThreadActivity;
+import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldProvider;
@@ -79,12 +81,15 @@ public class GrowthSimulator implements ComponentSystem {
                 while (running.get()) {
                     try {
                         Vector3i blockPos = blockQueue.take();
-                        if (world.isBlockRelevant(blockPos)) {
-                            if (simulate(blockPos)) {
-                                Thread.sleep(5000);
+                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Simulate")) {
+                            if (world.isBlockRelevant(blockPos)) {
+                                if (simulate(blockPos)) {
+                                    Thread.sleep(5000);
+                                }
                             }
                         }
                     } catch (InterruptedException e) {
+                        ThreadMonitor.addError(e);
                         logger.debug("Thread Interrupted", e);
                     }
                 }

@@ -27,6 +27,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.world.ChunkView;
 import org.terasology.world.RegionalChunkView;
 import org.terasology.world.chunks.Chunk;
@@ -56,6 +57,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(this, null, new ChunkTaskRelevanceComparator());
+        ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
     public void subscribe(ChunkReadyListener listener) {
@@ -103,7 +105,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void dispose() {
-
+        ChunkMonitor.fireChunkProviderDisposed(this);
     }
 
     @Override

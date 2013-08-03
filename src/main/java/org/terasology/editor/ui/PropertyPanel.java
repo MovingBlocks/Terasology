@@ -22,7 +22,6 @@ import org.terasology.editor.properties.PropertyProvider;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 

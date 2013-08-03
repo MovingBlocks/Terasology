@@ -16,6 +16,8 @@
 
 package org.terasology.utilities.procedural;
 
+import java.io.IOException;
+
 /**
  * Reads a heightmap encoded in a textfile
  *
@@ -24,13 +26,12 @@ package org.terasology.utilities.procedural;
 public class HeightmapFileReader {
 
     public static float[][] readFile(String file, String delimiter)
-            throws Exception {
+            throws IOException {
         return (readValues(new java.io.FileInputStream(file), delimiter));
     }
 
     public static float[][] readValues(java.io.InputStream in, String delimiter)
-            throws java.io.FileNotFoundException,
-            java.io.IOException,
+            throws java.io.IOException,
             java.lang.NumberFormatException {
         String thisLine;
         java.io.BufferedInputStream s = new java.io.BufferedInputStream(in);

@@ -73,7 +73,7 @@ import org.terasology.network.internal.pipelineFactory.TerasologyClientPipelineF
 import org.terasology.network.internal.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;

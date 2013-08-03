@@ -24,7 +24,8 @@ public class SystemConfig {
     private int maxThreads = 2;
     private int verticalChunkMeshSegments = 1;
 
-    private boolean debugEnabled;
+    private boolean debugEnabled = false;
+    private boolean monitoringEnabled = false;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;
@@ -56,5 +57,13 @@ public class SystemConfig {
 
     public void setDebugEnabled(boolean debugEnabled) {
         this.debugEnabled = debugEnabled;
+    }
+
+    public boolean isMonitoringEnabled() {
+        return monitoringEnabled;
+    }
+
+    public void setMonitoringEnabled(boolean monitoringEnabled) {
+        this.monitoringEnabled = monitoringEnabled;
     }
 }

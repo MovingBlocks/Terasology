@@ -26,33 +26,33 @@ public interface SoundSource<T extends Sound> {
      *
      * @return
      */
-    public SoundSource play();
+    SoundSource play();
 
     /**
      * Stop sound playback
      *
      * @return
      */
-    public SoundSource stop();
+    SoundSource stop();
 
     /**
      * Pause sound playback
      *
      * @return
      */
-    public SoundSource pause();
+    SoundSource pause();
 
     /**
      * Returns true if sound is currently playing, or intended to be played
      *
      * @return
      */
-    public boolean isPlaying();
+    boolean isPlaying();
 
     /**
      * Update method, use it for position update, buffer switching, etc
      */
-    public void update(float delta);
+    void update(float delta);
 
     /**
      * Set sound source absolute positioning.
@@ -61,14 +61,14 @@ public interface SoundSource<T extends Sound> {
      * @param absolute
      * @return
      */
-    public SoundSource setAbsolute(boolean absolute);
+    SoundSource setAbsolute(boolean absolute);
 
     /**
      * Returns true if sound source is absolute relative to listener
      *
      * @return
      */
-    public boolean isAbsolute();
+    boolean isAbsolute();
 
     /**
      * Set sound source position in space
@@ -76,14 +76,14 @@ public interface SoundSource<T extends Sound> {
      * @param pos
      * @return
      */
-    public SoundSource setPosition(Vector3f pos);
+    SoundSource setPosition(Vector3f pos);
 
     /**
      * Returns sound position in space
      *
      * @return
      */
-    public Vector3f getPosition();
+    Vector3f getPosition();
 
     /**
      * Set sound source velocity
@@ -92,14 +92,14 @@ public interface SoundSource<T extends Sound> {
      * @param velocity
      * @return
      */
-    public SoundSource setVelocity(Vector3f velocity);
+    SoundSource setVelocity(Vector3f velocity);
 
     /**
      * Returns sound source velocity
      *
      * @return
      */
-    public Vector3f getVelocity();
+    Vector3f getVelocity();
 
     /**
      * Set sound source direction in cartesian coordinates
@@ -107,21 +107,21 @@ public interface SoundSource<T extends Sound> {
      * @param direction
      * @return
      */
-    public SoundSource setDirection(Vector3f direction);
+    SoundSource setDirection(Vector3f direction);
 
     /**
      * Returns sound source direction in cartesian coordinates
      *
      * @return
      */
-    public Vector3f getDirection();
+    Vector3f getDirection();
 
     /**
      * Returns sound source pitch
      *
      * @return
      */
-    public float getPitch();
+    float getPitch();
 
     /**
      * Sets sound source pitch
@@ -129,19 +129,19 @@ public interface SoundSource<T extends Sound> {
      * @param pitch
      * @return
      */
-    public SoundSource setPitch(float pitch);
+    SoundSource setPitch(float pitch);
 
     /**
      * Returns sound source gain
      *
      * @return
      */
-    public float getGain();
+    float getGain();
 
     /**
      * Updates gain, used after pool volume is altered
      */
-    public void updateGain();
+    void updateGain();
 
     /**
      * Set sound source gain
@@ -149,14 +149,14 @@ public interface SoundSource<T extends Sound> {
      * @param gain
      * @return
      */
-    public SoundSource setGain(float gain);
+    SoundSource setGain(float gain);
 
     /**
      * Returns true if sound source is looped (sound will be repeated)
      *
      * @return
      */
-    public boolean isLooping();
+    boolean isLooping();
 
     /**
      * Set sound source looping
@@ -165,7 +165,7 @@ public interface SoundSource<T extends Sound> {
      * @param looping
      * @return
      */
-    public SoundSource setLooping(boolean looping);
+    SoundSource setLooping(boolean looping);
 
     /**
      * Set source of sound (samples)
@@ -173,14 +173,14 @@ public interface SoundSource<T extends Sound> {
      * @param sound
      * @return
      */
-    public SoundSource setAudio(T sound);
+    SoundSource setAudio(T sound);
 
     /**
      * Returns sound of source :)
      *
      * @return
      */
-    public T getAudio();
+    T getAudio();
 
     /**
      * Fade source smoothly
@@ -188,7 +188,7 @@ public interface SoundSource<T extends Sound> {
      * @param targetGain
      * @return
      */
-    public SoundSource fade(float targetGain);
+    SoundSource fade(float targetGain);
 
-    public SoundSource reset();
+    SoundSource reset();
 }

@@ -33,6 +33,11 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
     }
 
     @Override
+    public String getName() {
+        return "Internal Chunk Lighting";
+    }
+
+    @Override
     public void enact() {
         Chunk chunk = getProvider().getChunkForProcessing(getPosition());
         if (chunk == null) {

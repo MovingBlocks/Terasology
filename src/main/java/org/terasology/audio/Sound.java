@@ -23,16 +23,16 @@ public interface Sound<T extends AssetData> extends Asset<T> {
     /**
      * @return channels amount of sound (1 - mono, 2 - stereo)
      */
-    public int getChannels();
+    int getChannels();
 
     /**
      * @return sampling rate of sound (example 44100)
      */
-    public int getSamplingRate();
+    int getSamplingRate();
 
     /**
      * @return the size of the sound buffer
      */
-    public int getBufferSize();
+    int getBufferSize();
 
 }

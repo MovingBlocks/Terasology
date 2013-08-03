@@ -23,4 +23,6 @@ public interface LiquidSimulationTask {
     boolean shutdownThread();
 
     void run();
+
+    String getName();
 }

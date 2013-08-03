@@ -101,7 +101,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         this.storeChunksInZips = storeChunksInZips;
         entityManager.subscribe(this);
         playersPath = PathManager.getInstance().getCurrentSavePath().resolve(PLAYERS_PATH);
-        storageTaskMaster = TaskMaster.createFIFOTaskMaster(BACKGROUND_THREADS);
+        storageTaskMaster = TaskMaster.createFIFOTaskMaster("Storage", BACKGROUND_THREADS);
     }
 
     @Override
@@ -393,6 +393,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         pendingProcessingChunkStore.put(chunkStore.getChunkPosition(), chunkStore);
         try {
             storageTaskMaster.put(new AbstractTask() {
+                @Override
+                public String getName() {
+                    return "Compress chunk";
+                }
+
                 @Override
                 public void enact() {
                     EntityData.ChunkStore store = chunkStore.getStore();

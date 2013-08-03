@@ -20,6 +20,11 @@ package org.terasology.utilities.concurrency;
  */
 public class ShutdownTask implements Task {
     @Override
+    public String getName() {
+        return "Shutdown";
+    }
+
+    @Override
     public void enact() {
     }
 

@@ -17,7 +17,9 @@
 package org.terasology.rendering.gui.windows.metricsScreen;
 
 import gnu.trove.procedure.TObjectIntProcedure;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.rendering.gui.widgets.UILabel;
 
 import java.util.List;
@@ -36,12 +38,7 @@ final class RunningThreadsMode extends MetricsMode {
     @Override
     public void updateLines(List<UILabel> lines) {
         final SortedSet<String> threads = new TreeSet<>();
-        PerformanceMonitor.getRunningThreads().forEachEntry(new TObjectIntProcedure<String>() {
-            public boolean execute(String s, int i) {
-                threads.add(String.format("%s (%d)", s, i));
-                return true;
-            }
-        });
+        // TODO : Integrate with Thread Monitor
         int line = 0;
         for (String thread : threads) {
             lines.get(line).setVisible(true);

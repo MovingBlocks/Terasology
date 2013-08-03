@@ -21,7 +21,6 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 
 import java.applet.Applet;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,7 +60,9 @@ public final class TerasologyApplet extends Applet {
         for (String mod : mods) {
             try {
                 URL url = new URL(modsPath + mod);
-                try (ReadableByteChannel rbc = Channels.newChannel(url.openStream()); SeekableByteChannel writeChannel = Files.newByteChannel(PathManager.getInstance().getHomeModPath().resolve(mod), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);) {
+                try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+                     SeekableByteChannel writeChannel = Files.newByteChannel(PathManager.getInstance().getHomeModPath().resolve(mod),
+                             StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
                     ByteBuffer buffer = ByteBuffer.allocateDirect(1 << 24);
                     while (rbc.read(buffer) != -1) {
                         buffer.flip();
@@ -72,8 +73,6 @@ public final class TerasologyApplet extends Applet {
                     while (buffer.hasRemaining()) {
                         writeChannel.write(buffer);
                     }
-                } catch (FileNotFoundException e) {
-                    logger.error("Unable to obtain mod '{}'", mod, e);
                 } catch (IOException e) {
                     logger.error("Unable to obtain mod '{}'", mod, e);
                 }

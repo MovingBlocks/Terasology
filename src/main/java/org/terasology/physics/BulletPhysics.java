@@ -46,7 +46,7 @@ import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;

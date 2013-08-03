@@ -34,6 +34,11 @@ public class PropagateLightingChunkTask extends AbstractChunkTask {
     }
 
     @Override
+    public String getName() {
+        return "Chunk lighting";
+    }
+
+    @Override
     public void enact() {
         ChunkView chunkView = getProvider().getViewAround(getPosition());
         if (chunkView == null) {

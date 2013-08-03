@@ -1,22 +1,19 @@
 package org.terasology.benchmark;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * BenchmarkResult records the results and the errors of the execution of one particular benchmark.
- * It also maintains a list of columns which are very useful for pretty printing the results. 
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * It also maintains a list of columns which are very useful for pretty printing the results.
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public abstract class BenchmarkResult {
-    
+
     private final List<Column<?>> columns = Lists.newLinkedList();
 
     private final Class<?> benchmarkClass;
@@ -38,7 +35,7 @@ public abstract class BenchmarkResult {
                 return result;
             }
         },
-        
+
         RIGHT {
             @Override
             public String pad(String value, int size) {
@@ -49,23 +46,23 @@ public abstract class BenchmarkResult {
                 return result;
             }
         };
-        
+
         public abstract String pad(String value, int size);
     }
-    
+
     public abstract static class Column<T extends BenchmarkResult> {
-        
+
         private final int reps;
         private final String[] cache;
         private boolean hasMaxWidth = false;
         private int maxWidth = 0;
-        
+
         public final T owner;
         public final Alignment alignment;
         public final String name;
-        
+
         protected abstract String getValueInternal(int rep);
-        
+
         public Column(T owner, Alignment alignment, String name) {
             this.owner = Preconditions.checkNotNull(owner);
             this.alignment = Preconditions.checkNotNull(alignment);
@@ -73,7 +70,7 @@ public abstract class BenchmarkResult {
             this.reps = owner.getRepetitions();
             this.cache = new String[reps];
         }
-        
+
         public final String getValue(int rep) {
             Preconditions.checkElementIndex(rep, reps, "Parameter 'rep'");
             if (cache[rep] == null) {
@@ -83,7 +80,7 @@ public abstract class BenchmarkResult {
             }
             return cache[rep];
         }
-        
+
         public final int computeMaxWidth() {
             if (!hasMaxWidth) {
                 int max = name.length();
@@ -99,7 +96,7 @@ public abstract class BenchmarkResult {
             return maxWidth;
         }
     }
-    
+
     public BenchmarkResult(Benchmark benchmark) {
         Preconditions.checkNotNull(benchmark, "Parameter 'benchmark' must not be null");
         this.benchmarkClass = benchmark.getClass();
@@ -110,63 +107,63 @@ public abstract class BenchmarkResult {
         this.starttime = new long[reps];
         this.runtime = new long[reps];
     }
-    
+
     public final Iterator<Column<?>> getColumnsIterator() {
         return columns.iterator();
     }
-    
+
     public final void addColumn(Column<?> column) {
         columns.add(Preconditions.checkNotNull(column));
     }
-    
+
     public final int getNumColumns() {
         return columns.size();
     }
-    
+
     public final Class<?> getBenchmarkClass() {
         return benchmarkClass;
     }
-    
+
     public final String getTitle() {
         return title;
     }
-     
+
     public final int getRepetitions() {
         return repetitions.length;
     }
-    
+
     public final int getRepetitions(int rep) {
         return repetitions[rep];
     }
-    
+
     public final long getStartTime(int rep) {
         return starttime[rep];
     }
-    
+
     public final void setStartTime(int rep, long value) {
         starttime[rep] = value;
     }
-    
+
     public final long getRunTime(int rep) {
         return runtime[rep];
     }
-    
+
     public final void setRunTime(int rep, long value) {
         runtime[rep] = value;
     }
-    
+
     public final boolean isAborted() {
         return aborted;
     }
-    
+
     public final Iterator<BenchmarkError> getErrorsIterator() {
         return errors.iterator();
     }
-    
+
     public final int getNumErrors() {
         return errors.size();
     }
-    
+
     public final void addError(BenchmarkError.Type type, Exception error) {
         this.aborted = this.aborted || Preconditions.checkNotNull(type).abort;
         errors.add(new BenchmarkError(type, error));

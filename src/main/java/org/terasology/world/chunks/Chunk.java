@@ -25,14 +25,13 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArrays;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.chunks.internal.ChunkBlockIteratorImpl;
@@ -136,7 +135,7 @@ public class Chunk {
 
     private boolean ready = false;
 
-    public Chunk() {
+    protected Chunk() {
         final Chunks c = Chunks.getInstance();
         blockData = c.getBlockDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
@@ -151,21 +150,11 @@ public class Chunk {
         pos.x = x;
         pos.y = y;
         pos.z = z;
+        ChunkMonitor.fireChunkCreated(this);
     }
 
     public Chunk(Vector3i pos) {
         this(pos.x, pos.y, pos.z);
-    }
-
-    public Chunk(Chunk other) {
-        pos.set(other.pos);
-        blockData = other.blockData.copy();
-        sunlightData = other.sunlightData.copy();
-        lightData = other.lightData.copy();
-        extraData = other.extraData.copy();
-        chunkState = other.chunkState;
-        blockManager = other.blockManager;
-        dirty = true;
     }
 
     public Chunk(Vector3i pos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid, boolean loaded) {
@@ -178,6 +167,7 @@ public class Chunk {
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
         initialGenerationComplete = loaded;
+        ChunkMonitor.fireChunkCreated(this);
     }
 
     /**
@@ -275,7 +265,12 @@ public class Chunk {
 
     public void setChunkState(State chunkState) {
         Preconditions.checkNotNull(chunkState);
-        this.chunkState = chunkState;
+        if (chunkState != this.chunkState) {
+            State old = this.chunkState;
+            this.chunkState = chunkState;
+            ChunkMonitor.fireStateChanged(this, old);
+        }
+
     }
 
     public boolean isInitialGenerationComplete() {
@@ -451,31 +446,14 @@ public class Chunk {
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
 
                 logger.debug("chunk {}: size-before: {} bytes, size-after: {} bytes, total-deflated-by: {}%, blocks-deflated-by={}%, sunlight-deflated-by={}%, light-deflated-by={}%, liquid-deflated-by={}%", pos, SIZE_FORMAT.format(totalSize), SIZE_FORMAT.format(totalReduced), PERCENT_FORMAT.format(totalPercent), PERCENT_FORMAT.format(blocksPercent), PERCENT_FORMAT.format(sunlightPercent), PERCENT_FORMAT.format(lightPercent), PERCENT_FORMAT.format(liquidPercent));
+                ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
             } else {
+                final int oldSize = getEstimatedMemoryConsumptionInBytes();
                 blockData = def.deflate(blockData);
                 sunlightData = def.deflate(sunlightData);
                 lightData = def.deflate(lightData);
                 extraData = def.deflate(extraData);
-            }
-        } finally {
-            unlock();
-        }
-    }
-
-    public void inflate() {
-        lock();
-        try {
-            if (!(blockData instanceof TeraDenseArray8Bit)) {
-                blockData = new TeraDenseArray8Bit(blockData);
-            }
-            if (!(sunlightData instanceof TeraDenseArray4Bit)) {
-                sunlightData = new TeraDenseArray4Bit(sunlightData);
-            }
-            if (!(lightData instanceof TeraDenseArray4Bit)) {
-                lightData = new TeraDenseArray4Bit(lightData);
-            }
-            if (!(extraData instanceof TeraDenseArray4Bit)) {
-                extraData = new TeraDenseArray4Bit(extraData);
+                ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
             }
         } finally {
             unlock();
@@ -550,6 +528,7 @@ public class Chunk {
             }
             mesh = null;
         }
+        ChunkMonitor.fireChunkDisposed(this);
     }
 
     public void disposeMesh() {

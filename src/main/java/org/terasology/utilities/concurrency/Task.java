@@ -21,6 +21,8 @@ package org.terasology.utilities.concurrency;
  */
 public interface Task {
 
+    String getName();
+
     void enact();
 
     boolean isTerminateSignal();

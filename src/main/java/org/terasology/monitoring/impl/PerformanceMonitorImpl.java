@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.performanceMonitor.impl;
+package org.terasology.monitoring.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
@@ -39,7 +39,7 @@ import java.util.List;
  *         TODO: Check to ensure activities are being started and stopped correctly
  *         TODO: Remove activities with 0 time
  */
-public class PerformanceMonitorImpl implements IPerformanceMonitor {
+public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private static final int RETAINED_CYCLES = 60;
     private static final double DECAY_RATE = 0.98;
 

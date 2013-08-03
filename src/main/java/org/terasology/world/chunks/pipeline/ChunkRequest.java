@@ -71,6 +71,11 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
 
 
     @Override
+    public String getName() {
+        return type.name() + " CHUNK";
+    }
+
+    @Override
     public void enact() {
         switch (type) {
             case REVIEW:

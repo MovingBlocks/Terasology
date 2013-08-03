@@ -35,7 +35,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;

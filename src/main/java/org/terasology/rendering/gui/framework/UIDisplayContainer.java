@@ -395,10 +395,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     /**
      * Set the background color. The background color will fill the whole element.
      *
-     * @param r Red value. (0-255)
-     * @param g Green value. (0-255)
-     * @param b Blue value. (0-255)
-     * @param a Alpha value. (0-1)
+     * @param color
      */
     public void setBackgroundColor(Color color) {
         StyleBackgroundColor style = getStyle(StyleBackgroundColor.class);
@@ -420,7 +417,6 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         StyleBackgroundColor style = getStyle(StyleBackgroundColor.class);
         if (style == null) {
             style = new StyleBackgroundColor(color);
-            ;
             style.setVisible(true);
             addStyle(style);
         } else {
@@ -624,7 +620,6 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param texture The texture.
      * @param origin  The origin of the border in the texture.
      * @param size    The size of the border container in the texture.
-     * @param width   The border width for each side. x = top, y = right, z = bottom, w = left
      */
     public void setBorderImage(String texture, Vector2f origin, Vector2f size, Vector4f borderSize) {
         StyleBorderImage style = getStyle(StyleBorderImage.class);

@@ -33,6 +33,11 @@ public class SecondPassChunkTask extends AbstractChunkTask {
     }
 
     @Override
+    public String getName() {
+        return "Chunk second pass";
+    }
+
+    @Override
     public void enact() {
         ChunkView view = getProvider().getViewAround(getPosition());
         if (view == null) {

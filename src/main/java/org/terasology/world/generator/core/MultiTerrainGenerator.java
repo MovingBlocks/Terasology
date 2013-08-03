@@ -126,9 +126,9 @@ public class MultiTerrainGenerator implements ChunkGenerator {
          */
         triLerpDensityMap(densityMap);
 
-		/*
+        /*
          * Generate the chunk from the density map.
-		 */
+         */
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(

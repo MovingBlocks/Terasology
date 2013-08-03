@@ -23,15 +23,16 @@ import org.terasology.engine.GameEngine;
  * @version 0.1
  */
 public interface GameState {
-    public void init(GameEngine engine);
 
-    public void dispose();
+    void init(GameEngine engine);
 
-    public void handleInput(float delta);
+    void dispose();
 
-    public void update(float delta);
+    void handleInput(float delta);
 
-    public void render();
+    void update(float delta);
+
+    void render();
 
     /**
      * @return Whether the game should hibernate when it loses focus

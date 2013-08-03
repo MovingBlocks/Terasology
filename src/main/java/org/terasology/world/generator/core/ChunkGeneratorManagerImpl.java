@@ -17,6 +17,8 @@
 package org.terasology.world.generator.core;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
@@ -36,6 +38,8 @@ import java.util.List;
  * @author Immortius
  */
 public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChunkGeneratorManagerImpl.class);
 
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
@@ -75,20 +79,8 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 
                 chunkGeneratorManager.registerChunkGenerator(chunkGenerator);
 
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
+                logger.error("Failed to build chunk generator", e);
             }
         }
 

@@ -26,6 +26,6 @@ public interface StreamingSound extends Sound<StreamingSoundData> {
      *
      * @return
      */
-    public void reset();
+    void reset();
 
 }

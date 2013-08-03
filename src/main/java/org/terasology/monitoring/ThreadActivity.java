@@ -13,30 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.performanceMonitor.impl;
-
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.TObjectIntMap;
+package org.terasology.monitoring;
 
 /**
- * Base interface for performance monitor implementations.
+ * A token that is used to express a thread working on a task.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public interface IPerformanceMonitor {
-    void rollCycle();
-
-    void startActivity(String activity);
-
-    void endActivity();
-
-    void startThread(String name);
-
-    void endThread(String name);
-
-    TObjectIntMap<String> getRunningThreads();
-
-    TObjectDoubleMap<String> getRunningMean();
-
-    TObjectDoubleMap<String> getDecayingSpikes();
+public interface ThreadActivity extends AutoCloseable{
+    void close();
 }

@@ -567,7 +567,7 @@ public abstract class UIDisplayElement {
                 unitPositionX = EUnitType.PIXEL;
             }
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            logger.error("Invalid number for setPosition: {}", x, e);
         }
 
         try {
@@ -582,7 +582,7 @@ public abstract class UIDisplayElement {
                 unitPositionY = EUnitType.PIXEL;
             }
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            logger.error("Invalid number for setPosition: {}", y, e);
         }
 
         this.size.set(posX, posY);
@@ -663,7 +663,7 @@ public abstract class UIDisplayElement {
                     unitSizeX = EUnitType.PIXEL;
                 }
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                logger.error("Invalid number for setSize: {}", width, e);
             }
         }
 
@@ -680,7 +680,7 @@ public abstract class UIDisplayElement {
                     unitSizeY = EUnitType.PIXEL;
                 }
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                logger.error("Invalid number for setSize: {}", height, e);
             }
         }
 

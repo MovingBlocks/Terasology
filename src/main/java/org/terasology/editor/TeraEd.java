@@ -56,6 +56,7 @@ public final class TeraEd extends JWindow {
             }
         } catch (Exception e) {
             // If Nimbus is not available, you can set the GUI to another look and feel.
+            logger.warn("Failed to set look and feel to Nimbus", e);
         }
 
         engine = new TerasologyEngine();

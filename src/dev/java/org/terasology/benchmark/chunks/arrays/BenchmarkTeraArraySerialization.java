@@ -1,20 +1,17 @@
 package org.terasology.benchmark.chunks.arrays;
 
-import org.terasology.benchmark.BasicBenchmarkResult;
-import org.terasology.benchmark.Benchmark;
-import org.terasology.benchmark.BenchmarkResult;
-import org.terasology.world.chunks.blockdata.TeraArray;
-
 import com.google.common.base.Preconditions;
+import org.terasology.benchmark.Benchmark;
+import org.terasology.world.chunks.blockdata.TeraArray;
 
 @SuppressWarnings("rawtypes")
 public abstract class BenchmarkTeraArraySerialization implements Benchmark {
 
     public static final int BUFFER_SIZE = 1024 * 1024;
-    
+
     public final TeraArray.SerializationHandler handler;
     public final TeraArray array;
-    
+
     @SuppressWarnings("unchecked")
     public BenchmarkTeraArraySerialization(TeraArray.SerializationHandler handler, TeraArray array) {
         this.handler = Preconditions.checkNotNull(handler);
@@ -29,7 +26,7 @@ public abstract class BenchmarkTeraArraySerialization implements Benchmark {
 
     @Override
     public int[] getRepetitions() {
-        return new int[] {1000, 5000, 10000};
+        return new int[]{1000, 5000, 10000};
     }
 
 }

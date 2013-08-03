@@ -32,7 +32,8 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
@@ -108,7 +109,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         this.storageManager = storageManager;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
-        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster(8);
+        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
+        ChunkMonitor.fireChunkProviderInitialized(this);
 
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
     }
@@ -450,6 +452,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     @Override
     public void dispose() {
+        ChunkMonitor.fireChunkProviderDisposed(this);
         pipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
 
@@ -460,6 +463,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             store.save();
         }
         nearCache.clear();
+
     }
 
     @Override
@@ -494,6 +498,11 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 } else if (storageManager.containsChunkStoreFor(chunkPos)) {
                     pipeline.doTask(new AbstractChunkTask(pipeline, chunkPos, this) {
                         @Override
+                        public String getName() {
+                            return "Load Chunk";
+                        }
+
+                        @Override
                         public void enact() {
                             ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                             Chunk chunk = chunkStore.getChunk();
@@ -510,6 +519,11 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     });
                 } else {
                     pipeline.doTask(new AbstractChunkTask(pipeline, chunkPos, this) {
+
+                        @Override
+                        public String getName() {
+                            return "Generate Chunk";
+                        }
 
                         @Override
                         public void enact() {

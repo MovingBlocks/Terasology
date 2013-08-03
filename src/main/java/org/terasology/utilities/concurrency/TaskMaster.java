@@ -38,20 +38,22 @@ public class TaskMaster<T extends Task> {
     private ExecutorService executorService;
     private int threads;
     private boolean running = false;
+    private String name;
 
-    public static <T extends Task> TaskMaster<T> createFIFOTaskMaster(int threads) {
-        return new TaskMaster<T>(threads, new LinkedBlockingQueue<T>());
+    public static <T extends Task> TaskMaster<T> createFIFOTaskMaster(String name, int threads) {
+        return new TaskMaster<>(name, threads, new LinkedBlockingQueue<T>());
     }
 
-    public static <T extends Task & Comparable<? super T>> TaskMaster<T> createPriorityTaskMaster(int threads, int queueSize) {
-        return new TaskMaster<T>(threads, new PriorityBlockingQueue<T>(queueSize));
+    public static <T extends Task & Comparable<? super T>> TaskMaster<T> createPriorityTaskMaster(String name, int threads, int queueSize) {
+        return new TaskMaster<>(name, threads, new PriorityBlockingQueue<T>(queueSize));
     }
 
-    public static <T extends Task> TaskMaster<T> createPriorityTaskMaster(int threads, int queueSize, Comparator<T> comparator) {
-        return new TaskMaster<T>(threads, new PriorityBlockingQueue<T>(queueSize, comparator));
+    public static <T extends Task> TaskMaster<T> createPriorityTaskMaster(String name, int threads, int queueSize, Comparator<T> comparator) {
+        return new TaskMaster<>(name, threads, new PriorityBlockingQueue<T>(queueSize, comparator));
     }
 
-    private TaskMaster(int threads, BlockingQueue<T> queue) {
+    private TaskMaster(String name, int threads, BlockingQueue<T> queue) {
+        this.name = name;
         this.threads = threads;
         if (threads <= 0) {
             throw new IllegalArgumentException("Must have at least one thread.");
@@ -110,7 +112,7 @@ public class TaskMaster<T extends Task> {
         if (!running) {
             executorService = Executors.newFixedThreadPool(threads);
             for (int i = 0; i < threads; ++i) {
-                executorService.execute(new TaskProcessor(taskQueue));
+                executorService.execute(new TaskProcessor(name + "-" + i, taskQueue));
             }
             running = true;
         }

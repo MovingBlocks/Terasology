@@ -112,7 +112,7 @@ public class OggReader extends FilterInputStream {
             initVorbis();
             index = new int[info.channels];
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to read ogg file", e);
             eos = true;
         }
     }

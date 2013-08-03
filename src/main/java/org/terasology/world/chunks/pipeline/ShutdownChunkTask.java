@@ -25,6 +25,11 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 public final class ShutdownChunkTask implements ChunkTask {
 
     @Override
+    public String getName() {
+        return "Shutdown";
+    }
+
+    @Override
     public void enact() {
     }
 

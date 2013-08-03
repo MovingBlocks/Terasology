@@ -42,8 +42,8 @@ public class ChunkGenerationPipeline {
     public ChunkGenerationPipeline(GeneratingChunkProvider provider, ChunkGeneratorManager generatorManager, Comparator<ChunkTask> taskComparator) {
         this.provider = provider;
         this.generator = generatorManager;
-        chunkReviewer = TaskMaster.<ChunkRequest>createPriorityTaskMaster(NUM_REVIEW_THREADS, 64);
-        chunkGenerator = TaskMaster.createPriorityTaskMaster(NUM_TASK_THREADS, 128, taskComparator);
+        chunkReviewer = TaskMaster.createPriorityTaskMaster("Chunk-Reviewer", NUM_REVIEW_THREADS, 64);
+        chunkGenerator = TaskMaster.createPriorityTaskMaster("Chunk-Generator", NUM_TASK_THREADS, 128, taskComparator);
     }
 
     public void requestReview(Region3i region) {

@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.windows.metricsScreen;
 
 import com.google.common.collect.Lists;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 

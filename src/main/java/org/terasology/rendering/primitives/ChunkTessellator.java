@@ -23,7 +23,7 @@ import org.terasology.math.Direction;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
 import org.terasology.world.MiniatureChunk;

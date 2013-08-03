@@ -28,6 +28,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.ThreadActivity;
+import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.world.ChunkView;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldComponent;
@@ -73,7 +75,7 @@ public class LiquidSimulator implements ComponentSystem {
 
     @Override
     public void initialise() {
-        air = blockManager.getAir();
+        air = BlockManager.getAir();
         grass = blockManager.getBlock("engine:Grass");
         snow = blockManager.getBlock("engine:Snow");
         dirt = blockManager.getBlock("engine:Dirt");
@@ -94,10 +96,14 @@ public class LiquidSimulator implements ComponentSystem {
                             if (task.shutdownThread()) {
                                 break;
                             }
-                            task.run();
+                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
+                                task.run();
+                            }
                         } catch (InterruptedException e) {
+                            ThreadMonitor.addError(e);
                             logger.debug("Interrupted");
                         } catch (Exception e) {
+                            ThreadMonitor.addError(e);
                             logger.error("Error in water simulation", e);
                         }
                     }
@@ -118,6 +124,11 @@ public class LiquidSimulator implements ComponentSystem {
 
                 @Override
                 public void run() {
+                }
+
+                @Override
+                public String getName() {
+                    return "Shutdown";
                 }
             });
         }
@@ -309,6 +320,11 @@ public class LiquidSimulator implements ComponentSystem {
                 }
             }
         }
+
+        @Override
+        public String getName() {
+            return "Simulate";
+        }
     }
 
     private class ReviewChunk implements LiquidSimulationTask {
@@ -341,6 +357,11 @@ public class LiquidSimulator implements ComponentSystem {
 
                 }
             }
+        }
+
+        @Override
+        public String getName() {
+            return "Review";
         }
     }
 

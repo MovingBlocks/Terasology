@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.ChunkView;
@@ -108,6 +109,7 @@ public final class ChunkUpdateManager {
                 }
 
                 c.setPendingMesh(newMeshes);
+                ChunkMonitor.fireChunkTessellated(c.getPos(), newMeshes);
 
             }
             chunkUpdateManager.finishedProcessing(c);

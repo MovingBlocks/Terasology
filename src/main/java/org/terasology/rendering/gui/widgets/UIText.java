@@ -87,8 +87,8 @@ public class UIText extends UIDisplayContainerScrollable {
        Note 1: Calculating the text width and height by using the slick library isn't a perfect solution. Currently the cursor will be slightly 
                off the proper position at some characters. There is room for improvement there to calculate the >correct< text size. Thats why there 
                are a few workarounds in the 'calcTextHeight' method.
-       
-       Note 2: There is some dividing by the factor of 2 going on when setting the position or size of the character. This needs to be done, 
+
+       Note 2: There is some dividing by the factor of 2 going on when setting the position or size of the character. This needs to be done,
                otherwise the cursor will be at the wrong position. I can't explain this behavior.
     */
 
@@ -192,9 +192,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
 
-                    Vector2f pos = cursor.getAbsolutePosition();
-                    pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y - cursorSize.y / 2);
-                    setCursorToTextPosition(toTextPosition(pos));
+                    Vector2f cursorPos = cursor.getPosition();
+                    setCursorToTextPosition(toTextPositionLocal(new Vector2f(cursorPos.x, cursorPos.y - cursor.getSize().y + 1)));
 
                     event.consume();
                 } else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
@@ -202,9 +201,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
 
-                    Vector2f pos = cursor.getAbsolutePosition();
-                    pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y + cursorSize.y + cursorSize.y / 2);
-                    setCursorToTextPosition(toTextPosition(pos));
+                    Vector2f cursorPos = cursor.getPosition();
+                    setCursorToTextPosition(toTextPositionLocal(new Vector2f(cursorPos.x, cursorPos.y + cursor.getSize().y + 1)));
 
                     event.consume();
                 } else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
@@ -278,8 +276,8 @@ public class UIText extends UIDisplayContainerScrollable {
             glColor4f(color.r, color.g, color.b, color.a);
             glLineWidth(getSize().x);
             glBegin(GL11.GL_LINES);
-            glVertex2f(getPosition().x, getPosition().y);
-            glVertex2f(getPosition().x, getPosition().y + getSize().y);
+            glVertex2f(0, 0);
+            glVertex2f(0, getSize().y);
             glEnd();
             glPopMatrix();
         }
@@ -345,8 +343,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 for (int i = start; i < end; ) {
                     nextLine = findNextChar(i, '\n', false);
                     pos = toDisplayPosition(i);
-                    pos.x = pos.x * 2;
-                    pos.y = pos.y * 2 - cursor.getSize().y;
+                    pos.y -= cursor.getSize().y;
                     Vector2f size = new Vector2f(calcTextWidth(text.getText().substring(i, Math.min(end, nextLine))), cursor.getSize().y);
 
                     rectangles.add(new Vector2f[]{pos, size});
@@ -495,26 +492,26 @@ public class UIText extends UIDisplayContainerScrollable {
         //calculate the display position of the cursor from text position
         if (index != cursorPosition) {
             Vector2f newPos = toDisplayPosition(index);
-            newPos.y = newPos.y - cursorSize.y / 2;
+            newPos.y -= cursorSize.y;
             cursor.setPosition(newPos);
 
             if (isMultiLine()) {
                 //cursor is below of the input area
-                if ((cursor.getSize().y + cursor.getPosition().y - getScrollPosition() / 2) > (getSize().y / 2f)) {
+                if ((cursor.getSize().y + cursor.getPosition().y - getScrollPosition()) > (getSize().y)) {
                     float additionalSpacing = getPadding().z + 5f;
                     scrollTo(cursor.getPosition().y * 2 + cursor.getSize().y - getSize().y + additionalSpacing);
-                } else if (cursor.getPosition().y - getScrollPosition() / 2 < 0) {
+                } else if (cursor.getPosition().y - getScrollPosition() < 0) {
                     //cursor is on top of the input area
                     float additionalSpacing = getPadding().x + 5f;
-                    scrollTo(cursor.getPosition().y * 2 - additionalSpacing);
+                    scrollTo(cursor.getPosition().y - additionalSpacing);
                 }
             } else {
                 //cursor is right from input area
-                if ((cursor.getPosition().x + text.getPosition().x / 2 + getPadding().y) > (getSize().x / 2f)) {
-                    text.setPosition(new Vector2f(-(cursor.getPosition().x * 2 - getSize().x + getPadding().y + getPadding().w), 0f));
-                } else if ((cursor.getPosition().x + text.getPosition().x / 2) < 0) {
+                if ((cursor.getPosition().x + text.getPosition().x + getPadding().y) > (getSize().x)) {
+                    text.setPosition(new Vector2f(-(cursor.getPosition().x - getSize().x + getPadding().y + getPadding().w), 0f));
+                } else if ((cursor.getPosition().x + text.getPosition().x) < 0) {
                     //cursor is left from input area
-                    text.setPosition(new Vector2f(-cursor.getPosition().x * 2, 0f));
+                    text.setPosition(new Vector2f(-cursor.getPosition().x, 0f));
                 }
             }
 
@@ -544,55 +541,33 @@ public class UIText extends UIDisplayContainerScrollable {
             //clicked top of text container
             return 0;
         } else {
-            //calculate the cursor position
-            for (int i = 0; i < text.getText().length(); ) {
-                //first calculate the height
-                if (calcTextHeight(text.getText().substring(0, i)) >= relative.y) {
-                    //clicked left from the text box
-                    if (relative.x <= 0) {
-                        return i;
-                    }
+            return toTextPositionLocal(relative);
+        }
+    }
 
-                    //clicked somewhere in the text or right from text
-                    for (int j = i; j < text.getText().length(); j++) {
-                        //than calculate the width
-                        if (calcTextWidth(text.getText().substring(i, j)) > relative.x || text.getText().charAt(j) == '\n') {
-                            return j;
-                        } else if (j == text.getText().length() - 1) {
-                            return j + 1;
-                        }
-                    }
+    private int toTextPositionLocal(Vector2f local) {
+        for (int i = 0; i < text.getText().length(); ) {
+            //first calculate the height
+            if (calcTextHeight(text.getText().substring(0, i)) >= local.y) {
+                //clicked left from the text box
+                if (local.x <= 0) {
+                    return i;
                 }
 
-                i = findNextChar(i, '\n', false);
-            }
-            return text.getText().length();
-        }
-            /*
-        }
-        //single line
-        else {
-            //clicked right from text
-            if (mousePos.x >= (textAbsPos.x + text.getSize().x)) {
-                return text.getText().length();
-            }
-            //clicked left from text
-            else if (mousePos.x <= textAbsPos.x) {
-                return 0;
-            }
-            //clicked somewhere on the text
-            else {            
-                //calculate the cursor position
-                for (int i = 0; i <= text.getText().length(); i++) {
-                    if (calcTextWidth(text.getText().substring(0, i)) >= relative.x) {
-                        return i;
+                //clicked somewhere in the text or right from text
+                for (int j = i; j < text.getText().length(); j++) {
+                    //than calculate the width
+                    if (calcTextWidth(text.getText().substring(i, j)) > local.x || text.getText().charAt(j) == '\n') {
+                        return j;
+                    } else if (j == text.getText().length() - 1) {
+                        return j + 1;
                     }
                 }
             }
+
+            i = findNextChar(i, '\n', false);
         }
-        
-        return 0;
-        */
+        return text.getText().length();
     }
 
     /**
@@ -612,8 +587,8 @@ public class UIText extends UIDisplayContainerScrollable {
             lastLine = substr.substring(indexLastLine, substr.length());
         }
 
-        displayPos.x = calcTextWidth(lastLine) / 2;
-        displayPos.y = calcTextHeight(substr) / 2;
+        displayPos.x = calcTextWidth(lastLine);
+        displayPos.y = calcTextHeight(substr);
 
         return displayPos;
     }

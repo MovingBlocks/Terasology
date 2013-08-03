@@ -42,5 +42,5 @@ public interface AssetLoader<T extends AssetData> {
      * @return The loaded asset, or null
      * @throws IOException If there is any error loading the asset
      */
-    public T load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException;
+    T load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException;
 }

@@ -26,5 +26,5 @@ public interface StaticSound extends Sound<StaticSoundData> {
      *
      * @return
      */
-    public float getLength();
+    float getLength();
 }

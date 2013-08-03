@@ -24,6 +24,8 @@ import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.TerasologyDevelopment;
 import org.terasology.world.block.Block;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
@@ -35,6 +37,8 @@ import org.terasology.world.generator.core.PerlinTerrainGenerator;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class TerrainPreviewGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(TerrainPreviewGenerator.class);
 
     private static final String SEED = "rAtAiWyKgDlEeFjKiSsPzKaOuKhRrWqV";
 
@@ -148,7 +152,7 @@ public final class TerrainPreviewGenerator {
         try {
             ImageIO.write(image, "png", TerasologyDevelopment.getOutputFolder(fileName));
         } catch (final IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to write terrain preview", e);
         }
     }
 }

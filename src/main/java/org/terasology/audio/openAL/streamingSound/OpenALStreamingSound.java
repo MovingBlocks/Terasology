@@ -28,7 +28,7 @@ import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData> implements StreamingSound {
-    private static final int BUFFER_POOL_SIZE = 3;
+    private static final int BUFFER_POOL_SIZE = 8;
     private static final int BUFFER_SIZE = 4096 * 8;
 
     private StreamingSoundData stream;
