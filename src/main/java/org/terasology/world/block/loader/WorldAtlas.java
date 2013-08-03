@@ -213,7 +213,7 @@ public class WorldAtlas {
                 ImageIO.write(image, "png", bos);
                 PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
                 ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
                 buf.flip();
                 data[i] = buf;
             } catch (IOException e) {

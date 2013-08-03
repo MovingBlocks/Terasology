@@ -65,7 +65,7 @@ ext {
 repositories {
     mavenCentral()
     maven {
-        url "http://slick2d-maven-dependencies.googlecode.com/svn/trunk/repository/"
+        url "http://www.movingblocks.net:8081/artifactory/repo"
     }
 }
 
@@ -155,13 +155,8 @@ dependencies {
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
-    compile ('org.newdawn.slick:slick:236') {
-        exclude module: 'lwjgl'
-        exclude module: 'natives-windows'
-        exclude module: 'natives-mac'
-        exclude module: 'natives-linux'
-		exclude module: 'jorbis'
-    }
+    compile group: 'org.newdawn.slick', name: 'slick', version: '237'
+	compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
     
     // Also grab any libraries in the libs folder (not preferred)
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -315,7 +310,7 @@ subprojects {
         repositories {
             mavenCentral()
             maven {
-                url "http://slick2d-maven-dependencies.googlecode.com/svn/trunk/repository/"
+                url "http://www.movingblocks.net:8081/artifactory/repo"
             }
         }
         // Set dependencies. Note that the dependency information from mod.txt is used
