@@ -61,7 +61,7 @@
             <property name="severity" value="warning"/>
 			<!-- allow starred static member imports -->
             <property name="allowStaticMemberImports" value="true"/>
-			<property name="excludes" value="java.awt,java.swing"/>
+			<property name="excludes" value="java.awt,javax.swing"/>
         </module>
         <!-- Checks for redundant import statements. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#RedundantImport -->

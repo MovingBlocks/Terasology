@@ -119,7 +119,9 @@ public final class AssetUri implements Comparable<AssetUri> {
         }
         if (obj instanceof AssetUri) {
             AssetUri other = (AssetUri) obj;
-            return Objects.equal(type, other.type) && Objects.equal(normalisedPackageName, other.normalisedPackageName) && Objects.equal(normalisedAssetName, other.normalisedAssetName);
+            return Objects.equal(type, other.type)
+                    && Objects.equal(normalisedPackageName, other.normalisedPackageName)
+                    && Objects.equal(normalisedAssetName, other.normalisedAssetName);
         }
         return false;
     }

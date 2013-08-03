@@ -20,13 +20,13 @@ package org.terasology.entitySystem.systems;
  */
 public interface RenderSystem extends ComponentSystem {
 
-    public void renderOpaque();
+    void renderOpaque();
 
-    public void renderAlphaBlend();
+    void renderAlphaBlend();
 
-    public void renderOverlay();
+    void renderOverlay();
 
-    public void renderFirstPerson();
+    void renderFirstPerson();
 
-    public void renderShadows();
+    void renderShadows();
 }

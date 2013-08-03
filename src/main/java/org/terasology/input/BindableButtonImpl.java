@@ -141,7 +141,15 @@ public class BindableButtonImpl implements BindableButton {
      * @param guiOnly     Is the gui consuming input
      * @return Whether the button's event has been consumed
      */
-    boolean updateBindState(boolean pressed, float delta, EntityRef[] inputEntities, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal, boolean keyConsumed, boolean guiOnly) {
+    boolean updateBindState(boolean pressed,
+                            float delta,
+                            EntityRef[] inputEntities,
+                            EntityRef target,
+                            Vector3i targetBlockPos,
+                            Vector3f hitPosition,
+                            Vector3f hitNormal,
+                            boolean keyConsumed,
+                            boolean guiOnly) {
         if (pressed) {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {

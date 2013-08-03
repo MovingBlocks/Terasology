@@ -90,7 +90,12 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
         float width = movementComp.radius * location.getWorldScale();
         ConvexShape capsule = new CapsuleShape(width, height);
         capsule.setMargin(0.1f);
-        movementComp.collider = physics.createCollider(location.getWorldPosition(), capsule, Lists.<CollisionGroup>newArrayList(movementComp.collisionGroup), movementComp.collidesWith, CollisionFlags.CHARACTER_OBJECT);
+        movementComp.collider = physics.createCollider(
+                location.getWorldPosition(),
+                capsule,
+                Lists.newArrayList(movementComp.collisionGroup),
+                movementComp.collidesWith,
+                CollisionFlags.CHARACTER_OBJECT);
         movementComp.collider.setUserPointer(entity);
 
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);

@@ -23,7 +23,7 @@ package org.terasology.entitySystem.event;
  */
 public interface ConsumableEvent extends Event {
 
-    public boolean isConsumed();
+    boolean isConsumed();
 
-    public void consume();
+    void consume();
 }

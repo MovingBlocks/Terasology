@@ -24,5 +24,5 @@ import org.terasology.entitySystem.EntityRef;
  * @author Immortius
  */
 public interface EventReceiver<T extends Event> {
-    public void onEvent(T event, EntityRef entity);
+    void onEvent(T event, EntityRef entity);
 }

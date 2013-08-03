@@ -53,7 +53,7 @@ public class PerformanceMonitorPanel extends JPanel {
         add(list, BorderLayout.CENTER);
     }
 
-    protected static class HeaderPanel extends JPanel {
+    private static class HeaderPanel extends JPanel {
 
         private final JLabel lName = new JLabel("Title");
         private final JLabel lMean = new JLabel("Running Means");
@@ -73,7 +73,7 @@ public class PerformanceMonitorPanel extends JPanel {
         }
     }
 
-    protected static class Entry implements Comparable<Entry> {
+    private static class Entry implements Comparable<Entry> {
 
         public final String name;
         public boolean active = false;
@@ -81,8 +81,9 @@ public class PerformanceMonitorPanel extends JPanel {
         public double spike = 0.0;
 
         public Entry(String name) {
-            if (name == null)
+            if (name == null) {
                 name = "";
+            }
             this.name = name;
         }
 
@@ -93,9 +94,9 @@ public class PerformanceMonitorPanel extends JPanel {
         }
     }
 
-    protected static class PerformanceListRenderer implements ListCellRenderer {
+    private static class PerformanceListRenderer implements ListCellRenderer {
 
-        protected static class MyRenderer extends JPanel {
+        private static class MyRenderer extends JPanel {
 
             private final HeaderPanel header;
             private final DecimalFormat format = new DecimalFormat("#####0.00");
@@ -146,7 +147,7 @@ public class PerformanceMonitorPanel extends JPanel {
             }
         }
 
-        protected final MyRenderer renderer;
+        private final MyRenderer renderer;
 
         public PerformanceListRenderer(HeaderPanel header) {
             renderer = new MyRenderer(header);
@@ -154,21 +155,22 @@ public class PerformanceMonitorPanel extends JPanel {
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value instanceof Entry)
+            if (value instanceof Entry) {
                 renderer.setEntry((Entry) value);
-            else
+            } else {
                 renderer.setEntry(null);
+            }
             return renderer;
         }
     }
 
-    protected static class PerformanceListModel extends AbstractListModel {
+    private static class PerformanceListModel extends AbstractListModel {
 
         private final List<Entry> list = new ArrayList<Entry>();
         private final Map<String, Entry> map = new HashMap<String, Entry>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        protected void invokeIntervalAdded(final int a, final int b) {
+        private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -178,7 +180,7 @@ public class PerformanceMonitorPanel extends JPanel {
             });
         }
 
-        protected void invokeIntervalRemoved(final int a, final int b) {
+        private void invokeIntervalRemoved(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -188,7 +190,7 @@ public class PerformanceMonitorPanel extends JPanel {
             });
         }
 
-        protected void invokeContentsChanged(final int a, final int b) {
+        private void invokeContentsChanged(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -198,7 +200,7 @@ public class PerformanceMonitorPanel extends JPanel {
             });
         }
 
-        protected final void updateEntries(TObjectDoubleMap<String> means, TObjectDoubleMap<String> spikes) {
+        private final void updateEntries(TObjectDoubleMap<String> means, TObjectDoubleMap<String> spikes) {
             if (means != null) {
                 for (final Entry entry : list) {
                     entry.active = false;
@@ -233,7 +235,7 @@ public class PerformanceMonitorPanel extends JPanel {
             }
         }
 
-        protected PerformanceListModel() {
+        private PerformanceListModel() {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {

@@ -135,7 +135,11 @@ public class BulletCharacterMover implements CharacterMover {
      * @param movementComp
      * @param state
      */
-    private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state, final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+    private void checkMode(final CharacterMovementComponent movementComp,
+                           final CharacterStateEvent state,
+                           final CharacterStateEvent oldState,
+                           EntityRef entity,
+                           boolean firstRun) {
         if (state.getMode() == MovementMode.GHOSTING) {
             return;
         }
@@ -585,7 +589,10 @@ public class BulletCharacterMover implements CharacterMover {
             toWorld.y -= 0.05f;
             toWorld.add(lookAheadOffset);
             CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-            CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+            Transform transformFrom = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
+            Transform transformTo = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
+            Transform targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
+            CollisionWorld.rayTestSingle(transformFrom, transformTo, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
             if (rayResult.hasHit()) {
                 hitStep = true;
                 stepSlope = rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0));
@@ -593,7 +600,10 @@ public class BulletCharacterMover implements CharacterMover {
             fromWorld.add(lookAheadOffset);
             toWorld.add(lookAheadOffset);
             rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-            CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+            transformFrom = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
+            transformTo = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
+            targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
+            CollisionWorld.rayTestSingle(transformFrom, transformTo, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
             if (rayResult.hasHit()) {
                 hitStep = true;
                 stepSlope = Math.min(stepSlope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
@@ -647,7 +657,10 @@ public class BulletCharacterMover implements CharacterMover {
                     Vector3f toWorld = new Vector3f(contactPoint);
                     toWorld.y -= 0.2f;
                     CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-                    CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+                    Transform from = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
+                    Transform to = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
+                    Transform targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
+                    CollisionWorld.rayTestSingle(from, to, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
 
                     if (rayResult.hasHit()) {
                         foundSlope = true;
@@ -662,7 +675,10 @@ public class BulletCharacterMover implements CharacterMover {
                     toWorld.add(secondTraceOffset);
 
                     rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-                    CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+                    from = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
+                    to = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
+                    targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
+                    CollisionWorld.rayTestSingle(from, to, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
 
                     if (rayResult.hasHit()) {
                         foundSlope = true;
@@ -719,7 +735,8 @@ public class BulletCharacterMover implements CharacterMover {
     }
 
     private float moveUp(float riseAmount, GhostObject collider, Vector3f position) {
-        SweepCallback callback = sweep(position, new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z), collider, -1.0f, VERTICAL_PENETRATION_LEEWAY);
+        Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
+        SweepCallback callback = sweep(position, to, collider, -1.0f, VERTICAL_PENETRATION_LEEWAY);
 
         if (callback.hasHit()) {
             float actualDist = Math.max(0, ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction) - VERTICAL_PENETRATION_LEEWAY);

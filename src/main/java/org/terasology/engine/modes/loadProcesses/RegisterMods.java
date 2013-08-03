@@ -18,7 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
@@ -51,7 +53,7 @@ public class RegisterMods implements LoadProcess {
             if (mod != null) {
                 mod.setEnabled(true);
             } else {
-                // TODO: Fail if mod not available (means the server has it, client doesn't)
+                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + modName));
             }
         }
 

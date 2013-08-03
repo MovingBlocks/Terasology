@@ -32,7 +32,6 @@ import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
-import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
@@ -58,8 +57,8 @@ public class InitialiseRemoteWorld implements LoadProcess {
 
         RemoteChunkProvider chunkProvider = new RemoteChunkProvider();
 
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider));
+        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         CoreRegistry.put(WorldProvider.class, worldProvider);
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);

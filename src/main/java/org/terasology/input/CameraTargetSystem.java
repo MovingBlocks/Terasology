@@ -145,7 +145,19 @@ public class CameraTargetSystem implements ComponentSystem {
     public String toString() {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         if (targetBlockPos != null) {
-            return String.format("From: %f %f %f, Dir: %f %f %f, Hit %d %d %d %f %f %f", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z, camera.getViewingDirection().x, camera.getViewingDirection().y, camera.getViewingDirection().z, targetBlockPos.x, targetBlockPos.y, targetBlockPos.z, hitPosition.x, hitPosition.y, hitPosition.z);
+            return String.format("From: %f %f %f, Dir: %f %f %f, Hit %d %d %d %f %f %f",
+                    camera.getPosition().x,
+                    camera.getPosition().y,
+                    camera.getPosition().z,
+                    camera.getViewingDirection().x,
+                    camera.getViewingDirection().y,
+                    camera.getViewingDirection().z,
+                    targetBlockPos.x,
+                    targetBlockPos.y,
+                    targetBlockPos.z,
+                    hitPosition.x,
+                    hitPosition.y,
+                    hitPosition.z);
         }
         return "";
     }

@@ -56,73 +56,84 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @SuppressWarnings("serial")
 public class ChunkMonitorDisplay extends JPanel {
 
-    public static final Color ColorComplete = new Color(0, 38, 28);
-    public static final Color ColorFullLightConnectivityPending = new Color(69, 191, 85);
-    public static final Color ColorLightPropagationPending = new Color(22, 127, 57);
-    public static final Color ColorInternalLighGenerationPending = new Color(4, 76, 41);
-    public static final Color ColorAdjacencyGenerationPending = new Color(150, 237, 137);
+    public static final Color COLOR_COMPLETE = new Color(0, 38, 28);
+    public static final Color COLOR_FULL_LIGHT_CONNECTIVITY_PENDING = new Color(69, 191, 85);
+    public static final Color COLOR_LIGHT_PROPAGATION_PENDING = new Color(22, 127, 57);
+    public static final Color COLOR_INTERNAL_LIGHT_GENERATION_PENDING = new Color(4, 76, 41);
+    public static final Color COLOR_ADJACENCY_GENERATION_PENDING = new Color(150, 237, 137);
 
-    public static final Color ColorHighlightTessellation = Color.blue.brighter().brighter();
+    public static final Color COLOR_HIGHLIGHT_TESSELLATION = Color.blue.brighter().brighter();
 
-    public static final Color ColorSelectedChunk = new Color(255, 102, 0);
+    public static final Color COLOR_SELECTED_CHUNK = new Color(255, 102, 0);
 
-    public static final Color ColorDead = Color.lightGray;
-    public static final Color ColorInvalid = Color.red;
+    public static final Color COLOR_DEAD = Color.lightGray;
+    public static final Color COLOR_INVALID = Color.red;
 
-    protected static final Logger logger = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
 
-    protected final EventBus eventbus = new EventBus("ChunkMonitorDisplay");
-    protected final List<ChunkMonitorEntry> chunks = new LinkedList<ChunkMonitorEntry>();
-    protected final Map<Vector3i, ChunkMonitorEntry> map = new HashMap<Vector3i, ChunkMonitorEntry>();
-    protected final ImageBuffer image = new ImageBuffer();
+    private final EventBus eventbus = new EventBus("ChunkMonitorDisplay");
+    private final List<ChunkMonitorEntry> chunks = new LinkedList<ChunkMonitorEntry>();
+    private final Map<Vector3i, ChunkMonitorEntry> map = new HashMap<Vector3i, ChunkMonitorEntry>();
+    private final ImageBuffer image = new ImageBuffer();
 
-    protected int refreshInterval, centerOffsetX = 0, centerOffsetY = 0, offsetX, offsetY, chunkSize;
-    protected int renderY = 0, minRenderY = 0, maxRenderY = 0;
-    protected boolean followPlayer = true;
+    private int refreshInterval, centerOffsetX = 0, centerOffsetY = 0, offsetX, offsetY, chunkSize;
+    private int renderY = 0, minRenderY = 0, maxRenderY = 0;
+    private boolean followPlayer = true;
 
-    protected Vector3i selectedChunk = null;
+    private Vector3i selectedChunk = null;
 
-    protected final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
-    protected final ExecutorService executor;
-    protected final Runnable renderTask;
+    private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
+    private final ExecutorService executor;
+    private final Runnable renderTask;
 
-    protected void fireChunkSelectedEvent(Vector3i pos) {
+    private void fireChunkSelectedEvent(Vector3i pos) {
         eventbus.post(new ChunkMonitorDisplayEvent.Selected(this, pos, pos == null ? null : map.get(pos)));
     }
 
-    protected Vector3i mouseToChunkPos(Point p) {
+    private Vector3i mouseToChunkPos(Point p) {
         Preconditions.checkNotNull(p, "The parameter 'p' must not be null");
-        int x = (p.x - centerOffsetX - offsetX) / chunkSize, z = (p.y - centerOffsetY - offsetY) / chunkSize;
+        int x = (p.x - centerOffsetX - offsetX) / chunkSize;
+        int z = (p.y - centerOffsetY - offsetY) / chunkSize;
         return new Vector3i(x - 1, renderY, z);
     }
 
-    protected void updateDisplay() {
+    private void updateDisplay() {
         queue.offer(new RenderRequest());
     }
 
-    protected void updateDisplay(boolean fastResume) {
+    private void updateDisplay(boolean fastResume) {
         queue.offer(new RenderRequest(fastResume));
     }
 
-    protected void recomputeRenderY() {
-        int min = 0, max = 0, y = renderY;
+    private void recomputeRenderY() {
+        int min = 0;
+        int max = 0;
+        int y = renderY;
         for (ChunkMonitorEntry chunk : chunks) {
             final Vector3i pos = chunk.getPosition();
-            if (pos.y < min) min = pos.y;
-            if (pos.y > max) max = pos.y;
+            if (pos.y < min) {
+                min = pos.y;
+            }
+            if (pos.y > max) {
+                max = pos.y;
+            }
         }
-        if (y < min) y = min;
-        if (y > max) y = max;
+        if (y < min) {
+            y = min;
+        }
+        if (y > max) {
+            y = max;
+        }
         minRenderY = min;
         maxRenderY = max;
         renderY = y;
     }
 
-    protected static class ImageBuffer {
+    private static class ImageBuffer {
 
-        protected final ReadWriteLock lock = new ReentrantReadWriteLock();
-        protected int width, height;
-        protected BufferedImage imageA, imageB;
+        private final ReadWriteLock lock = new ReentrantReadWriteLock();
+        private int width, height;
+        private BufferedImage imageA, imageB;
 
         public ImageBuffer(int width, int height) {
             resize(width, height);
@@ -142,8 +153,9 @@ public class ChunkMonitorDisplay extends JPanel {
         public Graphics2D getGraphics() {
             lock.readLock().lock();
             try {
-                if (imageB != null)
+                if (imageB != null) {
                     return (Graphics2D) imageB.getGraphics();
+                }
             } finally {
                 lock.readLock().unlock();
             }
@@ -194,7 +206,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected interface Request {
+    private interface Request {
 
         String getName();
 
@@ -207,7 +219,7 @@ public class ChunkMonitorDisplay extends JPanel {
         void execute();
     }
 
-    protected abstract class UpdateRequest implements Request {
+    private abstract class UpdateRequest implements Request {
 
         @Override
         public boolean isChunkEvent() {
@@ -215,9 +227,9 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class RenderRequest extends UpdateRequest {
+    private class RenderRequest extends UpdateRequest {
 
-        protected final boolean fastResume;
+        private final boolean fastResume;
 
         public RenderRequest(boolean fastResume) {
             this.fastResume = fastResume;
@@ -247,7 +259,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class InitialRequest extends UpdateRequest {
+    private class InitialRequest extends UpdateRequest {
 
         @Override
         public void execute() {
@@ -271,7 +283,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class ResizeRequest extends UpdateRequest {
+    private class ResizeRequest extends UpdateRequest {
 
         public final int width, height;
 
@@ -303,7 +315,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class ChunkRequest implements Request {
+    private class ChunkRequest implements Request {
 
         public final ChunkMonitorEvent event;
 
@@ -328,8 +340,9 @@ public class ChunkMonitorDisplay extends JPanel {
                 chunks.clear();
                 map.clear();
                 ChunkMonitor.getChunks(chunks);
-                for (ChunkMonitorEntry e : chunks)
+                for (ChunkMonitorEntry e : chunks) {
                     map.put(e.getPosition(), e);
+                }
                 recomputeRenderY();
             } else if (event instanceof ChunkMonitorEvent.ChunkProviderDisposed) {
                 chunks.clear();
@@ -342,18 +355,22 @@ public class ChunkMonitorDisplay extends JPanel {
                 if (event instanceof ChunkMonitorEvent.Created) {
                     final ChunkMonitorEvent.Created cEvent = (ChunkMonitorEvent.Created) event;
                     entry = cEvent.getEntry();
-                    if (pos.y < minRenderY)
+                    if (pos.y < minRenderY) {
                         minRenderY = pos.y;
-                    if (pos.y > maxRenderY)
+                    }
+                    if (pos.y > maxRenderY) {
                         maxRenderY = pos.y;
+                    }
                     chunks.add(entry);
                     map.put(pos, entry);
-                } else
+                } else {
                     entry = map.get(pos);
-                if (entry != null)
+                }
+                if (entry != null) {
                     entry.addEvent(bEvent);
-                else
+                } else {
                     logger.error("No chunk monitor entry found for position {}", pos);
+                }
             }
         }
 
@@ -368,7 +385,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class ResizeListener implements ComponentListener {
+    private class ResizeListener implements ComponentListener {
 
         @Override
         public void componentResized(ComponentEvent e) {
@@ -388,7 +405,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class MouseInputListener implements MouseWheelListener, MouseMotionListener, MouseListener {
+    private class MouseInputListener implements MouseWheelListener, MouseMotionListener, MouseListener {
 
         private Point leftPressed = null;
         private int offsetX, offsetY;
@@ -415,8 +432,9 @@ public class ChunkMonitorDisplay extends JPanel {
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == 2) {
                 final Vector3i pos = calcPlayerChunkPos();
-                if (pos != null)
+                if (pos != null) {
                     setRenderY(pos.y);
+                }
             }
         }
 
@@ -434,8 +452,9 @@ public class ChunkMonitorDisplay extends JPanel {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1)
+            if (e.getButton() == MouseEvent.BUTTON1) {
                 leftPressed = null;
+            }
         }
 
         @Override
@@ -449,83 +468,97 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected class RenderTask implements Runnable {
+    private class RenderTask implements Runnable {
 
-        protected RenderTask() {
+        private RenderTask() {
         }
 
-        protected Rectangle calcBox(List<ChunkMonitorEntry> chunks) {
-            if (chunks.isEmpty())
+        private Rectangle calcBox(List<ChunkMonitorEntry> chunks) {
+            if (chunks.isEmpty()) {
                 return new Rectangle(0, 0, 0, 0);
+            }
             int xmin = Integer.MAX_VALUE, xmax = Integer.MIN_VALUE;
             int ymin = Integer.MAX_VALUE, ymax = Integer.MIN_VALUE;
             for (ChunkMonitorEntry entry : chunks) {
                 final Vector3i pos = entry.getPosition();
-                if (pos.y != renderY) continue;
-                if (pos.x < xmin) xmin = pos.x;
-                if (pos.x > xmax) xmax = pos.x;
-                if (pos.z < ymin) ymin = pos.z;
-                if (pos.z > ymax) ymax = pos.z;
+                if (pos.y != renderY) {
+                    continue;
+                }
+                if (pos.x < xmin) {
+                    xmin = pos.x;
+                }
+                if (pos.x > xmax) {
+                    xmax = pos.x;
+                }
+                if (pos.z < ymin) {
+                    ymin = pos.z;
+                }
+                if (pos.z > ymax) {
+                    ymax = pos.z;
+                }
             }
             return new Rectangle(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
         }
 
-        protected Color calcChunkColor(ChunkMonitorEntry entry) {
+        private Color calcChunkColor(ChunkMonitorEntry entry) {
             final Chunk chunk = entry.getLatestChunk();
 
-            if (chunk == null)
-                return ColorDead;
+            if (chunk == null) {
+                return COLOR_DEAD;
+            }
 
-            if (chunk.getMesh() != null)
-                return ColorHighlightTessellation;
+            if (chunk.getMesh() != null) {
+                return COLOR_HIGHLIGHT_TESSELLATION;
+            }
 
             switch (chunk.getChunkState()) {
                 case ADJACENCY_GENERATION_PENDING:
-                    return ColorAdjacencyGenerationPending;
+                    return COLOR_ADJACENCY_GENERATION_PENDING;
                 case FULL_LIGHT_CONNECTIVITY_PENDING:
-                    return ColorFullLightConnectivityPending;
+                    return COLOR_FULL_LIGHT_CONNECTIVITY_PENDING;
                 case LIGHT_PROPAGATION_PENDING:
-                    return ColorLightPropagationPending;
+                    return COLOR_LIGHT_PROPAGATION_PENDING;
                 case INTERNAL_LIGHT_GENERATION_PENDING:
-                    return ColorInternalLighGenerationPending;
+                    return COLOR_INTERNAL_LIGHT_GENERATION_PENDING;
                 case COMPLETE:
-                    return ColorComplete;
+                    return COLOR_COMPLETE;
             }
 
-            return ColorInvalid;
+            return COLOR_INVALID;
         }
 
-        protected void renderSelectedChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos) {
+        private void renderSelectedChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos) {
             if (pos != null) {
-                g.setColor(ColorSelectedChunk);
+                g.setColor(COLOR_SELECTED_CHUNK);
                 g.drawRect(pos.x * chunkSize + offsetx, pos.z * chunkSize + offsety, chunkSize - 1, chunkSize - 1);
                 g.drawRect(pos.x * chunkSize + offsetx - 1, pos.z * chunkSize + offsety - 1, chunkSize + 1, chunkSize + 1);
             }
         }
 
-        protected void renderBox(Graphics2D g, int offsetx, int offsety, Rectangle box) {
+        private void renderBox(Graphics2D g, int offsetx, int offsety, Rectangle box) {
             g.setColor(Color.white);
             g.drawRect(box.x * chunkSize + offsetx, box.y * chunkSize + offsety, box.width * chunkSize - 1, box.height * chunkSize - 1);
         }
 
-        protected void renderBackground(Graphics2D g, int width, int height) {
+        private void renderBackground(Graphics2D g, int width, int height) {
             g.setColor(Color.black);
             g.fillRect(0, 0, width, height);
         }
 
-        protected void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunks) {
+        private void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunks) {
             for (ChunkMonitorEntry entry : chunks) {
-                if (entry.getPosition().y == renderY)
+                if (entry.getPosition().y == renderY) {
                     renderChunk(g, offsetx, offsety, entry.getPosition(), entry);
+                }
             }
         }
 
-        protected void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
+        private void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
             g.setColor(calcChunkColor(entry));
             g.fillRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
         }
 
-        protected void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunks) {
+        private void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunks) {
             final Rectangle box = calcBox(chunks);
             renderBackground(g, width, height);
             renderChunks(g, offsetx, offsety, chunks);
@@ -533,7 +566,7 @@ public class ChunkMonitorDisplay extends JPanel {
             renderSelectedChunk(g, offsetx, offsety, selectedChunk);
         }
 
-        protected void render() {
+        private void render() {
             final Graphics2D g = image.getGraphics();
             if (g != null) {
                 final int iw = image.getWidth(), ih = image.getHeight();
@@ -543,7 +576,7 @@ public class ChunkMonitorDisplay extends JPanel {
             }
         }
 
-        protected void repaint() {
+        private void repaint() {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -552,7 +585,7 @@ public class ChunkMonitorDisplay extends JPanel {
             });
         }
 
-        protected long poll(List<Request> output) throws InterruptedException {
+        private long poll(List<Request> output) throws InterruptedException {
             long time = System.currentTimeMillis();
             final Request r = queue.poll(500, TimeUnit.MILLISECONDS);
             if (r != null) {
@@ -562,7 +595,7 @@ public class ChunkMonitorDisplay extends JPanel {
             return (System.currentTimeMillis() - time);
         }
 
-        protected void doFollowPlayer() {
+        private void doFollowPlayer() {
             final Vector3i pos = calcPlayerChunkPos();
             if (pos != null) {
                 setRenderY(pos.y);
@@ -615,7 +648,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    protected Vector3i calcPlayerChunkPos() {
+    private Vector3i calcPlayerChunkPos() {
         final LocalPlayer p = CoreRegistry.get(LocalPlayer.class);
         if (p != null) {
             return TeraMath.calcChunkPos(new Vector3i(p.getPosition()));
@@ -654,8 +687,9 @@ public class ChunkMonitorDisplay extends JPanel {
     }
 
     public Vector3i getSelectedChunk() {
-        if (selectedChunk == null)
+        if (selectedChunk == null) {
             return null;
+        }
         return new Vector3i(selectedChunk);
     }
 
@@ -689,8 +723,12 @@ public class ChunkMonitorDisplay extends JPanel {
     }
 
     public ChunkMonitorDisplay setRenderY(int value) {
-        if (value < minRenderY) value = minRenderY;
-        if (value > maxRenderY) value = maxRenderY;
+        if (value < minRenderY) {
+            value = minRenderY;
+        }
+        if (value > maxRenderY) {
+            value = maxRenderY;
+        }
         if (renderY != value) {
             renderY = value;
             updateDisplay(true);
@@ -747,14 +785,16 @@ public class ChunkMonitorDisplay extends JPanel {
     }
 
     @Subscribe
-    public void recieveChunkEvent(ChunkMonitorEvent event) {
-        if (event != null)
+    public void receiveChunkEvent(ChunkMonitorEvent event) {
+        if (event != null) {
             queue.offer(new ChunkRequest(event));
+        }
     }
 
     @Override
     public void paint(Graphics g) {
-        if (!image.render(g, 0, 0))
+        if (!image.render(g, 0, 0)) {
             super.paint(g);
+        }
     }
 }

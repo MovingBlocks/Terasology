@@ -63,7 +63,8 @@ public final class FieldMetadata {
     }
 
     private boolean isCollectionOf(Class<?> targetType, Field field) {
-        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == targetType) || (Map.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 1) == targetType);
+        return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == targetType)
+                || (Map.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 1) == targetType);
     }
 
     public Object deserialize(EntityData.Value value) {
@@ -149,7 +150,8 @@ public final class FieldMetadata {
     }
 
     private Method findSetter(Field field) {
-        Method result = findMethod(field.getDeclaringClass(), "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
+        String setterName = "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1);
+        Method result = findMethod(field.getDeclaringClass(), setterName, field.getType());
         if (result != null) {
             result.setAccessible(true);
         }
@@ -159,10 +161,10 @@ public final class FieldMetadata {
     private Method findMethod(Class<?> type, String methodName, Class<?>... parameters) {
         try {
             return type.getMethod(methodName, parameters);
-        } catch (NoSuchMethodException nsme) {
-            // Not really that exceptional
+        } catch (NoSuchMethodException me) {
+            // We're expecting not to find methods
+            return null;
         }
-        return null;
     }
 
     /**

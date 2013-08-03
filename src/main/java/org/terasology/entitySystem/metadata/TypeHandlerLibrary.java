@@ -134,7 +134,10 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             // For know types, just use the handler
             return typeHandlers.get(typeClass);
 
-        } else if (depth <= MAX_SERIALIZATION_DEPTH && !Modifier.isAbstract(typeClass.getModifiers()) && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
+        } else if (depth <= MAX_SERIALIZATION_DEPTH &&
+                !Modifier.isAbstract(typeClass.getModifiers()) &&
+                !typeClass.isLocalClass() &&
+                !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
             // For unknown types annotated by MappedContainer annotation, map them
             if (typeClass.getAnnotation(MappedContainer.class) == null) {
                 logger.error("Unable to register field of type {}: not a supported type or MappedContainer", typeClass.getSimpleName());

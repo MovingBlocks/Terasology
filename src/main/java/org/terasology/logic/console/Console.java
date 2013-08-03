@@ -65,7 +65,13 @@ public class Console {
     private boolean commandsSorted = false;
 
     public Console() {
-        addMessage("Welcome to the wonderful world of Terasology!\n\nType 'help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.\nBe sure to surround text type parameters in quotes.\nNo commas needed for multiple parameters.\nCommands are case-sensitive, block names and such are not.");
+        addMessage("Welcome to the wonderful world of Terasology!\n" +
+                "\n" +
+                "Type 'help' to see a list with available commands.\n" +
+                "To see a detailed command description try '/help \"<commandName>\"'.\n" +
+                "Be sure to surround text type parameters in quotes.\n" +
+                "No commas needed for multiple parameters.\n" +
+                "Commands are case-sensitive, block names and such are not.");
     }
 
     /**

@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.mod.Mod;
@@ -75,7 +77,7 @@ public class JoinServer implements LoadProcess {
             for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 Mod mod = modManager.getMod(moduleInfo.getModuleId());
                 if (mod == null) {
-                    // TODO: Missing module, fail and disconnect
+                    CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + moduleInfo.getModuleId()));
                 } else {
                     logger.debug("Activating module: {}", moduleInfo.getModuleId());
                     modConfig.addMod(moduleInfo.getModuleId());

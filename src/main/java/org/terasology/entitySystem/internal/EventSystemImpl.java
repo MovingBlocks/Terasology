@@ -365,11 +365,11 @@ public class EventSystemImpl implements EventSystem {
     }
 
     private interface EventHandlerInfo {
-        public boolean isValidFor(EntityRef entity);
+        boolean isValidFor(EntityRef entity);
 
-        public void invoke(EntityRef entity, Event event);
+        void invoke(EntityRef entity, Event event);
 
-        public int getPriority();
+        int getPriority();
     }
 
     private class ReflectedEventHandlerInfo implements EventHandlerInfo {
@@ -379,7 +379,11 @@ public class EventSystemImpl implements EventSystem {
         private ImmutableList<Class<? extends Component>> componentParams;
         private int priority;
 
-        public ReflectedEventHandlerInfo(ComponentSystem handler, Method method, int priority, Collection<Class<? extends Component>> filterComponents, Collection<Class<? extends Component>> componentParams) {
+        public ReflectedEventHandlerInfo(ComponentSystem handler,
+                                         Method method,
+                                         int priority,
+                                         Collection<Class<? extends Component>> filterComponents,
+                                         Collection<Class<? extends Component>> componentParams) {
             this.handler = handler;
             this.method = method;
             this.filterComponents = ImmutableList.copyOf(filterComponents);

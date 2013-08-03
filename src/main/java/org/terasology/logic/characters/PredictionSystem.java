@@ -30,7 +30,7 @@ public interface PredictionSystem {
      * @param client The client entity to rewind for
      * @param timeMs The time to rewind to
      */
-    public void lagCompensate(EntityRef client, long timeMs);
+    void lagCompensate(EntityRef client, long timeMs);
 
-    public void restoreToPresent();
+    void restoreToPresent();
 }

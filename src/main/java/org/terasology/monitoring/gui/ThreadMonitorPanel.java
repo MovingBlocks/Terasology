@@ -36,9 +36,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 public class ThreadMonitorPanel extends JPanel {
 
-    protected static final Color background = Color.white;
-
-    protected static final Logger logger = LoggerFactory.getLogger(ThreadMonitorPanel.class);
+    private static final Color BACKGROUND = Color.white;
+    private static final Logger logger = LoggerFactory.getLogger(ThreadMonitorPanel.class);
 
     private final JList list;
 
@@ -50,7 +49,7 @@ public class ThreadMonitorPanel extends JPanel {
         add(list, BorderLayout.CENTER);
     }
 
-    protected abstract static class Task {
+    private abstract static class Task {
 
         private String name;
 
@@ -66,9 +65,9 @@ public class ThreadMonitorPanel extends JPanel {
 
     }
 
-    protected static class ThreadListRenderer implements ListCellRenderer {
+    private static class ThreadListRenderer implements ListCellRenderer {
 
-        protected static class MyRenderer extends JPanel {
+        private static class MyRenderer extends JPanel {
 
             private final JPanel pHead = new JPanel();
             private final JPanel pList = new JPanel();
@@ -83,11 +82,11 @@ public class ThreadMonitorPanel extends JPanel {
             private Dimension dId = new Dimension(0, 0), dName = new Dimension(0, 0);
 
             public MyRenderer() {
-                setBackground(background);
+                setBackground(BACKGROUND);
                 setLayout(new BorderLayout());
 
                 pHead.setLayout(new BorderLayout());
-                pHead.setBackground(background);
+                pHead.setBackground(BACKGROUND);
                 pHead.add(pList, BorderLayout.LINE_START);
                 pHead.add(lActive, BorderLayout.LINE_END);
                 pHead.add(pError, BorderLayout.PAGE_END);
@@ -97,14 +96,14 @@ public class ThreadMonitorPanel extends JPanel {
                 lCounters.setForeground(Color.gray);
 
                 pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
-                pList.setBackground(background);
+                pList.setBackground(BACKGROUND);
                 pList.add(lId);
                 pList.add(lName);
                 pList.add(lCounters);
 
                 pError.setVisible(false);
                 pError.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
-                pError.setBackground(background);
+                pError.setBackground(BACKGROUND);
                 pError.add(lErrorSpacer);
                 pError.add(lError);
 
@@ -161,26 +160,27 @@ public class ThreadMonitorPanel extends JPanel {
 
         }
 
-        protected final MyRenderer renderer = new MyRenderer();
+        private final MyRenderer renderer = new MyRenderer();
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value instanceof SingleThreadMonitor)
+            if (value instanceof SingleThreadMonitor) {
                 renderer.setMonitor((SingleThreadMonitor) value);
-            else
+            } else {
                 renderer.setMonitor(null);
+            }
             return renderer;
         }
 
     }
 
-    protected static class ThreadListModel extends AbstractListModel {
+    private static class ThreadListModel extends AbstractListModel {
 
         private final ArrayList<SingleThreadMonitor> monitors = new ArrayList<SingleThreadMonitor>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
         private final BlockingQueue<Task> queue = new LinkedBlockingQueue<Task>();
 
-        protected void invokeIntervalAdded(final int a, final int b) {
+        private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -190,7 +190,7 @@ public class ThreadMonitorPanel extends JPanel {
             });
         }
 
-        protected void invokeIntervalRemoved(final int a, final int b) {
+        private void invokeIntervalRemoved(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -200,7 +200,7 @@ public class ThreadMonitorPanel extends JPanel {
             });
         }
 
-        protected void invokeContentsChanged(final int a, final int b) {
+        private void invokeContentsChanged(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -210,7 +210,7 @@ public class ThreadMonitorPanel extends JPanel {
             });
         }
 
-        protected ThreadListModel() {
+        private ThreadListModel() {
             ThreadMonitor.registerForEvents(this);
             queue.add(new Task("Sort Monitors") {
                 @Override
@@ -251,7 +251,7 @@ public class ThreadMonitorPanel extends JPanel {
 
         @Subscribe
         public void receiveThreadMonitorEvent(final ThreadMonitorEvent event) {
-            if (event != null)
+            if (event != null) {
                 switch (event.type) {
                     case MonitorAdded:
                         queue.add(new Task("Register Monitor") {
@@ -266,6 +266,7 @@ public class ThreadMonitorPanel extends JPanel {
                         });
                         break;
                 }
+            }
         }
 
         @Override

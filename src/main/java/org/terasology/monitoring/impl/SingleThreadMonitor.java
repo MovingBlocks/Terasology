@@ -19,31 +19,31 @@ import java.util.List;
 
 public interface SingleThreadMonitor extends Comparable<SingleThreadMonitor> {
 
-    public boolean isAlive();
+    boolean isAlive();
 
-    public boolean isActive();
+    boolean isActive();
 
-    public String getName();
+    String getName();
 
-    public long getThreadId();
+    long getThreadId();
 
-    public boolean hasErrors();
+    boolean hasErrors();
 
-    public int getNumErrors();
+    int getNumErrors();
 
-    public Throwable getLastError();
+    Throwable getLastError();
 
-    public List<Throwable> getErrors();
+    List<Throwable> getErrors();
 
-    public void addError(Throwable error);
+    void addError(Throwable error);
 
-    public Iterable<String> getTasks();
+    Iterable<String> getTasks();
 
-    public long getCounter(String task);
+    long getCounter(String task);
 
-    public void beginTask(String task);
+    void beginTask(String task);
 
-    public void endTask();
+    void endTask();
 
     String getLastTask();
 }

@@ -31,19 +31,19 @@ public interface Prefab extends ComponentContainer, Asset<PrefabData> {
     /**
      * @return The identifier for this prefab
      */
-    public String getName();
+    String getName();
 
     /**
      * Return parents prefabs
      *
      * @return
      */
-    public Prefab getParent();
+    Prefab getParent();
 
-    public List<Prefab> getChildren();
+    List<Prefab> getChildren();
 
-    public boolean isPersisted();
+    boolean isPersisted();
 
-    public boolean isAlwaysRelevant();
+    boolean isAlwaysRelevant();
 
 }

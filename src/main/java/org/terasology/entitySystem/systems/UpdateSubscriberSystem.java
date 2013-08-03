@@ -19,5 +19,7 @@ package org.terasology.entitySystem.systems;
  * @author Immortius <immortius@gmail.com>
  */
 public interface UpdateSubscriberSystem extends ComponentSystem {
-    public void update(float delta);
+
+    void update(float delta);
+
 }

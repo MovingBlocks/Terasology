@@ -49,11 +49,12 @@ public class RegisterBlocks implements LoadProcess {
         CoreRegistry.put(WorldAtlas.class, atlas);
 
         BlockManagerImpl blockManager;
+        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
         if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true, CoreRegistry.get(BlockFamilyFactoryRegistry.class));
+            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true, blockFamilyFactoryRegistry);
             blockManager.subscribe(CoreRegistry.get(NetworkSystem.class));
         } else {
-            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false, CoreRegistry.get(BlockFamilyFactoryRegistry.class));
+            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false, blockFamilyFactoryRegistry);
         }
         CoreRegistry.put(BlockManager.class, blockManager);
 

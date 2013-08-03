@@ -104,7 +104,10 @@ public final class TerrainPreviewGenerator {
 
                             if (n >= 0) {
                                 if (height > 32) {
-                                    g.setColor(new Color(Math.min(height + color.getRed(), 255), Math.min(height + color.getGreen(), 255), Math.min(height + color.getBlue(), 255)));
+                                    g.setColor(new Color(
+                                            Math.min(height + color.getRed(), 255),
+                                            Math.min(height + color.getGreen(), 255),
+                                            Math.min(height + color.getBlue(), 255)));
                                 } else {
                                     g.setColor(new Color(0, 0, (int) ((255.0 * (32.0 - (32.0 - height))) / 32.0)));
                                 }

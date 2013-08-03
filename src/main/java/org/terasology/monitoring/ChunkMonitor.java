@@ -30,20 +30,20 @@ import java.util.Map;
 
 public class ChunkMonitor {
 
-    private static final EventBus eventbus = new EventBus("ChunkMonitor");
-    private static final Map<Vector3i, ChunkMonitorEntry> chunks = Maps.newConcurrentMap();
+    private static final EventBus EVENT_BUS = new EventBus("ChunkMonitor");
+    private static final Map<Vector3i, ChunkMonitorEntry> CHUNKS = Maps.newConcurrentMap();
 
     private static void post(Object event) {
-        eventbus.post(event);
+        EVENT_BUS.post(event);
     }
 
     private static synchronized ChunkMonitorEntry registerChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         final Vector3i pos = chunk.getPos();
-        ChunkMonitorEntry entry = chunks.get(pos);
+        ChunkMonitorEntry entry = CHUNKS.get(pos);
         if (entry == null) {
             entry = new ChunkMonitorEntry(pos);
-            chunks.put(pos, entry);
+            CHUNKS.put(pos, entry);
         }
         entry.addChunk(chunk);
         return entry;
@@ -54,7 +54,7 @@ public class ChunkMonitor {
 
     public static void registerForEvents(Object object) {
         Preconditions.checkNotNull(object, "The parameter 'object' must not be null");
-        eventbus.register(object);
+        EVENT_BUS.register(object);
     }
 
     public static void fireChunkProviderInitialized(ChunkProvider provider) {
@@ -62,7 +62,7 @@ public class ChunkMonitor {
     }
 
     public static void fireChunkProviderDisposed(ChunkProvider provider) {
-        chunks.clear();
+        CHUNKS.clear();
         post(new ChunkMonitorEvent.ChunkProviderDisposed(provider));
     }
 
@@ -101,6 +101,6 @@ public class ChunkMonitor {
 
     public static synchronized void getChunks(List<ChunkMonitorEntry> output) {
         Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
-        output.addAll(chunks.values());
+        output.addAll(CHUNKS.values());
     }
 }

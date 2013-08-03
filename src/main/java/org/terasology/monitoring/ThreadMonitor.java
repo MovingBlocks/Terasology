@@ -29,8 +29,8 @@ import java.util.Map;
 
 public class ThreadMonitor {
 
-    private static final EventBus eventbus = new EventBus("ThreadMonitor");
-    private static final Map<Thread, SingleThreadMonitor> threadInfoById = Maps.newConcurrentMap();
+    private static final EventBus EVENT_BUS = new EventBus("ThreadMonitor");
+    private static final Map<Thread, SingleThreadMonitor> THREAD_INFO_BY_ID = Maps.newConcurrentMap();
 
     private ThreadMonitor() {
     }
@@ -45,7 +45,7 @@ public class ThreadMonitor {
     public static synchronized List<SingleThreadMonitor> getThreadMonitors(List<SingleThreadMonitor> output, boolean aliveThreadsOnly) {
         Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
         output.clear();
-        for (SingleThreadMonitor entry : threadInfoById.values()) {
+        for (SingleThreadMonitor entry : THREAD_INFO_BY_ID.values()) {
             if (!aliveThreadsOnly || entry.isAlive()) {
                 output.add(entry);
             }
@@ -59,7 +59,7 @@ public class ThreadMonitor {
 
     public static void registerForEvents(Object object) {
         Preconditions.checkNotNull(object, "The parameter 'object' must not be null");
-        eventbus.register(object);
+        EVENT_BUS.register(object);
     }
 
     public static void addError(Throwable e) {
@@ -68,11 +68,11 @@ public class ThreadMonitor {
     }
 
     private static SingleThreadMonitor getMonitor() {
-        SingleThreadMonitor monitor = threadInfoById.get(Thread.currentThread());
+        SingleThreadMonitor monitor = THREAD_INFO_BY_ID.get(Thread.currentThread());
         if (monitor == null) {
             monitor = new SingleThreadMonitorImpl(Thread.currentThread());
-            threadInfoById.put(Thread.currentThread(), monitor);
-            eventbus.post(new ThreadMonitorEvent(monitor, ThreadMonitorEvent.Type.MonitorAdded));
+            THREAD_INFO_BY_ID.put(Thread.currentThread(), monitor);
+            EVENT_BUS.post(new ThreadMonitorEvent(monitor, ThreadMonitorEvent.Type.MonitorAdded));
         }
         return monitor;
     }

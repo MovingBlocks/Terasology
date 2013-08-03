@@ -58,7 +58,16 @@ public class CharacterStateEvent extends NetworkEvent {
         this.footstepDelta = previous.footstepDelta;
     }
 
-    public CharacterStateEvent(long time, int sequenceNumber, Vector3f position, Quat4f rotation, Vector3f velocity, float yaw, float pitch, MovementMode mode, boolean grounded) {
+    public CharacterStateEvent(
+            long time,
+            int sequenceNumber,
+            Vector3f position,
+            Quat4f rotation,
+            Vector3f velocity,
+            float yaw,
+            float pitch,
+            MovementMode mode,
+            boolean grounded) {
         this.time = time;
         this.position.set(position);
         this.rotation.set(rotation);

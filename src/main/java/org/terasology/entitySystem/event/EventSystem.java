@@ -29,7 +29,7 @@ public interface EventSystem {
     /**
      * Process all pending events
      */
-    public void process();
+    void process();
 
     /**
      * Registers an event

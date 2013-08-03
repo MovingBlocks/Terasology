@@ -89,7 +89,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         return result;
     }
 
-    public static interface EntityRefInterceptor {
+    public interface EntityRefInterceptor {
         /**
          * @param id
          * @return Whether to complete loading the ref. If false, EntityRef.NULL is used instead.

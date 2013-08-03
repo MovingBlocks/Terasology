@@ -138,7 +138,9 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
 
     @Override
     public int compareTo(SingleThreadMonitor other) {
-        if (other == null) return 0;
+        if (other == null) {
+            return 0;
+        }
         final boolean alive1 = this.isAlive();
         final boolean alive2 = other.isAlive();
         final int relAlive = alive1 ? (alive2 ? 0 : -1) : (alive2 ? 1 : 0);
@@ -153,9 +155,7 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
                 if (relName == 0) {
                     final long id1 = this.getThreadId();
                     final long id2 = other.getThreadId();
-                    if (id1 == id2) return 0;
-                    if (id1 < id2) return -1;
-                    return 1;
+                    return (int) (id1 - id2);
                 }
                 return relName;
             }

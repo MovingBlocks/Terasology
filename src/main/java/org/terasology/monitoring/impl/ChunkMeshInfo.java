@@ -36,12 +36,13 @@ public class ChunkMeshInfo {
 
         for (int i = 0; i < mesh.length; i++) {
             final ChunkMesh segment = Preconditions.checkNotNull(mesh[i], "Chunk mesh segment #" + i + " must not be null");
-            if (segment.vertexElements != null)
+            if (segment.vertexElements != null) {
                 for (int j = 0; j < segment.vertexElements.length; j++) {
                     final ChunkMesh.VertexElements element = Preconditions.checkNotNull(segment.vertexElements[j], "Vertex element #" + j + " of chunk mesh segment #" + i + " must not be null");
                     totalFinalVertices += element.finalVertices.limit();
                     totalFinalIndices += element.finalIndices.limit();
                 }
+            }
             totalTimeToGenerateBlockVertices += segment.getTimeToGenerateBlockVertices();
             totalTimeToGenerateOptimizedBuffers += segment.getTimeToGenerateOptimizedBuffers();
         }

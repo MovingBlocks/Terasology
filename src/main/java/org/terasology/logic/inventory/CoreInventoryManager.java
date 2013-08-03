@@ -217,7 +217,10 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
                 EntityRef existingItem = inventory.itemSlots.get(slot);
                 ItemComponent slotItemComponent = existingItem.getComponent(ItemComponent.class);
 
-                if (!itemComponent.stackId.isEmpty() && slotItemComponent != null && Objects.equal(itemComponent.stackId, slotItemComponent.stackId) && slotItemComponent.stackCount < MAX_STACK) {
+                if (!itemComponent.stackId.isEmpty()
+                        && slotItemComponent != null
+                        && Objects.equal(itemComponent.stackId, slotItemComponent.stackId)
+                        && slotItemComponent.stackCount < MAX_STACK) {
                     mergeItems(itemComponent, existingItem, slotItemComponent);
                     if (itemComponent.stackCount == 0) {
                         item.destroy();
@@ -362,7 +365,8 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
             InventoryComponent from = getPredictedInventoryComponent(request.getFromInventory());
             InventoryComponent to = getPredictedInventoryComponent(request.getToInventory());
             if (request instanceof MoveItemAmountRequest) {
-                moveItemAmountCommon(request.getFromInventory(), from, request.getFromSlot(), request.getToInventory(), to, request.getToSlot(), ((MoveItemAmountRequest) request).getAmount());
+                int amount = ((MoveItemAmountRequest) request).getAmount();
+                moveItemAmountCommon(request.getFromInventory(), from, request.getFromSlot(), request.getToInventory(), to, request.getToSlot(), amount);
             } else {
                 moveItemCommon(request.getFromInventory(), from, request.getFromSlot(), request.getToInventory(), to, request.getToSlot());
             }

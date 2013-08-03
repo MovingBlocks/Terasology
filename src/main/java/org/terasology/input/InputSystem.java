@@ -75,12 +75,12 @@ public class InputSystem implements ComponentSystem {
     private BindableButtonImpl mouseWheelDownBind;
 
     private LocalPlayer localPlayer;
-    private CameraTargetSystem cameraTargetSystem;
+    private CameraTargetSystem targetSystem;
     private GUIManager guiManager;
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
+        targetSystem = CoreRegistry.get(CameraTargetSystem.class);
         guiManager = CoreRegistry.get(GUIManager.class);
 
         CoreRegistry.get(EventSystem.class).registerEventHandler(guiManager);
@@ -183,7 +183,16 @@ public class InputSystem implements ComponentSystem {
 
                 BindableButtonImpl bind = mouseButtonBinds.get(button);
                 if (bind != null) {
-                    bind.updateBindState(buttonDown, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
+                    bind.updateBindState(
+                            buttonDown,
+                            delta,
+                            getInputEntities(),
+                            targetSystem.getTarget(),
+                            targetSystem.getTargetBlockPosition(),
+                            targetSystem.getHitPosition(),
+                            targetSystem.getHitNormal(),
+                            consumed,
+                            guiManager.isConsumingInput());
                 }
             } else if (Mouse.getEventDWheel() != 0) {
                 //mouse wheel
@@ -192,8 +201,26 @@ public class InputSystem implements ComponentSystem {
 
                 BindableButtonImpl bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
-                    bind.updateBindState(true, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
-                    bind.updateBindState(false, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
+                    bind.updateBindState(
+                            true,
+                            delta,
+                            getInputEntities(),
+                            targetSystem.getTarget(),
+                            targetSystem.getTargetBlockPosition(),
+                            targetSystem.getHitPosition(),
+                            targetSystem.getHitNormal(),
+                            consumed,
+                            guiManager.isConsumingInput());
+                    bind.updateBindState(
+                            false,
+                            delta,
+                            getInputEntities(),
+                            targetSystem.getTarget(),
+                            targetSystem.getTargetBlockPosition(),
+                            targetSystem.getHitPosition(),
+                            targetSystem.getHitNormal(),
+                            consumed,
+                            guiManager.isConsumingInput());
                 }
             }
         }
@@ -226,8 +253,8 @@ public class InputSystem implements ComponentSystem {
     }
 
     private void setupTarget(InputEvent event) {
-        if (cameraTargetSystem.isTargetAvailable() && !guiManager.isConsumingInput()) {
-            event.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+        if (targetSystem.isTargetAvailable() && !guiManager.isConsumingInput()) {
+            event.setTarget(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 
@@ -242,20 +269,31 @@ public class InputSystem implements ComponentSystem {
             // Update bind
             BindableButtonImpl bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
-                bind.updateBindState(Keyboard.getEventKeyState(), delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
+                bind.updateBindState(
+                        Keyboard.getEventKeyState(),
+                        delta, getInputEntities(),
+                        targetSystem.getTarget(),
+                        targetSystem.getTargetBlockPosition(),
+                        targetSystem.getHitPosition(),
+                        targetSystem.getHitNormal(),
+                        consumed,
+                        guiConsumingInput);
             }
         }
     }
 
     private void processBindAxis(float delta) {
         for (BindableAxisImpl axis : axisBinds) {
-            axis.update(getInputEntities(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            axis.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
+
+                    targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 
     private void processBindRepeats(float delta) {
         for (BindableButtonImpl button : buttonBinds) {
-            button.update(getInputEntities(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            button.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 
