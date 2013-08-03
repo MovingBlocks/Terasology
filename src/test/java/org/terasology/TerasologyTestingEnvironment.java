@@ -27,8 +27,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
@@ -48,6 +50,28 @@ import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationData;
+import org.terasology.rendering.assets.animation.MeshAnimationImpl;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.opengl.GLSLMaterial;
+import org.terasology.rendering.opengl.GLSLShader;
+import org.terasology.rendering.opengl.OpenGLFont;
+import org.terasology.rendering.opengl.OpenGLMesh;
+import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
+import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -96,21 +120,66 @@ public abstract class TerasologyTestingEnvironment {
             AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
             AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
 
+            config = new Config();
+            CoreRegistry.put(Config.class, config);
+
+            Display.setDisplayMode(new DisplayMode(0, 0));
+            Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
+
+            AssetManager.getInstance().setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
+                @Override
+                public Texture buildAsset(AssetUri uri, TextureData data) {
+                    return new OpenGLTexture(uri, data);
+                }
+            });
+            AssetManager.getInstance().setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+                @Override
+                public Font buildAsset(AssetUri uri, FontData data) {
+                    return new OpenGLFont(uri, data);
+                }
+            });
+            AssetManager.getInstance().setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
+                @Override
+                public Shader buildAsset(AssetUri uri, ShaderData data) {
+                    return new GLSLShader(uri, data);
+                }
+            });
+            AssetManager.getInstance().setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
+                @Override
+                public Material buildAsset(AssetUri uri, MaterialData data) {
+                    return new GLSLMaterial(uri, data);
+                }
+            });
+            AssetManager.getInstance().setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
+                @Override
+                public Mesh buildAsset(AssetUri uri, MeshData data) {
+                    return new OpenGLMesh(uri, data);
+                }
+            });
+            AssetManager.getInstance().setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
+                @Override
+                public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
+                    return new OpenGLSkeletalMesh(uri, data);
+                }
+            });
+            AssetManager.getInstance().setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
+                @Override
+                public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
+                    return new MeshAnimationImpl(uri, data);
+                }
+            });
+
+            CoreRegistry.put(ShaderManager.class, new ShaderManager()).initShaders();
+
             DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
             blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
             blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AlignToSurfaceFamilyFactory());
             blockManager = new BlockManagerImpl(new WorldAtlas(4096), blockFamilyFactoryRegistry);
             CoreRegistry.put(BlockManager.class, blockManager);
 
-            config = new Config();
-            CoreRegistry.put(Config.class, config);
-
             audioManager = new NullAudioManager();
 
             CoreRegistry.put(AudioManager.class, audioManager);
-
-            Display.setDisplayMode(new DisplayMode(0, 0));
-            Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
 
             collisionGroupManager = new CollisionGroupManager();
             CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);

@@ -176,10 +176,12 @@ public class ModManager {
 
             // Zip files next
             try {
-                for (Path modPath : Files.newDirectoryStream(rootModPath, "*.{jar,zip}")) {
-                    if (!Files.isRegularFile(modPath)) {
-                        continue;
+                for (Path modPath : Files.newDirectoryStream(rootModPath, new DirectoryStream.Filter<Path>() {
+                    @Override
+                    public boolean accept(Path entry) throws IOException {
+                        return Files.isRegularFile(entry) && (entry.toString().endsWith(".jar") || entry.toString().endsWith(".zip"));
                     }
+                })) {
                     try (ZipFile zipFile = new ZipFile(modPath.toFile())) {
                         ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
                         if (modInfoEntry != null) {

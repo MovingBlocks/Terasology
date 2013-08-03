@@ -21,7 +21,7 @@ package org.terasology.engine.modes;
  */
 public interface LoadProcess {
 
-    final int UNKNOWN_STEPS = -1;
+    int UNKNOWN_STEPS = -1;
 
     /**
      * @return A message describing the state of the process

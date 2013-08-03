@@ -33,7 +33,7 @@ public class ChunkMonitorEntry {
     private LinkedList<WeakReference<Chunk>> chunks = new LinkedList<>();
     private LinkedList<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<>();
 
-    private final void purge() {
+    private void purge() {
         if (chunks.size() == 0) {
             return;
         }

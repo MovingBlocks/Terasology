@@ -200,7 +200,7 @@ public class PerformanceMonitorPanel extends JPanel {
             });
         }
 
-        private final void updateEntries(TObjectDoubleMap<String> means, TObjectDoubleMap<String> spikes) {
+        private void updateEntries(TObjectDoubleMap<String> means, TObjectDoubleMap<String> spikes) {
             if (means != null) {
                 for (final Entry entry : list) {
                     entry.active = false;

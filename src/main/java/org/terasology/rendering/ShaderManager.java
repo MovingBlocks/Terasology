@@ -131,8 +131,8 @@ public class ShaderManager {
     private GLSLMaterial prepareAndStoreShaderProgramInstance(String title, ShaderParameters params) {
         String uri = "engine:" + title;
         Shader shader = Assets.getShader(uri);
-        shader.recompile();
         checkNotNull(shader, "Failed to resolve %s", uri);
+        shader.recompile();
         GLSLMaterial material = Assets.generateAsset(new AssetUri(AssetType.MATERIAL, uri), new MaterialData(shader), GLSLMaterial.class);
         material.setShaderParameters(params);
 
