@@ -17,41 +17,45 @@
 package org.terasology.asset;
 
 import com.google.common.base.Objects;
-
-import java.util.Locale;
+import com.google.common.base.Preconditions;
+import org.terasology.engine.AbstractBaseUri;
 
 /**
  * @author Immortius
  */
-public final class AssetUri implements Comparable<AssetUri> {
+public final class AssetUri extends AbstractBaseUri {
     public static final String TYPE_SEPARATOR = ":";
-    public static final String PACKAGE_SEPARATOR = ":";
 
     private AssetType type;
-    private String packageName = "";
+    private String fullUri;
+
+    private String moduleName = "";
     private String assetName = "";
-    private String normalisedPackageName = "";
+    private String normalisedModuleName = "";
     private String normalisedAssetName = "";
 
     public AssetUri() {
     }
 
-    public AssetUri(AssetType type, String packageName, String assetName) {
+    public AssetUri(AssetType type, String moduleName, String assetName) {
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(moduleName);
+        Preconditions.checkNotNull(assetName);
         this.type = type;
-        this.packageName = packageName;
-        this.normalisedPackageName = packageName.toLowerCase(Locale.ENGLISH);
+        this.moduleName = moduleName;
         this.assetName = assetName;
-        this.normalisedAssetName = assetName.toLowerCase(Locale.ENGLISH);
+        this.normalisedModuleName = normalise(moduleName);
+        this.normalisedAssetName = normalise(assetName);
     }
 
     public AssetUri(AssetType type, String simpleUri) {
         this.type = type;
-        String[] split = simpleUri.split(PACKAGE_SEPARATOR, 2);
+        String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
-            packageName = split[0];
+            moduleName = split[0];
             assetName = split[1];
-            normalisedPackageName = split[0].toLowerCase(Locale.ENGLISH);
-            normalisedAssetName = split[1].toLowerCase(Locale.ENGLISH);
+            normalisedModuleName = normalise(split[0]);
+            normalisedAssetName = normalise(split[1]);
         }
     }
 
@@ -60,12 +64,12 @@ public final class AssetUri implements Comparable<AssetUri> {
         String[] typeSplit = uri.split(TYPE_SEPARATOR, 2);
         if (typeSplit.length > 1) {
             type = AssetType.getTypeForId(typeSplit[0]);
-            String[] packageSplit = typeSplit[1].split(PACKAGE_SEPARATOR, 2);
+            String[] packageSplit = typeSplit[1].split(MODULE_SEPARATOR, 2);
             if (packageSplit.length > 1) {
-                packageName = packageSplit[0];
+                moduleName = packageSplit[0];
                 assetName = packageSplit[1];
-                normalisedPackageName = packageSplit[0].toLowerCase(Locale.ENGLISH);
-                normalisedAssetName = packageSplit[1].toLowerCase(Locale.ENGLISH);
+                normalisedModuleName = normalise(packageSplit[0]);
+                normalisedAssetName = normalise(packageSplit[1]);
             }
         }
     }
@@ -74,12 +78,12 @@ public final class AssetUri implements Comparable<AssetUri> {
         return type;
     }
 
-    public String getPackage() {
-        return packageName;
+    public String getModuleName() {
+        return moduleName;
     }
 
-    public String getNormalisedPackage() {
-        return normalisedPackageName;
+    public String getNormalisedModuleName() {
+        return normalisedModuleName;
     }
 
     public String getAssetName() {
@@ -91,7 +95,7 @@ public final class AssetUri implements Comparable<AssetUri> {
     }
 
     public boolean isValid() {
-        return type != null && !packageName.isEmpty() && !assetName.isEmpty();
+        return type != null && !moduleName.isEmpty() && !assetName.isEmpty();
     }
 
     @Override
@@ -99,17 +103,32 @@ public final class AssetUri implements Comparable<AssetUri> {
         if (!isValid()) {
             return "";
         }
-        return type.getTypeId() + TYPE_SEPARATOR + packageName + PACKAGE_SEPARATOR + assetName;
+        return type.getTypeId() + TYPE_SEPARATOR + moduleName + MODULE_SEPARATOR + assetName;
+    }
+
+    @Override
+    public String toNormalisedString() {
+        if (!isValid()) {
+            return "";
+        }
+        return type.getTypeId() + TYPE_SEPARATOR + normalisedModuleName + MODULE_SEPARATOR + normalisedAssetName;
     }
 
     /**
      * @return The asset uri, minus the type
      */
-    public String getSimpleString() {
+    public String toSimpleString() {
         if (!isValid()) {
             return "";
         }
-        return packageName + PACKAGE_SEPARATOR + assetName;
+        return moduleName + MODULE_SEPARATOR + assetName;
+    }
+
+    public String toNormalisedSimpleString() {
+        if (!isValid()) {
+            return "";
+        }
+        return normalisedModuleName + MODULE_SEPARATOR + normalisedAssetName;
     }
 
     @Override
@@ -120,7 +139,7 @@ public final class AssetUri implements Comparable<AssetUri> {
         if (obj instanceof AssetUri) {
             AssetUri other = (AssetUri) obj;
             return Objects.equal(type, other.type)
-                    && Objects.equal(normalisedPackageName, other.normalisedPackageName)
+                    && Objects.equal(normalisedModuleName, other.normalisedModuleName)
                     && Objects.equal(normalisedAssetName, other.normalisedAssetName);
         }
         return false;
@@ -128,11 +147,8 @@ public final class AssetUri implements Comparable<AssetUri> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, normalisedPackageName, normalisedAssetName);
+        return Objects.hashCode(type, normalisedModuleName, normalisedAssetName);
     }
 
-    @Override
-    public int compareTo(AssetUri o) {
-        return toString().compareTo(o.toString());
-    }
+
 }

@@ -19,8 +19,7 @@ package org.terasology.world.block;
 import com.google.common.base.Objects;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-
-import java.util.Locale;
+import org.terasology.engine.AbstractBaseUri;
 
 /**
  * Identifier for both blocks and block families.
@@ -35,55 +34,63 @@ import java.util.Locale;
  *
  * @author Immortius
  */
-public class BlockUri implements Comparable<BlockUri> {
-    public static final String PACKAGE_SEPARATOR = ":";
+public class BlockUri extends AbstractBaseUri {
     public static final String IDENTIFIER_SEPARATOR = ".";
     public static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
 
-    private String packageName = "";
+    private AssetUri shape = null;
+
+    private String moduleName = "";
     private String familyName = "";
-    private String shapePackageName = "";
-    private String shapeName = "";
     private String blockIdentifier = "";
 
-    public BlockUri(String packageName, String familyName) {
-        this.packageName = packageName.toLowerCase(Locale.ENGLISH);
-        this.familyName = familyName.toLowerCase(Locale.ENGLISH);
+    private String normalisedModuleName = "";
+    private String normalisedFamilyName = "";
+    private String normalisedBlockIdentifier = "";
+
+    public BlockUri(String moduleName, String familyName) {
+        this.moduleName = moduleName;
+        this.familyName = familyName;
+        this.normalisedModuleName = normalise(moduleName);
+        this.normalisedFamilyName = normalise(familyName);
     }
 
-    public BlockUri(String packageName, String familyName, String identifier) {
-        this(packageName, familyName);
-        this.blockIdentifier = identifier.toLowerCase(Locale.ENGLISH);
+    public BlockUri(String moduleName, String familyName, String identifier) {
+        this(moduleName, familyName);
+        this.blockIdentifier = identifier;
+        this.normalisedBlockIdentifier = normalise(identifier);
     }
 
-    public BlockUri(String packageName, String familyName, String shapePackageName, String shapeName) {
-        this(packageName, familyName);
-        this.shapePackageName = shapePackageName;
-        this.shapeName = shapeName;
+    public BlockUri(String moduleName, String familyName, String shapeModuleName, String shapeName) {
+        this(moduleName, familyName);
+        this.shape = new AssetUri(AssetType.SHAPE, shapeModuleName, shapeName);
     }
 
     public BlockUri(BlockUri familyUri, String identifier) {
-        packageName = familyUri.packageName;
+        this.shape = familyUri.shape;
+        moduleName = familyUri.moduleName;
         familyName = familyUri.familyName;
-        shapePackageName = familyUri.shapePackageName;
-        shapeName = familyUri.shapeName;
-        blockIdentifier = identifier.toLowerCase(Locale.ENGLISH);
+        normalisedModuleName = familyUri.normalisedModuleName;
+        normalisedFamilyName = familyUri.normalisedFamilyName;
+
+        blockIdentifier = identifier;
+        normalisedBlockIdentifier = normalise(blockIdentifier);
     }
 
     public BlockUri(String uri) {
-        String[] split = uri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SEPARATOR, 4);
+        String[] split = uri.split(MODULE_SEPARATOR, 4);
         if (split.length > 1) {
-            packageName = split[0];
+            moduleName = split[0];
         }
         if (split.length == 4) {
             familyName = split[1];
-            shapePackageName = split[2];
+            String shapeModuleName = split[2];
             split = split[3].split(IDENTIFIER_SEPARATOR_REGEX, 2);
             if (split.length > 1) {
-                shapeName = split[0];
+                shape = new AssetUri(AssetType.SHAPE, shapeModuleName, split[0]);
                 blockIdentifier = split[1];
             } else if (split.length == 1) {
-                shapeName = split[0];
+                shape = new AssetUri(AssetType.SHAPE, shapeModuleName, split[0]);
             }
         } else if (split.length == 2) {
             split = split[1].split(IDENTIFIER_SEPARATOR_REGEX, 2);
@@ -94,26 +101,47 @@ public class BlockUri implements Comparable<BlockUri> {
                 familyName = split[0];
             }
         }
+        normalisedModuleName = normalise(moduleName);
+        normalisedFamilyName = normalise(familyName);
+        normalisedBlockIdentifier = normalise(blockIdentifier);
     }
 
     public boolean isValid() {
-        return !packageName.isEmpty() && !familyName.isEmpty() && (shapePackageName.isEmpty() == shapeName.isEmpty());
+        return !moduleName.isEmpty() && !familyName.isEmpty() && (shape == null || shape.isValid());
     }
 
-    public String getPackage() {
-        return packageName;
+    @Override
+    public String getModuleName() {
+        return moduleName;
     }
 
-    public String getFamily() {
+    @Override
+    public String getNormalisedModuleName() {
+        return normalisedModuleName;
+    }
+
+    public String getFamilyName() {
         return familyName;
     }
 
+    public String getNormalisedFamilyName() {
+        return normalisedFamilyName;
+    }
+
+    public boolean hasShape() {
+        return shape != null;
+    }
+
     public AssetUri getShapeUri() {
-        return new AssetUri(AssetType.SHAPE, shapePackageName, shapeName);
+        return shape;
     }
 
     public String getIdentifier() {
         return blockIdentifier;
+    }
+
+    public String getNormalisedIdentifier() {
+        return normalisedBlockIdentifier;
     }
 
     /**
@@ -123,38 +151,56 @@ public class BlockUri implements Comparable<BlockUri> {
         if (blockIdentifier.isEmpty()) {
             return this;
         }
-        if (shapePackageName != null) {
-            return new BlockUri(packageName, familyName, shapePackageName, shapeName);
+        if (shape != null) {
+            return new BlockUri(moduleName, familyName, shape.getModuleName(), shape.getAssetName());
         }
-        return new BlockUri(packageName, familyName);
+        return new BlockUri(moduleName, familyName);
     }
 
     /**
      * @return The uri of the block's family, excluding shape
      */
     public BlockUri getRootFamilyUri() {
-        if (blockIdentifier.isEmpty() && shapePackageName.isEmpty() && shapeName.isEmpty()) {
+        if (blockIdentifier.isEmpty() && shape == null) {
             return this;
         }
-        return new BlockUri(packageName, familyName);
+        return new BlockUri(moduleName, familyName);
     }
 
     @Override
     public String toString() {
         if (isValid()) {
             StringBuilder builder = new StringBuilder();
-            builder.append(packageName);
-            builder.append(PACKAGE_SEPARATOR);
+            builder.append(moduleName);
+            builder.append(MODULE_SEPARATOR);
             builder.append(familyName);
-            if (!shapePackageName.isEmpty()) {
-                builder.append(PACKAGE_SEPARATOR);
-                builder.append(shapePackageName);
-                builder.append(PACKAGE_SEPARATOR);
-                builder.append(shapeName);
+            if (shape != null) {
+                builder.append(MODULE_SEPARATOR);
+                builder.append(shape.toSimpleString());
             }
             if (!blockIdentifier.isEmpty()) {
                 builder.append(IDENTIFIER_SEPARATOR);
                 builder.append(blockIdentifier);
+            }
+            return builder.toString();
+        }
+        return "";
+    }
+
+    @Override
+    public String toNormalisedString() {
+        if (isValid()) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(normalisedModuleName);
+            builder.append(MODULE_SEPARATOR);
+            builder.append(normalisedFamilyName);
+            if (shape != null) {
+                builder.append(MODULE_SEPARATOR);
+                builder.append(shape.toNormalisedSimpleString());
+            }
+            if (!normalisedBlockIdentifier.isEmpty()) {
+                builder.append(IDENTIFIER_SEPARATOR);
+                builder.append(normalisedBlockIdentifier);
             }
             return builder.toString();
         }
@@ -168,22 +214,17 @@ public class BlockUri implements Comparable<BlockUri> {
         }
         if (obj instanceof BlockUri) {
             BlockUri other = (BlockUri) obj;
-            return Objects.equal(other.packageName, packageName) && Objects.equal(other.familyName, familyName) && Objects.equal(other.shapePackageName, shapePackageName) && Objects.equal(other.shapeName, shapeName) && Objects.equal(other.blockIdentifier, blockIdentifier);
+            return Objects.equal(other.normalisedModuleName, normalisedModuleName) &&
+                    Objects.equal(other.normalisedFamilyName, normalisedFamilyName) &&
+                    Objects.equal(other.shape, shape) &&
+                    Objects.equal(other.normalisedBlockIdentifier, normalisedBlockIdentifier);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(packageName, familyName, shapePackageName, shapeName, blockIdentifier);
+        return Objects.hashCode(normalisedModuleName, normalisedFamilyName, shape, normalisedBlockIdentifier);
     }
 
-    public boolean hasShape() {
-        return !shapePackageName.isEmpty() || !shapeName.isEmpty();
-    }
-
-    @Override
-    public int compareTo(BlockUri o) {
-        return toString().compareTo(o.toString());
-    }
 }

@@ -90,7 +90,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
         basicBlocks[6].put((byte) 63,
                 getBlockDefinition(SIX_CONNECTIONS, blockBuilder, blockDefJson));
 
-        BlockUri blockUri = new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName());
+        BlockUri blockUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName());
 
         // Now make sure we have all combinations based on the basic set (above) and rotations
         for (byte connections = 0; connections < 64; connections++) {

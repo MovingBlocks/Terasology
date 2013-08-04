@@ -153,7 +153,7 @@ public class WorldAtlas {
     }
 
     private void addNormal(AssetUri uri) {
-        String name = uri.getSimpleString() + "Normal";
+        String name = uri.toSimpleString() + "Normal";
         TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
         if (tile != null) {
             tilesNormal.add(tile);
@@ -163,7 +163,7 @@ public class WorldAtlas {
     }
 
     private void addHeightMap(AssetUri uri) {
-        String name = uri.getSimpleString() + "Height";
+        String name = uri.toSimpleString() + "Height";
         TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
         if (tile != null) {
             tilesHeight.add(tile);

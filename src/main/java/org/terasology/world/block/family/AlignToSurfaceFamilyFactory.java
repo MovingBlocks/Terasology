@@ -51,7 +51,7 @@ public class AlignToSurfaceFamilyFactory implements BlockFamilyFactory {
             block.setDirection(Side.BOTTOM);
             blockMap.put(Side.BOTTOM, block);
         }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
+        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
     }
 
 }

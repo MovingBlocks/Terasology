@@ -116,12 +116,12 @@ public class BlockLoader implements BlockBuilderHelper {
                     BlockDefinition blockDef = createBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
                     if (isShapelessBlockFamily(blockDef)) {
-                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockDef.categories));
+                        result.shapelessDefinitions.add(new FreeformFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), blockDef.categories));
                     } else {
                         if (blockDef.liquid) {
                             blockDef.rotation = null;
                             blockDef.shapes.clear();
-                            blockDef.shape = trimmedLoweredShape.getURI().getSimpleString();
+                            blockDef.shape = trimmedLoweredShape.getURI().toSimpleString();
                         }
 
                         if (blockDef.shapes.isEmpty()) {
@@ -163,7 +163,7 @@ public class BlockLoader implements BlockBuilderHelper {
                 return null;
             }
         }
-        AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getPackage(), uri.getFamily());
+        AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getPackage(), uri.getFamilyName());
         BlockDefinition def;
         if (AssetManager.getInstance().getAssetURLs(blockDefUri).isEmpty()) {
             // An auto-block
@@ -172,7 +172,7 @@ public class BlockLoader implements BlockBuilderHelper {
             def = createBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
         }
 
-        def.shape = (shape.getURI().getSimpleString());
+        def.shape = (shape.getURI().toSimpleString());
         if (shape.isCollisionYawSymmetric()) {
             Block block = constructSingleBlock(blockDefUri, def);
             return new SymmetricFamily(uri, block, def.categories);
@@ -189,7 +189,7 @@ public class BlockLoader implements BlockBuilderHelper {
         for (AssetUri blockTileUri : Assets.list(AssetType.BLOCK_TILE)) {
             if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
                 logger.debug("Loading auto block {}", blockTileUri);
-                BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
+                BlockUri uri = new BlockUri(blockTileUri.getModuleName(), blockTileUri.getAssetName());
                 result.add(new FreeformFamily(uri));
             }
         }
@@ -226,9 +226,9 @@ public class BlockLoader implements BlockBuilderHelper {
             if (shape != null) {
                 BlockUri familyUri;
                 if (shape.equals(cubeShape)) {
-                    familyUri = new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName());
+                    familyUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName());
                 } else {
-                    familyUri = new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName(), shapeUri.getPackage(), shapeUri.getAssetName());
+                    familyUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName(), shapeUri.getModuleName(), shapeUri.getAssetName());
                 }
                 blockDef.shape = shapeString;
                 if (shape.isCollisionYawSymmetric()) {
@@ -437,7 +437,7 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     private AssetUri getDefaultTile(BlockDefinition blockDef, AssetUri uri) {
-        String defaultName = uri.getSimpleString();
+        String defaultName = uri.toSimpleString();
         if (!blockDef.tile.isEmpty()) {
             defaultName = blockDef.tile;
         }

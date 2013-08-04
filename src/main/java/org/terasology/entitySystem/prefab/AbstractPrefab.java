@@ -27,7 +27,7 @@ public abstract class AbstractPrefab extends AbstractAsset<PrefabData> implement
 
     @Override
     public String getName() {
-        return getURI().getSimpleString();
+        return getURI().toSimpleString();
     }
 
     @Override

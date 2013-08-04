@@ -194,7 +194,7 @@ public class BlockCommands implements ComponentSystem {
         stringBuilder.append(StringConstants.NEW_LINE);
         List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
-            stringBuilder.append(uri.getSimpleString());
+            stringBuilder.append(uri.toSimpleString());
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
@@ -262,7 +262,7 @@ public class BlockCommands implements ComponentSystem {
             builder.append("Non-unique shape name, possible matches: ");
             Iterator<AssetUri> shapeUris = resolvedShapeUris.iterator();
             while (shapeUris.hasNext()) {
-                builder.append(shapeUris.next().getSimpleString());
+                builder.append(shapeUris.next().toSimpleString());
                 if (shapeUris.hasNext()) {
                     builder.append(", ");
                 }
@@ -271,7 +271,7 @@ public class BlockCommands implements ComponentSystem {
             return builder.toString();
         }
 
-        BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).getSimpleString());
+        BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).toSimpleString());
         if (blockUri.isValid()) {
             return giveBlock(blockManager.getBlockFamily(blockUri), quantity, client);
         }

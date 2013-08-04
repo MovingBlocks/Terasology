@@ -213,7 +213,7 @@ public class PojoEntityRef extends EntityRef {
         }
         if (prefabUri != null) {
             builder.append(", prefab = '");
-            builder.append(prefabUri.getSimpleString());
+            builder.append(prefabUri.toSimpleString());
             builder.append("'");
         }
         builder.append("}");

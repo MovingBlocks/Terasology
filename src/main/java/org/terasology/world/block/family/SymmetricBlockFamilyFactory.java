@@ -27,6 +27,6 @@ public class SymmetricBlockFamilyFactory implements BlockFamilyFactory {
     @Override
     public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
         Block block = blockBuilder.constructSimpleBlock(blockDefUri, blockDefinition);
-        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block, blockDefinition.categories);
+        return new SymmetricFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), block, blockDefinition.categories);
     }
 }

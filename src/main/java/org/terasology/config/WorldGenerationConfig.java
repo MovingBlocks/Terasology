@@ -16,6 +16,8 @@
 
 package org.terasology.config;
 
+import org.terasology.world.generator.MapGeneratorUri;
+
 /**
  * @author Immortius
  */
@@ -26,7 +28,18 @@ public class WorldGenerationConfig {
     private float snowGrassDensity = 0.001f;
     private float mountainGrassDensity = 0.2f;
     private float desertGrassDensity = 0.001f;
-    private String defaultSeed = "Blockmaina42";
+    private String defaultSeed = "Terasology";
+
+    private float zoomFactor = 8f;
+    private float baseTerrainFactor = 50.0f;
+    private float oceanTerrainFactor = 50.0f;
+    private float riverTerrainFactor = 50.0f;
+    private float mountainFactor = 50.0f;
+    private float hillDensityFactor = 50.0f;
+    private float plateauAreaFactor = 50.0f;
+    private float caveDensityFactor = 50.0f;
+
+    private MapGeneratorUri defaultGenerator = new MapGeneratorUri("core:perlin");
 
     public String getWorldTitle() {
         return worldTitle;
@@ -82,5 +95,77 @@ public class WorldGenerationConfig {
 
     public void setDefaultSeed(String defaultSeed) {
         this.defaultSeed = defaultSeed;
+    }
+
+    public float getZoomFactor() {
+        return zoomFactor;
+    }
+
+    public void setZoomFactor(float zoomFactor) {
+        this.zoomFactor = zoomFactor;
+    }
+
+    public float getBaseTerrainFactor() {
+        return baseTerrainFactor;
+    }
+
+    public void setBaseTerrainFactor(float baseTerrainFactor) {
+        this.baseTerrainFactor = baseTerrainFactor;
+    }
+
+    public float getOceanTerrainFactor() {
+        return oceanTerrainFactor;
+    }
+
+    public void setOceanTerrainFactor(float oceanTerrainFactor) {
+        this.oceanTerrainFactor = oceanTerrainFactor;
+    }
+
+    public float getRiverTerrainFactor() {
+        return riverTerrainFactor;
+    }
+
+    public void setRiverTerrainFactor(float riverTerrainFactor) {
+        this.riverTerrainFactor = riverTerrainFactor;
+    }
+
+    public float getMountainFactor() {
+        return mountainFactor;
+    }
+
+    public void setMountainFactor(float mountainFactor) {
+        this.mountainFactor = mountainFactor;
+    }
+
+    public float getHillDensityFactor() {
+        return hillDensityFactor;
+    }
+
+    public void setHillDensityFactor(float hillDensityFactor) {
+        this.hillDensityFactor = hillDensityFactor;
+    }
+
+    public float getPlateauAreaFactor() {
+        return plateauAreaFactor;
+    }
+
+    public void setPlateauAreaFactor(float plateauAreaFactor) {
+        this.plateauAreaFactor = plateauAreaFactor;
+    }
+
+    public float getCaveDensityFactor() {
+        return caveDensityFactor;
+    }
+
+    public void setCaveDensityFactor(float caveDensityFactor) {
+        this.caveDensityFactor = caveDensityFactor;
+    }
+
+    public MapGeneratorUri getDefaultGenerator() {
+        return defaultGenerator;
+    }
+
+    public void setDefaultGenerator(MapGeneratorUri defaultGenerator) {
+        this.defaultGenerator = defaultGenerator;
     }
 }

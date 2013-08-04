@@ -235,7 +235,7 @@ public class AssetManager {
 //            Asset asset = iterator.next();
 //
 //            // Don't dispose engine assets, all sorts of systems have references to them
-//            if (!asset.getURI().getPackage().equals(ModManager.ENGINE_PACKAGE)) {
+//            if (!asset.getURI().getModuleName().equals(ModManager.ENGINE_PACKAGE)) {
 //                asset.dispose();
 //                iterator.remove();
 //            }
@@ -321,7 +321,7 @@ public class AssetManager {
         if (overrideSource != null) {
             return overrideSource.getOverride(uri);
         } else {
-            AssetSource source = assetSources.get(uri.getNormalisedPackage());
+            AssetSource source = assetSources.get(uri.getNormalisedModuleName());
             if (source != null) {
                 return source.get(uri);
             }

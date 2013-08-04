@@ -63,7 +63,7 @@ public class FontLoader implements AssetLoader<FontData> {
         int numPages = parseCommon(builder, reader.readLine());
 
         for (int i = 0; i < numPages; ++i) {
-            parsePage(builder, uri.getPackage(), reader.readLine());
+            parsePage(builder, uri.getModuleName(), reader.readLine());
         }
 
         int charCount = getCharacterCount(reader.readLine());
