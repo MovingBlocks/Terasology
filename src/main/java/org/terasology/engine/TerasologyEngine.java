@@ -36,13 +36,13 @@ import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.mod.ModManager;
-import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -157,10 +157,10 @@ public class TerasologyEngine implements GameEngine {
 
     private void initSecurity() {
         // TODO: More work on security
-        ModSecurityManager modSecurityManager = new ModSecurityManager();
-        //System.setSecurityManager(modSecurityManager);
-        modSecurityManager.addModAvailableClass(GUIManager.class);
-        // TODO: Add in mod available classes
+        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
+        //System.setSecurityManager(moduleSecurityManager);
+        moduleSecurityManager.addModAvailableClass(GUIManager.class);
+        // TODO: Add in module available classes
 
     }
 
@@ -440,14 +440,14 @@ public class TerasologyEngine implements GameEngine {
 
     private void initManagers() {
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
-        CoreRegistry.putPermanently(ModManager.class, new ModManager());
+        CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
         CoreRegistry.putPermanently(Game.class, new Game(time));
 
         AssetType.registerAssetTypes();
-        ClasspathSource source = new ClasspathSource(ModManager.ENGINE_PACKAGE,
-                getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY);
+        ClasspathSource source = new ClasspathSource(ModuleManager.ENGINE_PACKAGE,
+                getClass().getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY);
         AssetManager.getInstance().addAssetSource(source);
         CoreRegistry.get(ShaderManager.class).initShaders();
 

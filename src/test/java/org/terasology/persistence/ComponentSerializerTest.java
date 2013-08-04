@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ClassMetadata;
@@ -15,7 +16,6 @@ import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.EntityData;
 
@@ -30,18 +30,18 @@ import static org.mockito.Mockito.mock;
 public class ComponentSerializerTest {
     private ComponentLibrary componentLibrary;
     private ComponentSerializer componentSerializer;
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager();
+        moduleManager = new ModuleManager();
     }
 
     @Before
     public void setup() {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        EngineEntityManager entityManager = builder.build(modManager, networkSystem);
+        EngineEntityManager entityManager = builder.build(moduleManager, networkSystem);
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);

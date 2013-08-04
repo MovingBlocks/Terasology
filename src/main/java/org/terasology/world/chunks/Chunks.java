@@ -80,7 +80,7 @@ public final class Chunks {
         Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
         Preconditions.checkArgument(!id.trim().isEmpty(), "The parameter 'id' must not be empty");
         Preconditions.checkNotNull(entry, "The parameter 'entry' must not be null");
-        Preconditions.checkState(!modDataEntries.containsKey(id), "The mod data id '" + id + "' is already in use");
+        Preconditions.checkState(!modDataEntries.containsKey(id), "The module data id '" + id + "' is already in use");
         modDataEntries.put(id, entry);
     }
 

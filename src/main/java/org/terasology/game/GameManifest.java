@@ -21,8 +21,8 @@ import com.google.gson.GsonBuilder;
 import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.world.WorldInfo;
 
 import java.io.BufferedReader;
@@ -127,8 +127,8 @@ public class GameManifest {
         try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
             GameManifest result = new GsonBuilder().create().fromJson(reader, GameManifest.class);
             if (result.modConfiguration.size() == 0) {
-                for (Mod mod : CoreRegistry.get(ModManager.class).getMods()) {
-                    result.modConfiguration.addMod(mod.getModInfo().getId());
+                for (Module module : CoreRegistry.get(ModuleManager.class).getMods()) {
+                    result.modConfiguration.addMod(module.getModuleInfo().getId());
                 }
             }
             return result;

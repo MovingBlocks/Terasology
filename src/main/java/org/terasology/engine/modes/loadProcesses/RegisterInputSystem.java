@@ -24,6 +24,8 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.BindableAxis;
@@ -34,8 +36,6 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.input.binds.ToolbarSlotButton;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.players.LocalPlayerSystem;
 
 import java.util.Locale;
@@ -55,7 +55,7 @@ public class RegisterInputSystem implements LoadProcess {
     @Override
     public boolean step() {
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        ModManager modManager = CoreRegistry.get(ModManager.class);
+        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
         LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem();
         componentSystemManager.register(localPlayerSystem, "engine:localPlayerSystem");
@@ -70,12 +70,12 @@ public class RegisterInputSystem implements LoadProcess {
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        registerButtonBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
-        registerAxisBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
-        for (Mod mod : modManager.getActiveMods()) {
-            if (mod.isCodeMod()) {
-                registerButtonBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
-                registerAxisBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+        registerButtonBinds(inputSystem, ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
+        registerAxisBinds(inputSystem, ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+        for (Module module : moduleManager.getActiveMods()) {
+            if (module.isCodeMod()) {
+                registerButtonBinds(inputSystem, module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
+                registerAxisBinds(inputSystem, module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
             }
         }
 

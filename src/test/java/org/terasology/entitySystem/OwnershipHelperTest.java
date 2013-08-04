@@ -4,10 +4,9 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.engine.Terasology;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.entitySystem.stubs.OwnerComponent;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkSystem;
 
 import static org.junit.Assert.assertEquals;
@@ -21,18 +20,18 @@ public class OwnershipHelperTest {
 
     EngineEntityManager entityManager;
 
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager();
+        moduleManager = new ModuleManager();
     }
 
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = builder.build(modManager, mock(NetworkSystem.class));
+        entityManager = builder.build(moduleManager, mock(NetworkSystem.class));
     }
 
     @Test

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.mod;
+package org.terasology.engine.module;
 
 import com.google.common.base.Objects;
 import org.reflections.Reflections;
@@ -32,8 +32,8 @@ import java.nio.file.Path;
 /**
  * @author Immortius
  */
-public class Mod {
-    private ModInfo modInfo;
+public class Module {
+    private ModuleInfo moduleInfo;
     private Path modRoot;
     private AssetSource modSource;
     private boolean enabled;
@@ -41,11 +41,11 @@ public class Mod {
     private ClassLoader activeClassLoader;
     private Reflections reflections;
 
-    public Mod(Path modRoot, ModInfo info, AssetSource modSource) {
+    public Module(Path modRoot, ModuleInfo info, AssetSource modSource) {
         if (info == null) {
-            throw new IllegalArgumentException("Mod info must not be null");
+            throw new IllegalArgumentException("Module info must not be null");
         }
-        this.modInfo = info;
+        this.moduleInfo = info;
         this.modRoot = modRoot;
         this.modSource = modSource;
     }
@@ -121,8 +121,8 @@ public class Mod {
         this.inactiveClassLoader = inactiveClassLoader;
     }
 
-    public ModInfo getModInfo() {
-        return modInfo;
+    public ModuleInfo getModuleInfo() {
+        return moduleInfo;
     }
 
     @Override
@@ -130,15 +130,15 @@ public class Mod {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof Mod) {
-            Mod other = (Mod) obj;
-            return Objects.equal(other.getModInfo().getId(), modInfo.getId());
+        if (obj instanceof Module) {
+            Module other = (Module) obj;
+            return Objects.equal(other.getModuleInfo().getId(), moduleInfo.getId());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return modInfo.getId().hashCode();
+        return moduleInfo.getId().hashCode();
     }
 }

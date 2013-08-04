@@ -24,10 +24,10 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.module.Module;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldInfo;
@@ -73,10 +73,10 @@ public class JoinServer implements LoadProcess {
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
             ModConfig modConfig = gameManifest.getModConfiguration();
-            ModManager modManager = CoreRegistry.get(ModManager.class);
+            ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
             for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
-                Mod mod = modManager.getMod(moduleInfo.getModuleId());
-                if (mod == null) {
+                Module module = moduleManager.getMod(moduleInfo.getModuleId());
+                if (module == null) {
                     CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + moduleInfo.getModuleId()));
                 } else {
                     logger.debug("Activating module: {}", moduleInfo.getModuleId());

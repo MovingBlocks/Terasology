@@ -3,5 +3,5 @@
 	"displayName" : "Fence Pack",
 	"author" : "A'nW",
 	"description" :
-	"A mod adding fence blocks."
+	"A module adding fence blocks."
 }

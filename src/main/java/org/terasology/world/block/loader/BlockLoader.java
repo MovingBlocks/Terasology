@@ -163,7 +163,7 @@ public class BlockLoader implements BlockBuilderHelper {
                 return null;
             }
         }
-        AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getPackage(), uri.getFamilyName());
+        AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getModuleName(), uri.getFamilyName());
         BlockDefinition def;
         if (AssetManager.getInstance().getAssetURLs(blockDefUri).isEmpty()) {
             // An auto-block

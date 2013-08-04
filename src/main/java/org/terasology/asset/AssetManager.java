@@ -235,7 +235,7 @@ public class AssetManager {
 //            Asset asset = iterator.next();
 //
 //            // Don't dispose engine assets, all sorts of systems have references to them
-//            if (!asset.getURI().getModuleName().equals(ModManager.ENGINE_PACKAGE)) {
+//            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_PACKAGE)) {
 //                asset.dispose();
 //                iterator.remove();
 //            }

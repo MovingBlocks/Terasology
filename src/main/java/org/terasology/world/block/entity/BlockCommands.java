@@ -271,7 +271,7 @@ public class BlockCommands implements ComponentSystem {
             return builder.toString();
         }
 
-        BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).toSimpleString());
+        BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.MODULE_SEPARATOR + resolvedShapeUris.get(0).toSimpleString());
         if (blockUri.isValid()) {
             return giveBlock(blockManager.getBlockFamily(blockUri), quantity, client);
         }
@@ -331,7 +331,7 @@ public class BlockCommands implements ComponentSystem {
         return matches;
     }
 
-    private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {
+    private <T extends Comparable<? super T>> List<T> sortItems(Iterable<T> items) {
         List<T> result = Lists.newArrayList();
         for (T item : items) {
             result.add(item);

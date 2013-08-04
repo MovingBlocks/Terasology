@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -44,12 +44,12 @@ public class RegisterBlockFamilyFactories implements LoadProcess {
     @Override
     public boolean step() {
         DefaultBlockFamilyFactoryRegistry registry = new DefaultBlockFamilyFactoryRegistry();
-        ModManager modManager = CoreRegistry.get(ModManager.class);
+        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
-        loadFamilies(registry, modManager.getEngineReflections());
-        for (Mod mod : modManager.getActiveMods()) {
-            if (mod.isCodeMod()) {
-                loadFamilies(registry, mod.getReflections());
+        loadFamilies(registry, moduleManager.getEngineReflections());
+        for (Module module : moduleManager.getActiveMods()) {
+            if (module.isCodeMod()) {
+                loadFamilies(registry, module.getReflections());
             }
         }
 

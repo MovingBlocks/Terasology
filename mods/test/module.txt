@@ -1,0 +1,5 @@
+{
+    "id" : "TestMod",
+    "displayName" : "Example Mod",
+    "description" : "This module contains a number of assets for testing Terasology engine features"
+}

@@ -74,10 +74,10 @@ public final class TerasologyApplet extends Applet {
                         writeChannel.write(buffer);
                     }
                 } catch (IOException e) {
-                    logger.error("Unable to obtain mod '{}'", mod, e);
+                    logger.error("Unable to obtain module '{}'", mod, e);
                 }
             } catch (MalformedURLException e) {
-                logger.error("Unable to obtain mod '{}'", mod, e);
+                logger.error("Unable to obtain module '{}'", mod, e);
             }
 
 

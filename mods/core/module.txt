@@ -1,0 +1,5 @@
+{
+    "id" : "core",
+    "displayName" : "Core Gameplay",
+    "description" : "This module introduces the core Terasology mechanics"
+}

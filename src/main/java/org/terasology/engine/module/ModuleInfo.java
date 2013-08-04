@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.mod;
+package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 
 /**
- * Information on a mod
+ * Information on a module
  *
  * @author Immortius
  */
-public class ModInfo {
+public class ModuleInfo {
     private String id;
     private String displayName;
     private String description;
@@ -64,7 +64,7 @@ public class ModInfo {
     }
 
     /**
-     * @return Whether this mod is only required server-side
+     * @return Whether this module is only required server-side
      */
     public boolean isServersideOnly() {
         return serversideOnly;

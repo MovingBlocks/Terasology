@@ -43,6 +43,7 @@ import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
+import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityChangeSubscriber;
@@ -60,8 +61,7 @@ import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
@@ -737,9 +737,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             worldInfoBuilder.setTitle(world.getTitle());
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }
-        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-            if (!mod.getModInfo().isServersideOnly()) {
-                serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
+        for (Module module : CoreRegistry.get(ModuleManager.class).getActiveMods()) {
+            if (!module.getModuleInfo().isServersideOnly()) {
+                serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(module.getModuleInfo().getId()).build());
             }
         }
         for (Map.Entry<String, Short> blockMapping : blockManager.getBlockIdMap().entrySet()) {

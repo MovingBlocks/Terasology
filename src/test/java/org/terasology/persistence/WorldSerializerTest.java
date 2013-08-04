@@ -3,6 +3,7 @@ package org.terasology.persistence;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.persistence.serializers.WorldSerializer;
@@ -11,7 +12,6 @@ import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.EntityData;
 
@@ -25,18 +25,18 @@ public class WorldSerializerTest {
 
     private EngineEntityManager entityManager;
     private WorldSerializer worldSerializer;
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager();
+        moduleManager = new ModuleManager();
     }
 
     @Before
     public void setup() {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(modManager, mock(NetworkSystem.class));
+        entityManager = builder.build(moduleManager, mock(NetworkSystem.class));
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);

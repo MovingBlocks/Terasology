@@ -39,11 +39,11 @@ ext {
     dirNatives = 'natives'
     dirSaves = 'saves'
     subDirLibs = 'libs'
-    subDirMods = 'mods'
+    subDirModules = 'mods'
     destDirApplet = 'distributions/applet'
     destDirApplication = 'distributions/application'
     destDirMainOutput = 'mainOutput'
-    destDirMods = "distributions/$subDirMods"
+    destDirModules = "distributions/$subDirModules"
     mainClassName = 'org.terasology.engine.Terasology'
 	mainClassNameEditor = 'org.terasology.editor.TeraEd'
     jarFileName = 'Terasology.jar'
@@ -209,20 +209,20 @@ test {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Mods
+// Modules
 //
-// Configuration around the creation and inclusion of mods
+// Configuration around the creation and inclusion of modules
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 subprojects {
-    // Ignore the actual "mods" directory as it itself is not a mod
+    // Ignore the actual "mods" directory as it itself is not a module
     if (name != 'mods') {
-        // Each mod gets set up as Java and prepped for being turned into an Eclipse or IntelliJ project
+        // Each module gets set up as Java and prepped for being turned into an Eclipse or IntelliJ project
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'idea'
         
-        // Change the output dir of each mod to classes, as this is where Terasology will look when loading mods
+        // Change the output dir of each module to classes, as this is where Terasology will look when loading modules
         sourceSets {
             main {
                 java {
@@ -231,7 +231,7 @@ subprojects {
             }
         }
         
-        // Generate the mod directory structure if missing
+        // Generate the module directory structure if missing
         task createSkeleton() {
             mkdir('assets')
             mkdir('assets/animations')
@@ -250,38 +250,38 @@ subprojects {
             mkdir('src/main/java')
             mkdir('src/test/java')
         }
-        // This task syncs everything in the assets dir into the output dir, used when jarring the mod
+        // This task syncs everything in the assets dir into the output dir, used when jarring the module
         task syncAssets(type: Sync) {
             from 'assets'
             into 'classes/assets'
         }
         
-        // This task creates a barebones mod.txt if it is missing, from a template
-        task createModManifest(type: Copy) {
+        // This task creates a barebones module.txt if it is missing, from a template
+        task createModuleManifest(type: Copy) {
             from templatesDir
             into projectDir
-            include 'mod.txt'
+            include 'module.txt'
             expand(id: project.name)
         }
         
-        def modDepends = [];
-        def modFile = file('mod.txt')
-        // If modFile is missing, create it
-        if (!modFile.exists()) {
-            compileJava.dependsOn createModManifest
-            createSkeleton.dependsOn createModManifest
+        def moduleDepends = [];
+        def moduleFile = file('module.txt')
+        // If moduleFile is missing, create it
+        if (!moduleFile.exists()) {
+            compileJava.dependsOn createModuleManifest
+            createSkeleton.dependsOn createModuleManifest
             
         // Otherwise, retrieve dependencies information from it
         } else {
             def slurper = new JsonSlurper()
-            def modConfig = slurper.parseText( file('mod.txt').text)
-            modDepends = modConfig.dependencies;
+            def moduleConfig = slurper.parseText( file('module.txt').text)
+            moduleDepends = moduleConfig.dependencies;
         }
         
-        // Jarring needs to copy mod.txt and all the assets into the output
+        // Jarring needs to copy module.txt and all the assets into the output
         jar.doFirst {
             copy {
-                from 'mod.txt'
+                from 'module.txt'
                 into 'classes'
             }
         }
@@ -313,31 +313,31 @@ subprojects {
                 url "http://www.movingblocks.net:8081/artifactory/repo"
             }
         }
-        // Set dependencies. Note that the dependency information from mod.txt is used
+        // Set dependencies. Note that the dependency information from module.txt is used
         dependencies {
             compile project(':')
             testCompile group: 'junit', name: 'junit', version: '4.10'
-            for (dependency in modDepends) {
+            for (dependency in moduleDepends) {
                 compile project(':mods:' + dependency)
             }
         }
     }
 }
 
-task modClasses {
-    description = "Compile all mods"
+task moduleClasses {
+    description = "Compile all modules"
     subprojects.each { project -> 
         if (project.name != 'mods') {
-            modClasses.dependsOn project.tasks['classes']
+            moduleClasses.dependsOn project.tasks['classes']
         }
     }    
 }
 
-task modAssemble {
-    description = "Assembles all mods"
+task moduleAssemble {
+    description = "Assembles all modules"
     subprojects.each { project -> 
         if (project.name != 'mods') {
-            modAssemble.dependsOn project.tasks['assemble']
+            moduleAssemble.dependsOn project.tasks['assemble']
         }
     }    
 }
@@ -374,7 +374,7 @@ task run(type:JavaExec) {
 
     dependsOn extractNatives
     dependsOn assembleMainOutput
-    dependsOn modClasses
+    dependsOn moduleClasses
     main = mainClassName
     classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
@@ -385,7 +385,7 @@ task runTeraEd(type:JavaExec) {
 
     dependsOn extractNatives
     dependsOn assembleMainOutput
-    dependsOn modClasses
+    dependsOn moduleClasses
     main = mainClassNameEditor
     classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
@@ -454,16 +454,16 @@ task createVersionFile(type: Copy) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Distributions
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-task distMods {
-    description = "Prepares the mods for distribution"
-    dependsOn modAssemble
+task distModules {
+    description = "Prepares the modules for distribution"
+    dependsOn moduleAssemble
     subprojects.each { project -> 
         if (project.name != 'mods') {
             project.task('dist', type: Copy) {
                 from (project.libsDir)
-                into "$buildDir/$destDirMods"
+                into "$buildDir/$destDirModules"
             }
-            distMods.dependsOn project.tasks['dist']
+            distModules.dependsOn project.tasks['dist']
         }
     }
 }
@@ -471,7 +471,7 @@ task distMods {
 task distApplication(type:Sync) {
     description = "Creates an Application folder"
     dependsOn extractNatives
-    dependsOn distMods
+    dependsOn distModules
     into("$buildDir/$destDirApplication")
     from ('Heightmap.txt') {}
     from ('README.markdown') {
@@ -494,8 +494,8 @@ task distApplication(type:Sync) {
     into(dirNatives) {
         from dirNatives
     }
-    into(subDirMods) {
-        from "$buildDir/$destDirMods"
+    into(subDirModules) {
+        from "$buildDir/$destDirModules"
     }
 }
 
@@ -529,8 +529,8 @@ task syncIntoApplet(type:Sync) {
         from configurations.runtime
         from configurations.natives
     }
-    into(subDirMods) {
-        from "$buildDir/$destDirMods"
+    into(subDirModules) {
+        from "$buildDir/$destDirModules"
     }
 }
 
@@ -540,21 +540,21 @@ task createIndexHtml(type:Copy) {
     configurations.runtime.each {
         jars += 'lib/' + it.getName()
     }
-    def mods = []
+    def modules = []
     subprojects.each { project -> 
         if (project.name != 'mods') {
-            mods += project.name + '.jar'
+            modules += project.name + '.jar'
         }
     }
     from(dirApplet)
     into("$buildDir/$destDirApplet")
     include 'index.html'
-    expand(lwjglVersion: LWJGL_VERSION, jinputVersion : JINPUT_VERSION, jars : jars.join(", "), mods : mods.join(", "))
+    expand(lwjglVersion: LWJGL_VERSION, jinputVersion : JINPUT_VERSION, jars : jars.join(", "), modules : modules.join(", "))
 }
 
 task distApplet {
     description = "Creates an Applet folder"
-    dependsOn distMods    
+    dependsOn distModules
     dependsOn syncIntoApplet
     dependsOn createIndexHtml    
 }
@@ -575,11 +575,11 @@ distApplet.doLast {
     }
 }
 
-task distModsZip(type:Zip) {
-    description = "Creates a MODs ZIP file from '$buildDir/$destDirMods'"
-    dependsOn distMods
+task distModulesZip(type:Zip) {
+    description = "Creates a modules ZIP file from '$buildDir/$destDirModules'"
+    dependsOn distModules
     appendix 'Mods'
-    from "$buildDir/$destDirMods"
+    from "$buildDir/$destDirModules"
 }
 
 task distApplicationZip(type:Zip) {

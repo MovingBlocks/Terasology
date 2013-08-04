@@ -21,13 +21,13 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -67,7 +67,7 @@ public class StateMainMenu implements GameState {
     public void init(GameEngine gameEngine) {
 
         //lets get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), CoreRegistry.get(NetworkSystem.class));
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), CoreRegistry.get(NetworkSystem.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
 
         guiManager = CoreRegistry.get(GUIManager.class);

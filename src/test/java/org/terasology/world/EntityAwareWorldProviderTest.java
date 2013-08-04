@@ -49,7 +49,7 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
@@ -84,7 +84,7 @@ public class EntityAwareWorldProviderTest {
 
     private EntityAwareWorldProvider worldProvider;
     private EngineEntityManager entityManager;
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
     private BlockManagerImpl blockManager;
     private WorldProviderCoreStub worldStub;
 
@@ -97,7 +97,7 @@ public class EntityAwareWorldProviderTest {
 
     @BeforeClass
     public static void commonSetup() {
-        modManager = new ModManager();
+        moduleManager = new ModuleManager();
     }
 
     @Before
@@ -109,7 +109,7 @@ public class EntityAwareWorldProviderTest {
         blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry()));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = builder.build(modManager, networkSystem);
+        entityManager = builder.build(moduleManager, networkSystem);
         PrefabManager prefabManager = entityManager.getPrefabManager();
         worldStub = new WorldProviderCoreStub(BlockManager.getAir());
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);

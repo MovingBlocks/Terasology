@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.mod;
+package org.terasology.engine.module;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -56,16 +56,16 @@ import java.util.zip.ZipFile;
  *
  * @author Immortius
  */
-public class ModManager {
+public class ModuleManager {
 
     public static final String ENGINE_PACKAGE = "engine";
 
     public static final String ASSETS_SUBDIRECTORY = "assets";
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
 
-    private static final Logger logger = LoggerFactory.getLogger(ModManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
 
-    private Map<String, Mod> mods = Maps.newHashMap();
+    private Map<String, Module> mods = Maps.newHashMap();
     private URLClassLoader activeModClassLoader;
     private URLClassLoader allModClassLoader;
 
@@ -75,11 +75,11 @@ public class ModManager {
 
     private ClassLoader[] engineClassLoaders;
 
-    public ModManager() {
-        this(ModManager.class.getClassLoader());
+    public ModuleManager() {
+        this(ModuleManager.class.getClassLoader());
     }
 
-    private ModManager(ClassLoader... engineClassLoaders) {
+    private ModuleManager(ClassLoader... engineClassLoaders) {
         this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
 
         ConfigurationBuilder builder = new ConfigurationBuilder()
@@ -114,9 +114,9 @@ public class ModManager {
     public Reflections getAllReflections() {
         if (allReflections == null) {
             List<URL> urls = Lists.newArrayList();
-            for (Mod mod : getMods()) {
-                if (mod.isCodeMod()) {
-                    urls.add(mod.getModClasspathUrl());
+            for (Module module : getMods()) {
+                if (module.isCodeMod()) {
+                    urls.add(module.getModClasspathUrl());
                 }
             }
 
@@ -129,9 +129,9 @@ public class ModManager {
             }
             allReflections = new Reflections(builder);
             allReflections.merge(getEngineReflections());
-            for (Mod mod : getMods()) {
-                if (mod.isCodeMod()) {
-                    allReflections.merge(mod.getReflections());
+            for (Module module : getMods()) {
+                if (module.isCodeMod()) {
+                    allReflections.merge(module.getReflections());
                 }
             }
         }
@@ -139,7 +139,7 @@ public class ModManager {
     }
 
     /**
-     * Rescans for mods.  This should not be done while a game is running, as it drops the mod classloader.
+     * Rescans for mods.  This should not be done while a game is running, as it drops the module classloader.
      */
     public void refresh() {
         mods.clear();
@@ -149,24 +149,24 @@ public class ModManager {
             // Directories first (they should override zips)
             try {
                 for (Path modPath : Files.newDirectoryStream(rootModPath, FilesUtil.DIRECTORY_FILTER)) {
-                    Path modInfoFile = modPath.resolve("mod.txt");
+                    Path modInfoFile = modPath.resolve("module.txt");
                     if (Files.isRegularFile(modInfoFile)) {
                         try (Reader reader = Files.newBufferedReader(modInfoFile, TerasologyConstants.CHARSET)) {
-                            ModInfo modInfo = gson.fromJson(reader, ModInfo.class);
-                            if (!mods.containsKey(modInfo.getId().toLowerCase(Locale.ENGLISH))) {
+                            ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
+                            if (!mods.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
                                 Path assetLocation = modPath.resolve(ASSETS_SUBDIRECTORY);
                                 Path overridesLocation = modPath.resolve(OVERRIDES_SUBDIRECTORY);
-                                AssetSource source = new DirectorySource(modInfo.getId(), assetLocation, overridesLocation);
-                                Mod mod = new Mod(modPath, modInfo, source);
-                                mods.put(modInfo.getId().toLowerCase(Locale.ENGLISH), mod);
-                                logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
+                                AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
+                                Module module = new Module(modPath, moduleInfo, source);
+                                mods.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
+                                logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeMod());
                             } else {
-                                logger.info("Discovered duplicate mod: {}, skipping", modInfo.getDisplayName());
+                                logger.info("Discovered duplicate module: {}, skipping", moduleInfo.getDisplayName());
                             }
                         } catch (FileNotFoundException e) {
-                            logger.warn("Failed to load mod manifest for mod at {}", modPath, e);
+                            logger.warn("Failed to load module manifest for module at {}", modPath, e);
                         } catch (JsonIOException e) {
-                            logger.warn("Failed to load mod manifest for mod at {}", modPath, e);
+                            logger.warn("Failed to load module manifest for module at {}", modPath, e);
                         }
                     }
                 }
@@ -183,25 +183,25 @@ public class ModManager {
                     }
                 })) {
                     try (ZipFile zipFile = new ZipFile(modPath.toFile())) {
-                        ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
+                        ZipEntry modInfoEntry = zipFile.getEntry("module.txt");
                         if (modInfoEntry != null) {
                             try {
-                                ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
-                                if (!mods.containsKey(modInfo.getId().toLowerCase(Locale.ENGLISH))) {
-                                    Mod mod = new Mod(modPath, modInfo, new ArchiveSource(modInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
-                                    mods.put(modInfo.getId().toLowerCase(Locale.ENGLISH), mod);
-                                    logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
+                                ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
+                                if (!mods.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
+                                    Module module = new Module(modPath, moduleInfo, new ArchiveSource(moduleInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
+                                    mods.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
+                                    logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeMod());
                                 } else {
-                                    logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
+                                    logger.info("Discovered duplicate module: " + moduleInfo.getDisplayName() + ", skipping");
                                 }
                             } catch (FileNotFoundException e) {
-                                logger.warn("Failed to load mod manifest for mod at {}", modPath, e);
+                                logger.warn("Failed to load module manifest for module at {}", modPath, e);
                             } catch (JsonIOException e) {
-                                logger.warn("Failed to load mod manifest for mod at {}", modPath, e);
+                                logger.warn("Failed to load module manifest for module at {}", modPath, e);
                             }
                         }
                     } catch (IOException e) {
-                        logger.error("Invalid mod file: {}", modPath, e);
+                        logger.error("Invalid module file: {}", modPath, e);
                     }
                 }
             } catch (IOException e) {
@@ -209,9 +209,9 @@ public class ModManager {
             }
         }
         List<URL> urls = Lists.newArrayList();
-        for (Mod mod : getMods()) {
-            if (mod.isCodeMod()) {
-                urls.add(mod.getModClasspathUrl());
+        for (Module module : getMods()) {
+            if (module.isCodeMod()) {
+                urls.add(module.getModClasspathUrl());
             }
         }
         if (allModClassLoader != null) {
@@ -222,8 +222,8 @@ public class ModManager {
             }
         }
         allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
-        for (Mod mod : getMods()) {
-            mod.setInactiveClassLoader(allModClassLoader);
+        for (Module module : getMods()) {
+            module.setInactiveClassLoader(allModClassLoader);
         }
 
         if (activeModClassLoader != null) {
@@ -238,9 +238,9 @@ public class ModManager {
 
     public void applyActiveMods() {
         List<URL> urls = Lists.newArrayList();
-        for (Mod mod : getActiveMods()) {
-            if (mod.isCodeMod()) {
-                urls.add(mod.getModClasspathUrl());
+        for (Module module : getActiveMods()) {
+            if (module.isCodeMod()) {
+                urls.add(module.getModClasspathUrl());
             }
         }
         if (activeModClassLoader != null) {
@@ -251,34 +251,34 @@ public class ModManager {
             }
         }
         activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
-        for (Mod mod : getActiveMods()) {
-            mod.setActiveClassLoader(activeModClassLoader);
+        for (Module module : getActiveMods()) {
+            module.setActiveClassLoader(activeModClassLoader);
         }
         // We don't submit any urls as we don't want to scan (going to merge in from previous scans)
         activeModReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModClassLoader));
         activeModReflections.merge(getEngineReflections());
-        for (Mod mod : getActiveMods()) {
-            if (mod.isCodeMod()) {
-                activeModReflections.merge(mod.getReflections());
+        for (Module module : getActiveMods()) {
+            if (module.isCodeMod()) {
+                activeModReflections.merge(module.getReflections());
             }
         }
     }
 
-    public Collection<Mod> getMods() {
+    public Collection<Module> getMods() {
         return mods.values();
     }
 
-    public Mod getMod(String modName) {
+    public Module getMod(String modName) {
         return mods.get(modName.toLowerCase(Locale.ENGLISH));
     }
 
-    public Iterable<Mod> getActiveMods() {
-        List<Mod> activeMods = Lists.newArrayListWithCapacity(mods.size());
-        for (Mod mod : mods.values()) {
-            if (mod.isEnabled()) {
-                activeMods.add(mod);
+    public Iterable<Module> getActiveMods() {
+        List<Module> activeModules = Lists.newArrayListWithCapacity(mods.size());
+        for (Module module : mods.values()) {
+            if (module.isEnabled()) {
+                activeModules.add(module);
             }
         }
-        return activeMods;
+        return activeModules;
     }
 }

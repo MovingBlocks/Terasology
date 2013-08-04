@@ -20,6 +20,7 @@ import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.DoNotAutoRegister;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -50,8 +51,7 @@ import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.Module;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
@@ -74,7 +74,7 @@ import java.util.Set;
  */
 public class EntitySystemBuilder {
 
-    public EngineEntityManager build(ModManager modManager, NetworkSystem networkSystem) {
+    public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem) {
         PojoEntityManager entityManager = new PojoEntityManager();
         TypeHandlerLibrary typeHandlerLibrary = buildTypeLibrary(entityManager);
         EntitySystemLibrary library = new EntitySystemLibraryImpl(typeHandlerLibrary);
@@ -91,8 +91,8 @@ public class EntitySystemBuilder {
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 
-        registerComponents(library.getComponentLibrary(), modManager);
-        registerEvents(entityManager.getEventSystem(), modManager);
+        registerComponents(library.getComponentLibrary(), moduleManager);
+        registerEvents(entityManager.getEventSystem(), moduleManager);
         return entityManager;
     }
 
@@ -118,8 +118,8 @@ public class EntitySystemBuilder {
                 .build();
     }
 
-    private void registerComponents(ComponentLibrary library, ModManager modManager) {
-        Reflections reflections = modManager.getActiveModReflections();
+    private void registerComponents(ComponentLibrary library, ModuleManager moduleManager) {
+        Reflections reflections = moduleManager.getActiveModReflections();
 
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
@@ -129,11 +129,11 @@ public class EntitySystemBuilder {
         }
     }
 
-    private void registerEvents(EventSystem eventSystem, ModManager modManager) {
-        registerEvents(ModManager.ENGINE_PACKAGE, eventSystem, modManager.getEngineReflections());
-        for (Mod mod : modManager.getActiveMods()) {
-            if (mod.isCodeMod()) {
-                registerEvents(mod.getModInfo().getId(), eventSystem, mod.getReflections());
+    private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
+        registerEvents(ModuleManager.ENGINE_PACKAGE, eventSystem, moduleManager.getEngineReflections());
+        for (Module module : moduleManager.getActiveMods()) {
+            if (module.isCodeMod()) {
+                registerEvents(module.getModuleInfo().getId(), eventSystem, module.getReflections());
             }
         }
     }

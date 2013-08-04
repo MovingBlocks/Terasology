@@ -8,6 +8,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
@@ -19,7 +20,6 @@ import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
@@ -37,19 +37,19 @@ public class EntitySerializerTest {
     private ComponentLibrary componentLibrary;
     private EngineEntityManager entityManager;
     private EntitySerializer entitySerializer;
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
     private Prefab prefab;
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager();
+        moduleManager = new ModuleManager();
     }
 
     @Before
     public void setup() {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(modManager, mock(NetworkSystem.class));
+        entityManager = builder.build(moduleManager, mock(NetworkSystem.class));
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);

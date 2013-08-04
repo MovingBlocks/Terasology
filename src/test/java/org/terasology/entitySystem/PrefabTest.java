@@ -11,11 +11,11 @@ import org.terasology.asset.Assets;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 
@@ -38,16 +38,16 @@ public class PrefabTest {
 
     @Before
     public void setup() throws Exception {
-        ModManager modManager = new ModManager();
-        modManager.applyActiveMods();
-        CoreRegistry.put(ModManager.class, modManager);
+        ModuleManager moduleManager = new ModuleManager();
+        moduleManager.applyActiveMods();
+        CoreRegistry.put(ModuleManager.class, moduleManager);
         AssetType.registerAssetTypes();
         URL url = getClass().getClassLoader().getResource("testResources");
         url = new URL(url.toString().substring(0, url.toString().length() - "testResources".length() - 1));
-        AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", url, ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+        AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", url, ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        EntityManager em = new EntitySystemBuilder().build(modManager, networkSystem);
+        EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem);
         prefabManager = new PojoPrefabManager(em.getComponentLibrary());
 
         for (AssetUri prefabUri : AssetManager.getInstance().listAssets(AssetType.PREFAB)) {

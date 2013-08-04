@@ -2,5 +2,5 @@
     "id" : "minerals",
     "displayName" : "Metouto's Mineral Pack",
     "author" : "Metouto",
-    "description" : "This mod adds a wide range of minerals."
+    "description" : "This module adds a wide range of minerals."
 }

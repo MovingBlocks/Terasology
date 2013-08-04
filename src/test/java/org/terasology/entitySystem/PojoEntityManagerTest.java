@@ -22,7 +22,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkSystem;
 
 import java.util.Collections;
@@ -42,21 +42,21 @@ import static org.mockito.Mockito.verify;
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityManagerTest {
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
 
     private PojoEntityManager entityManager;
     private Prefab prefab;
 
     @BeforeClass
     public static void setupClass() {
-        modManager = new ModManager();
+        moduleManager = new ModuleManager();
     }
 
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = (PojoEntityManager) builder.build(modManager, mock(NetworkSystem.class));
+        entityManager = (PojoEntityManager) builder.build(moduleManager, mock(NetworkSystem.class));
 
         PrefabManager prefabManager = entityManager.getPrefabManager();
         PrefabData protoPrefab = new PrefabData();

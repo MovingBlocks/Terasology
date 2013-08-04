@@ -22,9 +22,9 @@ import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.Module;
 import org.terasology.persistence.StorageManager;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.family.BlockFamily;
@@ -67,8 +67,8 @@ public class Game {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
             ModConfig modConfig = new ModConfig();
-            for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-                modConfig.addMod(mod.getModInfo().getId());
+            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveMods()) {
+                modConfig.addMod(module.getModuleInfo().getId());
             }
 
             GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), modConfig);

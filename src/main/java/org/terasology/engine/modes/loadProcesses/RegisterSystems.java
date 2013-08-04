@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkMode;
 
 import java.util.Locale;
@@ -36,7 +36,7 @@ public class RegisterSystems implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterSystems.class);
     private NetworkMode netMode;
     private Set<String> registeredMods = Sets.newHashSet();
-    private ModManager modManager;
+    private ModuleManager moduleManager;
     private ComponentSystemManager componentSystemManager;
 
     public RegisterSystems(NetworkMode netMode) {
@@ -51,29 +51,29 @@ public class RegisterSystems implements LoadProcess {
     @Override
     public boolean step() {
         componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        modManager = CoreRegistry.get(ModManager.class);
+        moduleManager = CoreRegistry.get(ModuleManager.class);
 
-        componentSystemManager.loadSystems(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections(), netMode);
-        for (Mod mod : modManager.getActiveMods()) {
-            if (!registeredMods.contains(mod.getModInfo().getId().toLowerCase(Locale.ENGLISH))) {
-                loadMod(mod);
+        componentSystemManager.loadSystems(ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections(), netMode);
+        for (Module module : moduleManager.getActiveMods()) {
+            if (!registeredMods.contains(module.getModuleInfo().getId().toLowerCase(Locale.ENGLISH))) {
+                loadMod(module);
             }
         }
         return true;
     }
 
-    private void loadMod(Mod mod) {
-        logger.debug("Loading {}", mod.getModInfo().getId());
-        for (String dependency : mod.getModInfo().getDependencies()) {
+    private void loadMod(Module module) {
+        logger.debug("Loading {}", module.getModuleInfo().getId());
+        for (String dependency : module.getModuleInfo().getDependencies()) {
             if (!registeredMods.contains(dependency.toLowerCase(Locale.ENGLISH))) {
                 logger.debug("Requesting {} due to dependency", dependency);
-                loadMod(modManager.getMod(dependency));
+                loadMod(moduleManager.getMod(dependency));
             }
         }
-        if (mod.isCodeMod()) {
-            componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections(), netMode);
+        if (module.isCodeMod()) {
+            componentSystemManager.loadSystems(module.getModuleInfo().getId(), module.getReflections(), netMode);
         }
-        registeredMods.add(mod.getModInfo().getId().toLowerCase(Locale.ENGLISH));
+        registeredMods.add(module.getModuleInfo().getId().toLowerCase(Locale.ENGLISH));
     }
 
     @Override

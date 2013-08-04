@@ -42,9 +42,9 @@ import org.terasology.engine.Terasology;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
@@ -99,7 +99,7 @@ public abstract class TerasologyTestingEnvironment {
     private static Config config;
     private static AudioManager audioManager;
     private static CollisionGroupManager collisionGroupManager;
-    private static ModManager modManager;
+    private static ModuleManager moduleManager;
     private static NetworkSystem networkSystem;
     private ComponentSystemManager componentSystemManager;
     private EngineTime mockTime;
@@ -113,12 +113,12 @@ public abstract class TerasologyTestingEnvironment {
             setup = true;
             bindLwjgl();
 
-            modManager = new ModManager();
-            modManager.applyActiveMods();
-            CoreRegistry.put(ModManager.class, modManager);
+            moduleManager = new ModuleManager();
+            moduleManager.applyActiveMods();
+            CoreRegistry.put(ModuleManager.class, moduleManager);
             AssetType.registerAssetTypes();
-            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
-            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
+            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModuleManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
 
             config = new Config();
             CoreRegistry.put(Config.class, config);
@@ -188,7 +188,7 @@ public abstract class TerasologyTestingEnvironment {
             CoreRegistry.put(Config.class, config);
             CoreRegistry.put(AudioManager.class, audioManager);
             CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
-            CoreRegistry.put(ModManager.class, modManager);
+            CoreRegistry.put(ModuleManager.class, moduleManager);
         }
         PathManager.getInstance().setCurrentSaveTitle("world1");
     }
@@ -199,7 +199,7 @@ public abstract class TerasologyTestingEnvironment {
         CoreRegistry.put(Time.class, mockTime);
         networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
-        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModManager.class), networkSystem);
+        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem);
         CoreRegistry.put(StorageManager.class, new StorageManagerInternal(engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();

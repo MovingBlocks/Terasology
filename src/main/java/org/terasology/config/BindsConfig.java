@@ -29,13 +29,13 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.lwjgl.input.Keyboard;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.input.events.ButtonEvent;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -158,12 +158,12 @@ public final class BindsConfig {
      * @return A new BindsConfig, with inputs set from the DefaultBinding annotations on bind classes
      */
     public static BindsConfig createDefault() {
-        ModManager modManager = CoreRegistry.get(ModManager.class);
+        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         BindsConfig config = new BindsConfig();
-        config.addDefaultsFor(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
-        for (Mod mod : modManager.getMods()) {
-            if (mod.isCodeMod()) {
-                config.addDefaultsFor(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        config.addDefaultsFor(ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        for (Module module : moduleManager.getMods()) {
+            if (module.isCodeMod()) {
+                config.addDefaultsFor(module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
         return config;
@@ -173,17 +173,17 @@ public final class BindsConfig {
      * Updates a config with any binds that it may be missing, through reflection over RegisterBindButton annotations
      */
     public void updateForChangedMods() {
-        ModManager modManager = CoreRegistry.get(ModManager.class);
-        updateInputsFor(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
-        for (Mod mod : modManager.getMods()) {
-            if (mod.isCodeMod()) {
-                updateInputsFor(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        updateInputsFor(ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        for (Module module : moduleManager.getMods()) {
+            if (module.isCodeMod()) {
+                updateInputsFor(module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {
-            if (!hasBinds(ModManager.ENGINE_PACKAGE, "toolbarSlot" + i)) {
-                setBinds(ModManager.ENGINE_PACKAGE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
+            if (!hasBinds(ModuleManager.ENGINE_PACKAGE, "toolbarSlot" + i)) {
+                setBinds(ModuleManager.ENGINE_PACKAGE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
             }
         }
     }
@@ -208,7 +208,7 @@ public final class BindsConfig {
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {
-            setBinds(ModManager.ENGINE_PACKAGE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
+            setBinds(ModuleManager.ENGINE_PACKAGE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
         }
     }
 
