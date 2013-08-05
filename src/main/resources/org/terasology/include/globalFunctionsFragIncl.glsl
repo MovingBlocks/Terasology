@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const float PI_TIMES_8 = 8.0 * PI;
-
 float linDepth(float depth) {
     return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }
@@ -48,6 +46,8 @@ float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
 }
 
 float calcSpecLightNormalized(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
+    const float PI_TIMES_8 = 8.0 * PI;
+
     vec3 halfWay = normalize(eyeVec+lightVec);
     return clamp(((exp + 8.0) / PI_TIMES_8) * pow(dot(halfWay, normal), exp), 0.0, 1.0);
 }
