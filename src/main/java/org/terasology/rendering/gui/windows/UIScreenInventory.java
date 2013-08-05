@@ -67,9 +67,7 @@ public class UIScreenInventory extends UIWindow {
 
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
-                if (button == 0) {
-                    //TODO drop item
-                }
+                // TODO: drop item
             }
         });
 
@@ -168,10 +166,18 @@ public class UIScreenInventory extends UIWindow {
 //                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 //                LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
 //                BlockPickupFactory droppedBlockFactory = new BlockPickupFactory(entityManager);
-//                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
+//                Vector3f pos = new Vector3f(
+//                        localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f,
+//                        localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f,
+//                        localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f);
+//                EntityRef droppedBlock = droppedBlockFactory.newInstance(pos, blockItem.blockFamily, 20);
 //
 //                for (int i = 0; i < itemComp.stackCount; i++) {
-//                    droppedBlock.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x * dropPower, localPlayer.getViewDirection().y * dropPower, localPlayer.getViewDirection().z * dropPower)));
+//                    Vector3f impulse = new Vector3f(
+//                            localPlayer.getViewDirection().x * dropPower,
+//                            localPlayer.getViewDirection().y * dropPower,
+//                            localPlayer.getViewDirection().z * dropPower);
+//                    droppedBlock.send(new ImpulseEvent(impulse));
 //                }
 //
 //                localPlayerComp.handAnimation = 0.5f;

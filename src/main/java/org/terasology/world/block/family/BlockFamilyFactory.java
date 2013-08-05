@@ -29,6 +29,6 @@ public interface BlockFamilyFactory {
      * @param blockDefJson
      * @return
      */
-    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson);
+    BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson);
 
 }

@@ -21,5 +21,5 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public interface ChangedListener {
-    public void changed(UIDisplayElement element);
+    void changed(UIDisplayElement element);
 }

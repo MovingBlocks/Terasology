@@ -21,11 +21,11 @@ import org.terasology.math.AABB;
 
 public interface Mesh extends Asset<MeshData> {
 
-    public static final int VERTEX_SIZE = 3;
-    public static final int TEX_COORD_0_SIZE = 2;
-    public static final int TEX_COORD_1_SIZE = 3;
-    public static final int COLOR_SIZE = 4;
-    public static final int NORMAL_SIZE = 3;
+    int VERTEX_SIZE = 3;
+    int TEX_COORD_0_SIZE = 2;
+    int TEX_COORD_1_SIZE = 3;
+    int COLOR_SIZE = 4;
+    int NORMAL_SIZE = 3;
 
     AABB getAABB();
 

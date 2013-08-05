@@ -32,7 +32,7 @@ public interface GeneratingChunkProvider {
      * @param pos
      * @return Whether this chunk is available and ready for use
      */
-    public boolean isChunkReady(Vector3i pos);
+    boolean isChunkReady(Vector3i pos);
 
     /**
      * Obtains a chunk for pipeline processing. This should happen regardless of the state of the chunk.

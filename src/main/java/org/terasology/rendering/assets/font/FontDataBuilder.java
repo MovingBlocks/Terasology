@@ -106,7 +106,8 @@ public class FontDataBuilder {
 
     public FontDataBuilder endCharacter() {
         Texture page = pages.get(characterPage);
-        FontCharacter character = new FontCharacter(((float) characterX / page.getWidth()), ((float) characterY / page.getHeight()), characterWidth, characterHeight, characterXOffset, characterYOffset, characterXAdvance, page);
+        FontCharacter character = new FontCharacter(((float) characterX / page.getWidth()), ((float) characterY / page.getHeight()),
+                characterWidth, characterHeight, characterXOffset, characterYOffset, characterXAdvance, page);
         characters.put(characterId, character);
         return this;
     }

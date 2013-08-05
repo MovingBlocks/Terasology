@@ -370,7 +370,8 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
 
         if (!success) {
-            String errorMessage = debugShaderType + " Shader '" + getURI() + "' failed to compile. Terasology might not look quite as good as it should now...\n\n" + error + "\n\n" + errorLine;
+            String errorMessage = debugShaderType + " Shader '" + getURI() + "' failed to compile. Terasology might not look quite as good as it should now...\n\n"
+                    + error + "\n\n" + errorLine;
 
             logger.error(errorMessage);
             JOptionPane.showMessageDialog(null, errorMessage, "Shader compilation error", JOptionPane.ERROR_MESSAGE);

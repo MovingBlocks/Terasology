@@ -32,10 +32,10 @@ public @interface Replicate {
     /**
      * @return Under what condition the field should be replicated
      */
-    public FieldReplicateType value() default FieldReplicateType.SERVER_TO_CLIENT;
+    FieldReplicateType value() default FieldReplicateType.SERVER_TO_CLIENT;
 
     /**
      * @return Whether the field should only be replicated when the entity initially becomes relevant to a client
      */
-    public boolean initialOnly() default false;
+    boolean initialOnly() default false;
 }

@@ -135,7 +135,8 @@ public class NetworkEntitySerializer {
         return entity;
     }
 
-    private void serializeComponentDelta(Component oldComponent, Component newComponent, FieldSerializeCheck<Component> fieldCheck, EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
+    private void serializeComponentDelta(Component oldComponent, Component newComponent, FieldSerializeCheck<Component> fieldCheck,
+                                         EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(oldComponent.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", oldComponent.getClass());
@@ -166,7 +167,8 @@ public class NetworkEntitySerializer {
         }
     }
 
-    private void serializeComponentFull(Component component, boolean ignoreIfNoFields, FieldSerializeCheck<Component> fieldCheck, EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
+    private void serializeComponentFull(Component component, boolean ignoreIfNoFields, FieldSerializeCheck<Component> fieldCheck,
+                                        EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
@@ -259,7 +261,8 @@ public class NetworkEntitySerializer {
     }
 
 
-    public EntityData.PackedEntity serialize(EntityRef entityRef, Set<Class<? extends Component>> added, Set<Class<? extends Component>> changed, Set<Class<? extends Component>> removed, FieldSerializeCheck<Component> fieldCheck) {
+    public EntityData.PackedEntity serialize(EntityRef entityRef, Set<Class<? extends Component>> added, Set<Class<? extends Component>> changed,
+                                             Set<Class<? extends Component>> removed, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.PackedEntity.Builder entity = EntityData.PackedEntity.newBuilder();
 
         ByteString.Output fieldIds = ByteString.newOutput();

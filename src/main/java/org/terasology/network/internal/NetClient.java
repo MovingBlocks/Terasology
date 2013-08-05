@@ -411,7 +411,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 logger.error("Sending non-existent entity update for netId {}", netId);
             }
             boolean isOwner = networkSystem.getOwner(entity) == this;
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId), dirtyComponents.get(netId), removedComponents.get(netId), new ServerComponentFieldCheck(isOwner, false));
+            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId), dirtyComponents.get(netId), removedComponents.get(netId),
+                    new ServerComponentFieldCheck(isOwner, false));
             if (entityData != null) {
                 message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
             }

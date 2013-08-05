@@ -73,7 +73,8 @@ public class ChunkRelevanceRegion {
     }
 
     private void reviewRelevantChunks(int distance) {
-        Region3i retainRegion = Region3i.createFromCenterExtents(center, new Vector3i(TeraMath.ceilToInt(distance / 2.0f) + unloadLeeway, 0, TeraMath.ceilToInt(distance / 2.0f) + unloadLeeway));
+        Vector3i extents = new Vector3i(TeraMath.ceilToInt(distance / 2.0f) + unloadLeeway, 0, TeraMath.ceilToInt(distance / 2.0f) + unloadLeeway);
+        Region3i retainRegion = Region3i.createFromCenterExtents(center, extents);
         Iterator<Vector3i> iter = relevantChunks.iterator();
         while (iter.hasNext()) {
             Vector3i pos = iter.next();
@@ -117,7 +118,8 @@ public class ChunkRelevanceRegion {
     private Region3i calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), new Vector3i(TeraMath.ceilToInt(distance / 2.0f), 0, TeraMath.ceilToInt(distance / 2.0f)));
+            Vector3i extents = new Vector3i(TeraMath.ceilToInt(distance / 2.0f), 0, TeraMath.ceilToInt(distance / 2.0f));
+            return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), extents);
         }
         return Region3i.EMPTY;
     }

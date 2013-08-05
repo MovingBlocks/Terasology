@@ -24,6 +24,6 @@ import org.terasology.world.block.Block;
  */
 public interface WorldChangeListener {
 
-    public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock);
+    void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock);
 
 }

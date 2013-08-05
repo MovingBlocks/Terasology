@@ -64,7 +64,8 @@ import java.util.concurrent.BlockingQueue;
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
 
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
-    private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS = ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class, EntityInfoComponent.class);
+    private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
+            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class, EntityInfoComponent.class);
 
     private EngineEntityManager entityManager;
 
@@ -190,7 +191,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         return false;
     }
 
-    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type, boolean forceEntityUpdate, Set<Class<? extends Component>> retainComponents) {
+    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type,
+                                   boolean forceEntityUpdate, Set<Class<? extends Component>> retainComponents) {
         if (type.isKeepActive()) {
             temporaryBlockEntities.remove(blockEntity);
         } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {

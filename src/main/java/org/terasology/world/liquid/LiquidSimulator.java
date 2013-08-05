@@ -165,7 +165,8 @@ public class LiquidSimulator implements ComponentSystem {
         } else {
             LiquidData currentState = world.getLiquid(event.getBlockPosition());
             if (currentState.getDepth() == 0) {
-                world.setLiquid(event.getBlockPosition(), new LiquidData((water.equals(event.getNewType())) ? LiquidType.WATER : LiquidType.LAVA, MAX_LIQUID_DEPTH), currentState);
+                LiquidData newState = new LiquidData((water.equals(event.getNewType())) ? LiquidType.WATER : LiquidType.LAVA, MAX_LIQUID_DEPTH);
+                world.setLiquid(event.getBlockPosition(), newState, currentState);
             }
 
             for (Side side : Side.values()) {

@@ -20,7 +20,7 @@ package org.terasology.physics;
  * @author Immortius
  */
 public interface CollisionGroup {
-    public short getFlag();
+    short getFlag();
 
-    public String getName();
+    String getName();
 }

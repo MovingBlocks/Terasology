@@ -16,7 +16,6 @@
 
 package org.terasology.world.block.items;
 
-import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -34,7 +33,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -121,7 +119,8 @@ public class BlockItemSystem implements ComponentSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            return !CoreRegistry.get(BulletPhysics.class).scanArea(block.getBounds(blockPos), Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER)).iterator().hasNext();
+            BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
+            return physics.scanArea(block.getBounds(blockPos), StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();
         }
         return true;
     }

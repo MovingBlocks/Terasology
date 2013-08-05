@@ -36,5 +36,5 @@ public @interface BroadcastEvent {
      *
      * @return Whether the event should not be sent to its instigator
      */
-    public boolean skipInstigator() default false;
+    boolean skipInstigator() default false;
 }

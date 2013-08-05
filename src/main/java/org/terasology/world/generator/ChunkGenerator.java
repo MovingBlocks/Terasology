@@ -30,6 +30,6 @@ public interface ChunkGenerator extends BaseChunkGenerator {
      *
      * @param chunk
      */
-    public void generateChunk(Chunk chunk);
+    void generateChunk(Chunk chunk);
 
 }

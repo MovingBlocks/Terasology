@@ -22,7 +22,7 @@ import org.terasology.math.AABB;
  * @author Adeon
  */
 public interface BlockOverlayRenderer {
-    public void setAABB(AABB aabb);
+    void setAABB(AABB aabb);
 
-    public void render(float lineThickness);
+    void render(float lineThickness);
 }

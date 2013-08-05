@@ -21,5 +21,5 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 
 public interface ConnectionCondition {
-    public boolean isConnectingTo(Vector3i blockLocation, Side connectSide, WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry);
+    boolean isConnectingTo(Vector3i blockLocation, Side connectSide, WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry);
 }

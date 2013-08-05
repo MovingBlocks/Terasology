@@ -15,8 +15,9 @@
  */
 package org.terasology.monitoring.impl;
 
-import com.google.common.base.Preconditions;
 import org.terasology.rendering.primitives.ChunkMesh;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ChunkMeshInfo {
 
@@ -27,7 +28,7 @@ public class ChunkMeshInfo {
     public final int totalTimeToGenerateOptimizedBuffers;
 
     public ChunkMeshInfo(ChunkMesh[] mesh) {
-        Preconditions.checkNotNull(mesh, "The parameter 'mesh' must not be null");
+        checkNotNull(mesh, "The parameter 'mesh' must not be null");
 
         int totalFinalVertices = 0;
         int totalFinalIndices = 0;
@@ -35,10 +36,10 @@ public class ChunkMeshInfo {
         int totalTimeToGenerateOptimizedBuffers = 0;
 
         for (int i = 0; i < mesh.length; i++) {
-            final ChunkMesh segment = Preconditions.checkNotNull(mesh[i], "Chunk mesh segment #" + i + " must not be null");
+            final ChunkMesh segment = checkNotNull(mesh[i], "Chunk mesh segment #" + i + " must not be null");
             if (segment.vertexElements != null) {
                 for (int j = 0; j < segment.vertexElements.length; j++) {
-                    final ChunkMesh.VertexElements element = Preconditions.checkNotNull(segment.vertexElements[j], "Vertex element #" + j + " of chunk mesh segment #" + i + " must not be null");
+                    final ChunkMesh.VertexElements element = segment.vertexElements[j];
                     totalFinalVertices += element.finalVertices.limit();
                     totalFinalIndices += element.finalIndices.limit();
                 }

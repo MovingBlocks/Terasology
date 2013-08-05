@@ -60,23 +60,23 @@ public final class Chunks {
         handler = new Chunk.ProtobufHandler();
     }
 
-    public final TeraArrays.Entry getBlockDataEntry() {
+    public TeraArrays.Entry getBlockDataEntry() {
         return blockDataEntry;
     }
 
-    public final TeraArrays.Entry getSunlightDataEntry() {
+    public TeraArrays.Entry getSunlightDataEntry() {
         return sunlightDataEntry;
     }
 
-    public final TeraArrays.Entry getLightDataEntry() {
+    public TeraArrays.Entry getLightDataEntry() {
         return lightDataEntry;
     }
 
-    public final TeraArrays.Entry getExtraDataEntry() {
+    public TeraArrays.Entry getExtraDataEntry() {
         return extraDataEntry;
     }
 
-    public final void registerModData(String id, TeraArrays.Entry entry) {
+    public void registerModData(String id, TeraArrays.Entry entry) {
         Preconditions.checkNotNull(id, "The parameter 'id' must not be null");
         Preconditions.checkArgument(!id.trim().isEmpty(), "The parameter 'id' must not be empty");
         Preconditions.checkNotNull(entry, "The parameter 'entry' must not be null");
@@ -84,11 +84,11 @@ public final class Chunks {
         modDataEntries.put(id, entry);
     }
 
-    public final EntityData.ChunkStore encode(Chunk chunk, boolean coreOnly) {
+    public EntityData.ChunkStore encode(Chunk chunk, boolean coreOnly) {
         return handler.encode(chunk, coreOnly).build();
     }
 
-    public final Chunk decode(EntityData.ChunkStore message) {
+    public Chunk decode(EntityData.ChunkStore message) {
         return handler.decode(message);
     }
 

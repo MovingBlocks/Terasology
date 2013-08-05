@@ -375,7 +375,7 @@ public class EntityDataJSONFormat {
                             try {
                                 byteList.add(element.getAsByte());
                             } catch (NumberFormatException nfe) {
-                                // TODO: Check whether it is a byte in advance
+                                byteList.add((byte)0);
                             }
                         }
                     }
@@ -399,10 +399,11 @@ public class EntityDataJSONFormat {
                 value.addDouble(primitive.getAsDouble());
                 value.addFloat(primitive.getAsFloat());
                 try {
-                    value.addLong(primitive.getAsLong());
                     value.addInteger(primitive.getAsInt());
+                    value.addLong(primitive.getAsLong());
                 } catch (NumberFormatException e) {
-                    // TODO: Check whether it is a long/integer in advance
+                    value.addInteger(0);
+                    value.addLong(0);
                 }
             }
             if (primitive.isBoolean()) {

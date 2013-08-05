@@ -372,7 +372,11 @@ public class BlockLoader implements BlockBuilderHelper {
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.none().getQuat4f()).mapTexCoords(atlas.getTexCoords(tileUris.get(part), true), atlas.getRelativeTileSizeWithOffset()));
+            BlockMeshPart meshPart = shape
+                    .getMeshPart(part)
+                    .rotate(Rotation.none().getQuat4f())
+                    .mapTexCoords(atlas.getTexCoords(tileUris.get(part), true), atlas.getRelativeTileSizeWithOffset());
+            block.setLoweredLiquidMesh(part.getSide(), meshPart);
         }
     }
 

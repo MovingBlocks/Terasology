@@ -29,26 +29,26 @@ public interface MouseMoveListener {
      *
      * @param element The element of the event.
      */
-    public void hover(UIDisplayElement element);
+    void hover(UIDisplayElement element);
 
     /**
      * Enter event. Will be called if the mouse enters the element.
      *
      * @param element The element of the event.
      */
-    public void enter(UIDisplayElement element);
+    void enter(UIDisplayElement element);
 
     /**
      * Leave event. Will be called if the mouse leaves the element.
      *
      * @param element The element of the event.
      */
-    public void leave(UIDisplayElement element);
+    void leave(UIDisplayElement element);
 
     /**
      * Move event. Will be called if the mouse moves anywhere in the UI. (Still mouse won't cause any events.)
      *
      * @param element The element of the event.
      */
-    public void move(UIDisplayElement element);
+    void move(UIDisplayElement element);
 }

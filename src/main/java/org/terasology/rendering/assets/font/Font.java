@@ -24,9 +24,9 @@ import org.terasology.asset.Asset;
  */
 public interface Font extends Asset<FontData> {
 
-    public void drawString(int x, int y, String text, Color color);
+    void drawString(int x, int y, String text, Color color);
 
-    public int getWidth(String text);
+    int getWidth(String text);
 
-    public int getHeight(String text);
+    int getHeight(String text);
 }

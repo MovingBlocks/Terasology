@@ -123,7 +123,8 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
         return result;
     }
 
-    private void readMeshData(BufferedReader reader, List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices) throws IOException {
+    private void readMeshData(BufferedReader reader, List<Vector3f> rawVertices, List<Vector3f> rawNormals,
+                              List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices) throws IOException {
         String line = null;
         int lineNum = 0;
         try {

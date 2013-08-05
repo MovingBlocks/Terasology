@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.google.common.base.Preconditions.checkState;
+
 
 /**
  * TeraArrays is the central registration point for all the different TeraArray implementations.
@@ -84,13 +86,13 @@ public final class TeraArrays {
             this.arrayClass = Preconditions.checkNotNull(factory.getArrayClass());
             this.arrayClassName = arrayClass.getName();
             this.handler = Preconditions.checkNotNull(factory.createSerializationHandler());
-            Preconditions.checkState(handler.canHandle(arrayClass));
+            checkState(handler.canHandle(arrayClass));
             this.protobufType = Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null");
         }
     }
 
     @SuppressWarnings("unchecked")
-    public final ChunksProtobuf.TeraArray encode(TeraArray array) {
+    public ChunksProtobuf.TeraArray encode(TeraArray array) {
         Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
         final Entry entry = getEntry(array.getClass());
         if (entry == null) {
@@ -107,7 +109,7 @@ public final class TeraArrays {
         return b.build();
     }
 
-    public final TeraArray decode(ChunksProtobuf.TeraArray message) {
+    public TeraArray decode(ChunksProtobuf.TeraArray message) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
         if (!message.hasType()) {
             throw new IllegalArgumentException("Illformed protobuf message. Missing type information.");
@@ -135,7 +137,7 @@ public final class TeraArrays {
         return entry.handler.deserialize(data.asReadOnlyByteBuffer());
     }
 
-    public final Entry getEntry(Class arrayClass) {
+    public Entry getEntry(Class arrayClass) {
         Preconditions.checkNotNull(arrayClass, "The parameter 'arrayClass' must not be null");
         lock.readLock().lock();
         try {
@@ -145,7 +147,7 @@ public final class TeraArrays {
         }
     }
 
-    public final Entry getEntry(ChunksProtobuf.Type protobufType) {
+    public Entry getEntry(ChunksProtobuf.Type protobufType) {
         Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null");
         lock.readLock().lock();
         try {
@@ -155,7 +157,7 @@ public final class TeraArrays {
         }
     }
 
-    public final Entry getEntry(String arrayClassName) {
+    public Entry getEntry(String arrayClassName) {
         Preconditions.checkNotNull(arrayClassName, "The parameter 'arrayClassName' must not be null");
         lock.readLock().lock();
         try {
@@ -165,7 +167,7 @@ public final class TeraArrays {
         }
     }
 
-    public final Entry[] getCoreArrayEntries() {
+    public Entry[] getCoreArrayEntries() {
         lock.readLock().lock();
         try {
             return arrayTypes.values().toArray(new Entry[arrayTypes.size()]);
@@ -174,7 +176,7 @@ public final class TeraArrays {
         }
     }
 
-    public final Entry[] getArrayEntries() {
+    public Entry[] getArrayEntries() {
         lock.readLock().lock();
         try {
             return arrayNames.values().toArray(new Entry[arrayNames.size()]);
@@ -183,7 +185,7 @@ public final class TeraArrays {
         }
     }
 
-    public final Class[] getArrayClasses() {
+    public Class[] getArrayClasses() {
         lock.readLock().lock();
         try {
             return arrayClasses.keySet().toArray(new Class[arrayClasses.size()]);
@@ -192,7 +194,7 @@ public final class TeraArrays {
         }
     }
 
-    public final String[] getArrayClassNames() {
+    public String[] getArrayClassNames() {
         lock.readLock().lock();
         try {
             return arrayNames.keySet().toArray(new String[arrayNames.size()]);
@@ -201,7 +203,7 @@ public final class TeraArrays {
         }
     }
 
-    public final ChunksProtobuf.Type[] getProtobufTypes() {
+    public ChunksProtobuf.Type[] getProtobufTypes() {
         lock.readLock().lock();
         try {
             return arrayTypes.keySet().toArray(new ChunksProtobuf.Type[arrayTypes.size()]);
@@ -210,16 +212,16 @@ public final class TeraArrays {
         }
     }
 
-    public final void register(TeraArray.Factory factory, ChunksProtobuf.Type protobufType) {
+    public void register(TeraArray.Factory factory, ChunksProtobuf.Type protobufType) {
         lock.writeLock().lock();
         try {
             final Entry entry = new Entry(factory, protobufType);
-            Preconditions.checkState(!arrayClasses.containsKey(entry.arrayClass), "There is already a class entry for the supplied array class: " + entry.arrayClassName);
+            checkState(!arrayClasses.containsKey(entry.arrayClass), "There is already a class entry for the supplied array class: " + entry.arrayClassName);
             arrayClasses.put(entry.arrayClass, entry);
-            Preconditions.checkState(!arrayNames.containsKey(entry.arrayClassName), "There is already a name entry for the supplied array class: " + entry.arrayClassName);
+            checkState(!arrayNames.containsKey(entry.arrayClassName), "There is already a name entry for the supplied array class: " + entry.arrayClassName);
             arrayNames.put(entry.arrayClassName, entry);
             if (protobufType != ChunksProtobuf.Type.Unknown) {
-                Preconditions.checkState(!arrayTypes.containsKey(protobufType), "There is already a protobuf type entry for the supplied array class: " + entry.arrayClassName);
+                checkState(!arrayTypes.containsKey(protobufType), "There is already a protobuf type entry for the supplied array class: " + entry.arrayClassName);
                 arrayTypes.put(protobufType, entry);
             }
         } finally {
@@ -227,7 +229,7 @@ public final class TeraArrays {
         }
     }
 
-    public static final TeraArrays getInstance() {
+    public static TeraArrays getInstance() {
         return INSTANCE;
     }
 }

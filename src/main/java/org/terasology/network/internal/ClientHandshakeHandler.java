@@ -130,7 +130,8 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
                 return;
             }
 
-            PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(publicCert.getModulus(), new BigInteger(certificateSet.getPrivateExponent().toByteArray()));
+            BigInteger exponent = new BigInteger(certificateSet.getPrivateExponent().toByteArray());
+            PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(publicCert.getModulus(), exponent);
 
             // Store identity for later use
             ClientIdentity identity = new ClientIdentity(publicCert, privateCert);
@@ -210,8 +211,8 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         ctx.getChannel().write(NetData.NetMessage.newBuilder()
                 .setNewIdentityRequest(NetData.NewIdentityRequest.newBuilder()
                         .setPreMasterSecret(ByteString.copyFrom(encryptedPreMasterSecret))
-                        .setRandom(ByteString.copyFrom(clientRandom))
-                ).build());
+                        .setRandom(ByteString.copyFrom(clientRandom)))
+                .build());
         requestedCertificate = true;
     }
 

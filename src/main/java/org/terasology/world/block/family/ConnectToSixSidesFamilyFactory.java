@@ -107,7 +107,8 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
                 archetypeBlock, blocksForConnections, connectionSides);
     }
 
-    private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder, final AssetUri blockDefUri, TByteObjectMap<BlockDefinition>[] basicBlocks) {
+    private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder,
+                                               final AssetUri blockDefUri, TByteObjectMap<BlockDefinition>[] basicBlocks) {
         int connectionCount = SideBitFlag.getSides(connections).size();
         TByteObjectMap<BlockDefinition> possibleBlockDefinitions = basicBlocks[connectionCount];
         final TByteObjectIterator<BlockDefinition> blockDefinitionIterator = possibleBlockDefinitions.iterator();

@@ -26,12 +26,12 @@ import java.util.Map;
 
 public interface BlockBuilderHelper {
 
-    public Block constructSimpleBlock(AssetUri blockDefUri, BlockDefinition blockDefinition);
+    Block constructSimpleBlock(AssetUri blockDefUri, BlockDefinition blockDefinition);
 
-    public Map<Side, Block> constructHorizontalRotatedBlocks(AssetUri blockDefUri, BlockDefinition blockDefinition);
+    Map<Side, Block> constructHorizontalRotatedBlocks(AssetUri blockDefUri, BlockDefinition blockDefinition);
 
-    public Block constructTransformedBlock(AssetUri blockDefUri, BlockDefinition blockDefinition, Rotation rotation);
+    Block constructTransformedBlock(AssetUri blockDefUri, BlockDefinition blockDefinition, Rotation rotation);
 
-    public BlockDefinition getBlockDefinitionForSection(JsonObject json, String sectionName);
+    BlockDefinition getBlockDefinitionForSection(JsonObject json, String sectionName);
 
 }

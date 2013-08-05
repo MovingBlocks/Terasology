@@ -23,6 +23,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
 public interface ScrollListener {
-    public void scrolled(UIDisplayElement element);
+    void scrolled(UIDisplayElement element);
 }
 

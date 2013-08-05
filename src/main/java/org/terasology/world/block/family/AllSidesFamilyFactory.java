@@ -40,6 +40,7 @@ public class AllSidesFamilyFactory implements BlockFamilyFactory {
         blocksBySide.put(Side.RIGHT, blockBuilder.constructTransformedBlock(blockDefUri, blockDefinition, Rotation.rotate(Yaw.CLOCKWISE_270)));
         blocksBySide.put(Side.TOP, blockBuilder.constructTransformedBlock(blockDefUri, blockDefinition, Rotation.rotate(Pitch.CLOCKWISE_90)));
         blocksBySide.put(Side.BOTTOM, blockBuilder.constructTransformedBlock(blockDefUri, blockDefinition, Rotation.rotate(Pitch.CLOCKWISE_270)));
-        return new AllSidesFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), blockDefinition.categories, blocksBySide.get(Side.LEFT), blocksBySide);
+        BlockUri familyUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName());
+        return new AllSidesFamily(familyUri, blockDefinition.categories, blocksBySide.get(Side.LEFT), blocksBySide);
     }
 }

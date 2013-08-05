@@ -308,7 +308,8 @@ public class GridLayout implements Layout {
     }
 
     /**
-     * Set the number of columns of the grid layout. Display elements are laid out in these columns from left to right. A new row is created when numColumns + 1 display elements where added.
+     * Set the number of columns of the grid layout. Display elements are laid out in these columns from left to right.
+     * A new row is created when numColumns + 1 display elements where added.
      *
      * @param columns The number of columns.
      */

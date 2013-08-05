@@ -32,17 +32,17 @@ import java.util.Arrays;
 public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
-    protected final TeraArray createSparse(byte fill) {
+    protected TeraArray createSparse(byte fill) {
         return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
     }
 
     @Override
-    protected final TeraArray createSparse(byte[][] inflated, byte[] deflated) {
+    protected TeraArray createSparse(byte[][] inflated, byte[] deflated) {
         return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
     }
 
     @Override
-    protected final int rowSize() {
+    protected int rowSize() {
         return getSizeXZ();
     }
 
@@ -109,7 +109,7 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public final int get(int x, int y, int z) {
+    public int get(int x, int y, int z) {
         if (inflated == null) {
             return fill;
         }
@@ -121,7 +121,7 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public final int set(int x, int y, int z, int value) {
+    public int set(int x, int y, int z, int value) {
         if (inflated == null) {
             int old = fill;
             if (old == value) {
@@ -151,7 +151,7 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public final boolean set(int x, int y, int z, int value, int expected) {
+    public boolean set(int x, int y, int z, int value, int expected) {
         if (value == expected) {
             return true;
         }

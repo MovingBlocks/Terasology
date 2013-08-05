@@ -21,6 +21,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -91,6 +93,8 @@ public class UIText extends UIDisplayContainerScrollable {
        Note 2: There is some dividing by the factor of 2 going on when setting the position or size of the character. This needs to be done,
                otherwise the cursor will be at the wrong position. I can't explain this behavior.
     */
+
+    private static final Logger logger = LoggerFactory.getLogger(UIText.class);
 
     //events
     private final List<ChangedListener> changedListeners = Lists.newArrayList();
@@ -734,10 +738,8 @@ public class UIText extends UIDisplayContainerScrollable {
                 String text = (String) t.getTransferData(DataFlavor.stringFlavor);
                 return text;
             }
-        } catch (UnsupportedFlavorException e) {
-
-        } catch (IOException e) {
-
+        } catch (UnsupportedFlavorException | IOException e) {
+            logger.warn("Failed to get data from clipboard", e);
         }
 
         return "";

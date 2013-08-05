@@ -30,7 +30,7 @@ public interface Noise {
      * @param z Position on the z-axis
      * @return The noise value
      */
-    public double noise(double x, double y, double z);
+    double noise(double x, double y, double z);
 
     /**
      * Returns Fractional Brownian Motion at the given position.
@@ -40,10 +40,10 @@ public interface Noise {
      * @param z Position on the z-axis
      * @return The noise value
      */
-    public double fBm(double x, double y, double z);
+    double fBm(double x, double y, double z);
 
 
-    public void setOctaves(int octaves);
+    void setOctaves(int octaves);
 
-    public int getOctaves();
+    int getOctaves();
 }

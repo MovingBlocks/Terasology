@@ -75,15 +75,15 @@ public abstract class TeraArray implements Externalizable {
      * @author Manuel Brotz <manu.brotz@gmx.ch>
      * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
      */
-    public static interface Factory<T extends TeraArray> {
+    public interface Factory<T extends TeraArray> {
 
-        public Class<T> getArrayClass();
+        Class<T> getArrayClass();
 
-        public SerializationHandler<T> createSerializationHandler();
+        SerializationHandler<T> createSerializationHandler();
 
-        public T create();
+        T create();
 
-        public T create(int sizeX, int sizeY, int sizeZ);
+        T create(int sizeX, int sizeY, int sizeZ);
 
     }
 
@@ -95,19 +95,15 @@ public abstract class TeraArray implements Externalizable {
      * @author Manuel Brotz <manu.brotz@gmx.ch>
      * @see org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler
      */
-    public static interface SerializationHandler<T extends TeraArray> {
+    public interface SerializationHandler<T extends TeraArray> {
 
-        public int computeMinimumBufferSize(T array);
+        int computeMinimumBufferSize(T array);
 
-        public ByteBuffer serialize(T array, ByteBuffer buffer);
+        ByteBuffer serialize(T array, ByteBuffer buffer);
 
-        public T deserialize(ByteBuffer buffer);
+        T deserialize(ByteBuffer buffer);
 
-        public boolean canHandle(Class<?> clazz);
-
-        ;
-
-
+        boolean canHandle(Class<?> clazz);
     }
 
     /**

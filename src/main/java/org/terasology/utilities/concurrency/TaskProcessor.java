@@ -39,7 +39,7 @@ final class TaskProcessor<T extends Task> implements Runnable {
     }
 
     @Override
-    public final void run() {
+    public void run() {
         boolean running = true;
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         Thread.currentThread().setName(name);

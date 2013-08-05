@@ -41,8 +41,8 @@ public class Matrix4i implements Serializable {
     public static final int M32 = 14;
     public static final int M33 = 15;
 
-    public final int tmp[] = new int[16];
-    public final int val[] = new int[16];
+    public final int[] tmp = new int[16];
+    public final int[] val = new int[16];
 
     /**
      * Constructs a new empty matrix

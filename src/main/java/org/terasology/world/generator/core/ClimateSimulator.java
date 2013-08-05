@@ -101,17 +101,22 @@ public class ClimateSimulator {
                 for (int height = 0; height < size; height++) {
                     float currHeight = heightmap[width][height];
                     if (distArr[width][height] == size) { //Block could update
-                        if (distArr[(width + 1) % size][height] + (heightmap[(width + 1) % size][height] - currHeight) * heightInfluence - currentDistance <= 0 ||
-                                distArr[width][(height + 1) % size] + (heightmap[width][(height + 1) % size] - currHeight) * heightInfluence - currentDistance <= 0 ||
-                                distArr[(width - 1 + size) % size][height] + (heightmap[(width - 1 + size) % size][height] - currHeight) * heightInfluence - currentDistance <= 0 ||
-                                distArr[width][(height - 1 + size) % size] + (heightmap[width][(height - 1 + size) % size] - currHeight) * heightInfluence - currentDistance <= 0) {
+                        int posW = (width + 1) % size;
+                        int posH = (height + 1) % size;
+                        int negW = ((width - 1) + size) % size;
+                        int negH = (height - 1 + size) % size;
+
+                        if (distArr[posW][height] + (heightmap[posW][height] - currHeight) * heightInfluence <= currentDistance ||
+                                distArr[width][posH] + (heightmap[width][posH] - currHeight) * heightInfluence <= currentDistance ||
+                                distArr[negW][height] + (heightmap[negW][height] - currHeight) * heightInfluence <= currentDistance ||
+                                distArr[width][negH] + (heightmap[width][negH] - currHeight) * heightInfluence <= currentDistance) {
                             //Updates over an edge
                             distArr[width][height] = currentDistance + 1;
                         } else if (
-                                distArr[(width + 1) % size][(height + 1) % size] + (heightmap[(width + 1) % size][(height + 1) % size] - currHeight) * heightInfluence - (currentDistance + 0.41421) <= 0 ||
-                                        distArr[(width - 1 + size) % size][(height + 1) % size] + (heightmap[(width - 1 + size) % size][(height + 1) % size] - currHeight) * heightInfluence - (currentDistance + 0.41421) <= 0 ||
-                                        distArr[(width + 1) % size][(height - 1 + size) % size] + (heightmap[(width + 1) % size][(height - 1 + size) % size] - currHeight) * heightInfluence - (currentDistance + 0.41421) <= 0 ||
-                                        distArr[(width - 1 + size) % size][(height - 1 + size) % size] + (heightmap[(width - 1 + size) % size][(height - 1 + size) % size] - currHeight) * heightInfluence - (currentDistance + 0.41421) <= 0) {
+                                distArr[posW][posH] + (heightmap[posW][posH] - currHeight) * heightInfluence <= currentDistance + 0.41421 ||
+                                        distArr[negW][posH] + (heightmap[negW][posH] - currHeight) * heightInfluence <= currentDistance + 0.41421 ||
+                                        distArr[posW][negH] + (heightmap[posW][negH] - currHeight) * heightInfluence <= currentDistance + 0.41421 ||
+                                        distArr[negW][negH] + (heightmap[negW][negH] - currHeight) * heightInfluence <= currentDistance + 0.41421) {
                             //Updates over the corner
                             distArr[width][height] = currentDistance + 1.41421f;
                         }
@@ -155,7 +160,8 @@ public class ClimateSimulator {
                 if (heightFactor < 0) {  // sea
                     climate[height][width] = distToEq * 0.4f;
                 } else {                // land
-                    climate[height][width] = ((100 - strength) * climate[height][width] + strength * ((distToEq * locationInfluence + (100 - locationInfluence) * 0.5f) * 0.01f - heightFactor * 0.05f)) * 0.01f;
+                    climate[height][width] = ((100 - strength) * climate[height][width]
+                            + strength * ((distToEq * locationInfluence + (100 - locationInfluence) * 0.5f) * 0.01f - heightFactor * 0.05f)) * 0.01f;
                 }
             }
         }

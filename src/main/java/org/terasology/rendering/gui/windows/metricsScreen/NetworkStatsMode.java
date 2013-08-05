@@ -59,8 +59,6 @@ final class NetworkStatsMode extends MetricsMode {
             lines.get(1).setText(String.format("In Bytes: %d", networkSystem.getIncomingBytesDelta()));
             lines.get(2).setText(String.format("Out Msg: %d", networkSystem.getOutgoingMessagesDelta()));
             lines.get(3).setText(String.format("Out Bytes: %d", networkSystem.getOutgoingBytesDelta()));
-        } else {
-            // No change
         }
         lastSecond = currentSecond;
         int line = 0;

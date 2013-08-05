@@ -28,6 +28,6 @@ public interface ClickListener {
      * @param element The element of the event.
      * @param button  The button. Left = 0, Right = 1, Middle = 2.
      */
-    public void click(UIDisplayElement element, int button);
+    void click(UIDisplayElement element, int button);
 
 }

@@ -134,7 +134,10 @@ public final class ChunkTessellator {
             int cColor = 0;
             int cFlags = 0;
             for (int i = 0; i < mesh.vertexElements[j].vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
-                Vector3f vertexPos = new Vector3f(mesh.vertexElements[j].vertices.get(i), mesh.vertexElements[j].vertices.get(i + 1), mesh.vertexElements[j].vertices.get(i + 2));
+                Vector3f vertexPos = new Vector3f(
+                        mesh.vertexElements[j].vertices.get(i),
+                        mesh.vertexElements[j].vertices.get(i + 1),
+                        mesh.vertexElements[j].vertices.get(i + 2));
 
                 /* POSITION */
                 mesh.vertexElements[j].finalVertices.putFloat(vertexPos.x);
@@ -345,7 +348,9 @@ public final class ChunkTessellator {
                 Block adjacentBelow = view.getBlock(x + offset.x, y - 1, z + offset.z);
                 Block adjacent = adjacentBlocks.get(side);
 
-                drawDir[side.ordinal()] |= (blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
+                boolean visible = (blockAppearance.getPart(BlockPart.fromSide(side)) != null
+                        && isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
+                drawDir[side.ordinal()] |= visible;
             }
 
             // Draw the top if below a non-lowered block

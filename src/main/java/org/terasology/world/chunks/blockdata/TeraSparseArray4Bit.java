@@ -32,35 +32,35 @@ import java.util.Arrays;
 public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
     @Override
-    protected final TeraArray createSparse(byte fill) {
+    protected TeraArray createSparse(byte fill) {
         return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
     }
 
     @Override
-    protected final TeraArray createSparse(byte[][] inflated, byte[] deflated) {
+    protected TeraArray createSparse(byte[][] inflated, byte[] deflated) {
         return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
     }
 
     @Override
-    protected final int rowSize() {
+    protected int rowSize() {
         return getSizeXZHalf();
     }
 
-    private final int rowGet(int pos, byte value) {
+    private int rowGet(int pos, byte value) {
         if (pos < getSizeXZHalf()) {
             return TeraArrayUtils.getHi(value);
         }
         return TeraArrayUtils.getLo(value);
     }
 
-    private final int rowGet(byte[] row, int pos) {
+    private int rowGet(byte[] row, int pos) {
         if (pos < getSizeXZHalf()) {
             return TeraArrayUtils.getHi(row[pos]);
         }
         return TeraArrayUtils.getLo(row[pos - getSizeXZHalf()]);
     }
 
-    private final void rowSet(byte[] row, int pos, int value) {
+    private void rowSet(byte[] row, int pos, int value) {
         if (pos < getSizeXZHalf()) {
             byte raw = row[pos];
             row[pos] = TeraArrayUtils.setHi(raw, value);
@@ -71,7 +71,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         row[pos] = TeraArrayUtils.setLo(raw, value);
     }
 
-    private final int rowSetGetOld(byte[] row, int pos, int value) {
+    private int rowSetGetOld(byte[] row, int pos, int value) {
         if (pos < getSizeXZHalf()) {
             byte raw = row[pos];
             byte old = TeraArrayUtils.getHi(raw);
@@ -149,7 +149,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public final int get(int x, int y, int z) {
+    public int get(int x, int y, int z) {
         int pos = pos(x, z);
         if (inflated == null) {
             return rowGet(pos, fill);
@@ -162,7 +162,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public final int set(int x, int y, int z, int value) {
+    public int set(int x, int y, int z, int value) {
         int pos = pos(x, z);
         if (inflated == null) {
             int old = rowGet(pos, fill);
@@ -188,7 +188,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public final boolean set(int x, int y, int z, int value, int expected) {
+    public boolean set(int x, int y, int z, int value, int expected) {
         if (value == expected) {
             return true;
         }

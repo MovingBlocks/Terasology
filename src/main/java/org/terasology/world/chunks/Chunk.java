@@ -295,7 +295,10 @@ public class Chunk {
     }
 
     public int getEstimatedMemoryConsumptionInBytes() {
-        return blockData.getEstimatedMemoryConsumptionInBytes() + sunlightData.getEstimatedMemoryConsumptionInBytes() + lightData.getEstimatedMemoryConsumptionInBytes() + extraData.getEstimatedMemoryConsumptionInBytes();
+        return blockData.getEstimatedMemoryConsumptionInBytes()
+                + sunlightData.getEstimatedMemoryConsumptionInBytes()
+                + lightData.getEstimatedMemoryConsumptionInBytes()
+                + extraData.getEstimatedMemoryConsumptionInBytes();
     }
 
     public Block getBlock(Vector3i pos) {
@@ -445,7 +448,22 @@ public class Chunk {
                 double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
 
-                logger.debug("chunk {}: size-before: {} bytes, size-after: {} bytes, total-deflated-by: {}%, blocks-deflated-by={}%, sunlight-deflated-by={}%, light-deflated-by={}%, liquid-deflated-by={}%", pos, SIZE_FORMAT.format(totalSize), SIZE_FORMAT.format(totalReduced), PERCENT_FORMAT.format(totalPercent), PERCENT_FORMAT.format(blocksPercent), PERCENT_FORMAT.format(sunlightPercent), PERCENT_FORMAT.format(lightPercent), PERCENT_FORMAT.format(liquidPercent));
+                logger.debug("chunk {}: " +
+                        "size-before: {} " +
+                        "bytes, size-after: {} " +
+                        "bytes, total-deflated-by: {}%, " +
+                        "blocks-deflated-by={}%, " +
+                        "sunlight-deflated-by={}%, " +
+                        "light-deflated-by={}%, " +
+                        "liquid-deflated-by={}%",
+                        pos,
+                        SIZE_FORMAT.format(totalSize),
+                        SIZE_FORMAT.format(totalReduced),
+                        PERCENT_FORMAT.format(totalPercent),
+                        PERCENT_FORMAT.format(blocksPercent),
+                        PERCENT_FORMAT.format(sunlightPercent),
+                        PERCENT_FORMAT.format(lightPercent),
+                        PERCENT_FORMAT.format(liquidPercent));
                 ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
             } else {
                 final int oldSize = getEstimatedMemoryConsumptionInBytes();
@@ -503,7 +521,8 @@ public class Chunk {
 
             for (int i = 0; i < subMeshAABB.length; i++) {
                 Vector3f dimensions = new Vector3f(8, heightHalf, 8);
-                Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+                Vector3f position = new Vector3f(getChunkWorldPosX() - 0.5f, (i * heightHalf * 2) - 0.5f, getChunkWorldPosZ() - 0.5f);
+                position.add(dimensions);
                 subMeshAABB[i] = AABB.createCenterExtent(position, dimensions);
             }
         }

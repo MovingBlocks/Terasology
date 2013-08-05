@@ -26,7 +26,7 @@ import org.terasology.rendering.assets.material.Material;
  */
 public interface ShaderParameters {
 
-    public void initialParameters(Material material);
+    void initialParameters(Material material);
 
-    public void applyParameters(Material material);
+    void applyParameters(Material material);
 }

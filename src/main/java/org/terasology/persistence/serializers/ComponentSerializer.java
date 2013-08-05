@@ -132,7 +132,8 @@ public class ComponentSerializer {
     }
 
 
-    private Component deserializeOnto(Component targetComponent, EntityData.Component componentData, ClassMetadata componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
+    private Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
+                                      ClassMetadata componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         for (EntityData.NameValue field : componentData.getFieldList()) {
             FieldMetadata fieldInfo = null;
             if (field.hasNameIndex()) {

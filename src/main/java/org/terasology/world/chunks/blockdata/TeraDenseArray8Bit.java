@@ -29,12 +29,12 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 
     @Override
-    protected final TeraArray createDense(byte[] data) {
+    protected TeraArray createDense(byte[] data) {
         return new TeraDenseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), data);
     }
 
     @Override
-    protected final int rowSize() {
+    protected int rowSize() {
         return getSizeXZ();
     }
 
@@ -105,13 +105,13 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public final int get(int x, int y, int z) {
+    public int get(int x, int y, int z) {
         int pos = pos(x, y, z);
         return data[pos];
     }
 
     @Override
-    public final int set(int x, int y, int z, int value) {
+    public int set(int x, int y, int z, int value) {
         int pos = pos(x, y, z);
         int old = data[pos];
         data[pos] = (byte) value;
@@ -119,7 +119,7 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public final boolean set(int x, int y, int z, int value, int expected) {
+    public boolean set(int x, int y, int z, int value, int expected) {
         int pos = pos(x, y, z);
         int old = data[pos];
         if (old == expected) {

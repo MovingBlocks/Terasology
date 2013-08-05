@@ -32,7 +32,8 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
     private TByteObjectMap<Block> blocks;
     private byte connectionSides;
 
-    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri, List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks, byte connectionSides) {
+    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri,
+                                   List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks, byte connectionSides) {
         super(blockUri, categories);
         this.connectionCondition = connectionCondition;
         this.archetypeBlock = archetypeBlock;

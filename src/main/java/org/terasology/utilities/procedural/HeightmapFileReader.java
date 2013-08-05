@@ -25,18 +25,14 @@ import java.io.IOException;
  */
 public class HeightmapFileReader {
 
-    public static float[][] readFile(String file, String delimiter)
-            throws IOException {
+    public static float[][] readFile(String file, String delimiter) throws IOException {
         return (readValues(new java.io.FileInputStream(file), delimiter));
     }
 
-    public static float[][] readValues(java.io.InputStream in, String delimiter)
-            throws java.io.IOException,
-            java.lang.NumberFormatException {
+    public static float[][] readValues(java.io.InputStream in, String delimiter) throws java.io.IOException, java.lang.NumberFormatException {
         String thisLine;
         java.io.BufferedInputStream s = new java.io.BufferedInputStream(in);
-        java.io.BufferedReader myInput = new java.io.BufferedReader
-                (new java.io.InputStreamReader(s));
+        java.io.BufferedReader myInput = new java.io.BufferedReader(new java.io.InputStreamReader(s));
 
         int index = 0;
         float min = 0;

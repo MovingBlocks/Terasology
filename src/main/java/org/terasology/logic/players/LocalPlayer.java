@@ -47,7 +47,8 @@ public class LocalPlayer {
     }
 
     public boolean isValid() {
-        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class) && getCharacterEntity().hasComponent(CharacterComponent.class) && getCharacterEntity().hasComponent(CharacterMovementComponent.class);
+        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class)
+                && getCharacterEntity().hasComponent(CharacterComponent.class) && getCharacterEntity().hasComponent(CharacterMovementComponent.class);
     }
 
     public Vector3f getPosition() {
@@ -106,7 +107,8 @@ public class LocalPlayer {
     }
 
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, getViewDirection().x, getViewDirection().y, getViewDirection().z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)",
+                getPosition().x, getPosition().y, getPosition().z, getViewDirection().x, getViewDirection().y, getViewDirection().z);
     }
 
     public EntityRef getClientEntity() {

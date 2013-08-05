@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityRef;
  */
 public interface GlobalStore {
 
-    public void store(EntityRef entity);
+    void store(EntityRef entity);
 
-    public void save();
+    void save();
 }

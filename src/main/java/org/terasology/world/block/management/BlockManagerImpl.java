@@ -103,7 +103,11 @@ public class BlockManagerImpl extends BlockManager {
         this(atlas, Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, blockFamilyFactoryRegistry);
     }
 
-    public BlockManagerImpl(WorldAtlas atlas, List<String> registeredBlockFamilies, Map<String, Short> knownBlockMappings, boolean generateNewIds, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+    public BlockManagerImpl(WorldAtlas atlas,
+                            List<String> registeredBlockFamilies,
+                            Map<String, Short> knownBlockMappings,
+                            boolean generateNewIds,
+                            BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
         blockLoader = new BlockLoader(blockFamilyFactoryRegistry, atlas);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();

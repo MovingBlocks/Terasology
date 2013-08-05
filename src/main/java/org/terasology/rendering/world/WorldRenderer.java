@@ -583,7 +583,8 @@ public final class WorldRenderer {
             updateAndQueueVisibleChunks(false, false);
         }
 
-        if (config.getRendering().isDynamicShadows() && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE)) {
+        if (config.getRendering().isDynamicShadows()
+                && (stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE)) {
             DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
             renderShadowMap(lightCamera);
             DefaultRenderingProcess.getInstance().endRenderSceneShadowMap();
@@ -908,7 +909,7 @@ public final class WorldRenderer {
                     shader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
 
-                shader.setFloat3("chunkPositionWorld", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
+                shader.setFloat3("chunkPositionWorld", chunk.getPos().x * Chunk.SIZE_X, chunk.getPos().y * Chunk.SIZE_Y, chunk.getPos().z * Chunk.SIZE_Z);
                 shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
                 if (mode == ChunkRenderMode.REFLECTION) {
@@ -1099,7 +1100,7 @@ public final class WorldRenderer {
      * @param z The Z-coordinate
      * @return The maximum height
      */
-    public final int maxHeightAt(int x, int z) {
+    public int maxHeightAt(int x, int z) {
         for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
             if (!worldProvider.getBlock(x, y, z).isInvisible()) {
                 return y;

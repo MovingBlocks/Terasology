@@ -181,7 +181,8 @@ public class LightPropagator {
             Block lastBlock = BlockManager.getAir();
             for (int columnY = y - 1; columnY >= 0; columnY--) {
                 Block block = chunkView.getBlock(x, columnY, z);
-                if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP) && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
+                if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP)
+                        && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
                     chunkView.setSunlight(x, columnY, z, lightLevel);
                     lastBlock = block;
                     nextWave.add(new Vector3i(x, columnY, z));
@@ -305,7 +306,8 @@ public class LightPropagator {
         if (oldSunlight == Chunk.MAX_LIGHT) {
             chunkView.setSunlight(x, y, z, (byte) 0);
             fullRecalculateSunlightAround(x, y, z);
-            return Region3i.createFromMinAndSize(new Vector3i(x - Chunk.MAX_LIGHT + 1, 0, z - Chunk.MAX_LIGHT + 1), new Vector3i(2 * Chunk.MAX_LIGHT - 1, Chunk.SIZE_Y, 2 * Chunk.MAX_LIGHT - 1));
+            return Region3i.createFromMinAndSize(new Vector3i(x - Chunk.MAX_LIGHT + 1, 0, z - Chunk.MAX_LIGHT + 1),
+                    new Vector3i(2 * Chunk.MAX_LIGHT - 1, Chunk.SIZE_Y, 2 * Chunk.MAX_LIGHT - 1));
         } else if (oldSunlight > 1) {
             localRecalculateSunlightAround(x, y, z, oldSunlight);
             return Region3i.createFromCenterExtents(new Vector3i(x, y, z), oldSunlight - 1);
@@ -364,7 +366,8 @@ public class LightPropagator {
 
     private void fullRecalculateSunlightAround(int blockX, int blockY, int blockZ) {
         int top = Math.min(Chunk.SIZE_Y - 2, blockY + Chunk.MAX_LIGHT - 2);
-        Region3i region = Region3i.createFromMinMax(new Vector3i(blockX - Chunk.MAX_LIGHT + 1, 0, blockZ - Chunk.MAX_LIGHT + 1), new Vector3i(blockX + Chunk.MAX_LIGHT - 1, top, blockZ + Chunk.MAX_LIGHT - 1));
+        Region3i region = Region3i.createFromMinMax(new Vector3i(blockX - Chunk.MAX_LIGHT + 1, 0, blockZ - Chunk.MAX_LIGHT + 1),
+                new Vector3i(blockX + Chunk.MAX_LIGHT - 1, top, blockZ + Chunk.MAX_LIGHT - 1));
         short[] tops = new short[region.size().x * region.size().z];
 
         // Tunnel light down
@@ -376,7 +379,8 @@ public class LightPropagator {
                 if (aboveLight == Chunk.MAX_LIGHT) {
                     for (; y >= 0; y--) {
                         Block block = chunkView.getBlock(x + region.min().x, y, z + region.min().z);
-                        if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP) && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
+                        if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP)
+                                && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
                             chunkView.setSunlight(x + region.min().x, y, z + region.min().z, Chunk.MAX_LIGHT);
                             lastBlock = block;
                         } else {
@@ -424,7 +428,8 @@ public class LightPropagator {
         adjSide.add(side.getVector3i());
         Block block = chunkView.getBlock(blockX, blockY, blockZ);
         Block adjBlock = chunkView.getBlock(adjSide);
-        if (lightLevel > 1 && chunkView.getSunlight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
+        if (lightLevel > 1 && chunkView.getSunlight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side)
+                && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
             chunkView.setSunlight(adjSide, (byte) (lightLevel - 1));
             pushSunlight(adjSide.x, adjSide.y, adjSide.z, (byte) (lightLevel - 1));
         }
@@ -436,7 +441,8 @@ public class LightPropagator {
         adjSide.add(side.getVector3i());
         Block block = chunkView.getBlock(blockX, blockY, blockZ);
         Block adjBlock = chunkView.getBlock(adjSide);
-        if (lightLevel > 1 && chunkView.getLight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side) && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
+        if (lightLevel > 1 && chunkView.getLight(adjSide) < lightLevel - 1 && LightingUtil.canSpreadLightOutOf(block, side)
+                && LightingUtil.canSpreadLightInto(adjBlock, side.reverse())) {
             chunkView.setLight(adjSide, (byte) (lightLevel - 1));
             pushLight(adjSide.x, adjSide.y, adjSide.z, (byte) (lightLevel - 1));
         }

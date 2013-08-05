@@ -32,7 +32,7 @@ public interface MouseButtonListener {
      * @param button    The button. Left = 0, Right = 1, Middle = 2.
      * @param intersect True if the current mouse position intersects with the element.
      */
-    public void up(UIDisplayElement element, int button, boolean intersect);
+    void up(UIDisplayElement element, int button, boolean intersect);
 
     /**
      * Mouse down event. Will be called if mouse was pressed anywhere in the UI.
@@ -41,7 +41,7 @@ public interface MouseButtonListener {
      * @param button    The button. Left = 0, Right = 1, Middle = 2.
      * @param intersect True if the current mouse position intersects with the element.
      */
-    public void down(UIDisplayElement element, int button, boolean intersect);
+    void down(UIDisplayElement element, int button, boolean intersect);
 
     /**
      * Mouse wheel moved event. Will be called if mouse wheel was moved anywhere in the UI.
@@ -50,6 +50,6 @@ public interface MouseButtonListener {
      * @param wheel     The value of how much the mouse wheel moved. wheel < 0 means down and wheel > 0 means up.
      * @param intersect True if the current mouse position intersects with the element.
      */
-    public void wheel(UIDisplayElement element, int wheel, boolean intersect);
+    void wheel(UIDisplayElement element, int wheel, boolean intersect);
 
 }

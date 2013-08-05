@@ -28,15 +28,15 @@ public interface ChunkBlockIterator {
      *
      * @return True if a new block was found,
      */
-    public boolean next();
+    boolean next();
 
     /**
      * @return the current block
      */
-    public Block getBlock();
+    Block getBlock();
 
     /**
      * @return The world coords of the current block
      */
-    public Vector3i getBlockPos();
+    Vector3i getBlockPos();
 }

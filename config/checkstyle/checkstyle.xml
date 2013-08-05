@@ -104,6 +104,7 @@
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#AvoidNestedBlocks -->
         <module name="AvoidNestedBlocks">
 			<property name="severity" value="warning"/>
+			<property name="allowInSwitchCase" value="true"/>
 		</module>
         <!-- Checks for empty blocks. -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#EmptyBlock -->
@@ -132,9 +133,10 @@
         </module>
         <!-- Checks correct indentation of Java Code. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#Indentation -->
-        <module name="Indentation">
-            <property name="severity" value="warning"/>
-        </module>
+		<!-- Disabled because it is buggy + unreasonable -->
+        <!--<module name="Indentation">
+            <property name="severity" value="info"/>
+        </module>-->
         <!-- Checks that long constants are defined with an upper ell. That is ' L' and not 'l'. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#UpperEll -->
         <module name="UpperEll"/>

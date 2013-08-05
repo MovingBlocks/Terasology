@@ -194,12 +194,15 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             CameraTargetSystem cameraTarget = CoreRegistry.get(CameraTargetSystem.class);
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
             Time time = CoreRegistry.get(Time.class);
-            debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
+            debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f",
+                    time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             if (entityManager != null) {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
             }
             debugLine3.setText(String.format("%s, %.2f", CoreRegistry.get(LocalPlayer.class).getPosition(), (character != null) ? character.yaw : 0));
-            debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(), CoreRegistry.get(WorldProvider.class).getTime().getDays()));
+            debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f",
+                    ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(),
+                    CoreRegistry.get(WorldProvider.class).getTime().getDays()));
         }
     }
 

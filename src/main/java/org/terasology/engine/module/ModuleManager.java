@@ -149,26 +149,7 @@ public class ModuleManager {
             // Directories first (they should override zips)
             try {
                 for (Path modPath : Files.newDirectoryStream(rootModPath, FilesUtil.DIRECTORY_FILTER)) {
-                    Path modInfoFile = modPath.resolve("module.txt");
-                    if (Files.isRegularFile(modInfoFile)) {
-                        try (Reader reader = Files.newBufferedReader(modInfoFile, TerasologyConstants.CHARSET)) {
-                            ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
-                            if (!mods.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
-                                Path assetLocation = modPath.resolve(ASSETS_SUBDIRECTORY);
-                                Path overridesLocation = modPath.resolve(OVERRIDES_SUBDIRECTORY);
-                                AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
-                                Module module = new Module(modPath, moduleInfo, source);
-                                mods.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
-                                logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeMod());
-                            } else {
-                                logger.info("Discovered duplicate module: {}, skipping", moduleInfo.getDisplayName());
-                            }
-                        } catch (FileNotFoundException e) {
-                            logger.warn("Failed to load module manifest for module at {}", modPath, e);
-                        } catch (JsonIOException e) {
-                            logger.warn("Failed to load module manifest for module at {}", modPath, e);
-                        }
-                    }
+                    processModDirectory(modPath, gson);
                 }
             } catch (IOException e) {
                 logger.error("Failed to scan for directory mods", e);
@@ -182,27 +163,7 @@ public class ModuleManager {
                         return Files.isRegularFile(entry) && (entry.toString().endsWith(".jar") || entry.toString().endsWith(".zip"));
                     }
                 })) {
-                    try (ZipFile zipFile = new ZipFile(modPath.toFile())) {
-                        ZipEntry modInfoEntry = zipFile.getEntry("module.txt");
-                        if (modInfoEntry != null) {
-                            try {
-                                ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
-                                if (!mods.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
-                                    Module module = new Module(modPath, moduleInfo, new ArchiveSource(moduleInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
-                                    mods.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
-                                    logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeMod());
-                                } else {
-                                    logger.info("Discovered duplicate module: " + moduleInfo.getDisplayName() + ", skipping");
-                                }
-                            } catch (FileNotFoundException e) {
-                                logger.warn("Failed to load module manifest for module at {}", modPath, e);
-                            } catch (JsonIOException e) {
-                                logger.warn("Failed to load module manifest for module at {}", modPath, e);
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.error("Invalid module file: {}", modPath, e);
-                    }
+                    processModArchive(modPath, gson);
                 }
             } catch (IOException e) {
                 logger.error("Failed to scan for jar and zip mods", e);
@@ -234,6 +195,50 @@ public class ModuleManager {
             }
         }
         allReflections = null;
+    }
+
+    private void processModArchive(Path modPath, Gson gson) {
+        try (ZipFile zipFile = new ZipFile(modPath.toFile())) {
+            ZipEntry modInfoEntry = zipFile.getEntry("module.txt");
+            if (modInfoEntry != null) {
+                try {
+                    ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
+                    if (!mods.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
+                        ArchiveSource source = new ArchiveSource(moduleInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY);
+                        Module module = new Module(modPath, moduleInfo, source);
+                        mods.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
+                        logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeMod());
+                    } else {
+                        logger.info("Discovered duplicate module: " + moduleInfo.getDisplayName() + ", skipping");
+                    }
+                } catch (FileNotFoundException | JsonIOException e) {
+                    logger.warn("Failed to load module manifest for module at {}", modPath, e);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Invalid module file: {}", modPath, e);
+        }
+    }
+
+    private void processModDirectory(Path modPath, Gson gson) throws IOException {
+        Path modInfoFile = modPath.resolve("module.txt");
+        if (Files.isRegularFile(modInfoFile)) {
+            try (Reader reader = Files.newBufferedReader(modInfoFile, TerasologyConstants.CHARSET)) {
+                ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
+                if (!mods.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
+                    Path assetLocation = modPath.resolve(ASSETS_SUBDIRECTORY);
+                    Path overridesLocation = modPath.resolve(OVERRIDES_SUBDIRECTORY);
+                    AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
+                    Module module = new Module(modPath, moduleInfo, source);
+                    mods.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
+                    logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeMod());
+                } else {
+                    logger.info("Discovered duplicate module: {}, skipping", moduleInfo.getDisplayName());
+                }
+            } catch (FileNotFoundException | JsonIOException e) {
+                logger.warn("Failed to load module manifest for module at {}", modPath, e);
+            }
+        }
     }
 
     public void applyActiveMods() {

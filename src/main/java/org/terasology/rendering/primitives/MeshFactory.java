@@ -51,7 +51,8 @@ public final class MeshFactory {
                 int a = buffer.get((posY + y) * stride + (posX + x) * 4 + 3) & 255;
 
                 if (a > alphaLimit) {
-                    TessellatorHelper.addBlockMesh(tessellator, new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
+                    Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f);
+                    TessellatorHelper.addBlockMesh(tessellator, color, 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
 
                     if (withContour) {
                         int newX = 0;
@@ -96,7 +97,8 @@ public final class MeshFactory {
                             }
 
                             if (newA < alphaLimit) {
-                                TessellatorHelper.addBlockMesh(tessellator, new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * newX - 1f / 2f, 2f * 0.0625f * (16 - newY) - 1f, 0f);
+                                Vector4f cColor = new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w);
+                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 1f / 2f, 0.125f * (16 - newY) - 1f, 0f);
                             }
                         }
                     }

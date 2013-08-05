@@ -40,7 +40,8 @@ public class InternalLightProcessor {
                 int y = top;
                 for (; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);
-                    if (LightingUtil.doesSunlightRetainsFullStrengthIn(block) && LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP)) {
+                    if (LightingUtil.doesSunlightRetainsFullStrengthIn(block) && LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM)
+                            && LightingUtil.canSpreadLightInto(block, Side.TOP)) {
                         chunk.setSunlight(x, y, z, Chunk.MAX_LIGHT);
                         lastBlock = block;
                     } else {

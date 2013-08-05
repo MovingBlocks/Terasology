@@ -825,7 +825,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), entitySystemLibrary.getEventLibrary()));
     }
 
-    private <T, U extends ClassMetadata<? extends T>> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T, U> classLibrary) {
+    private <T, U extends ClassMetadata<? extends T>> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList,
+                                                                                                              ClassLibrary<T, U> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
             ClassMetadata<? extends T> metadata = classLibrary.getMetadata(info.getName());

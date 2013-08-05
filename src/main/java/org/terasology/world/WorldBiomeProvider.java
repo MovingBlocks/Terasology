@@ -43,7 +43,7 @@ public interface WorldBiomeProvider {
      * @param z The Z-coordinate
      * @return The humidity
      */
-    public float getHumidityAt(int x, int z);
+    float getHumidityAt(int x, int z);
 
     /**
      * Returns the temperature at the given position.
@@ -52,16 +52,16 @@ public interface WorldBiomeProvider {
      * @param z The Z-coordinate
      * @return The temperature
      */
-    public float getTemperatureAt(int x, int z);
+    float getTemperatureAt(int x, int z);
 
-    public float getFog(float time);
+    float getFog(float time);
 
     /*
     * Returns the biome type at the given position.
     */
-    public Biome getBiomeAt(int x, int z);
+    Biome getBiomeAt(int x, int z);
 
-    public Biome getBiomeAt(float x, float z);
+    Biome getBiomeAt(float x, float z);
 
 
 }

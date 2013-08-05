@@ -22,6 +22,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  */
 public interface VisibilityListener {
 
-    public void changed(UIDisplayElement element, boolean visibility);
+    void changed(UIDisplayElement element, boolean visibility);
 
 }

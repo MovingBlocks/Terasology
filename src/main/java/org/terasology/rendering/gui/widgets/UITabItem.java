@@ -96,7 +96,8 @@ public class UITabItem extends UIDisplayContainerScrollable {
             if (image.isVisible()) {
                 label.setPosition(new Vector2f(padding.w + image.getSize().x + imageLabelSpace, padding.x));
                 image.setPosition(new Vector2f(padding.w, padding.x + label.getSize().y / 2 - image.getSize().y / 2));
-                setSize(new Vector2f(image.getSize().x + label.getSize().x + padding.y + padding.w + imageLabelSpace, Math.max(label.getSize().y + padding.x + padding.z, image.getSize().y + padding.x + padding.z)));
+                setSize(new Vector2f(image.getSize().x + label.getSize().x + padding.y + padding.w + imageLabelSpace,
+                        Math.max(label.getSize().y + padding.x + padding.z, image.getSize().y + padding.x + padding.z)));
             } else {
                 label.setPosition(new Vector2f(padding.w, padding.x));
                 setSize(new Vector2f(label.getSize().x + padding.y + padding.w, label.getSize().y + padding.x + padding.z));

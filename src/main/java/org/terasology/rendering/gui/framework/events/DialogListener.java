@@ -23,6 +23,6 @@ import org.terasology.rendering.gui.widgets.UIDialog.EReturnCode;
  */
 public interface DialogListener {
 
-    public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue);
+    void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue);
 
 }

@@ -160,7 +160,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         jump = false;
     }
 
-    private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent, CharacterComponent characterComp, LocationComponent location) {
+    private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent,
+                              CharacterComponent characterComp, LocationComponent location) {
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
         QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
@@ -185,9 +186,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void onJump(JumpButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             jump = true;
-            if (time.getGameTimeInMs() - lastTimeSpacePressed < 200) {
-                //characterMovement.isGhosting = !characterMovement.isGhosting;
-            }
             lastTimeSpacePressed = time.getGameTimeInMs();
             event.consume();
         } else {

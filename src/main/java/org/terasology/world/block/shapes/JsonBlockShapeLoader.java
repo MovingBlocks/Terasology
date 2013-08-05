@@ -119,27 +119,33 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         }
 
         private void processCollision(JsonDeserializationContext context, BlockShapeData shape, JsonObject collisionInfo) {
-            if (collisionInfo.has(PITCH_SYMMETRIC) && collisionInfo.get(PITCH_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(PITCH_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+            if (collisionInfo.has(PITCH_SYMMETRIC) && collisionInfo.get(PITCH_SYMMETRIC).isJsonPrimitive()
+                    && collisionInfo.get(PITCH_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
                 shape.setPitchSymmetric(collisionInfo.get(PITCH_SYMMETRIC).getAsBoolean());
             }
-            if (collisionInfo.has(YAW_SYMMETRIC) && collisionInfo.get(YAW_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(YAW_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+            if (collisionInfo.has(YAW_SYMMETRIC) && collisionInfo.get(YAW_SYMMETRIC).isJsonPrimitive()
+                    && collisionInfo.get(YAW_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
                 shape.setYawSymmetric(collisionInfo.get(YAW_SYMMETRIC).getAsBoolean());
             }
-            if (collisionInfo.has(ROLL_SYMMETRIC) && collisionInfo.get(ROLL_SYMMETRIC).isJsonPrimitive() && collisionInfo.get(ROLL_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+            if (collisionInfo.has(ROLL_SYMMETRIC) && collisionInfo.get(ROLL_SYMMETRIC).isJsonPrimitive()
+                    && collisionInfo.get(ROLL_SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
                 shape.setRollSymmetric(collisionInfo.get(ROLL_SYMMETRIC).getAsBoolean());
             }
 
-            if (collisionInfo.has(SYMMETRIC) && collisionInfo.get(SYMMETRIC).isJsonPrimitive() && collisionInfo.get(SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
+            if (collisionInfo.has(SYMMETRIC) && collisionInfo.get(SYMMETRIC).isJsonPrimitive()
+                    && collisionInfo.get(SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
                 if (collisionInfo.get(SYMMETRIC).getAsBoolean()) {
                     shape.setCollisionSymmetric(true);
                 }
             }
 
-            if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive() && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
+            if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
+                    && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
                 ObjectArrayList<Vector3f> verts = buildVertList(shape);
                 ConvexHullShape convexHull = new ConvexHullShape(verts);
                 shape.setCollisionShape(convexHull);
-            } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray() && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
+            } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
+                    && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
                 JsonArray colliderArray = collisionInfo.get(COLLIDERS).getAsJsonArray();
                 processColliders(context, colliderArray, shape);
             } else {

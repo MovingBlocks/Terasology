@@ -22,8 +22,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  */
 public interface WindowListener {
 
-    public void initialise(UIDisplayElement element);
+    void initialise(UIDisplayElement element);
 
-    public void shutdown(UIDisplayElement element);
+    void shutdown(UIDisplayElement element);
 
 }

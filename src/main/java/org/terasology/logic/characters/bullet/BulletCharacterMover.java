@@ -197,6 +197,7 @@ public class BulletCharacterMover implements CharacterMover {
         }
     }
 
+
     private void updatePosition(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
         switch (state.getMode()) {
             case GHOSTING:

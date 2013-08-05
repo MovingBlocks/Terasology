@@ -20,9 +20,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBHalfFloatPixel;
 import org.lwjgl.opengl.ARBTextureFloat;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.EXTPackedDepthStencil;
-import org.lwjgl.opengl.EXTPixelBufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
@@ -54,6 +52,38 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_STENCIL_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glCheckFramebufferStatusEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
+import static org.lwjgl.opengl.EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTPixelBufferObject.GL_STREAM_READ_ARB;
+import static org.lwjgl.opengl.EXTPixelBufferObject.glBindBufferARB;
+import static org.lwjgl.opengl.EXTPixelBufferObject.glBufferDataARB;
+import static org.lwjgl.opengl.EXTPixelBufferObject.glGenBuffersARB;
+import static org.lwjgl.opengl.EXTPixelBufferObject.glMapBufferARB;
+import static org.lwjgl.opengl.EXTPixelBufferObject.glUnmapBufferARB;
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -86,6 +116,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glNewList;
@@ -176,15 +207,15 @@ public class DefaultRenderingProcess {
         ByteBuffer cachedBuffer = null;
 
         public PBO() {
-            pboId = EXTPixelBufferObject.glGenBuffersARB();
+            pboId = glGenBuffersARB();
         }
 
         public void bind() {
-            EXTPixelBufferObject.glBindBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, pboId);
+            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, pboId);
         }
 
         public void unbind() {
-            EXTPixelBufferObject.glBindBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, 0);
+            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, 0);
         }
 
         public void init(int width, int height) {
@@ -195,22 +226,22 @@ public class DefaultRenderingProcess {
             cachedBuffer = BufferUtils.createByteBuffer(byteSize);
 
             bind();
-            EXTPixelBufferObject.glBufferDataARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, byteSize, EXTPixelBufferObject.GL_STREAM_READ_ARB);
+            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, byteSize, GL_STREAM_READ_ARB);
             unbind();
         }
 
         public void copyFromFBO(int fboId, int width, int height, int format, int type) {
             bind();
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
             glReadPixels(0, 0, width, height, format, type, 0);
             unbind();
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         }
 
         public ByteBuffer readBackPixels() {
             bind();
 
-            cachedBuffer = EXTPixelBufferObject.glMapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
+            cachedBuffer = glMapBufferARB(GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
 
             // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
             ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
@@ -218,7 +249,7 @@ public class DefaultRenderingProcess {
             cachedBuffer.rewind();
             resultBuffer.flip();
 
-            EXTPixelBufferObject.glUnmapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT);
+            glUnmapBufferARB(GL_PIXEL_PACK_BUFFER_EXT);
             unbind();
 
             return resultBuffer;
@@ -238,14 +269,14 @@ public class DefaultRenderingProcess {
 
         public void bind() {
             if (this != currentlyBoundFbo) {
-                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
                 currentlyBoundFbo = this;
             }
         }
 
         public void unbind() {
             if (currentlyBoundFbo != null) {
-                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
                 currentlyBoundFbo = null;
             }
         }
@@ -404,8 +435,8 @@ public class DefaultRenderingProcess {
         if (fboLookup.containsKey(title)) {
             FBO fbo = fboLookup.get(title);
 
-            EXTFramebufferObject.glDeleteFramebuffersEXT(fbo.fboId);
-            EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
+            glDeleteFramebuffersEXT(fbo.fboId);
+            glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
             GL11.glDeleteTextures(fbo.normalsTextureId);
             GL11.glDeleteTextures(fbo.depthStencilTextureId);
             GL11.glDeleteTextures(fbo.textureId);
@@ -420,12 +451,12 @@ public class DefaultRenderingProcess {
             return false;
         }
 
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, target.fboId);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, target.fboId);
 
-        EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, source.depthStencilRboId);
-        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, source.depthStencilTextureId, 0);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, source.depthStencilRboId);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, source.depthStencilTextureId, 0);
 
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
         return true;
     }
@@ -456,11 +487,11 @@ public class DefaultRenderingProcess {
         fbo.height = height;
 
         // Create the FBO
-        fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
+        fbo.fboId = glGenFramebuffersEXT();
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo.fboId);
 
         if (type != FBOType.NO_COLOR) {
-            fbo.textureId = GL11.glGenTextures();
+            fbo.textureId = glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.textureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -469,16 +500,17 @@ public class DefaultRenderingProcess {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
             if (type == FBOType.HDR) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA,
+                        ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (ByteBuffer) null);
             } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
             }
 
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
         }
 
         if (normalBuffer) {
-            fbo.normalsTextureId = GL11.glGenTextures();
+            fbo.normalsTextureId = glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsTextureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -488,11 +520,11 @@ public class DefaultRenderingProcess {
 
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
 
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsTextureId, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsTextureId, 0);
         }
 
         if (lightBuffer) {
-            fbo.lightBufferTextureId = GL11.glGenTextures();
+            fbo.lightBufferTextureId = glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -501,16 +533,17 @@ public class DefaultRenderingProcess {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
             if (type == FBOType.HDR) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0,
+                        GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (ByteBuffer) null);
             } else {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
             }
 
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
         }
 
         if (depthBuffer) {
-            fbo.depthStencilTextureId = GL11.glGenTextures();
+            fbo.depthStencilTextureId = glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
@@ -519,27 +552,28 @@ public class DefaultRenderingProcess {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
             if (!stencilBuffer) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_UNSIGNED_INT, (java.nio.ByteBuffer) null);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_UNSIGNED_INT, (ByteBuffer) null);
             } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height, 0, EXTPackedDepthStencil.GL_DEPTH_STENCIL_EXT, EXTPackedDepthStencil.GL_UNSIGNED_INT_24_8_EXT, (java.nio.ByteBuffer) null);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height, 0,
+                        EXTPackedDepthStencil.GL_DEPTH_STENCIL_EXT, EXTPackedDepthStencil.GL_UNSIGNED_INT_24_8_EXT, (ByteBuffer) null);
             }
 
-            fbo.depthStencilRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
-            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
+            fbo.depthStencilRboId = glGenRenderbuffersEXT();
+            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
 
             if (!stencilBuffer) {
-                EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
+                glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
             } else {
-                EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height);
+                glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height);
             }
 
-            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
+            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
-            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
 
             if (stencilBuffer) {
-                EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
             }
         }
 
@@ -547,13 +581,13 @@ public class DefaultRenderingProcess {
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
         if (type != FBOType.NO_COLOR) {
-            bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
+            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT);
         }
         if (normalBuffer) {
-            bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
+            bufferIds.put(GL_COLOR_ATTACHMENT1_EXT);
         }
         if (lightBuffer) {
-            bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT);
+            bufferIds.put(GL_COLOR_ATTACHMENT2_EXT);
         }
         bufferIds.flip();
 
@@ -564,35 +598,35 @@ public class DefaultRenderingProcess {
             GL20.glDrawBuffers(bufferIds);
         }
 
-        int checkFB = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
+        int checkFB = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         switch (checkFB) {
-            case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
+            case GL_FRAMEBUFFER_COMPLETE_EXT:
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+            case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
 
@@ -613,7 +647,7 @@ public class DefaultRenderingProcess {
                 break;
         }
 
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
         fboLookup.put(title, fbo);
         return fbo;
@@ -774,21 +808,21 @@ public class DefaultRenderingProcess {
 
         if (fbo.textureId != 0) {
             if (color) {
-                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
 
             attachmentId++;
         }
         if (fbo.normalsTextureId != 0) {
             if (normal) {
-                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
 
             attachmentId++;
         }
         if (fbo.lightBufferTextureId != 0) {
             if (lightBuffer) {
-                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
 
             attachmentId++;
@@ -961,7 +995,8 @@ public class DefaultRenderingProcess {
 
         float as = (float) vpWidth / vpHeight;
 
-        program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1], OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3], true);
+        program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
+                OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3], true);
 
         float ocLensCenter = (stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 

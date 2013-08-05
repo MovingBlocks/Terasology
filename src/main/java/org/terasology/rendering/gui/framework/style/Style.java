@@ -25,6 +25,6 @@ public interface Style {
      *
      * @return Returns the layer.
      */
-    public int getLayer();
+    int getLayer();
 
 }

@@ -138,9 +138,13 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
         Particle p = new Particle();
         p.lifeRemaining = random.randomPosFloat() * (particleEffect.maxLifespan - particleEffect.minLifespan) + particleEffect.minLifespan;
-        p.velocity.set(particleEffect.initialVelocityRange.x * random.randomFloat(), particleEffect.initialVelocityRange.y * random.randomFloat(), particleEffect.initialVelocityRange.z * random.randomFloat());
+        p.velocity.set(particleEffect.initialVelocityRange.x * random.randomFloat(),
+                particleEffect.initialVelocityRange.y * random.randomFloat(),
+                particleEffect.initialVelocityRange.z * random.randomFloat());
         p.size = random.randomPosFloat() * (particleEffect.maxSize - particleEffect.minSize) + particleEffect.minSize;
-        p.position.set(particleEffect.spawnRange.x * random.randomFloat(), particleEffect.spawnRange.y * random.randomFloat(), particleEffect.spawnRange.z * random.randomFloat());
+        p.position.set(particleEffect.spawnRange.x * random.randomFloat(),
+                particleEffect.spawnRange.y * random.randomFloat(),
+                particleEffect.spawnRange.z * random.randomFloat());
         p.color = particleEffect.color;
 
         if (particleEffect.blockType != null) {
@@ -152,12 +156,16 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
             if (particleEffect.randBlockTexDisplacement) {
                 final float relTileSize = worldAtlas.getRelativeTileSize();
-                Vector2f particleTexSize = new Vector2f(relTileSize * particleEffect.randBlockTexDisplacementScale.y, relTileSize * particleEffect.randBlockTexDisplacementScale.y);
+                Vector2f particleTexSize = new Vector2f(
+                        relTileSize * particleEffect.randBlockTexDisplacementScale.y,
+                        relTileSize * particleEffect.randBlockTexDisplacementScale.y);
 
                 p.texSize.x *= particleEffect.randBlockTexDisplacementScale.x;
                 p.texSize.y *= particleEffect.randBlockTexDisplacementScale.y;
 
-                p.texOffset.set(p.texOffset.x + random.randomPosFloat() * (tileSize - particleTexSize.x), p.texOffset.y + random.randomPosFloat() * (tileSize - particleTexSize.y));
+                p.texOffset.set(
+                        p.texOffset.x + random.randomPosFloat() * (tileSize - particleTexSize.x),
+                        p.texOffset.y + random.randomPosFloat() * (tileSize - particleTexSize.y));
             }
         }
 

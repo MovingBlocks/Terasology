@@ -16,10 +16,6 @@
 
 package org.terasology.rendering.gui.windows.metricsScreen;
 
-import gnu.trove.procedure.TObjectIntProcedure;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.rendering.gui.widgets.UILabel;
 
 import java.util.List;

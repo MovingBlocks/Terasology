@@ -21,7 +21,8 @@ import javax.vecmath.Vector2f;
 import java.util.LinkedList;
 
 /**
- * This class extends the UIButton and adds functionality to add states to a button. Each state will be assigned a label and a action to execute as the button enters the state.
+ * This class extends the UIButton and adds functionality to add states to a button.
+ * Each state will be assigned a label and a action to execute as the button enters the state.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         <p/>
