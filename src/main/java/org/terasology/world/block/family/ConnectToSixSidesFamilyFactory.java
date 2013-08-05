@@ -54,7 +54,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
     @Override
     public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
         TByteObjectMap<BlockDefinition>[] basicBlocks = new TByteObjectMap[7];
-        TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<Block>();
+        TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<>();
 
         basicBlocks[0] = new TByteObjectHashMap<>();
         basicBlocks[0].put((byte) 0,

@@ -24,17 +24,17 @@ import org.terasology.engine.AbstractBaseUri;
  *
  * @author synopia
  */
-public class MapGeneratorUri extends AbstractBaseUri {
+public class WorldGeneratorUri extends AbstractBaseUri {
     private String moduleName = "";
     private String generatorName = "";
 
     private String normalisedModuleName = "";
     private String normalisedGeneratorName = "";
 
-    public MapGeneratorUri() {
+    public WorldGeneratorUri() {
     }
 
-    public MapGeneratorUri(String moduleName, String generatorName) {
+    public WorldGeneratorUri(String moduleName, String generatorName) {
         Preconditions.checkNotNull(moduleName);
         Preconditions.checkNotNull(generatorName);
         this.moduleName = moduleName;
@@ -43,7 +43,7 @@ public class MapGeneratorUri extends AbstractBaseUri {
         this.normalisedGeneratorName = normalise(generatorName);
     }
 
-    public MapGeneratorUri(String simpleUri) {
+    public WorldGeneratorUri(String simpleUri) {
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
             moduleName = split[0];
@@ -96,8 +96,8 @@ public class MapGeneratorUri extends AbstractBaseUri {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof MapGeneratorUri) {
-            MapGeneratorUri other = (MapGeneratorUri) obj;
+        if (obj instanceof WorldGeneratorUri) {
+            WorldGeneratorUri other = (WorldGeneratorUri) obj;
             return Objects.equal(normalisedModuleName, other.normalisedModuleName) && Objects.equal(normalisedGeneratorName, other.normalisedGeneratorName);
         }
         return false;

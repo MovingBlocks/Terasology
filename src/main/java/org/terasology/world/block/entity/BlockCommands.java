@@ -38,7 +38,6 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.StringConstants;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
@@ -144,24 +143,24 @@ public class BlockCommands implements ComponentSystem {
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         stringBuilder.append("-----------");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
         }
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
 
         stringBuilder.append("Available Blocks");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         stringBuilder.append("----------------");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
         for (BlockUri blockUri : availableBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
         }
 
         return stringBuilder.toString();
@@ -172,15 +171,15 @@ public class BlockCommands implements ComponentSystem {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
             stringBuilder.append(category);
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
             stringBuilder.append("-----------");
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
             List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
             for (BlockUri uri : categoryBlocks) {
                 stringBuilder.append(uri.toString());
-                stringBuilder.append(StringConstants.NEW_LINE);
+                stringBuilder.append(System.lineSeparator());
             }
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
         }
         return stringBuilder.toString();
     }
@@ -189,13 +188,13 @@ public class BlockCommands implements ComponentSystem {
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         stringBuilder.append("-----------");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
             stringBuilder.append(uri.toSimpleString());
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
         }
 
         return stringBuilder.toString();
@@ -205,13 +204,13 @@ public class BlockCommands implements ComponentSystem {
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         stringBuilder.append("-----------------");
-        stringBuilder.append(StringConstants.NEW_LINE);
+        stringBuilder.append(System.lineSeparator());
         List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
         for (BlockUri uri : sortedUris) {
             stringBuilder.append(uri.toString());
-            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append(System.lineSeparator());
         }
 
         return stringBuilder.toString();

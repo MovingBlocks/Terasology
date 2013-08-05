@@ -23,7 +23,6 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.utilities.StringConstants;
 
 import java.util.Collection;
 import java.util.List;
@@ -71,23 +70,23 @@ public class ConsoleSystem implements ComponentSystem {
 
             for (CommandInfo cmd : cmdCollection) {
                 msg.append("=====================================================================================================================");
-                msg.append(StringConstants.NEW_LINE);
+                msg.append(System.lineSeparator());
                 msg.append(cmd.getUsageMessage());
-                msg.append(StringConstants.NEW_LINE);
+                msg.append(System.lineSeparator());
                 msg.append("=====================================================================================================================");
-                msg.append(StringConstants.NEW_LINE);
+                msg.append(System.lineSeparator());
                 if (!cmd.getHelpText().isEmpty()) {
                     msg.append(cmd.getHelpText());
-                    msg.append(StringConstants.NEW_LINE);
+                    msg.append(System.lineSeparator());
                     msg.append("=====================================================================================================================");
-                    msg.append(StringConstants.NEW_LINE);
+                    msg.append(System.lineSeparator());
                 } else if (!cmd.getShortDescription().isEmpty()) {
                     msg.append(cmd.getShortDescription());
-                    msg.append(StringConstants.NEW_LINE);
+                    msg.append(System.lineSeparator());
                     msg.append("=====================================================================================================================");
-                    msg.append(StringConstants.NEW_LINE);
+                    msg.append(System.lineSeparator());
                 }
-                msg.append(StringConstants.NEW_LINE);
+                msg.append(System.lineSeparator());
             }
             return msg.toString();
         }
