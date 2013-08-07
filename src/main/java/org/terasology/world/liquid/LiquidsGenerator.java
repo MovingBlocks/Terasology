@@ -21,7 +21,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.ChunkGenerator;
+import org.terasology.world.generator.FirstPassGenerator;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LiquidsGenerator implements ChunkGenerator {
+public class LiquidsGenerator implements FirstPassGenerator {
 
     private String seed;
     private WorldBiomeProvider biomeProvider;

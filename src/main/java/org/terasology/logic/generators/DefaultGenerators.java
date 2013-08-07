@@ -24,10 +24,10 @@ import com.google.common.collect.Maps;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.generator.core.ForestGenerator;
-import org.terasology.world.generator.tree.TreeGenerator;
-import org.terasology.world.generator.tree.TreeGeneratorCactus;
-import org.terasology.world.generator.tree.TreeGeneratorLSystem;
+import org.terasology.world.generator.chunkGenerators.ForestGenerator;
+import org.terasology.world.generator.chunkGenerators.TreeGenerator;
+import org.terasology.world.generator.chunkGenerators.TreeGeneratorCactus;
+import org.terasology.world.generator.chunkGenerators.TreeGeneratorLSystem;
 
 import java.util.Map;
 

@@ -26,9 +26,9 @@ import java.util.Set;
  * @author Immortius
  */
 public class ModuleInfo {
-    private String id;
-    private String displayName;
-    private String description;
+    private String id = "";
+    private String displayName = "";
+    private String description = "";
     private boolean serversideOnly = false;
     private Set<String> dependencies = Sets.newLinkedHashSet();
 

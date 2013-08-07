@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Region3i;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.generator.ChunkGeneratorManager;
 
 import java.util.Comparator;
 

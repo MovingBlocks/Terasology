@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.world.generator;
 
-import org.reflections.Reflections;
-
-import java.net.URL;
-import java.nio.file.Path;
+import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkView;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius
  */
-public interface Module {
+public interface WorldGenerator {
+    WorldGeneratorUri getUri();
 
-    Reflections getReflections();
+    void setWorldSeed(String seed);
 
-    boolean isCodeModule();
+    void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 
-    ModuleInfo getModuleInfo();
+    void applySecondPass(Vector3i chunkPos, ChunkView view);
 
+    Chunk createChunk(Vector3i pos);
 }

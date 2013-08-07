@@ -21,7 +21,7 @@ import org.terasology.world.chunks.Chunk;
 /**
  * @author Immortius
  */
-public interface ChunkGenerator extends BaseChunkGenerator {
+public interface FirstPassGenerator extends BaseChunkGenerator {
 
 
     /**

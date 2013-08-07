@@ -71,7 +71,7 @@ public class UIDialogMods extends UIDialog {
     }
 
     private void populateModList() {
-        List<Module> modules = Lists.newArrayList(moduleManager.getMods());
+        List<Module> modules = Lists.newArrayList(moduleManager.getModules());
         Collections.sort(modules, new Comparator<Module>() {
             @Override
             public int compare(Module o1, Module o2) {
@@ -80,16 +80,18 @@ public class UIDialogMods extends UIDialog {
         });
 
         for (Module module : modules) {
-            UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
-            item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
-            if (modConfig.hasMod(module.getModuleInfo().getId())) {
-                item.setTextColor(ACTIVE_TEXT_COLOR);
-                item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
-            } else {
-                item.setTextColor(INACTIVE_TEXT_COLOR);
-                item.setTextSelectionColor(INACTIVE_SELECTED_TEXT_COLOR);
+            if (!module.getModuleInfo().getId().equals(ModuleManager.ENGINE_MODULE)) {
+                UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
+                item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
+                if (modConfig.hasMod(module.getModuleInfo().getId())) {
+                    item.setTextColor(ACTIVE_TEXT_COLOR);
+                    item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
+                } else {
+                    item.setTextColor(INACTIVE_TEXT_COLOR);
+                    item.setTextSelectionColor(INACTIVE_SELECTED_TEXT_COLOR);
+                }
+                modList.addItem(item);
             }
-            modList.addItem(item);
         }
         modList.addSelectionListener(new SelectionListener() {
             @Override
@@ -140,7 +142,7 @@ public class UIDialogMods extends UIDialog {
     private void deactivateMod(Module module) {
         modConfig.removeMod(module.getModuleInfo().getId());
         for (String activeModName : Lists.newArrayList(modConfig.listMods())) {
-            Module activeModule = moduleManager.getMod(activeModName);
+            Module activeModule = moduleManager.getModule(activeModName);
             if (activeModule != null && activeModule.getModuleInfo().getDependencies().contains(module.getModuleInfo().getId())) {
                 deactivateMod(activeModule);
             }
@@ -150,7 +152,7 @@ public class UIDialogMods extends UIDialog {
     private void activateMod(Module module) {
         modConfig.addMod(module.getModuleInfo().getId());
         for (String dependencyName : module.getModuleInfo().getDependencies()) {
-            Module dependency = moduleManager.getMod(dependencyName);
+            Module dependency = moduleManager.getModule(dependencyName);
             if (dependency != null) {
                 activateMod(dependency);
             }

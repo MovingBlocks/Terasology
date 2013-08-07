@@ -15,20 +15,38 @@
  */
 package org.terasology.engine.module;
 
+import com.google.common.base.Objects;
 import org.reflections.Reflections;
-
-import java.net.URL;
-import java.nio.file.Path;
 
 /**
  * @author Immortius
  */
-public interface Module {
+public class EngineModule implements Module {
 
-    Reflections getReflections();
+    private Reflections reflections;
+    private ModuleInfo info;
 
-    boolean isCodeModule();
+    public EngineModule(Reflections reflections) {
+        this.reflections = reflections;
+        this.info = new ModuleInfo();
+        this.info.setId("engine");
+        this.info.setDisplayName("Engine");
+        this.info.setDescription("The engine module");
+    }
 
-    ModuleInfo getModuleInfo();
+    @Override
+    public Reflections getReflections() {
+        return reflections;
+    }
+
+    @Override
+    public boolean isCodeModule() {
+        return true;
+    }
+
+    @Override
+    public ModuleInfo getModuleInfo() {
+        return info;
+    }
 
 }

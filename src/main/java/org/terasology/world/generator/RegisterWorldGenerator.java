@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.world.generator;
 
-import org.reflections.Reflections;
-
-import java.net.URL;
-import java.nio.file.Path;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Immortius
  */
-public interface Module {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RegisterWorldGenerator {
+    String id();
 
-    Reflections getReflections();
+    String displayName();
 
-    boolean isCodeModule();
-
-    ModuleInfo getModuleInfo();
+    String description() default "";
 
 }

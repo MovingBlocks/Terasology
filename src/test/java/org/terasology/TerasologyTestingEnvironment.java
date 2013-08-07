@@ -114,10 +114,10 @@ public abstract class TerasologyTestingEnvironment {
             bindLwjgl();
 
             moduleManager = new ModuleManager();
-            moduleManager.applyActiveMods();
+            moduleManager.applyActiveModules();
             CoreRegistry.put(ModuleManager.class, moduleManager);
             AssetType.registerAssetTypes();
-            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModuleManager.ENGINE_PACKAGE, Terasology.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModuleManager.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
             AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
 
             config = new Config();

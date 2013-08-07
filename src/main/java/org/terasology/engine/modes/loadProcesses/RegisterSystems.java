@@ -53,8 +53,7 @@ public class RegisterSystems implements LoadProcess {
         componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
         moduleManager = CoreRegistry.get(ModuleManager.class);
 
-        componentSystemManager.loadSystems(ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections(), netMode);
-        for (Module module : moduleManager.getActiveMods()) {
+        for (Module module : moduleManager.getActiveModules()) {
             if (!registeredMods.contains(module.getModuleInfo().getId().toLowerCase(Locale.ENGLISH))) {
                 loadMod(module);
             }
@@ -67,10 +66,10 @@ public class RegisterSystems implements LoadProcess {
         for (String dependency : module.getModuleInfo().getDependencies()) {
             if (!registeredMods.contains(dependency.toLowerCase(Locale.ENGLISH))) {
                 logger.debug("Requesting {} due to dependency", dependency);
-                loadMod(moduleManager.getMod(dependency));
+                loadMod(moduleManager.getModule(dependency));
             }
         }
-        if (module.isCodeMod()) {
+        if (module.isCodeModule()) {
             componentSystemManager.loadSystems(module.getModuleInfo().getId(), module.getReflections(), netMode);
         }
         registeredMods.add(module.getModuleInfo().getId().toLowerCase(Locale.ENGLISH));

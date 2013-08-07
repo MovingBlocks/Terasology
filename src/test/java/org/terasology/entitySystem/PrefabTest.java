@@ -39,7 +39,7 @@ public class PrefabTest {
     @Before
     public void setup() throws Exception {
         ModuleManager moduleManager = new ModuleManager();
-        moduleManager.applyActiveMods();
+        moduleManager.applyActiveModules();
         CoreRegistry.put(ModuleManager.class, moduleManager);
         AssetType.registerAssetTypes();
         URL url = getClass().getClassLoader().getResource("testResources");

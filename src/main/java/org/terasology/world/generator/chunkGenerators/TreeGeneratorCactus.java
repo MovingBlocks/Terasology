@@ -13,40 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.world.generator.chunkGenerators;
 
-package org.terasology.world.generator.tree;
-
+import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 
 /**
- * Object generators are used to generate objects like trees etc.
+ * Cactus generator.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class TreeGenerator {
+public class TreeGeneratorCactus extends TreeGenerator {
 
-    private float generationProbability = 1.0f;
+    private Block cactus;
 
-    /**
-     * Generates a tree at the given position.
-     *
-     * @param rand The random generator
-     * @param posX Position on the x-axis
-     * @param posY Position on the y-axis
-     * @param posZ Position on the z-axis
-     */
-    public abstract void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ);
-
-    public double getGenerationProbability() {
-        return generationProbability;
+    public TreeGeneratorCactus() {
+        cactus = CoreRegistry.get(BlockManager.class).getBlock("engine:Cactus");
     }
 
-    public TreeGenerator setGenerationProbability(float genProbability) {
-        this.generationProbability = genProbability;
+    @Override
+    public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
+        for (int y = posY; y < posY + 3; y++) {
+            view.setBlock(posX, y, posZ, cactus);
+        }
+    }
+
+    @Override
+    public TreeGenerator setBarkType(Block b) {
         return this;
     }
-
-    public abstract TreeGenerator setBarkType(Block b);
 }

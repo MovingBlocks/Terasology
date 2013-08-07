@@ -59,7 +59,7 @@ import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.generator.ChunkGeneratorManager;
 
 import java.util.Comparator;
 import java.util.Iterator;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.generator.core;
+package org.terasology.world.generator.chunkGenerators;
 
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
@@ -23,7 +23,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.ChunkGenerator;
+import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class PerlinTerrainGenerator implements ChunkGenerator {
+public class PerlinTerrainGenerator implements FirstPassGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 

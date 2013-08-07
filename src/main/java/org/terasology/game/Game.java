@@ -67,7 +67,7 @@ public class Game {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
             ModConfig modConfig = new ModConfig();
-            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveMods()) {
+            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
                 modConfig.addMod(module.getModuleInfo().getId());
             }
 

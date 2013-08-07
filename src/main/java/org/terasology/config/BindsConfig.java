@@ -160,9 +160,8 @@ public final class BindsConfig {
     public static BindsConfig createDefault() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         BindsConfig config = new BindsConfig();
-        config.addDefaultsFor(ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
-        for (Module module : moduleManager.getMods()) {
-            if (module.isCodeMod()) {
+        for (Module module : moduleManager.getModules()) {
+            if (module.isCodeModule()) {
                 config.addDefaultsFor(module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
@@ -174,16 +173,15 @@ public final class BindsConfig {
      */
     public void updateForChangedMods() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        updateInputsFor(ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
-        for (Module module : moduleManager.getMods()) {
-            if (module.isCodeMod()) {
+        for (Module module : moduleManager.getModules()) {
+            if (module.isCodeModule()) {
                 updateInputsFor(module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {
-            if (!hasBinds(ModuleManager.ENGINE_PACKAGE, "toolbarSlot" + i)) {
-                setBinds(ModuleManager.ENGINE_PACKAGE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
+            if (!hasBinds(ModuleManager.ENGINE_MODULE, "toolbarSlot" + i)) {
+                setBinds(ModuleManager.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
             }
         }
     }
@@ -208,7 +206,7 @@ public final class BindsConfig {
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {
-            setBinds(ModuleManager.ENGINE_PACKAGE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
+            setBinds(ModuleManager.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
         }
     }
 

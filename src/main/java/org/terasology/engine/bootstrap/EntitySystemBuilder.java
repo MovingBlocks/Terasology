@@ -48,6 +48,7 @@ import org.terasology.entitySystem.metadata.extension.Region3iTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector2fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Vector4fTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -60,6 +61,7 @@ import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -67,6 +69,7 @@ import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.util.Set;
 
 /**
@@ -103,11 +106,13 @@ public class EntitySystemBuilder {
                 .add(Block.class, new BlockTypeHandler())
                 .add(Color4f.class, new Color4fTypeHandler())
                 .add(Quat4f.class, new Quat4fTypeHandler())
+                .add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class))
                 .add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class))
                 .add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class))
                 .add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class))
                 .add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class))
                 .add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class))
+                .add(Vector4f.class, new Vector4fTypeHandler())
                 .add(Vector3f.class, new Vector3fTypeHandler())
                 .add(Vector2f.class, new Vector2fTypeHandler())
                 .add(Vector3i.class, vector3iHandler)
@@ -119,7 +124,7 @@ public class EntitySystemBuilder {
     }
 
     private void registerComponents(ComponentLibrary library, ModuleManager moduleManager) {
-        Reflections reflections = moduleManager.getActiveModReflections();
+        Reflections reflections = moduleManager.getActiveModuleReflections();
 
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
@@ -130,9 +135,8 @@ public class EntitySystemBuilder {
     }
 
     private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
-        registerEvents(ModuleManager.ENGINE_PACKAGE, eventSystem, moduleManager.getEngineReflections());
-        for (Module module : moduleManager.getActiveMods()) {
-            if (module.isCodeMod()) {
+        for (Module module : moduleManager.getActiveModules()) {
+            if (module.isCodeModule()) {
                 registerEvents(module.getModuleInfo().getId(), eventSystem, module.getReflections());
             }
         }

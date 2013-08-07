@@ -21,9 +21,9 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
-import org.terasology.engine.module.Module;
 
 /**
  * @author Immortius
@@ -44,20 +44,19 @@ public class RegisterMods implements LoadProcess {
     @Override
     public boolean step() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        for (Module module : moduleManager.getMods()) {
-            module.setEnabled(false);
-        }
+        moduleManager.disableAllModules();
 
         for (String modName : gameManifest.getModConfiguration().listMods()) {
-            Module module = moduleManager.getMod(modName);
+            Module module = moduleManager.getModule(modName);
             if (module != null) {
-                module.setEnabled(true);
+                moduleManager.enableModule(module);
             } else {
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + modName));
+                return true;
             }
         }
 
-        moduleManager.applyActiveMods();
+        moduleManager.applyActiveModules();
         AssetManager.getInstance().clear();
         AssetManager.getInstance().applyOverrides();
         return true;

@@ -42,8 +42,8 @@ import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
+import org.terasology.world.generator.ChunkGeneratorManager;
+import org.terasology.world.generator.ChunkGeneratorManagerImpl;
 
 import java.util.Arrays;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.generator.core;
+package org.terasology.world.generator.chunkGenerators;
 
 
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.ChunkGenerator;
+import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @author Nym Traveel
  */
-public class BasicHMTerrainGenerator implements ChunkGenerator {
+public class BasicHMTerrainGenerator implements FirstPassGenerator {
     private static final Logger logger = LoggerFactory.getLogger(BasicHMTerrainGenerator.class);
 
     private WorldBiomeProvider biomeProvider;

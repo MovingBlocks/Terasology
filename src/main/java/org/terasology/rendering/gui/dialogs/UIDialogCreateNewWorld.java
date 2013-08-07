@@ -37,12 +37,12 @@ import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.core.BasicHMTerrainGenerator;
-import org.terasology.world.generator.core.FlatTerrainGenerator;
-import org.terasology.world.generator.core.FloraGenerator;
-import org.terasology.world.generator.core.ForestGenerator;
-import org.terasology.world.generator.core.MultiTerrainGenerator;
-import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.generator.chunkGenerators.BasicHMTerrainGenerator;
+import org.terasology.world.generator.chunkGenerators.FlatTerrainGenerator;
+import org.terasology.world.generator.chunkGenerators.FloraGenerator;
+import org.terasology.world.generator.chunkGenerators.ForestGenerator;
+import org.terasology.world.generator.chunkGenerators.MultiTerrainGenerator;
+import org.terasology.world.generator.chunkGenerators.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 import org.terasology.world.time.WorldTime;
 

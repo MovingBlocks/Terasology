@@ -45,7 +45,7 @@ public abstract class BlockManager {
         AIR.setHardness((byte) 0);
         AIR.setId((short) 0);
         AIR.setDisplayName("Air");
-        AIR.setUri(new BlockUri(ModuleManager.ENGINE_PACKAGE, AIR_ID));
+        AIR.setUri(new BlockUri(ModuleManager.ENGINE_MODULE, AIR_ID));
         AIR_FAMILY = new SymmetricFamily(AIR.getURI(), AIR);
     }
 

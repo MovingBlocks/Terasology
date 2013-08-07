@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator.core;
+package org.terasology.world.generator.chunkGenerators;
 
 import com.google.common.collect.Lists;
 import org.terasology.config.Config;
@@ -24,7 +24,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.ChunkGenerator;
+import org.terasology.world.generator.FirstPassGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class FloraGenerator implements ChunkGenerator {
+public class FloraGenerator implements FirstPassGenerator {
 
     private static final String[] FLOWER_BLOCKS = new String[]{"engine:YellowFlower", "engine:RedFlower", "engine:BrownShroom", "engine:BigBrownShroom", "engine:RedShroom",
             "engine:RedClover", "engine:Lavender", "engine:Iris", "engine:GlowbellBloom", "engine:Glowbell",

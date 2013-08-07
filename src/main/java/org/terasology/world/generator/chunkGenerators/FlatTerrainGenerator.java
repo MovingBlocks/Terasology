@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator.core;
+package org.terasology.world.generator.chunkGenerators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.ChunkGenerator;
+import org.terasology.world.generator.FirstPassGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @author Mathias Kalb
  */
-public class FlatTerrainGenerator implements ChunkGenerator {
+public class FlatTerrainGenerator implements FirstPassGenerator {
 
     private static final String INIT_PARAMETER_HEIGHT = "height";
     // TODO FlatTerrainGenerator: What is a good value for MAX_Y?

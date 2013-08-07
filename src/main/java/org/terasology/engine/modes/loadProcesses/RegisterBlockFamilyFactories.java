@@ -46,9 +46,8 @@ public class RegisterBlockFamilyFactories implements LoadProcess {
         DefaultBlockFamilyFactoryRegistry registry = new DefaultBlockFamilyFactoryRegistry();
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
-        loadFamilies(registry, moduleManager.getEngineReflections());
-        for (Module module : moduleManager.getActiveMods()) {
-            if (module.isCodeMod()) {
+        for (Module module : moduleManager.getActiveModules()) {
+            if (module.isCodeModule()) {
                 loadFamilies(registry, module.getReflections());
             }
         }

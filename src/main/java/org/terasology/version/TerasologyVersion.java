@@ -54,22 +54,12 @@ public final class TerasologyVersion {
 
     private TerasologyVersion() {
         final Properties properties = new Properties();
-        final InputStream inStream = this.getClass().getResourceAsStream(VERSION_INFO_FILE);
-        if (inStream != null) {
-            try {
+        try (InputStream inStream = this.getClass().getResourceAsStream(VERSION_INFO_FILE)) {
+            if (inStream != null) {
                 properties.load(inStream);
-            } catch (final IOException e) {
-                logger.error("Loading {} failed", VERSION_INFO_FILE, e);
-            } finally {
-                // JAVA7 : cleanup
-                try {
-                    if (inStream != null) {
-                        inStream.close();
-                    }
-                } catch (final IOException e) {
-                    logger.error("Closing {} failed", VERSION_INFO_FILE, e);
-                }
             }
+        } catch (final IOException e) {
+            logger.error("Loading {} failed", VERSION_INFO_FILE, e);
         }
 
         buildNumber = properties.getProperty(BUILD_NUMBER, DEFAULT_VALUE);

@@ -127,7 +127,7 @@ public class GameManifest {
         try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
             GameManifest result = new GsonBuilder().create().fromJson(reader, GameManifest.class);
             if (result.modConfiguration.size() == 0) {
-                for (Module module : CoreRegistry.get(ModuleManager.class).getMods()) {
+                for (Module module : CoreRegistry.get(ModuleManager.class).getModules()) {
                     result.modConfiguration.addMod(module.getModuleInfo().getId());
                 }
             }

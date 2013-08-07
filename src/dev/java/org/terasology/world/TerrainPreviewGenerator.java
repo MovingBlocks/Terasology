@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.TerasologyDevelopment;
 import org.terasology.world.block.Block;
-import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.generator.chunkGenerators.PerlinTerrainGenerator;
 
 /**
  * Simple preview generator. Generates heightmap images using the terrain

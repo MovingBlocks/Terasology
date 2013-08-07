@@ -18,10 +18,26 @@ package org.terasology.world.generator;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.chunks.Chunk;
+
+import java.util.List;
 
 /**
  * @author Immortius
  */
-public interface SecondPassChunkGenerator extends BaseChunkGenerator {
-    void postProcessChunk(Vector3i chunkPos, ChunkView view);
+public interface ChunkGeneratorManager {
+
+    List<BaseChunkGenerator> getBaseChunkGenerators();
+
+    void setWorldSeed(String seed);
+
+    void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
+
+    void registerChunkGenerator(BaseChunkGenerator generator);
+
+    Chunk generateChunk(Vector3i pos);
+
+    void secondPassChunk(Vector3i chunkPos, ChunkView view);
+
 }

@@ -70,10 +70,8 @@ public class RegisterInputSystem implements LoadProcess {
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        registerButtonBinds(inputSystem, ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
-        registerAxisBinds(inputSystem, ModuleManager.ENGINE_PACKAGE, moduleManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
-        for (Module module : moduleManager.getActiveMods()) {
-            if (module.isCodeMod()) {
+        for (Module module : moduleManager.getActiveModules()) {
+            if (module.isCodeModule()) {
                 registerButtonBinds(inputSystem, module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
                 registerAxisBinds(inputSystem, module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
             }

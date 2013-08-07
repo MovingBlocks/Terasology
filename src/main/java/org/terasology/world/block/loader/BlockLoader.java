@@ -449,9 +449,7 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     private JsonElement readJson(AssetUri blockDefUri) {
-        InputStream stream = null;
-        try {
-            stream = AssetManager.assetStream(blockDefUri);
+        try (InputStream stream = AssetManager.assetStream(blockDefUri)) {
             if (stream != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 return parser.parse(reader);
@@ -462,15 +460,6 @@ public class BlockLoader implements BlockBuilderHelper {
             logger.error("Failed to parse block definition '{}'", blockDefUri, e);
         } catch (IOException e) {
             logger.error("Failed to load block definition '{}'", blockDefUri, e);
-        } finally {
-            // JAVA7: Clean up closing
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close stream", e);
-                }
-            }
         }
         return null;
     }
