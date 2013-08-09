@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Region3i;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.generator.ChunkGeneratorManager;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Comparator;
 
@@ -36,12 +36,12 @@ public class ChunkGenerationPipeline {
     private TaskMaster<ChunkRequest> chunkReviewer;
     private TaskMaster<ChunkTask> chunkGenerator;
 
-    private ChunkGeneratorManager generator;
+    private WorldGenerator generator;
     private GeneratingChunkProvider provider;
 
-    public ChunkGenerationPipeline(GeneratingChunkProvider provider, ChunkGeneratorManager generatorManager, Comparator<ChunkTask> taskComparator) {
+    public ChunkGenerationPipeline(GeneratingChunkProvider provider, WorldGenerator generator, Comparator<ChunkTask> taskComparator) {
         this.provider = provider;
-        this.generator = generatorManager;
+        this.generator = generator;
         chunkReviewer = TaskMaster.createPriorityTaskMaster("Chunk-Reviewer", NUM_REVIEW_THREADS, 64);
         chunkGenerator = TaskMaster.createPriorityTaskMaster("Chunk-Generator", NUM_TASK_THREADS, 128, taskComparator);
     }
@@ -75,7 +75,7 @@ public class ChunkGenerationPipeline {
         chunkGenerator.shutdown(new ShutdownChunkTask(), false);
     }
 
-    public ChunkGeneratorManager getChunkGeneratorManager() {
+    public WorldGenerator getWorldGenerator() {
         return generator;
     }
 

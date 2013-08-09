@@ -37,6 +37,7 @@ import org.terasology.input.Input;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.MultimapHandler;
+import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -161,6 +162,8 @@ public final class Config {
                 merge(baseConfig.getAsJsonObject(), config.getAsJsonObject());
                 return gson.fromJson(baseConfig, Config.class);
             }
+        } catch (JsonParseException e) {
+            throw new IOException("Failed to load config", e);
         }
     }
 
@@ -172,6 +175,7 @@ public final class Config {
                 .registerTypeAdapter(Input.class, new InputHandler())
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+                .registerTypeAdapterFactory(new UriTypeAdapterFactory())
                 .setPrettyPrinting().create();
     }
 

@@ -28,8 +28,11 @@ import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
+import org.terasology.rendering.gui.layout.ColumnLayout;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIComboBox;
+import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
@@ -37,19 +40,14 @@ import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.chunkGenerators.BasicHMTerrainGenerator;
-import org.terasology.world.generator.chunkGenerators.FlatTerrainGenerator;
-import org.terasology.world.generator.chunkGenerators.FloraGenerator;
-import org.terasology.world.generator.chunkGenerators.ForestGenerator;
-import org.terasology.world.generator.chunkGenerators.MultiTerrainGenerator;
-import org.terasology.world.generator.chunkGenerators.PerlinTerrainGenerator;
-import org.terasology.world.liquid.LiquidsGenerator;
+import org.terasology.world.generator.WorldGeneratorInfo;
+import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.WorldGeneratorUri;
 import org.terasology.world.time.WorldTime;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -60,6 +58,8 @@ import java.util.List;
  */
 
 public class UIDialogCreateNewWorld extends UIDialog {
+    public static final float COMPONENT_WIDTH = 256f;
+    public static final float COMPONENT_HEIGHT = 30f;
     private UIButton okButton;
     private UIButton cancelButton;
 
@@ -67,17 +67,20 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UIText inputSeed;
     private UILabel inputWorldTitleLabel;
     private UIText inputWorldTitle;
-    private UILabel chunkGeneratorLabel;
-    private UIComboBox chunkGenerator;
+    private UILabel worldGeneratorLabel;
+    private UIComboBox worldGenerator;
 
     private ModConfig modConfig;
+    private List<WorldGeneratorInfo> worldGenerators;
+    private UIButton modButton;
 
-    private boolean createServerGame;
+    private boolean createServerGame = false;
 
-    public UIDialogCreateNewWorld(boolean createServerGame) {
+    public UIDialogCreateNewWorld(boolean createServer) {
         super(new Vector2f(512f, 380f));
-        this.createServerGame = createServerGame;
         setTitle("Create new world");
+
+        this.createServerGame = createServer;
 
         modConfig = new ModConfig();
         modConfig.copy(CoreRegistry.get(Config.class).getDefaultModSelection());
@@ -85,89 +88,110 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
     @Override
     protected void createDialogArea(UIDisplayContainer parent) {
-        inputSeed = new UIText();
-        inputSeed.setSize(new Vector2f(256f, 30f));
-        //inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
-        inputSeed.setVisible(true);
+        createWorldTitleInput();
+        createSeedInput();
+        createWorldGeneratorInput();
 
-        inputWorldTitle = new UIText();
-        inputWorldTitle.setSize(new Vector2f(256f, 30f));
-        //inputWorldTitle.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
-        inputWorldTitle.setText(getWorldName());
-        inputWorldTitle.setVisible(true);
+        ColumnLayout layout = new ColumnLayout();
+        layout.setSpacingVertical(4);
+        layout.setBorder(20);
 
-        inputSeedLabel = new UILabel("Enter a seed (optional):");
-        inputSeedLabel.setColor(Color.darkGray);
-        inputSeedLabel.setSize(new Vector2f(0f, 16f));
-        inputSeedLabel.setVisible(true);
+        UIComposite content = new UIComposite();
+        content.setVisible(true);
+        content.setLayout(layout);
+        content.addDisplayElement(inputWorldTitleLabel);
+        content.addDisplayElement(inputWorldTitle);
+        content.addDisplayElement(inputSeedLabel);
+        content.addDisplayElement(inputSeed);
+        content.addDisplayElement(worldGeneratorLabel);
+        content.addDisplayElement(worldGenerator);
 
-        inputWorldTitleLabel = new UILabel("Enter a world name:");
-        inputWorldTitleLabel.setColor(Color.darkGray);
-        inputWorldTitleLabel.setSize(new Vector2f(0f, 16f));
-        inputWorldTitleLabel.setVisible(true);
+        parent.addDisplayElement(content);
 
-        chunkGeneratorLabel = new UILabel("Choose Chunk Generator:");
-        chunkGeneratorLabel.setColor(Color.darkGray);
-        chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
-        chunkGeneratorLabel.setVisible(true);
-
-        UIListItem item;
-        chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
-        item = new UIListItem("Perlin", new Integer(0));
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        chunkGenerator.addItem(item);
-        item = new UIListItem("Flat", new Integer(1));
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        chunkGenerator.addItem(item);
-        item = new UIListItem("Multi", new Integer(2));
-        item.setTextColor(Color.cyan);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        chunkGenerator.addItem(item);
-        item = new UIListItem("Heigthmap Generator", new Integer(3));
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        chunkGenerator.addItem(item);
-        chunkGenerator.select(0);
-        chunkGenerator.setVisible(true);
-
-
-        inputWorldTitleLabel.setPosition(new Vector2f(15f, 32f));
-        inputWorldTitle.setPosition(new Vector2f(inputWorldTitleLabel.getPosition().x, inputWorldTitleLabel.getPosition().y + inputWorldTitleLabel.getSize().y + 8f));
-        inputSeedLabel.setPosition(new Vector2f(inputWorldTitle.getPosition().x, inputWorldTitle.getPosition().y + inputWorldTitle.getSize().y + 16f));
-        inputSeed.setPosition(new Vector2f(inputSeedLabel.getPosition().x, inputSeedLabel.getPosition().y + inputSeedLabel.getSize().y + 8f));
-
-        chunkGeneratorLabel.setPosition(new Vector2f(inputSeed.getPosition().x, inputSeed.getPosition().y + inputSeed.getSize().y + 16f));
-        chunkGenerator.setPosition(new Vector2f(chunkGeneratorLabel.getPosition().x, chunkGeneratorLabel.getPosition().y + chunkGeneratorLabel.getSize().y + 8f));
-
-
-        UIButton modButton = new UIButton(new Vector2f(80, 30), UIButton.ButtonType.NORMAL);
-        modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 58f));
-        modButton.setVisible(true);
-        modButton.getLabel().setText("Mods...");
-        modButton.addClickListener(new ClickListener() {
-            @Override
-            public void click(UIDisplayElement element, int button) {
-                UIDialogMods dialog = new UIDialogMods(modConfig);
-                dialog.open();
-            }
-        });
-        parent.addDisplayElement(inputWorldTitleLabel);
-        parent.addDisplayElement(inputWorldTitle);
-        parent.addDisplayElement(inputSeedLabel);
-        parent.addDisplayElement(inputSeed);
-        parent.addDisplayElement(chunkGeneratorLabel);
-        parent.addDisplayElement(chunkGenerator);
-        parent.addDisplayElement(modButton);
+        content.orderDisplayElementTop(worldGenerator);
         parent.layout();
     }
 
     @Override
     protected void createButtons(UIDisplayContainer parent) {
+        createOkayButton();
+        createCancelButton();
+        createModButton();
+//
+        parent.addDisplayElement(modButton);
+        parent.addDisplayElement(okButton);
+        parent.addDisplayElement(cancelButton);
+    }
+
+    private void createWorldTitleInput( ) {
+        inputWorldTitleLabel = createLabel("Enter a world name:");
+
+        inputWorldTitle = new UIText();
+        inputWorldTitle.setSize(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT));
+        //inputWorldTitle.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        inputWorldTitle.setText(getWorldName());
+        inputWorldTitle.setVisible(true);
+    }
+
+    private void createSeedInput() {
+        inputSeedLabel = createLabel("Enter a seed (optional):");
+
+        inputSeed = new UIText();
+        inputSeed.setSize(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT));
+        //inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        inputSeed.setVisible(true);
+    }
+
+    private void createWorldGeneratorInput() {
+        worldGeneratorLabel = createLabel("Choose World Generator:");
+
+        final WorldGeneratorManager worldGeneratorManager = CoreRegistry.get(WorldGeneratorManager.class);
+        worldGenerators = worldGeneratorManager.getWorldGenerators();
+        worldGenerator = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2*COMPONENT_HEIGHT));
+        WorldGeneratorUri defaultMapGenerator = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultGenerator();
+        UIListItem item;
+        int index = 0;
+        int defaultIndex = 0;
+        for (WorldGeneratorInfo generator : worldGenerators) {
+            if( generator.getUri().equals(defaultMapGenerator) ) {
+                defaultIndex = index;
+            }
+            item = new UIListItem(generator.getDisplayName(), index);
+            item.setTextColor(Color.black);
+            item.setPadding(new Vector4f(2f, 2f, 2f, 2f));
+            item.setValue(generator);
+            worldGenerator.addItem(item);
+
+            index++;
+        }
+
+        worldGenerator.setVisible(true);
+        worldGenerator.addSelectionListener(new SelectionListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                WorldGeneratorInfo generator = getSelectedWorldGenerator();
+                if (modConfig != null) {
+                    modConfig.addMod(generator.getUri().getModuleName());
+                }
+            }
+        });
+        worldGenerator.select(defaultIndex);
+    }
+
+    private UILabel createLabel( String text ) {
+        UILabel label;
+        label = new UILabel(text);
+        label.setColor(Color.darkGray);
+        label.setSize(new Vector2f(0f, 32));
+        label.setMargin(new Vector4f(16, 0, 0, 0));
+        label.setVisible(true);
+        return label;
+    }
+
+
+    private void createOkayButton() {
         okButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         okButton.getLabel().setText("Play");
-        okButton.setPosition(new Vector2f(getSize().x / 2 - okButton.getSize().x - 16f, getSize().y - okButton.getSize().y - 10));
         okButton.setVisible(true);
 
         okButton.addClickListener(new ClickListener() {
@@ -200,57 +224,28 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     config.getWorldGeneration().setWorldTitle(getWorldName());
                 }
 
-                List<String> chunkList = new ArrayList<String>();
-                switch (chunkGenerator.getSelectionIndex()) {
-                    case 1:   //flat
-                        chunkList.add(FlatTerrainGenerator.class.getName());
-                        //if (checkboxFlora == selected) ... (pseudo code)
-                        chunkList.add(FloraGenerator.class.getName());
-                        chunkList.add(LiquidsGenerator.class.getName());
-                        chunkList.add(ForestGenerator.class.getName());
-                        break;
+                CoreRegistry.get(Config.class).getDefaultModSelection().copy(modConfig);
+                CoreRegistry.get(Config.class).save();
 
-                    case 2:   //multiworld
-                        chunkList.add(MultiTerrainGenerator.class.getName());
-                        chunkList.add(FloraGenerator.class.getName());
-                        chunkList.add(LiquidsGenerator.class.getName());
-                        chunkList.add(ForestGenerator.class.getName());
-                        break;
-                    case 3:   //Nym
-                        chunkList.add(BasicHMTerrainGenerator.class.getName());
-                        chunkList.add(FloraGenerator.class.getName());
-                        chunkList.add(LiquidsGenerator.class.getName());
-                        chunkList.add(ForestGenerator.class.getName());
-                        break;
+                WorldGeneratorInfo worldGeneratorInfo = getSelectedWorldGenerator();
 
-                    default:  //normal
-                        chunkList.add(PerlinTerrainGenerator.class.getName());
-                        chunkList.add(FloraGenerator.class.getName());
-                        chunkList.add(LiquidsGenerator.class.getName());
-                        chunkList.add(ForestGenerator.class.getName());
-                        break;
-                }
-
-                String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
-                config.getDefaultModSelection().copy(modConfig);
-                config.save();
 
                 GameManifest gameManifest = new GameManifest();
                 gameManifest.setTitle(config.getWorldGeneration().getWorldTitle());
                 gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
                 gameManifest.getModConfiguration().copy(modConfig);
 
-                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), (long) (WorldTime.DAY_LENGTH * 0.025f), chunksListArr);
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());
                 gameManifest.addWorldInfo(worldInfo);
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(gameManifest, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE))
-                ;
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(gameManifest, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
             }
         });
+    }
 
-
+    private void createCancelButton() {
         cancelButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
-        cancelButton.setPosition(new Vector2f(okButton.getPosition().x + okButton.getSize().x + 16f, okButton.getPosition().y));
+//        cancelButton.setPosition(new Vector2f(okButton.getPosition().x + okButton.getSize().x + 16f, okButton.getPosition().y));
         cancelButton.getLabel().setText("Cancel");
         cancelButton.setVisible(true);
 
@@ -260,9 +255,25 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 close();
             }
         });
+    }
 
-        parent.addDisplayElement(okButton);
-        parent.addDisplayElement(cancelButton);
+    private UIButton createModButton() {
+        modButton = new UIButton(new Vector2f(128, 32), UIButton.ButtonType.NORMAL);
+//        modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 58f));
+        modButton.setVisible(true);
+        modButton.getLabel().setText("Mods...");
+        modButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                UIDialogMods dialog = new UIDialogMods(modConfig);
+                dialog.open();
+            }
+        });
+        return modButton;
+    }
+
+    private WorldGeneratorInfo getSelectedWorldGenerator() {
+        return (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
     }
 
     private String getWorldName() {

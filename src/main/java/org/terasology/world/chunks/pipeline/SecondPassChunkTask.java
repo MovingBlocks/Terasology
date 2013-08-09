@@ -53,7 +53,7 @@ public class SecondPassChunkTask extends AbstractChunkTask {
                 return;
             }
 
-            getPipeline().getChunkGeneratorManager().secondPassChunk(getPosition(), view);
+            getPipeline().getWorldGenerator().applySecondPass(getPosition(), view);
             chunk.setChunkState(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING);
             getPipeline().requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
         } finally {

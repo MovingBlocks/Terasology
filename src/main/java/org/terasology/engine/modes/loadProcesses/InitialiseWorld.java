@@ -20,8 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.GameManifest;
@@ -42,10 +44,9 @@ import org.terasology.world.WorldProviderCoreImpl;
 import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.generator.ChunkGeneratorManager;
-import org.terasology.world.generator.ChunkGeneratorManagerImpl;
-
-import java.util.Arrays;
+import org.terasology.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.WorldGeneratorManager;
 
 /**
  * @author Immortius
@@ -77,13 +78,19 @@ public class InitialiseWorld implements LoadProcess {
         logger.info("World seed: \"{}\"", worldInfo.getSeed());
 
         // TODO: Separate WorldRenderer from world handling in general
-        // Init ChunkGeneratorManager
-        ChunkGeneratorManager chunkGeneratorManager = ChunkGeneratorManagerImpl.buildChunkGenerator(Arrays.asList(worldInfo.getChunkGenerators()));
-        chunkGeneratorManager.setWorldSeed(worldInfo.getSeed());
-        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
+        WorldGenerator worldGenerator;
+        try {
+            worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(worldInfo.getWorldGenerator());
+            worldGenerator.setWorldSeed(worldInfo.getSeed());
+            worldGenerator.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
+        } catch (UnresolvedWorldGeneratorException e) {
+            logger.error("Unable to load world generator", e);
+            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));
+            return false;
+        }
 
         // Init. a new world
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, chunkGeneratorManager);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, worldGenerator);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);

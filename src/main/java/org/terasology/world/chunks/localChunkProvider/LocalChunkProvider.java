@@ -59,7 +59,7 @@ import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generator.ChunkGeneratorManager;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -85,7 +85,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private ChunkGenerationPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
-    private ChunkGeneratorManager generator;
+    private WorldGenerator generator;
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
 
@@ -104,7 +104,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private boolean forceCleanup = false;
 
-    public LocalChunkProvider(StorageManager storageManager, ChunkGeneratorManager generator) {
+    public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
         this.generator = generator;
@@ -527,7 +527,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
                         @Override
                         public void enact() {
-                            Chunk chunk = generator.generateChunk(getPosition());
+                            Chunk chunk = generator.createChunk(getPosition());
                             if (nearCache.putIfAbsent(getPosition(), chunk) != null) {
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }

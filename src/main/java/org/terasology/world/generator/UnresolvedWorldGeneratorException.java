@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.generator;
-
-import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.chunks.Chunk;
-
-import java.util.List;
 
 /**
  * @author Immortius
  */
-public interface ChunkGeneratorManager {
+public class UnresolvedWorldGeneratorException extends Exception {
+    public UnresolvedWorldGeneratorException() {
+    }
 
-    List<BaseChunkGenerator> getBaseChunkGenerators();
+    public UnresolvedWorldGeneratorException(String message) {
+        super(message);
+    }
 
-    void setWorldSeed(String seed);
-
-    void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
-
-    void registerChunkGenerator(BaseChunkGenerator generator);
-
-    Chunk generateChunk(Vector3i pos);
-
-    void secondPassChunk(Vector3i chunkPos, ChunkView view);
-
+    public UnresolvedWorldGeneratorException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

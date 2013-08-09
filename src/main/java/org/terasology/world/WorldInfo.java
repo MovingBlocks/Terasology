@@ -16,6 +16,8 @@
 
 package org.terasology.world;
 
+import org.terasology.world.generator.WorldGeneratorUri;
+
 /**
  * Summary information on a world.
  *
@@ -26,20 +28,20 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time = 0;
-    private String[] chunkGenerators = new String[]{};
+    private WorldGeneratorUri worldGenerator = new WorldGeneratorUri("engine", "perlin");
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, String[] chunkGenerators) {
+    public WorldInfo(String title, String seed, long time, WorldGeneratorUri worldGenerator) {
         if (title != null) {
             this.title = title;
         }
         if (seed != null) {
             this.seed = seed;
         }
-        if (chunkGenerators != null) {
-            this.chunkGenerators = chunkGenerators;
+        if (worldGenerator != null) {
+            this.worldGenerator = worldGenerator;
         }
         this.time = time;
     }
@@ -72,12 +74,11 @@ public class WorldInfo {
         this.time = time;
     }
 
-    public String[] getChunkGenerators() {
-        return chunkGenerators;
+    public WorldGeneratorUri getWorldGenerator() {
+        return worldGenerator;
     }
 
-    public void setChunkGenerators(String[] chunkGenerators) {
-        this.chunkGenerators = chunkGenerators;
+    public void setWorldGenerator(WorldGeneratorUri worldGenerator) {
+        this.worldGenerator = worldGenerator;
     }
-
 }

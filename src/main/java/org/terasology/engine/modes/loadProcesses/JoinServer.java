@@ -78,6 +78,7 @@ public class JoinServer implements LoadProcess {
                 Module module = moduleManager.getModule(moduleInfo.getModuleId());
                 if (module == null) {
                     CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + moduleInfo.getModuleId()));
+                    return false;
                 } else {
                     logger.debug("Activating module: {}", moduleInfo.getModuleId());
                     modConfig.addMod(moduleInfo.getModuleId());

@@ -140,7 +140,7 @@ public class ModuleManager {
      *
      * @return Reflections over the engine and all available modules
      */
-    public Reflections getAllReflections() {
+    public Reflections loadInactiveReflections() {
         if (allReflections == null) {
             List<URL> urls = Lists.newArrayList();
             for (ExtensionModule module : getExtensionModules()) {
@@ -325,5 +325,9 @@ public class ModuleManager {
             }
         }
         return result;
+    }
+
+    public boolean isEnabled(Module module) {
+        return activeModules.contains(module);
     }
 }

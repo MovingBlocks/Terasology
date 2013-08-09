@@ -17,12 +17,15 @@ package org.terasology.game;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.terasology.config.ModConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.world.WorldInfo;
 
 import java.io.BufferedReader;
@@ -119,13 +122,13 @@ public class GameManifest {
 
     public static void save(Path toFile, GameManifest gameManifest) throws IOException {
         try (Writer writer = Files.newBufferedWriter(toFile, TerasologyConstants.CHARSET)) {
-            new GsonBuilder().setPrettyPrinting().create().toJson(gameManifest, writer);
+            createGson().toJson(gameManifest, writer);
         }
     }
 
     public static GameManifest load(Path filePath) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
-            GameManifest result = new GsonBuilder().create().fromJson(reader, GameManifest.class);
+            GameManifest result = createGson().fromJson(reader, GameManifest.class);
             if (result.modConfiguration.size() == 0) {
                 for (Module module : CoreRegistry.get(ModuleManager.class).getModules()) {
                     result.modConfiguration.addMod(module.getModuleInfo().getId());
@@ -133,6 +136,14 @@ public class GameManifest {
             }
             return result;
         }
+    }
+
+    private static Gson createGson() {
+        return new GsonBuilder()
+                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+                .registerTypeAdapterFactory(new UriTypeAdapterFactory())
+                .setPrettyPrinting()
+                .create();
     }
 
 }
