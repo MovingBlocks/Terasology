@@ -356,7 +356,7 @@ public class BlockLoader implements BlockBuilderHelper {
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, atlas.getRelativeTileSizeWithOffset()));
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, atlas.getRelativeTileSize()));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);

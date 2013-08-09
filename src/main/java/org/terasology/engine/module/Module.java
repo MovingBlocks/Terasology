@@ -17,9 +17,6 @@ package org.terasology.engine.module;
 
 import org.reflections.Reflections;
 
-import java.net.URL;
-import java.nio.file.Path;
-
 /**
  * @author Immortius
  */

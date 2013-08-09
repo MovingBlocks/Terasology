@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.module;
 
-import com.google.common.base.Objects;
 import org.reflections.Reflections;
 
 /**

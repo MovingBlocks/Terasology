@@ -18,7 +18,6 @@ package org.terasology.entitySystem.metadata.extension;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 /**

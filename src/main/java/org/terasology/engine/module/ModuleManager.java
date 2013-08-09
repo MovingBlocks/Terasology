@@ -30,7 +30,6 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
@@ -286,7 +285,7 @@ public class ModuleManager {
         activeModuleClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
         for (Module module : activeModules) {
             if (module instanceof ExtensionModule) {
-                ((ExtensionModule)module).setActiveClassLoader(activeModuleClassLoader);
+                ((ExtensionModule) module).setActiveClassLoader(activeModuleClassLoader);
             }
         }
         // We don't submit any urls as we don't want to scan (going to merge in from previous scans)
