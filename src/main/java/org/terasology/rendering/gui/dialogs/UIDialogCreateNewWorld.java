@@ -37,7 +37,7 @@ import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
-import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
+import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.WorldGeneratorInfo;
@@ -277,7 +277,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
     }
 
     private String getWorldName() {
-        UIMenuSingleplayer menu = (UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer");
+        UIMenuSelectWorld menu = (UIMenuSelectWorld) getGUIManager().getWindowById("selectworld");
         return "Game" + (menu.getWorldCount() + 1);
     }
 }

@@ -91,8 +91,8 @@ public class UIMenuMain extends UIWindow {
         singlePlayerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                getGUIManager().openWindow("singleplayer");
-                ((UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer")).setCreateServerGame(false);
+                getGUIManager().openWindow("selectworld");
+                ((UIMenuSelectWorld) getGUIManager().getWindowById("selectworld")).setCreateServerGame(false);
             }
         });
 
@@ -105,8 +105,8 @@ public class UIMenuMain extends UIWindow {
         multiplayerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                getGUIManager().openWindow("singleplayer");
-                ((UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer")).setCreateServerGame(true);
+                getGUIManager().openWindow("selectworld");
+                ((UIMenuSelectWorld) getGUIManager().getWindowById("selectworld")).setCreateServerGame(true);
             }
         });
 

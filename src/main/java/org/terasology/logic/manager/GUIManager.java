@@ -47,7 +47,7 @@ import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
 import org.terasology.rendering.gui.windows.UIMenuJoinServer;
 import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
-import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
+import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
@@ -86,7 +86,7 @@ public class GUIManager implements ComponentSystem {
     private void registerWindows() {
         //TODO parser action here! this is temporary
         registeredWindows.put("main", UIMenuMain.class);
-        registeredWindows.put("singleplayer", UIMenuSingleplayer.class);
+        registeredWindows.put("selectworld", UIMenuSelectWorld.class);
         registeredWindows.put("joinserver", UIMenuJoinServer.class);
         registeredWindows.put("config", UIMenuConfig.class);
         registeredWindows.put("config:video", UIMenuConfigVideo.class);

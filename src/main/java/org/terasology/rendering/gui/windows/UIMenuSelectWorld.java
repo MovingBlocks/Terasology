@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -44,17 +44,17 @@ import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * Select world menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMenuSingleplayer extends UIWindow {
-    private static final Logger logger = LoggerFactory.getLogger(UIMenuSingleplayer.class);
+public class UIMenuSelectWorld extends UIWindow {
+    private static final Logger logger = LoggerFactory.getLogger(UIMenuSelectWorld.class);
 
     final UIList list;
     final UIButton goToBack;
@@ -64,8 +64,8 @@ public class UIMenuSingleplayer extends UIWindow {
 
     private boolean createServerGame = false;
 
-    public UIMenuSingleplayer() {
-        setId("singleplayer");
+    public UIMenuSelectWorld() {
+        setId("selectworld");
         setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
@@ -184,44 +184,30 @@ public class UIMenuSingleplayer extends UIWindow {
         list.removeAll();
 
         Path savedGames = PathManager.getInstance().getSavesPath();
-        List<Path> savedGamePaths = Lists.newArrayList();
+        SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
         try (DirectoryStream<Path> stream =
                      Files.newDirectoryStream(savedGames)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
-                    savedGamePaths.add(entry);
+
+                    savedGamePaths.put(Files.getLastModifiedTime(entry), entry);
                 }
             }
         } catch (IOException e) {
             logger.error("Failed to read saved games path", e);
         }
 
-        //TODO type safety!
-        Collections.sort(savedGamePaths, new Comparator<Path>() {
-            public int compare(Path o1, Path o2) {
-                Path f1 = o1.resolve(GameManifest.DEFAULT_FILE_NAME);
-                Path f2 = o2.resolve(GameManifest.DEFAULT_FILE_NAME);
-                try {
-                    FileTime f1Time = Files.getLastModifiedTime(f1);
-                    FileTime f2Time = Files.getLastModifiedTime(f2);
-                    return -f1Time.compareTo(f2Time);
-                } catch (IOException e) {
-                    logger.error("Failed to compare times for {} and {}", f1, f2, e);
-                }
-                return 0;
-            }
-        });
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (Map.Entry<FileTime, Path> world : savedGamePaths.entrySet()) {
+            Path gameManifest = world.getValue().resolve(GameManifest.DEFAULT_FILE_NAME);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        for (Path savedGameDir : savedGamePaths) {
-            Path gameManifest = savedGameDir.resolve(GameManifest.DEFAULT_FILE_NAME);
             if (!Files.isRegularFile(gameManifest)) {
                 continue;
             }
             try {
                 GameManifest info = GameManifest.load(gameManifest);
                 if (!info.getTitle().isEmpty()) {
-                    Date date = new Date(Files.getLastModifiedTime(gameManifest).toMillis());
+                    Date date = new Date(world.getKey().toMillis());
                     UIListItem item = new UIListItem(info.getTitle() + "\n" + dateFormat.format(date), info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
@@ -229,7 +215,6 @@ public class UIMenuSingleplayer extends UIWindow {
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);
             }
-
         }
     }
 
