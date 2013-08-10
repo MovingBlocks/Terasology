@@ -23,6 +23,8 @@
 {
     "hardness" : 6,
 
+    "categories" : ["wood"],
+
     // Graphics
     "tiles" : {
         "sides" : "engine:OakBark"

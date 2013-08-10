@@ -61,7 +61,7 @@ public final class Config {
     private InputConfig input = new InputConfig();
     private AudioConfig audio = new AudioConfig();
     private RenderingConfig rendering = new RenderingConfig();
-    private ModConfig defaultModSelection = new ModConfig();
+    private ModuleConfig defaultModSelection = new ModuleConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
@@ -80,7 +80,7 @@ public final class Config {
         return input;
     }
 
-    public ModConfig getDefaultModSelection() {
+    public ModuleConfig getDefaultModSelection() {
         return defaultModSelection;
     }
 

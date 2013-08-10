@@ -19,7 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ModConfig;
+import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
@@ -72,7 +72,7 @@ public class JoinServer implements LoadProcess {
             gameManifest.setBlockIdMap(blockMap);
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
-            ModConfig modConfig = gameManifest.getModConfiguration();
+            ModuleConfig moduleConfig = gameManifest.getModuleConfiguration();
             ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
             for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 Module module = moduleManager.getModule(moduleInfo.getModuleId());
@@ -81,7 +81,7 @@ public class JoinServer implements LoadProcess {
                     return false;
                 } else {
                     logger.debug("Activating module: {}", moduleInfo.getModuleId());
-                    modConfig.addMod(moduleInfo.getModuleId());
+                    moduleConfig.addMod(moduleInfo.getModuleId());
                 }
             }
 

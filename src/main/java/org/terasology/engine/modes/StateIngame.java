@@ -33,9 +33,9 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.MenuControlSystem;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -184,10 +184,6 @@ public class StateIngame implements GameState {
 
     private void updateUserInterface() {
         guiManager.update();
-    }
-
-    public WorldRenderer getWorldRenderer() {
-        return worldRenderer;
     }
 
     public void pause() {

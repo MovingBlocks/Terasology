@@ -18,5 +18,7 @@
  * Stone is just raw stone in the world
  */
 {
-    "mass" = 100
+    "mass" : 100,
+    "hardness" : 8,
+    "categories" : ["stone"]
 }

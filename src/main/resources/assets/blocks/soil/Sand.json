@@ -18,7 +18,7 @@
  * Sand is fairly sandy.
  */
 {
-    "categories" : ["soil"],
+    "basedOn" : "engine:soil",
     "hardness" : 2,
     "mass" : 32
 }

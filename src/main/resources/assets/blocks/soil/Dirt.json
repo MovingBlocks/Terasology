@@ -18,5 +18,5 @@
  * Dirt is pretty basic
  */
 {
-    "categories" : ["soil"]
+    "basedOn" : "engine:soil"
 }

@@ -23,13 +23,13 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ModConfig {
+public class ModuleConfig {
     private List<String> mods = Lists.newArrayList();
 
-    public ModConfig() {
+    public ModuleConfig() {
     }
 
-    public void copy(ModConfig other) {
+    public void copy(ModuleConfig other) {
         this.mods.clear();
         this.mods.addAll(other.mods);
     }

@@ -36,9 +36,9 @@ import org.terasology.world.generator.chunkGenerators.PerlinTerrainGenerator;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class TerrainPreviewGenerator {
+public final class TerrainMapExporter {
 
-    private static final Logger logger = LoggerFactory.getLogger(TerrainPreviewGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(TerrainMapExporter.class);
 
     private static final String SEED = "rAtAiWyKgDlEeFjKiSsPzKaOuKhRrWqV";
 
@@ -54,14 +54,14 @@ public final class TerrainPreviewGenerator {
     PerlinTerrainGenerator generator;
 
     public static void main(final String[] args) {
-        final TerrainPreviewGenerator gen = new TerrainPreviewGenerator(SEED);
+        final TerrainMapExporter gen = new TerrainMapExporter(SEED);
 
         gen.generateMap(MapStyle.BIOMES, "Biomes.png");
         gen.generateMap(MapStyle.COLOR_LUT, "ColorLut.png");
         gen.generateMap(MapStyle.FOLIAGE_LUT, "FoliageLut.png");
     }
 
-    public TerrainPreviewGenerator(final String seed) {
+    public TerrainMapExporter(final String seed) {
         biomeProvider = new WorldBiomeProviderImpl(seed);
         generator = new PerlinTerrainGenerator();
         generator.setWorldSeed(seed);

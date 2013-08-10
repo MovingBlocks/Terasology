@@ -163,7 +163,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
         TFloatIterator multiplierIter = multipliers.iterator();
         while (multiplierIter.hasNext()) {
-            total *= modifierIter.next();
+            total *= multiplierIter.next();
         }
         return TeraMath.floorToInt(total);
 

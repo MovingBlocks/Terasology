@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.dialogs;
 
 import org.newdawn.slick.Color;
 import org.terasology.config.Config;
-import org.terasology.config.ModConfig;
+import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
@@ -70,7 +70,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UILabel worldGeneratorLabel;
     private UIComboBox worldGenerator;
 
-    private ModConfig modConfig;
+    private ModuleConfig moduleConfig;
     private List<WorldGeneratorInfo> worldGenerators;
     private UIButton modButton;
 
@@ -82,8 +82,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
         this.createServerGame = createServer;
 
-        modConfig = new ModConfig();
-        modConfig.copy(CoreRegistry.get(Config.class).getDefaultModSelection());
+        moduleConfig = new ModuleConfig();
+        moduleConfig.copy(CoreRegistry.get(Config.class).getDefaultModSelection());
     }
 
     @Override
@@ -170,8 +170,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
             @Override
             public void changed(UIDisplayElement element) {
                 WorldGeneratorInfo generator = getSelectedWorldGenerator();
-                if (modConfig != null) {
-                    modConfig.addMod(generator.getUri().getModuleName());
+                if (moduleConfig != null) {
+                    moduleConfig.addMod(generator.getUri().getModuleName());
                 }
             }
         });
@@ -224,7 +224,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     config.getWorldGeneration().setWorldTitle(getWorldName());
                 }
 
-                CoreRegistry.get(Config.class).getDefaultModSelection().copy(modConfig);
+                CoreRegistry.get(Config.class).getDefaultModSelection().copy(moduleConfig);
                 CoreRegistry.get(Config.class).save();
 
                 WorldGeneratorInfo worldGeneratorInfo = getSelectedWorldGenerator();
@@ -233,7 +233,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 GameManifest gameManifest = new GameManifest();
                 gameManifest.setTitle(config.getWorldGeneration().getWorldTitle());
                 gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
-                gameManifest.getModConfiguration().copy(modConfig);
+                gameManifest.getModuleConfiguration().copy(moduleConfig);
 
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());
                 gameManifest.addWorldInfo(worldInfo);
@@ -265,7 +265,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         modButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                UIDialogMods dialog = new UIDialogMods(modConfig);
+                UIDialogModules dialog = new UIDialogModules(moduleConfig);
                 dialog.open();
             }
         });

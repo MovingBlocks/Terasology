@@ -18,7 +18,7 @@ package org.terasology.game;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ModConfig;
+import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
@@ -66,12 +66,12 @@ public class Game {
             BlockManager blockManager = CoreRegistry.get(BlockManager.class);
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-            ModConfig modConfig = new ModConfig();
+            ModuleConfig moduleConfig = new ModuleConfig();
             for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-                modConfig.addMod(module.getModuleInfo().getId());
+                moduleConfig.addMod(module.getModuleInfo().getId());
             }
 
-            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), modConfig);
+            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), moduleConfig);
             List<String> registeredBlockFamilies = Lists.newArrayList();
             for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
                 registeredBlockFamilies.add(family.getURI().toString());

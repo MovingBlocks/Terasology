@@ -1,0 +1,6 @@
+{
+    "parent" : "engine:physicalDamage",
+    "toolDamage" : {
+        "materialDamageMultiplier" : {"wood" : 2}
+    }
+}

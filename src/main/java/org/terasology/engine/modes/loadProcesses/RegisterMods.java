@@ -46,7 +46,7 @@ public class RegisterMods implements LoadProcess {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         moduleManager.disableAllModules();
 
-        for (String modName : gameManifest.getModConfiguration().listMods()) {
+        for (String modName : gameManifest.getModuleConfiguration().listMods()) {
             Module module = moduleManager.getModule(modName);
             if (module != null) {
                 moduleManager.enableModule(module);

@@ -18,6 +18,8 @@ package org.terasology.logic.inventory;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 
@@ -86,15 +88,6 @@ public final class ItemComponent implements Component {
      */
     public int baseDamage = 1;
 
-    // TODO: Should use block categories, rather than specific block names (or support both)
-    /**
-     * Map for what this item would have a bonus against (shovels dig faster than hammers)
-     */
-    private Map<String, Integer> perBlockDamageBonus = Maps.newHashMap();
-
-    public Map<String, Integer> getPerBlockDamageBonus() {
-
-        return perBlockDamageBonus;
-    }
+    public Prefab damageType = null;
 
 }

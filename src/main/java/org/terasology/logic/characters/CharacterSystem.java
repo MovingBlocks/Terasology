@@ -20,6 +20,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -131,21 +132,17 @@ public class CharacterSystem implements ComponentSystem {
 
         if (result.isHit()) {
             int damage = 1;
+            Prefab damageType = EngineDamageTypes.PHYSICAL.get();
             // Calculate damage from item
             ItemComponent item = event.getItem().getComponent(ItemComponent.class);
             if (item != null) {
                 damage = item.baseDamage;
-
-                BlockComponent blockComp = result.getEntity().getComponent(BlockComponent.class);
-                if (blockComp != null) {
-                    Block block = worldProvider.getBlock(blockComp.getPosition());
-                    if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
-                        damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
-                    }
+                if (item.damageType != null) {
+                    damageType = item.damageType;
                 }
             }
 
-            result.getEntity().send(new DoDamageEvent(damage, EngineDamageTypes.PHYSICAL.get(), character));
+            result.getEntity().send(new DoDamageEvent(damage, damageType, character));
         }
     }
 

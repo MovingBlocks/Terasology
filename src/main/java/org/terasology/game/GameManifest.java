@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.terasology.config.ModConfig;
+import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
@@ -48,12 +48,12 @@ public class GameManifest {
     private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worldInfo = Maps.newHashMap();
-    private ModConfig modConfiguration = new ModConfig();
+    private ModuleConfig moduleConfiguration = new ModuleConfig();
 
     public GameManifest() {
     }
 
-    public GameManifest(String title, String seed, long time, ModConfig modConfiguration) {
+    public GameManifest(String title, String seed, long time, ModuleConfig moduleConfiguration) {
         if (title != null) {
             this.title = title;
         }
@@ -61,7 +61,7 @@ public class GameManifest {
             this.seed = seed;
         }
         this.time = time;
-        this.modConfiguration.copy(modConfiguration);
+        this.moduleConfiguration.copy(moduleConfiguration);
     }
 
     public String getTitle() {
@@ -104,8 +104,8 @@ public class GameManifest {
         this.blockIdMap = blockIdMap;
     }
 
-    public ModConfig getModConfiguration() {
-        return modConfiguration;
+    public ModuleConfig getModuleConfiguration() {
+        return moduleConfiguration;
     }
 
     public WorldInfo getWorldInfo(String name) {
@@ -129,9 +129,9 @@ public class GameManifest {
     public static GameManifest load(Path filePath) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
             GameManifest result = createGson().fromJson(reader, GameManifest.class);
-            if (result.modConfiguration.size() == 0) {
+            if (result.moduleConfiguration.size() == 0) {
                 for (Module module : CoreRegistry.get(ModuleManager.class).getModules()) {
-                    result.modConfiguration.addMod(module.getModuleInfo().getId());
+                    result.moduleConfiguration.addMod(module.getModuleInfo().getId());
                 }
             }
             return result;

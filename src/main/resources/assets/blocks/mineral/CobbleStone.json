@@ -19,5 +19,7 @@
  * But maybe we'll do something else since ideally we'll have mini-blocks drop from Stone...
  */
 {
-    "mass" : 96
+    "mass" : 96,
+    "hardness" : 6,
+    "categories" : ["stone"]
 }

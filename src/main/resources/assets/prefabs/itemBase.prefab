@@ -1,5 +1,6 @@
 {
     "Item" : {
+        "damageType" : "engine:physicalDamage"
     },
     "Network" : {
         "replicateMode" : "RELEVANT"

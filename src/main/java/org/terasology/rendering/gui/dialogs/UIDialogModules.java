@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.dialogs;
 
 import com.google.common.collect.Lists;
 import org.newdawn.slick.Color;
-import org.terasology.config.ModConfig;
+import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class UIDialogMods extends UIDialog {
+public class UIDialogModules extends UIDialog {
     private static final Color ACTIVE_TEXT_COLOR = new Color(255, 220, 0);
     private static final Color ACTIVE_SELECTED_TEXT_COLOR = new Color(255, 255, 0);
     private static final Color INACTIVE_TEXT_COLOR = new Color(180, 180, 180);
@@ -51,8 +51,8 @@ public class UIDialogMods extends UIDialog {
     private static final String DEACTIVATE_TEXT = "Deactivate";
     private static final Color BLACK = new Color(0, 0, 0);
 
-    private ModConfig modConfig;
-    private ModConfig originalModConfig;
+    private ModuleConfig moduleConfig;
+    private ModuleConfig originalModuleConfig;
     private UIList modList;
     private UIButton toggleButton;
     private UILabel nameLabel;
@@ -60,13 +60,13 @@ public class UIDialogMods extends UIDialog {
     private UIComposite detailPanel;
     private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
-    public UIDialogMods(ModConfig modConfig) {
+    public UIDialogModules(ModuleConfig moduleConfig) {
         super(new Vector2f(640f, 480f));
-        this.modConfig = new ModConfig();
-        this.originalModConfig = modConfig;
-        this.modConfig.copy(modConfig);
+        this.moduleConfig = new ModuleConfig();
+        this.originalModuleConfig = moduleConfig;
+        this.moduleConfig.copy(moduleConfig);
         populateModList();
-        setTitle("Select Mods...");
+        setTitle("Select Modules...");
 
     }
 
@@ -83,7 +83,7 @@ public class UIDialogMods extends UIDialog {
             if (!module.getModuleInfo().getId().equals(ModuleManager.ENGINE_MODULE)) {
                 UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
                 item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
-                if (modConfig.hasMod(module.getModuleInfo().getId())) {
+                if (moduleConfig.hasMod(module.getModuleInfo().getId())) {
                     item.setTextColor(ACTIVE_TEXT_COLOR);
                     item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
                 } else {
@@ -100,7 +100,7 @@ public class UIDialogMods extends UIDialog {
                 detailPanel.setVisible(true);
                 nameLabel.setText(module.getModuleInfo().getDisplayName());
                 descriptionLabel.setText(module.getModuleInfo().getDescription());
-                boolean active = modConfig.hasMod(module.getModuleInfo().getId());
+                boolean active = moduleConfig.hasMod(module.getModuleInfo().getId());
                 if (active) {
                     toggleButton.getLabel().setText(DEACTIVATE_TEXT);
                 } else {
@@ -109,27 +109,40 @@ public class UIDialogMods extends UIDialog {
                 toggleButton.setVisible(!module.getModuleInfo().getId().equals("core"));
             }
         });
+        modList.addDoubleClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                toggleSelectedModuleActivation();
+            }
+        });
 
         toggleButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                Module selectedModule = (Module) modList.getSelection().getValue();
-                if (modConfig.hasMod(selectedModule.getModuleInfo().getId())) {
-                    deactivateMod(selectedModule);
-                    toggleButton.getLabel().setText(ACTIVATE_TEXT);
-                } else {
-                    activateMod(selectedModule);
-                    toggleButton.getLabel().setText(DEACTIVATE_TEXT);
-                }
-                refreshListItemActivation();
+                toggleSelectedModuleActivation();
             }
         });
+    }
+
+    private void toggleSelectedModuleActivation() {
+        Module selectedModule = (Module) modList.getSelection().getValue();
+        if (selectedModule.getModuleInfo().getId().equals("core")) {
+            return;
+        }
+        if (moduleConfig.hasMod(selectedModule.getModuleInfo().getId())) {
+            deactivateMod(selectedModule);
+            toggleButton.getLabel().setText(ACTIVATE_TEXT);
+        } else {
+            activateMod(selectedModule);
+            toggleButton.getLabel().setText(DEACTIVATE_TEXT);
+        }
+        refreshListItemActivation();
     }
 
     private void refreshListItemActivation() {
         for (UIListItem item : modList.getItems()) {
             Module module = (Module) item.getValue();
-            if (modConfig.hasMod(module.getModuleInfo().getId())) {
+            if (moduleConfig.hasMod(module.getModuleInfo().getId())) {
                 item.setTextColor(ACTIVE_TEXT_COLOR);
                 item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
             } else {
@@ -140,8 +153,8 @@ public class UIDialogMods extends UIDialog {
     }
 
     private void deactivateMod(Module module) {
-        modConfig.removeMod(module.getModuleInfo().getId());
-        for (String activeModName : Lists.newArrayList(modConfig.listMods())) {
+        moduleConfig.removeMod(module.getModuleInfo().getId());
+        for (String activeModName : Lists.newArrayList(moduleConfig.listMods())) {
             Module activeModule = moduleManager.getModule(activeModName);
             if (activeModule != null && activeModule.getModuleInfo().getDependencies().contains(module.getModuleInfo().getId())) {
                 deactivateMod(activeModule);
@@ -150,7 +163,7 @@ public class UIDialogMods extends UIDialog {
     }
 
     private void activateMod(Module module) {
-        modConfig.addMod(module.getModuleInfo().getId());
+        moduleConfig.addMod(module.getModuleInfo().getId());
         for (String dependencyName : module.getModuleInfo().getDependencies()) {
             Module dependency = moduleManager.getModule(dependencyName);
             if (dependency != null) {
@@ -229,7 +242,7 @@ public class UIDialogMods extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                originalModConfig.copy(modConfig);
+                originalModuleConfig.copy(moduleConfig);
                 close();
             }
         });
