@@ -1327,6 +1327,8 @@ public final class WorldRenderer {
     }
 
     public Vector3f getTint() {
-        return new Vector3f(0, 0, 0);
+        Vector3f cameraPos = getActiveCamera().getPosition();
+        Block block = worldProvider.getBlock(cameraPos);
+        return block.getTint();
     }
 }

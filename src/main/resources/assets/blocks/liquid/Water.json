@@ -27,5 +27,6 @@
     "targetable" : false,
     "penetrable" : true,
     "shadowCasting" : true,
-    "replacementAllowed" : true
+    "replacementAllowed" : true,
+    "tint" : [0.1, 0.2, 0.2]
 }

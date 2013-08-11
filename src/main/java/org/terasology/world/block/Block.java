@@ -153,6 +153,7 @@ public class Block {
     private boolean shadowCasting = true;
     private boolean waving = false;
     private byte luminance = 0;
+    private Vector3f tint = new Vector3f(0, 0, 0);
     private Map<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
     private Map<BlockPart, Vector4f> colorOffset = Maps.newEnumMap(BlockPart.class);
 
@@ -468,6 +469,14 @@ public class Block {
 
     public void setLuminance(byte luminance) {
         this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunk.MAX_LIGHT);
+    }
+
+    public Vector3f getTint() {
+        return tint;
+    }
+
+    public void setTint(Vector3f tint) {
+        this.tint.set(tint);
     }
 
     /**

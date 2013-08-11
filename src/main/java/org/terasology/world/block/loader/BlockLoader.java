@@ -36,6 +36,7 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
+import org.terasology.utilities.gson.Vector3fHandler;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
@@ -51,6 +52,7 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.shapes.BlockShape;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,6 +91,7 @@ public class BlockLoader implements BlockBuilderHelper {
                 .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
                 .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
                 .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
+                .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
                 .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
                 .create();
         cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
@@ -398,6 +401,7 @@ public class BlockLoader implements BlockBuilderHelper {
         block.setShadowCasting(def.shadowCasting);
         block.setWaving(def.waving);
         block.setLuminance(def.luminance);
+        block.setTint(def.tint);
         if (!def.displayName.isEmpty()) {
             block.setDisplayName(def.displayName);
         } else {

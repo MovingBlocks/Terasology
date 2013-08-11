@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.EnumMap;
 import java.util.List;
@@ -48,6 +49,8 @@ public class BlockDefinition {
     public boolean waving = false;
 
     public byte luminance = 0;
+
+    public Vector3f tint = new Vector3f();
 
     public List<String> categories = Lists.newArrayList();
 
