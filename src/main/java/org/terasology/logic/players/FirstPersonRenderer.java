@@ -189,7 +189,7 @@ public class FirstPersonRenderer implements RenderSystem {
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
             Icon icon = Icon.get(iconName);
-            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + iconName), icon.getX(), icon.getY());
+            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + iconName), icon.getTexture(), icon.getX(), icon.getY());
             iconMeshes.put(iconName, itemMesh);
         }
 

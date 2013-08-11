@@ -3,12 +3,12 @@
         "scale" : 0.3
     },
     "BoxShape" : {
-        "extents" : [1, 1, 1]
+        "extents" : [1, 1, 0.1]
     },
     "Pickup": {
     },
     "RigidBody" : {
-        "mass" : 1000f,
+        "mass" : 1,
         "collisionGroup" : "engine:debris",
         "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
     },

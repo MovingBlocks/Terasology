@@ -117,5 +117,9 @@ public class TunnelAction implements ComponentSystem {
                 }
             }
         }
+        // No blocks were destroyed, so cancel the event
+        if (blockCounter == MAX_DESTROYED_BLOCKS) {
+            event.consume();
+        }
     }
 }

@@ -28,12 +28,11 @@ public final class MeshFactory {
     private MeshFactory() {
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, int posX, int posY) {
-        return generateItemMesh(uri, posX, posY, 0, false, null);
+    public static Mesh generateItemMesh(AssetUri uri, Texture tex, int posX, int posY) {
+        return generateItemMesh(uri, tex, posX, posY, 0, false, null);
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
-        Texture tex = Assets.getTexture("engine:items");
+    public static Mesh generateItemMesh(AssetUri uri, Texture tex, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
         ByteBuffer buffer = tex.getData().getBuffers()[0];
 
         posX *= 16;
@@ -52,7 +51,7 @@ public final class MeshFactory {
 
                 if (a > alphaLimit) {
                     Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f);
-                    TessellatorHelper.addBlockMesh(tessellator, color, 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
+                    TessellatorHelper.addBlockMesh(tessellator, color, 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 0.5f, 2f * 0.0625f * (15 - y) - 1f, 0f);
 
                     if (withContour) {
                         int newX = 0;
@@ -98,7 +97,7 @@ public final class MeshFactory {
 
                             if (newA < alphaLimit) {
                                 Vector4f cColor = new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w);
-                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 1f / 2f, 0.125f * (16 - newY) - 1f, 0f);
+                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX -0.5f, 0.125f * (15 - newY) - 1f, 0f);
                             }
                         }
                     }

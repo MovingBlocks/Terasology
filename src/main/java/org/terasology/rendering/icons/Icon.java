@@ -83,6 +83,13 @@ public class Icon {
         return icons.get(name.toLowerCase(Locale.ENGLISH));
     }
 
+    public Texture getTexture() {
+        if (blockFamily != null) {
+            return terrainTex;
+        }
+        return element.getTexture();
+    }
+
     private static void loadIcons() {
         icons = new HashMap<String, Icon>();
 

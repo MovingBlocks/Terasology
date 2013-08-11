@@ -66,7 +66,7 @@ public class ItemPickupFactory {
                 Mesh itemMesh = iconMeshes.get(itemComp.icon);
                 if (itemMesh == null) {
                     Icon icon = Icon.get(itemComp.icon);
-                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + itemComp.icon), icon.getX(), icon.getY());
+                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + itemComp.icon), icon.getTexture(), icon.getX(), icon.getY());
                     iconMeshes.put(itemComp.icon, itemMesh);
                 }
                 builder.getComponent(MeshComponent.class).mesh = itemMesh;

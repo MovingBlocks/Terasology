@@ -65,6 +65,7 @@ public class UIDialogModules extends UIDialog {
         this.moduleConfig = new ModuleConfig();
         this.originalModuleConfig = moduleConfig;
         this.moduleConfig.copy(moduleConfig);
+        this.setEnableScrolling(false);
         populateModList();
         setTitle("Select Modules...");
 
