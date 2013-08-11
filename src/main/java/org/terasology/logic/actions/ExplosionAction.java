@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.actions;
 
+import org.terasology.entitySystem.EntityBuilder;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -45,6 +47,9 @@ public class ExplosionAction implements ComponentSystem {
     @In
     private BlockEntityRegistry blockEntityRegistry;
 
+    @In
+    private EntityManager entityManager;
+
     private FastRandom random = new FastRandom();
 
     @Override
@@ -55,9 +60,8 @@ public class ExplosionAction implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = {ExplosionActionComponent.class})
-    public void onActivate(ActivateEvent event, EntityRef entity) {
-        ExplosionActionComponent explosionComp = entity.getComponent(ExplosionActionComponent.class);
+    @ReceiveEvent
+    public void onActivate(ActivateEvent event, EntityRef entity, ExplosionActionComponent explosionComp) {
         Vector3f origin = null;
         switch (explosionComp.relativeTo) {
             case Self:
@@ -78,6 +82,10 @@ public class ExplosionAction implements ComponentSystem {
             return;
         }
 
+        EntityBuilder builder = entityManager.newBuilder("engine:smokeExplosion");
+        builder.getComponent(LocationComponent.class).setWorldPosition(origin);
+        builder.build();
+
         Vector3i blockPos = new Vector3i();
         for (int i = 0; i < 64; i++) {
             // TODO: Add a randomVector3f method to FastRandom?
@@ -97,7 +105,7 @@ public class ExplosionAction implements ComponentSystem {
 
                 /* PHYSICS */
                 if (currentBlock.isDestructible()) {
-                    blockEntityRegistry.getEntityAt(blockPos).send(new DoDamageEvent(1000, EngineDamageTypes.DIRECT.get(), EntityRef.NULL));
+                    blockEntityRegistry.getEntityAt(blockPos).send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get(), EntityRef.NULL));
                 }
             }
         }

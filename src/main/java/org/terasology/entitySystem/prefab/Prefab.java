@@ -15,8 +15,13 @@
  */
 package org.terasology.entitySystem.prefab;
 
+import com.google.common.base.Objects;
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.ComponentContainer;
+import org.terasology.entitySystem.common.NullEntityRef;
 
 import java.util.List;
 
@@ -26,24 +31,50 @@ import java.util.List;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Prefab extends ComponentContainer, Asset<PrefabData> {
+public abstract class Prefab extends AbstractAsset<PrefabData> implements ComponentContainer, Asset<PrefabData> {
 
-    /**
-     * @return The identifier for this prefab
-     */
-    String getName();
+    public static final Prefab NULL = new NullPrefab();
+
+    public Prefab(AssetUri uri) {
+        super(uri);
+    }
+
+    public final String getName() {
+        return getURI().toSimpleString();
+    }
 
     /**
      * Return parents prefabs
      *
      * @return
      */
-    Prefab getParent();
+    public abstract Prefab getParent();
 
-    List<Prefab> getChildren();
+    public abstract List<Prefab> getChildren();
 
-    boolean isPersisted();
+    public abstract boolean isPersisted();
 
-    boolean isAlwaysRelevant();
+    public abstract boolean isAlwaysRelevant();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof Prefab) {
+            return Objects.equal(getURI(), ((Prefab) o).getURI());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getURI());
+    }
+
+    @Override
+    public String toString() {
+        return "Prefab(" + getURI() + "){ components: " + this.iterateComponents() + ", parent: " + this.getParent() + " }";
+    }
 
 }

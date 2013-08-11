@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.AbstractPrefab;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 
@@ -32,8 +31,7 @@ import java.util.Map;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PojoPrefab extends AbstractPrefab {
-    private static final Logger logger = LoggerFactory.getLogger(PojoPrefab.class);
+public class PojoPrefab extends Prefab {
 
     private Prefab parent;
     private Map<Class<? extends Component>, Component> componentMap;

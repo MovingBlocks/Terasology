@@ -120,7 +120,7 @@ public final class TerasologyApplet extends Applet {
             gameThread.join();
         } catch (InterruptedException e) {
             if (logger != null) {
-                logger.error("Failed to cleanly shut down engine");
+                logger.error("Failed to cleanly shut down engine", e);
             }
         }
 

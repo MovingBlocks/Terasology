@@ -17,6 +17,7 @@
 package org.terasology.world.block.entity;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 
@@ -25,10 +26,12 @@ import org.terasology.network.NetworkEvent;
  */
 @BroadcastEvent(skipInstigator = true)
 public class PlayBlockDamagedEvent extends NetworkEvent {
+
     protected PlayBlockDamagedEvent() {
     }
 
     public PlayBlockDamagedEvent(EntityRef instigator) {
         super(instigator);
     }
+
 }

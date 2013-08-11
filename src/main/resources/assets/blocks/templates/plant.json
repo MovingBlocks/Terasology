@@ -27,6 +27,5 @@
     "replacementAllowed" : true,
     "translucent" : true,
     "doubleSided" : true,
-    "debrisOnDestroy" : false,
-    "replacementAllowed" : true
+    "debrisOnDestroy" : false
 }

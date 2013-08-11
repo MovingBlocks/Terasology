@@ -1,0 +1,19 @@
+{
+    "location" : {},
+    "blockParticleEffect" : {
+        "spawnCount" : 64,
+        "initialVelocityRange" : [4, 4, 4],
+        "spawnRange" : [0.3, 0.3, 0.3],
+        "destroyEntityOnCompletion" : true,
+        "minSize" : 0.25,
+        "maxSize" : 1,
+        "minLifespan" : 1,
+        "maxLifespan" : 1.5,
+        "targetVelocity" : [0, 2, 0],
+        "acceleration" : [2, 2, 2],
+        "collideWithBlocks" : true,
+        "texture" : "engine:fx_smoke",
+        "blendMode" : "ADD",
+        "color" : [0.847, 0.78, 0.62, 0.5]
+    }
+}

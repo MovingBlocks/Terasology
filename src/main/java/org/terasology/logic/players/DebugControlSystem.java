@@ -69,10 +69,15 @@ public class DebugControlSystem implements ComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onHideHUD(HideHUDButton event, EntityRef entity) {
         if (event.isDown()) {
+            // Make sure both are either visible or hidden
+            final boolean hide = !(config.getRendering().getDebug().isHudHidden() && config.getRendering().getDebug().isFirstPersonElementsHidden());
+
+            config.getRendering().getDebug().setFirstPersonElementsHidden(hide);
+            config.getRendering().getDebug().setHudHidden(hide);
+
             for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                element.setVisible(!element.isVisible());
+                element.setVisible(!hide);
             }
-            config.getRendering().getDebug().setFirstPersonElementsHidden(!config.getRendering().getDebug().isFirstPersonElementsHidden());
 
             event.consume();
         }

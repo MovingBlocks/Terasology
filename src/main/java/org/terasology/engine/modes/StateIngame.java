@@ -37,6 +37,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -94,6 +95,11 @@ public class StateIngame implements GameState {
 
             logger.info("Updating Oculus projection parameters from device...");
             OculusVrHelper.updateFromDevice();
+        }
+        // Show or hide the HUD according to the settings
+        final boolean hudHidden = CoreRegistry.get(Config.class).getRendering().getDebug().isHudHidden();
+        for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+            element.setVisible(!hudHidden);
         }
     }
 

@@ -1,6 +1,6 @@
 {
-    "Location" : {},
-    "BlockParticleEffect" : {
+    "location" : {},
+    "blockParticleEffect" : {
         "spawnCount" : 64,
         "initialVelocityRange" : [4, 4, 4],
         "spawnRange" : [0.3, 0.3, 0.3],
@@ -8,9 +8,10 @@
         "minSize" : 0.05,
         "maxSize" : 0.1,
         "minLifespan" : 1,
-        "maxLifespan" : 1.5,
+        "maxLifespan" : 1.5;
         "targetVelocity" : [0, -5, 0],
         "acceleration" : [2, 2, 2],
-        "collideWithBlocks" : true
+        "collideWithBlocks" : true,
+        "randBlockTexDisplacement" : true
     }
 }

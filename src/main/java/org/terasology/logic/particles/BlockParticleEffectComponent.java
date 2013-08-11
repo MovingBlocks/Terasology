@@ -28,8 +28,8 @@ import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-// TODO: Generalise for non-block particles?
 public final class BlockParticleEffectComponent implements Component {
 
     public enum ParticleBlendMode {

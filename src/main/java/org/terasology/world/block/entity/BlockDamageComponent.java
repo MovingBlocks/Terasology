@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.tools;
+package org.terasology.world.block.entity;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
@@ -23,8 +23,10 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class ToolDamageComponent implements Component {
+public class BlockDamageComponent implements Component {
 
     public Map<String, Integer> materialDamageMultiplier = Maps.newHashMap();
+    public float blockAnnihilationChance = 0;
+    public boolean skipPerBlockEffects = false;
 
 }

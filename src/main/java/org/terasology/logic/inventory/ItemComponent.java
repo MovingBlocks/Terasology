@@ -88,6 +88,6 @@ public final class ItemComponent implements Component {
      */
     public int baseDamage = 1;
 
-    public Prefab damageType = null;
+    public Prefab damageType = Prefab.NULL;
 
 }

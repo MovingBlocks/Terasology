@@ -31,7 +31,9 @@ import javax.vecmath.Vector2f;
 import java.util.Map;
 
 /**
- * @author Immortius
+ * Terasology's legacy map generator. Still rocks!
+ *
+ * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
  */
 public class PerlinTerrainGenerator implements FirstPassGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;

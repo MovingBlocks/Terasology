@@ -15,24 +15,24 @@
  */
 package org.terasology.logic.actions;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.ItemPickupFactory;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
 
@@ -42,22 +42,25 @@ import javax.vecmath.Vector3f;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TunnelAction implements ComponentSystem {
 
-    private static final int MAX_DESTROYED_BLOCKS = 100;
+    private static final int MAX_DESTROYED_BLOCKS = 1000;
+    private static final int MAX_PARTICLE_EFFECTS = 4;
 
+    @In
     private WorldProvider worldProvider;
-    private FastRandom random = new FastRandom();
+
+    @In
     private BulletPhysics physicsRenderer;
+
+    @In
     private BlockEntityRegistry blockEntityRegistry;
-    private ItemPickupFactory itemPickupFactory;
-    private BlockItemFactory blockItemFactory;
+
+    @In
+    private EntityManager entityManager;
+
+    private FastRandom random = new FastRandom();
 
     @Override
     public void initialise() {
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        physicsRenderer = CoreRegistry.get(BulletPhysics.class);
-        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-        itemPickupFactory = new ItemPickupFactory(CoreRegistry.get(EntityManager.class));
-        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
     }
 
     @Override
@@ -71,8 +74,9 @@ public class TunnelAction implements ComponentSystem {
         Vector3f origin = new Vector3f(event.getOrigin());
         Vector3i blockPos = new Vector3i();
 
+        int particleEffects = 0;
         int blockCounter = MAX_DESTROYED_BLOCKS;
-        for (int s = 4; s <= 10000; s += 30) {
+        for (int s = 4; s <= 5000; s += 30) {
             origin.add(dir);
 
             for (int i = 0; i < 64; i++) {
@@ -93,9 +97,15 @@ public class TunnelAction implements ComponentSystem {
                     Block currentBlock = worldProvider.getBlock(blockPos);
 
                     if (currentBlock.isDestructible()) {
+                        if (particleEffects < MAX_PARTICLE_EFFECTS) {
+                            EntityBuilder builder = entityManager.newBuilder("engine:smokeExplosion");
+                            builder.getComponent(LocationComponent.class).setWorldPosition(target);
+                            builder.build();
+                            particleEffects++;
+                        }
                         if (random.randomInt(6) == 0) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
-                            blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.DIRECT.get(), EntityRef.NULL));
+                            blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get(), EntityRef.NULL));
                         }
 
                         blockCounter--;
