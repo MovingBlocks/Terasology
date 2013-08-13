@@ -1,8 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE suppressions PUBLIC
-    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
     <suppress checks="." files="org[\\/]terasology[\\/]protobuf[\\/].*"/>
+    <!-- Example
+        <suppress checks="JavadocStyleCheck"
+                  files="AbstractComplexityCheck.java"
+                  lines="82,108-122"/>
+    -->
 </suppressions>
