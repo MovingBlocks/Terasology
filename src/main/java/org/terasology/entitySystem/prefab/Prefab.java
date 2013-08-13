@@ -56,6 +56,8 @@ public abstract class Prefab extends AbstractAsset<PrefabData> implements Compon
 
     public abstract boolean isAlwaysRelevant();
 
+    public abstract boolean exists();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

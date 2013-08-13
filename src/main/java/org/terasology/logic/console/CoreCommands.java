@@ -32,7 +32,7 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
-import org.terasology.logic.inventory.ItemPickupFactory;
+import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.network.ClientComponent;
@@ -69,11 +69,11 @@ public class CoreCommands implements ComponentSystem {
     @In
     private BlockManager blockManager;
 
-    private ItemPickupFactory itemPickupFactory;
+    private PickupBuilder pickupBuilder;
 
     @Override
     public void initialise() {
-        itemPickupFactory = new ItemPickupFactory(entityManager);
+        pickupBuilder = new PickupBuilder();
     }
 
     @Override
@@ -176,7 +176,8 @@ public class CoreCommands implements ComponentSystem {
 
         BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
         EntityRef blockItem = blockItemFactory.newInstance(block);
-        itemPickupFactory.newInstance(spawnPos, 60, blockItem);
+
+        pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
         return "Spawned block.";
     }
 

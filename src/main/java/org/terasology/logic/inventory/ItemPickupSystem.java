@@ -16,15 +16,30 @@
 
 package org.terasology.logic.inventory;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
+import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.physics.CollideEvent;
+import org.terasology.physics.RigidBodyComponent;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.icons.Icon;
+import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemComponent;
+
+import javax.vecmath.Vector3f;
 
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -32,6 +47,8 @@ public class ItemPickupSystem implements ComponentSystem {
 
     @In
     private InventoryManager inventoryManager;
+
+    private FastRandom rand = new FastRandom();
 
     @Override
     public void initialise() {
@@ -47,6 +64,46 @@ public class ItemPickupSystem implements ComponentSystem {
             event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
         }
     }
+
+    @ReceiveEvent
+    public void onBlockItemDropped(ItemDroppedEvent event, EntityRef itemEntity, BlockItemComponent blockItemComponent) {
+        EntityBuilder builder = event.getPickup();
+        BlockFamily blockFamily = blockItemComponent.blockFamily;
+        if (builder.hasComponent(MeshComponent.class)) {
+            MeshComponent mesh = builder.getComponent(MeshComponent.class);
+            mesh.mesh = blockFamily.getArchetypeBlock().getMesh();
+            mesh.material = Assets.getMaterial("engine:terrain");
+        }
+        if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
+            LightComponent lightComponent = builder.addComponent(new LightComponent());
+
+            Vector3f randColor = new Vector3f(rand.randomPosFloat(), rand.randomPosFloat(), rand.randomPosFloat());
+            lightComponent.lightColorDiffuse.set(randColor);
+            lightComponent.lightColorAmbient.set(randColor);
+        }
+
+        if (builder.hasComponent(RigidBodyComponent.class)) {
+            builder.getComponent(RigidBodyComponent.class).mass = blockItemComponent.blockFamily.getArchetypeBlock().getMass();
+        }
+    }
+
+    @ReceiveEvent
+    public void onItemDropped(ItemDroppedEvent event, EntityRef itemEntity, ItemComponent itemComponent) {
+        EntityBuilder builder = event.getPickup();
+        if (builder.hasComponent(MeshComponent.class)) {
+            MeshComponent mesh = builder.getComponent(MeshComponent.class);
+            if (mesh.mesh == null && Icon.get(itemComponent.icon) != null) {
+                String iconMeshUri = "engine:icon." + itemComponent.icon;
+                Mesh itemMesh = Assets.getMesh(iconMeshUri);
+                if (itemMesh == null) {
+                    Icon icon = Icon.get(itemComponent.icon);
+                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, iconMeshUri), icon.getTexture(), icon.getX(), icon.getY());
+                }
+                builder.getComponent(MeshComponent.class).mesh = itemMesh;
+            }
+        }
+    }
+
 
     @Override
     public void shutdown() {

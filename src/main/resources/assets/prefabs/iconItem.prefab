@@ -1,0 +1,6 @@
+{
+    "parent" : "engine:itemBase",
+    "Item" : {
+        "pickupPrefab" : "engine:iconItemPickup"
+    }
+}

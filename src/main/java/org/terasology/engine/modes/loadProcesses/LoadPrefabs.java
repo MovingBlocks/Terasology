@@ -46,7 +46,10 @@ public class LoadPrefabs implements LoadProcess {
     @Override
     public boolean step() {
         if (prefabs.hasNext()) {
-            prefabManager.registerPrefab(Assets.get(prefabs.next(), Prefab.class));
+            Prefab prefab = Assets.get(prefabs.next(), Prefab.class);
+            if (prefab != null) {
+                prefabManager.registerPrefab(prefab);
+            }
         }
         return !prefabs.hasNext();
     }

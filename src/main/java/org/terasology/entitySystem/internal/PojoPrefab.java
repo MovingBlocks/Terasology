@@ -65,6 +65,11 @@ public class PojoPrefab extends Prefab {
     }
 
     @Override
+    public boolean exists() {
+        return true;
+    }
+
+    @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return componentMap.containsKey(component);
     }

@@ -16,9 +16,9 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -35,7 +35,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.ItemPickupFactory;
+import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
@@ -44,8 +44,6 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -70,10 +68,13 @@ public class CharacterSystem implements ComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
+    private PickupBuilder pickupBuilder;
+
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     @Override
     public void initialise() {
+        pickupBuilder = new PickupBuilder();
     }
 
     @Override
@@ -160,29 +161,15 @@ public class CharacterSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {
-
         //make sure we own the item and it exists
         if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
             return;
         }
 
-        EntityRef itemEntity = inventoryManager.removeItem(event.getInventoryEntity(), event.getItem(), 1);
-
-        //don't perform actual drop on client side
-        if (networkSystem.getMode().isAuthority()) {
-            Vector3f impulse = event.getImpulse();
-            Vector3f newPosition = event.getNewPosition();
-
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-
-            ItemPickupFactory itemPickupFactory = new ItemPickupFactory(entityManager);
-            EntityRef droppedItem = itemPickupFactory.newInstance(new Vector3f(newPosition), 200, itemEntity);
-            if (!droppedItem.equals(EntityRef.NULL)) {
-                droppedItem.send(new ImpulseEvent(new Vector3f(impulse)));
-            }
-        }
+        EntityRef pickup = pickupBuilder.createPickupFor(event.getItem(), event.getNewPosition(), 200);
+        pickup.send(new ImpulseEvent(event.getImpulse()));
     }
 
 }

@@ -3,7 +3,7 @@
         "scale" : 0.3
     },
     "BoxShape" : {
-        "extents" : [1, 1, 0.1]
+        "extents" : [1, 1, 1]
     },
     "Pickup": {
     },

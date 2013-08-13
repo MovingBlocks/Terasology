@@ -1,0 +1,6 @@
+{
+    "parent" : "engine:itemPickup",
+    "Mesh" : {
+        "material" : "engine:terrain"
+    }
+}

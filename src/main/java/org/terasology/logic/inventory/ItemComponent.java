@@ -90,4 +90,6 @@ public final class ItemComponent implements Component {
 
     public Prefab damageType = Prefab.NULL;
 
+    public Prefab pickupPrefab = Prefab.NULL;
+
 }

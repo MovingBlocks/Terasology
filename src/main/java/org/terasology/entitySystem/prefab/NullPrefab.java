@@ -53,6 +53,11 @@ public class NullPrefab extends Prefab {
     }
 
     @Override
+    public boolean exists() {
+        return false;
+    }
+
+    @Override
     public void reload(PrefabData data) {
     }
 

@@ -31,7 +31,7 @@ import org.terasology.logic.health.FullHealthEvent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemPickupFactory;
+import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.physics.ImpulseEvent;
@@ -65,13 +65,13 @@ public class BlockEntitySystem implements ComponentSystem {
     private InventoryManager inventoryManager;
 
     private BlockItemFactory blockItemFactory;
-    private ItemPickupFactory itemPickupFactory;
+    private PickupBuilder pickupBuilder;
     private FastRandom random;
 
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-        itemPickupFactory = new ItemPickupFactory(entityManager);
+        pickupBuilder = new PickupBuilder();
         random = new FastRandom();
     }
 
@@ -108,12 +108,12 @@ public class BlockEntitySystem implements ComponentSystem {
 
             if ((oldBlock.isDirectPickup())) {
                 if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                    EntityRef pickup = itemPickupFactory.newInstance(blockComp.getPosition().toVector3f(), 20, item);
+                    EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
                     pickup.send(new ImpulseEvent(random.randomVector3f(30)));
                 }
             } else {
                 /* PHYSICS */
-                EntityRef pickup = itemPickupFactory.newInstance(blockComp.getPosition().toVector3f(), 20, item);
+                EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
                 pickup.send(new ImpulseEvent(random.randomVector3f(30)));
             }
         }

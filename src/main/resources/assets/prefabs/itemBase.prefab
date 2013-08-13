@@ -1,6 +1,7 @@
 {
     "Item" : {
-        "damageType" : "engine:physicalDamage"
+        "damageType" : "engine:physicalDamage",
+        "pickupPrefab" : "engine:itemPickup"
     },
     "Network" : {
         "replicateMode" : "RELEVANT"
