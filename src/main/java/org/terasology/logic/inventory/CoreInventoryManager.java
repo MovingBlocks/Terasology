@@ -35,6 +35,7 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
 import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
+import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.MoveItemAmountRequest;
 import org.terasology.logic.inventory.events.MoveItemRequest;
 import org.terasology.logic.inventory.events.ReceivedItemEvent;
@@ -78,7 +79,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     private Deque<MoveItemRequest> pendingMoves = Queues.newArrayDeque();
 
     private Map<EntityRef, InventoryComponent> predictedState = Maps.newHashMap();
-    private TObjectIntMap<EntityRef> predictedStackCounts = new TObjectIntHashMap<EntityRef>();
+    private TObjectIntMap<EntityRef> predictedStackCounts = new TObjectIntHashMap<>();
     private List<EntityRef> predictedNewItems = Lists.newArrayList();
 
     @Override
@@ -500,7 +501,9 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
      * @param item
      */
     private void putItemInSlot(EntityRef inventoryEntity, InventoryComponent inventory, int slot, EntityRef item) {
+        EntityRef oldItem = inventory.itemSlots.get(slot);
         inventory.itemSlots.set(slot, item);
+        inventoryEntity.send(new InventorySlotChangedEvent(slot, oldItem, item));
 
         if (networkSystem.getMode().isAuthority()) {
             inventoryEntity.saveComponent(inventory);

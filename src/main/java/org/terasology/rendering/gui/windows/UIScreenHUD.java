@@ -117,7 +117,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
         CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
         if (character != null) {
-            toolbar.setSelected(character.selectedTool);
+            toolbar.setSelected(character.selectedItem);
         }
 
         leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
@@ -179,7 +179,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         } else {
             toolbar.setVisible(true);
             toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
-            toolbar.setSelected(character.selectedTool);
+            toolbar.setSelected(character.selectedItem);
             leftGearWheel.setVisible(true);
             rightGearWheel.setVisible(true);
         }

@@ -74,10 +74,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private WorldProvider worldProvider;
     private Camera playerCamera;
 
-    private long lastTimeSpacePressed;
-    private long lastInteraction;
-    private long lastTimeThrowInteraction;
-
     @In
     private Config config;
     private float bobFactor = 0;
@@ -186,7 +182,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void onJump(JumpButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             jump = true;
-            lastTimeSpacePressed = time.getGameTimeInMs();
             event.consume();
         } else {
             jump = false;

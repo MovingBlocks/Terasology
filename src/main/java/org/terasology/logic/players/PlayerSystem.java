@@ -25,7 +25,7 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -64,7 +64,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     private NetworkSystem networkSystem;
 
     @In
-    private InventoryManager inventoryManager;
+    private SlotBasedInventoryManager inventoryManager;
 
     private ChunkProvider chunkProvider;
 

@@ -29,7 +29,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
@@ -79,8 +78,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class NetClient extends AbstractClient implements WorldChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(NetClient.class);
     public static final float NET_TICK_RATE = 0.05f;
-
-    private Config config = CoreRegistry.get(Config.class);
 
     private Time time;
     private NetworkSystemImpl networkSystem;

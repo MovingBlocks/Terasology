@@ -23,7 +23,9 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.SelectedItemChangedEvent;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.management.BlockManager;
 
@@ -35,11 +37,11 @@ import javax.vecmath.Vector3f;
 public class PlayerFactory {
 
     private EntityManager entityManager;
-    private InventoryManager inventoryManager;
+    private SlotBasedInventoryManager inventoryManager;
     private BlockItemFactory blockFactory;
     private BlockManager blockManager;
 
-    public PlayerFactory(EntityManager entityManager, InventoryManager inventoryManager) {
+    public PlayerFactory(EntityManager entityManager, SlotBasedInventoryManager inventoryManager) {
         this.entityManager = entityManager;
         this.inventoryManager = inventoryManager;
         blockFactory = new BlockItemFactory(entityManager);
@@ -104,6 +106,8 @@ public class PlayerFactory {
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
         inventoryManager.giveItem(player, chest);
+
+        player.send(new SelectedItemChangedEvent(EntityRef.NULL, inventoryManager.getItemInSlot(player, 0)));
 
         return player;
     }

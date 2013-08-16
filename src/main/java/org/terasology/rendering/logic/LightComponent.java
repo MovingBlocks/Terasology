@@ -16,6 +16,7 @@
 package org.terasology.rendering.logic;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
 
 import javax.vecmath.Vector3f;
 
@@ -30,19 +31,29 @@ public class LightComponent implements Component {
         DIRECTIONAL
     }
 
+    @Replicate
     public Vector3f lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
+    @Replicate
     public Vector3f lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
 
+    @Replicate
     public float lightDiffuseIntensity = 2.0f;
+    @Replicate
     public float lightSpecularIntensity = 0.1f;
+    @Replicate
     public float lightAmbientIntensity = 1.0f;
 
+    @Replicate
     public float lightSpecularPower = 4.0f;
+    @Replicate
     public float lightAttenuationRange = 16.0f;
+    @Replicate
     public float lightAttenuationFalloff = 1.25f;
 
     // The rendering distance for light components (0.0f == Always render the light)
+    @Replicate
     public float lightRenderingDistance = 0.0f;
 
+    @Replicate
     public LightType lightType = LightType.POINT;
 }

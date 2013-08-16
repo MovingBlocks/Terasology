@@ -120,7 +120,7 @@ public class FirstPersonRenderer implements RenderSystem {
         float handMovementAnimationOffset = character.handAnimation;
 
         UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
-        int invSlotIndex = character.selectedTool + toolbar.getStartSlot();
+        int invSlotIndex = character.selectedItem + toolbar.getStartSlot();
         EntityRef heldItem = inventoryManager.getItemInSlot(localPlayer.getCharacterEntity(), invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);

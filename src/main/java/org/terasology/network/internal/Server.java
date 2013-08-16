@@ -319,6 +319,8 @@ public class Server implements ChunkReadyListener {
             if (currentEntity.getComponent(NetworkComponent.class).getNetworkId() != updateEntity.getNetId()) {
                 logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), currentEntity.getComponent(NetworkComponent.class).getNetworkId());
             }
+        } else {
+            logger.warn("Received update for non-existent entity {}", updateEntity.getNetId());
         }
     }
 

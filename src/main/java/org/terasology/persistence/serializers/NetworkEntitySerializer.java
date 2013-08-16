@@ -287,7 +287,7 @@ public class NetworkEntitySerializer {
         }
         entity.setFieldIds(fieldIds.toByteString());
         entity.setComponentFieldCounts(componentFieldCounts.toByteString());
-        if (entity.getFieldIds().isEmpty()) {
+        if (entity.getFieldIds().isEmpty() && entity.getRemovedComponentCount() == 0) {
             return null;
         } else {
             return entity.build();
