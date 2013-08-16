@@ -52,6 +52,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import javax.vecmath.Vector3f;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +217,12 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
         logger.error("Attempted to get block entity off-thread");
         return EntityRef.NULL;
+    }
+
+    @Override
+    public EntityRef getBlockEntityAt(Vector3f position) {
+        Vector3i pos = new Vector3i(position, 0.5f);
+        return getBlockEntityAt(pos);
     }
 
     @Override

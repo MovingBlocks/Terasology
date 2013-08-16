@@ -71,12 +71,14 @@ public class TunnelAction implements ComponentSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
 
         Vector3f dir = new Vector3f(event.getDirection());
+        dir.scale(4.0f);
         Vector3f origin = new Vector3f(event.getOrigin());
+        origin.add(dir);
         Vector3i blockPos = new Vector3i();
 
         int particleEffects = 0;
         int blockCounter = MAX_DESTROYED_BLOCKS;
-        for (int s = 4; s <= 5000; s += 30) {
+        for (int s = 0; s <= 512; s++) {
             origin.add(dir);
 
             for (int i = 0; i < 64; i++) {
@@ -103,7 +105,7 @@ public class TunnelAction implements ComponentSystem {
                             builder.build();
                             particleEffects++;
                         }
-                        if (random.randomInt(6) == 0) {
+                        if (random.randomInt(4) == 0) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                             blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get(), EntityRef.NULL));
                         }

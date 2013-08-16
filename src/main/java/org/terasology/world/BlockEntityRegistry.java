@@ -20,6 +20,8 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 
+import javax.vecmath.Vector3f;
+
 /**
  * Manages creation and lookup of entities linked to blocks
  *
@@ -83,6 +85,12 @@ public interface BlockEntityRegistry {
      * @return Whether the block was changed
      */
     boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components);
+
+    /**
+     * @param position
+     * @return The block entity for the location, creating it if it doesn't exist
+     */
+    EntityRef getBlockEntityAt(Vector3f position);
 
     /**
      * @param blockPosition

@@ -32,6 +32,7 @@ import org.terasology.logic.characters.events.OnEnterLiquidEvent;
 import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.logic.health.DamageSoundComponent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
@@ -131,11 +132,20 @@ public class CharacterSoundSystem implements ComponentSystem {
 
     @ReceiveEvent()
     public void onDamaged(OnDamagedEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs() && characterSounds.damageSounds.size() > 0) {
-            Sound sound = random.randomItem(characterSounds.damageSounds);
-            entity.send(new PlaySoundEvent(entity, sound, characterSounds.damageVolume));
-            characterSounds.lastSoundTime = time.getGameTimeInMs();
-            entity.saveComponent(characterSounds);
+        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            DamageSoundComponent damageSounds = event.getType().getComponent(DamageSoundComponent.class);
+            Sound sound = null;
+            if (damageSounds != null && !damageSounds.sounds.isEmpty()) {
+                sound = random.randomItem(damageSounds.sounds);
+            } else if (!characterSounds.damageSounds.isEmpty()) {
+                sound = random.randomItem(characterSounds.damageSounds);
+            }
+
+            if (sound != null) {
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.damageVolume));
+                characterSounds.lastSoundTime = time.getGameTimeInMs();
+                entity.saveComponent(characterSounds);
+            }
         }
     }
 

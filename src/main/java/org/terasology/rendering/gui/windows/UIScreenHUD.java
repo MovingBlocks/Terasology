@@ -24,6 +24,8 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.drowning.DrowningComponent;
+import org.terasology.logic.drowning.DrownsComponent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -45,10 +47,15 @@ import javax.vecmath.Vector4f;
  */
 public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
+    private static final int NUM_HEART_ICONS = 10;
+    private static final int NUM_BUBBLE_ICONS = 10;
+
     protected EntityManager entityManager;
+    private Time time;
 
     /* DISPLAY ELEMENTS */
     private final UIImage[] hearts;
+    private final UIImage[] breathBubbles;
     private final UIImage crosshair;
     private final UILabel debugLine1;
     private final UILabel debugLine2;
@@ -70,10 +77,11 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     public UIScreenHUD() {
         setId("hud");
         maximize();
-        hearts = new UIImage[10];
+        time = CoreRegistry.get(Time.class);
 
         // Create hearts
-        for (int i = 0; i < 10; i++) {
+        hearts = new UIImage[NUM_HEART_ICONS];
+        for (int i = 0; i < NUM_HEART_ICONS; i++) {
             hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
             hearts[i].setVisible(true);
             hearts[i].setTextureSize(new Vector2f(9f, 9f));
@@ -84,6 +92,20 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
 
             addDisplayElement(hearts[i]);
+        }
+
+        breathBubbles = new UIImage[NUM_BUBBLE_ICONS];
+        for (int i = 0; i < NUM_BUBBLE_ICONS; ++i) {
+            breathBubbles[i] = new UIImage(Assets.getTexture("engine:icons"));
+            breathBubbles[i].setVisible(true);
+            breathBubbles[i].setTextureSize(new Vector2f(9f, 9f));
+            breathBubbles[i].setTextureOrigin(new Vector2f(16f, 18f));
+            breathBubbles[i].setSize(new Vector2f(18f, 18f));
+            breathBubbles[i].setVerticalAlign(EVerticalAlign.BOTTOM);
+            breathBubbles[i].setHorizontalAlign(EHorizontalAlign.CENTER);
+            breathBubbles[i].setPosition(new Vector2f(-18f * i + 210f, -52f));
+
+            addDisplayElement(breathBubbles[i]);
         }
 
         crosshair = new UIImage(Assets.getTexture("engine:gui"));
@@ -171,6 +193,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         super.update();
 
         updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
+        updateBreathBar(localPlayer.getCharacterEntity().getComponent(DrownsComponent.class), localPlayer.getCharacterEntity().getComponent(DrowningComponent.class));
         CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
         if (character == null) {
             toolbar.setVisible(false);
@@ -206,6 +229,32 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         }
     }
 
+    private void updateBreathBar(DrownsComponent drownsComponent, DrowningComponent drowningComponent) {
+        if (drownsComponent != null && drowningComponent != null) {
+            float breath = (drowningComponent.startDrowningTime - time.getGameTimeInMs()) / (1000 * drownsComponent.timeBeforeDrownStart);
+            if (breath <= 0) {
+                for (int i = 0; i < breathBubbles.length; ++i) {
+                    breathBubbles[i].setVisible(true);
+                    breathBubbles[i].setTextureOrigin(new Vector2f(25f, 18f));
+                }
+            } else {
+                breath *= NUM_BUBBLE_ICONS;
+                for (int i = 0; i < breathBubbles.length; ++i) {
+                    breathBubbles[i].setVisible(true);
+                    if (NUM_BUBBLE_ICONS - i - 1 < breath) {
+                        breathBubbles[i].setTextureOrigin(new Vector2f(16f, 18f));
+                    } else {
+                        breathBubbles[i].setTextureOrigin(new Vector2f(25f, 18f));
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < breathBubbles.length; ++i) {
+                breathBubbles[i].setVisible(false);
+            }
+        }
+    }
+
     private void updateHealthBar(HealthComponent health) {
         float healthRatio = 0;
         if (health != null) {
@@ -213,7 +262,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         }
 
         // Show/Hide hearts relatively to the available health points of the player
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NUM_HEART_ICONS; i++) {
 
             if (i < healthRatio * 10f) {
                 hearts[i].setVisible(true);

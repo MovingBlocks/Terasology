@@ -184,10 +184,10 @@ public class WorldAtlas {
         Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
 
         TextureData terrainNormalData = new TextureData(atlasSize, atlasSize, dataNormal, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
-        Texture terrainNorm = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainNormal"), terrainNormalData, Texture.class);
+        Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainNormal"), terrainNormalData, Texture.class);
 
         TextureData terrainHeightData = new TextureData(atlasSize, atlasSize, dataHeight, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
-        Texture terrainHeight = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainHeight"), terrainHeightData, Texture.class);
+        Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainHeight"), terrainHeightData, Texture.class);
 
         MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));
         terrainMatData.setParam("textureAtlas", terrainTex);
