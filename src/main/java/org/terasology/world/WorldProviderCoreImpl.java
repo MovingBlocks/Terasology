@@ -23,6 +23,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -51,6 +52,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private ChunkProvider chunkProvider;
     private WorldTime worldTime;
 
+    private PerlinNoise fogNoise;
+
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     public WorldProviderCoreImpl(String title, String seed, long time, WorldGeneratorUri worldGenerator, ChunkProvider chunkProvider) {
@@ -63,6 +66,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.worldGenerator = worldGenerator;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
+        this.fogNoise = new PerlinNoise(seed.hashCode() + 42*42);
+        this.fogNoise.setOctaves(8);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -320,5 +325,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public WorldTime getTime() {
         return worldTime;
+    }
+
+    @Override
+    public float getFog(float x, float y, float z) {
+        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.fBm(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * biomeProvider.getFog(x, y, z);
     }
 }

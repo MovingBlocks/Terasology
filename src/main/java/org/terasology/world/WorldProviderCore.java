@@ -187,4 +187,6 @@ public interface WorldProviderCore {
 
     WorldTime getTime();
 
+    float getFog(float x, float y, float z);
+
 }

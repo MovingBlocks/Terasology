@@ -114,4 +114,8 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
         core.unregisterListener(listener);
     }
 
+    @Override
+    public float getFog(Vector3f pos) {
+        return core.getFog(pos.x, pos.y, pos.z);
+    }
 }

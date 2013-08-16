@@ -22,16 +22,22 @@ package org.terasology.world;
 public interface WorldBiomeProvider {
 
     public enum Biome {
-        MOUNTAINS(true), SNOW(false), DESERT(true), FOREST(true), PLAINS(true);
+        MOUNTAINS(true, 0.95f), SNOW(false, 1.0f), DESERT(true, 0.0f), FOREST(true, 0.9f), PLAINS(true, 0.0f);
 
         private boolean vegetationFriendly;
+        private float fog;
 
-        private Biome(boolean vegetationFriendly) {
+        private Biome(boolean vegetationFriendly, float fog) {
             this.vegetationFriendly = vegetationFriendly;
+            this.fog = fog;
         }
 
         public boolean isVegetationFriendly() {
             return vegetationFriendly;
+        }
+
+        public float getFog() {
+            return fog;
         }
     }
 
@@ -54,7 +60,7 @@ public interface WorldBiomeProvider {
      */
     float getTemperatureAt(int x, int z);
 
-    float getFog(float time);
+    float getFog(float x, float y, float z);
 
     /*
     * Returns the biome type at the given position.

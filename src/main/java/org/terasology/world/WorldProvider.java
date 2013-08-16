@@ -134,4 +134,6 @@ public interface WorldProvider extends WorldProviderCore {
 
     byte getTotalLight(Vector3i pos);
 
+    float getFog(Vector3f pos);
+
 }

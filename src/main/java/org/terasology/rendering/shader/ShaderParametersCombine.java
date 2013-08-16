@@ -23,6 +23,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -38,13 +39,19 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     @EditorRange(min = 0.0f, max = 1.0f)
     private float outlineThickness = 0.65f;
 
+    @EditorRange(min = 0.0f, max = 1.0f)
     private float skyInscatteringLength = 0.25f;
+    @EditorRange(min = 0.0f, max = 1.0f)
     private float skyInscatteringStrength = 0.35f;
+    @EditorRange(min = 0.0f, max = 1.0f)
     private float skyInscatteringThreshold = 0.75f;
 
+    @EditorRange(min = 0.001f, max = 1.0f)
     private float volFogDensityAtViewer = 0.15f;
-    private float volFogGlobalDensity = 0.05f;
-    private float volFogHeightFalloff = 0.1f;
+    @EditorRange(min = 0.01f, max = 1.0f)
+    private float volFogGlobalDensity = 0.15f;
+    @EditorRange(min = 0.01f, max = 1.0f)
+    private float volFogHeightFalloff = 0.05f;
 
     @Override
     public void applyParameters(Material program) {
@@ -80,10 +87,14 @@ public class ShaderParametersCombine extends ShaderParametersBase {
                 Vector3f fogWorldPosition = new Vector3f(activeCamera.getPosition().x, 32.0f, activeCamera.getPosition().y);
                 fogWorldPosition.sub(activeCamera.getPosition());
                 program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z, true);
+
+                // Fog density is set according to the fog density provided by the world
+                // TODO: The 50% percent limit shouldn't be hardcoded
+                final float worldFog = Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
+                program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
             }
 
-            program.setFloat4("volumetricFogSettings", volFogDensityAtViewer,
-                    volFogGlobalDensity, volFogHeightFalloff, 0.0f, true);
+
         }
 
         DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");

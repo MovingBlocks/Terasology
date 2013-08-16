@@ -136,4 +136,9 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     public WorldTime getTime() {
         return base.getTime();
     }
+
+    @Override
+    public float getFog(float x, float y, float z) {
+        return base.getFog(x, y, z);
+    }
 }

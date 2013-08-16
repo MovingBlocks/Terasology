@@ -161,4 +161,9 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     public WorldTime getTime() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public float getFog(float x, float y, float z) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
