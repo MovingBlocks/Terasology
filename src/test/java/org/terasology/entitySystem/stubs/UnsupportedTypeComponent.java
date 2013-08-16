@@ -32,7 +32,7 @@ public class UnsupportedTypeComponent implements Component {
 
     }
 
-    public static interface UnsupportedType3 {
+    public interface UnsupportedType3 {
 
     }
 

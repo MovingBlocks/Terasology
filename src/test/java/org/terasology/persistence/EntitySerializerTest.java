@@ -123,7 +123,8 @@ public class EntitySerializerTest {
         assertEquals(0, entityData.getRemovedComponentCount());
         EntityData.Component componentData = entityData.getComponent(0);
         assertEquals("String", componentData.getType());
-        assertEquals(Lists.newArrayList(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("Delta").build()).build()), componentData.getFieldList());
+        assertEquals(Lists.newArrayList(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("Delta").build()).build()),
+                componentData.getFieldList());
     }
 
     @Test

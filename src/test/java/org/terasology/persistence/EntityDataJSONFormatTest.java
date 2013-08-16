@@ -218,7 +218,8 @@ public class EntityDataJSONFormatTest {
     @Test
     public void testPersistComponentWithValueMap() throws Exception {
         nameValueBuilder.setName(VALUE_NAME);
-        nameValueBuilder.setValue(EntityData.Value.newBuilder().addNameValue(EntityData.NameValue.newBuilder().setName("Fred").setValue(EntityData.Value.newBuilder().addInteger(1))));
+        nameValueBuilder.setValue(EntityData.Value.newBuilder()
+                .addNameValue(EntityData.NameValue.newBuilder().setName("Fred").setValue(EntityData.Value.newBuilder().addInteger(1))));
         componentBuilder.addField(nameValueBuilder);
         entityBuilder.addComponent(componentBuilder.build());
         worldBuilder.addEntity(entityBuilder.build());

@@ -117,8 +117,10 @@ public abstract class TerasologyTestingEnvironment {
             moduleManager.applyActiveModules();
             CoreRegistry.put(ModuleManager.class, moduleManager);
             AssetType.registerAssetTypes();
-            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModuleManager.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
-            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModuleManager.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(),
+                    ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(),
+                    ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
 
             config = new Config();
             CoreRegistry.put(Config.class, config);
@@ -205,8 +207,10 @@ public abstract class TerasologyTestingEnvironment {
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
-        prefabLoadStep.begin();
-        while (!prefabLoadStep.step()) {
+
+        boolean complete = false;
+        for (prefabLoadStep.begin(); !complete; ) {
+            complete = prefabLoadStep.step();
         }
         CoreRegistry.get(ComponentSystemManager.class).initialise();
     }

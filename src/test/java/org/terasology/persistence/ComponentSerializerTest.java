@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -11,12 +12,11 @@ import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
-import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.protobuf.EntityData;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +28,6 @@ import static org.mockito.Mockito.mock;
  * @author Immortius
  */
 public class ComponentSerializerTest {
-    private ComponentLibrary componentLibrary;
     private ComponentSerializer componentSerializer;
     private static ModuleManager moduleManager;
 
@@ -45,7 +44,7 @@ public class ComponentSerializerTest {
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);
-        componentLibrary = entityManager.getComponentLibrary();
+        ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
         componentSerializer = new ComponentSerializer(componentLibrary);
 
     }
@@ -90,7 +89,8 @@ public class ComponentSerializerTest {
     @Test
     public void testComponentTypeIdDeserializes() throws Exception {
         componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
-        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
+        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1)
+                .addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
         Component comp = componentSerializer.deserialize(compData);
         assertTrue(comp instanceof StringComponent);
         assertEquals("item", ((StringComponent) comp).value);
@@ -99,7 +99,8 @@ public class ComponentSerializerTest {
     @Test
     public void testDeltaComponentTypeIdDeserializesWithValue() throws Exception {
         componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
-        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
+        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1)
+                .addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
         StringComponent original = new StringComponent("test");
         componentSerializer.deserializeOnto(original, compData);
         assertEquals("item", original.value);

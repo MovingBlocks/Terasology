@@ -2,22 +2,22 @@ package org.terasology.testUtil;
 
 import com.google.common.collect.Lists;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Tuple4f;
 import java.util.Collection;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public final class TeraAssert {
-    private TeraAssert() {}
+    private TeraAssert() {
+    }
 
     public static <T> void assertEqualsContent(Collection<? extends T> expected, Collection<? extends T> actual) {
         if (expected == null) {

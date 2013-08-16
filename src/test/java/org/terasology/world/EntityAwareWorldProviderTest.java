@@ -28,10 +28,10 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.utilities.collection.NullIterator;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
@@ -49,13 +49,13 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.testUtil.WorldProviderCoreStub;
+import org.terasology.utilities.collection.NullIterator;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockUri;
@@ -146,7 +146,9 @@ public class EntityAwareWorldProviderTest {
         blockInFamilyTwo = new Block();
         blockInFamilyTwo.setPrefab("test:prefabWithString");
         blockInFamilyTwo.setKeepActive(true);
-        blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"), ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne), NullIterator.<String>newInstance()), true);
+        blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"),
+                ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne),
+                NullIterator.<String>newInstance()), true);
 
         keepActiveBlock = new Block();
         keepActiveBlock.setKeepActive(true);
@@ -208,7 +210,8 @@ public class EntityAwareWorldProviderTest {
         EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         assertTrue(blockEntity.exists());
 
-        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), blockEntity), new EventInfo(OnActivatedComponent.newInstance(), blockEntity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), blockEntity), new EventInfo(OnActivatedComponent.newInstance(), blockEntity)),
+                checker.receivedEvents);
     }
 
     @Test
@@ -221,7 +224,8 @@ public class EntityAwareWorldProviderTest {
         EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         assertTrue(blockEntity.exists());
 
-        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), blockEntity), new EventInfo(BeforeRemoveComponent.newInstance(), blockEntity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), blockEntity), new EventInfo(BeforeRemoveComponent.newInstance(), blockEntity)),
+                checker.receivedEvents);
     }
 
     @Test
@@ -292,7 +296,8 @@ public class EntityAwareWorldProviderTest {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
         worldProvider.update(1.0f);
-        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)),
+                checker.receivedEvents);
     }
 
     @Test
@@ -304,7 +309,8 @@ public class EntityAwareWorldProviderTest {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), IntegerComponent.class);
 
         worldProvider.update(1.0f);
-        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)),
+                checker.receivedEvents);
     }
 
     @Test
@@ -316,7 +322,8 @@ public class EntityAwareWorldProviderTest {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
         worldProvider.update(1.0f);
-        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)),
+                checker.receivedEvents);
     }
 
     @Test
@@ -362,7 +369,8 @@ public class EntityAwareWorldProviderTest {
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
-        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)),
+                checker.receivedEvents);
         assertTrue(entity.hasComponent(NetworkComponent.class));
     }
 
@@ -376,7 +384,8 @@ public class EntityAwareWorldProviderTest {
 
         worldProvider.update(1.0f);
 
-        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)), checker.receivedEvents);
+        assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), entity), new EventInfo(BeforeRemoveComponent.newInstance(), entity)),
+                checker.receivedEvents);
     }
 
     @Test

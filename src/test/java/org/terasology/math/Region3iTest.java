@@ -70,8 +70,10 @@ public class Region3iTest {
     @Test
     public void testCreateRegionWithBounds() {
         Region3i expectedRegion = Region3i.createFromMinMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
-        List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0), new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
-        List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0), new Vector3i(4, 107, -16), new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
+        List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0),
+                new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
+        List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0), new Vector3i(4, 107, -16),
+                new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
             assertEquals(expectedRegion, Region3i.createBounded(vec1.get(i), vec2.get(i)));
         }

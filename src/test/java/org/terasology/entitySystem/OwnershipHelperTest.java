@@ -5,11 +5,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.network.NetworkSystem;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
 

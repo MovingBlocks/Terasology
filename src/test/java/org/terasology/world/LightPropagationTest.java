@@ -62,7 +62,8 @@ public class LightPropagationTest extends TerasologyTestingEnvironment {
         view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         view.lock();
         propagator = new LightPropagator(view);
-        BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlas(4096), Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
+        BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlas(4096),
+                Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
 
         air = BlockManager.getAir();
@@ -189,7 +190,8 @@ public class LightPropagationTest extends TerasologyTestingEnvironment {
         view.setBlock(new Vector3i(14, Chunk.SIZE_Y - 1, 8), air);
         assertEquals(Region3i.createFromMinAndSize(new Vector3i(12, 0, -6), new Vector3i(17, Chunk.SIZE_Y, 29)), propagator.update(14, Chunk.SIZE_Y - 1, 8, air, dirt));
         for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, new Vector3i(WORLD_MAX.x, WORLD_MAX.y - 1, WORLD_MAX.z))) {
-            int expected = Math.max(Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 8) - TeraMath.fastAbs(pos.z - 8), 0), Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 14) - TeraMath.fastAbs(pos.z - 8), 0));
+            int expected = Math.max(Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 8) - TeraMath.fastAbs(pos.z - 8), 0),
+                    Math.max(Chunk.MAX_LIGHT - TeraMath.fastAbs(pos.x - 14) - TeraMath.fastAbs(pos.z - 8), 0));
             assertEquals(pos.toString(), expected, view.getSunlight(pos));
         }
     }
