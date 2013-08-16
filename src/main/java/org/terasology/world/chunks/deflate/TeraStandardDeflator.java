@@ -202,12 +202,14 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
     }
 
     @Override
-    public TeraArray deflateSparseArray8Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize, final int sizeX, final int sizeY, final int sizeZ) {
+    public TeraArray deflateSparseArray8Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize,
+                                            final int sizeX, final int sizeY, final int sizeZ) {
         return null;
     }
 
     @Override
-    public TeraArray deflateSparseArray4Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize, final int sizeX, final int sizeY, final int sizeZ) {
+    public TeraArray deflateSparseArray4Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize,
+                                            final int sizeX, final int sizeY, final int sizeZ) {
         return null;
     }
 

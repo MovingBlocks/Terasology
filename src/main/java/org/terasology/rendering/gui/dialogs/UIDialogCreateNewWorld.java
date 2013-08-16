@@ -235,7 +235,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
                 gameManifest.getModuleConfiguration().copy(moduleConfig);
 
-                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(), (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(),
+                        (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());
                 gameManifest.addWorldInfo(worldInfo);
 
                 CoreRegistry.get(GameEngine.class).changeState(new StateLoading(gameManifest, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));

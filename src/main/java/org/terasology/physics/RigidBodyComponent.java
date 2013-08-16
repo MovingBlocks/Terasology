@@ -36,5 +36,6 @@ public class RigidBodyComponent implements Component {
     @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
     @Replicate
-    public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
+    public List<CollisionGroup> collidesWith =
+            Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
 }

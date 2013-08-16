@@ -222,7 +222,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 if (storeChunksInZips) {
                     chunkData = loadChunkZip(chunkPos);
                 } else {
-                    Path chunkPath = PathManager.getInstance().getCurrentSavePath().resolve(WORLDS_PATH).resolve(TerasologyConstants.MAIN_WORLD).resolve(getChunkFilename(chunkPos));
+                    Path chunkPath = PathManager.getInstance().getCurrentSavePath()
+                            .resolve(WORLDS_PATH)
+                            .resolve(TerasologyConstants.MAIN_WORLD)
+                            .resolve(getChunkFilename(chunkPos));
                     if (Files.isRegularFile(chunkPath)) {
                         try {
                             chunkData = Files.readAllBytes(chunkPath);

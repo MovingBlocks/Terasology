@@ -313,7 +313,9 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
             if (physicsObj.getKey().hasComponent(NetworkComponent.class)) {
                 Transform transform = physicsObj.getValue().getWorldTransform(new Transform());
                 if (physicsObj.getValue().getActivationState() == RigidBody.ACTIVE_TAG) {
-                    physicsObj.getKey().send(new PhysicsResynchEvent(transform.origin, transform.getRotation(new Quat4f()), physicsObj.getValue().getLinearVelocity(new Vector3f()), physicsObj.getValue().getAngularVelocity(new Vector3f())));
+                    PhysicsResynchEvent event = new PhysicsResynchEvent(transform.origin, transform.getRotation(new Quat4f()),
+                            physicsObj.getValue().getLinearVelocity(new Vector3f()), physicsObj.getValue().getAngularVelocity(new Vector3f()));
+                    physicsObj.getKey().send(event);
                 }
             }
         }
@@ -390,7 +392,8 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
-            PairCachingGhostObject triggerObj = physics.createCollider(location.getWorldPosition(), shape, Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.SENSOR), detectGroups, CollisionFlags.NO_CONTACT_RESPONSE);
+            PairCachingGhostObject triggerObj = physics.createCollider(location.getWorldPosition(), shape,
+                    Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.SENSOR), detectGroups, CollisionFlags.NO_CONTACT_RESPONSE);
             triggerObj.setUserPointer(entity);
             entityTriggers.put(entity, triggerObj);
         }

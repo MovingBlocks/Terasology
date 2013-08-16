@@ -60,6 +60,7 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -101,7 +102,8 @@ public class Server implements ChunkReadyListener {
         this.time = (EngineTime) CoreRegistry.get(Time.class);
     }
 
-    void connectToEntitySystem(EngineEntityManager entityManager, NetworkEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
+    void connectToEntitySystem(EngineEntityManager entityManager, NetworkEntitySerializer entitySerializer,
+                               EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
         this.entityManager = entityManager;
         this.eventSerializer = eventSerializer;
         this.entitySerializer = entitySerializer;
@@ -179,7 +181,9 @@ public class Server implements ChunkReadyListener {
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
             if (isOwned(entity)) {
-                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, Collections.<Class<? extends Component>>emptySet(), changedComponents.get(netId), Collections.<Class<? extends Component>>emptySet(), new ClientComponentFieldCheck());
+                Set<Class<? extends Component>> emptyComponentClassSet = Collections.emptySet();
+                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, emptyComponentClassSet, changedComponents.get(netId),
+                        emptyComponentClassSet, new ClientComponentFieldCheck());
                 if (entityData != null) {
                     message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
                 }
@@ -302,10 +306,12 @@ public class Server implements ChunkReadyListener {
     private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
         EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
         if (currentEntity.exists()) {
-            if (currentEntity.getComponent(NetworkComponent.class) == null) {
+            NetworkComponent netComp = currentEntity.getComponent(NetworkComponent.class);
+            if (netComp == null) {
                 logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, updateEntity.getNetId());
+                return;
             }
-            if (currentEntity.getComponent(NetworkComponent.class).getNetworkId() != updateEntity.getNetId()) {
+            if (netComp.getNetworkId() != updateEntity.getNetId()) {
                 logger.error("Network ID wrong before update");
             }
             boolean blockEntityBefore = currentEntity.hasComponent(BlockComponent.class);
@@ -316,8 +322,8 @@ public class Server implements ChunkReadyListener {
                     logger.error("Failed to associated new block entity");
                 }
             }
-            if (currentEntity.getComponent(NetworkComponent.class).getNetworkId() != updateEntity.getNetId()) {
-                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), currentEntity.getComponent(NetworkComponent.class).getNetworkId());
+            if (netComp.getNetworkId() != updateEntity.getNetId()) {
+                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), netComp.getNetworkId());
             }
         } else {
             logger.warn("Received update for non-existent entity {}", updateEntity.getNetId());

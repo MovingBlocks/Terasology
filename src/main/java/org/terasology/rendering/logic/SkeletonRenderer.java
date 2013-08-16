@@ -112,7 +112,8 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
                     updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameId);
                 } else {
                     if ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
-                        updateSkeleton(skeletalMeshComp, skeletalMeshComp.animation.getFrame(skeletalMeshComp.animation.getFrameCount() - 1), skeletalMeshComp.animation.getFrame(skeletalMeshComp.animation.getFrameCount() - 1), 1.0f);
+                        MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(skeletalMeshComp.animation.getFrameCount() - 1);
+                        updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
                         MeshAnimation animation = skeletalMeshComp.animation;
                         skeletalMeshComp.animationTime = 0;
                         skeletalMeshComp.animation = null;

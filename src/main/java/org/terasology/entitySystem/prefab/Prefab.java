@@ -19,9 +19,7 @@ import com.google.common.base.Objects;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.entitySystem.ComponentContainer;
-import org.terasology.entitySystem.common.NullEntityRef;
 
 import java.util.List;
 

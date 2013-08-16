@@ -89,7 +89,8 @@ public abstract class TeraArray implements Externalizable {
 
     /**
      * This is the interface for serialization handlers for tera arrays. Every tera array is required to implement
-     * a serialization handler. It is recommended to subclass {@link org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
+     * a serialization handler. It is recommended to subclass
+     * {@link org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
      * instead of using this interface directly. It should be implemented as a static subclass of the corresponding tera array class.
      *
      * @author Manuel Brotz <manu.brotz@gmx.ch>
@@ -214,7 +215,8 @@ public abstract class TeraArray implements Externalizable {
 
     @Override
     public String toString() {
-        return getClass().getName() + "(" + getSizeX() + ", " + getSizeY() + ", " + getSizeZ() + ", " + (isSparse() ? "sparse" : "dense") + ", " + getElementSizeInBits() + "bit, " + getEstimatedMemoryConsumptionInBytes() + "byte)";
+        return getClass().getName() + "(" + getSizeX() + ", " + getSizeY() + ", " + getSizeZ() + ", "
+                + (isSparse() ? "sparse" : "dense") + ", " + getElementSizeInBits() + "bit, " + getEstimatedMemoryConsumptionInBytes() + "byte)";
     }
 
     public abstract boolean isSparse();

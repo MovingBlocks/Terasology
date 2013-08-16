@@ -654,7 +654,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Set the shadow.
      *
      * @param width     The width of the shadow for each side. x = top, y = right, z = bottom, w = left
-     * @param direction The direction of the shadow. OUTSIDE draws a shadow which points away from the element. INSIDE draws a shadow which points to the center of the element.
+     * @param direction The direction of the shadow. OUTSIDE draws a shadow which points away from the element.
+     *                  INSIDE draws a shadow which points to the center of the element.
      * @param opacity   The opacity of the shadow. 0-1
      */
     public void setShadow(Vector4f width, EShadowDirection direction, float opacity) {

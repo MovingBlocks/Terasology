@@ -3,7 +3,6 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;

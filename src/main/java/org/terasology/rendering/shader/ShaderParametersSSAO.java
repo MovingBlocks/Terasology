@@ -137,7 +137,8 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
             noiseValues.flip();
 
-            texture = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, new ByteBuffer[]{noiseValues}, Texture.WrapMode.Repeat, Texture.FilterMode.Nearest), Texture.class);
+            texture = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE,
+                    new ByteBuffer[]{noiseValues}, Texture.WrapMode.Repeat, Texture.FilterMode.Nearest), Texture.class);
         }
         return texture;
     }

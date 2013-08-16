@@ -1,7 +1,6 @@
 package org.terasology.logic.inventory.events;
 
 import org.terasology.entitySystem.EntityBuilder;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 /**

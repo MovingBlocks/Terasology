@@ -16,7 +16,6 @@
 package org.terasology.rendering.primitives;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 
@@ -97,7 +96,7 @@ public final class MeshFactory {
 
                             if (newA < alphaLimit) {
                                 Vector4f cColor = new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w);
-                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX -0.5f, 0.125f * (15 - newY) - 1f, 0f);
+                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f, 0f);
                             }
                         }
                     }

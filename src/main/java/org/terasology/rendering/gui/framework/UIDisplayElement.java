@@ -192,7 +192,8 @@ public abstract class UIDisplayElement {
      *
      * @param button     The button. 0 = left, 1 = right, 2 = middle. If no button was pressed the value will be -1.
      * @param state      The state of the button. True if the button is pressed.
-     * @param wheelMoved The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up. If lower than 0 the mouse wheel was moved down.
+     * @param wheelMoved The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up.
+     *                   If lower than 0 the mouse wheel was moved down.
      * @param consumed   True if the input event was already consumed by another widget.
      */
     public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
@@ -475,7 +476,8 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Get the vertical align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * Get the vertical align which describes the position of the element in its parent element or on the display,
+     * depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
      * The position will be added as an offset to the the <i>TOP</i>, <i>CENTER</i> or <i>BOTTOM</i> align.
      *
      * @return Returns the vertical align.
@@ -485,7 +487,8 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Set the vertical align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * Set the vertical align which describes the position of the element in its parent element or on the display,
+     * depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
      * The position will be added as an offset to the the <i>TOP</i>, <i>CENTER</i> or <i>BOTTOM</i> align.
      *
      * @param verticalAlign The vertical align.
@@ -495,7 +498,8 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Get the horizontal align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * Get the horizontal align which describes the position of the element in its parent element or on the display,
+     * depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
      * The position will be added as an offset to the the <i>LEFT</i>, <i>CENTER</i> or <i>RIGHT</i> align.
      *
      * @return Returns the horizontal align.
@@ -505,7 +509,8 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Set the horizontal align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * Set the horizontal align which describes the position of the element in its parent element or on the display,
+     * depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
      * The position will be added as an offset to the the <i>LEFT</i>, <i>CENTER</i> or <i>RIGHT</i> align.
      *
      * @param horizontalAlign The horizontal align.
@@ -863,7 +868,10 @@ public abstract class UIDisplayElement {
      * @return True if intersecting
      */
     public boolean intersects(Vector2f point) {
-        return (point.x >= getAbsolutePosition().x && point.y >= getAbsolutePosition().y && point.x <= getAbsolutePosition().x + getSize().x && point.y <= getAbsolutePosition().y + getSize().y);
+        return point.x >= getAbsolutePosition().x &&
+                point.y >= getAbsolutePosition().y &&
+                point.x <= getAbsolutePosition().x + getSize().x &&
+                point.y <= getAbsolutePosition().y + getSize().y;
     }
 
     /**
@@ -900,7 +908,8 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Add an animation, such as the rotation, movement or opacity animation. Every display element can only have one object of a specific class animation. To get an animation use the getAnimation method.
+     * Add an animation, such as the rotation, movement or opacity animation.
+     * Every display element can only have one object of a specific class animation. To get an animation use the getAnimation method.
      *
      * @param newAnimation The animation to add.
      */

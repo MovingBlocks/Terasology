@@ -21,7 +21,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.LocationComponent;

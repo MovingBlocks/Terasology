@@ -149,7 +149,8 @@ public class ThreadMonitorPanel extends JPanel {
                     pError.setVisible(monitor.hasErrors());
                     if (monitor.hasErrors()) {
                         lErrorSpacer.setPreferredSize(dId);
-                        lError.setText(monitor.getNumErrors() + " Error(s), [" + monitor.getLastError().getClass().getSimpleName() + "] " + monitor.getLastError().getMessage());
+                        lError.setText(monitor.getNumErrors() + " Error(s), [" + monitor.getLastError().getClass().getSimpleName() + "] "
+                                + monitor.getLastError().getMessage());
                     }
                 } else {
                     lName.setText("");
