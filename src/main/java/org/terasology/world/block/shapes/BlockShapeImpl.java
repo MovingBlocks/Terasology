@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,21 +96,21 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     }
 
     public CollisionShape getCollisionShape(Rotation rot) {
-        rot = applySymmetry(rot);
-        CollisionShape result = collisionShape.get(rot);
+        Rotation simplifiedRot = applySymmetry(rot);
+        CollisionShape result = collisionShape.get(simplifiedRot);
         if (result == null && baseCollisionShape != null) {
-            result = rotate(baseCollisionShape, rot.getQuat4f());
-            collisionShape.put(rot, result);
+            result = rotate(baseCollisionShape, simplifiedRot.getQuat4f());
+            collisionShape.put(simplifiedRot, result);
         }
         return result;
     }
 
     public Vector3f getCollisionOffset(Rotation rot) {
-        rot = applySymmetry(rot);
-        if (rot.equals(Rotation.none())) {
+        Rotation simplifiedRot = applySymmetry(rot);
+        if (simplifiedRot.equals(Rotation.none())) {
             return new Vector3f(baseCollisionOffset);
         }
-        return QuaternionUtil.quatRotate(rot.getQuat4f(), baseCollisionOffset, new Vector3f());
+        return QuaternionUtil.quatRotate(simplifiedRot.getQuat4f(), baseCollisionOffset, new Vector3f());
     }
 
     @Override

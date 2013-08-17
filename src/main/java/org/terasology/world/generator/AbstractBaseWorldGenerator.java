@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,13 +58,13 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public void setWorldBiomeProvider(final WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(final WorldBiomeProvider value) {
+        this.biomeProvider = value;
         for (final BaseChunkGenerator generator : firstPassGenerators) {
-            generator.setWorldBiomeProvider(biomeProvider);
+            generator.setWorldBiomeProvider(value);
         }
         for (final BaseChunkGenerator generator : secondPassGenerators) {
-            generator.setWorldBiomeProvider(biomeProvider);
+            generator.setWorldBiomeProvider(value);
         }
     }
 

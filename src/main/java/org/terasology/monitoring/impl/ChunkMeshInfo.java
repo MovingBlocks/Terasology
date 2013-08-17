@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,29 +30,29 @@ public class ChunkMeshInfo {
     public ChunkMeshInfo(ChunkMesh[] mesh) {
         checkNotNull(mesh, "The parameter 'mesh' must not be null");
 
-        int totalFinalVertices = 0;
-        int totalFinalIndices = 0;
-        int totalTimeToGenerateBlockVertices = 0;
-        int totalTimeToGenerateOptimizedBuffers = 0;
+        int vertices = 0;
+        int indices = 0;
+        int timeToGenerateBlockVertices = 0;
+        int timeToGenerateOptimizedBuffers = 0;
 
         for (int i = 0; i < mesh.length; i++) {
             final ChunkMesh segment = checkNotNull(mesh[i], "Chunk mesh segment #" + i + " must not be null");
             if (segment.vertexElements != null) {
                 for (int j = 0; j < segment.vertexElements.length; j++) {
                     final ChunkMesh.VertexElements element = segment.vertexElements[j];
-                    totalFinalVertices += element.finalVertices.limit();
-                    totalFinalIndices += element.finalIndices.limit();
+                    vertices += element.finalVertices.limit();
+                    indices += element.finalIndices.limit();
                 }
             }
-            totalTimeToGenerateBlockVertices += segment.getTimeToGenerateBlockVertices();
-            totalTimeToGenerateOptimizedBuffers += segment.getTimeToGenerateOptimizedBuffers();
+            timeToGenerateBlockVertices += segment.getTimeToGenerateBlockVertices();
+            timeToGenerateOptimizedBuffers += segment.getTimeToGenerateOptimizedBuffers();
         }
 
-        this.totalFinalVertices = totalFinalVertices;
-        this.totalFinalIndices = totalFinalIndices;
-        this.totalTriangles = totalFinalIndices / 3;
-        this.totalTimeToGenerateBlockVertices = totalTimeToGenerateBlockVertices;
-        this.totalTimeToGenerateOptimizedBuffers = totalTimeToGenerateOptimizedBuffers;
+        this.totalFinalVertices = vertices;
+        this.totalFinalIndices = indices;
+        this.totalTriangles = indices / 3;
+        this.totalTimeToGenerateBlockVertices = timeToGenerateBlockVertices;
+        this.totalTimeToGenerateOptimizedBuffers = timeToGenerateOptimizedBuffers;
     }
 }
 

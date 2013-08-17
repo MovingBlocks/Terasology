@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
  */
 package org.terasology.benchmark.chunks.arrays;
 
+import org.terasology.world.chunks.blockdata.TeraArray;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
-import org.terasology.world.chunks.blockdata.TeraArray;
-
 public class BenchmarkTeraArraySerializeToStreamViaChannel extends BenchmarkTeraArraySerialization {
 
     protected ByteBuffer buffer;
     protected ByteArrayOutputStream out;
     protected WritableByteChannel channel;
-    
+
     @SuppressWarnings("rawtypes")
     public BenchmarkTeraArraySerializeToStreamViaChannel(TeraArray.SerializationHandler handler, TeraArray array) {
         super(handler, array);
@@ -47,7 +47,8 @@ public class BenchmarkTeraArraySerializeToStreamViaChannel extends BenchmarkTera
     }
 
     @Override
-    public void prerun() {}
+    public void prerun() {
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -64,8 +65,10 @@ public class BenchmarkTeraArraySerializeToStreamViaChannel extends BenchmarkTera
     }
 
     @Override
-    public void postrun() {}
+    public void postrun() {
+    }
 
     @Override
-    public void finish(boolean aborted) {}
+    public void finish(boolean aborted) {
+    }
 }

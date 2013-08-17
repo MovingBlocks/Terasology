@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,7 +178,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
-                region.setDistance(distance + ChunkConstants.FULL_GENERATION_DISTANCE);
+                region.setRelevanceDistance(distance + ChunkConstants.FULL_GENERATION_DISTANCE);
                 return;
             }
         } finally {
@@ -210,7 +210,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
-                region.setDistance(distance + ChunkConstants.FULL_GENERATION_DISTANCE);
+                region.setRelevanceDistance(distance + ChunkConstants.FULL_GENERATION_DISTANCE);
             }
         } finally {
             regionLock.readLock().unlock();

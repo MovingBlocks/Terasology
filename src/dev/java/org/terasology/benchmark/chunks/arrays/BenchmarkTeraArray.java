@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,19 @@
  */
 package org.terasology.benchmark.chunks.arrays;
 
+import com.google.common.base.Preconditions;
 import org.terasology.benchmark.Benchmark;
 import org.terasology.world.chunks.blockdata.TeraArray;
 
-import com.google.common.base.Preconditions;
-
 /**
  * BenchmarkTeraArray is the base class for benchmarking tera arrays.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public abstract class BenchmarkTeraArray implements Benchmark {
 
     protected TeraArray array;
-    
+
     public BenchmarkTeraArray(TeraArray array) {
         this.array = Preconditions.checkNotNull(array);
     }
@@ -38,22 +36,26 @@ public abstract class BenchmarkTeraArray implements Benchmark {
     public int getWarmupRepetitions() {
         return 10000;
     }
-    
+
     @Override
     public int[] getRepetitions() {
-        return new int[] {500, 5000, 50000, 100000};
+        return new int[]{500, 5000, 50000, 100000};
     }
 
     @Override
-    public void setup() {}
+    public void setup() {
+    }
 
     @Override
-    public void prerun() {}
+    public void prerun() {
+    }
 
     @Override
-    public void postrun() {}
+    public void postrun() {
+    }
 
     @Override
-    public void finish(boolean aborted) {}
+    public void finish(boolean aborted) {
+    }
 
 }

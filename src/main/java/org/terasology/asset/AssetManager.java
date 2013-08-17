@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,16 @@ import java.util.UUID;
 public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);
-    private static AssetManager instance = null;
+    private static AssetManager instance;
+
+    private Map<String, AssetSource> assetSources = Maps.newHashMap();
+    private EnumMap<AssetType, Map<String, AssetLoader>> assetLoaders = Maps.newEnumMap(AssetType.class);
+    private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
+    private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
+    private Map<AssetType, AssetFactory> factories = Maps.newHashMap();
+
+    protected AssetManager() {
+    }
 
     public static AssetManager getInstance() {
         if (instance == null) {
@@ -65,15 +74,6 @@ public class AssetManager {
         }
 
         return instance;
-    }
-
-    private Map<String, AssetSource> assetSources = Maps.newHashMap();
-    private EnumMap<AssetType, Map<String, AssetLoader>> assetLoaders = Maps.newEnumMap(AssetType.class);
-    private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
-    private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
-    private Map<AssetType, AssetFactory> factories = Maps.newHashMap();
-
-    protected AssetManager() {
     }
 
     public void setAssetFactory(AssetType type, AssetFactory factory) {
@@ -342,7 +342,7 @@ public class AssetManager {
     private class AllAssetIterator implements Iterator<AssetUri> {
         Iterator<AssetSource> sourceIterator;
         Iterator<AssetUri> currentUriIterator;
-        AssetUri next = null;
+        AssetUri next;
 
         public AllAssetIterator() {
             sourceIterator = assetSources.values().iterator();
@@ -387,7 +387,7 @@ public class AssetManager {
         AssetType type;
         Iterator<AssetSource> sourceIterator;
         Iterator<AssetUri> currentUriIterator;
-        AssetUri next = null;
+        AssetUri next;
 
         public TypedAssetIterator(AssetType type) {
             this.type = type;

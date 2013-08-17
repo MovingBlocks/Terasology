@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class BindableAxisImpl implements BindableAxis {
     private BindAxisEvent event;
     private BindableButton positiveInput;
     private BindableButton negativeInput;
-    private float value = 0;
+    private float value;
 
     private List<BindAxisSubscriber> subscribers = Lists.newArrayList();
 

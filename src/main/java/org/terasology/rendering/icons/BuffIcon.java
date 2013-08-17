@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,14 +84,14 @@ public class BuffIcon {
         return y;
     }
 
-    private void setAtlasPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
+    private void setAtlasPosition(int newX, int newY) {
+        this.x = newX;
+        this.y = newY;
 
         if (element == null) {
             return;
         }
 
-        element.setTextureOrigin(new Vector2f(x * 16f, y * 16f));
+        element.setTextureOrigin(new Vector2f(newX * 16f, newY * 16f));
     }
 }

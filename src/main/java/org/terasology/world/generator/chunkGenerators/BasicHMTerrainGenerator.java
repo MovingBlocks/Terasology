@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
     private Block grass;
     private Block snow;
     private ClimateSimulator climate;
-    float[][] heightmap;
+    private float[][] heightmap;
 
     public BasicHMTerrainGenerator() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
@@ -79,8 +79,8 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
     }
 
     @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(WorldBiomeProvider value) {
+        this.biomeProvider = value;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,23 @@
  */
 package org.terasology.world;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.TerasologyDevelopment;
 import org.terasology.world.block.Block;
 import org.terasology.world.generator.chunkGenerators.PerlinTerrainGenerator;
 
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 /**
  * Simple preview generator. Generates heightmap images using the terrain
  * generator.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class TerrainMapExporter {

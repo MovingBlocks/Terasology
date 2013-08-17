@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class LightComponent implements Component {
 
     // The rendering distance for light components (0.0f == Always render the light)
     @Replicate
-    public float lightRenderingDistance = 0.0f;
+    public float lightRenderingDistance;
 
     @Replicate
     public LightType lightType = LightType.POINT;

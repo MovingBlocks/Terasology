@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ public class AnimationOpacity extends Animation {
     private float speed;
     private Mesh mesh;
 
-    private DefaultRenderingProcess.FBO fbo = null;
-    private String id = null;
+    private DefaultRenderingProcess.FBO fbo;
+    private String id;
 
 
     public AnimationOpacity(float fromOpacity, float toOpacity, float speed) {

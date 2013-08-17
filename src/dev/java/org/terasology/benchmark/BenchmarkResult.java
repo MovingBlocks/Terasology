@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,53 +63,6 @@ public abstract class BenchmarkResult {
         };
 
         public abstract String pad(String value, int size);
-    }
-
-    public abstract static class Column<T extends BenchmarkResult> {
-
-        private final int reps;
-        private final String[] cache;
-        private boolean hasMaxWidth = false;
-        private int maxWidth = 0;
-
-        public final T owner;
-        public final Alignment alignment;
-        public final String name;
-
-        protected abstract String getValueInternal(int rep);
-
-        public Column(T owner, Alignment alignment, String name) {
-            this.owner = Preconditions.checkNotNull(owner);
-            this.alignment = Preconditions.checkNotNull(alignment);
-            this.name = Preconditions.checkNotNull(name);
-            this.reps = owner.getRepetitions();
-            this.cache = new String[reps];
-        }
-
-        public final String getValue(int rep) {
-            Preconditions.checkElementIndex(rep, reps, "Parameter 'rep'");
-            if (cache[rep] == null) {
-                String v = Preconditions.checkNotNull(getValueInternal(rep), "BenchmarkResult::Column::getValueInternal() must never return null (rep=" + rep + ")");
-                cache[rep] = v;
-                return v;
-            }
-            return cache[rep];
-        }
-
-        public final int computeMaxWidth() {
-            if (!hasMaxWidth) {
-                int max = name.length();
-                for (int i = 0; i < reps; i++) {
-                    String v = getValue(i);
-                    if (v.length() > max) {
-                        max = v.length();
-                    }
-                }
-                hasMaxWidth = true;
-                maxWidth = max;
-            }
-            return maxWidth;
-        }
     }
 
     public BenchmarkResult(Benchmark benchmark) {
@@ -184,4 +137,50 @@ public abstract class BenchmarkResult {
         errors.add(new BenchmarkError(type, error));
     }
 
+    public abstract static class Column<T extends BenchmarkResult> {
+
+        public final T owner;
+        public final Alignment alignment;
+        public final String name;
+
+        private final int reps;
+        private final String[] cache;
+        private boolean hasMaxWidth;
+        private int maxWidth;
+
+        public Column(T owner, Alignment alignment, String name) {
+            this.owner = Preconditions.checkNotNull(owner);
+            this.alignment = Preconditions.checkNotNull(alignment);
+            this.name = Preconditions.checkNotNull(name);
+            this.reps = owner.getRepetitions();
+            this.cache = new String[reps];
+        }
+
+        protected abstract String getValueInternal(int rep);
+
+        public final String getValue(int rep) {
+            Preconditions.checkElementIndex(rep, reps, "Parameter 'rep'");
+            if (cache[rep] == null) {
+                String v = Preconditions.checkNotNull(getValueInternal(rep), "BenchmarkResult::Column::getValueInternal() must never return null (rep=" + rep + ")");
+                cache[rep] = v;
+                return v;
+            }
+            return cache[rep];
+        }
+
+        public final int computeMaxWidth() {
+            if (!hasMaxWidth) {
+                int max = name.length();
+                for (int i = 0; i < reps; i++) {
+                    String v = getValue(i);
+                    if (v.length() > max) {
+                        max = v.length();
+                    }
+                }
+                hasMaxWidth = true;
+                maxWidth = max;
+            }
+            return maxWidth;
+        }
+    }
 }

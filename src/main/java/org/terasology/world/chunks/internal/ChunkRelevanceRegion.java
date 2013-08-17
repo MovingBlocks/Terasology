@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class ChunkRelevanceRegion {
     private int unloadLeeway = 2;
 
     private EntityRef entity;
-    private int distance;
+    private int relevanceDistance;
     private boolean dirty;
     private Vector3i center = new Vector3i();
     private Region3i region = Region3i.EMPTY;
@@ -45,9 +45,9 @@ public class ChunkRelevanceRegion {
 
     private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
 
-    public ChunkRelevanceRegion(EntityRef entity, int distance) {
+    public ChunkRelevanceRegion(EntityRef entity, int relevanceDistance) {
         this.entity = entity;
-        this.distance = distance;
+        this.relevanceDistance = relevanceDistance;
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc == null) {
@@ -63,11 +63,11 @@ public class ChunkRelevanceRegion {
         return new Vector3i(center);
     }
 
-    public void setDistance(int distance) {
-        if (distance < this.distance) {
+    public void setRelevanceDistance(int distance) {
+        if (distance < this.relevanceDistance) {
             reviewRelevantChunks(distance);
         }
-        this.distance = distance;
+        this.relevanceDistance = distance;
         this.region = calculateRegion();
         dirty = true;
     }
@@ -110,7 +110,7 @@ public class ChunkRelevanceRegion {
                 dirty = true;
                 center.set(newCenter);
                 region = calculateRegion();
-                reviewRelevantChunks(distance);
+                reviewRelevantChunks(relevanceDistance);
             }
         }
     }
@@ -118,7 +118,7 @@ public class ChunkRelevanceRegion {
     private Region3i calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            Vector3i extents = new Vector3i(TeraMath.ceilToInt(distance / 2.0f), 0, TeraMath.ceilToInt(distance / 2.0f));
+            Vector3i extents = new Vector3i(TeraMath.ceilToInt(relevanceDistance / 2.0f), 0, TeraMath.ceilToInt(relevanceDistance / 2.0f));
             return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), extents);
         }
         return Region3i.EMPTY;

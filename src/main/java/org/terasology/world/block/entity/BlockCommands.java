@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-@RegisterSystem()
+@RegisterSystem
 @Share(BlockCommands.class)
 public class BlockCommands implements ComponentSystem {
 
@@ -88,9 +88,8 @@ public class BlockCommands implements ComponentSystem {
     }
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera)
-    @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in " +
-            "front of the player. The block is set directly into the world and might override existing blocks. After " +
-            "placement the block can be destroyed like any regular placed block.")
+    @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
+            "The block is set directly into the world and might override existing blocks. After placement the block can be destroyed like any regular placed block.")
     public String placeBlock(@CommandParam("blockName") String blockName) {
         Camera camera = renderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();

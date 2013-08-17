@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ public class BindButtonEvent extends ButtonEvent {
         super(0);
     }
 
-    void prepare(String id, ButtonState state, float delta) {
+    void prepare(String buttonId, ButtonState newState, float delta) {
         reset(delta);
-        this.id = id;
-        this.state = state;
+        this.id = buttonId;
+        this.state = newState;
     }
 
     public String getId() {

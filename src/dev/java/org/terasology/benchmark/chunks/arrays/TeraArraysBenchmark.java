@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,28 @@
  */
 package org.terasology.benchmark.chunks.arrays;
 
+import org.terasology.benchmark.Benchmark;
+import org.terasology.benchmark.Benchmarks;
+import org.terasology.benchmark.PrintToConsoleCallback;
+import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import org.terasology.benchmark.Benchmark;
-import org.terasology.benchmark.PrintToConsoleCallback;
-import org.terasology.benchmark.Benchmarks;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-
 /**
  * TeraArraysBenchmark simplifies the execution of the benchmarks for tera arrays.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 @SuppressWarnings("unused")
 public final class TeraArraysBenchmark {
- 
-    private TeraArraysBenchmark() {}
-    
+
+    private TeraArraysBenchmark() {
+    }
+
     private static final byte[][] INFLATED_8_BIT = new byte[256][];
     private static final byte[] DEFLATED_8_BIT = new byte[256];
-    
+
     private static final byte[][] INFLATED_4_BIT = new byte[256][];
     private static final byte[] DEFLATED_4_BIT = new byte[256];
 
@@ -48,11 +48,11 @@ public final class TeraArraysBenchmark {
             INFLATED_4_BIT[i] = new byte[128];
         }
     }
-    
+
     public static void main(String[] args) {
 
         final List<Benchmark> benchmarks = new LinkedList<Benchmark>();
-        
+
         benchmarks.add(new BenchmarkTeraArraySerializeObject(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
         benchmarks.add(new BenchmarkTeraArraySerializeToBuffer(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
         benchmarks.add(new BenchmarkTeraArraySerializeToByteString(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
@@ -74,6 +74,6 @@ public final class TeraArraysBenchmark {
 //        benchmarks.add(new BenchmarkTeraArrayWrite(new TeraSparseArray4Bit(16, 256, 16, INFLATED_4_BIT, DEFLATED_4_BIT)));
 
         Benchmarks.execute(benchmarks, new PrintToConsoleCallback());
-        
+
     }
 }

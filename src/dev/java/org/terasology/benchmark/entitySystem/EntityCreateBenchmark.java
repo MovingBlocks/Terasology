@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class EntityCreateBenchmark extends AbstractBenchmark {
     private List<List<Component>> rawEntityData;
 
     public EntityCreateBenchmark() {
-        super("Create Entities", 10000, new int[] {10000});
+        super("Create Entities", 10000, new int[]{10000});
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,15 @@ import org.terasology.entitySystem.event.Event;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class BeforeDeactivateComponent implements Event {
+public final class BeforeDeactivateComponent implements Event {
 
     private static BeforeDeactivateComponent instance = new BeforeDeactivateComponent();
+
+    private BeforeDeactivateComponent() {
+    }
 
     public static BeforeDeactivateComponent newInstance() {
         return instance;
     }
 
-    private BeforeDeactivateComponent() {
-    }
 }

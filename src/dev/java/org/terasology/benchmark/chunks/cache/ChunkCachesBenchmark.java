@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@ package org.terasology.benchmark.chunks.cache;
 
 public class ChunkCachesBenchmark {
 
-    private ChunkCachesBenchmark() {}
+    private ChunkCachesBenchmark() {
+    }
 
     public static void main(String[] args) {
 

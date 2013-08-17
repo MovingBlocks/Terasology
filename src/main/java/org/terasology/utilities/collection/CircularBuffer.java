@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,9 +79,8 @@ public class CircularBuffer<T> implements Iterable<T> {
     }
 
 
-    private int calculateIndex(int index) {
-        index += startIndex;
-        return index % buffer.length;
+    private int calculateIndex(int relativeIndex) {
+        return (relativeIndex + startIndex) % buffer.length;
     }
 
 

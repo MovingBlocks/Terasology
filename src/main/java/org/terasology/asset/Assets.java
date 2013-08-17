@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,10 @@ import org.terasology.rendering.assets.texture.Texture;
  * @author Immortius
  */
 public final class Assets {
+
+    // Private constructor to prevent instantiation (static class)
+    private Assets() {
+    }
 
     /**
      * @return An iterable over the complete list of available assets
@@ -248,10 +252,6 @@ public final class Assets {
             return assetClass.cast(asset);
         }
         return null;
-    }
-
-    // Private constructor to prevent instantiation (static class)
-    private Assets() {
     }
 
 }

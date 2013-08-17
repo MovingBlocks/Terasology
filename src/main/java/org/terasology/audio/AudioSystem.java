@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class AudioSystem implements UpdateSubscriberSystem {
         audioManager.playSound(Assets.getSound("engine:dig"), position);
     }
 
-    @ReceiveEvent(components = {})
+    @ReceiveEvent
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
@@ -79,7 +79,7 @@ public class AudioSystem implements UpdateSubscriberSystem {
         }
     }
 
-    @ReceiveEvent(components = {})
+    @ReceiveEvent
     public void onPlaySound(PlaySoundForOwnerEvent playSoundEvent, EntityRef entity) {
         ClientComponent clientComponent = networkSystem.getOwnerEntity(entity).getComponent(ClientComponent.class);
         if (clientComponent != null && !clientComponent.local) {

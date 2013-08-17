@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,15 @@ import org.terasology.entitySystem.event.Event;
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  */
-public class BeforeRemoveComponent implements Event {
+public final class BeforeRemoveComponent implements Event {
     private static BeforeRemoveComponent instance = new BeforeRemoveComponent();
+
+    private BeforeRemoveComponent() {
+    }
 
     public static BeforeRemoveComponent newInstance() {
         return instance;
     }
 
-    private BeforeRemoveComponent() {
-    }
+
 }

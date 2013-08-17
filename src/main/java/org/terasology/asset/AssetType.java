@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,9 +55,11 @@ public enum AssetType {
         @Override
         public AssetUri getUri(String sourceId, String item) {
             if (item.endsWith("_frag")) {
-                item = item.substring(0, item.length() - "_frag".length());
+                String itemPart = item.substring(0, item.length() - "_frag".length());
+                return new AssetUri(this, sourceId, itemPart);
             } else if (item.endsWith("_vert")) {
-                item = item.substring(0, item.length() - "_vert".length());
+                String itemPart = item.substring(0, item.length() - "_vert".length());
+                return new AssetUri(this, sourceId, itemPart);
             }
             return new AssetUri(this, sourceId, item);
         }
@@ -69,6 +71,8 @@ public enum AssetType {
     ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader()),
     FONT("font", "fonts", "fnt", new FontLoader());
 
+    private static Map<String, AssetType> typeIdLookup;
+    private static Table<String, String, AssetType> subDirLookup;
 
     /* ============
      * Class fields
@@ -85,9 +89,6 @@ public enum AssetType {
      * The file extension for assets of this type.
      */
     private List<String> fileExtensions;
-
-    private static Map<String, AssetType> typeIdLookup;
-    private static Table<String, String, AssetType> subDirLookup;
 
     /**
      * An instance of the asset loader for the current asset type.

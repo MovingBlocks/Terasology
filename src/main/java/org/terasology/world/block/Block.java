@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ public class Block {
     private byte luminance = 0;
     private Vector3f tint = new Vector3f(0, 0, 0);
     private Map<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
-    private Map<BlockPart, Vector4f> colorOffset = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, Vector4f> colorOffsets = Maps.newEnumMap(BlockPart.class);
 
     // Collision related
     private boolean penetrable = false;
@@ -193,7 +193,7 @@ public class Block {
     public Block() {
         for (BlockPart part : BlockPart.values()) {
             colorSource.put(part, ColorSource.DEFAULT);
-            colorOffset.put(part, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+            colorOffsets.put(part, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
     }
 
@@ -225,8 +225,8 @@ public class Block {
         return family;
     }
 
-    public void setBlockFamily(BlockFamily family) {
-        this.family = family;
+    public void setBlockFamily(BlockFamily value) {
+        this.family = value;
     }
 
     public void setDirection(Side direction) {
@@ -508,21 +508,21 @@ public class Block {
         }
     }
 
-    public void setColorSource(BlockPart part, ColorSource colorSource) {
-        this.colorSource.put(part, colorSource);
+    public void setColorSource(BlockPart part, ColorSource value) {
+        this.colorSource.put(part, value);
     }
 
     public Vector4f getColorOffset(BlockPart part) {
-        return colorOffset.get(part);
+        return colorOffsets.get(part);
     }
 
     public void setColorOffset(BlockPart part, Vector4f color) {
-        colorOffset.put(part, color);
+        colorOffsets.put(part, color);
     }
 
-    public void setColorOffset(Vector4f color) {
+    public void setColorOffsets(Vector4f color) {
         for (BlockPart part : BlockPart.values()) {
-            colorOffset.put(part, color);
+            colorOffsets.put(part, color);
         }
     }
 
@@ -578,7 +578,7 @@ public class Block {
         ColorSource source = getColorSource(part);
         Vector4f color = source.calcColor(temperature, humidity);
 
-        Vector4f colorOffset = this.colorOffset.get(part);
+        Vector4f colorOffset = colorOffsets.get(part);
         color.x *= colorOffset.x;
         color.y *= colorOffset.y;
         color.z *= colorOffset.z;

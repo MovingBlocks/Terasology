@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,22 +39,22 @@ import static org.lwjgl.openal.AL10.alSourcef;
 
 public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T> {
 
-    private SoundPool owningPool;
-
     protected T audio;
     protected int sourceId;
 
     protected float srcGain = 1.0f;
     protected float targetGain = 1.0f;
-    protected boolean fade = false;
+    protected boolean fade;
 
     protected Vector3f position = new Vector3f();
     protected Vector3f velocity = new Vector3f();
     protected Vector3f direction = new Vector3f();
 
-    protected boolean absolutePosition = false;
+    protected boolean absolutePosition;
 
-    protected boolean playing = false;
+    protected boolean playing;
+
+    private SoundPool owningPool;
 
     public BaseSoundSource(SoundPool pool) {
         this.owningPool = pool;
@@ -163,14 +163,14 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setVelocity(Vector3f velocity) {
-        if (velocity == null || this.velocity.equals(velocity)) {
+    public SoundSource setVelocity(Vector3f value) {
+        if (value == null || this.velocity.equals(value)) {
             return this;
         }
 
-        this.velocity.set(velocity);
+        this.velocity.set(value);
 
-        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, value.x, value.y, value.z);
 
         OpenALException.checkState("Setting sound source velocity");
 
@@ -183,13 +183,13 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setPosition(Vector3f position) {
-        if (position == null || this.position.equals(position)) {
+    public SoundSource setPosition(Vector3f value) {
+        if (value == null || this.position.equals(value)) {
             return this;
         }
 
-        this.position.set(position);
-        alSource3f(getSourceId(), AL10.AL_POSITION, position.x, position.y, position.z);
+        this.position.set(value);
+        alSource3f(getSourceId(), AL10.AL_POSITION, value.x, value.y, value.z);
 
         OpenALException.checkState("Changing sound position");
 
@@ -197,16 +197,16 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setDirection(Vector3f direction) {
-        if (direction == null || this.direction.equals(direction)) {
+    public SoundSource setDirection(Vector3f value) {
+        if (value == null || this.direction.equals(value)) {
             return this;
         }
 
-        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, direction.x, direction.y, direction.z);
+        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, value.x, value.y, value.z);
 
         OpenALException.checkState("Setting sound source direction");
 
-        this.direction.set(direction);
+        this.direction.set(value);
 
         return this;
     }
@@ -258,8 +258,8 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource fade(float targetGain) {
-        this.targetGain = targetGain;
+    public SoundSource fade(float value) {
+        this.targetGain = value;
         fade = true;
 
         return this;

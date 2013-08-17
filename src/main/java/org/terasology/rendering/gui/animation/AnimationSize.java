@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ public class AnimationSize extends Animation {
     private Vector2f sizeFrom;
     private Vector2f distination;
     private float speed;
-    private float dX, dY;
+    private float dX;
+    private float dY;
 
     public AnimationSize(Vector2f sizeTo, float speed) {
         this.distination = sizeTo;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,9 @@ public class AABBRenderer implements BlockOverlayRenderer {
         this.aabb = aabb;
     }
 
-    public void setAABB(AABB aabb) {
-        if (aabb != null && !aabb.equals(this.aabb)) {
-            this.aabb = aabb;
+    public void setAABB(AABB from) {
+        if (from != null && !from.equals(this.aabb)) {
+            this.aabb = from;
             dispose();
         }
     }

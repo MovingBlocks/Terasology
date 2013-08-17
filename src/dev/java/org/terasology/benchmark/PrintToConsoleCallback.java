@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,11 @@ import java.text.NumberFormat;
 
 /**
  * PrintToConsoleCallback implements BenchmarkCallback and simply prints everything to the console.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class PrintToConsoleCallback implements BenchmarkCallback {
-    
+
     private static final NumberFormat PERCENT_FORMAT = new DecimalFormat("##0.0");
 
     @Override
@@ -51,7 +50,7 @@ public class PrintToConsoleCallback implements BenchmarkCallback {
     public void success(BenchmarkResult result) {
         System.out.println();
         System.out.println();
-        System.out.println(Benchmarks.printResult(result, null));
+        System.out.println(Benchmarks.printResult(result));
         System.out.println();
     }
 
@@ -61,7 +60,7 @@ public class PrintToConsoleCallback implements BenchmarkCallback {
         System.out.println("Benchmark aborted: " + result.getTitle());
         System.out.println("Number of errors: " + result.getNumErrors());
     }
-    
+
     @Override
     public void error(BenchmarkError.Type type, Exception e, BenchmarkResult result) {
         System.out.println("Benchmark error of type: " + type);

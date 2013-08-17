@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,9 @@ public abstract class Camera {
     /* USED FOR DIRTY CHECKS */
     protected Vector3f cachedPosition = new Vector3f();
     protected Vector3f cachedViewigDirection = new Vector3f();
-    protected float cachedFov = 0.0f, cachedZNear = 0.0f, cachedZFar = 0.0f;
+    protected float cachedFov;
+    protected float cachedZNear;
+    protected float cachedZFar;
 
     /* ETC */
     private boolean reflected = false;

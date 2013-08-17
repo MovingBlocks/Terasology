@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.terasology.entitySystem.prefab.Prefab;
  * @author Immortius
  */
 public class BeforeDamagedEvent implements ConsumableEvent {
-    private boolean consumed = false;
+    private boolean consumed;
 
     private int baseDamage;
     private Prefab damageType;

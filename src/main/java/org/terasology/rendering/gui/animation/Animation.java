@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.terasology.rendering.gui.animation;
 
+import com.google.common.collect.Lists;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO notification for repeat event
@@ -30,27 +31,22 @@ public abstract class Animation {
         START, STOP, REPEAT
     }
 
-    ;
-    private final ArrayList<AnimationListener> animationListeners = new ArrayList<AnimationListener>();
-
-    private boolean started = false;
-    private boolean repeat = false;
     protected UIDisplayElement target;
 
+    private final List<AnimationListener> animationListeners = Lists.newArrayList();
+
+    private boolean started;
+    private boolean repeat;
 
     public void start() {
         started = true;
         notifyAnimationListeners(EAnimationEvents.START);
     }
 
-    ;
-
     public void stop() {
         started = false;
         notifyAnimationListeners(EAnimationEvents.STOP);
     }
-
-    ;
 
     public boolean isStarted() {
         return started;
@@ -59,8 +55,6 @@ public abstract class Animation {
     public void setTarget(UIDisplayElement target) {
         this.target = target;
     }
-
-    ;
 
     public void setRepeat(boolean repeat) {
         this.repeat = repeat;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(publicCert.getModulus(), exponent);
 
             // Store identity for later use
-            ClientIdentity identity = new ClientIdentity(publicCert, privateCert);
+            identity = new ClientIdentity(publicCert, privateCert);
             config.getSecurity().addIdentity(serverCertificate, identity);
             config.save();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,12 @@ public class BindableButtonImpl implements BindableButton {
     private String id;
     private String displayName;
     private BindButtonEvent buttonEvent;
-    private int activeInputs = 0;
+    private int activeInputs;
 
     private List<BindButtonSubscriber> subscribers = Lists.newArrayList();
     private ActivateMode mode = ActivateMode.BOTH;
-    private boolean repeating = false;
-    private int repeatTime = 0;
+    private boolean repeating;
+    private int repeatTime;
     private long lastActivateTime;
 
     private Time time;
@@ -134,11 +134,11 @@ public class BindableButtonImpl implements BindableButton {
      * Updates this bind with the new state of a bound button. This should be done whenever a bound button changes
      * state, so that the overall state of the bind can be tracked.
      *
-     * @param pressed     Is the changing
-     * @param delta       The length of the current frame
-     * @param target      The current camera target
-     * @param keyConsumed Has the changing button's event already been consumed
-     * @param guiOnly     Is the gui consuming input
+     * @param pressed            Is the changing
+     * @param delta              The length of the current frame
+     * @param target             The current camera target
+     * @param initialKeyConsumed Has the changing button's event already been consumed
+     * @param guiOnly            Is the gui consuming input
      * @return Whether the button's event has been consumed
      */
     boolean updateBindState(boolean pressed,
@@ -148,8 +148,9 @@ public class BindableButtonImpl implements BindableButton {
                             Vector3i targetBlockPos,
                             Vector3f hitPosition,
                             Vector3f hitNormal,
-                            boolean keyConsumed,
+                            boolean initialKeyConsumed,
                             boolean guiOnly) {
+        boolean keyConsumed = initialKeyConsumed;
         if (pressed) {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {
@@ -192,9 +193,9 @@ public class BindableButtonImpl implements BindableButton {
     }
 
     void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
-        long time = this.time.getGameTimeInMs();
-        if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
-            lastActivateTime = time;
+        long activateTime = this.time.getGameTimeInMs();
+        if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
+            lastActivateTime = activateTime;
             if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {

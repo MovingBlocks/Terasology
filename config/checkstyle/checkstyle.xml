@@ -15,9 +15,19 @@
     <!-- Checks that there are no tab characters ('\t') in the source code. -->
     <!-- See http://checkstyle.sourceforge.net/config_whitespace.html#FileTabCharacter -->
     <module name="FileTabCharacter">
-	    <property name="fileExtensions" value="java"/> 
+	    <property name="fileExtensions" value="java"/>
 	</module>
-
+	
+	<!-- Checks for header --> 
+	<!-- See http://checkstyle.sourceforge.net/config_header.html --> 
+	<!-- ***************** --> 
+	<!-- Checks that a source file begins with a specified header. --> 
+	<module name="Header"> 
+		<property name="severity" value="warning"/> 
+		<property name="header" value="/*\n * Copyright 2013 MovingBlocks\n *\n"/> 
+		<property name="fileExtensions" value="java"/> 
+	</module>
+	
     <module name="TreeWalker">
         <!-- Checks for Naming Conventions -->
         <!-- See http://checkstyle.sourceforge.net/config_naming.html -->
@@ -29,7 +39,7 @@
         <!-- constants (static, final fields) : ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
 		<!-- Unfortunately this module is too inclusive - static final fields are not necessarily constants! -->
         <module name="ConstantName">
-			<property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|logger)$"/> 
+			<property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|logger)$"/>
 		</module>
         <!-- local, final variables, including catch parameters : ^[a-z][a-zA-Z0-9]*$ -->
         <module name="LocalFinalVariableName"/>
@@ -84,6 +94,52 @@
 		<!-- Checks for the number of types declared at the outer (or root) level in a file. -->
 		<module name="OuterTypeNumber"/>
 		
+		<!-- Checks for whitespaces -->
+        <!-- See http://checkstyle.sourceforge.net/config_whitespace.html -->
+        <!-- ********************** -->
+        <!-- Checks the padding of an empty for iterator; that is whether a space is required at an empty for iterator, or such spaces are forbidden. -->
+        <module name="EmptyForIteratorPad">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks the padding between the identifier of a method definition, constructor definition, method call, or constructor invocation; and the left parenthesis of the parameter list. -->
+        <module name="MethodParamPad">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks that there is no whitespace after a token. -->
+        <module name="NoWhitespaceAfter">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks that there is no whitespace before a token. -->
+        <module name="NoWhitespaceBefore">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks line wrapping for operators. -->
+        <module name="OperatorWrap">
+            <property name="severity" value="warning"/>
+			<property name="tokens" value="BAND,BOR,BSR,BXOR,COLON,DIV,EQUAL,GE,GT,LAND,LE,LITERAL_INSTANCEOF,LOR,LT,MINUS,MOD,NOT_EQUAL,QUESTION,SL,SR,STAR"/>
+        </module>
+        <!-- Checks that the whitespace around the Generic tokens < and > is correct to the typical convention. -->
+        <module name="GenericWhitespace">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks the policy on the padding of parentheses. -->
+        <module name="ParenPad">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks the policy on the padding of parentheses for typecasts. -->
+        <module name="TypecastParenPad">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks that a token is followed by whitespace. -->
+        <module name="WhitespaceAfter">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks that a token is surrounded by whitespace. -->
+        <module name="WhitespaceAround">
+            <property name="severity" value="warning"/>
+			<!-- We skip RCURLY because a false positive when it appears in annotations -->
+			<property name="tokens" value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LCURLY,LE,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN"/>
+        </module>
 
         <!-- Modifier Checks -->
 		<!-- See http://checkstyle.sourceforge.net/config_modifier.html -->
@@ -122,6 +178,91 @@
         <!-- Checks the placement of right curly braces ('}') for else, try, and catch tokens. Default: same -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#RightCurly -->
         <module name="RightCurly"/>
+		
+		<!-- Checks for common coding problems -->
+        <!-- See http://checkstyle.sourceforge.net/config_coding.html -->
+        <!-- ********************************* -->
+        <!-- Checks that classes that define a covariant equals() method also override method equals(java.lang.Object). -->
+        <module name="CovariantEquals"/>
+        <!-- Detects empty statements (standalone ;). -->
+        <module name="EmptyStatement"/>
+        <!-- Checks that classes that override equals() also override hashCode(). -->
+        <module name="EqualsHashCode"/>
+        <!-- Checks that a local variable or a parameter does not shadow a field that is defined in the same class. -->
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+        </module>
+        <!-- Checks for assignments in subexpressions. -->
+        <module name="InnerAssignment"/>
+        <!-- Check for ensuring that for loop control variables are not modified inside the for block. -->
+        <module name="ModifiedControlVariable"/>
+        <!-- Checks for overly complicated boolean expressions. -->
+        <module name="SimplifyBooleanExpression">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks for overly complicated boolean return statements. -->
+        <module name="SimplifyBooleanReturn">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks that string literals are not used with == or !=.  -->
+        <module name="StringLiteralEquality"/>
+        <!-- This check can be used to ensure that types are not declared to be thrown. Declaring to throw java.lang.Error or java.lang.RuntimeException is almost never acceptable. -->
+        <module name="IllegalThrows">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Ensure a class is has a package declaration, and (optionally) whether the package name matches the directory name for the source file. -->
+        <module name="PackageDeclaration"/>
+        <!-- Checks that particular class are never used as types in variable declarations, return values or parameters. Includes a pattern check that by default disallows abstract classes. -->
+        <module name="IllegalType">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Checks for the order of the parts of a class. -->
+        <module name="DeclarationOrder">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Disallow assignment of parameters. -->
+        <module name="ParameterAssignment"/>
+        <!-- Checks if any class or object member explicitly initialized to default for its type value. -->
+        <module name="ExplicitInitialization">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Check that the default is after all the cases in a switch statement. -->
+        <module name="DefaultComesLast"/>
+        <!-- Checks for fall through in switch statements Finds locations where a case contains Java code - but lacks a break, return, throw or continue statement. -->
+        <module name="FallThrough"/>
+        <!-- Checks that each variable declaration is in its own statement and on its own line. -->
+        <module name="MultipleVariableDeclarations"/>
+        <!-- Checks there is only one statement per line. -->
+        <module name="OneStatementPerLine"/>
+		
+		<!-- Checks for class design -->
+        <!-- See http://checkstyle.sourceforge.net/config_design.html -->
+        <!-- *********************** -->
+        <!-- Checks visibility of class members. Only static final members may be public. -->
+        <!--
+        <module name="VisibilityModifier">
+            <property name="severity" value="warning"/>
+        </module>
+        -->
+        <!-- Checks that a class which has only private constructors is declared as final. -->
+        <module name="FinalClass">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Make sure that utility classes (classes that contain only static methods or fields in their API) do not have a public constructor. -->
+        <module name="HideUtilityClassConstructor">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Use Interfaces only to define types. -->
+        <module name="InterfaceIsType">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Ensures that exceptions are immutable. -->
+        <module name="MutableException"/>
+        <!-- Check nested (internal) classes/interfaces are declared at the bottom of the class after all method and field declarations. -->
+        <module name="InnerTypeLast">
+            <property name="severity" value="warning"/>
+        </module>
 
 		<!-- Miscellaneous other checks -->
 		<!-- See http://checkstyle.sourceforge.net/config_misc.html -->
@@ -143,6 +284,22 @@
         <!-- Checks that the outer type name and the file name match. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#OuterTypeFilename -->
         <module name="OuterTypeFilename"/>
+		
+		<!-- Checks for annotations -->
+        <!-- See http://checkstyle.sourceforge.net/config_annotation.html -->
+        <!-- ********************** -->
+        <!-- This check controls the style with the usage of annotations. -->
+        <module name="AnnotationUseStyle">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Verifies that both the java.lang.Deprecated annotation is present and the @deprecated Javadoc tag is present when either is present. -->
+        <module name="MissingDeprecated">
+            <property name="severity" value="warning"/>
+        </module>
+        <!-- Verifies that the java.lang.Override annotation is present when the {@inheritDoc} javadoc tag is present. -->
+        <module name="MissingOverride">
+            <property name="severity" value="warning"/>
+        </module>
 		
     </module>
 </module>

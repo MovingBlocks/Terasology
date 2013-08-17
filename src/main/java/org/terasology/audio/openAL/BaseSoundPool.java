@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@ public abstract class BaseSoundPool implements SoundPool {
 
     private static final int DEFAULT_POOL_SIZE = 32;
 
-    private float volume;
-
     protected Map<SoundSource, Integer> soundSources;
+
+    private float volume;
 
     public BaseSoundPool(int capacity) {
         soundSources = Maps.newHashMapWithExpectedSize(capacity);

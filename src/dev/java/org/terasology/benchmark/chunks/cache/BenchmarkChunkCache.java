@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ public class BenchmarkChunkCache implements Benchmark {
     public int getWarmupRepetitions() {
         return 1;
     }
-    
+
     @Override
     public int[] getRepetitions() {
-        return new int[] {1, 10};
+        return new int[]{1, 10};
     }
 
     @Override

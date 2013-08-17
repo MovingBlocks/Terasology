@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,8 @@ public abstract class ChunkMonitorEvent {
 
     public static class StateChanged extends BasicChunkEvent {
 
-        public final Chunk.State oldState, newState;
+        public final Chunk.State oldState;
+        public final Chunk.State newState;
 
         public StateChanged(Vector3i position, Chunk.State oldState, Chunk.State newState) {
             super(position);
@@ -100,7 +101,8 @@ public abstract class ChunkMonitorEvent {
 
     public static class Deflated extends BasicChunkEvent {
 
-        public final int oldSize, newSize;
+        public final int oldSize;
+        public final int newSize;
 
         public Deflated(Vector3i position, int oldSize, int newSize) {
             super(position);

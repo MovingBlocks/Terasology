@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion
@@ -34,12 +35,17 @@ import java.util.Iterator;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class AABB {
+public final class AABB {
 
     private final Vector3f min;
     private final Vector3f max;
 
     private Vector3f[] vertices;
+
+    private AABB(Vector3f min, Vector3f max) {
+        this.min = min;
+        this.max = max;
+    }
 
     public static AABB createMinMax(Vector3f min, Vector3f max) {
         return new AABB(new Vector3f(min), new Vector3f(max));
@@ -102,11 +108,6 @@ public class AABB {
         return AABB.createMinMax(min, max);
     }
 
-    private AABB(Vector3f min, Vector3f max) {
-        this.min = min;
-        this.max = max;
-    }
-
     public Vector3f getExtents() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.sub(min);
@@ -159,9 +160,9 @@ public class AABB {
      * @return True if overlapping
      */
     public boolean overlaps(AABB aabb2) {
-        return !(max.x < aabb2.min.x || min.x > aabb2.max.x) &&
-                !(max.y < aabb2.min.y || min.y > aabb2.max.y) &&
-                !(max.z < aabb2.min.z || min.z > aabb2.max.z);
+        return !(max.x < aabb2.min.x || min.x > aabb2.max.x)
+                && !(max.y < aabb2.min.y || min.y > aabb2.max.y)
+                && !(max.z < aabb2.min.z || min.z > aabb2.max.z);
     }
 
     /**
@@ -171,9 +172,9 @@ public class AABB {
      * @return True if containing
      */
     public boolean contains(Vector3d point) {
-        return !(max.x < point.x || min.x >= point.x) &&
-                !(max.y < point.y || min.y >= point.y) &&
-                !(max.z < point.z || min.z >= point.z);
+        return !(max.x < point.x || min.x >= point.x)
+                && !(max.y < point.y || min.y >= point.y)
+                && !(max.z < point.z || min.z >= point.z);
     }
 
     /**
@@ -183,9 +184,9 @@ public class AABB {
      * @return True if containing
      */
     public boolean contains(Vector3f point) {
-        return !(max.x < point.x || min.x >= point.x) &&
-                !(max.y < point.y || min.y >= point.y) &&
-                !(max.z < point.z || min.z >= point.z);
+        return !(max.x < point.x || min.x >= point.x)
+                && !(max.y < point.y || min.y >= point.y)
+                && !(max.z < point.z || min.z >= point.z);
     }
 
     /**
@@ -272,7 +273,7 @@ public class AABB {
      * @return The normal
      */
     public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
-        ArrayList<Vector3f> normals = new ArrayList<Vector3f>();
+        List<Vector3f> normals = new ArrayList<>();
 
         if (pointOnAABB.z == min.z && testZ) {
             normals.add(new Vector3f(0, 0, -1));

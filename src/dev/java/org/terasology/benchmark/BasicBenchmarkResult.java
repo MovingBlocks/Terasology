@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package org.terasology.benchmark;
 
 /**
  * BasicBenchmarkResult extends BenchmarkResult and adds three basic columns for pretty printing.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class BasicBenchmarkResult extends BenchmarkResult {
 
@@ -29,7 +28,7 @@ public class BasicBenchmarkResult extends BenchmarkResult {
         addColumn(new Column<BasicBenchmarkResult>(this, Alignment.RIGHT, "#") {
             @Override
             public String getValueInternal(int rep) {
-                return String.valueOf(rep+1);
+                return String.valueOf(rep + 1);
             }
         });
         addColumn(new Column<BasicBenchmarkResult>(this, Alignment.RIGHT, "Repetitions") {

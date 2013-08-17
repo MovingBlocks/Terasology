@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public class Chunk {
     public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
     public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
 
-    private final Vector3i pos = new Vector3i();
+    private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;
 
@@ -126,14 +126,14 @@ public class Chunk {
     private AABB aabb;
 
     // Rendering
-    private ChunkMesh[] mesh;
+    private ChunkMesh[] activeMesh;
     private ChunkMesh[] pendingMesh;
-    private AABB[] subMeshAABB = null;
+    private AABB[] subMeshAABB;
 
     private ReentrantLock lock = new ReentrantLock();
-    private boolean disposed = false;
+    private boolean disposed;
 
-    private boolean ready = false;
+    private boolean ready;
 
     protected Chunk() {
         final Chunks c = Chunks.getInstance();
@@ -147,18 +147,18 @@ public class Chunk {
 
     public Chunk(int x, int y, int z) {
         this();
-        pos.x = x;
-        pos.y = y;
-        pos.z = z;
+        chunkPos.x = x;
+        chunkPos.y = y;
+        chunkPos.z = z;
         ChunkMonitor.fireChunkCreated(this);
     }
 
-    public Chunk(Vector3i pos) {
-        this(pos.x, pos.y, pos.z);
+    public Chunk(Vector3i chunkPos) {
+        this(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
-    public Chunk(Vector3i pos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid, boolean loaded) {
-        this.pos.set(Preconditions.checkNotNull(pos));
+    public Chunk(Vector3i chunkPos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid, boolean loaded) {
+        this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.sunlightData = Preconditions.checkNotNull(sunlight);
         this.lightData = Preconditions.checkNotNull(light);
@@ -182,7 +182,7 @@ public class Chunk {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
             final TeraArrays t = TeraArrays.getInstance();
             final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
-                    .setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
+                    .setX(chunk.chunkPos.x).setY(chunk.chunkPos.y).setZ(chunk.chunkPos.z)
                     .setState(chunk.chunkState.protobufState)
                     .setBlockData(t.encode(chunk.blockData));
             if (!coreOnly) {
@@ -252,7 +252,7 @@ public class Chunk {
     }
 
     public Vector3i getPos() {
-        return new Vector3i(pos);
+        return new Vector3i(chunkPos);
     }
 
     public boolean isInBounds(int x, int y, int z) {
@@ -378,15 +378,15 @@ public class Chunk {
     }
 
     public int getChunkWorldPosX() {
-        return pos.x * getChunkSizeX();
+        return chunkPos.x * getChunkSizeX();
     }
 
     public int getChunkWorldPosY() {
-        return pos.y * getChunkSizeY();
+        return chunkPos.y * getChunkSizeY();
     }
 
     public int getChunkWorldPosZ() {
-        return pos.z * getChunkSizeZ();
+        return chunkPos.z * getChunkSizeZ();
     }
 
     public Vector3i getBlockWorldPos(Vector3i blockPos) {
@@ -456,7 +456,7 @@ public class Chunk {
                         "sunlight-deflated-by={}%, " +
                         "light-deflated-by={}%, " +
                         "liquid-deflated-by={}%",
-                        pos,
+                        chunkPos,
                         SIZE_FORMAT.format(totalSize),
                         SIZE_FORMAT.format(totalReduced),
                         PERCENT_FORMAT.format(totalPercent),
@@ -480,16 +480,16 @@ public class Chunk {
 
     @Override
     public String toString() {
-        return "Chunk" + pos.toString();
+        return "Chunk" + chunkPos.toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(pos);
+        return Objects.hashCode(chunkPos);
     }
 
     public void setMesh(ChunkMesh[] mesh) {
-        this.mesh = mesh;
+        this.activeMesh = mesh;
     }
 
     public void setPendingMesh(ChunkMesh[] mesh) {
@@ -506,7 +506,7 @@ public class Chunk {
 
 
     public ChunkMesh[] getMesh() {
-        return mesh;
+        return activeMesh;
     }
 
     public ChunkMesh[] getPendingMesh() {
@@ -541,21 +541,21 @@ public class Chunk {
     public void dispose() {
         disposed = true;
         ready = false;
-        if (mesh != null) {
-            for (ChunkMesh chunkMesh : mesh) {
+        if (activeMesh != null) {
+            for (ChunkMesh chunkMesh : activeMesh) {
                 chunkMesh.dispose();
             }
-            mesh = null;
+            activeMesh = null;
         }
         ChunkMonitor.fireChunkDisposed(this);
     }
 
     public void disposeMesh() {
-        if (mesh != null) {
-            for (ChunkMesh chunkMesh : mesh) {
+        if (activeMesh != null) {
+            for (ChunkMesh chunkMesh : activeMesh) {
                 chunkMesh.dispose();
             }
-            mesh = null;
+            activeMesh = null;
         }
     }
 

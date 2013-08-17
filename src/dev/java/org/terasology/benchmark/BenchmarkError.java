@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package org.terasology.benchmark;
 import com.google.common.base.Preconditions;
 
 /**
- * BenchmarkError encapsulates an error that occurred during a benchmark. 
- * It stores the type of the error and the exception object. 
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * BenchmarkError encapsulates an error that occurred during a benchmark.
+ * It stores the type of the error and the exception object.
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class BenchmarkError {
 
@@ -35,13 +34,13 @@ public class BenchmarkError {
             this.abort = abort;
         }
     }
-    
+
     public final Type type;
     public final Exception error;
-    
+
     public BenchmarkError(Type type, Exception error) {
         this.type = Preconditions.checkNotNull(type);
         this.error = Preconditions.checkNotNull(error);
     }
-    
+
 }

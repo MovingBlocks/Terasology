@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 
 /**
  * BenchmarkTeraArrayWrite implements a simple write performance benchmark for tera arrays.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class BenchmarkTeraArrayWrite extends BenchmarkTeraArray {
 

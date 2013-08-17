@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.terasology.benchmark.chunks.arrays;
 
-import java.nio.ByteBuffer;
-
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArray.SerializationHandler;
+
+import java.nio.ByteBuffer;
 
 @SuppressWarnings("rawtypes")
 public class BenchmarkTeraArraySerializeToBuffer extends BenchmarkTeraArraySerialization {
@@ -40,7 +40,8 @@ public class BenchmarkTeraArraySerializeToBuffer extends BenchmarkTeraArraySeria
     }
 
     @Override
-    public void prerun() {}
+    public void prerun() {
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -52,8 +53,10 @@ public class BenchmarkTeraArraySerializeToBuffer extends BenchmarkTeraArraySeria
     }
 
     @Override
-    public void postrun() {}
+    public void postrun() {
+    }
 
     @Override
-    public void finish(boolean aborted) {}
+    public void finish(boolean aborted) {
+    }
 }

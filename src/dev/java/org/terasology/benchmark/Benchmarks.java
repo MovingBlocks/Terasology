@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
  */
 package org.terasology.benchmark;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
-import com.google.common.base.Preconditions;
-
 /**
  * Benchmarks contains methods to execute one or many benchmarks with support for a progress callback as well as
  * a simple pretty printer for benchmark results.
- * 
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public final class Benchmarks {
-    
-    private Benchmarks() {} 
-    
+
+    private Benchmarks() {
+    }
+
     public static BenchmarkResult execute(Benchmark benchmark, int benchmarkIndex, int benchmarkCount, BenchmarkCallback callback) {
-        
+
         if (callback != null) {
             callback.begin(benchmark, benchmarkIndex, benchmarkCount);
         }
@@ -43,7 +42,7 @@ public final class Benchmarks {
         final BenchmarkResult result = new BasicBenchmarkResult(benchmark);
         final int[] repetitions = Preconditions.checkNotNull(benchmark.getRepetitions(), "Benchmark::getRepetitions() must not return null");
         Preconditions.checkState(repetitions.length > 0, "Benchmark::getRepetitions() must return an array of size greater than zero");
-        
+
         try {
             benchmark.setup();
         } catch (Exception e) {
@@ -53,7 +52,7 @@ public final class Benchmarks {
             }
             return result;
         }
-        
+
         try {
             if (callback != null) {
                 callback.warmup(benchmark, false);
@@ -71,17 +70,18 @@ public final class Benchmarks {
             }
             return result;
         }
-        
-        int repsTotal = 0, repsSoFar = 0;
+
+        int repsTotal = 0;
+        int repsSoFar = 0;
         for (int reps : repetitions) {
             repsTotal += reps;
         }
         int repsPart = repsTotal / 20;
-        
+
         int repIndex = 0;
         boolean aborted = false;
         for (int reps : repetitions) {
-            
+
             try {
                 benchmark.prerun();
             } catch (Exception e) {
@@ -92,27 +92,29 @@ public final class Benchmarks {
                 }
                 break;
             }
-            
-            long start = time(), elapsed = 0;
+
+            long start = time();
+            long elapsed;
             try {
                 result.setStartTime(repIndex, TimeUnit.MILLISECONDS.convert(start, TimeUnit.NANOSECONDS));
-                while (reps > repsPart) {
+                int currentReps = reps;
+                while (currentReps > repsPart) {
                     for (int i = 0; i < repsPart; ++i) {
                         benchmark.run();
                     }
-                    reps -= repsPart;
+                    currentReps -= repsPart;
                     repsSoFar += repsPart;
                     if (callback != null) {
-                        callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
+                        callback.progress(benchmark, 100d / (double) repsTotal * (double) repsSoFar);
                     }
                 }
-                if (reps <= repsPart) {
-                    for (int i = 0; i < reps; ++i) {
+                if (currentReps <= repsPart) {
+                    for (int i = 0; i < currentReps; ++i) {
                         benchmark.run();
                     }
-                    repsSoFar += reps;
+                    repsSoFar += currentReps;
                     if (callback != null) {
-                        callback.progress(benchmark, 100d / (double)repsTotal * (double)repsSoFar);
+                        callback.progress(benchmark, 100d / (double) repsTotal * (double) repsSoFar);
                     }
                 }
                 elapsed = elapsed(start, TimeUnit.NANOSECONDS);
@@ -125,7 +127,7 @@ public final class Benchmarks {
                 }
                 break;
             }
-                        
+
             try {
                 benchmark.postrun();
             } catch (Exception e) {
@@ -136,12 +138,12 @@ public final class Benchmarks {
                 }
                 break;
             }
-            
+
             ++repIndex;
         }
-        
+
         try {
-            benchmark.finish(aborted); 
+            benchmark.finish(aborted);
         } catch (Exception e) {
             result.addError(BenchmarkError.Type.Finish, e);
             if (callback != null) {
@@ -156,16 +158,16 @@ public final class Benchmarks {
                 callback.success(result);
             }
         }
-        
+
         return result;
     }
-    
+
     public static List<BenchmarkResult> execute(List<Benchmark> benchmarks, BenchmarkCallback callback) {
         Preconditions.checkNotNull(benchmarks);
-        
+
         final List<BenchmarkResult> results = new LinkedList<BenchmarkResult>();
         final int benchmarkCount = benchmarks.size();
-        
+
         try {
             int benchmarkIndex = 1;
             for (Benchmark benchmark : benchmarks) {
@@ -181,14 +183,17 @@ public final class Benchmarks {
                 callback.fatal(e);
             }
         }
-        
+
         return results;
     }
-    
+
+    public static StringBuilder printResults(List<BenchmarkResult> results) {
+        return printResults(results, new StringBuilder());
+    }
+
+
     public static StringBuilder printResults(List<BenchmarkResult> results, StringBuilder b) {
-        if (b == null) {
-            b = new StringBuilder();
-        }
+        Preconditions.checkNotNull(b);
         final int resultCount = results.size();
         int resultIndex = 1;
         for (BenchmarkResult result : results) {
@@ -201,11 +206,13 @@ public final class Benchmarks {
         }
         return b;
     }
-    
+
+    public static StringBuilder printResult(BenchmarkResult result) {
+        return printResult(result, new StringBuilder());
+    }
+
     public static StringBuilder printResult(BenchmarkResult result, StringBuilder b) {
-        if (b == null) {
-            b = new StringBuilder();
-        }
+        Preconditions.checkNotNull(b);
         BenchmarkResult.Column<?>[] columns = getColumns(result);
         printFieldTitles(result, columns, b);
         for (int repIndex = 0; repIndex < result.getRepetitions(); repIndex++) {
@@ -213,7 +220,7 @@ public final class Benchmarks {
         }
         return b;
     }
-    
+
     private static BenchmarkResult.Column<?>[] getColumns(BenchmarkResult result) {
         BenchmarkResult.Column<?>[] columns = new BenchmarkResult.Column<?>[result.getNumColumns()];
         Iterator<BenchmarkResult.Column<?>> it = result.getColumnsIterator();
@@ -223,7 +230,7 @@ public final class Benchmarks {
         }
         return columns;
     }
-    
+
     private static void printFieldTitles(BenchmarkResult result, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
@@ -236,7 +243,7 @@ public final class Benchmarks {
         }
         b.append("\n");
     }
-    
+
     private static void printFieldValues(BenchmarkResult result, int repIndex, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
@@ -249,7 +256,7 @@ public final class Benchmarks {
         }
         b.append("\n");
     }
-    
+
     private static long time() {
         return System.nanoTime();
     }
@@ -259,5 +266,5 @@ public final class Benchmarks {
         long result = time() - time;
         return unit.convert(result, TimeUnit.NANOSECONDS);
     }
-    
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ public class BindAxisEvent extends AxisEvent {
         return value;
     }
 
-    void prepare(String id, float value, float delta) {
+    void prepare(String axisId, float axisValue, float delta) {
         reset(delta);
-        this.id = id;
-        this.value = value;
+        this.id = axisId;
+        this.value = axisValue;
     }
 
     public String getId() {

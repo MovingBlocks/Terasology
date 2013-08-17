@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,8 +76,15 @@ public class ChunkMonitorDisplay extends JPanel {
     private final Map<Vector3i, ChunkMonitorEntry> map = new HashMap<Vector3i, ChunkMonitorEntry>();
     private final ImageBuffer image = new ImageBuffer();
 
-    private int refreshInterval, centerOffsetX = 0, centerOffsetY = 0, offsetX, offsetY, chunkSize;
-    private int renderY = 0, minRenderY = 0, maxRenderY = 0;
+    private int refreshInterval;
+    private int centerOffsetX;
+    private int centerOffsetY;
+    private int offsetX;
+    private int offsetY;
+    private int chunkSize;
+    private int renderY;
+    private int minRenderY;
+    private int maxRenderY;
     private boolean followPlayer = true;
 
     private Vector3i selectedChunk = null;
@@ -132,8 +139,10 @@ public class ChunkMonitorDisplay extends JPanel {
     private static class ImageBuffer {
 
         private final ReadWriteLock lock = new ReentrantReadWriteLock();
-        private int width, height;
-        private BufferedImage imageA, imageB;
+        private int width;
+        private int height;
+        private BufferedImage imageA;
+        private BufferedImage imageB;
 
         public ImageBuffer(int width, int height) {
             resize(width, height);
@@ -162,15 +171,15 @@ public class ChunkMonitorDisplay extends JPanel {
             return null;
         }
 
-        public void resize(int width, int height) {
+        public void resize(int newWidth, int hewHeight) {
             lock.writeLock().lock();
             try {
-                this.width = width;
-                this.height = height;
-                if (width < 1 || height < 1) {
+                this.width = newWidth;
+                this.height = hewHeight;
+                if (newWidth < 1 || hewHeight < 1) {
                     imageB = null;
-                } else if (imageB == null || width != imageB.getWidth() || height != imageB.getHeight()) {
-                    imageB = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                } else if (imageB == null || newWidth != imageB.getWidth() || hewHeight != imageB.getHeight()) {
+                    imageB = new BufferedImage(newWidth, hewHeight, BufferedImage.TYPE_INT_ARGB);
                 }
             } catch (Exception e) {
                 imageB = null;
@@ -285,7 +294,8 @@ public class ChunkMonitorDisplay extends JPanel {
 
     private class ResizeRequest extends UpdateRequest {
 
-        public final int width, height;
+        public final int width;
+        public final int height;
 
         public ResizeRequest(int width, int height) {
             this.width = width;
@@ -407,13 +417,15 @@ public class ChunkMonitorDisplay extends JPanel {
 
     private class MouseInputListener implements MouseWheelListener, MouseMotionListener, MouseListener {
 
-        private Point leftPressed = null;
-        private int offsetX, offsetY;
+        private Point leftPressed;
+        private int offsetXl;
+        private int offsetY;
 
         @Override
         public void mouseDragged(MouseEvent e) {
             if (leftPressed != null) {
-                final int dx = e.getPoint().x - leftPressed.x, dy = e.getPoint().y - leftPressed.y;
+                final int dx = e.getPoint().x - leftPressed.x;
+                final int dy = e.getPoint().y - leftPressed.y;
                 setOffset(offsetX + dx, offsetY + dy);
             }
         }
@@ -473,13 +485,15 @@ public class ChunkMonitorDisplay extends JPanel {
         private RenderTask() {
         }
 
-        private Rectangle calcBox(List<ChunkMonitorEntry> chunks) {
-            if (chunks.isEmpty()) {
+        private Rectangle calcBox(List<ChunkMonitorEntry> chunkEntries) {
+            if (chunkEntries.isEmpty()) {
                 return new Rectangle(0, 0, 0, 0);
             }
-            int xmin = Integer.MAX_VALUE, xmax = Integer.MIN_VALUE;
-            int ymin = Integer.MAX_VALUE, ymax = Integer.MIN_VALUE;
-            for (ChunkMonitorEntry entry : chunks) {
+            int xmin = Integer.MAX_VALUE;
+            int xmax = Integer.MIN_VALUE;
+            int ymin = Integer.MAX_VALUE;
+            int ymax = Integer.MIN_VALUE;
+            for (ChunkMonitorEntry entry : chunkEntries) {
                 final Vector3i pos = entry.getPosition();
                 if (pos.y != renderY) {
                     continue;
@@ -545,8 +559,8 @@ public class ChunkMonitorDisplay extends JPanel {
             g.fillRect(0, 0, width, height);
         }
 
-        private void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunks) {
-            for (ChunkMonitorEntry entry : chunks) {
+        private void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunkEntries) {
+            for (ChunkMonitorEntry entry : chunkEntries) {
                 if (entry.getPosition().y == renderY) {
                     renderChunk(g, offsetx, offsety, entry.getPosition(), entry);
                 }
@@ -558,10 +572,10 @@ public class ChunkMonitorDisplay extends JPanel {
             g.fillRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
         }
 
-        private void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunks) {
-            final Rectangle box = calcBox(chunks);
+        private void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunkEntries) {
+            final Rectangle box = calcBox(chunkEntries);
             renderBackground(g, width, height);
-            renderChunks(g, offsetx, offsety, chunks);
+            renderChunks(g, offsetx, offsety, chunkEntries);
             renderBox(g, offsetx, offsety, box);
             renderSelectedChunk(g, offsetx, offsety, selectedChunk);
         }
@@ -569,7 +583,8 @@ public class ChunkMonitorDisplay extends JPanel {
         private void render() {
             final Graphics2D g = image.getGraphics();
             if (g != null) {
-                final int iw = image.getWidth(), ih = image.getHeight();
+                final int iw = image.getWidth();
+                final int ih = image.getHeight();
                 render(g, centerOffsetX + offsetX, centerOffsetY + offsetY, iw, ih, chunks);
                 image.swap();
                 repaint();
@@ -613,7 +628,8 @@ public class ChunkMonitorDisplay extends JPanel {
                 while (true) {
 
                     final long slept = poll(requests);
-                    boolean needsRendering = false, fastResume = false;
+                    boolean needsRendering;
+                    boolean fastResume;
 
                     for (Request r : requests) {
                         try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(r.getName())) {
@@ -723,14 +739,15 @@ public class ChunkMonitorDisplay extends JPanel {
     }
 
     public ChunkMonitorDisplay setRenderY(int value) {
+        int clampedValue = value;
         if (value < minRenderY) {
-            value = minRenderY;
+            clampedValue = minRenderY;
         }
         if (value > maxRenderY) {
-            value = maxRenderY;
+            clampedValue = maxRenderY;
         }
-        if (renderY != value) {
-            renderY = value;
+        if (renderY != clampedValue) {
+            renderY = clampedValue;
             updateDisplay(true);
         }
         return this;
