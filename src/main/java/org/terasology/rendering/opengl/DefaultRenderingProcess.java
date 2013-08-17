@@ -147,7 +147,7 @@ public class DefaultRenderingProcess {
     @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrMaxExposure = 8.0f;
     @EditorRange(min = 0.0f, max = 10.0f)
-    private float hdrMaxExposureNight = 1.0f;
+    private float hdrMaxExposureNight = 8.0f;
     @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrMinExposure = 1.0f;
     @EditorRange(min = 0.0f, max = 4.0f)

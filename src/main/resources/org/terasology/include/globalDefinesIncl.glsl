@@ -22,15 +22,17 @@
 #define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
 #define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
 
-#define NIGHT_BRIGHTNESS 0.1
+#define NIGHT_BRIGHTNESS 0.125
 
 #define WATER_AMB 1.0
-#define WATER_DIFF 0.75
+#define WATER_DIFF 2.0
 
-#define BLOCK_DIFF 0.75
-#define BLOCK_AMB 2.0
+#define BLOCK_AMB 1.0
+#define BLOCK_DIFF 2.0
+
 
 #define EPSILON 0.000001
+#define PI 3.14159265359
 
 #define A 0.15
 #define B 0.50

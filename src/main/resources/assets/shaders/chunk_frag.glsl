@@ -16,7 +16,7 @@
 
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
-#define WATER_SPEC 2.0
+#define WATER_SPEC 1.0
 
 #ifdef FEATURE_REFRACTIVE_PASS
 varying vec3 waterNormalViewSpace;
@@ -236,7 +236,8 @@ void main() {
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
      if (isWater && isOceanWater) {
-            color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
+            float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(daylightValue, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp);
+            color.xyz += vec3(specularHighlight, specularHighlight, specularHighlight);
 
             vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
             vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);

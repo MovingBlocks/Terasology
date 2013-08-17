@@ -45,6 +45,13 @@ float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
     return pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
 }
 
+float calcSpecLightNormalized(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
+    const float PI_TIMES_8 = 8.0 * PI;
+
+    vec3 halfWay = normalize(eyeVec+lightVec);
+    return clamp(((exp + 8.0) / PI_TIMES_8) * pow(dot(halfWay, normal), exp), 0.0, 1.0);
+}
+
 vec4 linearToSrgb(vec4 color) {
      return vec4(sqrt(color.rgb), color.a);
 }
@@ -167,15 +174,19 @@ vec3 calcBlocklightColor(float blocklightValue
     return vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 }
 
-vec3 calcSunlightColorDeferred(float daylightValue, float diffuseLighting, float ambientIntensity, float diffuseIntensity, vec3 ambientColor, vec3 diffuseColor) {
+float calcDayAndNightLightingFactor(float daylightValue, float daylight) {
     float daylightScaledValue = daylight * daylightValue;
+    return expLightValue(daylightScaledValue) + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
+}
+
+vec3 calcSunlightColorDeferred(float daylightValue, float diffuseLighting, float ambientIntensity, float diffuseIntensity, vec3 ambientColor, vec3 diffuseColor) {
     vec3 daylightColorValue = vec3(ambientIntensity) + diffuseLighting * diffuseIntensity * diffuseColor;
 
     vec3 ambientTint = mix(vec3(MOONLIGHT_AMBIENT_COLOR), vec3(DAYLIGHT_AMBIENT_COLOR), daylight) * ambientColor;
     daylightColorValue.xyz *= ambientTint;
 
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= expLightValue(daylightScaledValue) + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
+    daylightColorValue.xyz *= calcDayAndNightLightingFactor(daylightValue, daylight);
 
     return daylightColorValue;
 }

@@ -15,7 +15,6 @@
  */
 
 varying vec4 vertexProjPos;
-varying vec3 eyeVec;
 
 uniform vec3 lightViewPos;
 
@@ -42,7 +41,7 @@ uniform mat4 invProjMatrix;
 uniform sampler2D texSceneClouds;
 # endif
 
-#define SHADOW_MAP_BIAS 0.003
+#define SHADOW_MAP_BIAS 0.01
 
 uniform sampler2D texSceneShadowMap;
 uniform mat4 lightViewProjMatrix;
@@ -99,16 +98,26 @@ void main() {
     // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
     vec3 viewSpacePos = reconstructViewPos(depth, projectedPos, invProjMatrix);
 
-    vec3 lightDir = lightViewPos.xyz - viewSpacePos;
+    vec3 lightDir;
+#if defined (FEATURE_LIGHT_POINT)
+    lightDir = lightViewPos.xyz - viewSpacePos;
+#else if defined (FEATURE_LIGHT_DIRECTIONAL)
+    lightDir = lightViewPos.xyz;
+#endif
+
+    vec3 eyeVec = -normalize(viewSpacePos.xyz).xyz;
+
     float lightDist = length(lightDir);
     vec3 lightDirNorm = lightDir / lightDist;
 
     float ambTerm = lightAmbientIntensity;
     float lambTerm = calcLambLight(normal, lightDirNorm);
-    float specTerm  = calcSpecLight(normal, lightDirNorm, eyeVec, lightSpecularPower);
+    float specTerm  = calcSpecLightNormalized(normal, lightDirNorm, eyeVec, lightSpecularPower);
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     lambTerm *= shadowTerm;
+    specTerm *= shadowTerm;
+
     ambTerm *= clamp(shadowTerm, 0.25, 1.0);
 #endif
 
@@ -120,7 +129,7 @@ void main() {
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
     vec3 color = calcSunlightColorDeferred(normalBuffer.a, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
 #else
-    vec3 color = vec3(0.0);
+    vec3 color = vec3(1.0, 0.0, 1.0);
 #endif
 
 #if defined (FEATURE_LIGHT_POINT)

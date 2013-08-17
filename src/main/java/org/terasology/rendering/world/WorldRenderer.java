@@ -210,8 +210,8 @@ public final class WorldRenderer {
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
         mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
         mainDirectionalLight.lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
-        mainDirectionalLight.lightAmbientIntensity = 2.0f;
-        mainDirectionalLight.lightDiffuseIntensity = 1.0f;
+        mainDirectionalLight.lightAmbientIntensity = 1.0f;
+        mainDirectionalLight.lightDiffuseIntensity = 2.0f;
         mainDirectionalLight.lightSpecularIntensity = 0.0f;
 
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
@@ -734,6 +734,8 @@ public final class WorldRenderer {
 
         // Sunlight
         Vector3f sunlightWorldPosition = new Vector3f(skysphere.getSunDirection(true));
+        sunlightWorldPosition.scale(50000f);
+        sunlightWorldPosition.add(activeCamera.getPosition());
         renderLightComponent(mainDirectionalLight, sunlightWorldPosition, program, camera, false);
 
         DefaultRenderingProcess.getInstance().endRenderDirectionalLights();
