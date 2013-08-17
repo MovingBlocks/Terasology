@@ -411,6 +411,7 @@ public final class TeraMath {
     /**
      * Copies the given matrix into a newly allocated FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
+     *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
      */
@@ -423,6 +424,7 @@ public final class TeraMath {
     /**
      * Copies the given matrix into a newly allocated FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
+     *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
      */
@@ -435,7 +437,8 @@ public final class TeraMath {
     /**
      * Copies the given matrix into an existing FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
-     * @param m the matrix to copy
+     *
+     * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
      */
@@ -457,7 +460,8 @@ public final class TeraMath {
     /**
      * Copies the given matrix into an existing FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
-     * @param m the matrix to copy
+     *
+     * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
      */

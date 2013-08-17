@@ -82,15 +82,15 @@ public class ColumnLayout implements Layout {
         }
 
         //get width and height of each cell
-        float maxX=0;
-        float maxY=0;
+        float maxX = 0;
+        float maxY = 0;
         for (int i = 0; i < cellSize.length; i++) {
             cellSize[i].x = elements.get(i).getSize().x;
             cellSize[i].y = elements.get(i).getSize().y;
-            if( cellSize[i].x>maxX ) {
+            if (cellSize[i].x > maxX) {
                 maxX = cellSize[i].x;
             }
-            if( cellSize[i].y>maxY ) {
+            if (cellSize[i].y > maxY) {
                 maxY = cellSize[i].y;
             }
         }

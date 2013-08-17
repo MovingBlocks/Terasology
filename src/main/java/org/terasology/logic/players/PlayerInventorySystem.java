@@ -80,8 +80,8 @@ public class PlayerInventorySystem implements ComponentSystem {
     @ReceiveEvent
     public void onSlotChangeRequested(SelectItemRequest request, EntityRef character, CharacterComponent characterComp) {
         if (request.getSlot() >= 0 && request.getSlot() < 10 && request.getSlot() != characterComp.selectedItem) {
-            EntityRef oldItem = inventoryManager.getItemInSlot(character,  characterComp.selectedItem);
-            EntityRef newItem = inventoryManager.getItemInSlot(character,  request.getSlot());
+            EntityRef oldItem = inventoryManager.getItemInSlot(character, characterComp.selectedItem);
+            EntityRef newItem = inventoryManager.getItemInSlot(character, request.getSlot());
             characterComp.selectedItem = request.getSlot();
             character.saveComponent(characterComp);
             character.send(new SelectedItemChangedEvent(oldItem, newItem));

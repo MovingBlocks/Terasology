@@ -66,7 +66,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.worldGenerator = worldGenerator;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
-        this.fogNoise = new PerlinNoise(seed.hashCode() + 42*42);
+        this.fogNoise = new PerlinNoise(seed.hashCode() + 42 * 42);
         this.fogNoise.setOctaves(8);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();

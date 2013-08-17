@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Moving Blocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.logic.drowning;
 
 import org.terasology.engine.Time;
@@ -45,7 +60,7 @@ public class DrowningSystem implements UpdateSubscriberSystem {
             if (drowning.nextDrownDamageTime < time.getGameTimeInMs()) {
                 DrownsComponent drowns = entity.getComponent(DrownsComponent.class);
 
-                drowning.nextDrownDamageTime = time.getGameTimeInMs() + (long)(drowns.timeBetweenDrownDamage * 1000);
+                drowning.nextDrownDamageTime = time.getGameTimeInMs() + (long) (drowns.timeBetweenDrownDamage * 1000);
                 entity.saveComponent(drowning);
 
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
@@ -58,7 +73,7 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     @ReceiveEvent
     public void onEnterLiquid(OnEnterLiquidEvent event, EntityRef entity, DrownsComponent drowns) {
         DrowningComponent drowning = new DrowningComponent();
-        drowning.startDrowningTime = time.getGameTimeInMs() + (long)(1000 * drowns.timeBeforeDrownStart);
+        drowning.startDrowningTime = time.getGameTimeInMs() + (long) (1000 * drowns.timeBeforeDrownStart);
         drowning.nextDrownDamageTime = drowning.startDrowningTime;
         entity.addComponent(drowning);
     }

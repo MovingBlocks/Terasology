@@ -20,6 +20,6 @@ package org.terasology.monitoring;
  *
  * @author Immortius
  */
-public interface ThreadActivity extends AutoCloseable{
+public interface ThreadActivity extends AutoCloseable {
     void close();
 }

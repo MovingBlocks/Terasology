@@ -23,6 +23,7 @@ import java.util.List;
 public interface PropertyProvider {
     /**
      * Adds the properties of this Object to the given property list.
+     *
      * @return a list of the properties of this object
      */
     List<Property<?>> getProperties();

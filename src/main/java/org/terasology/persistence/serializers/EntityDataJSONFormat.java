@@ -375,7 +375,7 @@ public class EntityDataJSONFormat {
                             try {
                                 byteList.add(element.getAsByte());
                             } catch (NumberFormatException nfe) {
-                                byteList.add((byte)0);
+                                byteList.add((byte) 0);
                             }
                         }
                     }

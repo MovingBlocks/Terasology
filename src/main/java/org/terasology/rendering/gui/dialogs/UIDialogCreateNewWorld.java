@@ -123,7 +123,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         parent.addDisplayElement(cancelButton);
     }
 
-    private void createWorldTitleInput( ) {
+    private void createWorldTitleInput() {
         inputWorldTitleLabel = createLabel("Enter a world name:");
 
         inputWorldTitle = new UIText();
@@ -147,13 +147,13 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
         final WorldGeneratorManager worldGeneratorManager = CoreRegistry.get(WorldGeneratorManager.class);
         worldGenerators = worldGeneratorManager.getWorldGenerators();
-        worldGenerator = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2*COMPONENT_HEIGHT));
+        worldGenerator = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2 * COMPONENT_HEIGHT));
         WorldGeneratorUri defaultMapGenerator = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultGenerator();
         UIListItem item;
         int index = 0;
         int defaultIndex = 0;
         for (WorldGeneratorInfo generator : worldGenerators) {
-            if( generator.getUri().equals(defaultMapGenerator) ) {
+            if (generator.getUri().equals(defaultMapGenerator)) {
                 defaultIndex = index;
             }
             item = new UIListItem(generator.getDisplayName(), index);
@@ -178,7 +178,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         worldGenerator.select(defaultIndex);
     }
 
-    private UILabel createLabel( String text ) {
+    private UILabel createLabel(String text) {
         UILabel label;
         label = new UILabel(text);
         label.setColor(Color.darkGray);

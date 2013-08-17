@@ -23,14 +23,14 @@ import java.util.Locale;
  */
 public enum StandardCollisionGroup implements CollisionGroup {
     // JAVA7: Use binary literals
-    DEFAULT((short)     0b0000001),
-    STATIC((short)      0b0000010),
-    KINEMATIC((short)   0b0000100),
-    DEBRIS((short)      0b0001000),
-    SENSOR((short)      0b0010000),
-    CHARACTER((short)   0b0100000),
-    WORLD((short)       0b1000000),
-    ALL((short)         0b1111111);
+    DEFAULT((short) 0b0000001),
+    STATIC((short) 0b0000010),
+    KINEMATIC((short) 0b0000100),
+    DEBRIS((short) 0b0001000),
+    SENSOR((short) 0b0010000),
+    CHARACTER((short) 0b0100000),
+    WORLD((short) 0b1000000),
+    ALL((short) 0b1111111);
 
     private short flag;
 
