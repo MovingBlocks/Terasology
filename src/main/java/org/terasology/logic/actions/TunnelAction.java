@@ -80,6 +80,9 @@ public class TunnelAction implements ComponentSystem {
         int blockCounter = MAX_DESTROYED_BLOCKS;
         for (int s = 0; s <= 512; s++) {
             origin.add(dir);
+            if (!worldProvider.isBlockRelevant(origin)) {
+                break;
+            }
 
             for (int i = 0; i < 64; i++) {
                 Vector3f direction = random.randomVector3f();

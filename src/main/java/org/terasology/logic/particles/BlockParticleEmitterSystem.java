@@ -19,9 +19,13 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -30,6 +34,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.logic.NearestSortingList;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -42,6 +47,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
@@ -90,7 +96,11 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     @In
     private WorldRenderer worldRenderer;
 
+    @In
+    private Config config;
+
     private FastRandom random = new FastRandom();
+    private NearestSortingList sorter = new NearestSortingList();
     private int displayList = 0;
 
     public void initialise() {
@@ -100,11 +110,13 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             drawParticle();
             glEndList();
         }
+        sorter.initialise(worldRenderer.getActiveCamera());
     }
 
     @Override
     public void shutdown() {
         glDeleteLists(displayList, 1);
+        sorter.stop();
     }
 
     public void update(float delta) {
@@ -133,6 +145,17 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             }
         }
     }
+
+    @ReceiveEvent(components = {BlockParticleEffectComponent.class, LocationComponent.class})
+    public void onActivated(OnActivatedComponent event, EntityRef entity) {
+        sorter.add(entity);
+    }
+
+    @ReceiveEvent(components = {BlockParticleEffectComponent.class, LocationComponent.class})
+    public void onDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
+        sorter.remove(entity);
+    }
+
 
     private void spawnParticle(BlockParticleEffectComponent particleEffect) {
 
@@ -198,12 +221,20 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     public void renderAlphaBlend() {
+        if (config.getRendering().isRenderNearest()) {
+            render(Arrays.asList(sorter.getNearest(config.getRendering().getParticleEffectLimit())));
+        } else {
+            render(entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class));
+        }
+    }
+
+    private void render(Iterable<EntityRef> particleEntities) {
         Assets.getMaterial("engine:particle").enable();
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        for (EntityRef entity : entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : particleEntities) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 

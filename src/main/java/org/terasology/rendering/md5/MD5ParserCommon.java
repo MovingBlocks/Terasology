@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.assetLoaders.md5;
+package org.terasology.rendering.md5;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;

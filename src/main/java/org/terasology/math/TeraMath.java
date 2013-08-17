@@ -407,19 +407,39 @@ public final class TeraMath {
     }
 
     // TODO: Move to a matrix util class
+
+    /**
+     * Copies the given matrix into a newly allocated FloatBuffer.
+     * The order of the elements is column major (as used by OpenGL).
+     * @param m the matrix to copy
+     * @return A new FloatBuffer containing the matrix in column-major form.
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         matrixToFloatBuffer(m, buffer);
         return buffer;
     }
 
+    /**
+     * Copies the given matrix into a newly allocated FloatBuffer.
+     * The order of the elements is column major (as used by OpenGL).
+     * @param m the matrix to copy
+     * @return A new FloatBuffer containing the matrix in column-major form.
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
         matrixToFloatBuffer(m, buffer);
         return buffer;
     }
 
-    public static void matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
+    /**
+     * Copies the given matrix into an existing FloatBuffer.
+     * The order of the elements is column major (as used by OpenGL).
+     * @param m the matrix to copy
+     * @param fb the float buffer to copy the matrix into
+     * @return The provided float buffer.
+     */
+    public static FloatBuffer matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
         fb.put(m.m00);
         fb.put(m.m10);
         fb.put(m.m20);
@@ -431,9 +451,17 @@ public final class TeraMath {
         fb.put(m.m22);
 
         fb.flip();
+        return fb;
     }
 
-    public static void matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
+    /**
+     * Copies the given matrix into an existing FloatBuffer.
+     * The order of the elements is column major (as used by OpenGL).
+     * @param m the matrix to copy
+     * @param fb the float buffer to copy the matrix into
+     * @return The provided float buffer.
+     */
+    public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
         fb.put(m.m00);
         fb.put(m.m10);
         fb.put(m.m20);
@@ -452,6 +480,7 @@ public final class TeraMath {
         fb.put(m.m33);
 
         fb.flip();
+        return fb;
     }
 
     public static Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {

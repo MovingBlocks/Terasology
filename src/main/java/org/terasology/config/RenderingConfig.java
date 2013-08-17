@@ -59,6 +59,9 @@ public class RenderingConfig {
     private boolean dynamicShadowsPcfFiltering = false;
     private boolean volumetricFog = false;
     private boolean cloudShadows = false;
+    private boolean renderNearest = true;
+    private int particleEffectLimit = 10;
+    private int meshLimit = 20;
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
@@ -326,6 +329,30 @@ public class RenderingConfig {
 
     public void setCloudShadows(boolean cloudShadows) {
         this.cloudShadows = cloudShadows;
+    }
+
+    public boolean isRenderNearest() {
+        return renderNearest;
+    }
+
+    public void setRenderNearest(boolean renderNearest) {
+        this.renderNearest = renderNearest;
+    }
+
+    public int getParticleEffectLimit() {
+        return particleEffectLimit;
+    }
+
+    public void setParticleEffectLimit(int particleEffectLimit) {
+        this.particleEffectLimit = particleEffectLimit;
+    }
+
+    public int getMeshLimit() {
+        return meshLimit;
+    }
+
+    public void setMeshLimit(int meshLimit) {
+        this.meshLimit = meshLimit;
     }
 
     public RenderingDebugConfig getDebug() {

@@ -29,18 +29,14 @@ import javax.vecmath.Color4f;
 @ForceBlockActive
 public final class MeshComponent implements Component {
 
-    // Temporary render details
-    public enum RenderType {
-        Normal,
-        GelatinousCube
-    }
-
-    @Replicate
-    public RenderType renderType = RenderType.Normal;
     @Replicate
     public Mesh mesh;
     @Replicate
     public Material material;
+
+    // TODO: This should be a setting on the material
+    @Replicate
+    public boolean translucent;
 
     public boolean hideFromOwner;
 

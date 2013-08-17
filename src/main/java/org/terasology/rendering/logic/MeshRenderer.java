@@ -24,6 +24,7 @@ import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
@@ -55,6 +56,8 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,29 +82,32 @@ public class MeshRenderer implements RenderSystem {
     @In
     private LocalPlayer localPlayer;
 
-    private Mesh gelatinousCubeMesh;
+    @In
+    private Config config;
+
     private WorldRenderer worldRenderer;
 
     private SetMultimap<Material, EntityRef> opaqueMesh = HashMultimap.create();
     private SetMultimap<Material, EntityRef> translucentMesh = HashMultimap.create();
-    private Set<EntityRef> gelatinous = Sets.newHashSet();
     private Map<EntityRef, Material> opaqueEntities = Maps.newHashMap();
     private Map<EntityRef, Material> translucentEntities = Maps.newHashMap();
+
+    private NearestSortingList opaqueMeshSorter = new NearestSortingList();
+    private NearestSortingList translucentMeshSorter = new NearestSortingList();
 
     public int lastRendered;
 
     @Override
     public void initialise() {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
-
-        Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
-        gelatinousCubeMesh = tessellator.generateMesh();
+        opaqueMeshSorter.initialise(worldRenderer.getActiveCamera());
+        translucentMeshSorter.initialise(worldRenderer.getActiveCamera());
     }
 
     @Override
     public void shutdown() {
+        opaqueMeshSorter.stop();
+        translucentMeshSorter.stop();
     }
 
     @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
@@ -118,11 +124,16 @@ public class MeshRenderer implements RenderSystem {
                 return;
             }
         }
-        if (meshComp.renderType == MeshComponent.RenderType.GelatinousCube) {
-            gelatinous.add(entity);
-        } else if (meshComp.material != null) {
-            opaqueMesh.put(meshComp.material, entity);
-            opaqueEntities.put(entity, meshComp.material);
+        if (meshComp.material != null) {
+            if (meshComp.translucent) {
+                translucentMesh.put(meshComp.material, entity);
+                translucentEntities.put(entity, meshComp.material);
+                translucentMeshSorter.add(entity);
+            } else {
+                opaqueMesh.put(meshComp.material, entity);
+                opaqueEntities.put(entity, meshComp.material);
+                opaqueMeshSorter.add(entity);
+            }
         }
     }
 
@@ -139,15 +150,15 @@ public class MeshRenderer implements RenderSystem {
     }
 
     private void removeMesh(EntityRef entity) {
-        if (!gelatinous.remove(entity)) {
-            Material mat = opaqueEntities.remove(entity);
+        Material mat = opaqueEntities.remove(entity);
+        if (mat != null) {
+            opaqueMesh.remove(mat, entity);
+            opaqueMeshSorter.remove(entity);
+        } else {
+            mat = translucentEntities.remove(entity);
             if (mat != null) {
-                opaqueMesh.remove(mat, entity);
-            } else {
-                mat = translucentEntities.remove(entity);
-                if (mat != null) {
-                    translucentMesh.remove(mat, entity);
-                }
+                translucentMesh.remove(mat, entity);
+                translucentMeshSorter.remove(entity);
             }
         }
     }
@@ -159,13 +170,19 @@ public class MeshRenderer implements RenderSystem {
 
     @Override
     public void renderAlphaBlend() {
+        if (config.getRendering().isRenderNearest()) {
+            renderAlphaBlend(Arrays.asList(translucentMeshSorter.getNearest(config.getRendering().getMeshLimit())));
+        } else {
+            renderAlphaBlend(translucentEntities.keySet());
+        }
+    }
 
+    private void renderAlphaBlend(Iterable<EntityRef> entityRefs) {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        GLSLMaterial material = (GLSLMaterial) Assets.getMaterial("engine:gelatinousCube");
-        material.enable();
 
-        for (EntityRef entity : gelatinous) {
+        for (EntityRef entity : entityRefs) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            meshComp.material.enable();
             LocationComponent location = entity.getComponent(LocationComponent.class);
             if (location == null) {
                 continue;
@@ -174,7 +191,7 @@ public class MeshRenderer implements RenderSystem {
             Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();
             float worldScale = location.getWorldScale();
-            AABB aabb = gelatinousCubeMesh.getAABB().transform(worldRot, worldPos, worldScale);
+            AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();
 
@@ -184,10 +201,10 @@ public class MeshRenderer implements RenderSystem {
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
                 glScalef(worldScale, worldScale, worldScale);
 
-                material.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w, true);
-                material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
+                meshComp.material.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w, true);
+                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
 
-                gelatinousCubeMesh.render();
+                meshComp.mesh.render();
 
                 glPopMatrix();
             }
@@ -196,6 +213,21 @@ public class MeshRenderer implements RenderSystem {
 
     @Override
     public void renderOpaque() {
+        if (config.getRendering().isRenderNearest()) {
+            SetMultimap<Material, EntityRef> entitiesToRender = HashMultimap.create();
+            for (EntityRef entity : Arrays.asList(opaqueMeshSorter.getNearest(config.getRendering().getMeshLimit()))) {
+                MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+                if (meshComp != null && meshComp.material != null) {
+                    entitiesToRender.put(meshComp.material, entity);
+                }
+            }
+            renderOpaque(entitiesToRender);
+        } else {
+            renderOpaque(opaqueMesh);
+        }
+    }
+
+    private void renderOpaque(SetMultimap<Material, EntityRef> meshByMaterial) {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -207,16 +239,16 @@ public class MeshRenderer implements RenderSystem {
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
-        for (Material material : opaqueMesh.keys()) {
+        for (Material material : meshByMaterial.keys()) {
             OpenGLMesh lastMesh = null;
             material.enable();
             material.setFloat("sunlight", 1.0f);
             material.setFloat("blockLight", 1.0f);
             material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.bindTextures();
-            lastRendered = opaqueMesh.get(material).size();
+            lastRendered = meshByMaterial.get(material).size();
 
-            for (EntityRef entity : opaqueMesh.get(material)) {
+            for (EntityRef entity : meshByMaterial.get(material)) {
                 MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                 LocationComponent location = entity.getComponent(LocationComponent.class);
 

@@ -52,11 +52,15 @@ public class LocalPlayer {
     }
 
     public Vector3f getPosition() {
+        return getPosition(new Vector3f());
+    }
+
+    public Vector3f getPosition(Vector3f out) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
-            return new Vector3f();
+            return out;
         }
-        return location.getWorldPosition();
+        return location.getWorldPosition(out);
     }
 
     public Quat4f getRotation() {

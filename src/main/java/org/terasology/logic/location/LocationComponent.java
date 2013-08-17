@@ -86,6 +86,9 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return scale;
     }
 
+    /**
+     * @return A new vector containing the world location.
+     */
     public Vector3f getWorldPosition() {
         return getWorldPosition(new Vector3f());
     }

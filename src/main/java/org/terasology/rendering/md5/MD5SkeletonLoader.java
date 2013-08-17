@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.assetLoaders.md5;
+package org.terasology.rendering.md5;
 
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
