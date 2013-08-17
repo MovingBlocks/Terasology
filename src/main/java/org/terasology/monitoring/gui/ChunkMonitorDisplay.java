@@ -628,8 +628,8 @@ public class ChunkMonitorDisplay extends JPanel {
                 while (true) {
 
                     final long slept = poll(requests);
-                    boolean needsRendering;
-                    boolean fastResume;
+                    boolean needsRendering = false;
+                    boolean fastResume = false;
 
                     for (Request r : requests) {
                         try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(r.getName())) {

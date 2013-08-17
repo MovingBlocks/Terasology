@@ -237,7 +237,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(),
                         (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());
-                gameManifest.addWorldInfo(worldInfo);
+                gameManifest.addWorld(worldInfo);
 
                 CoreRegistry.get(GameEngine.class).changeState(new StateLoading(gameManifest, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
             }

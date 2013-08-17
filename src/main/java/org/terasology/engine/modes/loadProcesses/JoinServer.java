@@ -61,7 +61,7 @@ public class JoinServer implements LoadProcess {
                 WorldInfo world = new WorldInfo();
                 world.setTime(worldInfo.getTime());
                 world.setTitle(worldInfo.getTitle());
-                gameManifest.addWorldInfo(world);
+                gameManifest.addWorld(world);
             }
 
             Map<String, Short> blockMap = Maps.newHashMap();

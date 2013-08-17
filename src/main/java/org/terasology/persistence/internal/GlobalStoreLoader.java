@@ -94,7 +94,6 @@ final class GlobalStoreLoader {
         // Prefabs that still need to be created, by their name
         Map<String, EntityData.Prefab> pendingPrefabs = Maps.newHashMap();
 
-        PrefabManager prefabManager = entityManager.getPrefabManager();
         for (EntityData.Prefab prefabData : globalStore.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
                 if (!prefabData.hasParentName()) {
@@ -129,7 +128,6 @@ final class GlobalStoreLoader {
     }
 
     private void loadComponentMapping(EntityData.GlobalStore globalStore) {
-        ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < globalStore.getComponentClassCount(); ++index) {
             ClassMetadata componentMetadata = componentLibrary.getMetadata(globalStore.getComponentClass(index));

@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -62,7 +61,6 @@ public class Game {
     public void save() {
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
-            Time time = CoreRegistry.get(Time.class);
             BlockManager blockManager = CoreRegistry.get(BlockManager.class);
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
@@ -78,7 +76,7 @@ public class Game {
             }
             gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
             gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
-            gameManifest.addWorldInfo(worldProvider.getWorldInfo());
+            gameManifest.addWorld(worldProvider.getWorldInfo());
 
             try {
                 GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);

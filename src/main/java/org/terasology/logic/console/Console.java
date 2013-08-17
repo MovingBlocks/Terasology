@@ -159,29 +159,28 @@ public class Console {
     /**
      * Execute a command.
      *
-     * @param str The whole string of the command including the command name and the optional parameters.
+     * @param command The whole string of the command including the command name and the optional parameters.
      * @return Returns true if the command was executed successfully.
      */
-    public boolean execute(String str, EntityRef callingClient) {
+    public boolean execute(String command, EntityRef callingClient) {
         //remove double spaces
-        str = str.replaceAll("\\s\\s+", " ");
+        String cleanedCommand = command.replaceAll("\\s\\s+", " ");
 
         //get the command name
-        int commandEndIndex = str.indexOf(" ");
+        int commandEndIndex = cleanedCommand.indexOf(" ");
         String commandName;
         if (commandEndIndex >= 0) {
-            commandName = str.substring(0, commandEndIndex);
+            commandName = cleanedCommand.substring(0, commandEndIndex);
         } else {
-            commandName = str;
-            str = "";
-            commandEndIndex = 0;
+            commandName = cleanedCommand;
+            commandEndIndex = commandName.length();
         }
 
         //remove command name from string
-        str = str.substring(commandEndIndex).trim();
+        String parameterPart = cleanedCommand.substring(commandEndIndex).trim();
 
         //get the parameters
-        List<String> params = splitParameters(str);
+        List<String> params = splitParameters(parameterPart);
 
         String paramsStr = PARAMETER_JOINER.join(params);
 

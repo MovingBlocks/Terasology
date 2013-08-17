@@ -75,8 +75,8 @@ public class FloraGenerator implements FirstPassGenerator {
     }
 
     @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(WorldBiomeProvider value) {
+        this.biomeProvider = value;
     }
 
     @Override

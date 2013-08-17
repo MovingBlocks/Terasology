@@ -292,8 +292,8 @@ public class EntityDataJSONFormatTest {
         assertPersist(worldBuilder);
     }
 
-    private void assertPersist(EntityData.GlobalStore.Builder worldBuilder) throws IOException{
-        EntityData.GlobalStore world = worldBuilder.build();
+    private void assertPersist(EntityData.GlobalStore.Builder builder) throws IOException{
+        EntityData.GlobalStore world = builder.build();
         EntityData.GlobalStore newWorld = persistAndRetrieve(world);
         assertEquals(world, newWorld);
     }

@@ -31,7 +31,7 @@ public class FontDataBuilder {
     private TIntObjectMap<Texture> pages = new TIntObjectHashMap<>();
     private Map<Integer, FontCharacter> characters = Maps.newHashMap();
 
-    private int characterId;
+    private int currentCharacterId;
     private int characterX;
     private int characterY;
     private int characterWidth;
@@ -57,49 +57,49 @@ public class FontDataBuilder {
     }
 
     public FontDataBuilder startCharacter(int characterId) {
-        this.characterId = characterId;
+        this.currentCharacterId = characterId;
         return this;
     }
 
-    public FontDataBuilder setCharacterX(int characterX) {
-        this.characterX = characterX;
+    public FontDataBuilder setCharacterX(int value) {
+        this.characterX = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterY(int characterY) {
-        this.characterY = characterY;
+    public FontDataBuilder setCharacterY(int value) {
+        this.characterY = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterWidth(int characterWidth) {
-        this.characterWidth = characterWidth;
+    public FontDataBuilder setCharacterWidth(int value) {
+        this.characterWidth = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterHeight(int characterHeight) {
-        this.characterHeight = characterHeight;
+    public FontDataBuilder setCharacterHeight(int value) {
+        this.characterHeight = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterXOffset(int characterXOffset) {
-        this.characterXOffset = characterXOffset;
+    public FontDataBuilder setCharacterXOffset(int value) {
+        this.characterXOffset = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterYOffset(int characterYOffset) {
-        this.characterYOffset = characterYOffset;
+    public FontDataBuilder setCharacterYOffset(int value) {
+        this.characterYOffset = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterXAdvance(int characterXAdvance) {
-        this.characterXAdvance = characterXAdvance;
+    public FontDataBuilder setCharacterXAdvance(int value) {
+        this.characterXAdvance = value;
         return this;
     }
 
-    public FontDataBuilder setCharacterPage(int characterPage) {
-        this.characterPage = characterPage;
-        if (pages.get(characterPage) == null) {
-            throw new IllegalArgumentException("Invalid font - character on missing page '" + characterPage + "'");
+    public FontDataBuilder setCharacterPage(int value) {
+        this.characterPage = value;
+        if (pages.get(value) == null) {
+            throw new IllegalArgumentException("Invalid font - character on missing page '" + value + "'");
         }
         return this;
     }
@@ -108,7 +108,7 @@ public class FontDataBuilder {
         Texture page = pages.get(characterPage);
         FontCharacter character = new FontCharacter(((float) characterX / page.getWidth()), ((float) characterY / page.getHeight()),
                 characterWidth, characterHeight, characterXOffset, characterYOffset, characterXAdvance, page);
-        characters.put(characterId, character);
+        characters.put(currentCharacterId, character);
         return this;
     }
 

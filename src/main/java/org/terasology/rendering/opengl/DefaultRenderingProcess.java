@@ -166,16 +166,23 @@ public class DefaultRenderingProcess {
     /* HDR */
     private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
-    private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
+    private PBO readBackPBOFront;
+    private PBO readBackPBOBack;
+    private PBO readBackPBOCurrent;
 
     /* RTs */
     private int rtFullWidth;
     private int rtFullHeight;
-    private int rtWidth2, rtHeight2;
-    private int rtWidth4, rtHeight4;
-    private int rtWidth8, rtHeight8;
-    private int rtWidth16, rtHeight16;
-    private int rtWidth32, rtHeight32;
+    private int rtWidth2;
+    private int rtHeight2;
+    private int rtWidth4;
+    private int rtHeight4;
+    private int rtWidth8;
+    private int rtHeight8;
+    private int rtWidth16;
+    private int rtHeight16;
+    private int rtWidth32;
+    private int rtHeight32;
 
     private int overwriteRtWidth = 0;
     private int overwriteRtHeight = 0;
@@ -199,122 +206,6 @@ public class DefaultRenderingProcess {
         MONO,
         OCULUS_LEFT_EYE,
         OCULUS_RIGHT_EYE
-    }
-
-    public class PBO {
-        public int pboId = 0;
-        public int width, height;
-        ByteBuffer cachedBuffer = null;
-
-        public PBO() {
-            pboId = glGenBuffersARB();
-        }
-
-        public void bind() {
-            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, pboId);
-        }
-
-        public void unbind() {
-            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, 0);
-        }
-
-        public void init(int width, int height) {
-            this.width = width;
-            this.height = height;
-
-            int byteSize = width * height * 4;
-            cachedBuffer = BufferUtils.createByteBuffer(byteSize);
-
-            bind();
-            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, byteSize, GL_STREAM_READ_ARB);
-            unbind();
-        }
-
-        public void copyFromFBO(int fboId, int width, int height, int format, int type) {
-            bind();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-            glReadPixels(0, 0, width, height, format, type, 0);
-            unbind();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        }
-
-        public ByteBuffer readBackPixels() {
-            bind();
-
-            cachedBuffer = glMapBufferARB(GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
-
-            // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
-            ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
-            resultBuffer.put(cachedBuffer);
-            cachedBuffer.rewind();
-            resultBuffer.flip();
-
-            glUnmapBufferARB(GL_PIXEL_PACK_BUFFER_EXT);
-            unbind();
-
-            return resultBuffer;
-        }
-    }
-
-    public class FBO {
-        public int fboId = 0;
-        public int textureId = 0;
-        public int depthStencilTextureId = 0;
-        public int depthStencilRboId = 0;
-        public int normalsTextureId = 0;
-        public int lightBufferTextureId = 0;
-
-        public int width = 0;
-        public int height = 0;
-
-        public void bind() {
-            if (this != currentlyBoundFbo) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-                currentlyBoundFbo = this;
-            }
-        }
-
-        public void unbind() {
-            if (currentlyBoundFbo != null) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                currentlyBoundFbo = null;
-            }
-        }
-
-        public void bindDepthTexture() {
-            //if (currentlyBoundTextureId != depthStencilTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
-            //currentlyBoundTextureId = depthStencilTextureId;
-            //}
-        }
-
-        public void bindTexture() {
-            //if (currentlyBoundTextureId != textureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
-            //currentlyBoundTextureId = textureId;
-            //}
-        }
-
-        public void bindNormalsTexture() {
-            //if (currentlyBoundTextureId != normalsTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
-            //currentlyBoundTextureId = normalsTextureId;
-            //}
-        }
-
-        public void bindLightBufferTexture() {
-            //if (currentlyBoundTextureId != lightBufferTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
-            //currentlyBoundTextureId = lightBufferTextureId;
-            //}
-        }
-
-        public void unbindTexture() {
-            //if (currentlyBoundTextureId != 0) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-            //currentlyBoundTextureId = 0;
-            //}
-        }
     }
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
@@ -1513,9 +1404,9 @@ public class DefaultRenderingProcess {
     }
 
     public boolean bindFbo(String title) {
-        FBO fbo;
+        FBO fbo = fboLookup.get(title);
 
-        if ((fbo = fboLookup.get(title)) != null) {
+        if (fbo != null) {
             fbo.bind();
             currentlyBoundFboName = title;
             return true;
@@ -1526,9 +1417,9 @@ public class DefaultRenderingProcess {
     }
 
     public boolean unbindFbo(String title) {
-        FBO fbo;
+        FBO fbo = fboLookup.get(title);
 
-        if ((fbo = fboLookup.get(title)) != null) {
+        if (fbo != null) {
             fbo.unbind();
             currentlyBoundFboName = "";
             return true;
@@ -1539,9 +1430,9 @@ public class DefaultRenderingProcess {
     }
 
     public boolean bindFboTexture(String title) {
-        FBO fbo;
+        FBO fbo = fboLookup.get(title);
 
-        if ((fbo = fboLookup.get(title)) != null) {
+        if (fbo != null) {
             fbo.bindTexture();
             return true;
         }
@@ -1551,9 +1442,9 @@ public class DefaultRenderingProcess {
     }
 
     public boolean bindFboDepthTexture(String title) {
-        FBO fbo;
+        FBO fbo = fboLookup.get(title);
 
-        if ((fbo = fboLookup.get(title)) != null) {
+        if (fbo != null) {
             fbo.bindDepthTexture();
             return true;
         }
@@ -1563,9 +1454,9 @@ public class DefaultRenderingProcess {
     }
 
     public boolean bindFboNormalsTexture(String title) {
-        FBO fbo;
+        FBO fbo = fboLookup.get(title);
 
-        if ((fbo = fboLookup.get(title)) != null) {
+        if (fbo != null) {
             fbo.bindNormalsTexture();
             return true;
         }
@@ -1575,9 +1466,9 @@ public class DefaultRenderingProcess {
     }
 
     public boolean bindFboLightBufferTexture(String title) {
-        FBO fbo;
+        FBO fbo = fboLookup.get(title);
 
-        if ((fbo = fboLookup.get(title)) != null) {
+        if (fbo != null) {
             fbo.bindLightBufferTexture();
             return true;
         }
@@ -1596,6 +1487,123 @@ public class DefaultRenderingProcess {
 
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
+    }
+
+    public class PBO {
+        public int pboId;
+        public int bufferWidth;
+        public int bufferHeight;
+        ByteBuffer cachedBuffer = null;
+
+        public PBO() {
+            pboId = glGenBuffersARB();
+        }
+
+        public void bind() {
+            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, pboId);
+        }
+
+        public void unbind() {
+            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, 0);
+        }
+
+        public void init(int width, int height) {
+            this.bufferWidth = width;
+            this.bufferHeight = height;
+
+            int byteSize = width * height * 4;
+            cachedBuffer = BufferUtils.createByteBuffer(byteSize);
+
+            bind();
+            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, byteSize, GL_STREAM_READ_ARB);
+            unbind();
+        }
+
+        public void copyFromFBO(int fboId, int width, int height, int format, int type) {
+            bind();
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+            glReadPixels(0, 0, width, height, format, type, 0);
+            unbind();
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        }
+
+        public ByteBuffer readBackPixels() {
+            bind();
+
+            cachedBuffer = glMapBufferARB(GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
+
+            // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
+            ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
+            resultBuffer.put(cachedBuffer);
+            cachedBuffer.rewind();
+            resultBuffer.flip();
+
+            glUnmapBufferARB(GL_PIXEL_PACK_BUFFER_EXT);
+            unbind();
+
+            return resultBuffer;
+        }
+    }
+
+    public class FBO {
+        public int fboId = 0;
+        public int textureId = 0;
+        public int depthStencilTextureId = 0;
+        public int depthStencilRboId = 0;
+        public int normalsTextureId = 0;
+        public int lightBufferTextureId = 0;
+
+        public int width = 0;
+        public int height = 0;
+
+        public void bind() {
+            if (this != currentlyBoundFbo) {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+                currentlyBoundFbo = this;
+            }
+        }
+
+        public void unbind() {
+            if (currentlyBoundFbo != null) {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+                currentlyBoundFbo = null;
+            }
+        }
+
+        public void bindDepthTexture() {
+            //if (currentlyBoundTextureId != depthStencilTextureId) {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
+            //currentlyBoundTextureId = depthStencilTextureId;
+            //}
+        }
+
+        public void bindTexture() {
+            //if (currentlyBoundTextureId != textureId) {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+            //currentlyBoundTextureId = textureId;
+            //}
+        }
+
+        public void bindNormalsTexture() {
+            //if (currentlyBoundTextureId != normalsTextureId) {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
+            //currentlyBoundTextureId = normalsTextureId;
+            //}
+        }
+
+        public void bindLightBufferTexture() {
+            //if (currentlyBoundTextureId != lightBufferTextureId) {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
+            //currentlyBoundTextureId = lightBufferTextureId;
+            //}
+        }
+
+        public void unbindTexture() {
+            //if (currentlyBoundTextureId != 0) {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            //currentlyBoundTextureId = 0;
+            //}
+        }
     }
 
 }

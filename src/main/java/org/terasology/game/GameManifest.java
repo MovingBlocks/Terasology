@@ -47,7 +47,7 @@ public class GameManifest {
     private long time = 0;
     private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Short> blockIdMap = Maps.newHashMap();
-    private Map<String, WorldInfo> worldInfo = Maps.newHashMap();
+    private Map<String, WorldInfo> worlds = Maps.newHashMap();
     private ModuleConfig moduleConfiguration = new ModuleConfig();
 
     public GameManifest() {
@@ -109,15 +109,15 @@ public class GameManifest {
     }
 
     public WorldInfo getWorldInfo(String name) {
-        return worldInfo.get(name);
+        return worlds.get(name);
     }
 
-    public void addWorldInfo(WorldInfo worldInfo) {
-        this.worldInfo.put(worldInfo.getTitle(), worldInfo);
+    public void addWorld(WorldInfo worldInfo) {
+        this.worlds.put(worldInfo.getTitle(), worldInfo);
     }
 
-    public Iterable<WorldInfo> getAllWorldInfo() {
-        return this.worldInfo.values();
+    public Iterable<WorldInfo> getWorlds() {
+        return this.worlds.values();
     }
 
     public static void save(Path toFile, GameManifest gameManifest) throws IOException {

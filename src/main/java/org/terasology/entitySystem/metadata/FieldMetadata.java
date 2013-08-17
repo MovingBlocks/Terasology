@@ -57,12 +57,12 @@ public final class FieldMetadata {
             replicated = true;
         }
         this.replicationInfo = field.getAnnotation(Replicate.class);
-        ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType()) || isCollectionOf(EntityRef.class, field));
-        getter = findGetter(field);
-        setter = findSetter(field);
+        ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType()) || isCollectionOf(EntityRef.class));
+        getter = findGetter();
+        setter = findSetter();
     }
 
-    private boolean isCollectionOf(Class<?> targetType, Field field) {
+    private boolean isCollectionOf(Class<?> targetType) {
         return (Collection.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 0) == targetType)
                 || (Map.class.isAssignableFrom(field.getType()) && ReflectionUtil.getTypeParameter(field.getGenericType(), 1) == targetType);
     }
@@ -135,7 +135,7 @@ public final class FieldMetadata {
         return replicationInfo;
     }
 
-    private Method findGetter(Field field) {
+    private Method findGetter() {
         Method result = findMethod(field.getDeclaringClass(), "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
         if (result != null && field.getType().equals(result.getReturnType())) {
             result.setAccessible(true);
@@ -149,7 +149,7 @@ public final class FieldMetadata {
         return null;
     }
 
-    private Method findSetter(Field field) {
+    private Method findSetter() {
         String setterName = "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1);
         Method result = findMethod(field.getDeclaringClass(), setterName, field.getType());
         if (result != null) {

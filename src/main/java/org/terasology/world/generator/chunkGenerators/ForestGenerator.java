@@ -116,13 +116,13 @@ public class ForestGenerator implements SecondPassGenerator {
     }
 
     @Override
-    public void setWorldSeed(String seed) {
-        this.seed = seed;
+    public void setWorldSeed(String value) {
+        this.seed = value;
     }
 
     @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(WorldBiomeProvider value) {
+        this.biomeProvider = value;
     }
 
     @Override

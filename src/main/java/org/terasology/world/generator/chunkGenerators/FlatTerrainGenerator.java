@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Create a flat world with a specified height. It use the WorldBiomeProvider
+ * Create a flat world with a specified surfaceHeight. It use the WorldBiomeProvider
  * but not the seed.
  *
  * @author Mathias Kalb
@@ -44,7 +44,7 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
     private static final Logger logger = LoggerFactory.getLogger(FlatTerrainGenerator.class);
 
     private WorldBiomeProvider biomeProvider;
-    private int height;
+    private int surfaceHeight;
 
     BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
@@ -57,29 +57,29 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
     private Block dirt = blockManager.getBlock("engine:Dirt");
 
     public FlatTerrainGenerator() {
-        height = FlatTerrainGenerator.DEFAULT_HEIGHT;
+        surfaceHeight = FlatTerrainGenerator.DEFAULT_HEIGHT;
     }
 
-    public FlatTerrainGenerator(final int height) {
+    public FlatTerrainGenerator(int surfaceHeight) {
         this();
-        setHeight(height);
+        setSurfaceHeight(surfaceHeight);
     }
 
-    public int getHeight() {
-        return height;
+    public int getSurfaceHeight() {
+        return surfaceHeight;
     }
 
-    public void setHeight(final int height) {
-        if (height < FlatTerrainGenerator.MIN_HEIGHT) {
-            this.height = FlatTerrainGenerator.MIN_HEIGHT;
-        } else if (height > FlatTerrainGenerator.MAX_HEIGHT) {
-            this.height = FlatTerrainGenerator.MAX_HEIGHT;
+    public void setSurfaceHeight(int surfaceHeight) {
+        if (surfaceHeight < FlatTerrainGenerator.MIN_HEIGHT) {
+            this.surfaceHeight = FlatTerrainGenerator.MIN_HEIGHT;
+        } else if (surfaceHeight > FlatTerrainGenerator.MAX_HEIGHT) {
+            this.surfaceHeight = FlatTerrainGenerator.MAX_HEIGHT;
         } else {
-            this.height = height;
+            this.surfaceHeight = surfaceHeight;
         }
     }
 
-    public boolean isValidHeight(final int height) {
+    public boolean isValidHeight(int height) {
         return height >= FlatTerrainGenerator.MIN_HEIGHT && height <= FlatTerrainGenerator.MAX_HEIGHT;
     }
 
@@ -87,28 +87,28 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
      * Seed is not used at the moment.
      */
     @Override
-    public void setWorldSeed(final String seed) {
+    public void setWorldSeed(String seed) {
     }
 
     @Override
-    public void setWorldBiomeProvider(final WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(WorldBiomeProvider value) {
+        this.biomeProvider = value;
     }
 
     @Override
     public Map<String, String> getInitParameters() {
         final Map<String, String> initParameters = new HashMap<String, String>();
-        initParameters.put(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT, String.valueOf(height));
+        initParameters.put(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT, String.valueOf(surfaceHeight));
         return initParameters;
     }
 
     @Override
-    public void setInitParameters(final Map<String, String> initParameters) {
+    public void setInitParameters(Map<String, String> initParameters) {
         if (initParameters != null) {
             final String heightStr = initParameters.get(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT);
             if (heightStr != null) {
                 try {
-                    setHeight(Integer.parseInt(heightStr));
+                    setSurfaceHeight(Integer.parseInt(heightStr));
                 } catch (final NumberFormatException e) {
                     logger.error("Cannot set initParameters to {}! ", initParameters, e);
                     // TODO Improved exception handling
@@ -127,7 +127,7 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
                     if (y == 0) {
                         // bedrock/mantle
                         chunk.setBlock(x, y, z, mantle);
-                    } else if (y < height) {
+                    } else if (y < surfaceHeight) {
                         // underground
                         switch (type) {
                             case FOREST:
@@ -146,7 +146,7 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
                                 chunk.setBlock(x, y, z, sand);
                                 break;
                         }
-                    } else if (y == height) {
+                    } else if (y == surfaceHeight) {
                         // surface
                         switch (type) {
                             case FOREST:
