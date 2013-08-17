@@ -16,6 +16,7 @@
 
 package org.terasology.logic.inventory;
 
+import com.bulletphysics.collision.shapes.BoxShape;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -30,6 +31,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.physics.CollideEvent;
 import org.terasology.physics.RigidBodyComponent;
+import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.logic.LightComponent;
@@ -73,6 +75,12 @@ public class ItemPickupSystem implements ComponentSystem {
             MeshComponent mesh = builder.getComponent(MeshComponent.class);
             mesh.mesh = blockFamily.getArchetypeBlock().getMesh();
             mesh.material = Assets.getMaterial("engine:terrain");
+        }
+        if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
+            Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new Vector3f());
+            extents.scale(2.0f);
+            extents.clampMin(0.5f);
+            builder.getComponent(BoxShapeComponent.class).extents.set(extents);
         }
         if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
             LightComponent lightComponent = builder.addComponent(new LightComponent());
