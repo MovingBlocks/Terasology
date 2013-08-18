@@ -378,7 +378,7 @@ public class BlockLoader implements BlockBuilderHelper {
             BlockMeshPart meshPart = shape
                     .getMeshPart(part)
                     .rotate(Rotation.none().getQuat4f())
-                    .mapTexCoords(atlas.getTexCoords(tileUris.get(part), true), atlas.getRelativeTileSizeWithOffset());
+                    .mapTexCoords(atlas.getTexCoords(tileUris.get(part), true), atlas.getRelativeTileSize());
             block.setLoweredLiquidMesh(part.getSide(), meshPart);
         }
     }

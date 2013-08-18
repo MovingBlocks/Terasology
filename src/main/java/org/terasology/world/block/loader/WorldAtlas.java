@@ -92,10 +92,6 @@ public class WorldAtlas {
         return ((float) getTileSize()) / (float) getAtlasSize();
     }
 
-    public float getRelativeTileSizeWithOffset() {
-        return getRelativeTileSize() - 0.01f;
-    }
-
     public int getNumMipmaps() {
         return TeraMath.sizeOfPower(tileSize) + 1;
     }

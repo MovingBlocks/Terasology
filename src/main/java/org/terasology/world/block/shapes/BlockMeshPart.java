@@ -32,6 +32,8 @@ import java.util.Arrays;
  * @author Immortius <immortius@gmail.com>
  */
 public class BlockMeshPart {
+    private static final float BORDER = 1f / 128f;
+
     private Vector3f[] vertices;
     private Vector3f[] normals;
     private Vector2f[] texCoords;
@@ -69,9 +71,11 @@ public class BlockMeshPart {
     }
 
     public BlockMeshPart mapTexCoords(Vector2f offset, float width) {
+        float normalisedBorder = BORDER * width;
         Vector2f[] newTexCoords = new Vector2f[texCoords.length];
         for (int i = 0; i < newTexCoords.length; ++i) {
-            newTexCoords[i] = new Vector2f(offset.x + texCoords[i].x * width, offset.y + texCoords[i].y * width);
+            newTexCoords[i] = new Vector2f(offset.x + normalisedBorder + texCoords[i].x * (width - 2 * normalisedBorder),
+                    offset.y + normalisedBorder + texCoords[i].y * (width - 2 * normalisedBorder));
         }
         return new BlockMeshPart(vertices, normals, newTexCoords, indices);
     }
