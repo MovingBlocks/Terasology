@@ -84,9 +84,9 @@ final class PlayerStoreInternal implements PlayerStore {
         if (entityStore != null) {
             EntityRestorer restorer = new EntityRestorer(entityManager);
             Map<String, EntityRef> refMap = restorer.restore(entityStore, externalRefs);
-            EntityRef character = refMap.get(CHARACTER);
-            if (character != null) {
-                this.character = character;
+            EntityRef loadedCharacter = refMap.get(CHARACTER);
+            if (loadedCharacter != null) {
+                this.character = loadedCharacter;
             }
             entityStore = null;
         }

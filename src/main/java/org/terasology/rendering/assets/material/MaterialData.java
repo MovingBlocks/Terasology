@@ -80,9 +80,9 @@ public class MaterialData implements AssetData {
     }
 
 
-    public void setTextureParams(Map<String, Texture> textures) {
+    public void setTextureParams(Map<String, Texture> newTextureParmas) {
         this.textures.clear();
-        this.textures.putAll(textures);
+        this.textures.putAll(newTextureParmas);
     }
 
     public void setFloatParams(Map<String, Float> floatParams) {

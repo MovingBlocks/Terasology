@@ -215,14 +215,14 @@ public class StyleBorderImage extends UIDisplayContainer implements Style {
     /**
      * Set the source origin, size and border width of the image.
      *
-     * @param origin The origin in the texture.
-     * @param size   The size of the border container in the texture.
-     * @param width  The border width. x = top, y = right, z = bottom, w = left
+     * @param origin      The origin in the texture.
+     * @param size        The size of the border container in the texture.
+     * @param borderWidth The border width. x = top, y = right, z = bottom, w = left
      */
-    public void setBorderSource(Vector2f origin, Vector2f size, Vector4f width) {
+    public void setBorderSource(Vector2f origin, Vector2f size, Vector4f borderWidth) {
         this.sourceOrigin = origin;
         this.sourceSize = size;
-        this.width = width;
+        this.width = borderWidth;
 
         sourceFrame("top");
         sourceFrame("bottom");

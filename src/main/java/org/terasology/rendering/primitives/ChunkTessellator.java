@@ -294,7 +294,7 @@ public final class ChunkTessellator {
             vertexFlag = ChunkVertexFlag.LAVA;
         } else if (block.isWaving() && block.isDoubleSided()) {
             vertexFlag = ChunkVertexFlag.WAVING;
-        } else if (block.isWaving() && !block.isDoubleSided()) {
+        } else if (block.isWaving()) {
             vertexFlag = ChunkVertexFlag.WAVING_BLOCK;
         }
 

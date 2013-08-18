@@ -415,17 +415,14 @@ public class Matrix4i implements Serializable {
     }
 
     /**
-     * Transforms a vector by this matrix and stores the result in the vector dest. If dest is null, a new vector is created. The w
-     * component of the vector is assumed to be zero.
+     * Transforms a vector by this matrix and stores the result in the vector dest.
+     * The w component of the vector is assumed to be zero.
      *
      * @param vec  the vector to transform
      * @param dest the vector to store the result in
      * @return the transformed vector (for chaining)
      */
     public Vector3i transform(Vector3i vec, Vector3i dest) {
-        if (dest == null) {
-            dest = new Vector3i();
-        }
         int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z;
         int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z;
         int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z;
@@ -436,17 +433,15 @@ public class Matrix4i implements Serializable {
     }
 
     /**
-     * Transforms a point (given as vector) by this matrix and stores the result in the vector dest. If dest is null, a new vector is
-     * created. The w component of the vector is assumed to be one.
+     * Transforms a point (given as vector) by this matrix and stores the result in the vector dest.
+     * The w component of the vector is assumed to be one.
      *
      * @param vec  the vector to transform
      * @param dest the vector to store the result in
      * @return the transformed vector (for chaining)
      */
     public Vector3i transformPoint(Vector3i vec, Vector3i dest) {
-        if (dest == null) {
-            dest = new Vector3i();
-        }
+
         int x = val[M00] * vec.x + val[M01] * vec.y + val[M02] * vec.z + val[M03];
         int y = val[M10] * vec.x + val[M11] * vec.y + val[M12] * vec.z + val[M13];
         int z = val[M20] * vec.x + val[M21] * vec.y + val[M22] * vec.z + val[M23];

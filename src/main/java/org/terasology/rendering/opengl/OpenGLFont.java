@@ -123,8 +123,8 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public void reload(FontData data) {
-        this.data = data;
+    public void reload(FontData newData) {
+        this.data = newData;
     }
 
     @Override

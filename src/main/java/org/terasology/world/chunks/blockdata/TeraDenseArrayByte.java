@@ -33,7 +33,7 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     protected byte[] data;
 
-    protected abstract TeraArray createDense(byte[] data);
+    protected abstract TeraArray createDense(byte[] arrayData);
 
     protected abstract int rowSize();
 

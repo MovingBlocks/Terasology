@@ -34,13 +34,11 @@ public final class PickupBuilder {
 
     private EntityManager entityManager;
     private InventoryManager inventoryManager;
-    private NetworkSystem networkSystem;
 
 
     public PickupBuilder() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.inventoryManager = CoreRegistry.get(InventoryManager.class);
-        this.networkSystem = CoreRegistry.get(NetworkSystem.class);
     }
 
     public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan) {
@@ -49,17 +47,14 @@ public final class PickupBuilder {
             return EntityRef.NULL;
         }
 
+        EntityRef pickupItem = itemEntity;
         EntityRef owner = itemEntity.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
-            itemEntity = inventoryManager.removeItem(owner, itemEntity, 1);
-        }
-
-        if (!itemEntity.exists()) {
-            return EntityRef.NULL;
+            pickupItem = inventoryManager.removeItem(owner, itemEntity, 1);
         }
 
         //don't perform actual drop on client side
-        if (itemEntity.exists()) {
+        if (pickupItem.exists()) {
             EntityBuilder builder = entityManager.newBuilder(itemComp.pickupPrefab);
             if (builder.hasComponent(LocationComponent.class)) {
                 builder.getComponent(LocationComponent.class).setWorldPosition(pos);
@@ -69,15 +64,14 @@ public final class PickupBuilder {
             }
             boolean destroyItem = false;
             if (builder.hasComponent(PickupComponent.class)) {
-                builder.getComponent(PickupComponent.class).itemEntity = itemEntity;
+                builder.getComponent(PickupComponent.class).itemEntity = pickupItem;
             } else {
                 destroyItem = true;
             }
 
-
-            itemEntity.send(new ItemDroppedEvent(builder));
+            pickupItem.send(new ItemDroppedEvent(builder));
             if (destroyItem) {
-                itemEntity.destroy();
+                pickupItem.destroy();
             }
             return builder.build();
         }

@@ -461,14 +461,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void connectToEntitySystem(EngineEntityManager entityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
+    public void connectToEntitySystem(EngineEntityManager newEntityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
-        this.entityManager = entityManager;
+        this.entityManager = newEntityManager;
         this.entityManager.subscribe(this);
         this.blockManager = CoreRegistry.get(BlockManager.class);
-        this.ownershipHelper = new OwnershipHelper(entityManager.getComponentLibrary());
+        this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = CoreRegistry.get(StorageManager.class);
 
         CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
@@ -491,7 +491,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
 
         eventSerializer = new EventSerializer(eventLibrary);
-        entitySerializer = new NetworkEntitySerializer(entityManager, componentLibrary);
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, componentLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -499,7 +499,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
 
         if (server != null) {
-            server.connectToEntitySystem(entityManager, entitySerializer, eventSerializer, blockEntityRegistry);
+            server.connectToEntitySystem(newEntityManager, entitySerializer, eventSerializer, blockEntityRegistry);
         }
     }
 

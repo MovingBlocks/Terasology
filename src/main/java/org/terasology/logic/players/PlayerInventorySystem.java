@@ -67,7 +67,8 @@ public class PlayerInventorySystem implements ComponentSystem {
     @In
     private SlotBasedInventoryManager inventoryManager;
 
-    private long lastInteraction, lastTimeThrowInteraction;
+    private long lastInteraction;
+    private long lastTimeThrowInteraction;
 
     @Override
     public void initialise() {

@@ -159,31 +159,32 @@ public class LightPropagator {
     }
 
     private byte pullLight(int x, int y, int z, byte newLight, Block type) {
+        byte resultLight = newLight;
         for (Side side : Side.values()) {
             if (LightingUtil.canSpreadLightInto(type, side)) {
                 Vector3i adjDir = side.getVector3i();
                 Block otherType = chunkView.getBlock(x + adjDir.x, y + adjDir.y, z + adjDir.z);
                 byte adjLight = (byte) (chunkView.getLight(x + adjDir.x, y + adjDir.y, z + adjDir.z) - 1);
                 if (adjLight > newLight && LightingUtil.canSpreadLightOutOf(otherType, side.reverse())) {
-                    newLight = adjLight;
+                    resultLight = adjLight;
                 }
             }
         }
-        return newLight;
+        return resultLight;
     }
 
-    private Region3i pushSunlight(int x, int y, int z, byte lightLevel) {
+    private Region3i pushSunlight(int x, int y, int z, byte initialLightLevel) {
         Collection<Vector3i> currentWave = Lists.newArrayList();
         Collection<Vector3i> nextWave = Lists.newArrayList();
         nextWave.add(new Vector3i(x, y, z));
         // First drop MAX_LIGHT until it is blocked
-        if (lightLevel == Chunk.MAX_LIGHT && chunkView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
+        if (initialLightLevel == Chunk.MAX_LIGHT && chunkView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
             Block lastBlock = BlockManager.getAir();
             for (int columnY = y - 1; columnY >= 0; columnY--) {
                 Block block = chunkView.getBlock(x, columnY, z);
                 if (LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM) && LightingUtil.canSpreadLightInto(block, Side.TOP)
                         && LightingUtil.doesSunlightRetainsFullStrengthIn(block)) {
-                    chunkView.setSunlight(x, columnY, z, lightLevel);
+                    chunkView.setSunlight(x, columnY, z, initialLightLevel);
                     lastBlock = block;
                     nextWave.add(new Vector3i(x, columnY, z));
                 } else {
@@ -194,6 +195,7 @@ public class LightPropagator {
 
         // Spread the sunlight
         Region3i affectedRegion = Region3i.createFromMinAndSize(new Vector3i(x, y, z), Vector3i.one());
+        byte lightLevel = initialLightLevel;
         while (lightLevel > 1 && !nextWave.isEmpty()) {
             Collection<Vector3i> temp = currentWave;
             currentWave = nextWave;
@@ -263,13 +265,14 @@ public class LightPropagator {
         return affectedRegion;
     }
 
-    private Region3i pushLight(int x, int y, int z, byte lightLevel) {
+    private Region3i pushLight(int x, int y, int z, byte initialLightLevel) {
         Collection<Vector3i> currentWave = Lists.newArrayList();
         Collection<Vector3i> nextWave = Lists.newArrayList();
         nextWave.add(new Vector3i(x, y, z));
 
         Region3i affectedRegion = Region3i.createFromMinAndSize(new Vector3i(x, y, z), Vector3i.one());
 
+        byte lightLevel = initialLightLevel;
         while (lightLevel > 1 && !nextWave.isEmpty()) {
             Collection<Vector3i> temp = currentWave;
             currentWave = nextWave;

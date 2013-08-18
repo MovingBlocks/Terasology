@@ -62,18 +62,19 @@ public class UIStateButton extends UIButton {
     /**
      * Remove a specific state. This will change the current state to the next state in the list.
      *
-     * @param stateID The id of the state.
+     * @param stateId The id of the state.
      */
-    public void removeState(int stateID) {
+    public void removeState(int stateId) {
+        int stateToRemove = stateId;
         if (states.size() > 0) {
-            if (stateID < 0) {
-                stateID = 0;
+            if (stateToRemove < 0) {
+                stateToRemove = 0;
             }
-            if (stateID >= states.size()) {
-                stateID = states.size() - 1;
+            if (stateToRemove >= states.size()) {
+                stateToRemove = states.size() - 1;
             }
 
-            states.remove(stateID);
+            states.remove(stateToRemove);
 
             if (states.size() == 0) {
                 currentState = -1;
@@ -87,22 +88,23 @@ public class UIStateButton extends UIButton {
     /**
      * Changes the state to the given state ID.
      *
-     * @param stateID The ID of the state.
+     * @param stateId The ID of the state.
      */
-    public void setState(int stateID) {
+    public void setState(int stateId) {
+        int stateToSet = stateId;
         if (states.size() > 0) {
-            if (stateID < 0) {
-                stateID = 0;
+            if (stateToSet < 0) {
+                stateToSet = 0;
             }
-            if (stateID >= states.size()) {
-                stateID = states.size() - 1;
+            if (stateToSet >= states.size()) {
+                stateToSet = states.size() - 1;
             }
 
-            getLabel().setText(states.get(stateID).name);
-            currentState = stateID;
+            getLabel().setText(states.get(stateToSet).name);
+            currentState = stateToSet;
 
-            if (states.get(stateID).action != null) {
-                states.get(stateID).action.action(this);
+            if (states.get(stateId).action != null) {
+                states.get(stateId).action.action(this);
             }
         }
     }

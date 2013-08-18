@@ -107,10 +107,10 @@ public class HierarchicalAISystem implements ComponentSystem,
             return;
         }
 
-        long directionChangeTime = ai.moveUpdateTime,
-                moveChangeTime = ai.moveUpdateTime,
-                idleChangeTime = ai.idlingUpdateTime,
-                dangerChangeTime = ai.dangerUpdateTime;
+        long directionChangeTime = ai.moveUpdateTime;
+        long moveChangeTime = ai.moveUpdateTime;
+        long idleChangeTime = ai.idlingUpdateTime;
+        long dangerChangeTime = ai.dangerUpdateTime;
 
         // get movement
         Vector3f drive = new Vector3f();

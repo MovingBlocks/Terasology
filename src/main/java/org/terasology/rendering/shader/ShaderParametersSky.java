@@ -44,8 +44,8 @@ public class ShaderParametersSky extends ShaderParametersBase {
     @EditorRange(min = 0.0f, max = 10.0f)
     private float skyNightBrightness = 1.0f;
 
-    public static Vector3d getAllWeatherZenith(float thetaSun, float turbidity) {
-        thetaSun = (float) Math.acos(thetaSun);
+    public static Vector3d getAllWeatherZenith(float thetaSunAngle, float turbidity) {
+        float thetaSun = (float) Math.acos(thetaSunAngle);
         Vector4f cx1 = new Vector4f(0.0f, 0.00209f, -0.00375f, 0.00165f);
         Vector4f cx2 = new Vector4f(0.00394f, -0.03202f, 0.06377f, -0.02903f);
         Vector4f cx3 = new Vector4f(0.25886f, 0.06052f, -0.21196f, 0.11693f);

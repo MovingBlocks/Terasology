@@ -136,12 +136,12 @@ public class Region3i implements Iterable<Vector3i> {
      *         do not overlap then the empty region is returned
      */
     public Region3i intersect(Region3i other) {
-        Vector3i min = min();
-        min.max(other.min());
-        Vector3i max = max();
-        max.min(other.max());
+        Vector3i intersectMin = min();
+        intersectMin.max(other.min());
+        Vector3i intersectMax = max();
+        intersectMax.min(other.max());
 
-        return createFromMinMax(min, max);
+        return createFromMinMax(intersectMin, intersectMax);
     }
 
     /**
@@ -159,27 +159,27 @@ public class Region3i implements Iterable<Vector3i> {
      * @return A new region
      */
     public Region3i expand(int amount) {
-        Vector3i min = min();
-        min.sub(amount, amount, amount);
-        Vector3i max = max();
-        max.add(amount, amount, amount);
-        return createFromMinMax(min, max);
+        Vector3i expandedMin = min();
+        expandedMin.sub(amount, amount, amount);
+        Vector3i expandedMax = max();
+        expandedMax.add(amount, amount, amount);
+        return createFromMinMax(expandedMin, expandedMax);
     }
 
     public Region3i expand(Vector3i amount) {
-        Vector3i min = min();
-        min.sub(amount);
-        Vector3i max = max();
-        max.add(amount);
-        return createFromMinMax(min, max);
+        Vector3i expandedMin = min();
+        expandedMin.sub(amount);
+        Vector3i expandedMax = max();
+        expandedMax.add(amount);
+        return createFromMinMax(expandedMin, expandedMax);
     }
 
     public Region3i expandToContain(Vector3i adjPos) {
-        Vector3i min = min();
-        min.min(adjPos);
-        Vector3i max = max();
-        max.max(adjPos);
-        return createFromMinMax(min, max);
+        Vector3i expandedMin = min();
+        expandedMin.min(adjPos);
+        Vector3i expandedMax = max();
+        expandedMax.max(adjPos);
+        return createFromMinMax(expandedMin, expandedMax);
     }
 
     /**

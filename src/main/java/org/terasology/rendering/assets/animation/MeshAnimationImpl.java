@@ -72,8 +72,8 @@ public class MeshAnimationImpl extends AbstractAsset<MeshAnimationData> implemen
     }
 
     @Override
-    public void reload(MeshAnimationData data) {
-        this.data = data;
+    public void reload(MeshAnimationData newData) {
+        this.data = newData;
     }
 
     @Override

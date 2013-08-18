@@ -40,7 +40,6 @@ public class UIProgressBar extends UIDisplayContainer {
         ABOVE, MIDDLE, UNDER
     }
 
-    ;
     private ELabelPosition labelPosition = ELabelPosition.UNDER;
     private final float labelSpacing = 8f;
 
@@ -57,7 +56,7 @@ public class UIProgressBar extends UIDisplayContainer {
     /**
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
-    private class UIProgressLine extends UIDisplayContainer {
+    private static class UIProgressLine extends UIDisplayContainer {
 
         public UIProgressLine() {
             setCropContainer(true);

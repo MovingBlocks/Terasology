@@ -643,7 +643,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             return value;
         }
 
-        public T setValue(T value) {
+        public T setValue(T newValue) {
             throw new UnsupportedOperationException();
         }
     }

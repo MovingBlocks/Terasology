@@ -221,9 +221,9 @@ public class UIList extends UIDisplayContainerScrollable {
      * @return Returns the item index or -1 if item is not in the list.
      */
     public int getItem(UIListItem item) {
-        List<UIListItem> list = getItems();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) == item) {
+        List<UIListItem> itemList = getItems();
+        for (int i = 0; i < itemList.size(); i++) {
+            if (itemList.get(i) == item) {
                 return i;
             }
         }

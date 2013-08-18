@@ -365,13 +365,13 @@ public final class TeraMath {
      * @return The lowest power of two greater or equal to val
      */
     public static int ceilPowerOfTwo(int val) {
-        val--;
-        val = (val >> 1) | val;
-        val = (val >> 2) | val;
-        val = (val >> 4) | val;
-        val = (val >> 8) | val;
-        val = (val >> 16) | val;
-        val++;
+        int result = val - 1;
+        result = (result >> 1) | result;
+        result = (result >> 2) | result;
+        result = (result >> 4) | result;
+        result = (result >> 8) | result;
+        result = (result >> 16) | result;
+        result++;
         return val;
     }
 
@@ -384,11 +384,12 @@ public final class TeraMath {
     }
 
     /**
-     * @param val
+     * @param value
      * @return The size of a power of two - that is, the exponent.
      */
-    public static int sizeOfPower(int val) {
+    public static int sizeOfPower(int value) {
         int power = 0;
+        int val = value;
         while (val > 1) {
             val = val >> 1;
             power++;

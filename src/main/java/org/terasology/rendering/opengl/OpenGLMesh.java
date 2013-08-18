@@ -81,9 +81,9 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public void reload(MeshData data) {
+    public void reload(MeshData newData) {
         dispose();
-        buildMesh(data);
+        buildMesh(newData);
     }
 
     @Override
@@ -181,7 +181,10 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     public int addToBatch(Transform transform, Transform normalTransform, TFloatList vertexData, TIntList indexData, int indexOffset) {
-        int uv1 = 0, uv2 = 0, n = 0, c = 0;
+        int uv1 = 0;
+        int uv2 = 0;
+        int n = 0;
+        int c = 0;
         for (int v = 0; v < data.getVertices().size(); v += VERTEX_SIZE) {
             Vector3f vert = new Vector3f(data.getVertices().get(v), data.getVertices().get(v + 1), data.getVertices().get(v + 2));
             transform.transform(vert);
@@ -214,51 +217,51 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         return indexOffset + data.getVertices().size() / VERTEX_SIZE;
     }
 
-    private void buildMesh(MeshData data) {
-        this.data = data;
+    private void buildMesh(MeshData newData) {
+        this.data = newData;
 
         List<TFloatIterator> parts = Lists.newArrayList();
         TIntList partSizes = new TIntArrayList();
-        int vertexCount = data.getVertices().size() / VERTEX_SIZE;
+        int vertexCount = newData.getVertices().size() / VERTEX_SIZE;
         int vertexSize = VERTEX_SIZE;
-        parts.add(data.getVertices().iterator());
+        parts.add(newData.getVertices().iterator());
         partSizes.add(VERTEX_SIZE);
 
-        if (data.getTexCoord0() != null && data.getTexCoord0().size() / TEX_COORD_0_SIZE == vertexCount) {
-            parts.add(data.getTexCoord0().iterator());
+        if (newData.getTexCoord0() != null && newData.getTexCoord0().size() / TEX_COORD_0_SIZE == vertexCount) {
+            parts.add(newData.getTexCoord0().iterator());
             partSizes.add(TEX_COORD_0_SIZE);
             texCoord0Offset = vertexSize * FLOAT_SIZE;
             vertexSize += TEX_COORD_0_SIZE;
             hasTexCoord0 = true;
         }
-        if (data.getTexCoord1() != null && data.getTexCoord1().size() / TEX_COORD_1_SIZE == vertexCount) {
-            parts.add(data.getTexCoord1().iterator());
+        if (newData.getTexCoord1() != null && newData.getTexCoord1().size() / TEX_COORD_1_SIZE == vertexCount) {
+            parts.add(newData.getTexCoord1().iterator());
             partSizes.add(TEX_COORD_1_SIZE);
             texCoord1Offset = vertexSize * FLOAT_SIZE;
             vertexSize += TEX_COORD_1_SIZE;
             hasTexCoord1 = true;
         }
-        if (data.getNormals() != null && data.getNormals().size() / NORMAL_SIZE == vertexCount) {
-            parts.add(data.getNormals().iterator());
+        if (newData.getNormals() != null && newData.getNormals().size() / NORMAL_SIZE == vertexCount) {
+            parts.add(newData.getNormals().iterator());
             partSizes.add(NORMAL_SIZE);
             normalOffset = vertexSize * FLOAT_SIZE;
             vertexSize += NORMAL_SIZE;
             hasNormal = true;
         }
-        if (data.getColors() != null && data.getColors().size() / COLOR_SIZE == vertexCount) {
-            parts.add(data.getColors().iterator());
+        if (newData.getColors() != null && newData.getColors().size() / COLOR_SIZE == vertexCount) {
+            parts.add(newData.getColors().iterator());
             partSizes.add(COLOR_SIZE);
             colorOffset = vertexSize * FLOAT_SIZE;
             vertexSize += COLOR_SIZE;
             hasColor = true;
         }
         stride = vertexSize * FLOAT_SIZE;
-        indexCount = data.getIndices().size();
+        indexCount = newData.getIndices().size();
 
         createVertexBuffer(parts, partSizes, vertexCount, vertexSize);
-        createIndexBuffer(data.getIndices());
+        createIndexBuffer(newData.getIndices());
 
-        aabb = AABB.createEncompasing(data.getVertices());
+        aabb = AABB.createEncompasing(newData.getVertices());
     }
 
     private void createVertexBuffer(List<TFloatIterator> parts, TIntList partSizes, int vertexCount, int vertexSize) {

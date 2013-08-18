@@ -294,9 +294,9 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
                 i.remove();
             } else {
                 float applyDelta = delta;
-                float time = delta + data.getT();
-                if (time >= RESYNC_TIME) {
-                    applyDelta -= time - RESYNC_TIME;
+                float timeDifference = delta + data.getT();
+                if (timeDifference >= RESYNC_TIME) {
+                    applyDelta -= timeDifference - RESYNC_TIME;
                     i.remove();
                 }
                 Vector3f change = new Vector3f();

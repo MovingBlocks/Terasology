@@ -91,16 +91,17 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
     private void checkHeal(EntityRef entity, int healAmount, EntityRef instigator, HealthComponent health) {
         BeforeHealEvent beforeHeal = entity.send(new BeforeHealEvent(healAmount, instigator));
         if (!beforeHeal.isConsumed()) {
-            healAmount = calculateTotal(beforeHeal.getBaseHeal(), beforeHeal.getMultipliers(), beforeHeal.getModifiers());
-            if (healAmount > 0) {
-                doHeal(entity, healAmount, instigator, health);
-            } else if (healAmount < 0) {
-                doDamage(entity, -healAmount, EngineDamageTypes.HEALING.get(), instigator, health);
+            int modifiedAmount = calculateTotal(beforeHeal.getBaseHeal(), beforeHeal.getMultipliers(), beforeHeal.getModifiers());
+            if (modifiedAmount > 0) {
+                doHeal(entity, modifiedAmount, instigator, health);
+            } else if (modifiedAmount < 0) {
+                doDamage(entity, -modifiedAmount, EngineDamageTypes.HEALING.get(), instigator, health);
             }
         }
     }
 
-    private void doHeal(EntityRef entity, int healAmount, EntityRef instigator, HealthComponent health) {
+    private void doHeal(EntityRef entity, int healAmount, EntityRef instigator, HealthComponent targetHealthComponent) {
+        HealthComponent health = targetHealthComponent;
         if (health == null) {
             health = entity.getComponent(HealthComponent.class);
         }
@@ -113,7 +114,8 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
     }
 
-    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, HealthComponent health) {
+    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, HealthComponent targetHealthComponent) {
+        HealthComponent health = targetHealthComponent;
         if (health == null) {
             health = entity.getComponent(HealthComponent.class);
         }

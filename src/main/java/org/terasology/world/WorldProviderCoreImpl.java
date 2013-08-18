@@ -57,11 +57,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     public WorldProviderCoreImpl(String title, String seed, long time, WorldGeneratorUri worldGenerator, ChunkProvider chunkProvider) {
-        if (title == null) {
-            title = seed;
-        }
-
-        this.title = title;
+        this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);

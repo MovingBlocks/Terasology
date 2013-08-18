@@ -121,10 +121,11 @@ public class Rotation {
     }
 
     public Side rotate(Side side) {
-        side = side.rollClockwise(roll.getIncrements());
-        side = side.pitchClockwise(pitch.getIncrements());
-        side = side.yawClockwise(yaw.getIncrements());
-        return side;
+        Side result = side;
+        result = result.rollClockwise(roll.getIncrements());
+        result = result.pitchClockwise(pitch.getIncrements());
+        result = result.yawClockwise(yaw.getIncrements());
+        return result;
     }
 
     @Override

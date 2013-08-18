@@ -81,12 +81,15 @@ public class WhiteNoise implements Noise {
             recomputeSpectralWeights = false;
         }
 
+        double workingX = x;
+        double workingY = y;
+        double workingZ = z;
         for (int i = 0; i < octaves; i++) {
-            result += noise(x, y, z) * spectralWeights[i];
+            result += noise(workingX, workingY, workingZ) * spectralWeights[i];
 
-            x *= LACUNARITY;
-            y *= LACUNARITY;
-            z *= LACUNARITY;
+            workingX *= LACUNARITY;
+            workingY *= LACUNARITY;
+            workingZ *= LACUNARITY;
         }
 
         return result;

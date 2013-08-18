@@ -205,10 +205,10 @@ public class RegionalChunkView implements ChunkView {
     }
 
     @Override
-    public void setDirtyAround(Region3i blockRegion) {
-        Vector3i minPos = new Vector3i(blockRegion.min());
+    public void setDirtyAround(Region3i region) {
+        Vector3i minPos = new Vector3i(region.min());
         minPos.sub(1, 0, 1);
-        Vector3i maxPos = new Vector3i(blockRegion.max());
+        Vector3i maxPos = new Vector3i(region.max());
         maxPos.add(1, 0, 1);
 
         Vector3i minChunk = TeraMath.calcChunkPos(minPos, chunkPower);

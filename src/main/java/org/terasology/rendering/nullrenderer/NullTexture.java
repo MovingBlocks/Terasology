@@ -69,12 +69,12 @@ public class NullTexture extends AbstractAsset<TextureData> implements Texture {
     }
 
     @Override
-    public void reload(TextureData data) {
-        this.data = data;
-        this.filterMode = data.getFilterMode();
-        this.wrapMode = data.getWrapMode();
-        this.height = data.getHeight();
-        this.width = data.getWidth();
+    public void reload(TextureData newData) {
+        this.data = newData;
+        this.filterMode = newData.getFilterMode();
+        this.wrapMode = newData.getWrapMode();
+        this.height = newData.getHeight();
+        this.width = newData.getWidth();
     }
 
     @Override

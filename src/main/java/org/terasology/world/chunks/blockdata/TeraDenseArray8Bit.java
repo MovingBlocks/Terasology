@@ -29,8 +29,8 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 
     @Override
-    protected TeraArray createDense(byte[] data) {
-        return new TeraDenseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), data);
+    protected TeraArray createDense(byte[] arrayData) {
+        return new TeraDenseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), arrayData);
     }
 
     @Override

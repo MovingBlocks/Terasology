@@ -154,16 +154,17 @@ public class UISlider extends UIDisplayContainer {
      * @param value The value the slider should have.
      */
     private void changeSlider(int value) {
-        if (value < minValue) {
-            value = minValue;
-        } else if (value > maxValue) {
-            value = maxValue;
+        int clampedValue = value;
+        if (clampedValue < minValue) {
+            clampedValue = minValue;
+        } else if (clampedValue > maxValue) {
+            clampedValue = maxValue;
         }
 
-        slider.setPosition(new Vector2f(valueToPos(value), 0));
+        slider.setPosition(new Vector2f(valueToPos(clampedValue), 0));
 
-        if (value != currentValue) {
-            currentValue = value;
+        if (clampedValue != currentValue) {
+            currentValue = clampedValue;
 
             notifyChangedListeners();
         }
@@ -219,13 +220,14 @@ public class UISlider extends UIDisplayContainer {
      * @return Returns the position at the given value.
      */
     private float valueToPos(int value) {
+        float clampedValue = value;
         if (minValue < 0) {
-            value += -minValue;
+            clampedValue += -minValue;
         } else {
-            value -= minValue;
+            clampedValue -= minValue;
         }
 
-        float pos = value * ((getSize().x - slider.getSize().x) / (float) range);
+        float pos = clampedValue * ((getSize().x - slider.getSize().x) / (float) range);
         if (pos < 0) {
             pos = 0;
         } else if (pos > getSize().x) {

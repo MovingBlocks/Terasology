@@ -102,12 +102,12 @@ public class Server implements ChunkReadyListener {
         this.time = (EngineTime) CoreRegistry.get(Time.class);
     }
 
-    void connectToEntitySystem(EngineEntityManager entityManager, NetworkEntitySerializer entitySerializer,
-                               EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
-        this.entityManager = entityManager;
-        this.eventSerializer = eventSerializer;
-        this.entitySerializer = entitySerializer;
-        this.blockEntityRegistry = blockEntityRegistry;
+    void connectToEntitySystem(EngineEntityManager newEntityManager, NetworkEntitySerializer newEntitySerializer,
+                               EventSerializer newEventSerializer, BlockEntityRegistry newBlockEntityRegistry) {
+        this.entityManager = newEntityManager;
+        this.eventSerializer = newEventSerializer;
+        this.entitySerializer = newEntitySerializer;
+        this.blockEntityRegistry = newBlockEntityRegistry;
         blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
     }
 
@@ -257,7 +257,6 @@ public class Server implements ChunkReadyListener {
 
     private void processBlockChanges(NetData.NetMessage message) {
         for (NetData.BlockChangeMessage blockChange : message.getBlockChangeList()) {
-            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
             logger.debug("Received block change to {}", blockManager.getBlock((byte) blockChange.getNewBlock()));
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -361,7 +360,6 @@ public class Server implements ChunkReadyListener {
     public void onChunkReady(Vector3i chunkPos) {
         List<NetData.BlockChangeMessage> updateMessages = awaitingChunkReadyUpdates.removeAll(chunkPos);
         for (NetData.BlockChangeMessage message : updateMessages) {
-            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             Block newBlock = blockManager.getBlock((byte) message.getNewBlock());

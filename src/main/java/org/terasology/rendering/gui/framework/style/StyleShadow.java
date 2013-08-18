@@ -85,11 +85,10 @@ public class StyleShadow extends UIDisplayContainer implements Style {
 
     public StyleShadow(Vector4f width, EShadowDirection direction, float opacity) {
         shadow = Assets.getTexture(textureUrl);
-        createMesh(opacity);
-
         this.opacity = opacity;
         this.direction = direction;
 
+        createMesh();
         setWidth(width);
         setCrop(false);
     }
@@ -342,7 +341,7 @@ public class StyleShadow extends UIDisplayContainer implements Style {
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
-    private void createMesh(float opacity) {
+    private void createMesh() {
         if (mesh != null) {
             mesh.dispose();
         }
@@ -428,7 +427,7 @@ public class StyleShadow extends UIDisplayContainer implements Style {
 
     public void setOpacity(float opacity) {
         this.opacity = opacity;
-        createMesh(opacity);
+        createMesh();
     }
 
     @Override

@@ -147,14 +147,14 @@ public class PublicIdentityCertificate {
     }
 
     /**
-     * Verifies that the signature was created by this certificate's corresponding private certificate, over the
+     * Verifies that the signedData was created by this certificate's corresponding private certificate, over the
      * given data.
      *
      * @param data
-     * @param signature
+     * @param signedData
      * @return
      */
-    public boolean verify(byte[] data, byte[] signature) {
+    public boolean verify(byte[] data, byte[] signedData) {
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, exponent);
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
@@ -162,7 +162,7 @@ public class PublicIdentityCertificate {
             Signature signatureVerifier = Signature.getInstance(IdentityConstants.SIGNATURE_ALGORITHM);
             signatureVerifier.initVerify(key);
             signatureVerifier.update(data);
-            return signatureVerifier.verify(signature);
+            return signatureVerifier.verify(signedData);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
         } catch (InvalidKeySpecException e) {

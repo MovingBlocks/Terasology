@@ -365,7 +365,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
         public void executeOn(List<EntityRef> entities);
     }
 
-    private class AddCommand implements Command {
+    private static class AddCommand implements Command {
         private EntityRef toAdd;
 
         public AddCommand(EntityRef toAdd) {
@@ -378,7 +378,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
         }
     }
 
-    private class RemoveCommand implements Command {
+    private static class RemoveCommand implements Command {
         private EntityRef toRem;
 
         public RemoveCommand(EntityRef toRemove) {
@@ -391,7 +391,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
         }
     }
 
-    private class ClearCommand implements Command {
+    private static class ClearCommand implements Command {
         @Override
         public void executeOn(List<EntityRef> entities) {
             entities.clear();

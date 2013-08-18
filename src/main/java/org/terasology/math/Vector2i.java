@@ -50,9 +50,9 @@ public class Vector2i {
     public Vector2i() {
     }
 
-    public final void set(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public final void set(int newX, int newY) {
+        this.x = newX;
+        this.y = newY;
     }
 
     public final void set(int[] values) {
@@ -104,9 +104,9 @@ public class Vector2i {
         y *= amount;
     }
 
-    public final void mult(int x, int y) {
-        this.x *= x;
-        this.y *= y;
+    public final void mult(int multX, int multY) {
+        this.x *= multX;
+        this.y *= multY;
     }
 
     public final void mult(Vector2i other) {

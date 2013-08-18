@@ -68,7 +68,8 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
             if (inf == null) {
                 return 3;
             } else {
-                final int sizeY = array.getSizeY(), rowSize = array.getSizeXZ() * 2;
+                int sizeY = array.getSizeY();
+                int rowSize = array.getSizeXZ() * 2;
                 int result = 1;
                 for (int y = 0; y < sizeY; y++) {
                     if (inf[y] == null) {
@@ -89,7 +90,8 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
                 buffer.putShort(array.fill);
             } else {
                 buffer.put((byte) 1);
-                final int sizeY = array.getSizeY(), rowSize = array.getSizeXZ();
+                int sizeY = array.getSizeY();
+                int rowSize = array.getSizeXZ();
                 final short[] def = array.deflated;
                 for (int y = 0; y < sizeY; y++) {
                     final short[] row = inf[y];
@@ -113,15 +115,15 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
                 return array;
             }
             final int rowSize = array.getSizeXZ();
-            final short[][] inf = array.inflated = new short[sizeY][];
-            final short[] def = array.deflated = new short[sizeY];
+            array.inflated = new short[sizeY][];
+            array.deflated = new short[sizeY];
             for (int y = 0; y < sizeY; y++) {
                 final byte hasRow = buffer.get();
                 if (hasRow == 0) {
-                    def[y] = buffer.getShort();
+                    array.deflated[y] = buffer.getShort();
                 } else {
-                    final short[] row = inf[y] = new short[rowSize];
-                    getRow(row, rowSize, buffer);
+                    array.inflated[y] = new short[rowSize];
+                    getRow(array.inflated[y], rowSize, buffer);
                 }
             }
             return array;
@@ -248,10 +250,10 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         if (old == value) {
             return old;
         }
-        row = inflated[y] = new short[getSizeXZ()];
-        Arrays.fill(row, deflated[y]);
+        inflated[y] = new short[getSizeXZ()];
+        Arrays.fill(inflated[y], deflated[y]);
         int pos = pos(x, z);
-        row[pos] = (short) value;
+        inflated[y][pos] = (short) value;
         return deflated[y];
     }
 
@@ -282,9 +284,9 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         }
         int old = deflated[y];
         if (old == expected) {
-            row = inflated[y] = new short[getSizeXZ()];
-            Arrays.fill(row, deflated[y]);
-            row[pos] = (short) value;
+            inflated[y] = new short[getSizeXZ()];
+            Arrays.fill(inflated[y], deflated[y]);
+            inflated[y][pos] = (short) value;
             return true;
         }
         return false;

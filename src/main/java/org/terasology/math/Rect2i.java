@@ -23,16 +23,16 @@ import java.util.List;
  */
 public class Rect2i {
     // position
-    public int x;
-    public int y;
+    public int posX;
+    public int posY;
 
     // size
     public int w;
     public int h;
 
     public Rect2i(int x, int y, int w, int h) {
-        this.x = x;
-        this.y = y;
+        this.posX = x;
+        this.posY = y;
 
         this.w = w;
         this.h = h;
@@ -45,7 +45,7 @@ public class Rect2i {
         ArrayList<Rect2i> result = new ArrayList<Rect2i>();
 
         boolean overlap = a.overlaps(b);
-        boolean equal = (a.x == b.x) && (a.y == b.y);
+        boolean equal = (a.posX == b.posX) && (a.posY == b.posY);
 
         if (equal) {
             // empty list
@@ -60,8 +60,8 @@ public class Rect2i {
 
         // invariant: equal size and overlapping and not equal position
 
-        int splitCenterX = (a.x < b.x) ? b.minX() : b.maxX();
-        int splitCenterY = (a.y < b.y) ? b.minY() : b.maxY();
+        int splitCenterX = (a.posX < b.posX) ? b.minX() : b.maxX();
+        int splitCenterY = (a.posY < b.posY) ? b.minY() : b.maxY();
 
         subtractEqualsSizedHelper(a.minX(), a.minY(), b, splitCenterX, splitCenterY, result);
         subtractEqualsSizedHelper(a.maxX(), a.minY(), b, splitCenterX, splitCenterY, result);
@@ -72,7 +72,7 @@ public class Rect2i {
     }
 
     public String toString() {
-        return String.format("x=%d y=%d w=%d h=%d", x, y, w, h);
+        return String.format("x=%d y=%d w=%d h=%d", posX, posY, w, h);
     }
 
     private static void subtractEqualsSizedHelper(int x, int y, Rect2i b, int splitCenterX, int splitCenterY, ArrayList<Rect2i> result) {
@@ -120,20 +120,20 @@ public class Rect2i {
     }
 
     public int maxX() {
-        return x + w;
+        return posX + w;
     }
 
     public int minX() {
-        return x;
+        return posX;
     }
 
 
     public int maxY() {
-        return y + h;
+        return posY + h;
     }
 
     public int minY() {
-        return y;
+        return posY;
     }
 
     public int area() {

@@ -91,11 +91,12 @@ public final class SideBitFlag {
     }
 
     public static byte addSide(byte sideBit, Side... sides) {
+        byte result = sideBit;
         for (Side side : sides) {
-            sideBit |= sideBits.get(side);
+            result |= sideBits.get(side);
         }
 
-        return sideBit;
+        return result;
     }
 
     private SideBitFlag() {

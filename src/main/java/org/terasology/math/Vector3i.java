@@ -97,7 +97,9 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      * values of (0,0,0).
      */
     public Vector3i() {
-        x = y = z = 0;
+        x = 0;
+        y = 0;
+        z = 0;
     }
 
     /**
@@ -347,7 +349,9 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      * <code>reset</code> resets this vector's data to zero internally.
      */
     public Vector3i reset() {
-        x = y = z = 0;
+        x = 0;
+        y = 0;
+        z = 0;
         return this;
     }
 

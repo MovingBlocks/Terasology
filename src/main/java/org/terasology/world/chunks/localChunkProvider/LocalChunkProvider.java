@@ -115,8 +115,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
     }
 
-    public void setBlockEntityRegistry(BlockEntityRegistry registry) {
-        this.registry = registry;
+    public void setBlockEntityRegistry(BlockEntityRegistry value) {
+        this.registry = value;
     }
 
     public void requestCleanup() {

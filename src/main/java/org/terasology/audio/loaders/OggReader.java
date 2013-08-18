@@ -159,15 +159,17 @@ public class OggReader extends FilterInputStream {
             return -1;
         }
         int bytesRead = 0;
-        while (!eos && (len > 0)) {
+        int bytesRemaining = len;
+        int offset = off;
+        while (!eos && (bytesRemaining > 0)) {
             fillConvbuffer();
             if (!eos) {
-                int bytesToCopy = Math.min(len, convbufferSize - convbufferOff);
-                System.arraycopy(convbuffer, convbufferOff, b, off, bytesToCopy);
+                int bytesToCopy = Math.min(bytesRemaining, convbufferSize - convbufferOff);
+                System.arraycopy(convbuffer, convbufferOff, b, offset, bytesToCopy);
                 convbufferOff += bytesToCopy;
                 bytesRead += bytesToCopy;
-                len -= bytesToCopy;
-                off += bytesToCopy;
+                bytesRemaining -= bytesToCopy;
+                offset += bytesToCopy;
             }
         }
         return bytesRead;
@@ -188,14 +190,15 @@ public class OggReader extends FilterInputStream {
         }
         b.position(off);
         int bytesRead = 0;
-        while (!eos && (len > 0)) {
+        int bytesRemaining = len;
+        while (!eos && (bytesRemaining > 0)) {
             fillConvbuffer();
             if (!eos) {
-                int bytesToCopy = Math.min(len, convbufferSize - convbufferOff);
+                int bytesToCopy = Math.min(bytesRemaining, convbufferSize - convbufferOff);
                 b.put(convbuffer, convbufferOff, bytesToCopy);
                 convbufferOff += bytesToCopy;
                 bytesRead += bytesToCopy;
-                len -= bytesToCopy;
+                bytesRemaining -= bytesToCopy;
             }
         }
         return bytesRead;
@@ -275,9 +278,9 @@ public class OggReader extends FilterInputStream {
         // serialno.
 
         // submit a 4k block to libvorbis' Ogg layer
-        int index = syncState.buffer(4096);
+        int bufferIndex = syncState.buffer(4096);
         byte[] buffer = syncState.data;
-        int bytes = in.read(buffer, index, 4096);
+        int bytes = in.read(buffer, bufferIndex, 4096);
         syncState.wrote(bytes);
 
         // Get the first page.
@@ -359,9 +362,9 @@ public class OggReader extends FilterInputStream {
             }
 
             // no harm in not checking before adding more
-            index = syncState.buffer(4096);
+            bufferIndex = syncState.buffer(4096);
             buffer = syncState.data;
-            bytes = in.read(buffer, index, 4096);
+            bytes = in.read(buffer, bufferIndex, 4096);
 
             // NOTE: This is a bugfix. read will return -1 which will mess up syncState.
             if (bytes < 0) {
@@ -388,7 +391,7 @@ public class OggReader extends FilterInputStream {
     /**
      * Decodes a packet.
      */
-    private int decodePacket(Packet packet) {
+    private int decodePacket() {
         // check the endianes of the computer.
         final boolean bigEndian = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 
@@ -403,7 +406,7 @@ public class OggReader extends FilterInputStream {
         int convOff = 0;
         int samples;
         while ((samples = dspState.synthesis_pcmout(pcm, index)) > 0) {
-            float[][] pcm = this.pcm[0];
+            float[][] localPcm = this.pcm[0];
             int bout = (samples < convsize ? samples : convsize);
 
             // convert floats to 16 bit signed ints (host order) and interleave
@@ -414,7 +417,7 @@ public class OggReader extends FilterInputStream {
                 int mono = index[i];
 
                 for (int j = 0; j < bout; j++) {
-                    int val = (int) (pcm[i][mono + j] * 32767);
+                    int val = (int) (localPcm[i][mono + j] * 32767);
 
                     // might as well guard against clipping
                     val = Math.max(-32768, Math.min(32767, val));
@@ -442,19 +445,20 @@ public class OggReader extends FilterInputStream {
      * @return bytes read into convbuffer of -1 if end of file
      */
     private int lazyDecodePacket() throws IOException {
-        int result = getNextPacket(packet);
+        int result = getNextPacket();
         if (result == -1) {
             return -1;
         }
 
         // we have a packet.  Decode it
-        return decodePacket(packet);
+        return decodePacket();
     }
 
     /**
-     * @param packet where to put the packet.
+     * @return
+     * @throws IOException
      */
-    private int getNextPacket(Packet packet) throws IOException {
+    private int getNextPacket() throws IOException {
         // get next packet.
         boolean fetchedPacket = false;
         while (!eos && !fetchedPacket) {
@@ -500,12 +504,12 @@ public class OggReader extends FilterInputStream {
     private void fetchData() throws IOException {
         if (!eos) {
             // copy 4096 bytes from compressed stream to syncState.
-            int index = syncState.buffer(4096);
-            if (index < 0) {
+            int bufferIndex = syncState.buffer(4096);
+            if (bufferIndex < 0) {
                 eos = true;
                 return;
             }
-            int bytes = in.read(syncState.data, index, 4096);
+            int bytes = in.read(syncState.data, bufferIndex, 4096);
             syncState.wrote(bytes);
             if (bytes == 0) {
                 eos = true;

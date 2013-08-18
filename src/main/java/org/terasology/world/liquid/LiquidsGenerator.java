@@ -55,7 +55,8 @@ public class LiquidsGenerator implements FirstPassGenerator {
     public void generateChunk(Chunk c) {
         // TODO: Better seeding mechanism
         FastRandom random = new FastRandom(seed.hashCode() ^ (c.getPos().x + 39L * (c.getPos().y + 39L * c.getPos().z)));
-        boolean grassGenerated = false, lavaGenerated = false;
+        boolean grassGenerated = false;
+        boolean lavaGenerated = false;
         for (int y = Chunk.SIZE_Y - 1; y >= 0; y -= 2) {
             Block currentBlock = c.getBlock(8, y, 8);
             if ((grass.equals(currentBlock) || snow.equals(currentBlock)) && !grassGenerated && y >= 32 && random.randomDouble() > 0.8) {
@@ -71,13 +72,13 @@ public class LiquidsGenerator implements FirstPassGenerator {
     }
 
     @Override
-    public void setWorldSeed(String seed) {
-        this.seed = seed;
+    public void setWorldSeed(String value) {
+        this.seed = value;
     }
 
     @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(WorldBiomeProvider value) {
+        this.biomeProvider = value;
     }
 
     @Override

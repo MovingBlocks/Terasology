@@ -197,10 +197,10 @@ public class WorldAtlas {
         Util.checkGLError();
     }
 
-    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<TileData> tilesToImage, String screenshotName) {
+    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<TileData> tileImages, String screenshotName) {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
-            BufferedImage image = generateAtlas(i, tilesToImage, initialColor);
+            BufferedImage image = generateAtlas(i, tileImages, initialColor);
             if (i == 0) {
                 try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
                     ImageIO.write(image, "png", stream);
@@ -253,7 +253,7 @@ public class WorldAtlas {
         }
     }
 
-    private BufferedImage generateAtlas(int mipMapLevel, List<TileData> tiles, Color clearColor) {
+    private BufferedImage generateAtlas(int mipMapLevel, List<TileData> tileImages, Color clearColor) {
         int size = atlasSize / (1 << mipMapLevel);
         int textureSize = tileSize / (1 << mipMapLevel);
         int tilesPerDim = atlasSize / tileSize;
@@ -263,10 +263,10 @@ public class WorldAtlas {
 
         g.setColor(clearColor);
         g.fillRect(0, 0, size, size);
-        for (int index = 0; index < tiles.size(); ++index) {
+        for (int index = 0; index < tileImages.size(); ++index) {
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
-            TileData tile = tiles.get(index);
+            TileData tile = tileImages.get(index);
             if (tile != null) {
                 g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
             }

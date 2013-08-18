@@ -32,8 +32,10 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  */
 public class PerspectiveCamera extends Camera {
 
-    private float bobbingRotationOffsetFactor, bobbingVerticalOffsetFactor;
-    private float cachedBobbingRotationOffsetFactor, cachedBobbingVerticalOffsetFactor;
+    private float bobbingRotationOffsetFactor;
+    private float bobbingVerticalOffsetFactor;
+    private float cachedBobbingRotationOffsetFactor;
+    private float cachedBobbingVerticalOffsetFactor;
 
     private Vector3f tempRightVector = new Vector3f();
 

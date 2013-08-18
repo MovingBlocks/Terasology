@@ -61,7 +61,8 @@ public class PerlinNoise implements Noise {
 
         // Finally replicate the noise permutations in the remaining 256 index positions
         for (int i = 0; i < 256; i++) {
-            noisePermutations[i] = noisePermutations[i + 256] = noiseTable[i];
+            noisePermutations[i] = noiseTable[i];
+            noisePermutations[i + 256] = noiseTable[i];
         }
 
     }
@@ -69,21 +70,23 @@ public class PerlinNoise implements Noise {
     /**
      * Returns the noise value at the given position.
      *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
+     * @param posX Position on the x-axis
+     * @param posY Position on the y-axis
+     * @param posZ Position on the z-axis
      * @return The noise value
      */
-    public double noise(double x, double y, double z) {
-        int xInt = (int) TeraMath.fastFloor(x) & 255;
-        int yInt = (int) TeraMath.fastFloor(y) & 255;
-        int zInt = (int) TeraMath.fastFloor(z) & 255;
+    public double noise(double posX, double posY, double posZ) {
+        int xInt = (int) TeraMath.fastFloor(posX) & 255;
+        int yInt = (int) TeraMath.fastFloor(posY) & 255;
+        int zInt = (int) TeraMath.fastFloor(posZ) & 255;
 
-        x -= TeraMath.fastFloor(x);
-        y -= TeraMath.fastFloor(y);
-        z -= TeraMath.fastFloor(z);
+        double x = posX - TeraMath.fastFloor(posX);
+        double y = posY - TeraMath.fastFloor(posY);
+        double z = posZ - TeraMath.fastFloor(posZ);
 
-        double u = fade(x), v = fade(y), w = fade(z);
+        double u = fade(x);
+        double v = fade(y);
+        double w = fade(z);
         int a = noisePermutations[xInt] + yInt;
         int aa = noisePermutations[a] + zInt;
         int ab = noisePermutations[(a + 1)] + zInt;
@@ -104,12 +107,12 @@ public class PerlinNoise implements Noise {
     /**
      * Returns Fractional Brownian Motion at the given position.
      *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
+     * @param posX Position on the x-axis
+     * @param posY Position on the y-axis
+     * @param posZ Position on the z-axis
      * @return The noise value
      */
-    public double fBm(double x, double y, double z) {
+    public double fBm(double posX, double posY, double posZ) {
         double result = 0.0;
 
         if (recomputeSpectralWeights) {
@@ -122,6 +125,9 @@ public class PerlinNoise implements Noise {
             recomputeSpectralWeights = false;
         }
 
+        double x = posX;
+        double y = posY;
+        double z = posZ;
         for (int i = 0; i < octaves; i++) {
             result += noise(x, y, z) * spectralWeights[i];
 
@@ -143,7 +149,8 @@ public class PerlinNoise implements Noise {
 
     private static double grad(int hash, double x, double y, double z) {
         int h = hash & 15;
-        double u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        double u = h < 8 ? x : y;
+        double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 

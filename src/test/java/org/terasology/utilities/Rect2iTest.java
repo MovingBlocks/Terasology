@@ -52,16 +52,16 @@ public class Rect2iTest {
         assertEquals(7, area);
 
         Rect2i r0 = findAnyRectWithArea(sub, 4);
-        assertEquals(1, r0.x);
-        assertEquals(2, r0.y);
+        assertEquals(1, r0.posX);
+        assertEquals(2, r0.posY);
 
         Rect2i r1 = findAnyRectWithArea(sub, 2);
-        assertEquals(3, r1.x);
-        assertEquals(2, r1.y);
+        assertEquals(3, r1.posX);
+        assertEquals(2, r1.posY);
 
         Rect2i r2 = findAnyRectWithArea(sub, 1);
-        assertEquals(3, r2.x);
-        assertEquals(4, r2.y);
+        assertEquals(3, r2.posX);
+        assertEquals(4, r2.posY);
     }
 
     @Test
@@ -81,8 +81,8 @@ public class Rect2iTest {
         assertEquals(6, area);
 
         Rect2i r0 = findAnyRectWithArea(sub, 6);
-        assertEquals(1, r0.x);
-        assertEquals(2, r0.y);
+        assertEquals(1, r0.posX);
+        assertEquals(2, r0.posY);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class Rect2iTest {
         assertEquals(6, area);
 
         Rect2i r0 = findAnyRectWithArea(sub, 6);
-        assertEquals(4, r0.x);
-        assertEquals(2, r0.y);
+        assertEquals(4, r0.posX);
+        assertEquals(2, r0.posY);
     }
 }

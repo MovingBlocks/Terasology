@@ -75,9 +75,9 @@ public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
     }
 
     @Override
-    public void setMilliseconds(long time) {
+    public void setMilliseconds(long newWorldTime) {
         // TODO: Send network event to update
-        this.worldTime.getAndSet(time);
+        this.worldTime.getAndSet(newWorldTime);
     }
 
     @Override

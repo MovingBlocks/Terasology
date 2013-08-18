@@ -28,10 +28,10 @@ public class StackLayout implements Layout {
     private UIDisplayContainer container;
 
     @Override
-    public void layout(UIDisplayContainer container, boolean fitSize) {
-        this.container = container;
+    public void layout(UIDisplayContainer newContainer, boolean fitSize) {
+        this.container = newContainer;
 
-        for (UIDisplayElement element : container.getDisplayElements()) {
+        for (UIDisplayElement element : newContainer.getDisplayElements()) {
             if (!(element instanceof Style)) {
                 element.setSize("100%", "100%");
                 if (element == top) {

@@ -79,7 +79,8 @@ public class ThreadMonitorPanel extends JPanel {
             private final JLabel lErrorSpacer = new JLabel();
             private final JLabel lError = new JLabel();
 
-            private Dimension dId = new Dimension(0, 0), dName = new Dimension(0, 0);
+            private Dimension dId = new Dimension(0, 0);
+            private Dimension dName = new Dimension(0, 0);
 
             public MyRenderer() {
                 setBackground(BACKGROUND);

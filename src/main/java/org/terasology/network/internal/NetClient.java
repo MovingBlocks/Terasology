@@ -294,13 +294,14 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
     }
 
-    public void connected(EntityManager entityManager, NetworkEntitySerializer entitySerializer, EventSerializer eventSerializer, EntitySystemLibrary entitySystemLibrary) {
+    public void connected(EntityManager entityManager, NetworkEntitySerializer newEntitySerializer,
+                          EventSerializer newEventSerializer, EntitySystemLibrary newSystemLibrary) {
         if (awaitingConnectMessage) {
             awaitingConnectMessage = false;
 
-            this.entitySerializer = entitySerializer;
-            this.eventSerializer = eventSerializer;
-            this.entitySystemLibrary = entitySystemLibrary;
+            this.entitySerializer = newEntitySerializer;
+            this.eventSerializer = newEventSerializer;
+            this.entitySystemLibrary = newSystemLibrary;
 
             createEntity(name, entityManager);
         }

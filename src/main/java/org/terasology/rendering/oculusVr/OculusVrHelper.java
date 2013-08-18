@@ -48,7 +48,9 @@ public class OculusVrHelper {
 
     private static boolean nativeLibraryLoaded = false;
 
-    private static float lastPitch, lastYaw, lastRoll;
+    private static float lastPitch;
+    private static float lastYaw;
+    private static float lastRoll;
 
     static {
         updateHelperVariables();

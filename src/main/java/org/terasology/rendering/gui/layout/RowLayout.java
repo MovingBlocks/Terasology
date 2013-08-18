@@ -51,10 +51,11 @@ public class RowLayout implements Layout {
             if (container.getSize().x > 0) {
                 int lastWrap = 0;
                 List<Float> rowSizeY = new ArrayList<Float>();
-                for (int i = 0; i < cellSize.length; i++) {
+                int cellIndex = 0;
+                while (cellIndex < cellSize.length) {
                     //calculate x position
                     float x = 0f;
-                    for (int j = lastWrap; j < i; j++) {
+                    for (int j = lastWrap; j < cellIndex; j++) {
                         x += cellSize[j].x;
                     }
 
@@ -64,21 +65,20 @@ public class RowLayout implements Layout {
                         y += rowSizeY.get(j);
                     }
 
-                    elements.get(i).setPosition(new Vector2f(x, y));
+                    elements.get(cellIndex).setPosition(new Vector2f(x, y));
 
                     //check if content width is to big
-                    if ((x + cellSize[i].x) > container.getSize().x) {
+                    if ((x + cellSize[cellIndex].x) > container.getSize().x) {
                         float max = 0f;
-                        for (int j = lastWrap; j < i; j++) {
+                        for (int j = lastWrap; j < cellIndex; j++) {
                             max = Math.max(max, cellSize[j].y);
                         }
 
                         rowSizeY.add(max);
 
-                        lastWrap = i;
-
-                        //this will recalculate the position of the last element again
-                        i--;
+                        lastWrap = cellIndex;
+                    } else {
+                        cellIndex++;
                     }
                 }
                 

@@ -124,13 +124,13 @@ public class UIScreenContainer extends UIWindow {
         layout();
     }
 
-    public void openContainer(EntityRef container, EntityRef creature) {
-        this.container = container;
-        this.creature = creature;
+    public void openContainer(EntityRef targetContainer, EntityRef targetCreature) {
+        this.container = targetContainer;
+        this.creature = targetCreature;
 
-        playerToolbar.linkToEntity(creature, 0, 10);
-        playerInventory.linkToEntity(creature, 10);
-        containerInventory.linkToEntity(container);
+        playerToolbar.linkToEntity(targetCreature, 0, 10);
+        playerInventory.linkToEntity(targetCreature, 10);
+        containerInventory.linkToEntity(targetContainer);
 
         //playerToolbar.setConnected(container);
         //playerInventory.setConnected(container);

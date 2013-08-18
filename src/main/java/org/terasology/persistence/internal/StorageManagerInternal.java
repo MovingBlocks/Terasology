@@ -118,11 +118,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     @Override
     public GlobalStore createGlobalStoreForSave() {
-        GlobalStoreSaver globalStore = new GlobalStoreSaver(entityManager);
+        GlobalStoreSaver newGlobalStore = new GlobalStoreSaver(entityManager);
         for (StoreMetadata table : storeMetadata.values()) {
-            globalStore.addStoreMetadata(table);
+            newGlobalStore.addStoreMetadata(table);
         }
-        return new GlobalStoreInternal(globalStore, this);
+        return new GlobalStoreInternal(newGlobalStore, this);
     }
 
     @Override

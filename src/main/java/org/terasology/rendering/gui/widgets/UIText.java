@@ -361,8 +361,8 @@ public class UIText extends UIDisplayContainerScrollable {
             }
         }
 
-        public void fadeSelection(boolean fade) {
-            this.fade = fade;
+        public void setFade(boolean value) {
+            this.fade = value;
         }
 
         public void setColor(Color color) {
@@ -450,7 +450,7 @@ public class UIText extends UIDisplayContainerScrollable {
             public void focusOn(UIDisplayElement element) {
                 if (!isDisabled()) {
                     cursor.setVisible(true);
-                    selectionRectangle.fadeSelection(false);
+                    selectionRectangle.setFade(false);
                     setCursorPosition(cursorPosition);
                 }
             }
@@ -458,7 +458,7 @@ public class UIText extends UIDisplayContainerScrollable {
             @Override
             public void focusOff(UIDisplayElement element) {
                 cursor.setVisible(false);
-                selectionRectangle.fadeSelection(true);
+                selectionRectangle.setFade(true);
             }
         });
 
@@ -944,14 +944,14 @@ public class UIText extends UIDisplayContainerScrollable {
      *
      * @param start The start index.
      * @param end   The end index.
-     * @param text  The text to replace with.
+     * @param newText  The text to replace with.
      */
-    public void replaceText(int start, int end, String text) {
+    public void replaceText(int start, int end, String newText) {
 
         boolean scrollbarVisibility = isScrollbarVisible();
 
         StringBuilder str = new StringBuilder(getText());
-        setText(str.replace(start, end, text).toString());
+        setText(str.replace(start, end, newText).toString());
 
         calcContentHeight();
 

@@ -60,8 +60,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
-    public void subscribe(ChunkReadyListener listener) {
-        this.listener = listener;
+    public void subscribe(ChunkReadyListener chunkReadyListener) {
+        this.listener = chunkReadyListener;
     }
 
     public void receiveChunk(Chunk chunk) {
@@ -155,7 +155,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener listener) {
+    public void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener chunkRegionListener) {
     }
 
     @Override

@@ -40,7 +40,12 @@ public class MultiTerrainGenerator implements FirstPassGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
-    private Noise pGen1, pGen2, pGen3, pGen4, pGen5, pGen8;
+    private Noise pGen1;
+    private Noise pGen2;
+    private Noise pGen3;
+    private Noise pGen4;
+    private Noise pGen5;
+    private Noise pGen8;
     private WorldBiomeProvider biomeProvider;
 
     private final Block air;
@@ -101,8 +106,8 @@ public class MultiTerrainGenerator implements FirstPassGenerator {
     }
 
     @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-        this.biomeProvider = biomeProvider;
+    public void setWorldBiomeProvider(WorldBiomeProvider value) {
+        this.biomeProvider = value;
     }
 
     @Override
@@ -343,20 +348,18 @@ public class MultiTerrainGenerator implements FirstPassGenerator {
     }
 
     private double calcMountainDensity(double x, double y, double z) {
-        double x1, y1, z1;
-        x1 = x * 0.002;
-        y1 = y * 0.001;
-        z1 = z * 0.002;
+        double x1 = x * 0.002;
+        double y1 = y * 0.001;
+        double z1 = z * 0.002;
 
         double result = pGen4.fBm(x1, y1, z1);
         return result > 0.0 ? result : 0;
     }
 
     private double calcHillDensity(double x, double y, double z) {
-        double x1, y1, z1;
-        x1 = x * 0.008;
-        y1 = y * 0.006;
-        z1 = z * 0.008;
+        double x1 = x * 0.008;
+        double y1 = y * 0.006;
+        double z1 = z * 0.008;
 
         double result = pGen5.fBm(x1, y1, z1) - 0.1;
         return result > 0.0 ? result : 0;

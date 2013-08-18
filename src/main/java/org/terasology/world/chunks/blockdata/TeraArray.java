@@ -16,7 +16,6 @@
 
 package org.terasology.world.chunks.blockdata;
 
-import com.google.common.base.Preconditions;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import java.io.Externalizable;
@@ -25,6 +24,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -100,7 +102,9 @@ public abstract class TeraArray implements Externalizable {
 
         int computeMinimumBufferSize(T array);
 
-        ByteBuffer serialize(T array, ByteBuffer buffer);
+        ByteBuffer serialize(T array);
+
+        ByteBuffer serialize(T array, ByteBuffer toBuffer);
 
         T deserialize(ByteBuffer buffer);
 
@@ -125,30 +129,34 @@ public abstract class TeraArray implements Externalizable {
 
         @Override
         public final int computeMinimumBufferSize(T array) {
-            Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
+            checkNotNull(array, "The parameter 'array' must not be null");
             return 16 + internalComputeMinimumBufferSize(array);
         }
 
         @Override
-        public final ByteBuffer serialize(T array, ByteBuffer buffer) {
-            Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
-            Preconditions.checkArgument(canHandle(array.getClass()), "Unable to handle the supplied array (" + array.getClass().getName() + ")");
-            if (buffer == null) {
-                buffer = ByteBuffer.allocateDirect(computeMinimumBufferSize(array));
-            }
-            final int lengthPos = buffer.position();
-            buffer.putInt(0);
-            buffer.putInt(array.getSizeX());
-            buffer.putInt(array.getSizeY());
-            buffer.putInt(array.getSizeZ());
-            internalSerialize(array, buffer);
-            buffer.putInt(lengthPos, buffer.position() - lengthPos - 4);
-            return buffer;
+        public final ByteBuffer serialize(T array) {
+            checkNotNull(array, "The parameter 'array' must not be null");
+            return serialize(array, ByteBuffer.allocateDirect(computeMinimumBufferSize(array)));
+        }
+
+        @Override
+        public final ByteBuffer serialize(T array, ByteBuffer toBuffer) {
+            checkNotNull(array, "The parameter 'array' must not be null");
+            checkNotNull(toBuffer, "The parameter 'toBuffer' must not be null");
+            checkArgument(canHandle(array.getClass()), "Unable to handle the supplied array (" + array.getClass().getName() + ")");
+            final int lengthPos = toBuffer.position();
+            toBuffer.putInt(0);
+            toBuffer.putInt(array.getSizeX());
+            toBuffer.putInt(array.getSizeY());
+            toBuffer.putInt(array.getSizeZ());
+            internalSerialize(array, toBuffer);
+            toBuffer.putInt(lengthPos, toBuffer.position() - lengthPos - 4);
+            return toBuffer;
         }
 
         @Override
         public final T deserialize(ByteBuffer buffer) {
-            Preconditions.checkNotNull(buffer, "The parameter 'buffer' must not be null");
+            checkNotNull(buffer, "The parameter 'buffer' must not be null");
             final int length = buffer.getInt();
             if (buffer.remaining() < length) {
                 throw new BufferUnderflowException();
@@ -164,9 +172,9 @@ public abstract class TeraArray implements Externalizable {
     }
 
     protected TeraArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
-        Preconditions.checkArgument(sizeX > 0);
-        Preconditions.checkArgument(sizeY > 0);
-        Preconditions.checkArgument(sizeZ > 0);
+        checkArgument(sizeX > 0);
+        checkArgument(sizeY > 0);
+        checkArgument(sizeZ > 0);
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
@@ -174,8 +182,8 @@ public abstract class TeraArray implements Externalizable {
         sizeXZHalf = sizeXZ / 2;
         sizeXYZ = sizeY * sizeXZ;
         sizeXYZHalf = sizeXYZ / 2;
-        Preconditions.checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
-        Preconditions.checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
+        checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
+        checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
         if (initialize) {
             initialize();
         }

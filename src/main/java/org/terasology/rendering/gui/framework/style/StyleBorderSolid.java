@@ -113,17 +113,17 @@ public class StyleBorderSolid extends UIDisplayContainer implements Style {
     }
 
     public void setColor(String color) {
-        color = color.trim().toLowerCase();
+        String normalisedColor = color.trim().toLowerCase();
 
         int r = 0;
         int g = 0;
         int b = 0;
         int a = 255;
 
-        if (color.matches("^#[a-f0-9]{1,8}$")) {
-            color = color.replace("#", "");
+        if (normalisedColor.matches("^#[a-f0-9]{1,8}$")) {
+            normalisedColor = normalisedColor.replace("#", "");
 
-            int sum = Integer.parseInt(color, 16);
+            int sum = Integer.parseInt(normalisedColor, 16);
 
             a = (sum & 0xFF000000) >> 24;
             r = (sum & 0x00FF0000) >> 16;

@@ -78,8 +78,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         rotation.set(newQuat);
     }
 
-    public void setLocalScale(float scale) {
-        this.scale = scale;
+    public void setLocalScale(float value) {
+        this.scale = value;
     }
 
     public float getLocalScale() {
@@ -129,8 +129,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return result;
     }
 
-    public void setWorldPosition(Vector3f position) {
-        this.position.set(position);
+    public void setWorldPosition(Vector3f value) {
+        this.position.set(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition());
@@ -141,8 +141,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         }
     }
 
-    public void setWorldRotation(Quat4f rotation) {
-        this.rotation.set(rotation);
+    public void setWorldRotation(Quat4f value) {
+        this.rotation.set(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             Quat4f worldRot = parentLoc.getWorldRotation();
@@ -151,8 +151,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         }
     }
 
-    public void setWorldScale(float scale) {
-        this.scale = scale;
+    public void setWorldScale(float value) {
+        this.scale = value;
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.scale /= parentLoc.getWorldScale();

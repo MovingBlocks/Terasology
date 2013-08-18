@@ -35,11 +35,11 @@ public abstract class InputEvent implements ConsumableEvent {
         this.delta = delta;
     }
 
-    public void setTarget(EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
-        this.target = target;
+    public void setTargetInfo(EntityRef newTarget, Vector3i targetBlockPos, Vector3f targetHitPosition, Vector3f targetHitNormal) {
+        this.target = newTarget;
         this.targetBlockPosition = targetBlockPos;
-        this.hitPosition = hitPosition;
-        this.hitNormal = hitNormal;
+        this.hitPosition = targetHitPosition;
+        this.hitNormal = targetHitNormal;
     }
 
     public EntityRef getTarget() {
@@ -72,9 +72,9 @@ public abstract class InputEvent implements ConsumableEvent {
         this.consumed = true;
     }
 
-    protected void reset(float delta) {
+    protected void reset(float newDelta) {
         consumed = false;
-        this.delta = delta;
+        this.delta = newDelta;
         this.target = EntityRef.NULL;
     }
 }

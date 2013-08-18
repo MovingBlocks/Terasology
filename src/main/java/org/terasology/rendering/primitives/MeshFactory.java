@@ -31,11 +31,11 @@ public final class MeshFactory {
         return generateItemMesh(uri, tex, posX, posY, 0, false, null);
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, Texture tex, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
+    public static Mesh generateItemMesh(AssetUri uri, Texture tex, int positionX, int positionY, int alphaLimit, boolean withContour, Vector4f colorContour) {
         ByteBuffer buffer = tex.getData().getBuffers()[0];
 
-        posX *= 16;
-        posY *= 16;
+        int posX = 16 * positionX;
+        int posY = 16 * positionY;
 
         int stride = tex.getWidth() * 4;
 

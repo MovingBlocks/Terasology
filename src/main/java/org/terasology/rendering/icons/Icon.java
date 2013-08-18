@@ -371,9 +371,9 @@ public class Icon {
         return y;
     }
 
-    private void setAtlasPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
+    private void setAtlasPosition(int newX, int newY) {
+        this.x = newX;
+        this.y = newY;
 
         if (element == null) {
             return;

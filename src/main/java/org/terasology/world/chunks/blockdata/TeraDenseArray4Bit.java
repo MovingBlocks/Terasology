@@ -29,8 +29,8 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
-    protected TeraArray createDense(byte[] data) {
-        return new TeraDenseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), data);
+    protected TeraArray createDense(byte[] arrayData) {
+        return new TeraDenseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), arrayData);
     }
 
     @Override
@@ -106,7 +106,8 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public int get(int x, int y, int z) {
-        int row = y * getSizeXZHalf(), pos = pos(x, z);
+        int row = y * getSizeXZHalf();
+        int pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             return TeraArrayUtils.getHi(data[row + pos]);
         }
@@ -116,7 +117,8 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public int set(int x, int y, int z, int value) {
-        int row = y * getSizeXZHalf(), pos = pos(x, z);
+        int row = y * getSizeXZHalf();
+        int pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             byte raw = data[row + pos];
             byte old = TeraArrayUtils.getHi(raw);
@@ -132,7 +134,8 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public boolean set(int x, int y, int z, int value, int expected) {
-        int row = y * getSizeXZHalf(), pos = pos(x, z);
+        int row = y * getSizeXZHalf();
+        int pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             byte raw = data[row + pos];
             byte old = TeraArrayUtils.getHi(raw);

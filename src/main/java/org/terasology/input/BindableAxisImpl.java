@@ -99,7 +99,7 @@ public class BindableAxisImpl implements BindableAxis {
 
         if (sendEventMode.shouldSendEvent(value, newValue)) {
             event.prepare(id, newValue, delta);
-            event.setTarget(target, targetBlockPos, hitPosition, hitNormal);
+            event.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
             for (EntityRef entity : inputEntities) {
                 entity.send(event);
                 if (event.isConsumed()) {

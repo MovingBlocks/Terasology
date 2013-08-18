@@ -28,7 +28,10 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  */
 public class OrthographicCamera extends Camera {
 
-    float top, bottom, left, right;
+    private float top;
+    private float bottom;
+    private float left;
+    private float right;
 
     public OrthographicCamera(float left, float right, float top, float bottom) {
         super();

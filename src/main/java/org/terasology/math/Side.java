@@ -189,10 +189,11 @@ public enum Side {
         return reverseMap.get(this);
     }
 
-    public Side yawClockwise(int steps) {
+    public Side yawClockwise(int turns) {
         if (!canYaw) {
             return this;
         }
+        int steps = turns;
         if (steps < 0) {
             steps = -steps + 2;
         }
@@ -209,10 +210,11 @@ public enum Side {
         }
     }
 
-    public Side pitchClockwise(int steps) {
+    public Side pitchClockwise(int turns) {
         if (!canPitch) {
             return this;
         }
+        int steps = turns;
         if (steps < 0) {
             steps = -steps + 2;
         }
@@ -233,10 +235,11 @@ public enum Side {
         return conversionMap.get(this);
     }
 
-    public Side rollClockwise(int steps) {
+    public Side rollClockwise(int turns) {
         if (!canRoll) {
             return this;
         }
+        int steps = turns;
         if (steps < 0) {
             steps = -steps + 2;
         }

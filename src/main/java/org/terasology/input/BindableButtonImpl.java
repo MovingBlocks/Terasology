@@ -160,7 +160,7 @@ public class BindableButtonImpl implements BindableButton {
                 }
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.DOWN, delta);
-                    buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
+                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
@@ -178,7 +178,7 @@ public class BindableButtonImpl implements BindableButton {
                 }
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.UP, delta);
-                    buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
+                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
@@ -200,7 +200,7 @@ public class BindableButtonImpl implements BindableButton {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);
-                    buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
+                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {

@@ -99,7 +99,7 @@ public final class TeraArrays {
             throw new IllegalArgumentException("Unable to encode the supplied array of class: " + array.getClass().getName());
         }
         final ChunksProtobuf.TeraArray.Builder b = ChunksProtobuf.TeraArray.newBuilder();
-        final ByteBuffer buf = entry.handler.serialize(array, null);
+        final ByteBuffer buf = entry.handler.serialize(array);
         buf.rewind();
         b.setData(ByteString.copyFrom(buf));
         b.setType(entry.protobufType);

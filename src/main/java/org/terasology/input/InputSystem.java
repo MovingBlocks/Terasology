@@ -254,7 +254,7 @@ public class InputSystem implements ComponentSystem {
 
     private void setupTarget(InputEvent event) {
         if (targetSystem.isTargetAvailable() && !guiManager.isConsumingInput()) {
-            event.setTarget(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
+            event.setTargetInfo(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 

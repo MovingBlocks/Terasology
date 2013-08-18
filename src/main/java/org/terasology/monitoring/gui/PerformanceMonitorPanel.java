@@ -81,16 +81,12 @@ public class PerformanceMonitorPanel extends JPanel {
         public double spike = 0.0;
 
         public Entry(String name) {
-            if (name == null) {
-                name = "";
-            }
-            this.name = name;
+            this.name = (name == null) ? "" : name;
         }
 
         @Override
         public int compareTo(Entry o) {
-            final String a = this.name, b = o.name;
-            return a.compareTo(b);
+            return name.compareTo(o.name);
         }
     }
 

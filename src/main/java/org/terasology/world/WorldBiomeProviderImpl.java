@@ -25,7 +25,9 @@ import org.terasology.utilities.procedural.PerlinNoise;
 // TODO: Evolve this class into a world description provider (density, height, etc) to feed into the world generators
 public class WorldBiomeProviderImpl implements WorldBiomeProvider {
 
-    PerlinNoise temperatureNoise, humidityNoise, fogNoise;
+    PerlinNoise temperatureNoise;
+    PerlinNoise humidityNoise;
+    PerlinNoise fogNoise;
 
     public WorldBiomeProviderImpl(String worldSeed) {
         temperatureNoise = new PerlinNoise(worldSeed.hashCode() + 5);

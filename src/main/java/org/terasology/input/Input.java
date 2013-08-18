@@ -31,14 +31,14 @@ public final class Input {
     private int id;
 
     public static Input parse(String inputString) {
-        inputString = inputString.toUpperCase(Locale.ENGLISH);
-        if (inputString.startsWith("KEY_")) {
-            int id = Keyboard.getKeyIndex(inputString.substring(4));
+        String normalisedString = inputString.toUpperCase(Locale.ENGLISH);
+        if (normalisedString.startsWith("KEY_")) {
+            int id = Keyboard.getKeyIndex(normalisedString.substring(4));
             if (id != Keyboard.KEY_NONE) {
                 return new Input(InputType.KEY, id);
             }
         } else {
-            MouseInput mouseInput = MouseInput.parse(inputString);
+            MouseInput mouseInput = MouseInput.parse(normalisedString);
             if (mouseInput != MouseInput.MOUSE_NONE) {
                 return mouseInput.getInput();
             }

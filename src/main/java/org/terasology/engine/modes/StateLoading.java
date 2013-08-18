@@ -116,7 +116,6 @@ public class StateLoading implements GameState {
         }
 
         popStep();
-        GUIManager guiManager = CoreRegistry.get(GUIManager.class);
         guiManager.closeAllWindows();
         loadingScreen = (UIScreenLoading) guiManager.openWindow("loading");
         loadingScreen.updateStatus(current.getMessage(), completedSteps / (currentExpectedSteps * 100f));

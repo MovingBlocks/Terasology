@@ -67,21 +67,21 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    public void reload(SkeletalMeshData data) {
+    public void reload(SkeletalMeshData newData) {
         dispose();
 
-        this.data = data;
+        this.data = newData;
 
         vboPosNormBuffer = VertexBufferObjectManager.getInstance().getVboId();
 
-        IntBuffer indexBuffer = BufferUtils.createIntBuffer(data.getIndices().size());
-        indexBuffer.put(data.getIndices().toArray());
+        IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
+        indexBuffer.put(newData.getIndices().toArray());
         indexBuffer.flip();
         vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
         VertexBufferObjectManager.getInstance().bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
-        FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(data.getUVs().size() * 2);
-        for (Vector2f uv : data.getUVs()) {
+        FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
+        for (Vector2f uv : newData.getUVs()) {
             uvBuffer.put(uv.x);
             uvBuffer.put(uv.y);
         }

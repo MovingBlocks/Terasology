@@ -216,7 +216,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         if (enableDebug) {
             CameraTargetSystem cameraTarget = CoreRegistry.get(CameraTargetSystem.class);
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-            Time time = CoreRegistry.get(Time.class);
             debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f",
                     time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             if (entityManager != null) {
