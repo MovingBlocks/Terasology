@@ -342,17 +342,16 @@ public class UIText extends UIDisplayContainerScrollable {
                 rectangles.clear();
 
                 //loop through all selected lines and add a selection rectangle for each
-                int nextLine;
-                Vector2f pos;
-                for (int i = start; i < end; ) {
-                    nextLine = findNextChar(i, '\n', false);
-                    pos = toDisplayPosition(i);
+                int charIndex = start;
+                while (charIndex < end) {
+                    int nextLineStart = findNextChar(charIndex, '\n', false);
+                    Vector2f pos = toDisplayPosition(charIndex);
                     pos.y -= cursor.getSize().y;
-                    Vector2f size = new Vector2f(calcTextWidth(text.getText().substring(i, Math.min(end, nextLine))), cursor.getSize().y);
+                    Vector2f size = new Vector2f(calcTextWidth(text.getText().substring(charIndex, Math.min(end, nextLineStart))), cursor.getSize().y);
 
                     rectangles.add(new Vector2f[]{pos, size});
 
-                    i = nextLine;
+                    charIndex = nextLineStart;
                 }
 
                 selectionRectangle.setVisible(true);
@@ -487,15 +486,16 @@ public class UIText extends UIDisplayContainerScrollable {
      * @param index The text position (index) to set the cursor to.
      */
     private void setCursorToTextPosition(int index) {
-        if (index < 0) {
-            index = 0;
-        } else if (index > text.getText().length()) {
-            index = text.getText().length();
+        int clampedIndex = index;
+        if (clampedIndex < 0) {
+            clampedIndex = 0;
+        } else if (clampedIndex > text.getText().length()) {
+            clampedIndex = text.getText().length();
         }
 
         //calculate the display position of the cursor from text position
-        if (index != cursorPosition) {
-            Vector2f newPos = toDisplayPosition(index);
+        if (clampedIndex != cursorPosition) {
+            Vector2f newPos = toDisplayPosition(clampedIndex);
             newPos.y -= cursorSize.y;
             cursor.setPosition(newPos);
 
@@ -519,7 +519,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
             }
 
-            cursorPosition = index;
+            cursorPosition = clampedIndex;
 
             notifySelectionListeners();
         }
@@ -532,16 +532,16 @@ public class UIText extends UIDisplayContainerScrollable {
      */
     private int toTextPosition(Vector2f mousePos) {
         Vector2f textAbsPos = text.getAbsolutePosition();
-        mousePos = new Vector2f(Math.max(mousePos.x, textAbsPos.x), Math.max(mousePos.y, textAbsPos.y));
-        Vector2f relative = new Vector2f(mousePos.x - textAbsPos.x, mousePos.y - textAbsPos.y);
+        Vector2f clampedMousePos = new Vector2f(Math.max(mousePos.x, textAbsPos.x), Math.max(mousePos.y, textAbsPos.y));
+        Vector2f relative = new Vector2f(clampedMousePos.x - textAbsPos.x, clampedMousePos.y - textAbsPos.y);
 
         //multi line
         //if (isMultiLine()) {
         //relative.x = relative.x - getPadding().y - getPadding().w;
         //clicked bottom of text container
-        if (mousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
+        if (clampedMousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
             return text.getText().length();
-        } else if (mousePos.y <= textAbsPos.y) {
+        } else if (clampedMousePos.y <= textAbsPos.y) {
             //clicked top of text container
             return 0;
         } else {
@@ -550,18 +550,19 @@ public class UIText extends UIDisplayContainerScrollable {
     }
 
     private int toTextPositionLocal(Vector2f local) {
-        for (int i = 0; i < text.getText().length(); ) {
+        int charIndex = 0;
+        while (charIndex < text.getText().length()) {
             //first calculate the height
-            if (calcTextHeight(text.getText().substring(0, i)) >= local.y) {
+            if (calcTextHeight(text.getText().substring(0, charIndex)) >= local.y) {
                 //clicked left from the text box
                 if (local.x <= 0) {
-                    return i;
+                    return charIndex;
                 }
 
                 //clicked somewhere in the text or right from text
-                for (int j = i; j < text.getText().length(); j++) {
+                for (int j = charIndex; j < text.getText().length(); j++) {
                     //than calculate the width
-                    if (calcTextWidth(text.getText().substring(i, j)) > local.x || text.getText().charAt(j) == '\n') {
+                    if (calcTextWidth(text.getText().substring(charIndex, j)) > local.x || text.getText().charAt(j) == '\n') {
                         return j;
                     } else if (j == text.getText().length() - 1) {
                         return j + 1;
@@ -569,7 +570,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
             }
 
-            i = findNextChar(i, '\n', false);
+            charIndex = findNextChar(charIndex, '\n', false);
         }
         return text.getText().length();
     }
@@ -600,44 +601,31 @@ public class UIText extends UIDisplayContainerScrollable {
     /**
      * Calculate the width of the given text.
      *
-     * @param text The text to calculate the width.
+     * @param string The text to calculate the width.
      * @return Returns the width of the given text.
      */
-    private int calcTextWidth(String text) {
-        return this.text.getFont().getWidth(text);
+    private int calcTextWidth(String string) {
+        return this.text.getFont().getWidth(string);
     }
 
     /**
      * Calculate the height of the given text.
      *
-     * @param text The text to calculate the height.
+     * @param string The text to calculate the height.
      * @return Returns the height of the given text.
      */
-    private int calcTextHeight(String text) {
-        //fix because the slick library is calculating the height of text wrong if the last/first character is a new line..
-        if (!text.isEmpty() && (text.charAt(text.length() - 1) == '\n' || text.charAt(text.length() - 1) == ' ')) {
-            text += "i";
-        }
-
-        if (!text.isEmpty() && text.charAt(0) == '\n') {
-            text = "i" + text;
-        }
-
-        if (text.isEmpty()) {
-            text = "i";
-        }
-
-        return this.text.getFont().getHeight(text);
+    private int calcTextHeight(String string) {
+        return this.text.getFont().getHeight(string);
     }
 
     /**
      * Remove all unsupported characters from a string.
      *
-     * @param text The string to remove all unsupported characters.
+     * @param string The string to remove all unsupported characters.
      * @return Returns the string where all unsupported characters are removed.
      */
-    private String removeUnsupportedChars(String text) {
-        StringBuilder original = new StringBuilder(text);
+    private String removeUnsupportedChars(String string) {
+        StringBuilder original = new StringBuilder(string);
         StringBuilder replaced = new StringBuilder();
         for (int i = 0; i < original.length(); i++) {
             if (validateChar(original.charAt(i))) {
@@ -735,8 +723,8 @@ public class UIText extends UIDisplayContainerScrollable {
 
         try {
             if (t != null && t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                String text = (String) t.getTransferData(DataFlavor.stringFlavor);
-                return text;
+                String str = (String) t.getTransferData(DataFlavor.stringFlavor);
+                return str;
             }
         } catch (UnsupportedFlavorException | IOException e) {
             logger.warn("Failed to get data from clipboard", e);
@@ -748,15 +736,15 @@ public class UIText extends UIDisplayContainerScrollable {
     /**
      * Wraps the text to the size of the container.
      *
-     * @param text The text to wrap.
+     * @param string The text to wrap.
      * @return Returns the wrapped text.
      */
-    private String wrapText(String text) {
+    private String wrapText(String string) {
         //multi line
         if (isMultiLine()) {
             int lastSpace = 0;
             int lastWrap = 0;
-            StringBuilder wrapText = new StringBuilder(text + " ");
+            StringBuilder wrapText = new StringBuilder(string + " ");
 
             wrapPosition.clear();
 
@@ -769,7 +757,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     if (calcTextWidth(wrapText.substring(lastWrap, i)) > getScrollContainerSize().x) {
                         //than wrap the text at the previous space
                         wrapText.insert(lastSpace + 1, '\n');
-                        wrapPosition.add(new Integer(lastSpace + 1));
+                        wrapPosition.add(lastSpace + 1);
 
                         lastWrap = lastSpace + 1;
                     }
@@ -786,7 +774,7 @@ public class UIText extends UIDisplayContainerScrollable {
             return wrapText.toString();
         } else {
             //single line
-            return text;
+            return string;
         }
     }
 
@@ -825,19 +813,20 @@ public class UIText extends UIDisplayContainerScrollable {
     /**
      * Set the text of the label.
      *
-     * @param text The text to set.
+     * @param value The text to set.
      */
-    public int setText(String text) {
+    public int setText(String value) {
         boolean scrollbarVisibility = isScrollbarVisible();
 
+        String clampedString = value;
         //check the max string length
         if (maxLength > 0) {
-            if (text.length() > maxLength) {
-                text = text.substring(0, maxLength);
+            if (value.length() > maxLength) {
+                clampedString = value.substring(0, maxLength);
             }
         }
 
-        this.text.setText(wrapText(text));
+        this.text.setText(wrapText(clampedString));
 
         calcContentHeight();
 
@@ -848,32 +837,33 @@ public class UIText extends UIDisplayContainerScrollable {
 
         notifyChangedListeners();
 
-        return text.length();
+        return clampedString.length();
     }
 
     /**
      * Append a text to the current displayed text.
      *
-     * @param text The text to append.
+     * @param string The text to append.
      * @return Returns the number of characters which where added.
      */
-    public int appendText(String text) {
+    public int appendText(String string) {
         boolean scrollbarVisibility = isScrollbarVisible();
 
         String str = getText();
 
+        String clampedText = string;
         //check the max string length
         if (maxLength > 0) {
             if (str.length() >= maxLength) {
                 return 0;
             }
 
-            if (str.length() + text.length() > maxLength) {
-                text = text.substring(0, maxLength - str.length());
+            if (str.length() + string.length() > maxLength) {
+                clampedText = string.substring(0, maxLength - str.length());
             }
         }
 
-        setText(str + text);
+        setText(str + clampedText);
 
         calcContentHeight();
 
@@ -882,17 +872,17 @@ public class UIText extends UIDisplayContainerScrollable {
             setText(getText());
         }
 
-        return text.length();
+        return clampedText.length();
     }
 
     /**
      * Insert a text at a specific position into the current displayed text of the label.
      *
      * @param offset The offset, where to insert the text at.
-     * @param text   The text to insert.
+     * @param string The text to insert.
      * @return Returns the number of characters which where added.
      */
-    public int insertText(int offset, String text) {
+    public int insertText(int offset, String string) {
 
         int prevWraps = getWrapOffset(cursorPosition);
         int currentWraps;
@@ -902,18 +892,19 @@ public class UIText extends UIDisplayContainerScrollable {
 
         StringBuilder str = new StringBuilder(getText());
 
+        String clampedString = string;
         //check the max string length
         if (maxLength > 0) {
             if (str.length() >= maxLength) {
                 return 0;
             }
 
-            if (str.length() + text.length() > maxLength) {
-                text = text.substring(0, maxLength - str.length());
+            if (str.length() + string.length() > maxLength) {
+                clampedString = string.substring(0, maxLength - str.length());
             }
         }
 
-        setText(str.insert(offset, text).toString());
+        setText(str.insert(offset, clampedString).toString());
 
         calcContentHeight();
 
@@ -927,7 +918,7 @@ public class UIText extends UIDisplayContainerScrollable {
         diff = currentWraps - prevWraps;
         cursorPosition = cursorPosition - diff;
 
-        return text.length();
+        return clampedString.length();
     }
 
     /**
@@ -942,9 +933,9 @@ public class UIText extends UIDisplayContainerScrollable {
     /**
      * Replace a string defined by its start and end index.
      *
-     * @param start The start index.
-     * @param end   The end index.
-     * @param newText  The text to replace with.
+     * @param start   The start index.
+     * @param end     The end index.
+     * @param newText The text to replace with.
      */
     public void replaceText(int start, int end, String newText) {
 

@@ -32,13 +32,13 @@ import java.util.Arrays;
 public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
     @Override
-    protected TeraArray createSparse(byte fill) {
-        return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
+    protected TeraArray createSparse(byte defaultFill) {
+        return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), defaultFill);
     }
 
     @Override
-    protected TeraArray createSparse(byte[][] inflated, byte[] deflated) {
-        return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
+    protected TeraArray createSparse(byte[][] inflatedData, byte[] deflatedData) {
+        return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), inflatedData, deflatedData);
     }
 
     @Override
@@ -66,9 +66,9 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
             row[pos] = TeraArrayUtils.setHi(raw, value);
             return;
         }
-        pos = pos - getSizeXZHalf();
-        byte raw = row[pos];
-        row[pos] = TeraArrayUtils.setLo(raw, value);
+        int rowPos = pos - getSizeXZHalf();
+        byte raw = row[rowPos];
+        row[rowPos] = TeraArrayUtils.setLo(raw, value);
     }
 
     private int rowSetGetOld(byte[] row, int pos, int value) {
@@ -78,10 +78,10 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
             row[pos] = TeraArrayUtils.setHi(raw, value);
             return old;
         }
-        pos = pos - getSizeXZHalf();
-        byte raw = row[pos];
+        int rowPos = pos - getSizeXZHalf();
+        byte raw = row[rowPos];
         byte old = TeraArrayUtils.getLo(raw);
-        row[pos] = TeraArrayUtils.setLo(raw, value);
+        row[rowPos] = TeraArrayUtils.setLo(raw, value);
         return old;
     }
 
@@ -182,9 +182,9 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         if (old == value) {
             return old;
         }
-        row = inflated[y] = new byte[rowSize()];
-        Arrays.fill(row, deflated[y]);
-        return rowSetGetOld(row, pos, value);
+        inflated[y] = new byte[rowSize()];
+        Arrays.fill(inflated[y], deflated[y]);
+        return rowSetGetOld(inflated[y], pos, value);
     }
 
     @Override
@@ -214,9 +214,9 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         }
         int old = rowGet(pos, deflated[y]);
         if (old == expected) {
-            row = inflated[y] = new byte[rowSize()];
-            Arrays.fill(row, deflated[y]);
-            rowSet(row, pos, value);
+            inflated[y] = new byte[rowSize()];
+            Arrays.fill(inflated[y], deflated[y]);
+            rowSet(inflated[y], pos, value);
             return true;
         }
         return false;

@@ -178,24 +178,26 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     @Override
-    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean previouslyConsumed, boolean previouslyCropped) {
         if (!isVisible()) {
-            return consumed;
+            return previouslyConsumed;
         }
 
         //cancel mouse click event if the click is out of the cropped area
+        boolean cropped = previouslyCropped;
         if (cropContainer) {
             if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-                croped = true;
+                cropped = true;
             }
         }
 
         // Pass the mouse event to all display elements
+        boolean consumed = previouslyConsumed;
         for (int i = displayElements.size() - 1; i >= 0; i--) {
-            consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed, croped);
+            consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed, cropped);
         }
 
-        consumed = super.processMouseInput(button, state, wheelMoved, consumed, croped);
+        consumed = super.processMouseInput(button, state, wheelMoved, consumed, cropped);
 
         return consumed;
     }
@@ -328,7 +330,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             }
 
             if (element instanceof UIDisplayContainer) {
-                if ((ret = ((UIDisplayContainer) element).getElementById(elementId)) != null) {
+                ret = ((UIDisplayContainer) element).getElementById(elementId);
+                if (ret != null) {
                     break;
                 }
             }
@@ -508,20 +511,6 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
         if (style != null) {
             style.setPosition(position);
-        }
-    }
-
-    /**
-     * Set the position of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
-     *
-     * @param x The x position to set including the unit.
-     * @param y The y position to set including the unit.
-     */
-    public void setBackgroundImagePosition(String x, String y) {
-        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
-
-        if (style != null) {
-            style.setPosition(x, y);
         }
     }
 

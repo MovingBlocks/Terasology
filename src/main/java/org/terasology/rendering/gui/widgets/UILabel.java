@@ -99,36 +99,23 @@ public class UILabel extends UIDisplayContainer {
     }
 
     /**
-     * Calculate the width of the given text.
+     * Calculate the width of the given string.
      *
-     * @param text The text to calculate the width.
-     * @return Returns the width of the given text.
+     * @param string The string to calculate the width.
+     * @return Returns the width of the given string.
      */
-    private int calcTextWidth(String text) {
-        return font.getWidth(text);
+    private int calcTextWidth(String string) {
+        return font.getWidth(string);
     }
 
     /**
-     * Calculate the height of the given text.
+     * Calculate the height of the given string.
      *
-     * @param text The text to calculate the height.
-     * @return Returns the height of the given text.
+     * @param string The string to calculate the height.
+     * @return Returns the height of the given string.
      */
-    private int calcTextHeight(String text) {
-        //fix because the slick library is calculating the height of text wrong if the last/first character is a new line..
-        if (!text.isEmpty() && (text.charAt(text.length() - 1) == '\n' || text.charAt(text.length() - 1) == ' ')) {
-            text += "i";
-        }
-
-        if (!text.isEmpty() && text.charAt(0) == '\n') {
-            text = "i" + text;
-        }
-
-        if (text.isEmpty()) {
-            text = "i";
-        }
-
-        return font.getHeight(text);
+    private int calcTextHeight(String string) {
+        return font.getHeight(string);
     }
 
     @Override
@@ -154,31 +141,31 @@ public class UILabel extends UIDisplayContainer {
     }
 
     /**
-     * Wraps the text to the with of the wrapWidth.
+     * Wraps the string to the with of the wrapWidth.
      *
-     * @param text The text to wrap.
-     * @return Returns the wrapped text.
+     * @param string The string to wrap.
+     * @return Returns the wrapped string.
      */
-    private String wrapText(String text) {
-        //wrap text
+    private String wrapText(String string) {
+        //wrap string
         if (isWrap()) {
             int lastSpace = 0;
             int lastWrap = 0;
-            StringBuilder wrapText = new StringBuilder(text + " ");
+            StringBuilder wrapText = new StringBuilder(string + " ");
 
             wrapPosition.clear();
 
             float wrapWidth = getSize().x - margin.y - margin.w;
 
             if (wrapWidth > 0) {
-                //loop through whole text
+                //loop through whole string
                 for (int i = 0; i < wrapText.length(); i++) {
 
-                    //check if character is a space -> text can only be wrapped at spaces
+                    //check if character is a space -> string can only be wrapped at spaces
                     if (wrapText.charAt(i) == ' ') {
                         //check if the string (from the beginning of the new line) is bigger than the container width
                         if (calcTextWidth(wrapText.substring(lastWrap, i)) > wrapWidth) {
-                            //than wrap the text at the previous space
+                            //than wrap the string at the previous space
                             wrapText.insert(lastSpace + 1, '\n');
                             wrapPosition.add(new Integer(lastSpace + 1));
 
@@ -198,7 +185,7 @@ public class UILabel extends UIDisplayContainer {
             return wrapText.toString();
         } else {
             //no wrap
-            return text;
+            return string;
         }
     }
 
@@ -239,23 +226,23 @@ public class UILabel extends UIDisplayContainer {
     }
 
     /**
-     * Append a text to the current displayed text of the label.
+     * Append a string to the current displayed text of the label.
      *
-     * @param text The text to append.
+     * @param string The string to append.
      */
-    public void appendText(String text) {
-        setText(getText() + text);
+    public void appendText(String string) {
+        setText(getText() + string);
     }
 
     /**
      * Insert a text at a specific position into the current displayed text of the label.
      *
      * @param offset The offset, where to insert the text at.
-     * @param text   The text to insert.
+     * @param string The text to insert.
      */
-    public void insertText(int offset, String text) {
+    public void insertText(int offset, String string) {
         StringBuilder builder = new StringBuilder(getText());
-        builder.insert(offset, text);
+        builder.insert(offset, string);
 
         setText(builder.toString());
     }
@@ -263,13 +250,13 @@ public class UILabel extends UIDisplayContainer {
     /**
      * Replace a string defined by its start and end index.
      *
-     * @param start The start index.
-     * @param end   The end index.
-     * @param text  The text to replace with.
+     * @param start  The start index.
+     * @param end    The end index.
+     * @param string The text to replace with.
      */
-    public void replaceText(int start, int end, String text) {
+    public void replaceText(int start, int end, String string) {
         StringBuilder builder = new StringBuilder(getText());
-        builder.replace(start, end, text);
+        builder.replace(start, end, string);
 
         setText(builder.toString());
     }
@@ -304,10 +291,10 @@ public class UILabel extends UIDisplayContainer {
     /**
      * Set the shadow color.
      *
-     * @param shadowColor The shadow color to set.
+     * @param value The shadow color to set.
      */
-    public void setTextShadowColor(Color shadowColor) {
-        this.shadowColor = shadowColor;
+    public void setTextShadowColor(Color value) {
+        this.shadowColor = value;
     }
 
     /**
@@ -376,10 +363,10 @@ public class UILabel extends UIDisplayContainer {
     /**
      * Set whether the text will be wrapped. The width where the text will be wrapped can be set by using setWrapWidth().
      *
-     * @param isWrap True to enable text wrapping.
+     * @param value True to enable text wrapping.
      */
-    public void setWrap(boolean isWrap) {
-        this.isWrap = isWrap;
+    public void setWrap(boolean value) {
+        this.isWrap = value;
     }
 
     /*

@@ -141,10 +141,6 @@ public class UIImage extends UIDisplayContainer {
      */
     public void setTextureOrigin(Vector2f origin) {
         if (texture != null) {
-            if (origin == null) {
-                origin = new Vector2f(0f, 0f);
-            }
-
             textureOrigin.set(origin.x / (float) texture.getWidth(), origin.y / (float) texture.getHeight());
         }
     }
@@ -165,10 +161,6 @@ public class UIImage extends UIDisplayContainer {
      */
     public void setTextureSize(Vector2f size) {
         if (texture != null) {
-            if (size == null) {
-                size = new Vector2f(texture.getWidth(), texture.getHeight());
-            }
-
             textureSize.set(size.x / (float) texture.getWidth(), size.y / (float) texture.getHeight());
         }
     }
@@ -194,22 +186,23 @@ public class UIImage extends UIDisplayContainer {
         return color;
     }
 
-    public void setColor(Color color) {
-        generateMesh(color);
+    public void setColor(Color value) {
+        this.color = value;
+        generateMesh();
     }
 
-    public void setColor(String color) {
-        color = color.trim().toLowerCase();
+    public void setColor(String value) {
+        String normalisedColor = value.trim().toLowerCase();
 
         int r = 0;
         int g = 0;
         int b = 0;
         int a = 255;
 
-        if (color.matches("^#[a-f0-9]{1,8}$")) {
-            color = color.replace("#", "");
+        if (normalisedColor.matches("^#[a-f0-9]{1,8}$")) {
+            normalisedColor = normalisedColor.replace("#", "");
 
-            int sum = Integer.parseInt(color, 16);
+            int sum = Integer.parseInt(normalisedColor, 16);
 
             a = (sum & 0xFF000000) >> 24;
             r = (sum & 0x00FF0000) >> 16;
@@ -220,12 +213,10 @@ public class UIImage extends UIDisplayContainer {
         setColor(new Color(rbgToColor(r), rbgToColor(g), rbgToColor(b), rbgToColor(a)));
     }
 
-    private void generateMesh(Color color) {
+    private void generateMesh() {
         if (mesh != null) {
             mesh.dispose();
         }
-
-        this.color = color;
 
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(color.r, color.g, color.b, color.a), 1.0f, 1.0f);

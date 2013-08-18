@@ -32,13 +32,13 @@ import java.util.Arrays;
 public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
-    protected TeraArray createSparse(byte fill) {
-        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
+    protected TeraArray createSparse(byte defaultFill) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), defaultFill);
     }
 
     @Override
-    protected TeraArray createSparse(byte[][] inflated, byte[] deflated) {
-        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
+    protected TeraArray createSparse(byte[][] inflatedData, byte[] deflatedData) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflatedData, deflatedData);
     }
 
     @Override
@@ -143,10 +143,10 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         if (old == value) {
             return old;
         }
-        row = inflated[y] = new byte[rowSize()];
-        Arrays.fill(row, deflated[y]);
+        inflated[y] = new byte[rowSize()];
+        Arrays.fill(inflated[y], deflated[y]);
         int pos = pos(x, z);
-        row[pos] = (byte) value;
+        inflated[y][pos] = (byte) value;
         return deflated[y];
     }
 
@@ -177,9 +177,9 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         }
         int old = deflated[y];
         if (old == expected) {
-            row = inflated[y] = new byte[rowSize()];
-            Arrays.fill(row, deflated[y]);
-            row[pos] = (byte) value;
+            inflated[y] = new byte[rowSize()];
+            Arrays.fill(inflated[y], deflated[y]);
+            inflated[y][pos] = (byte) value;
             return true;
         }
         return false;

@@ -190,21 +190,23 @@ public abstract class UIDisplayElement {
     /**
      * Process the mouse input. Mouse input will be passed down from the GUI Manager to each element within the active window.
      *
-     * @param button     The button. 0 = left, 1 = right, 2 = middle. If no button was pressed the value will be -1.
-     * @param state      The state of the button. True if the button is pressed.
-     * @param wheelMoved The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up.
-     *                   If lower than 0 the mouse wheel was moved down.
-     * @param consumed   True if the input event was already consumed by another widget.
+     * @param button             The button. 0 = left, 1 = right, 2 = middle. If no button was pressed the value will be -1.
+     * @param state              The state of the button. True if the button is pressed.
+     * @param wheelMoved         The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up.
+     *                           If lower than 0 the mouse wheel was moved down.
+     * @param previouslyConsumed True if the input event was already consumed by another widget.
      */
-    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean previouslyConsumed, boolean previouslyCropped) {
         if (!isVisible()) {
-            return consumed;
+            return previouslyConsumed;
         }
 
+        boolean cropped = previouslyCropped;
+        boolean consumed = previouslyConsumed;
         if (mouseMoveListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0 || doubleClickListeners.size() > 0) {
             if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-                if (!croped) {
-                    if (lastMouseState == EMouseEvents.ENTER && (consumed || croped)) {
+                if (!cropped) {
+                    if (lastMouseState == EMouseEvents.ENTER && (consumed || cropped)) {
                         notifyMouseMoveListeners(EMouseEvents.LEAVE, consumed);
                         lastMouseState = EMouseEvents.LEAVE;
                     }
@@ -331,11 +333,12 @@ public abstract class UIDisplayElement {
     }
 
     private boolean isParentOf(UIDisplayElement otherElement) {
-        while (otherElement != null) {
-            if (otherElement == this) {
+        UIDisplayElement nextElement = otherElement;
+        while (nextElement != null) {
+            if (nextElement == this) {
                 return true;
             }
-            otherElement = otherElement.parent;
+            nextElement = nextElement.parent;
         }
         return false;
     }
@@ -548,55 +551,6 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Set the position of the display element including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
-     *
-     * @param x The x position to set including the unit.
-     * @param y The y position to set including the unit.
-     */
-    public void setPosition(String x, String y) {
-        x = x.replace(" ", "").toLowerCase();
-        y = y.replace(" ", "").toLowerCase();
-
-        float posX = 0;
-        float posY = 0;
-
-        try {
-            if (x.matches("^\\d+(\\.\\d+)?%$")) {
-                posX = Float.valueOf(x.substring(0, x.length() - 1));
-                unitPositionX = EUnitType.PERCENTAGE;
-            } else if (x.matches("^\\d+(\\.\\d+)?px$")) {
-                posX = Float.valueOf(x.substring(0, x.length() - 2));
-                unitPositionX = EUnitType.PIXEL;
-            } else if (x.matches("^\\d+(\\.\\d+)?$")) {
-                posX = Float.valueOf(x);
-                unitPositionX = EUnitType.PIXEL;
-            }
-        } catch (NumberFormatException e) {
-            logger.error("Invalid number for setPosition: {}", x, e);
-        }
-
-        try {
-            if (y.matches("^\\d+(\\.\\d+)?%$")) {
-                posY = Float.valueOf(y.substring(0, y.length() - 1));
-                unitPositionY = EUnitType.PERCENTAGE;
-            } else if (y.matches("^\\d+(\\.\\d+)?px$")) {
-                posY = Float.valueOf(y.substring(0, y.length() - 2));
-                unitPositionY = EUnitType.PIXEL;
-            } else if (y.matches("^\\d+(\\.\\d+)?$")) {
-                posY = Float.valueOf(y);
-                unitPositionY = EUnitType.PIXEL;
-            }
-        } catch (NumberFormatException e) {
-            logger.error("Invalid number for setPosition: {}", y, e);
-        }
-
-        this.size.set(posX, posY);
-        this.sizeOriginal.set(posX, posY);
-
-        layout();
-    }
-
-    /**
      * Get the unit of the position in y direction, which can be <i>PIXEL</i> or <i>PERCENTAGE</i>
      *
      * @return Returns the unit.
@@ -649,44 +603,40 @@ public abstract class UIDisplayElement {
      * @param height The height to set including the unit.
      */
     public void setSize(String width, String height) {
-        width = width.replace(" ", "").toLowerCase();
-        height = height.replace(" ", "").toLowerCase();
+        String normalisedWidth = width.replace(" ", "").toLowerCase();
+        String normalisedHeight = height.replace(" ", "").toLowerCase();
 
         float widthValue = sizeOriginal.x;
         float heightValue = sizeOriginal.x;
 
-        if (width != null) {
-            try {
-                if (width.matches("^\\d+(\\.\\d+)?%$")) {
-                    widthValue = Float.valueOf(width.substring(0, width.length() - 1));
-                    unitSizeX = EUnitType.PERCENTAGE;
-                } else if (width.matches("^\\d+(\\.\\d+)?px$")) {
-                    widthValue = Float.valueOf(width.substring(0, width.length() - 2));
-                    unitSizeX = EUnitType.PIXEL;
-                } else if (width.matches("^\\d+(\\.\\d+)?$")) {
-                    widthValue = Float.valueOf(width);
-                    unitSizeX = EUnitType.PIXEL;
-                }
-            } catch (NumberFormatException e) {
-                logger.error("Invalid number for setSize: {}", width, e);
+        try {
+            if (normalisedWidth.matches("^\\d+(\\.\\d+)?%$")) {
+                widthValue = Float.valueOf(normalisedWidth.substring(0, normalisedWidth.length() - 1));
+                unitSizeX = EUnitType.PERCENTAGE;
+            } else if (normalisedWidth.matches("^\\d+(\\.\\d+)?px$")) {
+                widthValue = Float.valueOf(normalisedWidth.substring(0, normalisedWidth.length() - 2));
+                unitSizeX = EUnitType.PIXEL;
+            } else if (normalisedWidth.matches("^\\d+(\\.\\d+)?$")) {
+                widthValue = Float.valueOf(normalisedWidth);
+                unitSizeX = EUnitType.PIXEL;
             }
+        } catch (NumberFormatException e) {
+            logger.error("Invalid number for setSize: {}", normalisedWidth, e);
         }
 
-        if (height != null) {
-            try {
-                if (height.matches("^\\d+(\\.\\d+)?%$")) {
-                    heightValue = Float.valueOf(height.substring(0, height.length() - 1));
-                    unitSizeY = EUnitType.PERCENTAGE;
-                } else if (height.matches("^\\d+(\\.\\d+)?px$")) {
-                    heightValue = Float.valueOf(height.substring(0, height.length() - 2));
-                    unitSizeY = EUnitType.PIXEL;
-                } else if (height.matches("^\\d+(\\.\\d+)?$")) {
-                    heightValue = Float.valueOf(height);
-                    unitSizeY = EUnitType.PIXEL;
-                }
-            } catch (NumberFormatException e) {
-                logger.error("Invalid number for setSize: {}", height, e);
+        try {
+            if (normalisedHeight.matches("^\\d+(\\.\\d+)?%$")) {
+                heightValue = Float.valueOf(normalisedHeight.substring(0, normalisedHeight.length() - 1));
+                unitSizeY = EUnitType.PERCENTAGE;
+            } else if (normalisedHeight.matches("^\\d+(\\.\\d+)?px$")) {
+                heightValue = Float.valueOf(normalisedHeight.substring(0, normalisedHeight.length() - 2));
+                unitSizeY = EUnitType.PIXEL;
+            } else if (normalisedHeight.matches("^\\d+(\\.\\d+)?$")) {
+                heightValue = Float.valueOf(normalisedHeight);
+                unitSizeY = EUnitType.PIXEL;
             }
+        } catch (NumberFormatException e) {
+            logger.error("Invalid number for setSize: {}", normalisedHeight, e);
         }
 
         this.size.set(widthValue, heightValue);
@@ -827,20 +777,11 @@ public abstract class UIDisplayElement {
     /**
      * Set the parent of the display element.
      *
-     * @param parent The parent to set.
+     * @param value The parent to set.
      */
-    protected void setParent(UIDisplayElement parent) {
-        this.parent = parent;
-
-        while (!(parent instanceof UIWindow)) {
-            if (parent == null) {
-                break;
-            }
-
-            parent = parent.getWindow();
-        }
-
-        setWindow((UIWindow) parent);
+    protected void setParent(UIDisplayElement value) {
+        this.parent = value;
+        setWindow(value.getWindow());
     }
 
     /**
@@ -872,20 +813,6 @@ public abstract class UIDisplayElement {
                 point.y >= getAbsolutePosition().y &&
                 point.x <= getAbsolutePosition().x + getSize().x &&
                 point.y <= getAbsolutePosition().y + getSize().y;
-    }
-
-    /**
-     * Debug command. Prints the stack of all parent display elements.
-     */
-    public void printParentStack() {
-        UIDisplayElement parent = this;
-        while (parent != null) {
-            if (parent != this) {
-                logger.info(" -> ");
-            }
-            logger.info(parent.getClass().getSimpleName() + " (id: " + parent.getId() + ")");
-            parent = parent.getParent();
-        }
     }
 
     /**

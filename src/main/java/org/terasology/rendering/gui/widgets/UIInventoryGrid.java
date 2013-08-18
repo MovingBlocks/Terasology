@@ -53,20 +53,20 @@ public class UIInventoryGrid extends UIDisplayContainer {
         this.numColumns = numColumns;
     }
 
-    public void linkToEntity(EntityRef entity) {
-        int numSlots = inventoryManager.getNumSlots(entity);
-        this.linkToEntity(entity, 0, numSlots);
+    public void linkToEntity(EntityRef newEntity) {
+        int numSlots = inventoryManager.getNumSlots(newEntity);
+        this.linkToEntity(newEntity, 0, numSlots);
     }
 
-    public void linkToEntity(EntityRef entity, int startSlot) {
-        int numSlots = inventoryManager.getNumSlots(entity);
-        this.linkToEntity(entity, startSlot, Math.max(0, numSlots - startSlot));
+    public void linkToEntity(EntityRef newEntity, int slotOffset) {
+        int numSlots = inventoryManager.getNumSlots(newEntity);
+        this.linkToEntity(newEntity, slotOffset, Math.max(0, numSlots - slotOffset));
     }
 
-    public void linkToEntity(EntityRef entity, int startSlot, int numSlots) {
-        if (!entity.equals(this.entity)) {
-            this.entity = entity;
-            this.startSlot = startSlot;
+    public void linkToEntity(EntityRef newEntity, int slotOffset, int numSlots) {
+        if (!newEntity.equals(this.entity)) {
+            this.entity = newEntity;
+            this.startSlot = slotOffset;
             this.maxSlotsInGrid = numSlots;
 
             fillInventoryCells();

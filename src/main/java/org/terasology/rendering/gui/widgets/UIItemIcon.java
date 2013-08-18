@@ -74,7 +74,7 @@ public class UIItemIcon extends UIDisplayContainer {
 
         ItemComponent itemComponent = item.getComponent(ItemComponent.class);
         setVisible(itemComponent != null);
-        updateCountLabel(item);
+        updateCountLabel();
     }
 
 
@@ -84,11 +84,11 @@ public class UIItemIcon extends UIDisplayContainer {
 
     public void setDisplayingItemCount(boolean enable) {
         displayingItemCount = enable;
-        updateCountLabel(item);
+        updateCountLabel();
 
     }
 
-    private void updateCountLabel(EntityRef item) {
+    private void updateCountLabel() {
         int stackSize = inventoryManager.getStackSize(item);
         if (stackSize > 1 && displayingItemCount) {
             itemCount.setVisible(true);

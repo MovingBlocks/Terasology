@@ -35,9 +35,9 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     protected byte[] deflated;
     protected byte fill;
 
-    protected abstract TeraArray createSparse(byte fill);
+    protected abstract TeraArray createSparse(byte defaultFill);
 
-    protected abstract TeraArray createSparse(byte[][] inflated, byte[] deflated);
+    protected abstract TeraArray createSparse(byte[][] inflatedData, byte[] deflatedData);
 
     protected abstract int rowSize();
 
@@ -55,7 +55,8 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
             if (inf == null) {
                 return 2;
             } else {
-                final int sizeY = array.getSizeY(), rowSize = array.rowSize();
+                int sizeY = array.getSizeY();
+                int rowSize = array.rowSize();
                 int result = 1;
                 for (int y = 0; y < sizeY; y++) {
                     if (inf[y] == null) {
@@ -76,7 +77,8 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
                 buffer.put(array.fill);
             } else {
                 buffer.put((byte) 1);
-                final int sizeY = array.getSizeY(), rowSize = array.rowSize();
+                int sizeY = array.getSizeY();
+                int rowSize = array.rowSize();
                 final byte[] def = array.deflated;
                 for (int y = 0; y < sizeY; y++) {
                     final byte[] row = inf[y];
@@ -99,16 +101,16 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
                 array.fill = buffer.get();
                 return array;
             }
-            final int rowSize = array.rowSize();
-            final byte[][] inf = array.inflated = new byte[sizeY][];
-            final byte[] def = array.deflated = new byte[sizeY];
+            int rowSize = array.rowSize();
+            array.inflated = new byte[sizeY][];
+            array.deflated = new byte[sizeY];
             for (int y = 0; y < sizeY; y++) {
                 final byte hasRow = buffer.get();
                 if (hasRow == 0) {
-                    def[y] = buffer.get();
+                    array.deflated[y] = buffer.get();
                 } else {
-                    final byte[] row = inf[y] = new byte[rowSize];
-                    buffer.get(row, 0, rowSize);
+                    array.inflated[y] = new byte[rowSize];
+                    buffer.get(array.inflated[y], 0, rowSize);
                 }
             }
             return array;
