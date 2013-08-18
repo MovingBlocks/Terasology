@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.gui.windows;
 
+import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.engine.CoreRegistry;
@@ -32,11 +33,9 @@ import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.utilities.collection.CircularBuffer;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,22 +45,20 @@ import java.util.List;
  */
 public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
 
-    private static final int COMMAND_HISTORY_SIZE = 30;
     private static final int MESSAGE_HISTORY_SIZE = 30;
 
     private final Console console;
     private final LocalPlayer localPlayer;
 
-    private final CircularBuffer<String> commandHistory = CircularBuffer.create(COMMAND_HISTORY_SIZE);
-
     private final UIText inputBox;
     private final UIList messageList;
 
-    private int commandCursor = commandHistory.size();
+    private int commandCursor;
 
     public UIScreenConsole() {
         console = CoreRegistry.get(Console.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
+        commandCursor = console.previousCommandSize();
 
         setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         setCloseBinds(new String[]{"engine:console"});
@@ -85,24 +82,23 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                         String message = inputBox.getText().trim();
                         inputBox.deleteText();
 
-                        commandHistory.add(message);
-                        commandCursor = commandHistory.size();
                         console.execute(message, localPlayer.getClientEntity());
+                        commandCursor = console.previousCommandSize();
                     } else if (event.getKey() == Keyboard.KEY_UP) {
                         //message history previous
                         if (commandCursor > 0) {
                             commandCursor--;
-                            inputBox.setText(commandHistory.get(commandCursor));
+                            inputBox.setText(console.getPreviousCommand(commandCursor));
                             inputBox.setCursorEnd();
                         }
                     } else if (event.getKey() == Keyboard.KEY_DOWN) {
                         //message history next
-                        if (commandCursor < commandHistory.size()) {
+                        if (commandCursor < console.previousCommandSize()) {
                             commandCursor++;
-                            if (commandCursor == commandHistory.size()) {
+                            if (commandCursor == console.previousCommandSize()) {
                                 inputBox.setText("");
                             } else {
-                                inputBox.setText(commandHistory.get(commandCursor));
+                                inputBox.setText(console.getPreviousCommand(commandCursor));
                             }
                             inputBox.setCursorEnd();
                         }
@@ -112,7 +108,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
 
                         String commandName = message.substring(1);
                         List<CommandInfo> commands = console.getCommandList();
-                        List<CommandInfo> matches = new ArrayList<CommandInfo>();
+                        List<CommandInfo> matches = Lists.newArrayList();
 
                         //check for matching commands
                         for (CommandInfo cmd : commands) {

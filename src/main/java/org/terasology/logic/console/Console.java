@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
 import org.terasology.utilities.collection.CircularBuffer;
 
@@ -53,10 +54,12 @@ public class Console {
     public static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     private static final Joiner PARAMETER_JOINER = Joiner.on(", ");
     private static final int MAX_MESSAGE_HISTORY = 255;
+    private static final int MAX_COMMAND_HISTORY = 30;
 
     private final List<CommandInfo> commands = Lists.newArrayList();
     private final Table<String, Integer, CommandInfo> commandLookup = HashBasedTable.create();
     private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
+    private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
 
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
@@ -137,6 +140,14 @@ public class Console {
         return messageHistory;
     }
 
+    public int previousCommandSize() {
+        return localCommandHistory.size();
+    }
+
+    public String getPreviousCommand(int index) {
+        return localCommandHistory.get(index);
+    }
+
     /**
      * Subscribe for notification of all messages added to the console
      *
@@ -155,7 +166,6 @@ public class Console {
         this.messageSubscribers.remove(subscriber);
     }
 
-
     /**
      * Execute a command.
      *
@@ -163,6 +173,11 @@ public class Console {
      * @return Returns true if the command was executed successfully.
      */
     public boolean execute(String command, EntityRef callingClient) {
+        Client owner = networkSystem.getOwner(callingClient);
+        if (owner != null && owner.isLocal()) {
+            localCommandHistory.add(command);
+        }
+
         //remove double spaces
         String cleanedCommand = command.replaceAll("\\s\\s+", " ");
 
