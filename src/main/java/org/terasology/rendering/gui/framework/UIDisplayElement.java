@@ -781,7 +781,11 @@ public abstract class UIDisplayElement {
      */
     protected void setParent(UIDisplayElement value) {
         this.parent = value;
-        setWindow(value.getWindow());
+        if (value != null) {
+            setWindow(value.getWindow());
+        } else {
+            setWindow(null);
+        }
     }
 
     /**

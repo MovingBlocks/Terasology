@@ -94,7 +94,7 @@ public class NetworkEntitySerializer {
                 continue;
             }
 
-            serializeComponentFull(component, false, fieldCheck, entity, fieldIds, componentFieldCounts);
+            serializeComponentFull(component, false, fieldCheck, entity, fieldIds, componentFieldCounts, true);
         }
         entity.setFieldIds(fieldIds.toByteString());
         entity.setComponentFieldCounts(componentFieldCounts.toByteString());
@@ -119,9 +119,9 @@ public class NetworkEntitySerializer {
             Component prefabComponent = prefab.getComponent(component.getClass());
 
             if (prefabComponent == null) {
-                serializeComponentFull(component, false, fieldCheck, entity, fieldIds, componentFieldCounts);
+                serializeComponentFull(component, false, fieldCheck, entity, fieldIds, componentFieldCounts, true);
             } else {
-                serializeComponentDelta(prefabComponent, component, fieldCheck, entity, fieldIds, componentFieldCounts);
+                serializeComponentDelta(prefabComponent, component, fieldCheck, entity, fieldIds, componentFieldCounts, true);
             }
         }
         entity.setFieldIds(fieldIds.toByteString());
@@ -136,7 +136,8 @@ public class NetworkEntitySerializer {
     }
 
     private void serializeComponentDelta(Component oldComponent, Component newComponent, FieldSerializeCheck<Component> fieldCheck,
-                                         EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
+                                         EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
+                                         boolean componentInitial) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(oldComponent.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", oldComponent.getClass());
@@ -145,7 +146,7 @@ public class NetworkEntitySerializer {
 
         byte fieldCount = 0;
         for (FieldMetadata field : componentMetadata.iterateFields()) {
-            if (fieldCheck.shouldSerializeField(field, newComponent)) {
+            if (fieldCheck.shouldSerializeField(field, newComponent, componentInitial)) {
                 Object oldValue = field.getValue(oldComponent);
                 Object newValue = field.getValue(newComponent);
                 if (!Objects.equal(oldValue, newValue)) {
@@ -168,7 +169,8 @@ public class NetworkEntitySerializer {
     }
 
     private void serializeComponentFull(Component component, boolean ignoreIfNoFields, FieldSerializeCheck<Component> fieldCheck,
-                                        EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
+                                        EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
+                                        boolean componentInitial) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
@@ -176,7 +178,7 @@ public class NetworkEntitySerializer {
 
         byte fieldCount = 0;
         for (FieldMetadata field : componentMetadata.iterateFields()) {
-            if (fieldCheck.shouldSerializeField(field, component)) {
+            if (fieldCheck.shouldSerializeField(field, component, componentInitial)) {
                 EntityData.Value fieldValue = field.serialize(component);
                 if (fieldValue != null) {
 
@@ -272,12 +274,12 @@ public class NetworkEntitySerializer {
             if (component == null) {
                 logger.error("Non-existent component marked as added: {}", componentType);
             }
-            serializeComponentFull(entityRef.getComponent(componentType), false, fieldCheck, entity, fieldIds, componentFieldCounts);
+            serializeComponentFull(entityRef.getComponent(componentType), false, fieldCheck, entity, fieldIds, componentFieldCounts, true);
         }
         for (Class<? extends Component> componentType : changed) {
             Component comp = entityRef.getComponent(componentType);
             if (comp != null) {
-                serializeComponentFull(comp, true, fieldCheck, entity, fieldIds, componentFieldCounts);
+                serializeComponentFull(comp, true, fieldCheck, entity, fieldIds, componentFieldCounts, false);
             } else {
                 logger.error("Non-existent component marked as changed: {}", componentType);
             }

@@ -16,7 +16,9 @@
 package org.terasology.rendering.logic;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
+import org.terasology.network.ReplicationCheck;
 
 import javax.vecmath.Vector3f;
 
@@ -24,7 +26,7 @@ import javax.vecmath.Vector3f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 // TODO: Split into multiple components? Point, Directional?
-public class LightComponent implements Component {
+public final class LightComponent implements Component, ReplicationCheck {
 
     public enum LightType {
         POINT,
@@ -56,4 +58,17 @@ public class LightComponent implements Component {
 
     @Replicate
     public LightType lightType = LightType.POINT;
+
+    public boolean simulateFading = false;
+
+
+    @Override
+    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+        switch (field.getName()) {
+            case "lightDiffuseIntensity":
+            case "lightAmbientIntensity":
+                return initial || !simulateFading;
+        }
+        return true;
+    }
 }

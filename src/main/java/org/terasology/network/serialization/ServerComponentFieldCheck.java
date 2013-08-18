@@ -29,21 +29,27 @@ import org.terasology.persistence.serializers.FieldSerializeCheck;
  */
 public class ServerComponentFieldCheck implements FieldSerializeCheck<Component> {
     private boolean owned = false;
-    private boolean initial = false;
+    private boolean entityInitial = false;
 
-    public ServerComponentFieldCheck(boolean owned, boolean initial) {
+    public ServerComponentFieldCheck(boolean owned, boolean entityInitial) {
         this.owned = owned;
-        this.initial = initial;
+        this.entityInitial = entityInitial;
     }
 
     @Override
-    public boolean shouldSerializeField(FieldMetadata field, Component component) {
+    public boolean shouldSerializeField(FieldMetadata field, Component object) {
+        return shouldSerializeField(field, object, false);
+    }
+
+    @Override
+    public boolean shouldSerializeField(FieldMetadata field, Component component, boolean componentInitial) {
         // The server will send fields that are replicated when
         // 1. It is the initial send of the component
         // 2. The field is replicated from Server to Client
         // 3. The field is replicated from Server to Owner and the client owns the entity
         // 4. The field is replicated from owner and the client doesn't own it
         // Except if the field is initialOnly and it isn't the initial send
+        boolean initial = entityInitial || componentInitial;
         boolean result = field.isReplicated() && (initial
                 || !field.getReplicationInfo().initialOnly()
                 && (field.getReplicationInfo().value() == FieldReplicateType.SERVER_TO_CLIENT

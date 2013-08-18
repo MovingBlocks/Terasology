@@ -32,6 +32,14 @@ public interface FieldSerializeCheck<T> {
      */
     boolean shouldSerializeField(FieldMetadata field, T object);
 
+    /**
+     * @param field  The field to check
+     * @param object The object it belongs to
+     * @param componentInitial In a network situation, whether the component is newly added or not
+     * @return Whether the field should be serialized
+     */
+    boolean shouldSerializeField(FieldMetadata field, T object, boolean componentInitial);
+
     boolean shouldDeserializeField(FieldMetadata fieldInfo);
 
     /**
@@ -51,6 +59,11 @@ public interface FieldSerializeCheck<T> {
 
         @Override
         public boolean shouldSerializeField(FieldMetadata field, T object) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldSerializeField(FieldMetadata field, T object, boolean componentInitial) {
             return true;
         }
 

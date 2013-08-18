@@ -26,6 +26,7 @@ import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.logic.LightFadeComponent;
 import org.terasology.world.block.items.BlockItemComponent;
 
 /**
@@ -76,21 +77,47 @@ public class HoldLuminousBlockSystem implements ComponentSystem {
         byte newLuminance = getLuminance(newItem);
         if (oldLuminance != newLuminance) {
             if (newLuminance == 0) {
-                entity.removeComponent(LightComponent.class);
-            } else if (oldLuminance > 0) {
+                // Fade out
+                if (entity.hasComponent(LightComponent.class)) {
+                    LightFadeComponent fade = entity.getComponent(LightFadeComponent.class);
+                    if (fade == null) {
+                        fade = new LightFadeComponent();
+                        fade.targetAmbientIntensity = 0.0f;
+                        fade.targetDiffuseIntensity = 0.0f;
+                        fade.removeLightAfterFadeComplete = true;
+                        entity.addComponent(fade);
+                    } else {
+                        fade.targetAmbientIntensity = 0.0f;
+                        fade.targetDiffuseIntensity = 0.0f;
+                        fade.removeLightAfterFadeComplete = true;
+                        entity.saveComponent(fade);
+                    }
+                }
+            } else if (oldLuminance == 0) {
+                // Fade in
                 LightComponent light = entity.getComponent(LightComponent.class);
-                light.lightColorAmbient.set(1.0f, 0.6f, 0.6f);
-                light.lightColorDiffuse.set(1.0f, 0.6f, 0.6f);
-                light.lightDiffuseIntensity = 1.0f;
-                light.lightAmbientIntensity = 1.0f;
-                entity.saveComponent(light);
-            } else {
-                LightComponent light = new LightComponent();
-                light.lightColorAmbient.set(1.0f, 0.6f, 0.6f);
-                light.lightColorDiffuse.set(1.0f, 0.6f, 0.6f);
-                light.lightDiffuseIntensity = 1.0f;
-                light.lightAmbientIntensity = 1.0f;
-                entity.addComponent(light);
+                if (light == null) {
+                    light = new LightComponent();
+                    light.lightColorAmbient.set(1.0f, 0.6f, 0.6f);
+                    light.lightColorDiffuse.set(1.0f, 0.6f, 0.6f);
+                    light.lightDiffuseIntensity = 0.0f;
+                    light.lightAmbientIntensity = 0.0f;
+                    entity.addComponent(light);
+                }
+
+                LightFadeComponent fade = entity.getComponent(LightFadeComponent.class);
+                if (fade == null) {
+                    fade = new LightFadeComponent();
+                    fade.targetAmbientIntensity = 1.0f;
+                    fade.targetDiffuseIntensity = 1.0f;
+                    fade.removeLightAfterFadeComplete = false;
+                    entity.addComponent(fade);
+                } else {
+                    fade.targetAmbientIntensity = 1.0f;
+                    fade.targetDiffuseIntensity = 1.0f;
+                    fade.removeLightAfterFadeComplete = false;
+                    entity.saveComponent(fade);
+                }
             }
         }
     }
