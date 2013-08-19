@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import com.google.common.collect.Lists;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
@@ -888,7 +889,7 @@ public abstract class UIDisplayElement {
         //we copy the list so the listener can remove itself within the close/open method call (see UIInventoryCell). Otherwise ConcurrentModificationException.
         //TODO other solution?
         @SuppressWarnings("unchecked")
-        ArrayList<VisibilityListener> listeners = (ArrayList<VisibilityListener>) visibilityListeners.clone();
+        List<VisibilityListener> listeners = Lists.newArrayList(visibilityListeners);
 
         for (VisibilityListener listener : listeners) {
             listener.changed(this, visible);
