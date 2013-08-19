@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public final class ChunkTessellator {
 
-    private static int statVertexArrayUpdateCount = 0;
+    private static int statVertexArrayUpdateCount;
 
     private WorldBiomeProvider biomeProvider;
 
@@ -119,69 +119,70 @@ public final class ChunkTessellator {
     private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
-        for (int j = 0; j < mesh.vertexElements.length; j++) {
+        for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
+            ChunkMesh.VertexElements elements = mesh.getVertexElements(type);
             // Vertices double to account for light info
-            mesh.vertexElements[j].finalVertices = BufferUtils.createByteBuffer(
-                    mesh.vertexElements[j].vertices.size() * 4 + /* POSITION */
-                            mesh.vertexElements[j].tex.size() * 4 + /* TEX0 (UV0 and flags) */
-                            mesh.vertexElements[j].tex.size() * 4 + /* TEX1 (lighting data) */
-                            mesh.vertexElements[j].flags.size() * 4 + /* FLAGS */
-                            mesh.vertexElements[j].color.size() * 4 + /* COLOR */
-                            mesh.vertexElements[j].normals.size() * 4 /* NORMALS */
+            elements.finalVertices = BufferUtils.createByteBuffer(
+                    elements.vertices.size() * 4 + /* POSITION */
+                            elements.tex.size() * 4 + /* TEX0 (UV0 and flags) */
+                            elements.tex.size() * 4 + /* TEX1 (lighting data) */
+                            elements.flags.size() * 4 + /* FLAGS */
+                            elements.color.size() * 4 + /* COLOR */
+                            elements.normals.size() * 4 /* NORMALS */
             );
 
             int cTex = 0;
             int cColor = 0;
             int cFlags = 0;
-            for (int i = 0; i < mesh.vertexElements[j].vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
+            for (int i = 0; i < elements.vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
                 Vector3f vertexPos = new Vector3f(
-                        mesh.vertexElements[j].vertices.get(i),
-                        mesh.vertexElements[j].vertices.get(i + 1),
-                        mesh.vertexElements[j].vertices.get(i + 2));
+                        elements.vertices.get(i),
+                        elements.vertices.get(i + 1),
+                        elements.vertices.get(i + 2));
 
                 /* POSITION */
-                mesh.vertexElements[j].finalVertices.putFloat(vertexPos.x);
-                mesh.vertexElements[j].finalVertices.putFloat(vertexPos.y);
-                mesh.vertexElements[j].finalVertices.putFloat(vertexPos.z);
+                elements.finalVertices.putFloat(vertexPos.x);
+                elements.finalVertices.putFloat(vertexPos.y);
+                elements.finalVertices.putFloat(vertexPos.z);
 
                 /* UV0 - TEX DATA 0 */
-                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].tex.get(cTex));
-                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].tex.get(cTex + 1));
+                elements.finalVertices.putFloat(elements.tex.get(cTex));
+                elements.finalVertices.putFloat(elements.tex.get(cTex + 1));
 
                 /* FLAGS */
-                mesh.vertexElements[j].finalVertices.putFloat(mesh.vertexElements[j].flags.get(cFlags));
+                elements.finalVertices.putFloat(elements.flags.get(cFlags));
 
                 float[] result = new float[3];
-                Vector3f normal = new Vector3f(mesh.vertexElements[j].normals.get(i), mesh.vertexElements[j].normals.get(i + 1), mesh.vertexElements[j].normals.get(i + 2));
+                Vector3f normal = new Vector3f(elements.normals.get(i), elements.normals.get(i + 1), elements.normals.get(i + 2));
                 calcLightingValuesForVertexPos(chunkView, vertexPos, result, normal);
 
                 /* LIGHTING DATA / TEX DATA 1 */
-                mesh.vertexElements[j].finalVertices.putFloat(result[0]);
-                mesh.vertexElements[j].finalVertices.putFloat(result[1]);
-                mesh.vertexElements[j].finalVertices.putFloat(result[2]);
+                elements.finalVertices.putFloat(result[0]);
+                elements.finalVertices.putFloat(result[1]);
+                elements.finalVertices.putFloat(result[2]);
 
                 /* PACKED COLOR */
                 final int packedColor = RenderMath.packColor(
-                        mesh.vertexElements[j].color.get(cColor),
-                        mesh.vertexElements[j].color.get(cColor + 1),
-                        mesh.vertexElements[j].color.get(cColor + 2),
-                        mesh.vertexElements[j].color.get(cColor + 3));
-                mesh.vertexElements[j].finalVertices.putInt(packedColor);
+                        elements.color.get(cColor),
+                        elements.color.get(cColor + 1),
+                        elements.color.get(cColor + 2),
+                        elements.color.get(cColor + 3));
+                elements.finalVertices.putInt(packedColor);
 
                 /* NORMALS */
-                mesh.vertexElements[j].finalVertices.putFloat(normal.x);
-                mesh.vertexElements[j].finalVertices.putFloat(normal.y);
-                mesh.vertexElements[j].finalVertices.putFloat(normal.z);
+                elements.finalVertices.putFloat(normal.x);
+                elements.finalVertices.putFloat(normal.y);
+                elements.finalVertices.putFloat(normal.z);
             }
 
-            mesh.vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh.vertexElements[j].indices.size());
-            TIntIterator indexIterator = mesh.vertexElements[j].indices.iterator();
+            elements.finalIndices = BufferUtils.createIntBuffer(elements.indices.size());
+            TIntIterator indexIterator = elements.indices.iterator();
             while (indexIterator.hasNext()) {
-                mesh.vertexElements[j].finalIndices.put(indexIterator.next());
+                elements.finalIndices.put(indexIterator.next());
             }
 
-            mesh.vertexElements[j].finalVertices.flip();
-            mesh.vertexElements[j].finalIndices.flip();
+            elements.finalVertices.flip();
+            elements.finalIndices.flip();
         }
         PerformanceMonitor.endActivity();
     }
@@ -326,7 +327,7 @@ public final class ChunkTessellator {
 
         if (blockAppearance.getPart(BlockPart.CENTER) != null) {
             Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, temp, hum);
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlag);
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
         }
 
         boolean[] drawDir = new boolean[6];
@@ -362,7 +363,7 @@ public final class ChunkTessellator {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
-                        block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlag);
+                        block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
                     }
                 }
                 return;
@@ -374,9 +375,9 @@ public final class ChunkTessellator {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                 if (block.getURI().toNormalisedString().equals("engine:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), ChunkVertexFlag.COLOR_MASK);
+                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
                 } else {
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlag);
+                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
                 }
             }
         }
@@ -395,13 +396,9 @@ public final class ChunkTessellator {
             return false;
         }
 
-        if (currentBlock.isWaving() != blockToCheck.isWaving()) {
-            return true;
-        }
+        return currentBlock.isWaving() != blockToCheck.isWaving() || blockToCheck.isInvisible()
+                || !blockToCheck.isFullSide(side.reverse()) || (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
 
-        return blockToCheck.isInvisible() ||
-                !blockToCheck.isFullSide(side.reverse()) ||
-                (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
     }
 
     public static int getVertexArrayUpdateCount() {

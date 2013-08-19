@@ -62,14 +62,14 @@ public abstract class UIDisplayElement {
     private String id = "";
 
     //events
-    private final ArrayList<VisibilityListener> visibilityListeners = new ArrayList<VisibilityListener>();
-    private final ArrayList<MouseMoveListener> mouseMoveListeners = new ArrayList<MouseMoveListener>();
-    private final ArrayList<MouseButtonListener> mouseButtonListeners = new ArrayList<MouseButtonListener>();
-    private final ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
-    private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
-    private final ArrayList<FocusListener> focusListeners = new ArrayList<FocusListener>();
-    private final ArrayList<KeyListener> keyListeners = new ArrayList<KeyListener>();
-    private final ArrayList<BindKeyListener> bindKeyListeners = new ArrayList<BindKeyListener>();
+    private final List<VisibilityListener> visibilityListeners = new ArrayList<>();
+    private final List<MouseMoveListener> mouseMoveListeners = new ArrayList<>();
+    private final List<MouseButtonListener> mouseButtonListeners = new ArrayList<>();
+    private final List<ClickListener> clickListeners = new ArrayList<>();
+    private final List<ClickListener> doubleClickListeners = new ArrayList<>();
+    private final List<FocusListener> focusListeners = new ArrayList<>();
+    private final List<KeyListener> keyListeners = new ArrayList<>();
+    private final List<BindKeyListener> bindKeyListeners = new ArrayList<>();
 
     private static enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE}
 

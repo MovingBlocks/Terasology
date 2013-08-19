@@ -30,6 +30,17 @@ public class Region3i implements Iterable<Vector3i> {
     private final Vector3i min = new Vector3i();
     private final Vector3i size = new Vector3i();
 
+    /**
+     * Constructs an empty Region with size (0,0,0).
+     */
+    public Region3i() {
+    }
+
+    private Region3i(Vector3i min, Vector3i size) {
+        this.min.set(min);
+        this.size.set(size);
+    }
+
     public static Region3i createFromMinAndSize(Vector3i min, Vector3i size) {
         if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
             return EMPTY;
@@ -89,17 +100,6 @@ public class Region3i implements Iterable<Vector3i> {
         Vector3i max = a.max();
         max.max(b.max());
         return createFromMinMax(min, max);
-    }
-
-    /**
-     * Constructs an empty Region with size (0,0,0).
-     */
-    public Region3i() {
-    }
-
-    private Region3i(Vector3i min, Vector3i size) {
-        this.min.set(min);
-        this.size.set(size);
     }
 
     public boolean isEmpty() {

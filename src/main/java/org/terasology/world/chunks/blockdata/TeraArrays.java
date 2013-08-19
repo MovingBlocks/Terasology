@@ -72,25 +72,6 @@ public final class TeraArrays {
         }
     }
 
-    public static class Entry {
-
-        public final Class arrayClass;
-        public final String arrayClassName;
-        public final TeraArray.Factory factory;
-        public final TeraArray.SerializationHandler handler;
-        public final ChunksProtobuf.Type protobufType;
-
-        @SuppressWarnings("unchecked")
-        private Entry(TeraArray.Factory factory, ChunksProtobuf.Type protobufType) {
-            this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
-            this.arrayClass = Preconditions.checkNotNull(factory.getArrayClass());
-            this.arrayClassName = arrayClass.getName();
-            this.handler = Preconditions.checkNotNull(factory.createSerializationHandler());
-            checkState(handler.canHandle(arrayClass));
-            this.protobufType = Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null");
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public ChunksProtobuf.TeraArray encode(TeraArray array) {
         Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
@@ -231,5 +212,24 @@ public final class TeraArrays {
 
     public static TeraArrays getInstance() {
         return INSTANCE;
+    }
+
+    public static final class Entry {
+
+        public final Class arrayClass;
+        public final String arrayClassName;
+        public final TeraArray.Factory factory;
+        public final TeraArray.SerializationHandler handler;
+        public final ChunksProtobuf.Type protobufType;
+
+        @SuppressWarnings("unchecked")
+        private Entry(TeraArray.Factory factory, ChunksProtobuf.Type protobufType) {
+            this.factory = Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
+            this.arrayClass = Preconditions.checkNotNull(factory.getArrayClass());
+            this.arrayClassName = arrayClass.getName();
+            this.handler = Preconditions.checkNotNull(factory.createSerializationHandler());
+            checkState(handler.canHandle(arrayClass));
+            this.protobufType = Preconditions.checkNotNull(protobufType, "The parameter 'protobufType' must not be null");
+        }
     }
 }

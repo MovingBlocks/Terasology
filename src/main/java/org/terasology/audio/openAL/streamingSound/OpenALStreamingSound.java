@@ -31,9 +31,10 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     private static final int BUFFER_POOL_SIZE = 8;
     private static final int BUFFER_SIZE = 4096 * 8;
 
-    private StreamingSoundData stream;
     protected int[] buffers = new int[0];
-    protected int lastUpdatedBuffer = 0;
+    protected int lastUpdatedBuffer;
+
+    private StreamingSoundData stream;
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
     public OpenALStreamingSound(AssetUri uri, StreamingSoundData data) {

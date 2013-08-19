@@ -21,7 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class OpenALException extends IllegalStateException {
+public final class OpenALException extends IllegalStateException {
+
+    private OpenALException(String message, int errorCode) {
+        super("OpenAL Error (" + errorCode + ") at " + message + " - " + AL10.alGetString(errorCode));
+    }
 
     public static void checkState(String message) {
         int error = AL10.alGetError();
@@ -39,7 +43,5 @@ public class OpenALException extends IllegalStateException {
         }
     }
 
-    protected OpenALException(String message, int errorCode) {
-        super("OpenAL Error (" + errorCode + ") at " + message + " - " + AL10.alGetString(errorCode));
-    }
+
 }

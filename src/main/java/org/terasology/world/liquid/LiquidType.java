@@ -23,8 +23,9 @@ public enum LiquidType {
     WATER(0),
     LAVA(1);
 
-    private byte typeValue;
     private static LiquidType[] liquidLookup = new LiquidType[2];
+    private byte typeValue;
+
 
     static {
         liquidLookup = new LiquidType[LiquidType.values().length];

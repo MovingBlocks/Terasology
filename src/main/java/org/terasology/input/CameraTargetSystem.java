@@ -50,11 +50,11 @@ public class CameraTargetSystem implements ComponentSystem {
     private BlockEntityRegistry blockRegistry;
 
     private EntityRef target = EntityRef.NULL;
-    private Vector3i targetBlockPos = null;
+    private Vector3i targetBlockPos;
     private Vector3f hitPosition = new Vector3f();
     private Vector3f hitNormal = new Vector3f();
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
-    private float eyeFocusDistance = 0;
+    private float eyeFocusDistance;
 
     @Override
     public void initialise() {

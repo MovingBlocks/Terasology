@@ -65,29 +65,6 @@ public class BlockManagerImpl extends BlockManager {
     private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
     private final Map<BlockUri, BlockFamily> availableFamilies = Maps.newHashMap();
 
-    private static class RegisteredState {
-        private final Map<BlockUri, BlockFamily> registeredFamilyByUri;
-
-        /* Blocks */
-        private final Map<BlockUri, Block> blocksByUri;
-        private final TShortObjectMap<Block> blocksById;
-        private final TObjectShortMap<BlockUri> idByUri;
-
-        public RegisteredState() {
-            this.registeredFamilyByUri = Maps.newHashMap();
-            this.blocksByUri = Maps.newHashMap();
-            this.blocksById = new TShortObjectHashMap<>();
-            this.idByUri = new TObjectShortHashMap<>();
-        }
-
-        public RegisteredState(RegisteredState oldState) {
-            this.registeredFamilyByUri = Maps.newHashMap(oldState.registeredFamilyByUri);
-            this.blocksByUri = Maps.newHashMap(oldState.blocksByUri);
-            this.blocksById = new TShortObjectHashMap<>(oldState.blocksById);
-            this.idByUri = new TObjectShortHashMap<>(oldState.idByUri);
-        }
-    }
-
     private ReentrantLock lock = new ReentrantLock();
 
     private AtomicReference<RegisteredState> registeredBlockInfo = new AtomicReference<>(new RegisteredState());
@@ -96,7 +73,7 @@ public class BlockManagerImpl extends BlockManager {
 
     private BlockLoader blockLoader;
 
-    private boolean generateNewIds = false;
+    private boolean generateNewIds;
     private int nextId = 1;
 
     public BlockManagerImpl(WorldAtlas atlas, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
@@ -403,6 +380,29 @@ public class BlockManagerImpl extends BlockManager {
     @Override
     public Iterable<Block> listRegisteredBlocks() {
         return ImmutableList.copyOf(registeredBlockInfo.get().blocksById.valueCollection());
+    }
+
+    private static class RegisteredState {
+        private final Map<BlockUri, BlockFamily> registeredFamilyByUri;
+
+        /* Blocks */
+        private final Map<BlockUri, Block> blocksByUri;
+        private final TShortObjectMap<Block> blocksById;
+        private final TObjectShortMap<BlockUri> idByUri;
+
+        public RegisteredState() {
+            this.registeredFamilyByUri = Maps.newHashMap();
+            this.blocksByUri = Maps.newHashMap();
+            this.blocksById = new TShortObjectHashMap<>();
+            this.idByUri = new TObjectShortHashMap<>();
+        }
+
+        public RegisteredState(RegisteredState oldState) {
+            this.registeredFamilyByUri = Maps.newHashMap(oldState.registeredFamilyByUri);
+            this.blocksByUri = Maps.newHashMap(oldState.blocksByUri);
+            this.blocksById = new TShortObjectHashMap<>(oldState.blocksById);
+            this.idByUri = new TObjectShortHashMap<>(oldState.idByUri);
+        }
     }
 
 }

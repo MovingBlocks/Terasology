@@ -92,15 +92,15 @@ import static org.mockito.Mockito.mock;
 public abstract class TerasologyTestingEnvironment {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
-    private static boolean setup = false;
+    private static boolean setup;
 
-    private EngineEntityManager engineEntityManager;
     private static BlockManager blockManager;
     private static Config config;
     private static AudioManager audioManager;
     private static CollisionGroupManager collisionGroupManager;
     private static ModuleManager moduleManager;
     private static NetworkSystem networkSystem;
+    private EngineEntityManager engineEntityManager;
     private ComponentSystemManager componentSystemManager;
     private EngineTime mockTime;
 
@@ -209,7 +209,8 @@ public abstract class TerasologyTestingEnvironment {
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
 
         boolean complete = false;
-        for (prefabLoadStep.begin(); !complete; ) {
+        prefabLoadStep.begin();
+        while (!complete) {
             complete = prefabLoadStep.step();
         }
         CoreRegistry.get(ComponentSystemManager.class).initialise();

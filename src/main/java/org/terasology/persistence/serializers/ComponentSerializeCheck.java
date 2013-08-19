@@ -29,14 +29,14 @@ public interface ComponentSerializeCheck {
 
     boolean serialize(ComponentMetadata<? extends Component> metadata);
 
-    public static class NullCheck implements ComponentSerializeCheck {
-        private static NullCheck instance = new NullCheck();
-
-        public static ComponentSerializeCheck create() {
-            return instance;
-        }
+    public static final class NullCheck implements ComponentSerializeCheck {
+        private static final NullCheck INSTANCE = new NullCheck();
 
         private NullCheck() {
+        }
+
+        public static ComponentSerializeCheck create() {
+            return INSTANCE;
         }
 
         @Override

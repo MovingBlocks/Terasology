@@ -296,48 +296,6 @@ public final class WorldRenderer {
         return false;
     }
 
-    private static class ChunkFrontToBackComparator implements Comparator<Chunk> {
-
-        @Override
-        public int compare(Chunk o1, Chunk o2) {
-            double distance = distanceToCamera(o1);
-            double distance2 = distanceToCamera(o2);
-
-            if (o1 == null) {
-                return -1;
-            } else if (o2 == null) {
-                return 1;
-            }
-
-            if (distance == distance2) {
-                return 0;
-            }
-
-            return distance2 > distance ? -1 : 1;
-        }
-    }
-
-    private static class ChunkBackToFrontComparator implements Comparator<Chunk> {
-
-        @Override
-        public int compare(Chunk o1, Chunk o2) {
-            double distance = distanceToCamera(o1);
-            double distance2 = distanceToCamera(o2);
-
-            if (o1 == null) {
-                return 1;
-            } else if (o2 == null) {
-                return -1;
-            }
-
-            if (distance == distance2) {
-                return 0;
-            }
-
-            return distance2 > distance ? 1 : -1;
-        }
-    }
-
     private static float distanceToCamera(Chunk chunk) {
         Vector3f result = new Vector3f((chunk.getPos().x + 0.5f) * Chunk.SIZE_X, 0, (chunk.getPos().z + 0.5f) * Chunk.SIZE_Z);
 
@@ -1220,7 +1178,7 @@ public final class WorldRenderer {
         return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
                 + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, fog: %.1f, seed: \"%s\", title: \"%s\")",
 
-                ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered,
+                ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
                 getPlayerBiome(),
                 worldProvider.getTime().getDays(),
                 DefaultRenderingProcess.getInstance().getExposure(),
@@ -1273,11 +1231,9 @@ public final class WorldRenderer {
     }
 
     public boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
-        if (component.lightType == LightComponent.LightType.DIRECTIONAL) {
-            return true;
-        }
+        return component.lightType == LightComponent.LightType.DIRECTIONAL
+                || activeCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
 
-        return activeCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
     }
 
     public float getDaylight() {
@@ -1333,5 +1289,47 @@ public final class WorldRenderer {
         Vector3f cameraPos = getActiveCamera().getPosition();
         Block block = worldProvider.getBlock(cameraPos);
         return block.getTint();
+    }
+
+    private static class ChunkFrontToBackComparator implements Comparator<Chunk> {
+
+        @Override
+        public int compare(Chunk o1, Chunk o2) {
+            double distance = distanceToCamera(o1);
+            double distance2 = distanceToCamera(o2);
+
+            if (o1 == null) {
+                return -1;
+            } else if (o2 == null) {
+                return 1;
+            }
+
+            if (distance == distance2) {
+                return 0;
+            }
+
+            return distance2 > distance ? -1 : 1;
+        }
+    }
+
+    private static class ChunkBackToFrontComparator implements Comparator<Chunk> {
+
+        @Override
+        public int compare(Chunk o1, Chunk o2) {
+            double distance = distanceToCamera(o1);
+            double distance2 = distanceToCamera(o2);
+
+            if (o1 == null) {
+                return 1;
+            } else if (o2 == null) {
+                return -1;
+            }
+
+            if (distance == distance2) {
+                return 0;
+            }
+
+            return distance2 > distance ? 1 : -1;
+        }
     }
 }

@@ -60,7 +60,7 @@ public class PojoEventSystemTests {
         compLibrary = entitySystemLibrary.getComponentLibrary();
         entityManager = new PojoEntityManager();
         entityManager.setEntitySystemLibrary(entitySystemLibrary);
-        entityManager.setPrefabManager(new PojoPrefabManager(compLibrary));
+        entityManager.setPrefabManager(new PojoPrefabManager());
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem);
@@ -227,8 +227,9 @@ public class PojoEventSystemTests {
 
     public static class TestHighPriorityEventHandler implements ComponentSystem {
 
+        public boolean cancel;
+
         List<Received> receivedList = Lists.newArrayList();
-        public boolean cancel = false;
 
         @ReceiveEvent(components = StringComponent.class, priority = EventPriority.PRIORITY_HIGH)
         public void handleStringEvent(TestEvent event, EntityRef entity) {

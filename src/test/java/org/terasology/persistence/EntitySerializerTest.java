@@ -49,10 +49,10 @@ import static org.mockito.Mockito.mock;
  */
 public class EntitySerializerTest {
 
+    private static ModuleManager moduleManager;
     private ComponentLibrary componentLibrary;
     private EngineEntityManager entityManager;
     private EntitySerializer entitySerializer;
-    private static ModuleManager moduleManager;
     private Prefab prefab;
 
     @BeforeClass

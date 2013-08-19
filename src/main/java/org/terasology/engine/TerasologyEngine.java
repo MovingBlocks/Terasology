@@ -117,8 +117,8 @@ public class TerasologyEngine implements GameEngine {
     private EngineTime time;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-    private Canvas customViewPort = null;
-    private boolean hibernationAllowed = false;
+    private Canvas customViewPort;
+    private boolean hibernationAllowed;
     private boolean gameFocused = true;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 

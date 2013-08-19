@@ -34,12 +34,12 @@ public class SkeletalMeshComponent implements Component {
     public SkeletalMesh mesh;
     public Material material;
     public MeshAnimation animation;
-    public boolean loop = false;
+    public boolean loop;
     public float animationRate = 1.0f;
 
     @Owns
     public Map<String, EntityRef> boneEntities;
     public EntityRef rootBone = EntityRef.NULL;
-    public float animationTime = 0;
+    public float animationTime;
 
 }

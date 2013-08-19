@@ -26,8 +26,8 @@ import org.terasology.audio.StreamingSoundData;
  */
 public final class NullStreamingSound extends AbstractAsset<StreamingSoundData> implements StreamingSound {
 
-    private int channels = 0;
-    private int sampleRate = 0;
+    private int channels;
+    private int sampleRate;
 
     public NullStreamingSound(AssetUri uri, StreamingSoundData data) {
         super(uri);

@@ -63,7 +63,7 @@ public class PrefabTest {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem);
-        prefabManager = new PojoPrefabManager(em.getComponentLibrary());
+        prefabManager = new PojoPrefabManager();
 
         for (AssetUri prefabUri : AssetManager.getInstance().listAssets(AssetType.PREFAB)) {
             prefabManager.registerPrefab(Assets.get(prefabUri, Prefab.class));

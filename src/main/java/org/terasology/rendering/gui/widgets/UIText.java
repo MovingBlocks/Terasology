@@ -259,119 +259,6 @@ public class UIText extends UIDisplayContainerScrollable {
         }
     };
 
-    /**
-     * A text cursor.
-     *
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
-     */
-    private class UITextCursor extends UIDisplayContainer {
-        private Color color = new Color(Color.black);
-
-        public UITextCursor(Vector2f size) {
-            setSize(size);
-        }
-
-        public void render() {
-            if (!isVisible()) {
-                return;
-            }
-
-            glPushMatrix();
-            glColor4f(color.r, color.g, color.b, color.a);
-            glLineWidth(getSize().x);
-            glBegin(GL11.GL_LINES);
-            glVertex2f(0, 0);
-            glVertex2f(0, getSize().y);
-            glEnd();
-            glPopMatrix();
-        }
-
-        public void update() {
-
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-        }
-    }
-
-    /**
-     * The selection rectangle.
-     *
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
-     */
-    private class UISelection extends UIDisplayContainer {
-        private Color color = new Color(Color.gray);
-        private final List<Vector2f[]> rectangles = new ArrayList<Vector2f[]>();
-        private boolean fade = false;
-
-        public void render() {
-            if (!isVisible() || rectangles.size() == 0) {
-                return;
-            }
-
-            glPushMatrix();
-
-            float alpha = color.a;
-            if (fade) {
-
-                alpha = Math.max(0, alpha - 0.5f);
-            }
-            glColor4f(color.r, color.g, color.b, alpha);
-
-            glBegin(GL_QUADS);
-
-            for (Vector2f[] rect : rectangles) {
-                //[0] = position, [1] = size
-                glVertex2f(rect[0].x, rect[0].y);
-                glVertex2f(rect[0].x + rect[1].x, rect[0].y);
-                glVertex2f(rect[0].x + rect[1].x, rect[0].y + rect[1].y);
-                glVertex2f(rect[0].x, rect[0].y + rect[1].y);
-            }
-
-            glEnd();
-            glPopMatrix();
-        }
-
-        public void update() {
-
-        }
-
-        public void updateSelection(int start, int end) {
-            if (start != end) {
-                rectangles.clear();
-
-                //loop through all selected lines and add a selection rectangle for each
-                int charIndex = start;
-                while (charIndex < end) {
-                    int nextLineStart = findNextChar(charIndex, '\n', false);
-                    Vector2f pos = toDisplayPosition(charIndex);
-                    pos.y -= cursor.getSize().y;
-                    Vector2f size = new Vector2f(calcTextWidth(text.getText().substring(charIndex, Math.min(end, nextLineStart))), cursor.getSize().y);
-
-                    rectangles.add(new Vector2f[]{pos, size});
-
-                    charIndex = nextLineStart;
-                }
-
-                selectionRectangle.setVisible(true);
-            } else {
-                selectionRectangle.setVisible(false);
-            }
-        }
-
-        public void setFade(boolean value) {
-            this.fade = value;
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-        }
-
-        public Color getColor() {
-            return color;
-        }
-    }
 
     public UIText() {
         //key listener for processing the input
@@ -1268,5 +1155,119 @@ public class UIText extends UIDisplayContainerScrollable {
 
     public void removeChangedListener(ChangedListener listener) {
         changedListeners.remove(listener);
+    }
+
+    /**
+     * A text cursor.
+     *
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+     */
+    private class UITextCursor extends UIDisplayContainer {
+        private Color color = new Color(Color.black);
+
+        public UITextCursor(Vector2f size) {
+            setSize(size);
+        }
+
+        public void render() {
+            if (!isVisible()) {
+                return;
+            }
+
+            glPushMatrix();
+            glColor4f(color.r, color.g, color.b, color.a);
+            glLineWidth(getSize().x);
+            glBegin(GL11.GL_LINES);
+            glVertex2f(0, 0);
+            glVertex2f(0, getSize().y);
+            glEnd();
+            glPopMatrix();
+        }
+
+        public void update() {
+
+        }
+
+        public void setColor(Color color) {
+            this.color = color;
+        }
+    }
+
+    /**
+     * The selection rectangle.
+     *
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+     */
+    private class UISelection extends UIDisplayContainer {
+        private Color color = new Color(Color.gray);
+        private final List<Vector2f[]> rectangles = new ArrayList<Vector2f[]>();
+        private boolean fade = false;
+
+        public void render() {
+            if (!isVisible() || rectangles.size() == 0) {
+                return;
+            }
+
+            glPushMatrix();
+
+            float alpha = color.a;
+            if (fade) {
+
+                alpha = Math.max(0, alpha - 0.5f);
+            }
+            glColor4f(color.r, color.g, color.b, alpha);
+
+            glBegin(GL_QUADS);
+
+            for (Vector2f[] rect : rectangles) {
+                //[0] = position, [1] = size
+                glVertex2f(rect[0].x, rect[0].y);
+                glVertex2f(rect[0].x + rect[1].x, rect[0].y);
+                glVertex2f(rect[0].x + rect[1].x, rect[0].y + rect[1].y);
+                glVertex2f(rect[0].x, rect[0].y + rect[1].y);
+            }
+
+            glEnd();
+            glPopMatrix();
+        }
+
+        public void update() {
+
+        }
+
+        public void updateSelection(int start, int end) {
+            if (start != end) {
+                rectangles.clear();
+
+                //loop through all selected lines and add a selection rectangle for each
+                int charIndex = start;
+                while (charIndex < end) {
+                    int nextLineStart = findNextChar(charIndex, '\n', false);
+                    Vector2f pos = toDisplayPosition(charIndex);
+                    pos.y -= cursor.getSize().y;
+                    Vector2f size = new Vector2f(calcTextWidth(text.getText().substring(charIndex, Math.min(end, nextLineStart))), cursor.getSize().y);
+
+                    rectangles.add(new Vector2f[]{pos, size});
+
+                    charIndex = nextLineStart;
+                }
+
+                selectionRectangle.setVisible(true);
+            } else {
+                selectionRectangle.setVisible(false);
+            }
+        }
+
+        public void setFade(boolean value) {
+            this.fade = value;
+        }
+
+        public void setColor(Color color) {
+            this.color = color;
+        }
+
+        public Color getColor() {
+            return color;
+        }
     }
 }

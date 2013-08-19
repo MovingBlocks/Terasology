@@ -32,17 +32,6 @@ public class UIStateButton extends UIButton {
     private final LinkedList<ButtonState> states = new LinkedList<>();
     private int currentState = -1;
 
-    private class ButtonState {
-        String name;
-        StateButtonAction action;
-
-        public ButtonState(String name, StateButtonAction action) {
-            this.name = name;
-            this.action = action;
-        }
-
-    }
-
     public UIStateButton(Vector2f size) {
         super(size, ButtonType.NORMAL);
     }
@@ -146,5 +135,16 @@ public class UIStateButton extends UIButton {
 
             setState(prevState);
         }
+    }
+
+    private class ButtonState {
+        String name;
+        StateButtonAction action;
+
+        public ButtonState(String name, StateButtonAction action) {
+            this.name = name;
+            this.action = action;
+        }
+
     }
 }

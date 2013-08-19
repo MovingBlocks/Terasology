@@ -54,7 +54,23 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class Chunk {
-    protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
+
+    public static final int SIZE_X = 16;
+    public static final int SIZE_Y = 256;
+    public static final int SIZE_Z = 16;
+    public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
+    public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
+    public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
+    public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
+    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+    public static final byte MAX_LIGHT = 0x0f;
+    public static final byte MAX_LIQUID_DEPTH = 0x07;
+
+    public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);
+    public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
+    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
+
+    private static final Logger logger = LoggerFactory.getLogger(Chunk.class);
 
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
@@ -66,9 +82,9 @@ public class Chunk {
         FULL_LIGHT_CONNECTIVITY_PENDING(EntityData.ChunkState.FULL_LIGHT_CONNECTIVITY_PENDING),
         COMPLETE(EntityData.ChunkState.COMPLETE);
 
-        private final EntityData.ChunkState protobufState;
-
         private static final Map<EntityData.ChunkState, State> LOOKUP;
+
+        private final EntityData.ChunkState protobufState;
 
         static {
             LOOKUP = Maps.newHashMap();
@@ -94,21 +110,7 @@ public class Chunk {
         }
     }
 
-    /* PUBLIC CONSTANT VALUES */
-    public static final int SIZE_X = 16;
-    public static final int SIZE_Y = 256;
-    public static final int SIZE_Z = 16;
-    public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
-    public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
-    public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
-    public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
-    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-    public static final byte MAX_LIGHT = 0x0f;
-    public static final byte MAX_LIQUID_DEPTH = 0x07;
 
-    public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);
-    public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
-    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
 
     private final Vector3i chunkPos = new Vector3i();
 
@@ -119,7 +121,7 @@ public class Chunk {
     private TeraArray lightData;
     private TeraArray extraData;
 
-    public boolean initialGenerationComplete = false;
+    private boolean initialGenerationComplete;
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
     private boolean animated;
@@ -168,75 +170,6 @@ public class Chunk {
         blockManager = CoreRegistry.get(BlockManager.class);
         initialGenerationComplete = loaded;
         ChunkMonitor.fireChunkCreated(this);
-    }
-
-    /**
-     * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
-     *
-     * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @todo Add support for chunk data extensions.
-     */
-    public static class ProtobufHandler {
-
-        public EntityData.ChunkStore.Builder encode(Chunk chunk, boolean coreOnly) {
-            Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-            final TeraArrays t = TeraArrays.getInstance();
-            final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
-                    .setX(chunk.chunkPos.x).setY(chunk.chunkPos.y).setZ(chunk.chunkPos.z)
-                    .setState(chunk.chunkState.protobufState)
-                    .setBlockData(t.encode(chunk.blockData));
-            if (!coreOnly) {
-                b.setSunlightData(t.encode(chunk.sunlightData))
-                        .setLightData(t.encode(chunk.lightData))
-                        .setLiquidData(t.encode(chunk.extraData));
-            }
-            return b;
-        }
-
-        public Chunk decode(EntityData.ChunkStore message) {
-            Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
-            if (!message.hasX() || !message.hasY() || !message.hasZ()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
-            }
-            Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
-            if (!message.hasState()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk state.");
-            }
-            State state = State.lookup(message.getState());
-            if (!message.hasBlockData()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
-            }
-
-            final TeraArrays t = TeraArrays.getInstance();
-            final TeraArray blockData = t.decode(message.getBlockData());
-
-            Chunks c = Chunks.getInstance();
-            TeraArray sunlightData;
-            if (message.hasSunlightData()) {
-                sunlightData = t.decode(message.getSunlightData());
-            } else {
-                sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
-                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
-                }
-            }
-            TeraArray lightData;
-            if (message.hasLightData()) {
-                lightData = t.decode(message.getLightData());
-            } else {
-                lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
-                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
-                }
-            }
-            TeraArray extraData;
-            if (message.hasLiquidData()) {
-                extraData = t.decode(message.getLiquidData());
-            } else {
-                extraData = c.getExtraDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-            }
-            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData, state == State.COMPLETE);
-        }
     }
 
     public void lock() {
@@ -581,5 +514,74 @@ public class Chunk {
 
     public ChunkBlockIterator getBlockIterator() {
         return new ChunkBlockIteratorImpl(blockManager, getChunkWorldPos(), blockData);
+    }
+
+    /**
+     * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
+     *
+     * @author Manuel Brotz <manu.brotz@gmx.ch>
+     * @todo Add support for chunk data extensions.
+     */
+    public static class ProtobufHandler {
+
+        public EntityData.ChunkStore.Builder encode(Chunk chunk, boolean coreOnly) {
+            Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+            final TeraArrays t = TeraArrays.getInstance();
+            final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
+                    .setX(chunk.chunkPos.x).setY(chunk.chunkPos.y).setZ(chunk.chunkPos.z)
+                    .setState(chunk.chunkState.protobufState)
+                    .setBlockData(t.encode(chunk.blockData));
+            if (!coreOnly) {
+                b.setSunlightData(t.encode(chunk.sunlightData))
+                        .setLightData(t.encode(chunk.lightData))
+                        .setLiquidData(t.encode(chunk.extraData));
+            }
+            return b;
+        }
+
+        public Chunk decode(EntityData.ChunkStore message) {
+            Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
+            if (!message.hasX() || !message.hasY() || !message.hasZ()) {
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
+            }
+            Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
+            if (!message.hasState()) {
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk state.");
+            }
+            State state = State.lookup(message.getState());
+            if (!message.hasBlockData()) {
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
+            }
+
+            final TeraArrays t = TeraArrays.getInstance();
+            final TeraArray blockData = t.decode(message.getBlockData());
+
+            Chunks c = Chunks.getInstance();
+            TeraArray sunlightData;
+            if (message.hasSunlightData()) {
+                sunlightData = t.decode(message.getSunlightData());
+            } else {
+                sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
+                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
+                }
+            }
+            TeraArray lightData;
+            if (message.hasLightData()) {
+                lightData = t.decode(message.getLightData());
+            } else {
+                lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
+                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
+                }
+            }
+            TeraArray extraData;
+            if (message.hasLiquidData()) {
+                extraData = t.decode(message.getLiquidData());
+            } else {
+                extraData = c.getExtraDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+            }
+            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData, state == State.COMPLETE);
+        }
     }
 }

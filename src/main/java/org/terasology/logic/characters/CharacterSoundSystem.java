@@ -64,7 +64,7 @@ public class CharacterSoundSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onFootstep(FootstepEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = random.randomItem(characterSounds.footstepSounds);
@@ -74,7 +74,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onJump(JumpEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = null;
@@ -91,7 +91,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onLanded(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (event.getVelocity().y > 0f) {
             return;
@@ -112,7 +112,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onCrash(HorizontalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds, HealthComponent healthComponent) {
         Vector3f horizVelocity = new Vector3f(event.getVelocity());
         horizVelocity.y = 0;
@@ -130,7 +130,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             DamageSoundComponent damageSounds = event.getType().getComponent(DamageSoundComponent.class);
@@ -149,7 +149,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onDeath(NoHealthEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.deathSounds.size() > 0) {
             Sound sound = random.randomItem(characterSounds.deathSounds);
@@ -157,7 +157,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onRespawn(OnPlayerSpawnedEvent event, EntityRef character, CharacterSoundComponent characterSounds) {
         if (characterSounds.respawnSounds.size() > 0) {
             Sound sound = random.randomItem(characterSounds.respawnSounds);
@@ -165,7 +165,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onSwimStroke(SwimStrokeEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.swimSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = random.randomItem(characterSounds.swimSounds);
@@ -175,7 +175,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onEnterLiquid(OnEnterLiquidEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = random.randomItem(characterSounds.enterWaterSounds);
@@ -185,7 +185,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onLeaveLiquid(OnLeaveLiquidEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = random.randomItem(characterSounds.leaveWaterSounds);

@@ -57,10 +57,10 @@ import java.util.Map;
 @RegisterSystem(RegisterMode.ALWAYS)
 @Share({InventoryManager.class, SlotBasedInventoryManager.class})
 public class CoreInventoryManager implements ComponentSystem, SlotBasedInventoryManager {
-    private static final Logger logger = LoggerFactory.getLogger(CoreInventoryManager.class);
-
     // TODO: differ per item?
     public static final byte MAX_STACK = (byte) 99;
+
+    private static final Logger logger = LoggerFactory.getLogger(CoreInventoryManager.class);
 
     @In
     private EntityManager entityManager;

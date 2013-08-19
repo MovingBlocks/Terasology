@@ -42,7 +42,7 @@ public class Rect2i {
     // @pre a and b have the same size
     // @return list of disjunct rects building the subtraction result (eg. L-shape)
     public static List<Rect2i> subtractEqualsSized(Rect2i a, Rect2i b) {
-        ArrayList<Rect2i> result = new ArrayList<Rect2i>();
+        List<Rect2i> result = new ArrayList<Rect2i>();
 
         boolean overlap = a.overlaps(b);
         boolean equal = (a.posX == b.posX) && (a.posY == b.posY);
@@ -75,7 +75,7 @@ public class Rect2i {
         return String.format("x=%d y=%d w=%d h=%d", posX, posY, w, h);
     }
 
-    private static void subtractEqualsSizedHelper(int x, int y, Rect2i b, int splitCenterX, int splitCenterY, ArrayList<Rect2i> result) {
+    private static void subtractEqualsSizedHelper(int x, int y, Rect2i b, int splitCenterX, int splitCenterY, List<Rect2i> result) {
         if (!b.contains(x, y) && x != splitCenterX && y != splitCenterY) {
             Rect2i candidate = createRectSpanning2Points(x, y, splitCenterX, splitCenterY);
 
@@ -104,8 +104,8 @@ public class Rect2i {
      * @return True if containing
      */
     public boolean contains(int x, int y) {
-        return !(maxX() < x || minX() > x) &&
-                !(maxY() < y || minY() > y);
+        return !(maxX() < x || minX() > x)
+                && !(maxY() < y || minY() > y);
     }
 
     /**
@@ -115,8 +115,8 @@ public class Rect2i {
      * @return True if overlapping
      */
     public boolean overlaps(Rect2i b) {
-        return !(maxX() < b.minX() || minX() > b.maxX()) &&
-                !(maxY() < b.minY() || minY() > b.maxY());
+        return !(maxX() < b.minX() || minX() > b.maxX())
+                && !(maxY() < b.minY() || minY() > b.maxY());
     }
 
     public int maxX() {

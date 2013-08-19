@@ -139,7 +139,7 @@ public class DefaultRenderingProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultRenderingProcess.class);
 
-    private static DefaultRenderingProcess instance = null;
+    private static DefaultRenderingProcess instance;
 
     /* PROPERTIES */
     @EditorRange(min = 0.0f, max = 10.0f)
@@ -184,11 +184,11 @@ public class DefaultRenderingProcess {
     private int rtWidth32;
     private int rtHeight32;
 
-    private int overwriteRtWidth = 0;
-    private int overwriteRtHeight = 0;
+    private int overwriteRtWidth;
+    private int overwriteRtHeight;
 
     private String currentlyBoundFboName = "";
-    private FBO currentlyBoundFbo = null;
+    private FBO currentlyBoundFbo;
     //private int currentlyBoundTextureId = -1;
 
     public enum FBOType {
@@ -198,7 +198,7 @@ public class DefaultRenderingProcess {
     }
 
     /* VARIOUS */
-    private boolean takeScreenshot = false;
+    private boolean takeScreenshot;
     private int displayListQuad = -1;
     private Config config = CoreRegistry.get(Config.class);
 
@@ -209,6 +209,10 @@ public class DefaultRenderingProcess {
     }
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
+
+    public DefaultRenderingProcess() {
+        initialize();
+    }
 
     /**
      * Returns (and creates – if necessary) the static instance
@@ -222,10 +226,6 @@ public class DefaultRenderingProcess {
         }
 
         return instance;
-    }
-
-    public DefaultRenderingProcess() {
-        initialize();
     }
 
     public void initialize() {
@@ -1493,7 +1493,7 @@ public class DefaultRenderingProcess {
         public int pboId;
         public int bufferWidth;
         public int bufferHeight;
-        ByteBuffer cachedBuffer = null;
+        ByteBuffer cachedBuffer;
 
         public PBO() {
             pboId = glGenBuffersARB();
@@ -1546,15 +1546,15 @@ public class DefaultRenderingProcess {
     }
 
     public class FBO {
-        public int fboId = 0;
-        public int textureId = 0;
-        public int depthStencilTextureId = 0;
-        public int depthStencilRboId = 0;
-        public int normalsTextureId = 0;
-        public int lightBufferTextureId = 0;
+        public int fboId;
+        public int textureId;
+        public int depthStencilTextureId;
+        public int depthStencilRboId;
+        public int normalsTextureId;
+        public int lightBufferTextureId;
 
-        public int width = 0;
-        public int height = 0;
+        public int width;
+        public int height;
 
         public void bind() {
             if (this != currentlyBoundFbo) {

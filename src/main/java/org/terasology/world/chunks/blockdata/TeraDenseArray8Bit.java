@@ -28,6 +28,22 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
  */
 public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 
+    public TeraDenseArray8Bit() {
+        super();
+    }
+
+    public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
+    }
+
+    public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ, byte[] data) {
+        super(sizeX, sizeY, sizeZ, data);
+    }
+
+    public TeraDenseArray8Bit(TeraArray in) {
+        super(in);
+    }
+
     @Override
     protected TeraArray createDense(byte[] arrayData) {
         return new TeraDenseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), arrayData);
@@ -36,6 +52,41 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     @Override
     protected int rowSize() {
         return getSizeXZ();
+    }
+
+    @Override
+    public TeraArray deflate(TeraVisitingDeflator deflator) {
+        return Preconditions.checkNotNull(deflator).deflateDenseArray8Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
+    }
+
+    @Override
+    public int getElementSizeInBits() {
+        return 8;
+    }
+
+    @Override
+    public int get(int x, int y, int z) {
+        int pos = pos(x, y, z);
+        return data[pos];
+    }
+
+    @Override
+    public int set(int x, int y, int z, int value) {
+        int pos = pos(x, y, z);
+        int old = data[pos];
+        data[pos] = (byte) value;
+        return old;
+    }
+
+    @Override
+    public boolean set(int x, int y, int z, int value, int expected) {
+        int pos = pos(x, y, z);
+        int old = data[pos];
+        if (old == expected) {
+            data[pos] = (byte) value;
+            return true;
+        }
+        return false;
     }
 
     public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray8Bit> {
@@ -77,56 +128,4 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
             return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
         }
     }
-
-    public TeraDenseArray8Bit() {
-        super();
-    }
-
-    public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ);
-    }
-
-    public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ, byte[] data) {
-        super(sizeX, sizeY, sizeZ, data);
-    }
-
-    public TeraDenseArray8Bit(TeraArray in) {
-        super(in);
-    }
-
-    @Override
-    public TeraArray deflate(TeraVisitingDeflator deflator) {
-        return Preconditions.checkNotNull(deflator).deflateDenseArray8Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
-    }
-
-    @Override
-    public int getElementSizeInBits() {
-        return 8;
-    }
-
-    @Override
-    public int get(int x, int y, int z) {
-        int pos = pos(x, y, z);
-        return data[pos];
-    }
-
-    @Override
-    public int set(int x, int y, int z, int value) {
-        int pos = pos(x, y, z);
-        int old = data[pos];
-        data[pos] = (byte) value;
-        return old;
-    }
-
-    @Override
-    public boolean set(int x, int y, int z, int value, int expected) {
-        int pos = pos(x, y, z);
-        int old = data[pos];
-        if (old == expected) {
-            data[pos] = (byte) value;
-            return true;
-        }
-        return false;
-    }
-
 }

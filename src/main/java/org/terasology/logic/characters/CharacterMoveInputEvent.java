@@ -34,7 +34,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     private boolean running;
     private boolean jumpRequested;
     private Vector3f movementDirection = new Vector3f();
-    private int sequenceNumber = 0;
+    private int sequenceNumber;
     private boolean firstRun = true;
 
     protected CharacterMoveInputEvent() {

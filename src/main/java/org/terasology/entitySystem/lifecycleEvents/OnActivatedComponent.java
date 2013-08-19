@@ -27,14 +27,15 @@ import org.terasology.entitySystem.event.Event;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class OnActivatedComponent implements Event {
+public final class OnActivatedComponent implements Event {
 
     private static OnActivatedComponent instance = new OnActivatedComponent();
+
+    private OnActivatedComponent() {
+    }
 
     public static OnActivatedComponent newInstance() {
         return instance;
     }
 
-    private OnActivatedComponent() {
-    }
 }

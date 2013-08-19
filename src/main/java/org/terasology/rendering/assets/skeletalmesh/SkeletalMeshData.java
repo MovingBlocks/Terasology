@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class SkeletalMeshData implements AssetData {
 
-    private Bone rootBone = null;
+    private Bone rootBone;
     private Map<String, Bone> boneLookup = Maps.newHashMap();
     private List<Bone> bones = Lists.newArrayList();
     private List<Vector2f> uvs = ImmutableList.of();

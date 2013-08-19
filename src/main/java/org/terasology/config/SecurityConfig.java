@@ -78,12 +78,6 @@ public class SecurityConfig {
         public static final String SERVER_PRIVATE_CERTIFICATE = "serverPrivateCertificate";
         public static final String CLIENT_IDENTITIES = "clientIdentities";
 
-        private static class ClientEntry {
-            public PublicIdentityCertificate server;
-            public PublicIdentityCertificate clientPublic;
-            public PrivateIdentityCertificate clientPrivate;
-        }
-
         @Override
         public SecurityConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             SecurityConfig result = new SecurityConfig();
@@ -120,5 +114,11 @@ public class SecurityConfig {
             result.add(CLIENT_IDENTITIES, clientArray);
             return result;
         }
+    }
+
+    private static class ClientEntry {
+        public PublicIdentityCertificate server;
+        public PublicIdentityCertificate clientPublic;
+        public PrivateIdentityCertificate clientPrivate;
     }
 }

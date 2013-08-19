@@ -49,7 +49,7 @@ import org.terasology.world.block.management.BlockManager;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterSystem()
+@RegisterSystem
 public class BlockEntitySystem implements ComponentSystem {
 
     @In

@@ -39,120 +39,6 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     protected short[] deflated;
     protected short fill;
 
-    @Override
-    protected void initialize() {
-    }
-
-    public static class SerializationHandler extends TeraArray.BasicSerializationHandler<TeraSparseArray16Bit> {
-
-        private void putRow(final short[] row, final int length, final ByteBuffer buffer) {
-            final ShortBuffer sbuffer = buffer.asShortBuffer();
-            sbuffer.put(row, 0, length);
-            buffer.position(buffer.position() + length * 2);
-        }
-
-        private void getRow(final short[] row, final int length, final ByteBuffer buffer) {
-            final ShortBuffer sbuffer = buffer.asShortBuffer();
-            sbuffer.get(row, 0, length);
-            buffer.position(buffer.position() + length * 2);
-        }
-
-        @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraSparseArray16Bit.class.equals(clazz);
-        }
-
-        @Override
-        protected int internalComputeMinimumBufferSize(TeraSparseArray16Bit array) {
-            final short[][] inf = array.inflated;
-            if (inf == null) {
-                return 3;
-            } else {
-                int sizeY = array.getSizeY();
-                int rowSize = array.getSizeXZ() * 2;
-                int result = 1;
-                for (int y = 0; y < sizeY; y++) {
-                    if (inf[y] == null) {
-                        result += 3;
-                    } else {
-                        result += 1 + rowSize;
-                    }
-                }
-                return result;
-            }
-        }
-
-        @Override
-        protected void internalSerialize(TeraSparseArray16Bit array, ByteBuffer buffer) {
-            final short[][] inf = array.inflated;
-            if (inf == null) {
-                buffer.put((byte) 0);
-                buffer.putShort(array.fill);
-            } else {
-                buffer.put((byte) 1);
-                int sizeY = array.getSizeY();
-                int rowSize = array.getSizeXZ();
-                final short[] def = array.deflated;
-                for (int y = 0; y < sizeY; y++) {
-                    final short[] row = inf[y];
-                    if (row == null) {
-                        buffer.put((byte) 0);
-                        buffer.putShort(def[y]);
-                    } else {
-                        buffer.put((byte) 1);
-                        putRow(row, rowSize, buffer);
-                    }
-                }
-            }
-        }
-
-        @Override
-        protected TeraSparseArray16Bit internalDeserialize(int sizeX, int sizeY, int sizeZ, ByteBuffer buffer) {
-            final byte hasData = buffer.get();
-            final TeraSparseArray16Bit array = new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
-            if (hasData == 0) {
-                array.fill = buffer.getShort();
-                return array;
-            }
-            final int rowSize = array.getSizeXZ();
-            array.inflated = new short[sizeY][];
-            array.deflated = new short[sizeY];
-            for (int y = 0; y < sizeY; y++) {
-                final byte hasRow = buffer.get();
-                if (hasRow == 0) {
-                    array.deflated[y] = buffer.getShort();
-                } else {
-                    array.inflated[y] = new short[rowSize];
-                    getRow(array.inflated[y], rowSize, buffer);
-                }
-            }
-            return array;
-        }
-    }
-
-    public static class Factory implements TeraArray.Factory<TeraSparseArray16Bit> {
-
-        @Override
-        public Class<TeraSparseArray16Bit> getArrayClass() {
-            return TeraSparseArray16Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-
-        @Override
-        public TeraSparseArray16Bit create() {
-            return new TeraSparseArray16Bit();
-        }
-
-        @Override
-        public TeraSparseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
-            return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
-        }
-    }
-
     public TeraSparseArray16Bit() {
         super();
     }
@@ -172,6 +58,10 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     public TeraSparseArray16Bit(int sizeX, int sizeY, int sizeZ, short fill) {
         super(sizeX, sizeY, sizeZ, false);
         this.fill = fill;
+    }
+
+    @Override
+    protected void initialize() {
     }
 
     @Override
@@ -306,6 +196,116 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         inflated = (short[][]) in.readObject();
         deflated = (short[]) in.readObject();
         fill = in.readShort();
+    }
+
+    public static class SerializationHandler extends TeraArray.BasicSerializationHandler<TeraSparseArray16Bit> {
+
+        private void putRow(final short[] row, final int length, final ByteBuffer buffer) {
+            final ShortBuffer sbuffer = buffer.asShortBuffer();
+            sbuffer.put(row, 0, length);
+            buffer.position(buffer.position() + length * 2);
+        }
+
+        private void getRow(final short[] row, final int length, final ByteBuffer buffer) {
+            final ShortBuffer sbuffer = buffer.asShortBuffer();
+            sbuffer.get(row, 0, length);
+            buffer.position(buffer.position() + length * 2);
+        }
+
+        @Override
+        public boolean canHandle(Class<?> clazz) {
+            return TeraSparseArray16Bit.class.equals(clazz);
+        }
+
+        @Override
+        protected int internalComputeMinimumBufferSize(TeraSparseArray16Bit array) {
+            final short[][] inf = array.inflated;
+            if (inf == null) {
+                return 3;
+            } else {
+                int sizeY = array.getSizeY();
+                int rowSize = array.getSizeXZ() * 2;
+                int result = 1;
+                for (int y = 0; y < sizeY; y++) {
+                    if (inf[y] == null) {
+                        result += 3;
+                    } else {
+                        result += 1 + rowSize;
+                    }
+                }
+                return result;
+            }
+        }
+
+        @Override
+        protected void internalSerialize(TeraSparseArray16Bit array, ByteBuffer buffer) {
+            final short[][] inf = array.inflated;
+            if (inf == null) {
+                buffer.put((byte) 0);
+                buffer.putShort(array.fill);
+            } else {
+                buffer.put((byte) 1);
+                int sizeY = array.getSizeY();
+                int rowSize = array.getSizeXZ();
+                final short[] def = array.deflated;
+                for (int y = 0; y < sizeY; y++) {
+                    final short[] row = inf[y];
+                    if (row == null) {
+                        buffer.put((byte) 0);
+                        buffer.putShort(def[y]);
+                    } else {
+                        buffer.put((byte) 1);
+                        putRow(row, rowSize, buffer);
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected TeraSparseArray16Bit internalDeserialize(int sizeX, int sizeY, int sizeZ, ByteBuffer buffer) {
+            final byte hasData = buffer.get();
+            final TeraSparseArray16Bit array = new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
+            if (hasData == 0) {
+                array.fill = buffer.getShort();
+                return array;
+            }
+            final int rowSize = array.getSizeXZ();
+            array.inflated = new short[sizeY][];
+            array.deflated = new short[sizeY];
+            for (int y = 0; y < sizeY; y++) {
+                final byte hasRow = buffer.get();
+                if (hasRow == 0) {
+                    array.deflated[y] = buffer.getShort();
+                } else {
+                    array.inflated[y] = new short[rowSize];
+                    getRow(array.inflated[y], rowSize, buffer);
+                }
+            }
+            return array;
+        }
+    }
+
+    public static class Factory implements TeraArray.Factory<TeraSparseArray16Bit> {
+
+        @Override
+        public Class<TeraSparseArray16Bit> getArrayClass() {
+            return TeraSparseArray16Bit.class;
+        }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
+
+        @Override
+        public TeraSparseArray16Bit create() {
+            return new TeraSparseArray16Bit();
+        }
+
+        @Override
+        public TeraSparseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
+        }
     }
 
 }

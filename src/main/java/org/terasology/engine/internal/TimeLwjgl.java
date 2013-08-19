@@ -77,35 +77,6 @@ public final class TimeLwjgl implements EngineTime {
         }
     }
 
-    private class TimeStepper implements Iterator<Float> {
-
-        private int cycles;
-        private long deltaPerCycle;
-        private int currentCycle = 0;
-
-        public TimeStepper(int cycles, long deltaPerCycle) {
-            this.cycles = cycles;
-            this.deltaPerCycle = deltaPerCycle;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return currentCycle < cycles;
-        }
-
-        @Override
-        public Float next() {
-            currentCycle++;
-            gameTime.addAndGet(deltaPerCycle);
-            return deltaPerCycle / 1000f;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
     @Override
     public float getDelta() {
         return delta.get() / 1000f;
@@ -154,5 +125,34 @@ public final class TimeLwjgl implements EngineTime {
 
     public boolean isPaused() {
         return paused;
+    }
+
+    private class TimeStepper implements Iterator<Float> {
+
+        private int cycles;
+        private long deltaPerCycle;
+        private int currentCycle = 0;
+
+        public TimeStepper(int cycles, long deltaPerCycle) {
+            this.cycles = cycles;
+            this.deltaPerCycle = deltaPerCycle;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentCycle < cycles;
+        }
+
+        @Override
+        public Float next() {
+            currentCycle++;
+            gameTime.addAndGet(deltaPerCycle);
+            return deltaPerCycle / 1000f;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

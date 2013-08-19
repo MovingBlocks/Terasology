@@ -46,6 +46,6 @@ public final class CharacterSoundComponent implements Component {
     public float swimmingVolume = 1.0f;
     public float diveVolume = 1.0f;
 
-    public long lastSoundTime = 0;
+    public long lastSoundTime;
 
 }

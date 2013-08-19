@@ -58,7 +58,7 @@ public class PojoPrefabManagerTest {
                 .build();
         entitySystemLibrary = new EntitySystemLibraryImpl(lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
-        prefabManager = new PojoPrefabManager(componentLibrary);
+        prefabManager = new PojoPrefabManager();
     }
 
     @Test

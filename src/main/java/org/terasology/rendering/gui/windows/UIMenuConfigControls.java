@@ -49,19 +49,6 @@ import java.util.List;
  */
 public final class UIMenuConfigControls extends UIWindow {
 
-    // TODO: Much of this can be derived from the register bind button annotations, more generic input screen?
-    private static class ButtonDefinition {
-        public String bindId;
-        public String displayText;
-        public int group;
-
-        public ButtonDefinition(String bindId, String displayText, int group) {
-            this.bindId = bindId;
-            this.displayText = displayText;
-            this.group = group;
-        }
-    }
-
     // TODO: Yeah, this is rough as, populate better
     private List<ButtonDefinition> buttonDefs = Lists.newArrayList(
             new ButtonDefinition("engine:forwards", "Forwards", 0),
@@ -277,6 +264,19 @@ public final class UIMenuConfigControls extends UIWindow {
             } else {
                 button.getLabel().setText("");
             }
+        }
+    }
+
+    // TODO: Much of this can be derived from the register bind button annotations, more generic input screen?
+    private static class ButtonDefinition {
+        public String bindId;
+        public String displayText;
+        public int group;
+
+        public ButtonDefinition(String bindId, String displayText, int group) {
+            this.bindId = bindId;
+            this.displayText = displayText;
+            this.group = group;
         }
     }
 }

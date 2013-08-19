@@ -15,7 +15,7 @@
  */
 package org.terasology.benchmark.chunks.cache;
 
-public class ChunkCachesBenchmark {
+public final class ChunkCachesBenchmark {
 
     private ChunkCachesBenchmark() {
     }

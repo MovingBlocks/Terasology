@@ -26,7 +26,7 @@ import java.util.Map;
 public class BlockDamageComponent implements Component {
 
     public Map<String, Integer> materialDamageMultiplier = Maps.newHashMap();
-    public float blockAnnihilationChance = 0;
-    public boolean skipPerBlockEffects = false;
+    public float blockAnnihilationChance;
+    public boolean skipPerBlockEffects;
 
 }

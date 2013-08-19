@@ -23,13 +23,24 @@ import java.util.Iterator;
  */
 public final class Diamond3iIterator implements Iterator<Vector3i> {
 
-    private Vector3i origin;
+    private final Vector3i origin;
     private int maxDistance;
 
-    private int x = 0;
-    private int y = 0;
-    private int z = 0;
-    private int level = 0;
+    private int x;
+    private int y;
+    private int z;
+    private int level;
+
+    private Diamond3iIterator(Vector3i origin, int maxDistance) {
+        this.origin = origin;
+        this.maxDistance = maxDistance + 1;
+    }
+
+    private Diamond3iIterator(Vector3i origin, int maxDistance, int startDistance) {
+        this(origin, maxDistance);
+        this.level = startDistance + 1;
+        x = -level;
+    }
 
     public static Iterable<Vector3i> iterate(final Vector3i origin, final int distance) {
         return new Iterable<Vector3i>() {
@@ -47,17 +58,6 @@ public final class Diamond3iIterator implements Iterator<Vector3i> {
                 return new Diamond3iIterator(origin, distance, distance - 1);
             }
         };
-    }
-
-    Diamond3iIterator(Vector3i origin, int maxDistance) {
-        this.origin = origin;
-        this.maxDistance = maxDistance + 1;
-    }
-
-    Diamond3iIterator(Vector3i origin, int maxDistance, int startDistance) {
-        this(origin, maxDistance);
-        this.level = startDistance + 1;
-        x = -level;
     }
 
     @Override

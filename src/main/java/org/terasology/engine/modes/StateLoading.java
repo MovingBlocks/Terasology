@@ -69,8 +69,8 @@ public class StateLoading implements GameState {
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
-    private int currentExpectedSteps = 0;
-    private int completedSteps = 0;
+    private int currentExpectedSteps;
+    private int completedSteps;
 
     private GUIManager guiManager;
 

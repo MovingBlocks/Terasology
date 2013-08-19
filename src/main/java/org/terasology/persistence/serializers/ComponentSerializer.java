@@ -49,7 +49,7 @@ public class ComponentSerializer {
 
     private ComponentLibrary componentLibrary;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
-    private boolean usingFieldIds = false;
+    private boolean usingFieldIds;
 
     /**
      * Creates the component serializer.

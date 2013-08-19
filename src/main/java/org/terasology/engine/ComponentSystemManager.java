@@ -58,9 +58,9 @@ public class ComponentSystemManager {
     private List<ComponentSystem> store = Lists.newArrayList();
     private List<Class<?>> sharedSystems = Lists.newArrayList();
 
-    private Console console = null;
+    private Console console;
 
-    public boolean initialised = false;
+    private boolean initialised;
 
     public ComponentSystemManager() {
     }
@@ -88,9 +88,7 @@ public class ComponentSystemManager {
                     }
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);
-                } catch (InstantiationException e) {
-                    logger.error("Failed to load system {}", id, e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("Failed to load system {}", id, e);
                 }
             }

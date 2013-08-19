@@ -35,13 +35,8 @@ import java.util.Objects;
  * @author Immortius <immortius@gmail.com>
  */
 public final class LocationComponent implements Component, ReplicationCheck {
-    // Standard position/rotation
-    @Replicate
-    private Vector3f position = new Vector3f();
-    @Replicate
-    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
-    @Replicate
-    private float scale = 1.0f;
+
+    public boolean replicateChanges = true;
 
     // Relative to
     @Replicate
@@ -50,7 +45,13 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @Replicate
     List<EntityRef> children = Lists.newArrayList();
 
-    public boolean replicateChanges = true;
+    // Standard position/rotation
+    @Replicate
+    private Vector3f position = new Vector3f();
+    @Replicate
+    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    @Replicate
+    private float scale = 1.0f;
 
     public LocationComponent() {
     }

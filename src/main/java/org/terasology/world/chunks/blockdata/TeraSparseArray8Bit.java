@@ -31,57 +31,6 @@ import java.util.Arrays;
  */
 public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
-    @Override
-    protected TeraArray createSparse(byte defaultFill) {
-        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), defaultFill);
-    }
-
-    @Override
-    protected TeraArray createSparse(byte[][] inflatedData, byte[] deflatedData) {
-        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflatedData, deflatedData);
-    }
-
-    @Override
-    protected int rowSize() {
-        return getSizeXZ();
-    }
-
-    public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray8Bit> {
-
-        @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraSparseArray8Bit.class.equals(clazz);
-        }
-
-        @Override
-        protected TeraSparseArray8Bit createArray(int sizeX, int sizeY, int sizeZ) {
-            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
-        }
-    }
-
-    public static class Factory implements TeraArray.Factory<TeraSparseArray8Bit> {
-
-        @Override
-        public Class<TeraSparseArray8Bit> getArrayClass() {
-            return TeraSparseArray8Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-
-        @Override
-        public TeraSparseArray8Bit create() {
-            return new TeraSparseArray8Bit();
-        }
-
-        @Override
-        public TeraSparseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
-            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
-        }
-    }
-
     public TeraSparseArray8Bit() {
         super();
     }
@@ -96,6 +45,21 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
         super(sizeX, sizeY, sizeZ, fill);
+    }
+
+    @Override
+    protected TeraArray createSparse(byte defaultFill) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), defaultFill);
+    }
+
+    @Override
+    protected TeraArray createSparse(byte[][] inflatedData, byte[] deflatedData) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflatedData, deflatedData);
+    }
+
+    @Override
+    protected int rowSize() {
+        return getSizeXZ();
     }
 
     @Override
@@ -185,4 +149,39 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         return false;
     }
 
+    public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray8Bit> {
+
+        @Override
+        public boolean canHandle(Class<?> clazz) {
+            return TeraSparseArray8Bit.class.equals(clazz);
+        }
+
+        @Override
+        protected TeraSparseArray8Bit createArray(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
+        }
+    }
+
+    public static class Factory implements TeraArray.Factory<TeraSparseArray8Bit> {
+
+        @Override
+        public Class<TeraSparseArray8Bit> getArrayClass() {
+            return TeraSparseArray8Bit.class;
+        }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
+
+        @Override
+        public TeraSparseArray8Bit create() {
+            return new TeraSparseArray8Bit();
+        }
+
+        @Override
+        public TeraSparseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
+        }
+    }
 }

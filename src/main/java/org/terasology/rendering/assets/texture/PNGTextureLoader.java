@@ -37,12 +37,6 @@ import java.util.List;
  */
 public class PNGTextureLoader implements AssetLoader<TextureData> {
 
-    private static class TextureMetadata {
-        Texture.FilterMode filterMode;
-        Texture.WrapMode wrapMode;
-        Texture.Type type;
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(PNGTextureLoader.class);
 
     private Gson gson;
@@ -139,5 +133,11 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
         } finally {
             pngStream.close();
         }
+    }
+
+    private static class TextureMetadata {
+        Texture.FilterMode filterMode;
+        Texture.WrapMode wrapMode;
+        Texture.Type type;
     }
 }

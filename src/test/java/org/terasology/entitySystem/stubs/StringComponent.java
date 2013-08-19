@@ -21,10 +21,11 @@ import org.terasology.entitySystem.Component;
  * @author Immortius <immortius@gmail.com>
  */
 public final class StringComponent implements Component {
-    public String value;
     public static String staticValue = "Test";
+    public String value;
 
-    public StringComponent() {}
+    public StringComponent() {
+    }
 
     public StringComponent(String value) {
         this.value = value;

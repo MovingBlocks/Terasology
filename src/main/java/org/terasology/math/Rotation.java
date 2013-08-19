@@ -31,10 +31,20 @@ import java.util.List;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class Rotation {
+public final class Rotation {
 
     private static final TByteObjectMap<Rotation> ROTATIONS;
     private static final ImmutableList<Rotation> HORIZONTAL_ROTATIONS;
+
+    private Yaw yaw;
+    private Pitch pitch;
+    private Roll roll;
+
+    private Rotation(Yaw yaw, Pitch pitch, Roll roll) {
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.roll = roll;
+    }
 
     public static Rotation none() {
         return ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE));
@@ -90,16 +100,6 @@ public class Rotation {
 
     private static byte indexFor(Yaw yaw, Pitch pitch, Roll roll) {
         return (byte) ((yaw.getIndex() << 4) + (pitch.getIndex() << 2) + roll.getIndex());
-    }
-
-    private Yaw yaw;
-    private Pitch pitch;
-    private Roll roll;
-
-    private Rotation(Yaw yaw, Pitch pitch, Roll roll) {
-        this.pitch = pitch;
-        this.yaw = yaw;
-        this.roll = roll;
     }
 
     public Yaw getYaw() {

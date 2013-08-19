@@ -25,15 +25,15 @@ import javax.vecmath.Vector3f;
 public final class HierarchicalAIComponent implements Component {
 
     //how often updates are progressed, handle whit care
-    public int updateFrequency = 0;
-    public long lastProgressedUpdateAt = 0;
+    public int updateFrequency;
+    public long lastProgressedUpdateAt;
 
     public Vector3f movementTarget = new Vector3f();
 
-    public long lastChangeOfDirectionAt = 0;
-    public long lastChangeOfMovementAt = 0;
-    public long lastChangeOfidlingtAt = 0;
-    public long lastChangeOfDangerAt = 0;
+    public long lastChangeOfDirectionAt;
+    public long lastChangeOfMovementAt;
+    public long lastChangeOfidlingtAt;
+    public long lastChangeOfDangerAt;
 
     //how long ai move
     public int moveUpdateTime = 600;
@@ -48,10 +48,10 @@ public final class HierarchicalAIComponent implements Component {
     public int dieDistance = 2000;
 
     //define type of AI 
-    public boolean hunter = false;
-    public boolean aggressive = false;
-    public boolean wild = false;
-    public boolean flying = false;
+    public boolean hunter;
+    public boolean aggressive;
+    public boolean wild;
+    public boolean flying;
 
     //AI properties
     // if flying maximum altitude
@@ -75,7 +75,7 @@ public final class HierarchicalAIComponent implements Component {
     public int panicDistance = 10;
 
     //doing something
-    public boolean inDanger = false;
+    public boolean inDanger;
 
 
     //TODO remove this when fight system is ready!!!

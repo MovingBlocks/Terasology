@@ -22,13 +22,15 @@ public class MouseUpButtonEvent extends MouseButtonEvent {
 
     private static MouseUpButtonEvent event = new MouseUpButtonEvent(0, 0);
 
+    protected MouseUpButtonEvent(int button, float delta) {
+        super(button, ButtonState.UP, delta);
+    }
+
     public static MouseUpButtonEvent create(int button, float delta) {
         event.reset(delta);
         event.setButton(button);
         return event;
     }
 
-    protected MouseUpButtonEvent(int button, float delta) {
-        super(button, ButtonState.UP, delta);
-    }
+
 }

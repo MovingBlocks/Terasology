@@ -29,7 +29,7 @@ public class CircularBufferTest {
         CircularBuffer<Integer> buffer = CircularBuffer.create(4);
         for (int i = 0; i < 100; ++i) {
             buffer.add(i);
-            assertEquals((Integer)i, buffer.getLast());
+            assertEquals((Integer) i, buffer.getLast());
         }
     }
 
@@ -42,10 +42,10 @@ public class CircularBufferTest {
         buffer.add(4);
         buffer.add(5);
         assertEquals(4, buffer.size());
-        assertEquals((Integer)2, buffer.getFirst());
-        assertEquals((Integer)2, buffer.popFirst());
-        assertEquals((Integer)3, buffer.getFirst());
+        assertEquals((Integer) 2, buffer.getFirst());
+        assertEquals((Integer) 2, buffer.popFirst());
+        assertEquals((Integer) 3, buffer.getFirst());
         assertEquals(3, buffer.size());
-        assertEquals((Integer)5, buffer.getLast());
+        assertEquals((Integer) 5, buffer.getLast());
     }
 }

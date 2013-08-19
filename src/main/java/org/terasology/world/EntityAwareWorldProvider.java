@@ -83,23 +83,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private BlockingQueue<BlockChange> pendingChanges = Queues.newLinkedBlockingQueue();
 
-    private static class BlockChange {
-        private Vector3i position = new Vector3i();
-        private Block oldType;
-        private Block newType;
-        private boolean forceEntityUpdate;
-        private Set<Class<? extends Component>> retainComponentTypes;
-
-        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate, Class<? extends Component>... retainComponentTypes) {
-            this.position.set(pos);
-            this.oldType = oldType;
-            this.newType = newType;
-            this.forceEntityUpdate = forceEntityUpdate;
-            this.retainComponentTypes = Sets.newHashSet(retainComponentTypes);
-        }
-    }
-
-
     public EntityAwareWorldProvider(WorldProviderCore base) {
         super(base);
         mainThread = Thread.currentThread();
@@ -539,6 +522,23 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                     temporaryBlockEntities.add(entity);
                 }
             }
+        }
+    }
+
+    private static class BlockChange {
+        private Vector3i position = new Vector3i();
+        private Block oldType;
+        private Block newType;
+        private boolean forceEntityUpdate;
+        private Set<Class<? extends Component>> retainComponentTypes;
+
+        @SafeVarargs
+        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate, Class<? extends Component>... retainComponentTypes) {
+            this.position.set(pos);
+            this.oldType = oldType;
+            this.newType = newType;
+            this.forceEntityUpdate = forceEntityUpdate;
+            this.retainComponentTypes = Sets.newHashSet(retainComponentTypes);
         }
     }
 }

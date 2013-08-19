@@ -31,14 +31,24 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Immortius
  */
-public class TaskMaster<T extends Task> {
+public final class TaskMaster<T extends Task> {
     private static final Logger logger = LoggerFactory.getLogger(TaskMaster.class);
 
     private BlockingQueue<T> taskQueue;
     private ExecutorService executorService;
     private int threads;
-    private boolean running = false;
+    private boolean running;
     private String name;
+
+    private TaskMaster(String name, int threads, BlockingQueue<T> queue) {
+        this.name = name;
+        this.threads = threads;
+        if (threads <= 0) {
+            throw new IllegalArgumentException("Must have at least one thread.");
+        }
+        taskQueue = queue;
+        restart();
+    }
 
     public static <T extends Task> TaskMaster<T> createFIFOTaskMaster(String name, int threads) {
         return new TaskMaster<>(name, threads, new LinkedBlockingQueue<T>());
@@ -50,16 +60,6 @@ public class TaskMaster<T extends Task> {
 
     public static <T extends Task> TaskMaster<T> createPriorityTaskMaster(String name, int threads, int queueSize, Comparator<T> comparator) {
         return new TaskMaster<>(name, threads, new PriorityBlockingQueue<T>(queueSize, comparator));
-    }
-
-    private TaskMaster(String name, int threads, BlockingQueue<T> queue) {
-        this.name = name;
-        this.threads = threads;
-        if (threads <= 0) {
-            throw new IllegalArgumentException("Must have at least one thread.");
-        }
-        taskQueue = queue;
-        restart();
     }
 
     /**

@@ -59,7 +59,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
     /**
      * True while the background sorting process is active.
      */
-    private boolean sorting = false;
+    private boolean sorting;
 
     /**
      * The delay in ms to wait between each sorting run.
@@ -362,7 +362,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      * when the background process is sorting the entities.
      */
     private interface Command {
-        public void executeOn(List<EntityRef> entities);
+        void executeOn(List<EntityRef> entities);
     }
 
     private static class AddCommand implements Command {

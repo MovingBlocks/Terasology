@@ -21,7 +21,7 @@ import org.terasology.input.ButtonState;
 
 public class MouseButtonEvent extends ButtonEvent {
 
-    private int button = 0;
+    private int button;
     private ButtonState state;
 
     public MouseButtonEvent(int button, ButtonState state, float delta) {

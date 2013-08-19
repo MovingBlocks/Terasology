@@ -52,7 +52,7 @@ public class EntitySerializer {
     private ComponentSerializer componentSerializer;
 
     private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
-    private boolean ignoringEntityId = false;
+    private boolean ignoringEntityId;
 
     /**
      * @param entityManager The entityManager that deserialized entities will be placed in.

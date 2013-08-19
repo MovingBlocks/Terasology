@@ -43,8 +43,8 @@ import static org.mockito.Mockito.mock;
  * @author Immortius
  */
 public class ComponentSerializerTest {
-    private ComponentSerializer componentSerializer;
     private static ModuleManager moduleManager;
+    private ComponentSerializer componentSerializer;
 
     @BeforeClass
     public static void setupClass() {

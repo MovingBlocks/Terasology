@@ -28,56 +28,6 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
  */
 public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
-    @Override
-    protected TeraArray createDense(byte[] arrayData) {
-        return new TeraDenseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), arrayData);
-    }
-
-    @Override
-    protected int rowSize() {
-        return getSizeXZHalf();
-    }
-
-    public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray4Bit> {
-
-        @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraDenseArray4Bit.class.equals(clazz);
-        }
-
-        @Override
-        protected TeraDenseArray4Bit createArray(int sizeX, int sizeY, int sizeZ, byte[] data) {
-            if (data == null) {
-                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
-            } else {
-                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ, data);
-            }
-        }
-    }
-
-    public static class Factory implements TeraArray.Factory<TeraDenseArray4Bit> {
-
-        @Override
-        public Class<TeraDenseArray4Bit> getArrayClass() {
-            return TeraDenseArray4Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-
-        @Override
-        public TeraDenseArray4Bit create() {
-            return new TeraDenseArray4Bit();
-        }
-
-        @Override
-        public TeraDenseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
-            return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
-        }
-    }
-
     public TeraDenseArray4Bit() {
         super();
     }
@@ -92,6 +42,16 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     public TeraDenseArray4Bit(TeraArray in) {
         super(in);
+    }
+
+    @Override
+    protected TeraArray createDense(byte[] arrayData) {
+        return new TeraDenseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), arrayData);
+    }
+
+    @Override
+    protected int rowSize() {
+        return getSizeXZHalf();
     }
 
     @Override
@@ -153,6 +113,46 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
             return true;
         }
         return false;
+    }
+
+    public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray4Bit> {
+
+        @Override
+        public boolean canHandle(Class<?> clazz) {
+            return TeraDenseArray4Bit.class.equals(clazz);
+        }
+
+        @Override
+        protected TeraDenseArray4Bit createArray(int sizeX, int sizeY, int sizeZ, byte[] data) {
+            if (data == null) {
+                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
+            } else {
+                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ, data);
+            }
+        }
+    }
+
+    public static class Factory implements TeraArray.Factory<TeraDenseArray4Bit> {
+
+        @Override
+        public Class<TeraDenseArray4Bit> getArrayClass() {
+            return TeraDenseArray4Bit.class;
+        }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
+
+        @Override
+        public TeraDenseArray4Bit create() {
+            return new TeraDenseArray4Bit();
+        }
+
+        @Override
+        public TeraDenseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
+        }
     }
 
 }

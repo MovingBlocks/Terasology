@@ -39,7 +39,7 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
 
     private Deque<Throwable> errors = Queues.newArrayDeque();
 
-    private boolean active = false;
+    private boolean active;
     private String lastTask = "";
 
     public SingleThreadMonitorImpl(Thread thread) {

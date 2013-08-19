@@ -26,7 +26,10 @@ import org.terasology.world.chunks.Chunk;
  *
  * @author Immortius
  */
-public class InternalLightProcessor {
+public final class InternalLightProcessor {
+
+    private InternalLightProcessor() {
+    }
 
     public static void generateInternalLighting(Chunk chunk) {
         int top = Chunk.SIZE_Y - 1;
@@ -60,10 +63,10 @@ public class InternalLightProcessor {
                 }
                 for (int y = top; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);
-                    if (y > tops[x + Chunk.SIZE_X * z] && ((x > 0 && tops[(x - 1) + Chunk.SIZE_X * z] >= y) ||
-                            (x < Chunk.SIZE_X - 1 && tops[(x + 1) + Chunk.SIZE_X * z] >= y) ||
-                            (z > 0 && tops[x + Chunk.SIZE_X * (z - 1)] >= y) ||
-                            (z < Chunk.SIZE_Z - 1 && tops[x + Chunk.SIZE_X * (z + 1)] >= y))) {
+                    if (y > tops[x + Chunk.SIZE_X * z] && ((x > 0 && tops[(x - 1) + Chunk.SIZE_X * z] >= y)
+                            || (x < Chunk.SIZE_X - 1 && tops[(x + 1) + Chunk.SIZE_X * z] >= y)
+                            || (z > 0 && tops[x + Chunk.SIZE_X * (z - 1)] >= y)
+                            || (z < Chunk.SIZE_Z - 1 && tops[x + Chunk.SIZE_X * (z + 1)] >= y))) {
                         spreadSunlightInternal(chunk, x, y, z, block);
                     }
                     if (block.getLuminance() > 0) {

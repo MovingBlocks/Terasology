@@ -93,7 +93,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
 
-    private ShaderData shaderProgramBase = null;
+    private ShaderData shaderProgramBase;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
 
     public GLSLShader(AssetUri uri, ShaderData data) {

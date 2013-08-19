@@ -57,8 +57,8 @@ import java.util.Locale;
  * @author Immortius
  */
 public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
-    private Gson gson;
     private static final BoxShape CUBE_SHAPE = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+    private Gson gson;
 
     public JsonBlockShapeLoader() {
         gson = new GsonBuilder()
@@ -69,7 +69,6 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
                 .registerTypeAdapter(Vector2f.class, new Vector2fHandler())
                 .create();
     }
-
 
     @Override
     public BlockShapeData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {

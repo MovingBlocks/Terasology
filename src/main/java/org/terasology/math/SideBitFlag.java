@@ -42,6 +42,9 @@ public final class SideBitFlag {
         sideBits.put(Side.BACK, (byte) 0b100000);
     }
 
+    private SideBitFlag() {
+    }
+
     public static byte getReverse(byte sides) {
         return (byte) ((sides / 8) + ((sides % 8) * 8));
     }
@@ -99,6 +102,4 @@ public final class SideBitFlag {
         return result;
     }
 
-    private SideBitFlag() {
-    }
 }

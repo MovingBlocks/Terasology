@@ -59,7 +59,7 @@ public final class LightComponent implements Component, ReplicationCheck {
     @Replicate
     public LightType lightType = LightType.POINT;
 
-    public boolean simulateFading = false;
+    public boolean simulateFading;
 
 
     @Override

@@ -77,7 +77,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NetClient extends AbstractClient implements WorldChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(NetClient.class);
-    public static final float NET_TICK_RATE = 0.05f;
+    private static final float NET_TICK_RATE = 0.05f;
 
     private Time time;
     private NetworkSystemImpl networkSystem;
@@ -101,7 +101,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private boolean awaitingConnectMessage = true;
     private String name = "Unknown";
-    private long lastReceivedTime = 0;
+    private long lastReceivedTime;
     private ViewDistance viewDistance = ViewDistance.NEAR;
     private float chunkSendCounter = 1.0f;
 

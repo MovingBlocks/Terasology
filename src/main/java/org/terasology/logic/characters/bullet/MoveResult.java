@@ -23,9 +23,9 @@ import javax.vecmath.Vector3f;
  */
 public class MoveResult {
     private Vector3f finalPosition;
-    private boolean horizontalHit = false;
-    private boolean bottomHit = false;
-    private boolean topHit = false;
+    private boolean horizontalHit;
+    private boolean bottomHit;
+    private boolean topHit;
 
     public MoveResult(Vector3f finalPosition, boolean hitHorizontal, boolean hitBottom, boolean hitTop) {
         this.finalPosition = finalPosition;

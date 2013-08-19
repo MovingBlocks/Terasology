@@ -25,7 +25,10 @@ import org.terasology.entitySystem.DoNotAutoRegister;
 @DoNotAutoRegister
 public class UnsupportedTypeComponent implements Component {
     public static class UnsupportedType {
-        private UnsupportedType() {};
+        private UnsupportedType() {
+        }
+
+        ;
     }
 
     public abstract static class UnsupportedType2 {

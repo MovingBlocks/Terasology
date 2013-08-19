@@ -33,6 +33,24 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     protected byte[] data;
 
+    protected TeraDenseArrayByte() {
+        super();
+    }
+
+    protected TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ, true);
+    }
+
+    protected TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, byte[] data) {
+        super(sizeX, sizeY, sizeZ, false);
+        this.data = Preconditions.checkNotNull(data);
+        Preconditions.checkArgument(data.length == dataSize(), "The length of the parameter 'data' has to be " + dataSize() + " but is " + data.length);
+    }
+
+    protected TeraDenseArrayByte(TeraArray in) {
+        super(in);
+    }
+
     protected abstract TeraArray createDense(byte[] arrayData);
 
     protected abstract int rowSize();
@@ -44,6 +62,34 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
     @Override
     protected void initialize() {
         this.data = new byte[dataSize()];
+    }
+
+    @Override
+    public final int getEstimatedMemoryConsumptionInBytes() {
+        if (data == null) {
+            return 4;
+        } else {
+            return 16 + data.length;
+        }
+    }
+
+    @Override
+    public final TeraArray copy() {
+        byte[] result = new byte[dataSize()];
+        System.arraycopy(data, 0, result, 0, dataSize());
+        return createDense(result);
+    }
+
+    @Override
+    public final void writeExternal(ObjectOutput out) throws IOException {
+        writeExternalHeader(out);
+        out.writeObject(data);
+    }
+
+    @Override
+    public final void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        readExternalHeader(in);
+        data = (byte[]) in.readObject();
     }
 
     protected abstract static class SerializationHandler<T extends TeraDenseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
@@ -82,51 +128,4 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
             return createArray(sizeX, sizeY, sizeZ, null);
         }
     }
-
-    protected TeraDenseArrayByte() {
-        super();
-    }
-
-    protected TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ, true);
-    }
-
-    protected TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, byte[] data) {
-        super(sizeX, sizeY, sizeZ, false);
-        this.data = Preconditions.checkNotNull(data);
-        Preconditions.checkArgument(data.length == dataSize(), "The length of the parameter 'data' has to be " + dataSize() + " but is " + data.length);
-    }
-
-    protected TeraDenseArrayByte(TeraArray in) {
-        super(in);
-    }
-
-    @Override
-    public final int getEstimatedMemoryConsumptionInBytes() {
-        if (data == null) {
-            return 4;
-        } else {
-            return 16 + data.length;
-        }
-    }
-
-    @Override
-    public final TeraArray copy() {
-        byte[] result = new byte[dataSize()];
-        System.arraycopy(data, 0, result, 0, dataSize());
-        return createDense(result);
-    }
-
-    @Override
-    public final void writeExternal(ObjectOutput out) throws IOException {
-        writeExternalHeader(out);
-        out.writeObject(data);
-    }
-
-    @Override
-    public final void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        readExternalHeader(in);
-        data = (byte[]) in.readObject();
-    }
-
 }

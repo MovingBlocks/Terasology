@@ -31,7 +31,7 @@ public class RigidBodyComponent implements Component {
     @Replicate
     public float mass = 10.0f;
     @Replicate
-    public boolean kinematic = false;
+    public boolean kinematic;
 
     @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;

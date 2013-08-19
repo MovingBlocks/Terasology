@@ -24,11 +24,6 @@ import java.util.Random;
  * @author Immortius
  */
 public class Voronoi {
-    public static class VoronoiResult {
-        public float distance;
-        public Vector2f delta;
-        public int id;
-    }
 
     private Vector2f offset;
 
@@ -152,5 +147,11 @@ public class Voronoi {
                 results[index].id = (int) id;
             }
         }
+    }
+
+    public static class VoronoiResult {
+        public float distance;
+        public Vector2f delta;
+        public int id;
     }
 }

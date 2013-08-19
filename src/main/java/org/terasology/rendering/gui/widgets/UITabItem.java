@@ -41,6 +41,59 @@ public class UITabItem extends UIDisplayContainerScrollable {
     private UITabFolder tabFolder;
     private final UITab tab;
 
+    public UITabItem() {
+        tab = new UITab(this);
+        tab.setText("");
+        tab.setVisible(true);
+    }
+
+    /**
+     * Get the tab folder where the item was added.
+     *
+     * @return Returns the tab folder where the item was added.
+     */
+    public UITabFolder getTabFolder() {
+        return tabFolder;
+    }
+
+    /**
+     * Set the tab folder where the item belongs too. Will be set from the tab folder.
+     * Shouldn't be used by anyone other.
+     *
+     * @param folder The tab folder.
+     */
+    public void setTabFolder(UITabFolder folder) {
+        this.tabFolder = folder;
+    }
+
+    /**
+     * Get the tab element which can be clicked on, to switch between the tabs.
+     * All tabs are displayed in the tab bar over the actual tabs.
+     *
+     * @return Returns the tab.
+     */
+    public UITab getTab() {
+        return tab;
+    }
+
+    /**
+     * Get the text which will be displayed as the tabs name.
+     *
+     * @return Returns the text which will be displayed.
+     */
+    public String getText() {
+        return tab.getText();
+    }
+
+    /**
+     * Set the text of the tab which will be displayed as the tabs name. Can only be set indirect through a UITabItem.
+     *
+     * @param text The text to set.
+     */
+    public void setText(String text) {
+        tab.setText(text);
+    }
+
     /**
      * The tab element which can be clicked on, to switch between the tabs.
      * All tabs are displayed in the tab bar over the actual tabs.
@@ -198,58 +251,5 @@ public class UITabItem extends UIDisplayContainerScrollable {
                 setShadow(new Vector4f(0f, 3f, 4f, 3f), EShadowDirection.INSIDE, 1);
             }
         }
-    }
-
-    public UITabItem() {
-        tab = new UITab(this);
-        tab.setText("");
-        tab.setVisible(true);
-    }
-
-    /**
-     * Get the tab folder where the item was added.
-     *
-     * @return Returns the tab folder where the item was added.
-     */
-    public UITabFolder getTabFolder() {
-        return tabFolder;
-    }
-
-    /**
-     * Set the tab folder where the item belongs too. Will be set from the tab folder.
-     * Shouldn't be used by anyone other.
-     *
-     * @param folder The tab folder.
-     */
-    public void setTabFolder(UITabFolder folder) {
-        this.tabFolder = folder;
-    }
-
-    /**
-     * Get the tab element which can be clicked on, to switch between the tabs.
-     * All tabs are displayed in the tab bar over the actual tabs.
-     *
-     * @return Returns the tab.
-     */
-    public UITab getTab() {
-        return tab;
-    }
-
-    /**
-     * Get the text which will be displayed as the tabs name.
-     *
-     * @return Returns the text which will be displayed.
-     */
-    public String getText() {
-        return tab.getText();
-    }
-
-    /**
-     * Set the text of the tab which will be displayed as the tabs name. Can only be set indirect through a UITabItem.
-     *
-     * @param text The text to set.
-     */
-    public void setText(String text) {
-        tab.setText(text);
     }
 }

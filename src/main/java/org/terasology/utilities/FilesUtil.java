@@ -28,9 +28,6 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public final class FilesUtil {
 
-    private FilesUtil() {
-    }
-
     /**
      * A filter for DirectoryStream that only accepts directories
      */
@@ -40,6 +37,9 @@ public final class FilesUtil {
                     return Files.isDirectory(file);
                 }
             };
+
+    private FilesUtil() {
+    }
 
     /**
      * Note: Keep an eye out for recursive delete being added to the core Java API in the future - there are certain

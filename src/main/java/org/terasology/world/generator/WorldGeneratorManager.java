@@ -43,7 +43,13 @@ public class WorldGeneratorManager {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         CoreRegistry.get(ModuleManager.class).loadInactiveReflections();
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
-        for (Module module : moduleManager.getModules()) {
+        for (Module module : moduleManager.getCodeModules()) {
+            if (module == null) {
+                logger.error("Null module");
+            }
+            if (module.getReflections() == null) {
+                logger.error("Module has no reflections: {}", module.getModuleInfo().getId());
+            }
             for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                 if (isValidWorldGenerator(generatorClass)) {

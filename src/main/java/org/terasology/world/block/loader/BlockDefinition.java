@@ -31,24 +31,24 @@ import java.util.List;
  */
 public class BlockDefinition {
     public String displayName = "";
-    public boolean liquid = false;
+    public boolean liquid;
     public byte hardness = 0x3;
 
     public boolean attachmentAllowed = true;
-    public boolean replacementAllowed = false;
-    public boolean supportRequired = false;
+    public boolean replacementAllowed;
+    public boolean supportRequired;
 
-    public boolean penetrable = false;
+    public boolean penetrable;
     public boolean targetable = true;
-    public boolean climbable = false;
+    public boolean climbable;
 
-    public boolean invisible = false;
-    public boolean translucent = false;
-    public boolean doubleSided = false;
+    public boolean invisible;
+    public boolean translucent;
+    public boolean doubleSided;
     public boolean shadowCasting = true;
-    public boolean waving = false;
+    public boolean waving;
 
-    public byte luminance = 0;
+    public byte luminance;
 
     public Vector3f tint = new Vector3f();
 
@@ -71,9 +71,9 @@ public class BlockDefinition {
 
     public String shape = "";
     public List<String> shapes = Lists.newArrayList();
-    public String rotation = null;
-    public boolean water = false;
-    public boolean lava = false;
+    public String rotation;
+    public boolean water;
+    public boolean lava;
 
     public static class Tiles {
         public EnumMap<BlockPart, String> map = Maps.newEnumMap(BlockPart.class);
@@ -89,11 +89,11 @@ public class BlockDefinition {
 
     public static class Entity {
         public String prefab = "";
-        public boolean keepActive = false;
+        public boolean keepActive;
     }
 
     public static class Inventory {
-        public boolean directPickup = false;
+        public boolean directPickup;
         public boolean stackable = true;
     }
 }

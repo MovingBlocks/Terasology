@@ -86,7 +86,7 @@ public class EntitySystemBuilder {
         CoreRegistry.put(EventLibrary.class, library.getEventLibrary());
         entityManager.setEntitySystemLibrary(library);
 
-        PrefabManager prefabManager = new PojoPrefabManager(library.getComponentLibrary());
+        PrefabManager prefabManager = new PojoPrefabManager();
         entityManager.setPrefabManager(prefabManager);
         CoreRegistry.put(PrefabManager.class, prefabManager);
 

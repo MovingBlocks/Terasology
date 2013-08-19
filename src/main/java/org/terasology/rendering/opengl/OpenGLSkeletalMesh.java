@@ -57,9 +57,9 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
 
     private SkeletalMeshData data;
 
-    private int vboPosNormBuffer = 0;
-    private int vboUVBuffer = 0;
-    private int vboIndexBuffer = 0;
+    private int vboPosNormBuffer;
+    private int vboUVBuffer;
+    private int vboIndexBuffer;
 
     public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
         super(uri);

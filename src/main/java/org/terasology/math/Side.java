@@ -101,6 +101,18 @@ public enum Side {
         horizontalSides = new Side[]{LEFT, RIGHT, FRONT, BACK};
     }
 
+    private Vector3i vector3iDir;
+    private boolean canYaw;
+    private boolean canPitch;
+    private boolean canRoll;
+
+    private Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
+        this.vector3iDir = vector3i;
+        this.canPitch = canPitch;
+        this.canYaw = canYaw;
+        this.canRoll = canRoll;
+    }
+
     /**
      * @return The horizontal sides, for iteration
      */
@@ -154,18 +166,6 @@ public enum Side {
             return (x > 0) ? RIGHT : LEFT;
         }
         return (z > 0) ? BACK : FRONT;
-    }
-
-    private Vector3i vector3iDir;
-    private boolean canYaw;
-    private boolean canPitch;
-    private boolean canRoll;
-
-    Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
-        this.vector3iDir = vector3i;
-        this.canPitch = canPitch;
-        this.canYaw = canYaw;
-        this.canRoll = canRoll;
     }
 
     /**

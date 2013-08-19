@@ -47,8 +47,8 @@ public final class CharacterComponent implements Component {
     public EntityRef controller = EntityRef.NULL;
 
     // What inventory slot the character has selected (this currently also determines held item, will need to review based on gameplay)
-    public int selectedItem = 0;
-    public float handAnimation = 0;
+    public int selectedItem;
+    public float handAnimation;
 
     public Quat4f getLookRotation() {
         Quat4f lookRotation = new Quat4f();

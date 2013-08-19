@@ -51,7 +51,7 @@ public class MasterSecretGeneratorTests {
     public void dddd() throws Exception {
         String message = "The Quick Brown Fox Jumped Over The Lazy Dog";
 
-        SecretKeySpec key = new SecretKeySpec(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, "ARCFOUR");
+        SecretKeySpec key = new SecretKeySpec(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, "ARCFOUR");
         Cipher cipher = Cipher.getInstance("ARCFOUR");
         cipher.init(Cipher.ENCRYPT_MODE, key);
         byte[] encrypted = cipher.doFinal(message.getBytes("UTF-8"));

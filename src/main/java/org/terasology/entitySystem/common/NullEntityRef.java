@@ -28,14 +28,14 @@ import org.terasology.utilities.collection.NullIterator;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class NullEntityRef extends EntityRef {
+public final class NullEntityRef extends EntityRef {
     private static NullEntityRef instance = new NullEntityRef();
+
+    private NullEntityRef() {
+    }
 
     public static NullEntityRef getInstance() {
         return instance;
-    }
-
-    private NullEntityRef() {
     }
 
     @Override

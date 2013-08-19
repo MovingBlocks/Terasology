@@ -40,7 +40,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLTexture.class);
 
-    private int id = 0;
+    private int id;
     private int width;
     private int height;
     private int depth;

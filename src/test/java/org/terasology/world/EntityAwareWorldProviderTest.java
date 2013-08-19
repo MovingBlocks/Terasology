@@ -82,9 +82,9 @@ import static org.mockito.Mockito.when;
  */
 public class EntityAwareWorldProviderTest {
 
+    private static ModuleManager moduleManager;
     private EntityAwareWorldProvider worldProvider;
     private EngineEntityManager entityManager;
-    private static ModuleManager moduleManager;
     private BlockManagerImpl blockManager;
     private WorldProviderCoreStub worldStub;
 
@@ -437,10 +437,10 @@ public class EntityAwareWorldProviderTest {
 
     public static class BlockEventChecker implements ComponentSystem {
 
-        public boolean addedReceived = false;
-        public boolean activateReceived = false;
-        public boolean deactivateReceived = false;
-        public boolean removedReceived = false;
+        public boolean addedReceived;
+        public boolean activateReceived;
+        public boolean deactivateReceived;
+        public boolean removedReceived;
 
         @Override
         public void initialise() {

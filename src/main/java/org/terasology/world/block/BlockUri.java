@@ -38,7 +38,7 @@ public class BlockUri extends AbstractBaseUri {
     public static final String IDENTIFIER_SEPARATOR = ".";
     public static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
 
-    private AssetUri shape = null;
+    private AssetUri shape;
 
     private String moduleName = "";
     private String familyName = "";
@@ -214,10 +214,10 @@ public class BlockUri extends AbstractBaseUri {
         }
         if (obj instanceof BlockUri) {
             BlockUri other = (BlockUri) obj;
-            return Objects.equal(other.normalisedModuleName, normalisedModuleName) &&
-                    Objects.equal(other.normalisedFamilyName, normalisedFamilyName) &&
-                    Objects.equal(other.shape, shape) &&
-                    Objects.equal(other.normalisedBlockIdentifier, normalisedBlockIdentifier);
+            return Objects.equal(other.normalisedModuleName, normalisedModuleName)
+                    && Objects.equal(other.normalisedFamilyName, normalisedFamilyName)
+                    && Objects.equal(other.shape, shape)
+                    && Objects.equal(other.normalisedBlockIdentifier, normalisedBlockIdentifier);
         }
         return false;
     }

@@ -17,18 +17,17 @@ package org.terasology.input.events;
 
 import org.terasology.input.ButtonState;
 
-public class KeyDownEvent extends KeyEvent {
+public final class KeyDownEvent extends KeyEvent {
 
     private static KeyDownEvent event = new KeyDownEvent(0, 0);
+
+    private KeyDownEvent(int key, float delta) {
+        super(key, ButtonState.DOWN, delta);
+    }
 
     public static KeyDownEvent create(int key, float delta) {
         event.reset(delta);
         event.setKey(key);
         return event;
     }
-
-    private KeyDownEvent(int key, float delta) {
-        super(key, ButtonState.DOWN, delta);
-    }
-
 }

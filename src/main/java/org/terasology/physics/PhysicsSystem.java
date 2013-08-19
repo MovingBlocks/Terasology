@@ -93,7 +93,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     private int skipProcessingFrames = 4;
     private List<EntityRef> newRigidBodies = Lists.newArrayList();
     private Map<EntityRef, Vector3f> pendingImpulses = Maps.newLinkedHashMap();
-    private long lastNetsync = 0;
+    private long lastNetsync;
     private Map<EntityRef, ResynchData> pendingResynch = Maps.newLinkedHashMap();
 
     @Override
@@ -444,7 +444,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     private static class ResynchData {
         private Vector3f positionDelta = new Vector3f();
         private Quat4f rotationDelta = new Quat4f();
-        private float t = 0;
+        private float t;
 
         public ResynchData(Vector3f position, Quat4f rotation) {
             this.positionDelta.set(position);

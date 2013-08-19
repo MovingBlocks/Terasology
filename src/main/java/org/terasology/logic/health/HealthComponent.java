@@ -26,9 +26,9 @@ public final class HealthComponent implements Component {
     @Replicate
     public int maxHealth = 20;
     @Replicate
-    public float regenRate = 0.0f;
+    public float regenRate;
     @Replicate
-    public float waitBeforeRegen = 0.0f;
+    public float waitBeforeRegen;
 
     // TODO: Should these be in a separate component?
     @Replicate
@@ -42,7 +42,7 @@ public final class HealthComponent implements Component {
     public int currentHealth = 20;
 
     // Regen info
-    public long nextRegenTick = 0;
+    public long nextRegenTick;
 
     public HealthComponent() {
     }

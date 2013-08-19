@@ -35,18 +35,18 @@ import java.util.Map;
  */
 public class FlatTerrainGenerator implements FirstPassGenerator {
 
-    private static final String INIT_PARAMETER_HEIGHT = "height";
     // TODO FlatTerrainGenerator: What is a good value for MAX_Y?
     public static final int MAX_HEIGHT = Chunk.SIZE_Y - 100;
     public static final int MIN_HEIGHT = 0;
     public static final int DEFAULT_HEIGHT = 50;
 
     private static final Logger logger = LoggerFactory.getLogger(FlatTerrainGenerator.class);
+    private static final String INIT_PARAMETER_HEIGHT = "height";
 
     private WorldBiomeProvider biomeProvider;
     private int surfaceHeight;
 
-    BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    private BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
     private Block air = BlockManager.getAir();
     private Block mantle = blockManager.getBlock("engine:MantleStone");

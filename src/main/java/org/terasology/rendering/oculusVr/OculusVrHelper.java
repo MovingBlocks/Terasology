@@ -23,7 +23,7 @@ import org.terasology.TeraOVR;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class OculusVrHelper {
+public final class OculusVrHelper {
 
     private static float verticalRes = 800.0f;
     private static float horizontalRes = 1280.0f;
@@ -46,7 +46,7 @@ public class OculusVrHelper {
     private static float percievedHalfRTDistance;
     private static float yFov;
 
-    private static boolean nativeLibraryLoaded = false;
+    private static boolean nativeLibraryLoaded;
 
     private static float lastPitch;
     private static float lastYaw;
@@ -54,6 +54,9 @@ public class OculusVrHelper {
 
     static {
         updateHelperVariables();
+    }
+
+    private OculusVrHelper() {
     }
 
     public static void loadNatives() {

@@ -26,9 +26,12 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class SavedGamesPathFinder {
+public final class SavedGamesPathFinder {
 
     private static final Map<String, Integer> FOLDER_ID_TO_CSIDL = ImmutableMap.of(Shell32.FOLDERID_DOCUMENTS, 0x0005);
+
+    private SavedGamesPathFinder() {
+    }
 
     public static String findSavedGamesPath() {
         return findWindowsPath(Shell32.FOLDERID_SAVED_GAMES);

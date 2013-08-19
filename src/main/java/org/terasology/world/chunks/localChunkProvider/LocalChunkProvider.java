@@ -100,9 +100,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
     private BlockManager blockManager;
-    private BlockEntityRegistry registry = null;
+    private BlockEntityRegistry registry;
 
-    private boolean forceCleanup = false;
+    private boolean forceCleanup;
 
     public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
         blockManager = CoreRegistry.get(BlockManager.class);

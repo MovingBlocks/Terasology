@@ -26,7 +26,7 @@ import org.terasology.entitySystem.EntityRef;
  * @author Immortius
  */
 public class ClientComponent implements Component {
-    public boolean local = false;
+    public boolean local;
 
     @Replicate
     public EntityRef clientInfo = EntityRef.NULL;

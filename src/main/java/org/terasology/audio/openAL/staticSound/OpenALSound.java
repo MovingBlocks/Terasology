@@ -32,9 +32,11 @@ import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALSound extends AbstractAsset<StaticSoundData> implements StaticSound {
 
+    protected float length;
+
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
-    private int bufferId = 0;
-    protected float length = 0;
+    private int bufferId;
+
 
     public OpenALSound(AssetUri uri, StaticSoundData data) {
         super(uri);

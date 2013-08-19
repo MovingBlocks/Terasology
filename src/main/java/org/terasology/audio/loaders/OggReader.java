@@ -50,19 +50,25 @@ public class OggReader extends FilterInputStream {
     /**
      * The mono 16 bit format
      */
-    public static final int FORMAT_MONO16 = 1;
+    private static final int FORMAT_MONO16 = 1;
 
     /**
      * The stereo 16 bit format
      */
-    public static final int FORMAT_STEREO16 = 2;
+    private static final int FORMAT_STEREO16 = 2;
+
+    /// Conversion buffer size
+    private static int convsize = 4096 * 2;
+
+    // Conversion buffer
+    private static byte[] convbuffer = new byte[convsize];
 
     // temp vars
     private float[][][] pcm = new float[1][][];
     private int[] index;
 
     // end of stream
-    private boolean eos = false;
+    private boolean eos;
 
     // sync and verify incoming physical bitstream
     private SyncState syncState = new SyncState();
@@ -88,17 +94,11 @@ public class OggReader extends FilterInputStream {
     // local working space for packet->PCM decode
     private Block block = new Block(dspState);
 
-    /// Conversion buffer size
-    private static int convsize = 4096 * 2;
-
-    // Conversion buffer
-    private static byte[] convbuffer = new byte[convsize];
-
     // where we are in the convbuffer
-    private int convbufferOff = 0;
+    private int convbufferOff;
 
     // bytes ready in convbuffer.
-    private int convbufferSize = 0;
+    private int convbufferSize;
 
     // a dummy used by read() to read 1 byte.
     private byte[] readDummy = new byte[1];
@@ -287,7 +287,7 @@ public class OggReader extends FilterInputStream {
         if (syncState.pageout(page) != 1) {
             // have we simply run out of data?  If so, we're done.
             if (bytes < 4096) {
-                return;//break;
+                return; //break;
             }
             // error case.  Must not be Vorbis data
             throw new Exception("Input does not appear to be an Ogg bitstream.");

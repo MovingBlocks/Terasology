@@ -38,9 +38,9 @@ public final class BlockParticleEffectComponent implements Component {
     }
 
     // Can be null for non-block particles
-    public BlockFamily blockType = null;
+    public BlockFamily blockType;
     // If no texture is specified, the default block texture atlas is used
-    public Texture texture = null;
+    public Texture texture;
 
     public int spawnCount = 16;
     public boolean destroyEntityOnCompletion;
@@ -52,16 +52,16 @@ public final class BlockParticleEffectComponent implements Component {
     public Vector3f initialVelocityRange = new Vector3f();
     public float minSize = 0.1f;
     public float maxSize = 1.0f;
-    public float minLifespan = 0.0f;
+    public float minLifespan;
     public float maxLifespan = 1.0f;
 
-    public boolean randBlockTexDisplacement = false;
+    public boolean randBlockTexDisplacement;
     public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
 
     // Lifetime conditions
     public Vector3f targetVelocity = new Vector3f();
     public Vector3f acceleration = new Vector3f();
-    public boolean collideWithBlocks = false;
+    public boolean collideWithBlocks;
 
     public List<Particle> particles = Lists.newArrayList();
 

@@ -60,16 +60,16 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     private MeshData data;
 
     private int stride;
-    private int vertexOffset = 0;
+    private int vertexOffset;
     private int texCoord0Offset;
     private int texCoord1Offset;
     private int colorOffset;
     private int normalOffset;
 
-    private boolean hasTexCoord0 = false;
-    private boolean hasTexCoord1 = false;
-    private boolean hasColor = false;
-    private boolean hasNormal = false;
+    private boolean hasTexCoord0;
+    private boolean hasTexCoord1;
+    private boolean hasColor;
+    private boolean hasNormal;
 
     private int vboVertexBuffer;
     private int vboIndexBuffer;

@@ -18,7 +18,6 @@ package org.terasology.entitySystem.internal;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 
@@ -36,27 +35,14 @@ import java.util.Map;
 public class PojoPrefabManager implements PrefabManager {
 
     /**
-     * Library for available components (passed in).
-     */
-    private ComponentLibrary componentLibrary;
-
-    /**
      * Map that stores the loaded Prefabs.
      */
     private Map<String, Prefab> prefabTable = Maps.newHashMap();
 
     /**
-     * Constructor requiring a ComponentLibrary to be passed in.
-     *
-     * @param library The library of Components to use
-     */
-    public PojoPrefabManager(ComponentLibrary library) {
-        componentLibrary = library;
-    }
-
-    /**
      * {@inheritDoc}
      */
+    @Override
     public Prefab getPrefab(String name) {
         String normalisedName = normalizeName(name);
         return exists(normalisedName) ? prefabTable.get(normalisedName) : null;
@@ -65,6 +51,7 @@ public class PojoPrefabManager implements PrefabManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean exists(String name) {
         String normalisedName = normalizeName(name);
         return prefabTable.containsKey(normalisedName);
@@ -73,6 +60,7 @@ public class PojoPrefabManager implements PrefabManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Prefab registerPrefab(Prefab prefab) {
         String normalisedName = normalizeName(prefab.getName());
         if (prefabTable.containsKey(normalisedName)) {
@@ -87,6 +75,7 @@ public class PojoPrefabManager implements PrefabManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<Prefab> listPrefabs() {
         return prefabTable.values();
     }
@@ -94,6 +83,7 @@ public class PojoPrefabManager implements PrefabManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<Prefab> listPrefabs(Class<? extends Component> comp) {
         Collection<Prefab> prefabs = Sets.newHashSet();
 
@@ -104,14 +94,6 @@ public class PojoPrefabManager implements PrefabManager {
         }
 
         return prefabs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removePrefab(String name) {
-        String normalisedName = normalizeName(name);
-        prefabTable.remove(normalisedName);
     }
 
     private String normalizeName(String name) {

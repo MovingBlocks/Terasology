@@ -21,17 +21,17 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class CircularBuffer<T> implements Iterable<T> {
+public final class CircularBuffer<T> implements Iterable<T> {
     private T[] buffer;
-    private int startIndex = 0;
+    private int startIndex;
     private int occupancy;
-
-    public static <T> CircularBuffer<T> create(int length) {
-        return new CircularBuffer<T>(length);
-    }
 
     private CircularBuffer(int length) {
         buffer = (T[]) new Object[length];
+    }
+
+    public static <T> CircularBuffer<T> create(int length) {
+        return new CircularBuffer<>(length);
     }
 
     public T get(int index) {
@@ -94,7 +94,7 @@ public class CircularBuffer<T> implements Iterable<T> {
     }
 
     private class BufferIterator implements Iterator<T> {
-        int index = 0;
+        int index;
 
         @Override
         public boolean hasNext() {

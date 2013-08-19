@@ -53,21 +53,6 @@ public class UIProgressBar extends UIDisplayContainer {
     private UIProgressLine progressLine;
     private int range;
 
-    /**
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
-     */
-    private static class UIProgressLine extends UIDisplayContainer {
-
-        public UIProgressLine() {
-            setCropContainer(true);
-            setBackgroundImage("engine:gui_menu", new Vector2f(0f, 190f), new Vector2f(248f, 9f));
-        }
-
-        public void updateProgress(int value, int range) {
-            setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * ((float) value / (float) range)), 0f, 0f));
-        }
-    }
-
     public UIProgressBar() {
         setBackgroundImage("engine:gui_menu", new Vector2f(0f, 175f), new Vector2f(256f, 15f));
 
@@ -266,6 +251,21 @@ public class UIProgressBar extends UIDisplayContainer {
 
     public void removeChangedListener(ChangedListener listener) {
         changedListeners.remove(listener);
+    }
+
+    /**
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+     */
+    private static class UIProgressLine extends UIDisplayContainer {
+
+        public UIProgressLine() {
+            setCropContainer(true);
+            setBackgroundImage("engine:gui_menu", new Vector2f(0f, 190f), new Vector2f(248f, 9f));
+        }
+
+        public void updateProgress(int value, int range) {
+            setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * ((float) value / (float) range)), 0f, 0f));
+        }
     }
 }
 

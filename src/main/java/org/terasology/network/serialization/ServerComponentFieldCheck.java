@@ -28,8 +28,8 @@ import org.terasology.persistence.serializers.FieldSerializeCheck;
  * @author Immortius
  */
 public class ServerComponentFieldCheck implements FieldSerializeCheck<Component> {
-    private boolean owned = false;
-    private boolean entityInitial = false;
+    private boolean owned;
+    private boolean entityInitial;
 
     public ServerComponentFieldCheck(boolean owned, boolean entityInitial) {
         this.owned = owned;

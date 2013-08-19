@@ -63,7 +63,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     float waterTint = 0.24f;
 
     @EditorRange(min = 0.0f, max = 5.0f)
-    float waterOffsetY = 0.0f;
+    float waterOffsetY;
 
     @EditorRange(min = 0.0f, max = 1024.0f)
     float waterSpecExp = 200.0f;

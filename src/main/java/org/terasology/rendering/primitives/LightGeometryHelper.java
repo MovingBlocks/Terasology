@@ -24,9 +24,12 @@ import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
 
-public class LightGeometryHelper {
+public final class LightGeometryHelper {
 
-    static int displayListSphere = -1;
+    private static int displayListSphere = -1;
+
+    private LightGeometryHelper() {
+    }
 
     public static void renderSphereGeometry() {
         if (displayListSphere == -1) {
