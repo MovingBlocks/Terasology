@@ -38,9 +38,10 @@ import static org.mockito.Mockito.mock;
  */
 public class WorldSerializerTest {
 
+    private static ModuleManager moduleManager;
+
     private EngineEntityManager entityManager;
     private WorldSerializer worldSerializer;
-    private static ModuleManager moduleManager;
 
     @BeforeClass
     public static void setupClass() {

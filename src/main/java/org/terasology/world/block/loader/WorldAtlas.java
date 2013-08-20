@@ -66,8 +66,8 @@ public class WorldAtlas {
     private List<TileData> tilesNormal = Lists.newArrayList();
     private List<TileData> tilesHeight = Lists.newArrayList();
 
-    private TileData defaultNormal = null;
-    private TileData defaultHeight = null;
+    private TileData defaultNormal;
+    private TileData defaultHeight;
 
     /**
      * @param maxAtlasSize The maximum dimensions of the atlas (both width and height, in pixels)

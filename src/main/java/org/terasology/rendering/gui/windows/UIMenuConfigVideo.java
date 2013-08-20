@@ -59,7 +59,7 @@ public class UIMenuConfigVideo extends UIWindow {
 
     private final Config config = CoreRegistry.get(Config.class);
 
-    final UILabel version;
+    private final UILabel version;
 
     private final ClickListener clickAction = new ClickListener() {
         @Override

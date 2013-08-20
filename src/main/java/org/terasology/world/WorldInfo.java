@@ -27,7 +27,7 @@ public class WorldInfo {
 
     private String title = "";
     private String seed = "";
-    private long time = 0;
+    private long time;
     private WorldGeneratorUri worldGenerator = new WorldGeneratorUri("engine", "perlin");
 
     public WorldInfo() {

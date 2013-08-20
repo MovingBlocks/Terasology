@@ -28,6 +28,7 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.
@@ -45,15 +46,14 @@ public class UIWindow extends UIDisplayContainerScrollable {
         INITIALISE, SHUTDOWN
     }
 
-    ;
-    private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
+    private final List<WindowListener> windowListeners = new ArrayList<>();
 
     //close buttons
     private String[] closeBinds;
     private int[] closeKeys;
 
     //layout
-    private boolean modal = false;
+    private boolean modal;
 
     public UIWindow() {
         addClickListener(new ClickListener() {

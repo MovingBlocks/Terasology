@@ -46,7 +46,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     //scrollbar
     private UIImage scrollbarBackground;
     private UIImage scrollbar;
-    private boolean scrolling = false;            //true if the scrollbar was pressed, this will enable scrolling
+    private boolean scrolling;                    //true if the scrollbar was pressed, this will enable scrolling
     private float scrollbarPressedOffset;         //the position on which the scrollbar was grabbed with the mouse
 
     //content
@@ -55,15 +55,15 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     private float multiplier = 1f;                //the multiplier of how the movement in the scrollbar will move the actual child elements
 
     //settings
-    private boolean enableScrolling = false;
-    private boolean enableScrollbar = false;
+    private boolean enableScrolling;
+    private boolean enableScrollbar;
 
     //layout
     private final float scrollbarWidth = 15f;
     private Vector4f padding = new Vector4f(0f, 0f, 0f, 0f); //top, right, bottom, left
 
     //other
-    private boolean isScrollable = false;
+    private boolean isScrollable;
 
     public UIDisplayContainerScrollable() {
         setup();
@@ -300,7 +300,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     }
 
     @Override
-    public ArrayList<UIDisplayElement> getDisplayElements() {
+    public List<UIDisplayElement> getDisplayElements() {
         return container.getDisplayElements();
     }
 

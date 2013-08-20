@@ -34,9 +34,9 @@ public final class TimeLwjgl implements EngineTime {
 
     private AtomicLong last = new AtomicLong(0);
     private AtomicLong delta = new AtomicLong(0);
-    private float avgDelta = 0;
-    private long desynch = 0;
-    private boolean paused = false;
+    private float avgDelta;
+    private long desynch;
+    private boolean paused;
 
     private AtomicLong gameTime = new AtomicLong(0);
 
@@ -131,7 +131,7 @@ public final class TimeLwjgl implements EngineTime {
 
         private int cycles;
         private long deltaPerCycle;
-        private int currentCycle = 0;
+        private int currentCycle;
 
         public TimeStepper(int cycles, long deltaPerCycle) {
             this.cycles = cycles;

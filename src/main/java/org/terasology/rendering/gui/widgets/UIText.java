@@ -105,20 +105,20 @@ public class UIText extends UIDisplayContainerScrollable {
 
     //selection
     private int cursorPosition = -1;
-    private boolean selection = false;
+    private boolean selection;
     private int selectionStart;
     private int selectionEnd;
 
     //characters
     private final char[] specialCharacters = new char[]{' ', '_', '.', ',', '/', '!', '-', '(', ')', '"', '\'', ';', ':', '+'};
     private final char[] multiLineSecialCharacters = new char[]{'\n'};
-    private boolean ctrlKeyPressed = false;
+    private boolean ctrlKeyPressed;
 
     //options
     private final Vector2f cursorSize = new Vector2f(1f, 16f);
-    private int maxLength = 0;
+    private int maxLength;
     private boolean disabled;
-    private boolean multiLine = false;
+    private boolean multiLine;
 
     //child elements
     private final UILabel text;
@@ -1201,7 +1201,7 @@ public class UIText extends UIDisplayContainerScrollable {
     private class UISelection extends UIDisplayContainer {
         private Color color = new Color(Color.gray);
         private final List<Vector2f[]> rectangles = new ArrayList<Vector2f[]>();
-        private boolean fade = false;
+        private boolean fade;
 
         public void render() {
             if (!isVisible() || rectangles.size() == 0) {

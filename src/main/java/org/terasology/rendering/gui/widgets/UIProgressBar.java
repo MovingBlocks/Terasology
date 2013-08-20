@@ -23,6 +23,7 @@ import org.terasology.rendering.gui.framework.events.ChangedListener;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple graphical progressBar
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 public class UIProgressBar extends UIDisplayContainer {
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
 
     //label position
     public static enum ELabelPosition {
@@ -44,8 +45,8 @@ public class UIProgressBar extends UIDisplayContainer {
     private final float labelSpacing = 8f;
 
     //value
-    private int value = 0;
-    private int minValue = 0;
+    private int value;
+    private int minValue;
     private int maxValue = 100;
 
     //child elements

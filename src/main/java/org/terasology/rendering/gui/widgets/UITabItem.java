@@ -101,7 +101,7 @@ public class UITabItem extends UIDisplayContainerScrollable {
      *
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
-    public class UITab extends UIDisplayContainer {
+    public final class UITab extends UIDisplayContainer {
 
         private final UITabItem tabItem;
         private Vector4f padding = new Vector4f(5f, 5f, 5f, 5f);

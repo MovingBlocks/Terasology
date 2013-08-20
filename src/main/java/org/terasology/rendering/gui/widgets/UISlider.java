@@ -28,6 +28,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple Slider.
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 public class UISlider extends UIDisplayContainer {
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
 
     //value
     private int currentValue;

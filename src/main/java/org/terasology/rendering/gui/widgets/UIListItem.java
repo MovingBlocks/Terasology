@@ -34,7 +34,7 @@ import javax.vecmath.Vector4f;
 public class UIListItem extends UIDisplayContainer {
 
     //options
-    private boolean isSelected = false;
+    private boolean isSelected;
     private Color textColor = Color.white;
     private Color textSelectionColor = Color.orange;
     private Color selectionColor = new Color(0xE1, 0xDD, 0xD4);

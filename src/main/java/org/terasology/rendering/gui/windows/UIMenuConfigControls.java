@@ -82,9 +82,8 @@ public final class UIMenuConfigControls extends UIWindow {
     private List<UILabel> inputLabels = Lists.newArrayList();
     private List<UIButton> inputButtons = Lists.newArrayList();
 
-    String editButtonCurrent = "";
-    UIButton editButton = null;
-    final UIImage title;
+    private UIButton editButton;
+    private final UIImage title;
 
     private final Config config = CoreRegistry.get(Config.class);
 
@@ -141,7 +140,6 @@ public final class UIMenuConfigControls extends UIWindow {
             public void click(UIDisplayElement element, int button) {
                 if (editButton == null) {
                     editButton = (UIButton) element;
-                    editButtonCurrent = editButton.getLabel().getText();
                     editButton.getLabel().setText("...");
                 }
             }

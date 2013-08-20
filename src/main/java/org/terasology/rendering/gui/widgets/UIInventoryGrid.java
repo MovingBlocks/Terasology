@@ -43,8 +43,8 @@ public class UIInventoryGrid extends UIDisplayContainer {
 
     private int numColumns;
 
-    private int startSlot = 0;
-    private int maxSlotsInGrid = 0;
+    private int startSlot;
+    private int maxSlotsInGrid;
 
     public UIInventoryGrid(int numColumns) {
         if (inventoryManager == null) {

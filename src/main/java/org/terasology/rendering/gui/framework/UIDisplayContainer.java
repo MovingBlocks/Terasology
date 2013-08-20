@@ -33,6 +33,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -47,13 +48,14 @@ import static org.lwjgl.opengl.GL11.glScissor;
  */
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
+    protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+
     //child elements
-    private final ArrayList<UIDisplayElement> displayElements = new ArrayList<UIDisplayElement>();
-    private final ArrayList<Style> styles = new ArrayList<Style>();
+    private final List<UIDisplayElement> displayElements = new ArrayList<>();
+    private final List<Style> styles = new ArrayList<>();
 
     //cropping
-    private boolean cropContainer = false;
-    protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    private boolean cropContainer;
 
     public UIDisplayContainer() {
         super();
@@ -313,7 +315,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      *
      * @return Returns the list of all display elements.
      */
-    public ArrayList<UIDisplayElement> getDisplayElements() {
+    public List<UIDisplayElement> getDisplayElements() {
         return displayElements;
     }
 

@@ -58,7 +58,7 @@ public class UIImage extends UIDisplayContainer {
     private Vector2f textureOrigin = new Vector2f(0.0f, 0.0f);
     private Vector2f textureSize = new Vector2f(1.0f, 1.0f);
 
-    private float rotate = 0f;
+    private float rotate;
     private Mesh mesh;
 
     public UIImage() {

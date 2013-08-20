@@ -19,6 +19,7 @@ import org.terasology.rendering.gui.framework.events.StateButtonAction;
 
 import javax.vecmath.Vector2f;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class extends the UIButton and adds functionality to add states to a button.
@@ -29,7 +30,7 @@ import java.util.LinkedList;
  *         TODO integrate into UIButton
  */
 public class UIStateButton extends UIButton {
-    private final LinkedList<ButtonState> states = new LinkedList<>();
+    private final List<ButtonState> states = new LinkedList<>();
     private int currentState = -1;
 
     public UIStateButton(Vector2f size) {

@@ -30,6 +30,7 @@ import org.terasology.rendering.gui.layout.RowLayout;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
@@ -38,11 +39,11 @@ import java.util.ArrayList;
 public class UIDialog extends UIWindow {
 
     //events
-    private final ArrayList<DialogListener> dialogListeners = new ArrayList<DialogListener>();
+    private final List<DialogListener> dialogListeners = new ArrayList<>();
 
     //drag
     private final Vector2f pressedOffset = new Vector2f(0f, 0f);
-    private boolean dragged = false;
+    private boolean dragged;
 
     //others
     public static enum EReturnCode {

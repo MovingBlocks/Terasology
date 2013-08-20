@@ -54,9 +54,19 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  *         TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
+    protected static UIDisplayElement focusedElement;
+
     private static final Logger logger = LoggerFactory.getLogger(UIDisplayElement.class);
 
-    protected static UIDisplayElement focusedElement;
+    protected final Vector2f positionOriginal = new Vector2f(0, 0);
+    protected final Vector2f sizeOriginal = new Vector2f(0, 0);
+
+    protected EUnitType unitPositionX = EUnitType.PIXEL;
+    protected EUnitType unitPositionY = EUnitType.PIXEL;
+    protected EUnitType unitSizeX = EUnitType.PIXEL;
+    protected EUnitType unitSizeY = EUnitType.PIXEL;
+
+    protected EPositionType positionType = EPositionType.RELATIVE;
 
     private UIWindow window;
     private UIDisplayElement parent;
@@ -72,63 +82,60 @@ public abstract class UIDisplayElement {
     private final List<KeyListener> keyListeners = new ArrayList<>();
     private final List<BindKeyListener> bindKeyListeners = new ArrayList<>();
 
-    private static enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE}
+    private static enum EMouseEvents {
+        ENTER,
+        LEAVE,
+        HOVER,
+        MOVE
+    }
 
-    ;
     private EMouseEvents lastMouseState;
 
     private final long doubleClickTimeout = 200;
-    private long lastTime = 0;
+    private long lastTime;
     private int lastButton = -1;
 
-    private boolean mouseIsDown = false;
+    private boolean mouseIsDown;
     private boolean consumeEvents = true;
 
     //layout
     private boolean isVisible = true;
-    private boolean isFixed = false;
+    private boolean isFixed;
     private boolean isCrop = true;
 
     //align
     public static enum EVerticalAlign {
-        TOP, CENTER, BOTTOM
+        TOP,
+        CENTER,
+        BOTTOM
     }
 
-    ;
+    public static enum EHorizontalAlign {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
 
-    public static enum EHorizontalAlign {LEFT, CENTER, RIGHT}
-
-    ;
     private EVerticalAlign verticalAlign = EVerticalAlign.TOP;
     private EHorizontalAlign horizontalAlign = EHorizontalAlign.LEFT;
 
     //position type
     public static enum EPositionType {
-        ABSOLUTE, RELATIVE
+        ABSOLUTE,
+        RELATIVE
     }
-
-    ;
-    protected EPositionType positionType = EPositionType.RELATIVE;
 
     //position and size
     private final Vector2f position = new Vector2f(0, 0);
-    protected final Vector2f positionOriginal = new Vector2f(0, 0);
     private final Vector2f size = new Vector2f(0, 0);
-    protected final Vector2f sizeOriginal = new Vector2f(0, 0);
 
     //position and size unit
     public static enum EUnitType {
         PIXEL, PERCENTAGE
     }
 
-    ;
-    protected EUnitType unitPositionX = EUnitType.PIXEL;
-    protected EUnitType unitPositionY = EUnitType.PIXEL;
-    protected EUnitType unitSizeX = EUnitType.PIXEL;
-    protected EUnitType unitSizeY = EUnitType.PIXEL;
-
     //animation
-    private final List<Animation> animations = new ArrayList<Animation>();
+    private final List<Animation> animations = new ArrayList<>();
 
     //
     private Object userData;
@@ -304,11 +311,7 @@ public abstract class UIDisplayElement {
      * @return Returns true if the display element has the focus.
      */
     public boolean isFocused() {
-        if (focusedElement == this) {
-            return true;
-        } else {
-            return false;
-        }
+        return focusedElement == this;
     }
 
     /**
@@ -359,8 +362,6 @@ public abstract class UIDisplayElement {
             }
         }
     }
-
-    ;
 
     /**
      * Set the layout of the child elements here. Will be executed if the display or a parent window was resized.
@@ -814,10 +815,10 @@ public abstract class UIDisplayElement {
      * @return True if intersecting
      */
     public boolean intersects(Vector2f point) {
-        return point.x >= getAbsolutePosition().x &&
-                point.y >= getAbsolutePosition().y &&
-                point.x <= getAbsolutePosition().x + getSize().x &&
-                point.y <= getAbsolutePosition().y + getSize().y;
+        return point.x >= getAbsolutePosition().x
+                && point.y >= getAbsolutePosition().y
+                && point.x <= getAbsolutePosition().x + getSize().x
+                && point.y <= getAbsolutePosition().y + getSize().y;
     }
 
     /**
