@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.widgets;
 
 import org.newdawn.slick.Color;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -106,7 +107,7 @@ public class UIProgressBar extends UIDisplayContainer {
      * @param value The value. The range of the value should be greater or equal than the minimum value and lower or equal than the maximum value.
      */
     public void setValue(int value) {
-        this.value = value;
+        this.value = TeraMath.clamp(value, minValue, maxValue);
 
         progressLine.updateProgress(value, range);
 

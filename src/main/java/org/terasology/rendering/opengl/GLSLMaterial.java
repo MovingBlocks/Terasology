@@ -136,6 +136,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
     @Override
     public void reload(MaterialData data) {
+        Util.checkGLError();
         dispose();
 
         shader = (GLSLShader) data.getShader();
@@ -169,6 +170,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
                     break;
             }
         }
+        Util.checkGLError();
     }
 
     @Override

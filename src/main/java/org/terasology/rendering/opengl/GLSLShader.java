@@ -23,6 +23,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
@@ -158,6 +159,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     @Override
     public void reload(ShaderData data) {
+        Util.checkGLError();
         logger.debug("Recompiling shader {}.", getURI());
 
         dispose();
@@ -168,6 +170,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
         updateAvailableFeatures();
         recompile();
+        Util.checkGLError();
     }
 
     private static StringBuilder createShaderBuilder() {

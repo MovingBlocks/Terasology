@@ -192,7 +192,6 @@ public class StateLoading implements GameState {
     @Override
     public void update(float delta) {
         long startTime = 1000 * Sys.getTime() / Sys.getTimerResolution();
-
         while (current != null && 1000 * Sys.getTime() / Sys.getTimerResolution() - startTime < 20) {
             if (current.step()) {
                 popStep();
@@ -205,7 +204,7 @@ public class StateLoading implements GameState {
             CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
         } else {
             if (currentExpectedSteps > 0) {
-                loadingScreen.updateStatus(current.getMessage(), 100f * completedSteps / currentExpectedSteps);
+                loadingScreen.updateStatus(current.getMessage(), Math.min(100f, 100f * completedSteps / currentExpectedSteps));
             } else {
                 loadingScreen.updateStatus(current.getMessage(), 0);
             }
