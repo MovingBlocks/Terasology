@@ -26,6 +26,7 @@ import org.terasology.engine.module.ModuleManager;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import org.reflections.Reflections;
 
 /**
  * @author Immortius
@@ -44,7 +45,12 @@ public class WorldGeneratorManager {
         CoreRegistry.get(ModuleManager.class).loadInactiveReflections();
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
         for (Module module : moduleManager.getModules()) {
-            for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
+            Reflections reflections = module.getReflections();
+            if(reflections == null) {
+                logger.warn("A module retured null for its reflections, rather than an empty list. Module: " + module);
+                continue;
+            }
+            for (Class<?> generatorClass : reflections.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                 if (isValidWorldGenerator(generatorClass)) {
                     WorldGeneratorUri uri = new WorldGeneratorUri(module.getModuleInfo().getId(), annotation.id());

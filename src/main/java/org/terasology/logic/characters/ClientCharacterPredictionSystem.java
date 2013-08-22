@@ -83,20 +83,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
-        float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
-        float width = movementComp.radius * location.getWorldScale();
-        ConvexShape capsule = new CapsuleShape(width, height);
-        capsule.setMargin(0.1f);
-        movementComp.collider = physics.createCollider(
-                location.getWorldPosition(),
-                capsule,
-                Lists.newArrayList(movementComp.collisionGroup),
-                movementComp.collidesWith,
-                CollisionFlags.CHARACTER_OBJECT);
-        movementComp.collider.setUserPointer(entity);
-
+        physics.createCollider(entity);
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
         stateBuffer.add(createInitialState(entity));
         playerStates.put(entity, stateBuffer);
@@ -104,16 +91,13 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class, LocationComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
-        CharacterMovementComponent comp = entity.getComponent(CharacterMovementComponent.class);
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         ClientComponent controller = character.controller.getComponent(ClientComponent.class);
         if (controller != null && controller.local) {
             predictedState = null;
             authoritiveState = null;
         }
-        if (comp.collider != null) {
-            physics.removeCollider(comp.collider);
-        }
+        physics.removeCollider(entity);
         playerStates.remove(entity);
     }
 

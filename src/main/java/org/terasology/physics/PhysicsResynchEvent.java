@@ -42,18 +42,39 @@ public class PhysicsResynchEvent implements Event {
         this.angularVelocity.set(angularVelocity);
     }
 
+    /**
+     * Returns the position of this event. The returned object is backed by the
+     * event, so any changes to it also change the event.
+     *
+     * @return
+     */
     public Vector3f getPosition() {
         return position;
     }
 
+    /**
+     * Returns the rotation of this event. The returned object is backed by the
+     * event, so any changes to it also change the event.
+     *
+     * @return
+     */
     public Quat4f getRotation() {
         return rotation;
     }
 
+    /**
+     * @return the linear velocity for this event. The returned object is backed
+     * by the event, so any changes to it also change the event.
+     */
     public Vector3f getVelocity() {
         return velocity;
     }
 
+    /**
+     * @return The angular or rotational velocity of this event. The returned
+     * object is backed by the event, so any changes to it also change the
+     * event.
+     */
     public Vector3f getAngularVelocity() {
         return angularVelocity;
     }

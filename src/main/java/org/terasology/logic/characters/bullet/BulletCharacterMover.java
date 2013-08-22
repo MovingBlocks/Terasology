@@ -48,6 +48,9 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CharacterMoverBody;
 
 /**
  * @author Immortius
@@ -243,7 +246,10 @@ public class BulletCharacterMover implements CharacterMover {
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
 
-        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, movementComp.collider);
+        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
+        BulletPhysics.BulletCollider collider = (BulletPhysics.BulletCollider) physics.getCollider(entity);
+        
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
 
@@ -251,7 +257,8 @@ public class BulletCharacterMover implements CharacterMover {
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
-        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
+        
+        collider.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
 
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
@@ -317,8 +324,11 @@ public class BulletCharacterMover implements CharacterMover {
         Vector3f moveDelta = new Vector3f(state.getVelocity());
         moveDelta.scale(input.getDelta());
 
+        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
+        BulletPhysics.BulletCollider collider = (BulletPhysics.BulletCollider) physics.getCollider(entity);
+        
         // Note: No stepping underwater, no issue with slopes
-        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, movementComp.collider);
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
 
@@ -369,6 +379,7 @@ public class BulletCharacterMover implements CharacterMover {
     private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
+        //If the movement direction length is smaller than 1, so will be the movement speed?? huh? Shouldnt this be lengthSquared != 0
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
@@ -378,7 +389,7 @@ public class BulletCharacterMover implements CharacterMover {
             maxSpeed *= movementComp.runFactor;
         }
 
-        // As we can't use it, remove the y component of desired movement while maintaining speed
+        // As we can't use it, remove the y component of desired movement while maintaining speed.
         if (desiredVelocity.y != 0) {
             float speed = desiredVelocity.length();
             desiredVelocity.y = 0;
@@ -403,7 +414,10 @@ public class BulletCharacterMover implements CharacterMover {
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
 
-        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
+        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
+        BulletPhysics.BulletCollider collider = (BulletPhysics.BulletCollider) physics.getCollider(entity);
+        
+        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
 
@@ -411,9 +425,8 @@ public class BulletCharacterMover implements CharacterMover {
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
-
-        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
-
+        
+        collider.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 if (input.isFirstRun()) {

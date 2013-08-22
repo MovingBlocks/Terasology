@@ -51,3 +51,6 @@ entityDump.txt
 /mods/*/classes/
 /mods/*/testClasses/
 /mods/*/.*
+/nbproject/private/
+/nbbuild/
+/dist/
