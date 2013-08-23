@@ -74,7 +74,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private List<WorldGeneratorInfo> worldGenerators;
     private UIButton modButton;
 
-    private boolean createServerGame = false;
+    private boolean createServerGame;
 
     public UIDialogCreateNewWorld(boolean createServer) {
         super(new Vector2f(512f, 380f));

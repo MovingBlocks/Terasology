@@ -37,7 +37,7 @@ public final class ItemComponent implements Component {
      * Should this item be rendered? Some items have an inventory icon but no "held" representation
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public boolean renderWithIcon = false;
+    public boolean renderWithIcon;
 
     /**
      * Name of the icon this item should be rendered with
@@ -77,7 +77,7 @@ public final class ItemComponent implements Component {
     /**
      * Does this item drop in quantity on usage (stacks of things would, tools would not)
      */
-    public boolean consumedOnUse = false;
+    public boolean consumedOnUse;
 
     /**
      * Setting for how much damage would be inflicted on attack (for instance to damage a block)

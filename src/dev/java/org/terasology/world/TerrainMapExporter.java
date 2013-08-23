@@ -49,7 +49,14 @@ public final class TerrainMapExporter {
     private static final Vector2f POSITION = new Vector2f(0.0f, 0.0f);
 
     private final WorldBiomeProvider biomeProvider;
-    PerlinTerrainGenerator generator;
+    private PerlinTerrainGenerator generator;
+
+    public TerrainMapExporter(final String seed) {
+        biomeProvider = new WorldBiomeProviderImpl(seed);
+        generator = new PerlinTerrainGenerator();
+        generator.setWorldSeed(seed);
+        generator.setWorldBiomeProvider(biomeProvider);
+    }
 
     public static void main(final String[] args) {
         final TerrainMapExporter gen = new TerrainMapExporter(SEED);
@@ -57,13 +64,6 @@ public final class TerrainMapExporter {
         gen.generateMap(MapStyle.BIOMES, "Biomes.png");
         gen.generateMap(MapStyle.COLOR_LUT, "ColorLut.png");
         gen.generateMap(MapStyle.FOLIAGE_LUT, "FoliageLut.png");
-    }
-
-    public TerrainMapExporter(final String seed) {
-        biomeProvider = new WorldBiomeProviderImpl(seed);
-        generator = new PerlinTerrainGenerator();
-        generator.setWorldSeed(seed);
-        generator.setWorldBiomeProvider(biomeProvider);
     }
 
     public void generateMap(final MapStyle mapStyle, final String fileName) {

@@ -36,7 +36,7 @@ public class UIScreenMetrics extends UIWindow {
     public static final int METRIC_LINES = 10;
 
     private List<MetricsMode> modes = Lists.newArrayList(new NullMode(), new RunningMeansMode(), new SpikesMode(), new RunningThreadsMode(), new NetworkStatsMode());
-    private int currentMode = 0;
+    private int currentMode;
 
     /* DISPLAY ELEMENTS */
     private final UILabel headerLine;

@@ -37,14 +37,14 @@ import java.util.List;
 public class UIList extends UIDisplayContainerScrollable {
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final List<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
+    private final List<SelectionListener> selectionListeners = new ArrayList<>();
 
     //selection
-    private UIListItem selection = null;
+    private UIListItem selection;
 
     //options
-    private boolean isDisabled = false;
+    private boolean isDisabled;
 
     //child elements
     private final UIComposite list;

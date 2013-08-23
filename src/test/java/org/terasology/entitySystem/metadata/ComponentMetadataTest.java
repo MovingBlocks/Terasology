@@ -16,9 +16,6 @@
 
 package org.terasology.entitySystem.metadata;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
@@ -26,6 +23,9 @@ import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.stubs.UnsupportedTypeComponent;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Immortius

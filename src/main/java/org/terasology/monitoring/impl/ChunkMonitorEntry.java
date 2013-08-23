@@ -22,16 +22,22 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
 import java.lang.ref.WeakReference;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ChunkMonitorEntry {
 
     private static final Logger logger = LoggerFactory.getLogger(ChunkMonitorEntry.class);
 
     private final Vector3i pos;
-    private LinkedList<WeakReference<Chunk>> chunks = new LinkedList<>();
-    private LinkedList<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<>();
+    private Deque<WeakReference<Chunk>> chunks = new LinkedList<>();
+    private List<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<>();
+
+    public ChunkMonitorEntry(Vector3i pos) {
+        this.pos = Preconditions.checkNotNull(pos, "The parameter 'pos' must not be null");
+    }
 
     private void purge() {
         if (chunks.size() == 0) {
@@ -44,10 +50,6 @@ public class ChunkMonitorEntry {
                 it.remove();
             }
         }
-    }
-
-    public ChunkMonitorEntry(Vector3i pos) {
-        this.pos = Preconditions.checkNotNull(pos, "The parameter 'pos' must not be null");
     }
 
     public Vector3i getPosition() {

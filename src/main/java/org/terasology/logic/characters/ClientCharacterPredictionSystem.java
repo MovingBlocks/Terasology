@@ -96,6 +96,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
         if (controller != null && controller.local) {
             predictedState = null;
             authoritiveState = null;
+            inputs.clear();
         }
         physics.removeCollider(entity);
         playerStates.remove(entity);
@@ -104,9 +105,9 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onCharacterStateReceived(CharacterStateEvent state, EntityRef entity) {
         if (entity.equals(localPlayer.getCharacterEntity())) {
-
             logger.trace("Received new state, sequence number: {}, buffered input size {}", state.getSequenceNumber(), inputs.size());
 
+            playerStates.remove(entity);
             authoritiveState = state;
             Iterator<CharacterMoveInputEvent> inputIterator = inputs.iterator();
             CharacterStateEvent newState = authoritiveState;

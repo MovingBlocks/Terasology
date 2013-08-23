@@ -24,7 +24,7 @@ import javax.vecmath.Vector3f;
 
 public abstract class InputEvent implements ConsumableEvent {
     private float delta;
-    private boolean consumed = false;
+    private boolean consumed;
 
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPosition;

@@ -57,10 +57,86 @@ public class UIInventoryCell extends UIDisplayContainer {
     private final UILabel itemLabel;
     private UIItemIcon icon;
 
-    private boolean selected = false;
+    private boolean selected;
     private boolean selectOnMouseOver = true;
 
-    private boolean multiplierKeyPressed = false;
+    private boolean multiplierKeyPressed;
+
+    private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
+        @Override
+        public void leave(UIDisplayElement element) {
+            itemLabel.setVisible(false);
+
+            if (selectOnMouseOver) {
+                selectionRectangle.setVisible(selected);
+            }
+        }
+
+        @Override
+        public void hover(UIDisplayElement element) {
+
+        }
+
+        @Override
+        public void enter(UIDisplayElement element) {
+            itemLabel.setVisible(true);
+
+            if (selectOnMouseOver) {
+                selectionRectangle.setVisible(true);
+            }
+        }
+
+        @Override
+        public void move(UIDisplayElement element) {
+        }
+    };
+
+    private MouseButtonListener mouseButtonListener = new MouseButtonListener() {
+        @Override
+        public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+            if (intersect) {
+
+                int amount = (multiplierKeyPressed) ? 2 : 1;
+
+                //move item to the transfer slot
+                if (wheel > 0) {
+                    takeAmount(amount);
+                } else {
+                    //get item from transfer slot
+                    giveAmount(amount);
+                }
+            }
+        }
+
+        @Override
+        public void up(UIDisplayElement element, int button, boolean intersect) {
+
+        }
+
+        @Override
+        public void down(UIDisplayElement element, int button, boolean intersect) {
+            if (intersect) {
+                if (MouseInput.MOUSE_LEFT.getId() == button) {
+                    swapItem();
+                } else if (MouseInput.MOUSE_RIGHT.getId() == button) {
+                    EntityRef item = inventoryManager.getItemInSlot(inventoryEntity, slot);
+                    int stackSize = inventoryManager.getStackSize(item);
+                    if (stackSize > 0) {
+                        giveAmount((stackSize + 1) / 2);
+                    }
+                }
+            }
+        }
+    };
+
+    private KeyListener keyListener = new KeyListener() {
+        @Override
+        public void key(UIDisplayElement element, KeyEvent event) {
+            if (event.getKey() == Keyboard.KEY_LCONTROL) {
+                multiplierKeyPressed = event.isDown();
+            }
+        }
+    };
 
     public UIInventoryCell(EntityRef inventoryEntity, int slot, Vector2f size) {
         this(inventoryEntity, slot, size, DEFAULT_ICON_POSITION);
@@ -140,73 +216,6 @@ public class UIInventoryCell extends UIDisplayContainer {
         return "";
     }
 
-    private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
-        @Override
-        public void leave(UIDisplayElement element) {
-            itemLabel.setVisible(false);
-
-            if (selectOnMouseOver) {
-                selectionRectangle.setVisible(selected);
-            }
-        }
-
-        @Override
-        public void hover(UIDisplayElement element) {
-
-        }
-
-        @Override
-        public void enter(UIDisplayElement element) {
-            itemLabel.setVisible(true);
-
-            if (selectOnMouseOver) {
-                selectionRectangle.setVisible(true);
-            }
-        }
-
-        @Override
-        public void move(UIDisplayElement element) {
-        }
-    };
-
-    private MouseButtonListener mouseButtonListener = new MouseButtonListener() {
-        @Override
-        public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
-            if (intersect) {
-
-                int amount = (multiplierKeyPressed) ? 2 : 1;
-
-                //move item to the transfer slot
-                if (wheel > 0) {
-                    takeAmount(amount);
-                } else {
-                    //get item from transfer slot
-                    giveAmount(amount);
-                }
-            }
-        }
-
-        @Override
-        public void up(UIDisplayElement element, int button, boolean intersect) {
-
-        }
-
-        @Override
-        public void down(UIDisplayElement element, int button, boolean intersect) {
-            if (intersect) {
-                if (MouseInput.MOUSE_LEFT.getId() == button) {
-                    swapItem();
-                } else if (MouseInput.MOUSE_RIGHT.getId() == button) {
-                    EntityRef item = inventoryManager.getItemInSlot(inventoryEntity, slot);
-                    int stackSize = inventoryManager.getStackSize(item);
-                    if (stackSize > 0) {
-                        giveAmount((stackSize + 1) / 2);
-                    }
-                }
-            }
-        }
-    };
-
     private void swapItem() {
         if (getTransferItem().exists()) {
             inventoryManager.moveItem(getTransferEntity(), 0, inventoryEntity, slot);
@@ -234,15 +243,6 @@ public class UIInventoryCell extends UIDisplayContainer {
     private void takeAmount(int amount) {
         inventoryManager.moveItemAmount(getTransferEntity(), 0, inventoryEntity, slot, amount);
     }
-
-    private KeyListener keyListener = new KeyListener() {
-        @Override
-        public void key(UIDisplayElement element, KeyEvent event) {
-            if (event.getKey() == Keyboard.KEY_LCONTROL) {
-                multiplierKeyPressed = event.isDown();
-            }
-        }
-    };
 
     /**
      * Check if the cell shows an item count.

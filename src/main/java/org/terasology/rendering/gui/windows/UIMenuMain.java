@@ -42,7 +42,7 @@ public class UIMenuMain extends UIWindow {
     private final UIButton joinButton;
     private final UIButton multiplayerButton;
 
-    final UILabel version;
+    private final UILabel version;
 
     public UIMenuMain() {
         setId("main");

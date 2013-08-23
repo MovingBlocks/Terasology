@@ -30,9 +30,9 @@ import java.util.List;
  */
 public class PropertyPanel extends JPanel {
 
-    private PropertyProvider activePropertyProvider = null;
+    private PropertyProvider activePropertyProvider;
 
-    private TitledBorder border = null;
+    private TitledBorder border;
     private String title = "";
 
     public PropertyPanel() {

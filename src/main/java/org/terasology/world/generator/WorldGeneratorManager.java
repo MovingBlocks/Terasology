@@ -44,13 +44,14 @@ public class WorldGeneratorManager {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         CoreRegistry.get(ModuleManager.class).loadInactiveReflections();
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
-        for (Module module : moduleManager.getModules()) {
-            Reflections reflections = module.getReflections();
-            if(reflections == null) {
-                logger.warn("A module retured null for its reflections, rather than an empty list. Module: " + module);
-                continue;
+        for (Module module : moduleManager.getCodeModules()) {
+            if (module == null) {
+                logger.error("Null module");
             }
-            for (Class<?> generatorClass : reflections.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
+            if (module.getReflections() == null) {
+                logger.error("Module has no reflections: {}", module.getModuleInfo().getId());
+            }
+            for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                 if (isValidWorldGenerator(generatorClass)) {
                     WorldGeneratorUri uri = new WorldGeneratorUri(module.getModuleInfo().getId(), annotation.id());

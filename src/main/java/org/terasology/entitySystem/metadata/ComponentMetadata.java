@@ -26,12 +26,12 @@ import org.terasology.world.block.RequiresBlockLifecycleEvents;
  */
 public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
 
-    private boolean replicated = false;
-    private boolean replicatedFromOwner = false;
-    private boolean referenceOwner = false;
-    private boolean forceBlockActive = false;
-    private boolean retainUnalteredOnBlockChange = false;
-    private boolean blockLifecycleEventsRequired = false;
+    private boolean replicated;
+    private boolean replicatedFromOwner;
+    private boolean referenceOwner;
+    private boolean forceBlockActive;
+    private boolean retainUnalteredOnBlockChange;
+    private boolean blockLifecycleEventsRequired;
 
     public ComponentMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
         super(simpleClass, names);

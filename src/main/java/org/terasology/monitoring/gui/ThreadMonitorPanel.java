@@ -67,6 +67,18 @@ public class ThreadMonitorPanel extends JPanel {
 
     private static class ThreadListRenderer implements ListCellRenderer {
 
+        private final MyRenderer renderer = new MyRenderer();
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (value instanceof SingleThreadMonitor) {
+                renderer.setMonitor((SingleThreadMonitor) value);
+            } else {
+                renderer.setMonitor(null);
+            }
+            return renderer;
+        }
+
         private static class MyRenderer extends JPanel {
 
             private final JPanel pHead = new JPanel();
@@ -161,56 +173,13 @@ public class ThreadMonitorPanel extends JPanel {
             }
 
         }
-
-        private final MyRenderer renderer = new MyRenderer();
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value instanceof SingleThreadMonitor) {
-                renderer.setMonitor((SingleThreadMonitor) value);
-            } else {
-                renderer.setMonitor(null);
-            }
-            return renderer;
-        }
-
     }
 
-    private static class ThreadListModel extends AbstractListModel {
+    private static final class ThreadListModel extends AbstractListModel {
 
-        private final ArrayList<SingleThreadMonitor> monitors = new ArrayList<SingleThreadMonitor>();
+        private final java.util.List<SingleThreadMonitor> monitors = new ArrayList<SingleThreadMonitor>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
         private final BlockingQueue<Task> queue = new LinkedBlockingQueue<Task>();
-
-        private void invokeIntervalAdded(final int a, final int b) {
-            final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalAdded(source, a, b);
-                }
-            });
-        }
-
-        private void invokeIntervalRemoved(final int a, final int b) {
-            final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalRemoved(source, a, b);
-                }
-            });
-        }
-
-        private void invokeContentsChanged(final int a, final int b) {
-            final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireContentsChanged(source, a, b);
-                }
-            });
-        }
 
         private ThreadListModel() {
             ThreadMonitor.registerForEvents(this);
@@ -247,6 +216,36 @@ public class ThreadMonitorPanel extends JPanel {
                         logger.error("Error executing thread monitor update", e);
                     }
                     invokeContentsChanged(0, monitors.size() - 1);
+                }
+            });
+        }
+
+        private void invokeIntervalAdded(final int a, final int b) {
+            final Object source = this;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    fireIntervalAdded(source, a, b);
+                }
+            });
+        }
+
+        private void invokeIntervalRemoved(final int a, final int b) {
+            final Object source = this;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    fireIntervalRemoved(source, a, b);
+                }
+            });
+        }
+
+        private void invokeContentsChanged(final int a, final int b) {
+            final Object source = this;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    fireContentsChanged(source, a, b);
                 }
             });
         }

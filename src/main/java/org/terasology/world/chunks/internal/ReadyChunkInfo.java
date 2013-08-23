@@ -26,7 +26,7 @@ import org.terasology.persistence.ChunkStore;
 public class ReadyChunkInfo {
     private Vector3i pos;
     private TShortObjectMap<TIntList> blockPositionMapppings;
-    private ChunkStore chunkStore = null;
+    private ChunkStore chunkStore;
 
     public ReadyChunkInfo(Vector3i pos, TShortObjectMap<TIntList> blockPositionMapppings) {
         this.pos = pos;

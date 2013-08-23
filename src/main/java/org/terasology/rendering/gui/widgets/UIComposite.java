@@ -32,7 +32,7 @@ import javax.vecmath.Vector2f;
 public class UIComposite extends UIDisplayContainer {
 
     private Layout compositeLayout;
-    private boolean customSize = false;
+    private boolean customSize;
 
     private void renderLayout() {
         if (compositeLayout != null) {

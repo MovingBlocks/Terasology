@@ -76,9 +76,9 @@ public class PerformanceMonitorPanel extends JPanel {
     private static class Entry implements Comparable<Entry> {
 
         public final String name;
-        public boolean active = false;
-        public double mean = 0.0;
-        public double spike = 0.0;
+        public boolean active;
+        public double mean;
+        public double spike;
 
         public Entry(String name) {
             this.name = (name == null) ? "" : name;
@@ -91,6 +91,22 @@ public class PerformanceMonitorPanel extends JPanel {
     }
 
     private static class PerformanceListRenderer implements ListCellRenderer {
+
+        private final MyRenderer renderer;
+
+        public PerformanceListRenderer(HeaderPanel header) {
+            renderer = new MyRenderer(header);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (value instanceof Entry) {
+                renderer.setEntry((Entry) value);
+            } else {
+                renderer.setEntry(null);
+            }
+            return renderer;
+        }
 
         private static class MyRenderer extends JPanel {
 
@@ -142,29 +158,33 @@ public class PerformanceMonitorPanel extends JPanel {
                 }
             }
         }
-
-        private final MyRenderer renderer;
-
-        public PerformanceListRenderer(HeaderPanel header) {
-            renderer = new MyRenderer(header);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value instanceof Entry) {
-                renderer.setEntry((Entry) value);
-            } else {
-                renderer.setEntry(null);
-            }
-            return renderer;
-        }
     }
 
-    private static class PerformanceListModel extends AbstractListModel {
+    private static final class PerformanceListModel extends AbstractListModel {
 
         private final List<Entry> list = new ArrayList<Entry>();
         private final Map<String, Entry> map = new HashMap<String, Entry>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        private PerformanceListModel() {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                    try {
+                        while (true) {
+                            Thread.sleep(1000);
+                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
+                                updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
+                            }
+                        }
+                    } catch (Exception e) {
+                        ThreadMonitor.addError(e);
+                        logger.error("Error executing performance monitor update", e);
+                    }
+                }
+            });
+        }
 
         private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
@@ -229,26 +249,6 @@ public class PerformanceMonitorPanel extends JPanel {
                 Collections.sort(list);
                 invokeContentsChanged(0, list.size() - 1);
             }
-        }
-
-        private PerformanceListModel() {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    try {
-                        while (true) {
-                            Thread.sleep(1000);
-                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
-                                updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
-                            }
-                        }
-                    } catch (Exception e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Error executing performance monitor update", e);
-                    }
-                }
-            });
         }
 
         @Override

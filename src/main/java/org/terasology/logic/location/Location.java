@@ -105,7 +105,7 @@ public class Location implements ComponentSystem {
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onDestroyed(BeforeRemoveComponent event, EntityRef entity, LocationComponent location) {
         if (location.parent.exists()) {
             removeChild(location.parent, entity);

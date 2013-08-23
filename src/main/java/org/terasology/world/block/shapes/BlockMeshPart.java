@@ -80,30 +80,31 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices);
     }
 
-    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, int meshBit, ChunkVertexFlag flags) {
+    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
+        ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
-            chunk.vertexElements[meshBit].tex.add(texCoord.x);
-            chunk.vertexElements[meshBit].tex.add(texCoord.y);
+            elements.tex.add(texCoord.x);
+            elements.tex.add(texCoord.y);
         }
 
-        int nextIndex = chunk.vertexElements[meshBit].vertexCount;
+        int nextIndex = elements.vertexCount;
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
-            chunk.vertexElements[meshBit].color.add(colorOffset.x);
-            chunk.vertexElements[meshBit].color.add(colorOffset.y);
-            chunk.vertexElements[meshBit].color.add(colorOffset.z);
-            chunk.vertexElements[meshBit].color.add(colorOffset.w);
-            chunk.vertexElements[meshBit].vertices.add(vertices[vIdx].x + offsetX);
-            chunk.vertexElements[meshBit].vertices.add(vertices[vIdx].y + offsetY);
-            chunk.vertexElements[meshBit].vertices.add(vertices[vIdx].z + offsetZ);
-            chunk.vertexElements[meshBit].normals.add(normals[vIdx].x);
-            chunk.vertexElements[meshBit].normals.add(normals[vIdx].y);
-            chunk.vertexElements[meshBit].normals.add(normals[vIdx].z);
-            chunk.vertexElements[meshBit].flags.add(flags.getValue());
+            elements.color.add(colorOffset.x);
+            elements.color.add(colorOffset.y);
+            elements.color.add(colorOffset.z);
+            elements.color.add(colorOffset.w);
+            elements.vertices.add(vertices[vIdx].x + offsetX);
+            elements.vertices.add(vertices[vIdx].y + offsetY);
+            elements.vertices.add(vertices[vIdx].z + offsetZ);
+            elements.normals.add(normals[vIdx].x);
+            elements.normals.add(normals[vIdx].y);
+            elements.normals.add(normals[vIdx].z);
+            elements.flags.add(flags.getValue());
         }
-        chunk.vertexElements[meshBit].vertexCount += vertices.length;
+        elements.vertexCount += vertices.length;
 
-        for (int i = 0; i < indices.length; ++i) {
-            chunk.vertexElements[meshBit].indices.add(indices[i] + nextIndex);
+        for (int index : indices) {
+            elements.indices.add(index + nextIndex);
         }
     }
 

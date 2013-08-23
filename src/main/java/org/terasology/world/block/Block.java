@@ -48,7 +48,6 @@ import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.EnumMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -62,7 +61,7 @@ import static org.lwjgl.opengl.GL11.glIsEnabled;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 // TODO: Make this immutable, add a block builder class?
-public class Block {
+public final class Block {
     private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this
@@ -103,8 +102,8 @@ public class Block {
     }
 
     /* LUTs */
-    protected static BufferedImage colorLut;
-    protected static BufferedImage foliageLut;
+    private static BufferedImage colorLut;
+    private static BufferedImage foliageLut;
 
     /**
      * Init. the LUTs.
@@ -126,41 +125,41 @@ public class Block {
         }
     }
 
-    private short id = 0x0;
+    private short id;
     private String displayName = "Untitled block";
     private BlockUri uri;
-    private BlockFamily family = null;
+    private BlockFamily family;
     private Side direction = Side.FRONT;
 
     /* PROPERTIES */
 
     // Overall behavioural
-    private boolean liquid = false;
+    private boolean liquid;
     private boolean attachmentAllowed = true;
-    private boolean replacementAllowed = false;
+    private boolean replacementAllowed;
     private byte hardness = 0x3;
-    private boolean supportRequired = false;
-    private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
+    private boolean supportRequired;
+    private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
 
     // Special liquid flags (TODO: clean this up)
-    private boolean water = false;
-    private boolean lava = false;
+    private boolean water;
+    private boolean lava;
 
     // Rendering related
-    private boolean invisible = false;
-    private boolean translucent = false;
-    private boolean doubleSided = false;
+    private boolean invisible;
+    private boolean translucent;
+    private boolean doubleSided;
     private boolean shadowCasting = true;
-    private boolean waving = false;
-    private byte luminance = 0;
+    private boolean waving;
+    private byte luminance;
     private Vector3f tint = new Vector3f(0, 0, 0);
     private Map<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
     private Map<BlockPart, Vector4f> colorOffsets = Maps.newEnumMap(BlockPart.class);
 
     // Collision related
-    private boolean penetrable = false;
+    private boolean penetrable;
     private boolean targetable = true;
-    private boolean climbable = false;
+    private boolean climbable;
 
     // Physics
     private float mass = 10;
@@ -168,24 +167,24 @@ public class Block {
 
     // Entity integration
     private String prefab = "";
-    private boolean keepActive = false;
+    private boolean keepActive;
     private EntityRef entity = EntityRef.NULL;
-    private boolean lifecycleEventsRequired = false;
+    private boolean lifecycleEventsRequired;
 
     // Inventory settings
-    private boolean directPickup = false;
+    private boolean directPickup;
     private boolean stackable = true;
 
     /* Mesh */
     private Mesh mesh;
     private BlockAppearance primaryAppearance = new BlockAppearance();
     // TODO: Remove once liquids have nicer generation
-    private EnumMap<Side, BlockMeshPart> loweredLiquidMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
+    private Map<Side, BlockMeshPart> loweredLiquidMesh = Maps.newEnumMap(Side.class);
 
     /* Collision */
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
-    public AABB bounds = AABB.createEmpty();
+    private AABB bounds = AABB.createEmpty();
 
     /**
      * Init. a new block with default properties in place.

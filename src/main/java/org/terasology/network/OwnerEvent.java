@@ -29,6 +29,6 @@ import java.lang.annotation.Target;
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 public @interface OwnerEvent {
 }

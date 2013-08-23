@@ -19,7 +19,11 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
-public class TessellatorHelper {
+public final class TessellatorHelper {
+
+    private TessellatorHelper() {
+    }
+
     public static void addBlockMesh(Tessellator tessellator, Vector4f color, float size, float light1, float light2, float posX, float posY, float posZ) {
         Vector2f defaultSize = new Vector2f(1.0f, 1.0f);
         Vector2f defaultOffset = new Vector2f(0.0f, 0.0f);

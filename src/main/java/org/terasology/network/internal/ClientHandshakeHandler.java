@@ -57,9 +57,9 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     private NetData.HandshakeHello serverHello;
     private NetData.HandshakeHello clientHello;
 
-    private boolean requestedCertificate = false;
-    private ClientIdentity identity = null;
-    private PublicIdentityCertificate serverCertificate = null;
+    private boolean requestedCertificate;
+    private ClientIdentity identity;
+    private PublicIdentityCertificate serverCertificate;
 
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {

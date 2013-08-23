@@ -38,9 +38,9 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
     @EditorRange(min = 0.0f, max = 0.1f)
-    float aberrationOffsetX = 0.0f;
+    float aberrationOffsetX;
     @EditorRange(min = 0.0f, max = 0.1f)
-    float aberrationOffsetY = 0.0f;
+    float aberrationOffsetY;
 
     @EditorRange(min = 0.0f, max = 1.0f)
     float bloomFactor = 0.5f;

@@ -56,7 +56,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     @EditorRange(min = 0.1f, max = 25.0f)
     private float ssaoRad = 2.0f;
 
-    private FloatBuffer ssaoSamples = null;
+    private FloatBuffer ssaoSamples;
 
     @Override
     public void initialParameters(Material material) {

@@ -38,11 +38,11 @@ import java.util.List;
 public class UITabFolder extends UIDisplayContainer {
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final List<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
+    private final List<SelectionListener> selectionListeners = new ArrayList<>();
 
     //selection
-    private UITabItem selection = null;
+    private UITabItem selection;
 
     //child elements
     private final UIComposite container;

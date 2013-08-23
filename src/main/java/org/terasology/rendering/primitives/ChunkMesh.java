@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
+import com.google.common.collect.Maps;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
@@ -26,6 +27,7 @@ import org.terasology.rendering.VertexBufferObjectManager;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
@@ -47,33 +49,6 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
  */
 @SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkMesh {
-
-    /**
-     * Data structure for storing vertex data. Abused like a "struct" in C/C++. Just sad.
-     */
-    public static class VertexElements {
-
-        public VertexElements() {
-            vertexCount = 0;
-            normals = new TFloatArrayList();
-            vertices = new TFloatArrayList();
-            tex = new TFloatArrayList();
-            color = new TFloatArrayList();
-            indices = new TIntArrayList();
-            flags = new TIntArrayList();
-        }
-
-        public final TFloatList normals;
-        public final TFloatList vertices;
-        public final TFloatList tex;
-        public final TFloatList color;
-        public final TIntList indices;
-        public final TIntList flags;
-        public int vertexCount;
-
-        public ByteBuffer finalVertices;
-        public IntBuffer finalIndices;
-    }
 
     /**
      * Possible rendering types.
@@ -125,22 +100,29 @@ public class ChunkMesh {
     private int triangleCount = -1;
 
     /* TEMPORARY DATA */
-    public VertexElements[] vertexElements = new VertexElements[4];
+    private Map<RenderType, VertexElements> vertexElements = Maps.newEnumMap(RenderType.class);
 
-    private boolean disposed = false;
+    private boolean disposed;
 
     /* CONCURRENCY */
-    public ReentrantLock lock = new ReentrantLock();
+    private ReentrantLock lock = new ReentrantLock();
 
     /* MEASUREMENTS */
-    private int timeToGenerateBlockVertices = 0;
-    private int timeToGenerateOptimizedBuffers = 0;
+    private int timeToGenerateBlockVertices;
+    private int timeToGenerateOptimizedBuffers;
 
     public ChunkMesh() {
-        vertexElements[0] = new VertexElements();
-        vertexElements[1] = new VertexElements();
-        vertexElements[2] = new VertexElements();
-        vertexElements[3] = new VertexElements();
+        for (RenderType type : RenderType.values()) {
+            vertexElements.put(type, new VertexElements());
+        }
+    }
+
+    public VertexElements getVertexElements(RenderType renderType) {
+        return vertexElements.get(renderType);
+    }
+
+    public boolean isGenerated() {
+        return vertexElements == null;
     }
 
     /**
@@ -156,8 +138,8 @@ public class ChunkMesh {
                     return false;
                 }
 
-                for (int i = 0; i < vertexBuffers.length; i++) {
-                    generateVBO(i);
+                for (RenderType type : RenderType.values()) {
+                    generateVBO(type);
                 }
 
                 // Free unused space on the heap
@@ -174,14 +156,16 @@ public class ChunkMesh {
         return false;
     }
 
-    private void generateVBO(int id) {
-        if (!disposed && vertexElements[id].finalIndices.limit() > 0 && vertexElements[id].finalVertices.limit() > 0) {
+    private void generateVBO(RenderType type) {
+        VertexElements elements = vertexElements.get(type);
+        int id = type.getIndex();
+        if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
             vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
             idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
-            vertexCount[id] = vertexElements[id].finalIndices.limit();
+            vertexCount[id] = elements.finalIndices.limit();
 
-            VertexBufferObjectManager.getInstance().bufferVboElementData(idxBuffers[id], vertexElements[id].finalIndices, GL15.GL_STATIC_DRAW);
-            VertexBufferObjectManager.getInstance().bufferVboData(vertexBuffers[id], vertexElements[id].finalVertices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectManager.getInstance().bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectManager.getInstance().bufferVboData(vertexBuffers[id], elements.finalVertices, GL15.GL_STATIC_DRAW);
         } else {
             vertexBuffers[id] = 0;
             idxBuffers[id] = 0;
@@ -309,5 +293,32 @@ public class ChunkMesh {
 
     public int getTimeToGenerateOptimizedBuffers() {
         return timeToGenerateOptimizedBuffers;
+    }
+
+    /**
+     * Data structure for storing vertex data. Abused like a "struct" in C/C++. Just sad.
+     */
+    public static class VertexElements {
+
+        public final TFloatList normals;
+        public final TFloatList vertices;
+        public final TFloatList tex;
+        public final TFloatList color;
+        public final TIntList indices;
+        public final TIntList flags;
+        public int vertexCount;
+
+        public ByteBuffer finalVertices;
+        public IntBuffer finalIndices;
+
+        public VertexElements() {
+            vertexCount = 0;
+            normals = new TFloatArrayList();
+            vertices = new TFloatArrayList();
+            tex = new TFloatArrayList();
+            color = new TFloatArrayList();
+            indices = new TIntArrayList();
+            flags = new TIntArrayList();
+        }
     }
 }

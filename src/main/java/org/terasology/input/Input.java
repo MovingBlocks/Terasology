@@ -30,6 +30,15 @@ public final class Input {
     private InputType type;
     private int id;
 
+    public Input() {
+        this.type = InputType.NONE;
+    }
+
+    public Input(InputType type, int id) {
+        this.type = type;
+        this.id = id;
+    }
+
     public static Input parse(String inputString) {
         String normalisedString = inputString.toUpperCase(Locale.ENGLISH);
         if (normalisedString.startsWith("KEY_")) {
@@ -44,15 +53,6 @@ public final class Input {
             }
         }
         return new Input();
-    }
-
-    public Input() {
-        this.type = InputType.NONE;
-    }
-
-    public Input(InputType type, int id) {
-        this.type = type;
-        this.id = id;
     }
 
     public InputType getType() {

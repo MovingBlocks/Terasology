@@ -28,8 +28,8 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
 
     private NetworkEventType networkEventType;
     private String uri;
-    private boolean lagCompensated = false;
-    private boolean skipInstigator = false;
+    private boolean lagCompensated;
+    private boolean skipInstigator;
 
     public EventMetadata(Class<T> simpleClass, String uri) throws NoSuchMethodException {
         super(simpleClass, uri);

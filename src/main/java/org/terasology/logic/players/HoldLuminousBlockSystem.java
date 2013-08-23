@@ -59,7 +59,7 @@ public class HoldLuminousBlockSystem implements ComponentSystem {
 
     @ReceiveEvent
     public void onBlockItemDestroyed(BeforeDeactivateComponent event, EntityRef item, BlockItemComponent blockItemComponent) {
-        if (blockItemComponent.blockFamily.getArchetypeBlock().getLuminance() == 0) {
+        if (blockItemComponent.blockFamily == null || blockItemComponent.blockFamily.getArchetypeBlock().getLuminance() == 0) {
             return;
         }
 

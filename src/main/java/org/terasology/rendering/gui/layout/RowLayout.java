@@ -30,10 +30,10 @@ import java.util.List;
 public class RowLayout implements Layout {
 
     //options
-    private float spacingHorizontal = 0f;
-    private float spacingVertical = 0f;
-    private boolean wrap = false;
-    private boolean equalWidth = false;
+    private float spacingHorizontal;
+    private float spacingVertical;
+    private boolean wrap;
+    private boolean equalWidth;
 
     @Override
     public void layout(UIDisplayContainer container, boolean fitSize) {

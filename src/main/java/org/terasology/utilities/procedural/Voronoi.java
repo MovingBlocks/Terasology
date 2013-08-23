@@ -24,17 +24,11 @@ import java.util.Random;
  * @author Immortius
  */
 public class Voronoi {
-    public static class VoronoiResult {
-        public float distance;
-        public Vector2f delta;
-        public int id;
-    }
+
+    private static final float DENSITY_ADJUSTMENT = 0.39815f;
+    private static final float INVERSE_DENSITY_ADJUSTMENT = 1.0f / DENSITY_ADJUSTMENT;
 
     private Vector2f offset;
-
-    public static float standardDistanceFunction(Vector2f delta) {
-        return delta.x * delta.x + delta.y * delta.y;
-    }
 
     private int[] poissonCount = new int[]{
             4, 3, 1, 1, 1, 2, 4, 2, 2, 2, 5, 1, 0, 2, 1, 2, 2, 0, 4, 3, 2, 1, 2, 1, 3, 2, 2, 4, 2, 2, 5, 1, 2, 3,
@@ -47,11 +41,13 @@ public class Voronoi {
             1, 4, 2, 3, 3, 4, 2, 5, 4, 2, 4, 2, 2, 2, 4, 5, 3, 2
     };
 
-    private static final float DENSITY_ADJUSTMENT = 0.39815f;
-    private static final float INVERSE_DENSITY_ADJUSTMENT = 1.0f / DENSITY_ADJUSTMENT;
 
     public Voronoi(Random random) {
         offset = new Vector2f(99999 * random.nextFloat(), 99999 * random.nextFloat());
+    }
+
+    public static float standardDistanceFunction(Vector2f delta) {
+        return delta.x * delta.x + delta.y * delta.y;
     }
 
     /**
@@ -61,8 +57,8 @@ public class Voronoi {
      */
     public VoronoiResult[] getClosestPoints(Vector2f at, int numPoints) {
         VoronoiResult[] results = new VoronoiResult[numPoints];
-        for (int i = 0; i < results.length; i++) {
-            results[i].distance = Float.MAX_VALUE;
+        for (VoronoiResult result : results) {
+            result.distance = Float.MAX_VALUE;
         }
 
         at.scale(DENSITY_ADJUSTMENT);
@@ -152,5 +148,11 @@ public class Voronoi {
                 results[index].id = (int) id;
             }
         }
+    }
+
+    public static class VoronoiResult {
+        public float distance;
+        public Vector2f delta;
+        public int id;
     }
 }

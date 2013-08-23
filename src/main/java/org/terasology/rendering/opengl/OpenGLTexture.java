@@ -40,7 +40,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLTexture.class);
 
-    private int id = 0;
+    private int id;
     private int width;
     private int height;
     private int depth;
@@ -59,6 +59,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     @Override
     public void reload(TextureData data) {
+        Util.checkGLError();
         dispose();
         this.width = data.getWidth();
         this.height = data.getHeight();
@@ -86,7 +87,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 }
                 break;
             case TEXTURE3D:
-                Util.checkGLError();
                 id = glGenTextures();
                 logger.debug("Bound texture '{}' - {}", getURI(), id);
                 glBindTexture(GL12.GL_TEXTURE_3D, id);
@@ -105,11 +105,9 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                     GL12.glTexImage3D(GL12.GL_TEXTURE_3D, i, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
                 }
 
-                Util.checkGLError();
                 break;
         }
-
-
+        Util.checkGLError();
     }
 
     @Override

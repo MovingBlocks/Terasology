@@ -31,9 +31,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public final class TeraArraysBenchmark {
 
-    private TeraArraysBenchmark() {
-    }
-
     private static final byte[][] INFLATED_8_BIT = new byte[256][];
     private static final byte[] DEFLATED_8_BIT = new byte[256];
 
@@ -47,6 +44,9 @@ public final class TeraArraysBenchmark {
         for (int i = 0; i < INFLATED_4_BIT.length; i++) {
             INFLATED_4_BIT[i] = new byte[128];
         }
+    }
+
+    private TeraArraysBenchmark() {
     }
 
     public static void main(String[] args) {

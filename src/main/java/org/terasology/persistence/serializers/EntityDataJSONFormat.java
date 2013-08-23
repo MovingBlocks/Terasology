@@ -52,7 +52,10 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: More javadoc
-public class EntityDataJSONFormat {
+public final class EntityDataJSONFormat {
+
+    private EntityDataJSONFormat() {
+    }
 
     public static void write(EntityData.GlobalStore world, BufferedWriter writer) throws IOException {
         newGson().toJson(world, writer);

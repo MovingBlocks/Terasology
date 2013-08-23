@@ -16,9 +16,9 @@
 
 package org.terasology.world.liquid;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius
@@ -28,19 +28,19 @@ public class LiquidTypeTest {
     @Test
     public void byteToLiquidType() {
         for (int i = 0; i < 8; i++) {
-            assertEquals(LiquidType.WATER, LiquidType.getTypeForByte((byte)i));
+            assertEquals(LiquidType.WATER, LiquidType.getTypeForByte((byte) i));
         }
         for (int i = 8; i < 16; ++i) {
-            assertEquals(LiquidType.LAVA, LiquidType.getTypeForByte((byte)i));
+            assertEquals(LiquidType.LAVA, LiquidType.getTypeForByte((byte) i));
         }
     }
 
     @Test
     public void convertToByte() {
-        assertEquals(0, LiquidType.WATER.convertToByte((byte)0));
-        assertEquals(4, LiquidType.WATER.convertToByte((byte)4));
-        assertEquals(7, LiquidType.WATER.convertToByte((byte)7));
-        assertEquals(9, LiquidType.LAVA.convertToByte((byte)1));
-        assertEquals(12, LiquidType.LAVA.convertToByte((byte)4));
+        assertEquals(0, LiquidType.WATER.convertToByte((byte) 0));
+        assertEquals(4, LiquidType.WATER.convertToByte((byte) 4));
+        assertEquals(7, LiquidType.WATER.convertToByte((byte) 7));
+        assertEquals(9, LiquidType.LAVA.convertToByte((byte) 1));
+        assertEquals(12, LiquidType.LAVA.convertToByte((byte) 4));
     }
 }

@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import javax.vecmath.Vector3f;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -213,7 +214,7 @@ public class Vector3iTest {
     public void testHashCollisions() {
         int range = 50;
 
-        HashSet<Integer> alreadyUsedHashes = new HashSet<Integer>();
+        Set<Integer> alreadyUsedHashes = new HashSet<>();
 
         for (int x = -range; x < range; ++x) {
             for (int y = -range; y < range; ++y) {

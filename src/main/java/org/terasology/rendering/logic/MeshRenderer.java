@@ -86,7 +86,7 @@ public class MeshRenderer implements RenderSystem {
     private NearestSortingList opaqueMeshSorter = new NearestSortingList();
     private NearestSortingList translucentMeshSorter = new NearestSortingList();
 
-    public int lastRendered;
+    private int lastRendered;
 
     @Override
     public void initialise() {
@@ -304,5 +304,9 @@ public class MeshRenderer implements RenderSystem {
 
     @Override
     public void renderShadows() {
+    }
+
+    public int getLastRendered() {
+        return lastRendered;
     }
 }

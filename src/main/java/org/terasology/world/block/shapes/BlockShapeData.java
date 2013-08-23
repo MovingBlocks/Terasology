@@ -33,9 +33,9 @@ public class BlockShapeData implements AssetData {
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape collisionShape;
     private Vector3f collisionOffset = new Vector3f();
-    private boolean yawSymmetric = false;
-    private boolean pitchSymmetric = false;
-    private boolean rollSymmetric = false;
+    private boolean yawSymmetric;
+    private boolean pitchSymmetric;
+    private boolean rollSymmetric;
 
     public BlockMeshPart getMeshPart(BlockPart part) {
         return meshParts.get(part);

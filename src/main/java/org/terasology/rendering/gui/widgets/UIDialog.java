@@ -30,6 +30,7 @@ import org.terasology.rendering.gui.layout.RowLayout;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
@@ -38,18 +39,17 @@ import java.util.ArrayList;
 public class UIDialog extends UIWindow {
 
     //events
-    private final ArrayList<DialogListener> dialogListeners = new ArrayList<DialogListener>();
+    private final List<DialogListener> dialogListeners = new ArrayList<>();
 
     //drag
     private final Vector2f pressedOffset = new Vector2f(0f, 0f);
-    private boolean dragged = false;
+    private boolean dragged;
 
     //others
     public static enum EReturnCode {
         OK, CANCEL, YES, NO, NONE
     }
 
-    ;
     private float titleWidth = 300f;
 
     //child elements
@@ -60,63 +60,6 @@ public class UIDialog extends UIWindow {
     private UIImage overlay;
     private UIDialogBackground topBar;
     //private final UIButton closeButton;
-
-    @Deprecated
-    private class UIDialogBackground extends UIDisplayContainer {
-        private UIImage leftBackground;
-        private UIImage centerBackground;
-        private UIImage rightBackground;
-        private UILabel text;
-
-        public UIDialogBackground(Vector2f size) {
-            setSize(size);
-
-            text = new UILabel();
-            text.setColor(Color.orange);
-            text.setVisible(true);
-            text.setTextShadow(true);
-
-            leftBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
-            leftBackground.setSize(new Vector2f(7f, 19f));
-            leftBackground.setTextureSize(new Vector2f(7f, 19f));
-            leftBackground.setTextureOrigin(new Vector2f(111f, 155f));
-            leftBackground.setVisible(true);
-
-            centerBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
-            centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
-            centerBackground.setTextureSize(new Vector2f(51f, 19f));
-            centerBackground.setTextureOrigin(new Vector2f(118f, 155f));
-            centerBackground.setPosition(new Vector2f(centerBackground.getPosition().x + leftBackground.getSize().x, 0f));
-            centerBackground.setVisible(true);
-
-            rightBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
-            rightBackground.setSize(new Vector2f(8f, 19f));
-            rightBackground.setTextureSize(new Vector2f(8f, 19f));
-            rightBackground.setTextureOrigin(new Vector2f(189f, 155f));
-            rightBackground.setVisible(true);
-            rightBackground.setPosition(new Vector2f(centerBackground.getPosition().x + centerBackground.getSize().x, 0f));
-            addDisplayElement(leftBackground);
-            addDisplayElement(centerBackground);
-            addDisplayElement(rightBackground);
-            addDisplayElement(text);
-        }
-
-        public String getTitle() {
-            return text.getText();
-        }
-
-        public void setTitle(String title) {
-            text.setText(title);
-            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
-        }
-
-        public void resize() {
-            centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
-            centerBackground.setPosition(new Vector2f(leftBackground.getPosition().x + leftBackground.getSize().x, 0f));
-            rightBackground.setPosition(new Vector2f(centerBackground.getPosition().x + centerBackground.getSize().x, 0f));
-            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
-        }
-    }
 
     public UIDialog(Vector2f size) {
         super();
@@ -342,5 +285,62 @@ public class UIDialog extends UIWindow {
 
     public void removeDialogListener(DialogListener listener) {
         dialogListeners.remove(listener);
+    }
+
+    @Deprecated
+    private class UIDialogBackground extends UIDisplayContainer {
+        private UIImage leftBackground;
+        private UIImage centerBackground;
+        private UIImage rightBackground;
+        private UILabel text;
+
+        public UIDialogBackground(Vector2f size) {
+            setSize(size);
+
+            text = new UILabel();
+            text.setColor(Color.orange);
+            text.setVisible(true);
+            text.setTextShadow(true);
+
+            leftBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
+            leftBackground.setSize(new Vector2f(7f, 19f));
+            leftBackground.setTextureSize(new Vector2f(7f, 19f));
+            leftBackground.setTextureOrigin(new Vector2f(111f, 155f));
+            leftBackground.setVisible(true);
+
+            centerBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
+            centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
+            centerBackground.setTextureSize(new Vector2f(51f, 19f));
+            centerBackground.setTextureOrigin(new Vector2f(118f, 155f));
+            centerBackground.setPosition(new Vector2f(centerBackground.getPosition().x + leftBackground.getSize().x, 0f));
+            centerBackground.setVisible(true);
+
+            rightBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
+            rightBackground.setSize(new Vector2f(8f, 19f));
+            rightBackground.setTextureSize(new Vector2f(8f, 19f));
+            rightBackground.setTextureOrigin(new Vector2f(189f, 155f));
+            rightBackground.setVisible(true);
+            rightBackground.setPosition(new Vector2f(centerBackground.getPosition().x + centerBackground.getSize().x, 0f));
+            addDisplayElement(leftBackground);
+            addDisplayElement(centerBackground);
+            addDisplayElement(rightBackground);
+            addDisplayElement(text);
+        }
+
+        public String getTitle() {
+            return text.getText();
+        }
+
+        public void setTitle(String title) {
+            text.setText(title);
+            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
+        }
+
+        public void resize() {
+            centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
+            centerBackground.setPosition(new Vector2f(leftBackground.getPosition().x + leftBackground.getSize().x, 0f));
+            rightBackground.setPosition(new Vector2f(centerBackground.getPosition().x + centerBackground.getSize().x, 0f));
+            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
+        }
     }
 }

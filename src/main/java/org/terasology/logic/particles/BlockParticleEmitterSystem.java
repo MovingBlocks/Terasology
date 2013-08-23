@@ -101,7 +101,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
     private FastRandom random = new FastRandom();
     private NearestSortingList sorter = new NearestSortingList();
-    private int displayList = 0;
+    private int displayList;
 
     public void initialise() {
         if (displayList == 0) {

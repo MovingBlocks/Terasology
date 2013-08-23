@@ -72,7 +72,7 @@ public abstract class Camera {
     protected float cachedZFar;
 
     /* ETC */
-    private boolean reflected = false;
+    private boolean reflected;
 
     /**
      * Applies the projection and modelview matrix.

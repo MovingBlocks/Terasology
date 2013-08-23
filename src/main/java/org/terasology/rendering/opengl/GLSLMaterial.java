@@ -63,20 +63,20 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLMaterial.class);
 
-    private int textureIndex = 0;
+    private int textureIndex;
 
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<>();
     private TIntObjectMap<OpenGLTexture> textureMap = new TIntObjectHashMap<>();
-    private GLSLShader shader = null;
-    private boolean activeFeaturesChanged = false;
+    private GLSLShader shader;
+    private boolean activeFeaturesChanged;
     private TObjectIntMap<UniformId> uniformLocationMap = new TObjectIntHashMap<>();
 
     private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
-    private int activeFeaturesMask = 0;
+    private int activeFeaturesMask;
 
     private ShaderManager shaderManager;
-    private ShaderParameters shaderParameters = null;
+    private ShaderParameters shaderParameters;
 
     public GLSLMaterial(AssetUri uri, MaterialData data) {
         super(uri);
@@ -136,6 +136,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
     @Override
     public void reload(MaterialData data) {
+        Util.checkGLError();
         dispose();
 
         shader = (GLSLShader) data.getShader();
@@ -169,6 +170,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
                     break;
             }
         }
+        Util.checkGLError();
     }
 
     @Override

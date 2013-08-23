@@ -35,12 +35,12 @@ import java.util.List;
 @ForceBlockActive
 public final class InventoryComponent implements Component, ReplicationCheck {
 
+    public boolean privateToOwner = true;
+    public List<EntityRef> accessors = Lists.newArrayList();
+
     @Replicate
     @Owns
     List<EntityRef> itemSlots = Lists.newArrayList();
-
-    public boolean privateToOwner = true;
-    public List<EntityRef> accessors = Lists.newArrayList();
 
     public InventoryComponent() {
     }

@@ -45,16 +45,16 @@ public interface FieldSerializeCheck<T> {
     /**
      * Null implementation, returns true for all fields
      */
-    public static class NullCheck<T> implements FieldSerializeCheck<T> {
+    public static final class NullCheck<T> implements FieldSerializeCheck<T> {
 
-        private static NullCheck instance = new NullCheck();
+        private static final NullCheck INSTANCE = new NullCheck();
+
+        private NullCheck() {
+        }
 
         @SuppressWarnings("unchecked")
         public static <T> NullCheck<T> newInstance() {
-            return instance;
-        }
-
-        private NullCheck() {
+            return INSTANCE;
         }
 
         @Override

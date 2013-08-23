@@ -23,8 +23,8 @@ import javax.vecmath.Vector2f;
  * @author Immortius
  */
 public class Vector2i {
-    public int x = 0;
-    public int y = 0;
+    public int x;
+    public int y;
 
     public Vector2i(int x, int y) {
         this.x = x;

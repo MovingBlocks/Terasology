@@ -56,9 +56,25 @@ public class LiquidSimulator implements ComponentSystem {
 
     private static final int NUM_THREADS = 2;
     private static final byte MAX_LIQUID_DEPTH = 0x7;
-    public static final int PROPAGATION_DELAY = 200;
+    private static final int PROPAGATION_DELAY = 200;
 
     private static final Logger logger = LoggerFactory.getLogger(LiquidSimulator.class);
+
+    /**
+     * Map of outgoing amounts of water, by number of available spaces (0-4) and depth (0-7)
+     */
+    private static final byte[][] OUTGOING_FLOW = new byte[][]{
+            // No where to go
+            {0, 0, 0, 0, 0, 0, 0, 0},
+            // One space
+            {0, 0, 1, 2, 3, 4, 5, 6},
+            // Two spaces
+            {0, 0, 1, 2, 2, 3, 3, 4},
+            // Three spaces
+            {0, 0, 1, 1, 1, 2, 2, 3},
+            // Four spaces
+            {0, 0, 1, 1, 1, 1, 2, 2}
+    };
 
     @In
     private WorldProvider world;
@@ -252,22 +268,6 @@ public class LiquidSimulator implements ComponentSystem {
 
         return new LiquidData();
     }
-
-    /**
-     * Map of outgoing amounts of water, by number of available spaces (0-4) and depth (0-7)
-     */
-    private static final byte[][] OUTGOING_FLOW = new byte[][]{
-            // No where to go
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            // One space
-            {0, 0, 1, 2, 3, 4, 5, 6},
-            // Two spaces
-            {0, 0, 1, 2, 2, 3, 3, 4},
-            // Three spaces
-            {0, 0, 1, 1, 1, 2, 2, 3},
-            // Four spaces
-            {0, 0, 1, 1, 1, 1, 2, 2}
-    };
 
     private static LiquidData getOutgoingLiquid(Vector3i pos, ChunkView chunkView) {
         LiquidData currentState = chunkView.getLiquid(pos);

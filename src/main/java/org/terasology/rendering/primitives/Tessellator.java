@@ -30,7 +30,7 @@ public class Tessellator {
 
     private MeshData meshData = new MeshData();
 
-    private int nextIndex = 0;
+    private int nextIndex;
 
     private Vector4f activeColor = new Vector4f();
     private Vector3f activeNormal = new Vector3f();

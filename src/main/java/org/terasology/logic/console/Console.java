@@ -51,7 +51,7 @@ import static org.reflections.ReflectionUtils.withModifier;
  */
 public class Console {
     private static final Logger logger = LoggerFactory.getLogger(Console.class);
-    public static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
+    private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     private static final Joiner PARAMETER_JOINER = Joiner.on(", ");
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
@@ -65,7 +65,7 @@ public class Console {
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-    private boolean commandsSorted = false;
+    private boolean commandsSorted;
 
     public Console() {
         addMessage("Welcome to the wonderful world of Terasology!\n" +

@@ -44,7 +44,7 @@ public class GameManifest {
 
     private String title = "";
     private String seed = "";
-    private long time = 0;
+    private long time;
     private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worlds = Maps.newHashMap();

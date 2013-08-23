@@ -87,11 +87,28 @@ public class ChunkMonitorDisplay extends JPanel {
     private int maxRenderY;
     private boolean followPlayer = true;
 
-    private Vector3i selectedChunk = null;
+    private Vector3i selectedChunk;
 
     private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
     private final ExecutorService executor;
     private final Runnable renderTask;
+
+    public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
+        Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");
+        Preconditions.checkArgument(chunkSize >= 6, "Parameter 'chunkSize' has to be greater or equal 6 (" + chunkSize + ")");
+        addComponentListener(new ResizeListener());
+        final MouseInputListener ml = new MouseInputListener();
+        addMouseListener(ml);
+        addMouseMotionListener(ml);
+        addMouseWheelListener(ml);
+        this.refreshInterval = refreshInterval;
+        this.chunkSize = chunkSize;
+        this.executor = Executors.newSingleThreadExecutor();
+        this.renderTask = new RenderTask();
+        ChunkMonitor.registerForEvents(this);
+        queue.offer(new InitialRequest());
+        executor.execute(renderTask);
+    }
 
     private void fireChunkSelectedEvent(Vector3i pos) {
         eventbus.post(new ChunkMonitorDisplayEvent.Selected(this, pos, pos == null ? null : map.get(pos)));
@@ -134,6 +151,140 @@ public class ChunkMonitorDisplay extends JPanel {
         minRenderY = min;
         maxRenderY = max;
         renderY = y;
+    }
+
+    private Vector3i calcPlayerChunkPos() {
+        final LocalPlayer p = CoreRegistry.get(LocalPlayer.class);
+        if (p != null) {
+            return TeraMath.calcChunkPos(new Vector3i(p.getPosition()));
+        }
+        return null;
+    }
+
+    public int getChunkSize() {
+        return chunkSize;
+    }
+
+    public ChunkMonitorDisplay setChunkSize(int value) {
+        if (value != chunkSize) {
+            Preconditions.checkArgument(value >= 6, "Parameter 'value' has to be greater or equal 6 (" + value + ")");
+            chunkSize = value;
+            updateDisplay(true);
+        }
+        return this;
+    }
+
+    public Vector3i getSelectedChunk() {
+        if (selectedChunk == null) {
+            return null;
+        }
+        return new Vector3i(selectedChunk);
+    }
+
+    public ChunkMonitorDisplay setSelectedChunk(Vector3i chunk) {
+        if (selectedChunk == null) {
+            if (chunk != null) {
+                selectedChunk = chunk;
+                updateDisplay(true);
+                fireChunkSelectedEvent(chunk);
+            }
+        } else {
+            if (chunk == null || !selectedChunk.equals(chunk)) {
+                selectedChunk = chunk;
+                updateDisplay(true);
+                fireChunkSelectedEvent(chunk);
+            }
+        }
+        return this;
+    }
+
+    public int getRenderY() {
+        return renderY;
+    }
+
+    public int getMinRenderY() {
+        return minRenderY;
+    }
+
+    public int getMaxRenderY() {
+        return maxRenderY;
+    }
+
+    public ChunkMonitorDisplay setRenderY(int value) {
+        int clampedValue = value;
+        if (value < minRenderY) {
+            clampedValue = minRenderY;
+        }
+        if (value > maxRenderY) {
+            clampedValue = maxRenderY;
+        }
+        if (renderY != clampedValue) {
+            renderY = clampedValue;
+            updateDisplay(true);
+        }
+        return this;
+    }
+
+    public ChunkMonitorDisplay setRenderYDelta(int delta) {
+        return setRenderY(renderY + delta);
+    }
+
+    public boolean getFollowPlayer() {
+        return followPlayer;
+    }
+
+    public ChunkMonitorDisplay setFollowPlayer(boolean value) {
+        if (followPlayer != value) {
+            followPlayer = value;
+            updateDisplay();
+        }
+        return this;
+    }
+
+    public int getOffsetX() {
+        return offsetX;
+    }
+
+    public int getOffsetY() {
+        return offsetY;
+    }
+
+    public ChunkMonitorDisplay setOffset(int x, int y) {
+        if (offsetX != x || offsetY != y) {
+            this.offsetX = x;
+            this.offsetY = y;
+            updateDisplay(true);
+        }
+        return this;
+    }
+
+    public int getRefreshInterval() {
+        return refreshInterval;
+    }
+
+    public ChunkMonitorDisplay setRefreshInterval(int value) {
+        Preconditions.checkArgument(value >= 500, "Parameter 'value' has to be greater or equal 500 (" + value + ")");
+        this.refreshInterval = value;
+        return this;
+    }
+
+    public void registerForEvents(Object object) {
+        Preconditions.checkNotNull(object, "The parameter 'object' must not be null");
+        eventbus.register(object);
+    }
+
+    @Subscribe
+    public void receiveChunkEvent(ChunkMonitorEvent event) {
+        if (event != null) {
+            queue.offer(new ChunkRequest(event));
+        }
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        if (!image.render(g, 0, 0)) {
+            super.paint(g);
+        }
     }
 
     private static class ImageBuffer {
@@ -480,7 +631,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    private class RenderTask implements Runnable {
+    private final class RenderTask implements Runnable {
 
         private RenderTask() {
         }
@@ -622,7 +773,7 @@ public class ChunkMonitorDisplay extends JPanel {
 
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
-            final LinkedList<Request> requests = new LinkedList<>();
+            final List<Request> requests = new LinkedList<>();
 
             try {
                 while (true) {
@@ -661,157 +812,6 @@ public class ChunkMonitorDisplay extends JPanel {
                 ThreadMonitor.addError(e);
                 logger.error("Thread error", e);
             }
-        }
-    }
-
-    private Vector3i calcPlayerChunkPos() {
-        final LocalPlayer p = CoreRegistry.get(LocalPlayer.class);
-        if (p != null) {
-            return TeraMath.calcChunkPos(new Vector3i(p.getPosition()));
-        }
-        return null;
-    }
-
-    public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
-        Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");
-        Preconditions.checkArgument(chunkSize >= 6, "Parameter 'chunkSize' has to be greater or equal 6 (" + chunkSize + ")");
-        addComponentListener(new ResizeListener());
-        final MouseInputListener ml = new MouseInputListener();
-        addMouseListener(ml);
-        addMouseMotionListener(ml);
-        addMouseWheelListener(ml);
-        this.refreshInterval = refreshInterval;
-        this.chunkSize = chunkSize;
-        this.executor = Executors.newSingleThreadExecutor();
-        this.renderTask = new RenderTask();
-        ChunkMonitor.registerForEvents(this);
-        queue.offer(new InitialRequest());
-        executor.execute(renderTask);
-    }
-
-    public int getChunkSize() {
-        return chunkSize;
-    }
-
-    public ChunkMonitorDisplay setChunkSize(int value) {
-        if (value != chunkSize) {
-            Preconditions.checkArgument(value >= 6, "Parameter 'value' has to be greater or equal 6 (" + value + ")");
-            chunkSize = value;
-            updateDisplay(true);
-        }
-        return this;
-    }
-
-    public Vector3i getSelectedChunk() {
-        if (selectedChunk == null) {
-            return null;
-        }
-        return new Vector3i(selectedChunk);
-    }
-
-    public ChunkMonitorDisplay setSelectedChunk(Vector3i chunk) {
-        if (selectedChunk == null) {
-            if (chunk != null) {
-                selectedChunk = chunk;
-                updateDisplay(true);
-                fireChunkSelectedEvent(chunk);
-            }
-        } else {
-            if (chunk == null || !selectedChunk.equals(chunk)) {
-                selectedChunk = chunk;
-                updateDisplay(true);
-                fireChunkSelectedEvent(chunk);
-            }
-        }
-        return this;
-    }
-
-    public int getRenderY() {
-        return renderY;
-    }
-
-    public int getMinRenderY() {
-        return minRenderY;
-    }
-
-    public int getMaxRenderY() {
-        return maxRenderY;
-    }
-
-    public ChunkMonitorDisplay setRenderY(int value) {
-        int clampedValue = value;
-        if (value < minRenderY) {
-            clampedValue = minRenderY;
-        }
-        if (value > maxRenderY) {
-            clampedValue = maxRenderY;
-        }
-        if (renderY != clampedValue) {
-            renderY = clampedValue;
-            updateDisplay(true);
-        }
-        return this;
-    }
-
-    public ChunkMonitorDisplay setRenderYDelta(int delta) {
-        return setRenderY(renderY + delta);
-    }
-
-    public boolean getFollowPlayer() {
-        return followPlayer;
-    }
-
-    public ChunkMonitorDisplay setFollowPlayer(boolean value) {
-        if (followPlayer != value) {
-            followPlayer = value;
-            updateDisplay();
-        }
-        return this;
-    }
-
-    public int getOffsetX() {
-        return offsetX;
-    }
-
-    public int getOffsetY() {
-        return offsetY;
-    }
-
-    public ChunkMonitorDisplay setOffset(int x, int y) {
-        if (offsetX != x || offsetY != y) {
-            this.offsetX = x;
-            this.offsetY = y;
-            updateDisplay(true);
-        }
-        return this;
-    }
-
-    public int getRefreshInterval() {
-        return refreshInterval;
-    }
-
-    public ChunkMonitorDisplay setRefreshInterval(int value) {
-        Preconditions.checkArgument(value >= 500, "Parameter 'value' has to be greater or equal 500 (" + value + ")");
-        this.refreshInterval = value;
-        return this;
-    }
-
-    public void registerForEvents(Object object) {
-        Preconditions.checkNotNull(object, "The parameter 'object' must not be null");
-        eventbus.register(object);
-    }
-
-    @Subscribe
-    public void receiveChunkEvent(ChunkMonitorEvent event) {
-        if (event != null) {
-            queue.offer(new ChunkRequest(event));
-        }
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        if (!image.render(g, 0, 0)) {
-            super.paint(g);
         }
     }
 }

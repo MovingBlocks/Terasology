@@ -84,14 +84,13 @@ public class UIMenuPause extends UIWindow {
         respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnRequestEvent());
-
+                CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
                 setVisible(false);
             }
         });
         respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
-        respawnButton.setVisible(true);
+        respawnButton.setVisible(false);
 
         mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         mainMenuButton.getLabel().setText("Return to Main Menu");
@@ -123,5 +122,12 @@ public class UIMenuPause extends UIWindow {
         addDisplayElement(respawnButton);
         addDisplayElement(mainMenuButton);
         addDisplayElement(backToGameButton);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        respawnButton.setVisible(!localPlayer.getCharacterEntity().exists());
     }
 }

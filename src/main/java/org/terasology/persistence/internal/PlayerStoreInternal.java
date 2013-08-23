@@ -36,7 +36,7 @@ final class PlayerStoreInternal implements PlayerStore {
     private final StorageManagerInternal manager;
     private final Vector3f relevanceLocation = new Vector3f();
     private EntityRef character = EntityRef.NULL;
-    private boolean hasCharacter = false;
+    private boolean hasCharacter;
     private EntityData.EntityStore entityStore;
     private TIntSet externalRefs;
 

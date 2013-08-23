@@ -49,9 +49,9 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape baseCollisionShape;
     private Vector3f baseCollisionOffset = new Vector3f();
-    private boolean yawSymmetric = false;
-    private boolean pitchSymmetric = false;
-    private boolean rollSymmetric = false;
+    private boolean yawSymmetric;
+    private boolean pitchSymmetric;
+    private boolean rollSymmetric;
 
     private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
 

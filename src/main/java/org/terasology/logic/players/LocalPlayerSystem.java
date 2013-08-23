@@ -76,15 +76,15 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
 
     @In
     private Config config;
-    private float bobFactor = 0;
-    private float lastStepDelta = 0;
+    private float bobFactor;
+    private float lastStepDelta;
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean run = false;
-    private boolean jump = false;
-    private float lookPitch = 0;
-    private float lookYaw = 0;
+    private boolean run;
+    private boolean jump;
+    private float lookPitch;
+    private float lookYaw;
 
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 

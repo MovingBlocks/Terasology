@@ -59,7 +59,7 @@ public class ShaderManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShaderManager.class);
 
-    private GLSLMaterial activeMaterial = null;
+    private GLSLMaterial activeMaterial;
     private GLSLMaterial defaultShaderProgram;
     private GLSLMaterial defaultTexturedShaderProgram;
 

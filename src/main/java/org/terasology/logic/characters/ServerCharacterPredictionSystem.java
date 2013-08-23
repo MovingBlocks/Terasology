@@ -51,14 +51,14 @@ import java.util.Map;
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(PredictionSystem.class)
 public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, PredictionSystem {
+    public static final int RENDER_DELAY = 100;
+    public static final int MAX_INPUT_OVERFLOW = 100;
+    public static final int MAX_INPUT_UNDERFLOW = 100;
+
     private static final Logger logger = LoggerFactory.getLogger(ServerCharacterPredictionSystem.class);
 
     private static final int BUFFER_SIZE = 128;
     private static final int TIME_BETWEEN_STATE_REPLICATE = 50;
-    public static final int RENDER_DELAY = 100;
-
-    public static final int MAX_INPUT_OVERFLOW = 100;
-    public static final int MAX_INPUT_UNDERFLOW = 100;
 
     @In
     private Time time;
@@ -105,7 +105,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
         lastInputEvent.remove(entity);
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onToggleNoClip(ToggleNoClipEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
         CharacterStateEvent lastState = stateBuffer.getLast();

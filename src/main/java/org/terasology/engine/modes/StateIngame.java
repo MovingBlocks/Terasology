@@ -69,7 +69,7 @@ public class StateIngame implements GameState {
     private NetworkSystem networkSystem;
 
     /* GAME LOOP */
-    private boolean pauseGame = false;
+    private boolean pauseGame;
 
 
     public StateIngame() {

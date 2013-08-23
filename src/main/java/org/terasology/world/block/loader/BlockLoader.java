@@ -472,45 +472,6 @@ public class BlockLoader implements BlockBuilderHelper {
         return gson.fromJson(element, BlockDefinition.class);
     }
 
-    private static class BlockTilesDefinitionHandler implements JsonDeserializer<BlockDefinition.Tiles> {
-
-        @Override
-        public BlockDefinition.Tiles deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonObject()) {
-                BlockDefinition.Tiles result = new BlockDefinition.Tiles();
-                deserializeBlockPartMap(result.map, json.getAsJsonObject(), String.class, context);
-                return result;
-            }
-            return null;
-        }
-    }
-
-    private static class BlockColorSourceDefinitionHandler implements JsonDeserializer<BlockDefinition.ColorSources> {
-
-        @Override
-        public BlockDefinition.ColorSources deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonObject()) {
-                BlockDefinition.ColorSources result = new BlockDefinition.ColorSources();
-                deserializeBlockPartMap(result.map, json.getAsJsonObject(), Block.ColorSource.class, context);
-                return result;
-            }
-            return null;
-        }
-    }
-
-    private static class BlockColorOffsetDefinitionHandler implements JsonDeserializer<BlockDefinition.ColorOffsets> {
-
-        @Override
-        public BlockDefinition.ColorOffsets deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonObject()) {
-                BlockDefinition.ColorOffsets result = new BlockDefinition.ColorOffsets();
-                deserializeBlockPartMap(result.map, json.getAsJsonObject(), Vector4f.class, context);
-                return result;
-            }
-            return null;
-        }
-    }
-
     public static <T> void deserializeBlockPartMap(EnumMap<BlockPart, T> target, JsonObject jsonObj, Class<T> type, JsonDeserializationContext context) {
         if (jsonObj.has("all")) {
             T value = context.deserialize(jsonObj.get("all"), type);
@@ -567,5 +528,44 @@ public class BlockLoader implements BlockBuilderHelper {
     public static class LoadBlockDefinitionResults {
         public List<BlockFamily> families = Lists.newArrayList();
         public List<FreeformFamily> shapelessDefinitions = Lists.newArrayList();
+    }
+
+    private static class BlockTilesDefinitionHandler implements JsonDeserializer<BlockDefinition.Tiles> {
+
+        @Override
+        public BlockDefinition.Tiles deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonObject()) {
+                BlockDefinition.Tiles result = new BlockDefinition.Tiles();
+                deserializeBlockPartMap(result.map, json.getAsJsonObject(), String.class, context);
+                return result;
+            }
+            return null;
+        }
+    }
+
+    private static class BlockColorSourceDefinitionHandler implements JsonDeserializer<BlockDefinition.ColorSources> {
+
+        @Override
+        public BlockDefinition.ColorSources deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonObject()) {
+                BlockDefinition.ColorSources result = new BlockDefinition.ColorSources();
+                deserializeBlockPartMap(result.map, json.getAsJsonObject(), Block.ColorSource.class, context);
+                return result;
+            }
+            return null;
+        }
+    }
+
+    private static class BlockColorOffsetDefinitionHandler implements JsonDeserializer<BlockDefinition.ColorOffsets> {
+
+        @Override
+        public BlockDefinition.ColorOffsets deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonObject()) {
+                BlockDefinition.ColorOffsets result = new BlockDefinition.ColorOffsets();
+                deserializeBlockPartMap(result.map, json.getAsJsonObject(), Vector4f.class, context);
+                return result;
+            }
+            return null;
+        }
     }
 }

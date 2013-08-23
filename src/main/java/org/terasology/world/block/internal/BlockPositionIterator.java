@@ -27,7 +27,7 @@ import java.util.Iterator;
 public class BlockPositionIterator implements Iterator<Vector3i> {
     private BlockEntityRegistry registry;
     private TIntList positionList;
-    private int i = 0;
+    private int i;
     private Vector3i nextResult = new Vector3i();
 
     public BlockPositionIterator(TIntList positionList, BlockEntityRegistry registry) {

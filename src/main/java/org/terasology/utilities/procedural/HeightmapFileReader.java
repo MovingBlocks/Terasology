@@ -23,7 +23,10 @@ import java.io.IOException;
  *
  * @author Nym Traveel
  */
-public class HeightmapFileReader {
+public final class HeightmapFileReader {
+
+    private HeightmapFileReader() {
+    }
 
     public static float[][] readFile(String file, String delimiter) throws IOException {
         return (readValues(new java.io.FileInputStream(file), delimiter));

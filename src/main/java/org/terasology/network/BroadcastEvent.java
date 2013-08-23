@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 public @interface BroadcastEvent {
     /**
      * If true and applied to a subclass of NetworkEvent, the event will not be sent to the client owning the instigator

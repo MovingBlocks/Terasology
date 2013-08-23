@@ -42,9 +42,12 @@ public class UIButton extends UIDisplayContainer {
 
     private final UILabel label;
 
-    public enum ButtonType {NORMAL, TOGGLE}
+    public enum ButtonType {
+        NORMAL,
+        TOGGLE
+    }
 
-    private boolean toggleState = false;
+    private boolean toggleState;
     private ButtonType buttonType;
 
     private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();

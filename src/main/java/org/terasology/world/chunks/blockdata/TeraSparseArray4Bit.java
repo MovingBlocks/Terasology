@@ -31,6 +31,23 @@ import java.util.Arrays;
  */
 public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
+    public TeraSparseArray4Bit() {
+        super();
+    }
+
+    public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
+    }
+
+    public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
+        super(sizeX, sizeY, sizeZ, inflated, deflated);
+    }
+
+    public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
+        super(sizeX, sizeY, sizeZ, fill);
+        Preconditions.checkArgument(fill >= 0 && fill <= 15, "Parameter 'fill' has to be in the range 0 - 15 (" + fill + ")");
+    }
+
     @Override
     protected TeraArray createSparse(byte defaultFill) {
         return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), defaultFill);
@@ -83,59 +100,6 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         byte old = TeraArrayUtils.getLo(raw);
         row[rowPos] = TeraArrayUtils.setLo(raw, value);
         return old;
-    }
-
-    public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray4Bit> {
-
-        @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraSparseArray4Bit.class.equals(clazz);
-        }
-
-        @Override
-        protected TeraSparseArray4Bit createArray(int sizeX, int sizeY, int sizeZ) {
-            return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
-        }
-    }
-
-    public static class Factory implements TeraArray.Factory<TeraSparseArray4Bit> {
-
-        @Override
-        public Class<TeraSparseArray4Bit> getArrayClass() {
-            return TeraSparseArray4Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-
-        @Override
-        public TeraSparseArray4Bit create() {
-            return new TeraSparseArray4Bit();
-        }
-
-        @Override
-        public TeraSparseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
-            return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
-        }
-    }
-
-    public TeraSparseArray4Bit() {
-        super();
-    }
-
-    public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ);
-    }
-
-    public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
-        super(sizeX, sizeY, sizeZ, inflated, deflated);
-    }
-
-    public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
-        super(sizeX, sizeY, sizeZ, fill);
-        Preconditions.checkArgument(fill >= 0 && fill <= 15, "Parameter 'fill' has to be in the range 0 - 15 (" + fill + ")");
     }
 
     @Override
@@ -222,4 +186,39 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         return false;
     }
 
+    public static final class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray4Bit> {
+
+        @Override
+        public boolean canHandle(Class<?> clazz) {
+            return TeraSparseArray4Bit.class.equals(clazz);
+        }
+
+        @Override
+        protected TeraSparseArray4Bit createArray(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
+        }
+    }
+
+    public static class Factory implements TeraArray.Factory<TeraSparseArray4Bit> {
+
+        @Override
+        public Class<TeraSparseArray4Bit> getArrayClass() {
+            return TeraSparseArray4Bit.class;
+        }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
+
+        @Override
+        public TeraSparseArray4Bit create() {
+            return new TeraSparseArray4Bit();
+        }
+
+        @Override
+        public TeraSparseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
+        }
+    }
 }

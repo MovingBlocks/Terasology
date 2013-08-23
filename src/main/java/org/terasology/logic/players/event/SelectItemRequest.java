@@ -24,7 +24,7 @@ import org.terasology.network.ServerEvent;
 @ServerEvent
 public class SelectItemRequest implements Event {
 
-    private int slot = 0;
+    private int slot;
 
     protected SelectItemRequest() {
     }

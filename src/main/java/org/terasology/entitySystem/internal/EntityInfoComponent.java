@@ -30,7 +30,7 @@ public class EntityInfoComponent implements Component {
 
     @Replicate
     public EntityRef owner = EntityRef.NULL;
-    public boolean alwaysRelevant = false;
+    public boolean alwaysRelevant;
 
     public EntityInfoComponent() {
     }

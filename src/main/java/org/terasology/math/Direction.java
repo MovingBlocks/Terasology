@@ -37,6 +37,9 @@ public enum Direction {
     private static EnumMap<Direction, Direction> reverseMap;
     private static EnumMap<Direction, Side> conversionMap;
 
+    private Vector3i vector3iDir;
+    private Vector3f vector3fDir;
+
     static {
         reverseMap = new EnumMap<>(Direction.class);
         reverseMap.put(UP, DOWN);
@@ -52,6 +55,11 @@ public enum Direction {
         conversionMap.put(BACKWARD, Side.FRONT);
         conversionMap.put(LEFT, Side.RIGHT);
         conversionMap.put(RIGHT, Side.LEFT);
+    }
+
+    private Direction(Vector3i vector3i, Vector3f vector3f) {
+        this.vector3iDir = vector3i;
+        this.vector3fDir = vector3f;
     }
 
     public static Direction inDirection(int x, int y, int z) {
@@ -104,14 +112,6 @@ public enum Direction {
             return (x > 0) ? LEFT : RIGHT;
         }
         return (z > 0) ? FORWARD : BACKWARD;
-    }
-
-    private Vector3i vector3iDir;
-    private Vector3f vector3fDir;
-
-    Direction(Vector3i vector3i, Vector3f vector3f) {
-        this.vector3iDir = vector3i;
-        this.vector3fDir = vector3f;
     }
 
     /**

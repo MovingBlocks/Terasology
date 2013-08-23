@@ -29,7 +29,7 @@ public class ModuleInfo {
     private String id = "";
     private String displayName = "";
     private String description = "";
-    private boolean serversideOnly = false;
+    private boolean serversideOnly;
     private Set<String> dependencies = Sets.newLinkedHashSet();
 
     public String getId() {

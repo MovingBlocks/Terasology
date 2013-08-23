@@ -62,7 +62,6 @@ public class StyleShadow extends UIDisplayContainer implements Style {
         INSIDE, OUTSIDE
     }
 
-    ;
     private EShadowDirection direction = EShadowDirection.OUTSIDE;
 
     //texture

@@ -28,10 +28,13 @@ import org.terasology.world.chunks.ChunkProvider;
 import java.util.List;
 import java.util.Map;
 
-public class ChunkMonitor {
+public final class ChunkMonitor {
 
     private static final EventBus EVENT_BUS = new EventBus("ChunkMonitor");
     private static final Map<Vector3i, ChunkMonitorEntry> CHUNKS = Maps.newConcurrentMap();
+
+    private ChunkMonitor() {
+    }
 
     private static void post(Object event) {
         EVENT_BUS.post(event);
@@ -47,9 +50,6 @@ public class ChunkMonitor {
         }
         entry.addChunk(chunk);
         return entry;
-    }
-
-    private ChunkMonitor() {
     }
 
     public static void registerForEvents(Object object) {

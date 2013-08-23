@@ -16,16 +16,16 @@
 package org.terasology.input.events;
 
 
-public class RightMouseDownButtonEvent extends MouseDownButtonEvent {
+public final class RightMouseDownButtonEvent extends MouseDownButtonEvent {
 
     private static RightMouseDownButtonEvent event = new RightMouseDownButtonEvent(0);
+
+    private RightMouseDownButtonEvent(float delta) {
+        super(1, delta);
+    }
 
     public static RightMouseDownButtonEvent create(float delta) {
         event.reset(delta);
         return event;
-    }
-
-    private RightMouseDownButtonEvent(float delta) {
-        super(1, delta);
     }
 }

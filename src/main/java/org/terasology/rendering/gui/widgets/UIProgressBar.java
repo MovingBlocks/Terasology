@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.widgets;
 
 import org.newdawn.slick.Color;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -23,6 +24,7 @@ import org.terasology.rendering.gui.framework.events.ChangedListener;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple graphical progressBar
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 public class UIProgressBar extends UIDisplayContainer {
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
 
     //label position
     public static enum ELabelPosition {
@@ -44,29 +46,14 @@ public class UIProgressBar extends UIDisplayContainer {
     private final float labelSpacing = 8f;
 
     //value
-    private int value = 0;
-    private int minValue = 0;
+    private int value;
+    private int minValue;
     private int maxValue = 100;
 
     //child elements
     private UILabel label;
     private UIProgressLine progressLine;
     private int range;
-
-    /**
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
-     */
-    private static class UIProgressLine extends UIDisplayContainer {
-
-        public UIProgressLine() {
-            setCropContainer(true);
-            setBackgroundImage("engine:gui_menu", new Vector2f(0f, 190f), new Vector2f(248f, 9f));
-        }
-
-        public void updateProgress(int value, int range) {
-            setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * ((float) value / (float) range)), 0f, 0f));
-        }
-    }
 
     public UIProgressBar() {
         setBackgroundImage("engine:gui_menu", new Vector2f(0f, 175f), new Vector2f(256f, 15f));
@@ -120,7 +107,7 @@ public class UIProgressBar extends UIDisplayContainer {
      * @param value The value. The range of the value should be greater or equal than the minimum value and lower or equal than the maximum value.
      */
     public void setValue(int value) {
-        this.value = value;
+        this.value = TeraMath.clamp(value, minValue, maxValue);
 
         progressLine.updateProgress(value, range);
 
@@ -266,6 +253,21 @@ public class UIProgressBar extends UIDisplayContainer {
 
     public void removeChangedListener(ChangedListener listener) {
         changedListeners.remove(listener);
+    }
+
+    /**
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+     */
+    private static class UIProgressLine extends UIDisplayContainer {
+
+        public UIProgressLine() {
+            setCropContainer(true);
+            setBackgroundImage("engine:gui_menu", new Vector2f(0f, 190f), new Vector2f(248f, 9f));
+        }
+
+        public void updateProgress(int value, int range) {
+            setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * ((float) value / (float) range)), 0f, 0f));
+        }
     }
 }
 

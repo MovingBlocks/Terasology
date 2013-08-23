@@ -300,6 +300,17 @@ public class ModuleManager {
         return ImmutableList.<Module>builder().add(engineModule).addAll(modules.values()).build();
     }
 
+    public List<Module> getCodeModules() {
+        List<Module> result = Lists.newArrayList();
+        result.add(engineModule);
+        for (Module module : modules.values()) {
+            if (module.isCodeModule()) {
+                result.add(module);
+            }
+        }
+        return result;
+    }
+
     private Collection<ExtensionModule> getExtensionModules() {
         return modules.values();
     }

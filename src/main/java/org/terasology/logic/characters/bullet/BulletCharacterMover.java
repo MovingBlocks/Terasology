@@ -56,6 +56,16 @@ import org.terasology.physics.CharacterMoverBody;
  * @author Immortius
  */
 public class BulletCharacterMover implements CharacterMover {
+    public static final float GRAVITY = 28.0f;
+    public static final float TERMINAL_VELOCITY = 64.0f;
+
+    public static final float UNDERWATER_GRAVITY = 0.25f;
+    public static final float UNDERWATER_INERTIA = 2.0f;
+
+    public static final float CLIMB_GRAVITY = 0f;
+
+    public static final float GHOST_INERTIA = 4f;
+
     private static final Logger logger = LoggerFactory.getLogger(BulletCharacterMover.class);
 
     /**
@@ -75,24 +85,14 @@ public class BulletCharacterMover implements CharacterMover {
      */
     private static final float HORIZONTAL_PENETRATION = 0.03f;
 
-    public static final float GRAVITY = 28.0f;
-    public static final float TERMINAL_VELOCITY = 64.0f;
-
-    public static final float UNDERWATER_GRAVITY = 0.25f;
-    public static final float UNDERWATER_INERTIA = 2.0f;
-
-    public static final float CLIMB_GRAVITY = 0f;
-
-    public static final float GHOST_INERTIA = 4f;
-
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
     private WorldProvider worldProvider;
 
     // Processing state variables
 
-    private float steppedUpDist = 0;
-    private boolean stepped = false;
+    private float steppedUpDist;
+    private boolean stepped;
 
     public BulletCharacterMover(WorldProvider worldProvider) {
         this.worldProvider = worldProvider;
@@ -772,28 +772,6 @@ public class BulletCharacterMover implements CharacterMover {
         return callback;
     }
 
-    private static class SweepCallback extends CollisionWorld.ClosestConvexResultCallback {
-        protected CollisionObject me;
-        protected final Vector3f up;
-        protected float minSlopeDot;
-
-        public SweepCallback(CollisionObject me, final Vector3f up, float minSlopeDot) {
-            super(new Vector3f(), new Vector3f());
-            this.me = me;
-            this.up = up;
-            this.minSlopeDot = minSlopeDot;
-        }
-
-        @Override
-        public float addSingleResult(CollisionWorld.LocalConvexResult convexResult, boolean normalInWorldSpace) {
-            if (convexResult.hitCollisionObject == me) {
-                return 1.0f;
-            }
-
-            return super.addSingleResult(convexResult, normalInWorldSpace);
-        }
-    }
-
     private Vector3f extractResidualMovement(Vector3f hitNormal, Vector3f direction) {
         return extractResidualMovement(hitNormal, direction, 1f);
     }
@@ -818,5 +796,25 @@ public class BulletCharacterMover implements CharacterMover {
         return direction;
     }
 
+    private static class SweepCallback extends CollisionWorld.ClosestConvexResultCallback {
+        protected CollisionObject me;
+        protected final Vector3f up;
+        protected float minSlopeDot;
 
+        public SweepCallback(CollisionObject me, final Vector3f up, float minSlopeDot) {
+            super(new Vector3f(), new Vector3f());
+            this.me = me;
+            this.up = up;
+            this.minSlopeDot = minSlopeDot;
+        }
+
+        @Override
+        public float addSingleResult(CollisionWorld.LocalConvexResult convexResult, boolean normalInWorldSpace) {
+            if (convexResult.hitCollisionObject == me) {
+                return 1.0f;
+            }
+
+            return super.addSingleResult(convexResult, normalInWorldSpace);
+        }
+    }
 }

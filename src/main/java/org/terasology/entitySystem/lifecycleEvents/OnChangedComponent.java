@@ -26,14 +26,14 @@ import org.terasology.entitySystem.event.Event;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class OnChangedComponent implements Event {
+public final class OnChangedComponent implements Event {
 
     private static OnChangedComponent instance = new OnChangedComponent();
 
-    public static OnChangedComponent newInstance() {
-        return instance;
+    private OnChangedComponent() {
     }
 
-    private OnChangedComponent() {
+    public static OnChangedComponent newInstance() {
+        return instance;
     }
 }

@@ -15,8 +15,12 @@
  */
 package org.terasology.persistence;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.Lists;
+import com.google.protobuf.ByteString;
+import org.junit.Before;
+import org.junit.Test;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,13 +30,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
-import org.terasology.protobuf.EntityData;
-
-import com.google.common.collect.Lists;
-import com.google.protobuf.ByteString;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -128,7 +127,7 @@ public class EntityDataJSONFormatTest {
     }
 
     @Test
-     public void testPersistComponentWithDouble() throws Exception {
+    public void testPersistComponentWithDouble() throws Exception {
         nameValueBuilder.setName(VALUE_NAME);
         nameValueBuilder.setValue(EntityData.Value.newBuilder().addDouble(1));
         componentBuilder.addField(nameValueBuilder);
@@ -175,7 +174,7 @@ public class EntityDataJSONFormatTest {
 
         EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
-        assertEquals(Lists.newArrayList(1,2), actual.getEntity(0).getComponent(0).getField(0).getValue().getIntegerList());
+        assertEquals(Lists.newArrayList(1, 2), actual.getEntity(0).getComponent(0).getField(0).getValue().getIntegerList());
     }
 
     @Test
@@ -227,7 +226,7 @@ public class EntityDataJSONFormatTest {
 
         EntityData.GlobalStore actual = persistAndRetrieve(worldBuilder.build());
         assertEquals(VALUE_NAME, actual.getEntity(0).getComponent(0).getField(0).getName());
-        assertEquals(Lists.newArrayList(1,2), actual.getEntity(0).getComponent(0).getField(0).getValue().getValue(0).getIntegerList());
+        assertEquals(Lists.newArrayList(1, 2), actual.getEntity(0).getComponent(0).getField(0).getValue().getValue(0).getIntegerList());
     }
 
     @Test
@@ -292,7 +291,7 @@ public class EntityDataJSONFormatTest {
         assertPersist(worldBuilder);
     }
 
-    private void assertPersist(EntityData.GlobalStore.Builder builder) throws IOException{
+    private void assertPersist(EntityData.GlobalStore.Builder builder) throws IOException {
         EntityData.GlobalStore world = builder.build();
         EntityData.GlobalStore newWorld = persistAndRetrieve(world);
         assertEquals(world, newWorld);

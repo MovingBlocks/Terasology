@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 public @interface ServerEvent {
     /**
      * @return Whether the event should be compensated for lag - if true then the location and rotation of all characters

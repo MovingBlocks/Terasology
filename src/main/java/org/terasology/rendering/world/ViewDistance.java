@@ -27,10 +27,10 @@ public enum ViewDistance {
     FAR(2, 32),
     ULTRA(3, 64);
 
+    private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
+
     private int chunkDistance;
     private int index;
-
-    private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 
     static {
         for (ViewDistance viewDistance : ViewDistance.values()) {

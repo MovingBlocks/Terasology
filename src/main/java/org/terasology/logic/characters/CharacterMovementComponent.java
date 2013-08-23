@@ -63,20 +63,20 @@ public final class CharacterMovementComponent implements Component {
     public float groundFriction = 8.0f;
     public float distanceBetweenFootsteps = 1f;
     public float distanceBetweenSwimStrokes = 1f;
-    public boolean faceMovementDirection = false;
+    public boolean faceMovementDirection;
 
     // Current movement mode
     public MovementMode mode = MovementMode.WALKING;
-    public boolean grounded = false;
-
-    private Vector3f velocity = new Vector3f();
+    public boolean grounded;
 
     // Movement inputs - desired direction, etc
-    public boolean jump = false;
+    public boolean jump;
 
     // Distance since last footstep
-    public float footstepDelta = 0.0f;
+    public float footstepDelta;
 
+
+    private Vector3f velocity = new Vector3f();
     public Vector3f getVelocity() {
         return velocity;
     }

@@ -34,9 +34,9 @@ public final class TimeLwjgl implements EngineTime {
 
     private AtomicLong last = new AtomicLong(0);
     private AtomicLong delta = new AtomicLong(0);
-    private float avgDelta = 0;
-    private long desynch = 0;
-    private boolean paused = false;
+    private float avgDelta;
+    private long desynch;
+    private boolean paused;
 
     private AtomicLong gameTime = new AtomicLong(0);
 
@@ -74,35 +74,6 @@ public final class TimeLwjgl implements EngineTime {
                 delta.set(newDelta / updateCycles);
             }
             return new TimeStepper(updateCycles, newDelta / updateCycles);
-        }
-    }
-
-    private class TimeStepper implements Iterator<Float> {
-
-        private int cycles;
-        private long deltaPerCycle;
-        private int currentCycle = 0;
-
-        public TimeStepper(int cycles, long deltaPerCycle) {
-            this.cycles = cycles;
-            this.deltaPerCycle = deltaPerCycle;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return currentCycle < cycles;
-        }
-
-        @Override
-        public Float next() {
-            currentCycle++;
-            gameTime.addAndGet(deltaPerCycle);
-            return deltaPerCycle / 1000f;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
     }
 
@@ -154,5 +125,34 @@ public final class TimeLwjgl implements EngineTime {
 
     public boolean isPaused() {
         return paused;
+    }
+
+    private class TimeStepper implements Iterator<Float> {
+
+        private int cycles;
+        private long deltaPerCycle;
+        private int currentCycle;
+
+        public TimeStepper(int cycles, long deltaPerCycle) {
+            this.cycles = cycles;
+            this.deltaPerCycle = deltaPerCycle;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentCycle < cycles;
+        }
+
+        @Override
+        public Float next() {
+            currentCycle++;
+            gameTime.addAndGet(deltaPerCycle);
+            return deltaPerCycle / 1000f;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

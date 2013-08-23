@@ -49,19 +49,6 @@ import java.util.List;
  */
 public final class UIMenuConfigControls extends UIWindow {
 
-    // TODO: Much of this can be derived from the register bind button annotations, more generic input screen?
-    private static class ButtonDefinition {
-        public String bindId;
-        public String displayText;
-        public int group;
-
-        public ButtonDefinition(String bindId, String displayText, int group) {
-            this.bindId = bindId;
-            this.displayText = displayText;
-            this.group = group;
-        }
-    }
-
     // TODO: Yeah, this is rough as, populate better
     private List<ButtonDefinition> buttonDefs = Lists.newArrayList(
             new ButtonDefinition("engine:forwards", "Forwards", 0),
@@ -95,9 +82,8 @@ public final class UIMenuConfigControls extends UIWindow {
     private List<UILabel> inputLabels = Lists.newArrayList();
     private List<UIButton> inputButtons = Lists.newArrayList();
 
-    String editButtonCurrent = "";
-    UIButton editButton = null;
-    final UIImage title;
+    private UIButton editButton;
+    private final UIImage title;
 
     private final Config config = CoreRegistry.get(Config.class);
 
@@ -154,7 +140,6 @@ public final class UIMenuConfigControls extends UIWindow {
             public void click(UIDisplayElement element, int button) {
                 if (editButton == null) {
                     editButton = (UIButton) element;
-                    editButtonCurrent = editButton.getLabel().getText();
                     editButton.getLabel().setText("...");
                 }
             }
@@ -277,6 +262,19 @@ public final class UIMenuConfigControls extends UIWindow {
             } else {
                 button.getLabel().setText("");
             }
+        }
+    }
+
+    // TODO: Much of this can be derived from the register bind button annotations, more generic input screen?
+    private static class ButtonDefinition {
+        public String bindId;
+        public String displayText;
+        public int group;
+
+        public ButtonDefinition(String bindId, String displayText, int group) {
+            this.bindId = bindId;
+            this.displayText = displayText;
+            this.group = group;
         }
     }
 }

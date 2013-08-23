@@ -48,8 +48,8 @@ public class GridLayout implements Layout {
     private Vector2f size = new Vector2f(0, 0);
     private int columns;
     private Vector4f cellPadding = new Vector4f(0, 0, 0, 0); //top, right, bottom, left
-    private float minCellWidth = 0f;
-    private float minCellHeight = 0f;
+    private float minCellWidth;
+    private float minCellHeight;
     private float[] cellWidth;
     private float[] cellHeight;
 
@@ -58,10 +58,10 @@ public class GridLayout implements Layout {
     private EHorizontalAlign horizontalCellAlign = EHorizontalAlign.LEFT;
 
     //options
-    private boolean enableBorder = false;
+    private boolean enableBorder;
     private float borderWidth = 1f;
     private Color borderColor = Color.black;
-    private boolean equalWidth = false;
+    private boolean equalWidth;
 
     public GridLayout(int columns) {
         this.columns = columns;

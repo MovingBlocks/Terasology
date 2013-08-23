@@ -24,8 +24,8 @@ import javax.vecmath.Vector3f;
  */
 public final class SimpleAIComponent implements Component {
 
-    public long lastChangeOfDirectionAt = 0;
+    public long lastChangeOfDirectionAt;
     public Vector3f movementTarget = new Vector3f();
-    public boolean followingPlayer = false;
+    public boolean followingPlayer;
 
 }

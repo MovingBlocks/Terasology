@@ -24,13 +24,14 @@ import org.terasology.entitySystem.event.Event;
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  */
-public class OnAddedComponent implements Event {
+public final class OnAddedComponent implements Event {
+
     private static OnAddedComponent instance = new OnAddedComponent();
+
+    private OnAddedComponent() {
+    }
 
     public static OnAddedComponent newInstance() {
         return instance;
-    }
-
-    private OnAddedComponent() {
     }
 }

@@ -22,6 +22,8 @@ import org.terasology.entitySystem.Component;
  * @author Immortius
  */
 public class NetworkComponent implements Component {
+    public ReplicateMode replicateMode = ReplicateMode.RELEVANT;
+
     // Network identifier for the entity
     @Replicate
     private int networkId;
@@ -29,10 +31,8 @@ public class NetworkComponent implements Component {
     public enum ReplicateMode {
         ALWAYS, // Always replicate this entity to all clients
         RELEVANT, // Replicate to client which this entity is relevant to (based on distance)
-        OWNER; // Always replicate this entity to its owner
+        OWNER // Always replicate this entity to its owner
     }
-
-    public ReplicateMode replicateMode = ReplicateMode.RELEVANT;
 
     public void setNetworkId(int networkId) {
         this.networkId = networkId;

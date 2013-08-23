@@ -19,6 +19,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldTimeEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 // TODO: merge into WorldTime
 public class WorldTimeEventManager {
 
-    protected final ArrayList<WorldTimeEvent> worldTimeEvents = new ArrayList<WorldTimeEvent>();
+    protected final List<WorldTimeEvent> worldTimeEvents = new ArrayList<>();
     protected final WorldProvider parent;
 
     public WorldTimeEventManager(WorldProvider parent) {

@@ -62,7 +62,7 @@ public class UIMenuSelectWorld extends UIWindow {
     final UIButton loadFromList;
     final UIButton deleteFromList;
 
-    private boolean createServerGame = false;
+    private boolean createServerGame;
 
     public UIMenuSelectWorld() {
         setId("selectworld");

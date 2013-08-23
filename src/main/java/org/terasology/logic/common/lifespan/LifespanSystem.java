@@ -25,7 +25,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 /**
  * @author Immortius
  */
-@RegisterSystem()
+@RegisterSystem
 public class LifespanSystem implements UpdateSubscriberSystem {
 
     private EntityManager entityManager;

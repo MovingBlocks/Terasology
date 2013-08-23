@@ -18,16 +18,16 @@ package org.terasology.persistence;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.persistence.serializers.WorldSerializer;
-import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.serializers.WorldSerializer;
+import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
 import static org.junit.Assert.assertEquals;
@@ -38,9 +38,10 @@ import static org.mockito.Mockito.mock;
  */
 public class WorldSerializerTest {
 
+    private static ModuleManager moduleManager;
+
     private EngineEntityManager entityManager;
     private WorldSerializer worldSerializer;
-    private static ModuleManager moduleManager;
 
     @BeforeClass
     public static void setupClass() {

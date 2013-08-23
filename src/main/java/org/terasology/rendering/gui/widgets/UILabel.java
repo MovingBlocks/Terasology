@@ -42,20 +42,20 @@ import static org.lwjgl.opengl.GL11.glDisable;
  */
 public class UILabel extends UIDisplayContainer {
 
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-
     protected StringBuilder text = new StringBuilder();
+
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
 
     //wrapping
     private final List<Integer> wrapPosition = new ArrayList<Integer>();
-    private boolean isWrap = false;
+    private boolean isWrap;
 
     //font
     private Font font = Assets.getFont("engine:default");
     private Color color = new Color(Color.white);
 
     //shadow
-    private boolean enableShadow = false;
+    private boolean enableShadow;
     private Color shadowColor = new Color(Color.black);
     private final Vector2f shadowOffset = new Vector2f(1, 0);
 

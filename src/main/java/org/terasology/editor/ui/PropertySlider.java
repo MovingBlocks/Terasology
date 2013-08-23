@@ -29,7 +29,7 @@ import java.awt.*;
 public class PropertySlider extends JPanel implements ChangeListener {
 
     private JSlider slider;
-    private FloatProperty activeProperty = null;
+    private FloatProperty activeProperty;
 
     private BorderLayout borderLayout;
     private TitledBorder titledBorder;

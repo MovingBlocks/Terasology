@@ -27,7 +27,7 @@ import org.terasology.monitoring.impl.ThreadMonitorEvent;
 import java.util.List;
 import java.util.Map;
 
-public class ThreadMonitor {
+public final class ThreadMonitor {
 
     private static final EventBus EVENT_BUS = new EventBus("ThreadMonitor");
     private static final Map<Thread, SingleThreadMonitor> THREAD_INFO_BY_ID = Maps.newConcurrentMap();

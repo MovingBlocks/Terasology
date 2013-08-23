@@ -31,13 +31,12 @@ import java.nio.FloatBuffer;
  */
 public final class TeraMath {
 
-    private TeraMath() {
-    }
-
     public static final float PI = (float) Math.PI;
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
 
+    private TeraMath() {
+    }
 
     /**
      * Returns the absolute value.

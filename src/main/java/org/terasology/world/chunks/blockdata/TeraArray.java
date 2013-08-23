@@ -44,6 +44,27 @@ public abstract class TeraArray implements Externalizable {
     private int sizeXYZ;
     private int sizeXYZHalf;
 
+    protected TeraArray() {
+    }
+
+    protected TeraArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
+        checkArgument(sizeX > 0);
+        checkArgument(sizeY > 0);
+        checkArgument(sizeZ > 0);
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.sizeZ = sizeZ;
+        sizeXZ = sizeX * sizeZ;
+        sizeXZHalf = sizeXZ / 2;
+        sizeXYZ = sizeY * sizeXZ;
+        sizeXYZHalf = sizeXYZ / 2;
+        checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
+        checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
+        if (initialize) {
+            initialize();
+        }
+    }
+
     protected final void writeExternalHeader(ObjectOutput out) throws IOException {
         out.writeInt(sizeX);
         out.writeInt(sizeY);
@@ -69,6 +90,60 @@ public abstract class TeraArray implements Externalizable {
     }
 
     protected abstract void initialize();
+
+    public final int getSizeX() {
+        return sizeX;
+    }
+
+    public final int getSizeY() {
+        return sizeY;
+    }
+
+    public final int getSizeZ() {
+        return sizeZ;
+    }
+
+    public final int getSizeXZ() {
+        return sizeXZ;
+    }
+
+    public final int getSizeXZHalf() {
+        return sizeXZHalf;
+    }
+
+    public final int getSizeXYZ() {
+        return sizeXYZ;
+    }
+
+    public final int getSizeXYZHalf() {
+        return sizeXYZHalf;
+    }
+
+    public final boolean contains(int x, int y, int z) {
+        return (x >= 0 && x < sizeX && y >= 0 && y < sizeY && z >= 0 && z < sizeZ);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "(" + getSizeX() + ", " + getSizeY() + ", " + getSizeZ() + ", "
+                + (isSparse() ? "sparse" : "dense") + ", " + getElementSizeInBits() + "bit, " + getEstimatedMemoryConsumptionInBytes() + "byte)";
+    }
+
+    public abstract boolean isSparse();
+
+    public abstract TeraArray copy();
+
+    public abstract TeraArray deflate(TeraVisitingDeflator deflator);
+
+    public abstract int getEstimatedMemoryConsumptionInBytes();
+
+    public abstract int getElementSizeInBits();
+
+    public abstract int get(int x, int y, int z);
+
+    public abstract int set(int x, int y, int z, int value);
+
+    public abstract boolean set(int x, int y, int z, int value, int expected);
 
     /**
      * This is the interface for tera array factories. Every tera array is required to implement a factory.
@@ -167,79 +242,4 @@ public abstract class TeraArray implements Externalizable {
             return internalDeserialize(sizeX, sizeY, sizeZ, buffer);
         }
     }
-
-    protected TeraArray() {
-    }
-
-    protected TeraArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
-        checkArgument(sizeX > 0);
-        checkArgument(sizeY > 0);
-        checkArgument(sizeZ > 0);
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.sizeZ = sizeZ;
-        sizeXZ = sizeX * sizeZ;
-        sizeXZHalf = sizeXZ / 2;
-        sizeXYZ = sizeY * sizeXZ;
-        sizeXYZHalf = sizeXYZ / 2;
-        checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
-        checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
-        if (initialize) {
-            initialize();
-        }
-    }
-
-    public final int getSizeX() {
-        return sizeX;
-    }
-
-    public final int getSizeY() {
-        return sizeY;
-    }
-
-    public final int getSizeZ() {
-        return sizeZ;
-    }
-
-    public final int getSizeXZ() {
-        return sizeXZ;
-    }
-
-    public final int getSizeXZHalf() {
-        return sizeXZHalf;
-    }
-
-    public final int getSizeXYZ() {
-        return sizeXYZ;
-    }
-
-    public final int getSizeXYZHalf() {
-        return sizeXYZHalf;
-    }
-
-    public final boolean contains(int x, int y, int z) {
-        return (x >= 0 && x < sizeX && y >= 0 && y < sizeY && z >= 0 && z < sizeZ);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getName() + "(" + getSizeX() + ", " + getSizeY() + ", " + getSizeZ() + ", "
-                + (isSparse() ? "sparse" : "dense") + ", " + getElementSizeInBits() + "bit, " + getEstimatedMemoryConsumptionInBytes() + "byte)";
-    }
-
-    public abstract boolean isSparse();
-
-    public abstract TeraArray copy();
-
-    public abstract TeraArray deflate(TeraVisitingDeflator deflator);
-
-    public abstract int getEstimatedMemoryConsumptionInBytes();
-
-    public abstract int getElementSizeInBits();
-
-    public abstract int get(int x, int y, int z);
-
-    public abstract int set(int x, int y, int z, int value);
-
-    public abstract boolean set(int x, int y, int z, int value, int expected);
 }

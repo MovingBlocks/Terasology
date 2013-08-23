@@ -24,11 +24,12 @@ import org.terasology.entitySystem.metadata.MappedContainer;
  */
 public class MappedTypeComponent implements Component {
 
+    public InnerType val = new InnerType();
+    public Number number = 2;
+
     @MappedContainer
     public static class InnerType {
         public static final int STATIC_VALUE = 2;
     }
 
-    public InnerType val = new InnerType();
-    public Number number = 2;
 }

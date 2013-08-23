@@ -45,7 +45,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     float filmGrainIntensity = 0.025f;
 
     @EditorRange(min = 0.0f, max = 1.0f)
-    float blurStart = 0.0f;
+    float blurStart;
     @EditorRange(min = 0.0f, max = 1.0f)
     float blurLength = 0.15f;
 

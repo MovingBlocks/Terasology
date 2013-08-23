@@ -24,19 +24,22 @@ import org.terasology.entitySystem.DoNotAutoRegister;
  */
 @DoNotAutoRegister
 public class UnsupportedTypeComponent implements Component {
-    public static class UnsupportedType {
-        private UnsupportedType() {};
+    public UnsupportedType value;
+    public UnsupportedType2 value2;
+    public UnsupportedType3 value3;
+
+    public interface UnsupportedType3 {
+
+    }
+
+    public static final class UnsupportedType {
+        private UnsupportedType() {
+        }
     }
 
     public abstract static class UnsupportedType2 {
 
     }
 
-    public interface UnsupportedType3 {
 
-    }
-
-    public UnsupportedType value;
-    public UnsupportedType2 value2;
-    public UnsupportedType3 value3;
 }

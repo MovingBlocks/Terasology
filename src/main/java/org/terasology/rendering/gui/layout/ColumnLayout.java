@@ -32,8 +32,8 @@ import java.util.List;
 public class ColumnLayout implements Layout {
 
     //options
-    private float spacingVertical = 0f;
-    private boolean equalHeight = false;
+    private float spacingVertical;
+    private boolean equalHeight;
     private float border;
 
     @Override

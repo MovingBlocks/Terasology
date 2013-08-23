@@ -37,9 +37,9 @@ public class ChunkMeshInfo {
 
         for (int i = 0; i < mesh.length; i++) {
             final ChunkMesh segment = checkNotNull(mesh[i], "Chunk mesh segment #" + i + " must not be null");
-            if (segment.vertexElements != null) {
-                for (int j = 0; j < segment.vertexElements.length; j++) {
-                    final ChunkMesh.VertexElements element = segment.vertexElements[j];
+            if (!segment.isGenerated()) {
+                for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
+                    final ChunkMesh.VertexElements element = segment.getVertexElements(type);
                     vertices += element.finalVertices.limit();
                     indices += element.finalIndices.limit();
                 }

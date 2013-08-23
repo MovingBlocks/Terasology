@@ -24,7 +24,7 @@ import org.terasology.network.Replicate;
  */
 public class DrowningComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    public long startDrowningTime = 0;
+    public long startDrowningTime;
 
-    public long nextDrownDamageTime = 0;
+    public long nextDrownDamageTime;
 }

@@ -50,7 +50,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius
  */
-@RegisterSystem()
+@RegisterSystem
 public class CharacterSystem implements ComponentSystem {
 
     @In

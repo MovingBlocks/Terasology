@@ -57,16 +57,12 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     private JMenuItem fileMenuExitItem;
 
     private JMenu shaderPropertiesMenu;
-    private ArrayList<JMenuItem> shaderPropertyMenuEntries = new ArrayList<>(64);
+    private java.util.List<JMenuItem> shaderPropertyMenuEntries = new ArrayList<>(64);
 
     private JMenu propertiesMenu;
     private JMenuItem propertiesMenuScene;
 
     private JScrollPane propertyPanelScrollPane;
-
-    public Viewport getViewport() {
-        return viewport;
-    }
 
     public MainWindow(TeraEd teraEd) {
         this.teraEd = teraEd;
@@ -117,6 +113,10 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
         pack();
         setVisible(true);
+    }
+
+    public Viewport getViewport() {
+        return viewport;
     }
 
     public void onStateChange() {

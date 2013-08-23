@@ -40,8 +40,8 @@ import java.util.List;
 public class UIComboBox extends UIDisplayContainer {
 
     //events
-    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
+    private final List<ChangedListener> changedListeners = new ArrayList<>();
+    private final List<SelectionListener> selectionListeners = new ArrayList<>();
 
     private UIText baseInput;
     private UIButton baseButton;

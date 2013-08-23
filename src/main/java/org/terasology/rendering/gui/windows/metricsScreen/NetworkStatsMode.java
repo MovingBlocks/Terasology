@@ -28,7 +28,7 @@ import java.util.List;
  * @author Immortius
  */
 final class NetworkStatsMode extends MetricsMode {
-    private long lastSecond = 0;
+    private long lastSecond;
     private Time time;
     private NetworkSystem networkSystem;
 

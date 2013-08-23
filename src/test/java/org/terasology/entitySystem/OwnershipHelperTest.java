@@ -32,9 +32,9 @@ import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
  */
 public class OwnershipHelperTest {
 
-    EngineEntityManager entityManager;
-
     private static ModuleManager moduleManager;
+
+    EngineEntityManager entityManager;
 
     @BeforeClass
     public static void setupClass() {

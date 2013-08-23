@@ -24,8 +24,8 @@ public class SystemConfig {
     private int maxThreads = 2;
     private int verticalChunkMeshSegments = 1;
 
-    private boolean debugEnabled = false;
-    private boolean monitoringEnabled = false;
+    private boolean debugEnabled;
+    private boolean monitoringEnabled;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;

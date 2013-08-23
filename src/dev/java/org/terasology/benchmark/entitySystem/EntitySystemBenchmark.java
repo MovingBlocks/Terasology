@@ -28,8 +28,11 @@ import java.util.List;
 /**
  *
  */
-public class EntitySystemBenchmark {
+public final class EntitySystemBenchmark {
     private static final Logger logger = LoggerFactory.getLogger(EntitySystemBenchmark.class);
+
+    private EntitySystemBenchmark() {
+    }
 
     public static void main(String[] args) {
         final List<Benchmark> benchmarks = Lists.newArrayList();

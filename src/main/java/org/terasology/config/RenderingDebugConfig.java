@@ -53,12 +53,12 @@ public class RenderingDebugConfig {
         }
     }
 
-    private boolean enabled = false;
+    private boolean enabled;
     private DebugRenderingStage stage = DebugRenderingStage.OPAQUE_COLOR;
-    private boolean firstPersonElementsHidden = false;
-    private boolean hudHidden = false;
-    private boolean wireframe = false;
-    private boolean renderChunkBoundingBoxes = false;
+    private boolean firstPersonElementsHidden;
+    private boolean hudHidden;
+    private boolean wireframe;
+    private boolean renderChunkBoundingBoxes;
 
     public boolean isWireframe() {
         return wireframe;

@@ -23,7 +23,8 @@ import org.terasology.entitySystem.Component;
 public final class IntegerComponent implements Component {
     public int value;
 
-    public IntegerComponent() {}
+    public IntegerComponent() {
+    }
 
     public IntegerComponent(int value) {
         this.value = value;

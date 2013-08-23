@@ -23,7 +23,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.utilities.collection.NullIterator;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.internal.PojoEntityManager;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
@@ -37,8 +37,8 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkSystem;
+import org.terasology.utilities.collection.NullIterator;
 
 import java.util.Collections;
 import java.util.Iterator;

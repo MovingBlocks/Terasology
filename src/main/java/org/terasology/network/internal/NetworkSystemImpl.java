@@ -100,7 +100,7 @@ import java.util.concurrent.Executors;
  */
 public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystemImpl.class);
-    public static final int OWNER_DEPTH_LIMIT = 50;
+    private static final int OWNER_DEPTH_LIMIT = 50;
     private static final int NET_TICK_RATE = 50;
     private static final int NULL_NET_ID = 0;
 
@@ -118,7 +118,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
 
     private EngineTime time;
-    private long nextNetworkTick = 0;
+    private long nextNetworkTick;
 
 
     // Server only

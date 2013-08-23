@@ -42,13 +42,13 @@ import static org.lwjgl.opengl.GL11.glNewList;
  */
 public class Skysphere {
 
+    private static int displayListSphere = -1;
+
     @EditorRange(min = 0.01f, max = 100.0f)
     private float colorExp = 0.01f;
     @EditorRange(min = 2.0f, max = 32.0f)
     private float turbidity = 9.0f;
     private float sunPosAngle = 0.1f;
-
-    private static int displayListSphere = -1;
 
     private final WorldRenderer parentWorldRenderer;
 

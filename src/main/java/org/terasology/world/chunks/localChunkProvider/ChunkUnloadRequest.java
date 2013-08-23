@@ -25,7 +25,7 @@ public class ChunkUnloadRequest implements Task {
 
     private Chunk chunk;
     private LocalChunkProvider chunkProvider;
-    private boolean shutdown = false;
+    private boolean shutdown;
 
     public ChunkUnloadRequest(Chunk chunk, LocalChunkProvider localChunkProvider) {
         this.chunk = chunk;

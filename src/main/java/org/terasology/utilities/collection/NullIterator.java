@@ -20,15 +20,15 @@ import java.util.Iterator;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class NullIterator<T> implements Iterator<T>, Iterable<T> {
+public final class NullIterator<T> implements Iterator<T>, Iterable<T> {
 
-    private static NullIterator instance = new NullIterator();
-
-    public static <T> NullIterator<T> newInstance() {
-        return instance;
-    }
+    private static final NullIterator INSTANCE = new NullIterator();
 
     private NullIterator() {
+    }
+
+    public static <T> NullIterator<T> newInstance() {
+        return INSTANCE;
     }
 
     public boolean hasNext() {

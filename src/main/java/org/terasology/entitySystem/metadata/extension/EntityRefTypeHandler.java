@@ -31,12 +31,12 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     private static ThreadLocal<EntityRefInterceptor> refInterceptor = new ThreadLocal<>();
     private EngineEntityManager entityManager;
 
-    public static void setReferenceInterceptor(EntityRefInterceptor interceptor) {
-        refInterceptor.set(interceptor);
-    }
-
     public EntityRefTypeHandler(EngineEntityManager engineEntityManager) {
         this.entityManager = engineEntityManager;
+    }
+
+    public static void setReferenceInterceptor(EntityRefInterceptor interceptor) {
+        refInterceptor.set(interceptor);
     }
 
     public EntityData.Value serialize(EntityRef value) {

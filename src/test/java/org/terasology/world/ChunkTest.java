@@ -58,7 +58,7 @@ public class ChunkTest {
 
     @Test
     public void getAABB() {
-        assertEquals(new Vector3f(0,0,0), chunk.getAABB().getMin());
+        assertEquals(new Vector3f(0, 0, 0), chunk.getAABB().getMin());
         assertEquals(new Vector3f(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z), chunk.getAABB().getMax());
     }
 

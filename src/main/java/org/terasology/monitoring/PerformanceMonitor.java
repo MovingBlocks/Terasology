@@ -32,11 +32,14 @@ import org.terasology.monitoring.impl.PerformanceMonitorInternal;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class PerformanceMonitor {
+public final class PerformanceMonitor {
     private static PerformanceMonitorInternal instance;
 
     static {
         instance = new NullPerformanceMonitor();
+    }
+
+    private PerformanceMonitor() {
     }
 
     /**

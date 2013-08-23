@@ -39,11 +39,11 @@ public class CharacterStateEvent extends NetworkEvent {
     private Vector3f position = new Vector3f();
     private Quat4f rotation = new Quat4f(0, 0, 0, 1);
     private MovementMode mode = MovementMode.WALKING;
-    private boolean grounded = false;
+    private boolean grounded;
     private Vector3f velocity = new Vector3f();
-    private float yaw = 0;
-    private float pitch = 0;
-    private float footstepDelta = 0;
+    private float yaw;
+    private float pitch;
+    private float footstepDelta;
 
     protected CharacterStateEvent() {
     }
