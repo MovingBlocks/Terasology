@@ -21,6 +21,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.metadata.reflected.ReflectedComponentMetadata;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
 /**
@@ -45,8 +46,8 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component, Compo
     }
 
     @Override
-    public <T extends Component> ComponentMetadata<T> getMetadata(Class<T> clazz) {
-        return (ComponentMetadata<T>) super.getMetadata(clazz);
+    public <T extends Component> ReflectedComponentMetadata<T> getMetadata(Class<T> clazz) {
+        return (ReflectedComponentMetadata<T>) super.getMetadata(clazz);
     }
 
     @Override
@@ -63,7 +64,7 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component, Compo
     protected <U extends Component> ComponentMetadata<U> createMetadata(Class<U> clazz, String... names) {
         ComponentMetadata<U> info;
         try {
-            info = new ComponentMetadata<>(clazz, names);
+            info = new ReflectedComponentMetadata<>(clazz, names);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
             return null;

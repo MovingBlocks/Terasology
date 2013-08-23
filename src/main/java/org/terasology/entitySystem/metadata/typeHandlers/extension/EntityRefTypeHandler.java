@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EngineEntityManager;

@@ -22,8 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to mark simple classes for mapped serialization. These classes must not have recursive nested
- * elements (the flatter they are the better), and must not depend on objects appearing multiple times in their structure
+ * This annotation is used to mark simple classes for mapped serialization (this is, they serialize to a map of fieldname -> value).
+ * These classes must not have recursive nested elements (the flatter they are the better), and must not depend on objects appearing multiple times in their structure
  * being the same object - when deserialized each object will be a separate instance.
  */
 @Retention(RetentionPolicy.RUNTIME)

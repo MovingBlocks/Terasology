@@ -17,6 +17,7 @@
 package org.terasology.entitySystem.metadata.internal;
 
 import com.google.common.collect.Maps;
+import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
 import org.terasology.entitySystem.metadata.ClassLibrary;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public abstract class BaseLibraryImpl<T, U extends ClassMetadata<? extends T>> implements ClassLibrary<T, U> {
+public abstract class BaseLibraryImpl<T, U extends ReflectedClassMetadata<? extends T>> implements ClassLibrary<T, U> {
 
     private Map<Class<? extends T>, U> serializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
@@ -73,7 +74,7 @@ public abstract class BaseLibraryImpl<T, U extends ClassMetadata<? extends T>> i
     public <TYPE extends T> TYPE copy(TYPE object) {
         ClassMetadata<TYPE> info = (ClassMetadata<TYPE>) getMetadata(object);
         if (info != null) {
-            return info.clone(object);
+            return info.copy(object);
         }
         return null;
     }

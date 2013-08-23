@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
@@ -24,7 +24,7 @@ import org.terasology.protobuf.EntityData;
 /**
  * @author Immortius
  */
-public class Region3iTypeHandler extends AbstractTypeHandler<Region3i> {
+public class Region3iTypeHandler extends SimpleTypeHandler<Region3i> {
     private Vector3iTypeHandler vector3iTypeHandler;
 
     public Region3iTypeHandler(Vector3iTypeHandler vector3iTypeHandler) {

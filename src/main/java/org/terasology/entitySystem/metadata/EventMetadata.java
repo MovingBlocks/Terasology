@@ -17,6 +17,7 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
@@ -24,7 +25,7 @@ import org.terasology.network.ServerEvent;
 /**
  * @author Immortius
  */
-public class EventMetadata<T extends Event> extends ClassMetadata<T> {
+public class EventMetadata<T extends Event> extends ReflectedClassMetadata<T> {
 
     private NetworkEventType networkEventType;
     private String uri;

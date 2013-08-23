@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
-import org.terasology.math.Vector3i;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.protobuf.EntityData;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class Vector3iTypeHandler extends AbstractTypeHandler<Vector3i> {
+public class Vector3fTypeHandler extends SimpleTypeHandler<Vector3f> {
 
-    public EntityData.Value serialize(Vector3i value) {
-        return EntityData.Value.newBuilder().addInteger(value.x).addInteger(value.y).addInteger(value.z).build();
+    public EntityData.Value serialize(Vector3f value) {
+        return EntityData.Value.newBuilder().addFloat(value.x).addFloat(value.y).addFloat(value.z).build();
     }
 
-    public Vector3i deserialize(EntityData.Value value) {
-        if (value.getIntegerCount() > 2) {
-            return new Vector3i(value.getInteger(0), value.getInteger(1), value.getInteger(2));
+    public Vector3f deserialize(EntityData.Value value) {
+        if (value.getFloatCount() > 2) {
+            return new Vector3f(value.getFloat(0), value.getFloat(1), value.getFloat(2));
         }
         return null;
     }
 
-    public Vector3i copy(Vector3i value) {
+    public Vector3f copy(Vector3f value) {
         if (value != null) {
-            return new Vector3i(value);
+            return new Vector3f(value);
         }
         return null;
     }

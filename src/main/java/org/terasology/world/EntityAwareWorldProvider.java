@@ -40,6 +40,7 @@ import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.reflected.ReflectedComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
@@ -277,9 +278,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         if (newPrefab != null) {
             for (Component comp : newPrefab.iterateComponents()) {
-                ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
+                ReflectedComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                 if (!blockEntity.hasComponent(comp.getClass())) {
-                    blockEntity.addComponent(metadata.clone(comp));
+                    blockEntity.addComponent(metadata.copy(comp));
                 } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
                     updateComponent(blockEntity, metadata, comp);
                 }
@@ -307,7 +308,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         Component currentComp = blockEntity.getComponent(targetComponent.getClass());
         if (currentComp != null) {
             boolean changed = false;
-            for (FieldMetadata field : metadata.iterateFields()) {
+            for (FieldMetadata field : metadata.getFields()) {
                 Object newVal = field.getValue(targetComponent);
                 if (!Objects.equal(field.getValue(currentComp), newVal)) {
                     field.setValue(currentComp, newVal);
@@ -481,7 +482,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                 } else {
                     ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                     boolean changed = false;
-                    for (FieldMetadata field : metadata.iterateFields()) {
+                    for (FieldMetadata field : metadata.getFields()) {
                         Object expected = field.getValue(comp);
                         if (!Objects.equal(expected, field.getValue(currentComp))) {
                             field.setValue(currentComp, expected);

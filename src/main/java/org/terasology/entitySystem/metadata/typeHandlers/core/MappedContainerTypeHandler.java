@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.core;
+package org.terasology.entitySystem.metadata.typeHandlers.core;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
+public class MappedContainerTypeHandler<T> extends SimpleTypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(MappedContainerTypeHandler.class);
 

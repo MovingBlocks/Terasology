@@ -137,7 +137,7 @@ public class ComponentSerializer {
         for (EntityData.NameValue field : componentData.getFieldList()) {
             FieldMetadata fieldInfo = null;
             if (field.hasNameIndex()) {
-                fieldInfo = componentMetadata.getFieldById(field.getNameIndex());
+                fieldInfo = componentMetadata.getField(field.getNameIndex());
             } else if (field.hasName()) {
                 fieldInfo = componentMetadata.getField(field.getName());
             }
@@ -177,7 +177,7 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(component, componentMessage);
 
-        for (FieldMetadata field : componentMetadata.iterateFields()) {
+        for (FieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, component)) {
                 EntityData.NameValue fieldData = field.serializeNameValue(component, usingFieldIds);
                 if (fieldData != null) {
@@ -228,7 +228,7 @@ public class ComponentSerializer {
         serializeComponentType(delta, componentMessage);
 
         boolean changed = false;
-        for (FieldMetadata field : componentMetadata.iterateFields()) {
+        for (FieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, delta)) {
                 Object origValue = field.getValue(base);
                 Object deltaValue = field.getValue(delta);

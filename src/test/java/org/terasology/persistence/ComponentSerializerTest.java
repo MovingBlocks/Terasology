@@ -23,10 +23,11 @@ import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.metadata.reflected.ReflectedFieldMetadata;
+import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -66,8 +67,8 @@ public class ComponentSerializerTest {
 
     @Test
     public void testGetterSetterUtilization() throws Exception {
-        ClassMetadata<?> info = new ClassMetadata<>(GetterSetterComponent.class);
-        info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), new Vector3fTypeHandler(), false));
+        ClassMetadata<?> info = new ReflectedClassMetadata<>(GetterSetterComponent.class);
+        info.addField(new ReflectedFieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), new Vector3fTypeHandler(), false));
 
         GetterSetterComponent comp = new GetterSetterComponent();
         GetterSetterComponent newComp = (GetterSetterComponent) componentSerializer.deserialize(componentSerializer.serialize(comp));

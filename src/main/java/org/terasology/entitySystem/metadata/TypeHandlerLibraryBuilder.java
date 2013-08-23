@@ -17,14 +17,14 @@
 package org.terasology.entitySystem.metadata;
 
 import com.google.common.collect.Maps;
-import org.terasology.entitySystem.metadata.core.BooleanTypeHandler;
-import org.terasology.entitySystem.metadata.core.ByteTypeHandler;
-import org.terasology.entitySystem.metadata.core.DoubleTypeHandler;
-import org.terasology.entitySystem.metadata.core.FloatTypeHandler;
-import org.terasology.entitySystem.metadata.core.IntTypeHandler;
-import org.terasology.entitySystem.metadata.core.LongTypeHandler;
-import org.terasology.entitySystem.metadata.core.NumberTypeHandler;
-import org.terasology.entitySystem.metadata.core.StringTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.BooleanTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.ByteTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.DoubleTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.FloatTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.IntTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.LongTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.NumberTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.StringTypeHandler;
 
 import java.util.Map;
 

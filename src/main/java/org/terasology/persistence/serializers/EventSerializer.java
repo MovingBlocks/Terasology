@@ -85,7 +85,7 @@ public class EventSerializer {
     private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, ClassMetadata<? extends Event> eventMetadata) {
         for (int i = 0; i < eventData.getFieldIds().size(); ++i) {
             byte fieldId = eventData.getFieldIds().byteAt(i);
-            FieldMetadata fieldInfo = eventMetadata.getFieldById(fieldId);
+            FieldMetadata fieldInfo = eventMetadata.getField(fieldId);
             if (fieldInfo == null) {
                 logger.error("Unable to serialize field {}, out of bounds", fieldId);
                 continue;
@@ -113,7 +113,7 @@ public class EventSerializer {
         serializeEventType(event, eventData);
 
         ByteString.Output fieldIds = ByteString.newOutput();
-        for (FieldMetadata field : eventMetadata.iterateFields()) {
+        for (FieldMetadata field : eventMetadata.getFields()) {
             if (field.isReplicated()) {
                 EntityData.Value serializedValue = field.serialize(event);
                 if (serializedValue != null) {

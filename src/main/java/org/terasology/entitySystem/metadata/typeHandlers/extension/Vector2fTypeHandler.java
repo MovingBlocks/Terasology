@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import javax.vecmath.Color4f;
+import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class Color4fTypeHandler extends AbstractTypeHandler<Color4f> {
+public class Vector2fTypeHandler extends SimpleTypeHandler<Vector2f> {
 
-    public EntityData.Value serialize(Color4f value) {
-        return EntityData.Value.newBuilder().addFloat(value.x).addFloat(value.y).addFloat(value.z).addFloat(value.w).build();
+    public EntityData.Value serialize(Vector2f value) {
+        return EntityData.Value.newBuilder().addFloat(value.x).addFloat(value.y).build();
     }
 
-    public Color4f deserialize(EntityData.Value value) {
-        if (value.getFloatCount() > 3) {
-            return new Color4f(value.getFloat(0), value.getFloat(1), value.getFloat(2), value.getFloat(3));
+    public Vector2f deserialize(EntityData.Value value) {
+        if (value.getFloatCount() > 1) {
+            return new Vector2f(value.getFloat(0), value.getFloat(1));
         }
         return null;
     }
 
-    public Color4f copy(Color4f value) {
+    public Vector2f copy(Vector2f value) {
         if (value != null) {
-            return new Color4f(value);
+            return new Vector2f(value);
         }
         return null;
     }

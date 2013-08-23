@@ -25,12 +25,21 @@ import org.terasology.entitySystem.Component;
 public interface ComponentLibrary extends ClassLibrary<Component, ComponentMetadata<? extends Component>> {
 
     /**
-     * @param clazz
-     * @return The metadata for the given clazz, or null if not registered.
+     * @param clazz The class of the component to retrieve metadata for
+     * @return The metadata for the given component class, or null if not registered.
      */
     <T extends Component> ComponentMetadata<T> getMetadata(Class<T> clazz);
 
-    <T extends Component> ComponentMetadata<T> getMetadata(T object);
+    /**
+     * @param component The component to retrieve metadata for
+     * @param <T>       The type of the object
+     * @return The metadata for the given component
+     */
+    <T extends Component> ComponentMetadata<T> getMetadata(T component);
 
-    ComponentMetadata<? extends Component> getMetadata(String className);
+    /**
+     * @param name The simple name of the class - no packages, and may exclude any common suffix. Case doesn't matter.
+     * @return The metadata for the given component
+     */
+    ComponentMetadata<? extends Component> getMetadata(String name);
 }

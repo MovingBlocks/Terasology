@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector4f;
@@ -23,7 +23,7 @@ import javax.vecmath.Vector4f;
 /**
  * @author Immortius
  */
-public class Vector4fTypeHandler extends AbstractTypeHandler<Vector4f> {
+public class Vector4fTypeHandler extends SimpleTypeHandler<Vector4f> {
 
     @Override
     public EntityData.Value serialize(Vector4f value) {

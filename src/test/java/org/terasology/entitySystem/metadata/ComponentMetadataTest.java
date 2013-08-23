@@ -18,7 +18,7 @@ package org.terasology.entitySystem.metadata;
 
 import org.junit.Test;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;

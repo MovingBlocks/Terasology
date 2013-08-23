@@ -145,7 +145,7 @@ public class NetworkEntitySerializer {
         }
 
         byte fieldCount = 0;
-        for (FieldMetadata field : componentMetadata.iterateFields()) {
+        for (FieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, newComponent, componentInitial)) {
                 Object oldValue = field.getValue(oldComponent);
                 Object newValue = field.getValue(newComponent);
@@ -177,7 +177,7 @@ public class NetworkEntitySerializer {
         }
 
         byte fieldCount = 0;
-        for (FieldMetadata field : componentMetadata.iterateFields()) {
+        for (FieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, component, componentInitial)) {
                 EntityData.Value fieldValue = field.serialize(component);
                 if (fieldValue != null) {
@@ -223,7 +223,7 @@ public class NetworkEntitySerializer {
             }
             for (int fieldIndex = 0; fieldIndex < UnsignedBytes.toInt(entityData.getComponentFieldCounts().byteAt(componentIndex)); ++fieldIndex) {
                 byte fieldId = entityData.getFieldIds().byteAt(fieldPos);
-                FieldMetadata fieldMetadata = metadata.getFieldById(fieldId);
+                FieldMetadata fieldMetadata = metadata.getField(fieldId);
                 if (fieldMetadata != null && fieldCheck.shouldDeserializeField(fieldMetadata)) {
                     logger.trace("Deserializing field {} of component {} as value {}", fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
                     fieldMetadata.deserializeOnto(component, entityData.getFieldValue(fieldPos));

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.metadata.core;
+package org.terasology.entitySystem.metadata.typeHandlers.core;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.metadata.TypeHandler;

@@ -16,7 +16,8 @@
 package org.terasology.editor.properties;
 
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.core.FloatTypeHandler;
+import org.terasology.entitySystem.metadata.reflected.ReflectedFieldMetadata;
+import org.terasology.entitySystem.metadata.typeHandlers.core.FloatTypeHandler;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -40,7 +41,7 @@ public class FloatProperty implements Property<Float> {
         this.min = min;
         this.max = max;
         this.title = title;
-        this.accessor = new FieldMetadata(field, new FloatTypeHandler(), false);
+        this.accessor = new ReflectedFieldMetadata(field, new FloatTypeHandler(), false);
     }
 
     public float getMinValue() {

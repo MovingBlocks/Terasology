@@ -15,108 +15,59 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import com.google.common.collect.Maps;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Collection;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * Class Metadata provides information on a class and its fields, and the ability to create, copy or manipulate an instance of the class.
+ * @author Immortius
  */
-public class ClassMetadata<T> {
-    private static final Logger logger = LoggerFactory.getLogger(ClassMetadata.class);
+public interface ClassMetadata<T> {
 
-    private Map<String, FieldMetadata> fields = Maps.newHashMap();
-    private Class<T> clazz;
-    private Constructor<T> constructor;
-    private String[] names;
-    private TIntObjectMap<FieldMetadata> fieldsById = new TIntObjectHashMap<FieldMetadata>();
+    /**
+     * @return A collection of the names that identify this class
+     */
+    Collection<String> getNames();
 
-    public ClassMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
-        this.clazz = simpleClass;
-        this.names = Arrays.copyOf(names, names.length);
-        constructor = simpleClass.getDeclaredConstructor();
-        constructor.setAccessible(true);
-    }
+    /**
+     * @return The primary name that identifies this class
+     */
+    String getName();
 
-    public String[] getNames() {
-        return Arrays.copyOf(names, names.length);
-    }
+    /**
+     * @return The class described by this metadata
+     */
+    Class<T> getType();
 
-    public String getName() {
-        return names[0];
-    }
+    /**
+     * @param id The previously set id of the field
+     * @return The field identified by the given id, or null if there is no such field
+     */
+    FieldMetadata<T, ?> getField(int id);
 
-    public Class<T> getType() {
-        return clazz;
-    }
+    /**
+     * @param name The name of the field
+     * @return The field identified by the given name, or null if there is no such field
+     */
+    FieldMetadata<T, ?> getField(String name);
 
-    public void setFieldId(FieldMetadata field, byte id) {
-        if (fields.containsValue(field)) {
-            field.setId(id);
-            fieldsById.put(id, field);
-        }
-    }
+    /**
+     * @return The fields that this class has.
+     */
+    Collection<FieldMetadata<T, ?>> getFields();
 
-    public FieldMetadata getFieldById(int id) {
-        return fieldsById.get(id);
-    }
+    /**
+     * @return A new instance of this class.
+     */
+    T newInstance();
 
-    public void addField(FieldMetadata fieldInfo) {
-        fields.put(fieldInfo.getName().toLowerCase(Locale.ENGLISH), fieldInfo);
-    }
+    /**
+     * @param object The instance of this class to copy
+     * @return A copy of the given object
+     */
+    T copy(T object);
 
-    public FieldMetadata getField(String name) {
-        return fields.get(name.toLowerCase(Locale.ENGLISH));
-    }
-
-    public Iterable<FieldMetadata> iterateFields() {
-        return fields.values();
-    }
-
-    public T newInstance() {
-        try {
-            return constructor.newInstance();
-        } catch (InstantiationException e) {
-            logger.error("Exception instantiating type: {}", clazz, e);
-        } catch (IllegalAccessException e) {
-            logger.error("Exception instantiating type: {}", clazz, e);
-        } catch (InvocationTargetException e) {
-            logger.error("Exception instantiating type: {}", clazz, e);
-        }
-        return null;
-    }
-
-    public T clone(T component) {
-        try {
-            T result = constructor.newInstance();
-            for (FieldMetadata field : fields.values()) {
-                field.setValue(result, field.getCopyOfValue(component));
-            }
-            return result;
-        } catch (InstantiationException e) {
-            logger.error("Exception during serializing type: {}", clazz, e);
-        } catch (IllegalAccessException e) {
-            logger.error("Exception during serializing type: {}", clazz, e);
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during serializing type: {}", clazz, e);
-        }
-        return null;
-    }
-
-    public int size() {
-        return fields.size();
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
+    /**
+     * @return The number of fields this class has
+     */
+    int getFieldCount();
 }

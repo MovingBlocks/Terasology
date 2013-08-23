@@ -318,6 +318,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         if (body != null) {
             body.setLinearVelocity(event.getVelocity());
             body.setAngularVelocity(event.getAngularVelocity());
+            // TODO: Improved system for this, that smooths the correction.
             body.proceedToTransform(new Transform(new Matrix4f(event.getRotation(), event.getPosition(), 1)));
         }
     }

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.protobuf.EntityData;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class CollisionGroupTypeHandler extends AbstractTypeHandler<CollisionGroup> {
+public class CollisionGroupTypeHandler extends SimpleTypeHandler<CollisionGroup> {
 
     private CollisionGroupManager groupManager;
 

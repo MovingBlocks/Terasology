@@ -16,16 +16,15 @@
 
 package org.terasology.entitySystem.metadata;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.metadata.core.EnumTypeHandler;
-import org.terasology.entitySystem.metadata.core.ListTypeHandler;
-import org.terasology.entitySystem.metadata.core.MappedContainerTypeHandler;
-import org.terasology.entitySystem.metadata.core.SetTypeHandler;
-import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
+import org.terasology.entitySystem.metadata.reflected.ReflectedFieldMetadata;
+import org.terasology.entitySystem.metadata.typeHandlers.core.EnumTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.ListTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.MappedContainerTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.SetTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.core.StringMapTypeHandler;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -37,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * A library of type handlers. This is used for the construction of class metadata.
+ *
  * @author Immortius
  */
 public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHandler<?>>> {
@@ -45,19 +46,33 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
 
     private Map<Class<?>, TypeHandler<?>> typeHandlers;
 
+    /**
+     * @param typeHandlers A map of type->TypeHandler to populate the library with
+     */
     public TypeHandlerLibrary(Map<Class<?>, TypeHandler<?>> typeHandlers) {
         this.typeHandlers = ImmutableMap.copyOf(typeHandlers);
     }
 
+    /**
+     * Obtains the type handler for the given type.
+     * @param forClass The class of the type to get a handler for
+     * @param <T> The type to get a handler for
+     * @return The type handler, or null if none is registered
+     */
     @SuppressWarnings("unchecked")
     public <T> TypeHandler<? super T> getTypeHandler(Class<T> forClass) {
         return (TypeHandler<? super T>) typeHandlers.get(forClass);
     }
 
-    public <T> ClassMetadata<T> build(Class<T> forClass, boolean replicateFieldsByDefault, String... names) {
+    @Override
+    public Iterator<Map.Entry<Class<?>, TypeHandler<?>>> iterator() {
+        return typeHandlers.entrySet().iterator();
+    }
+
+    /*public <T> ClassMetadata<T> build(Class<T> forClass, boolean replicateFieldsByDefault, String primaryName, String... additionalNames) {
         ClassMetadata<T> info;
         try {
-            info = new ClassMetadata<T>(forClass, names);
+            info = new ReflectedClassMetadata<T>(forClass, primaryName, additionalNames);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", forClass.getSimpleName(), e);
             return null;
@@ -75,13 +90,17 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             }
 
             field.setAccessible(true);
-            TypeHandler typeHandler = getHandlerFor(field.getGenericType(), 0);
+            TypeHandler typeHandler = getTypeHandlerFor(field.getGenericType(), 0);
             if (typeHandler == null) {
                 logger.error("Unsupported field type in component type {}, {} : {}", forClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
-                info.addField(new FieldMetadata(field, typeHandler, replicateFieldsByDefault));
+                info.addField(new ReflectedFieldMetadata(field, typeHandler, replicateFieldsByDefault));
             }
         }
+    }*/
+
+    public TypeHandler getTypeHandlerFor(Type type) {
+        return getHandlerFor(type, 0);
     }
 
     // TODO: Refactor
@@ -163,7 +182,7 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 if (handler == null) {
                     logger.error("Unsupported field type in component type {}, {} : {}", typeClass.getSimpleName(), field.getName(), field.getGenericType());
                 } else {
-                    mappedHandler.addField(new FieldMetadata(field, handler, false));
+                    mappedHandler.addField(new ReflectedFieldMetadata(field, handler, false));
                 }
             }
             return mappedHandler;
@@ -172,8 +191,4 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
         return null;
     }
 
-    @Override
-    public Iterator<Map.Entry<Class<?>, TypeHandler<?>>> iterator() {
-        return typeHandlers.entrySet().iterator();
-    }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.core;
+package org.terasology.entitySystem.metadata.typeHandlers.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

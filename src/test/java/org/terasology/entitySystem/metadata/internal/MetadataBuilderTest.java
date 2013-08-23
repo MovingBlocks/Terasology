@@ -47,14 +47,14 @@ public class MetadataBuilderTest {
     public void trivialMetadata() {
         ClassMetadata<Trivial> metadata = metadataBuilder.build(Trivial.class, false);
         assertNotNull(metadata);
-        assertEquals(0, metadata.size());
+        assertEquals(0, metadata.getFieldCount());
     }
 
     @Test
     public void testPrivateField() {
         ClassMetadata<PrivateField> metadata = metadataBuilder.build(PrivateField.class, false);
         assertNotNull(metadata);
-        assertEquals(1, metadata.size());
+        assertEquals(1, metadata.getFieldCount());
         FieldMetadata fieldMetadata = metadata.getField("name");
         assertNotNull(fieldMetadata);
         assertEquals(String.class, fieldMetadata.getType());
@@ -66,7 +66,7 @@ public class MetadataBuilderTest {
     public void testInheritsFields() {
         ClassMetadata<Inheriting> metadata = metadataBuilder.build(Inheriting.class, false);
         assertNotNull(metadata);
-        assertEquals(2, metadata.size());
+        assertEquals(2, metadata.getFieldCount());
         assertNotNull(metadata.getField("name"));
         assertNotNull(metadata.getField("value"));
         assertNotNull(metadata.newInstance());

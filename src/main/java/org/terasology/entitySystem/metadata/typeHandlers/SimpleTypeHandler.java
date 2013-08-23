@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata;
+package org.terasology.entitySystem.metadata.typeHandlers;
 
 import com.google.common.collect.Lists;
+import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;
 
 /**
+ * Abstract class for type handlers where collections of the type are simply handled by nesting individually serialized values into another value - that is there is
+ * no special manner in which they are handled.
+ *
  * @author Immortius <immortius@gmail.com>
  */
-public abstract class AbstractTypeHandler<T> implements TypeHandler<T> {
+public abstract class SimpleTypeHandler<T> implements TypeHandler<T> {
 
     public EntityData.Value serialize(Iterable<T> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();

@@ -13,39 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.core;
 
-import com.google.common.collect.Lists;
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+package org.terasology.entitySystem.metadata.typeHandlers.core;
+
+import com.google.common.collect.Sets;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
+import java.util.Set;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public class ListTypeHandler<T> extends AbstractTypeHandler<List<T>> {
+public class SetTypeHandler<T> extends SimpleTypeHandler<Set<T>> {
     private TypeHandler<T> contentsHandler;
 
-    public ListTypeHandler(TypeHandler contentsHandler) {
+    public SetTypeHandler(TypeHandler contentsHandler) {
         this.contentsHandler = contentsHandler;
     }
 
-    public EntityData.Value serialize(List<T> value) {
+    @Override
+    public EntityData.Value serialize(Set<T> value) {
         if (value.size() > 0) {
             return contentsHandler.serialize(value);
         }
         return null;
     }
 
-    public List<T> deserialize(EntityData.Value value) {
-        return contentsHandler.deserializeList(value);
+    @Override
+    public Set<T> deserialize(EntityData.Value value) {
+        return Sets.newHashSet(contentsHandler.deserializeList(value));
     }
 
-    public List<T> copy(List<T> value) {
+    @Override
+    public Set<T> copy(Set<T> value) {
         if (value != null) {
-            List result = Lists.newArrayList();
+            Set result = Sets.newHashSet();
             for (T item : value) {
                 if (item != null) {
                     result.add(contentsHandler.copy(item));

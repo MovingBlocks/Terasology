@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.metadata.extension;
+package org.terasology.entitySystem.metadata.typeHandlers.extension;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.protobuf.EntityData;
@@ -26,7 +26,7 @@ import org.terasology.protobuf.EntityData;
  * @author Immortius
  */
 // TODO: This won't really work when loading prefabs, as the prefab may not yet have been loaded
-public class PrefabTypeHandler extends AbstractTypeHandler<Prefab> {
+public class PrefabTypeHandler extends SimpleTypeHandler<Prefab> {
 
     public PrefabTypeHandler() {
     }

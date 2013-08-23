@@ -17,6 +17,7 @@
 package org.terasology.entitySystem.metadata;
 
 /**
+ * The set of class libraries used by the entity system
  * @author Immortius
  */
 public interface EntitySystemLibrary {
@@ -32,7 +33,7 @@ public interface EntitySystemLibrary {
     EventLibrary getEventLibrary();
 
     /**
-     * @return The metadata builder used by this library.
+     * @return The library of type handlers
      */
     TypeHandlerLibrary getTypeHandlerLibrary();
 

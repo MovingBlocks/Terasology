@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.core;
+package org.terasology.entitySystem.metadata.typeHandlers.core;
 
 import com.google.common.collect.Maps;
-import org.terasology.entitySystem.metadata.AbstractTypeHandler;
+import org.terasology.entitySystem.metadata.typeHandlers.SimpleTypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class StringMapTypeHandler<T> extends AbstractTypeHandler<Map<String, T>> {
+public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
 
     TypeHandler<T> contentsHandler;
 

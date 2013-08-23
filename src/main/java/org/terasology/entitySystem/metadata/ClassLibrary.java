@@ -16,38 +16,58 @@
 
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
+
 /**
+ * The interface for a class library. These store metadata on a type of class, and provide the ability to copy them.
  * @author Immortius
  */
 public interface ClassLibrary<T, U extends ClassMetadata<? extends T>> extends Iterable<U> {
 
     /**
-     * Registers a class with this library
+     * Registers a class with this library.
+     * Its name for lookup purposes will be the simple name of the class.
      *
-     * @param clazz
+     * @param clazz The class to register with this library
      */
     void register(Class<? extends T> clazz);
 
     /**
      * Registers a class with this library
      *
-     * @param clazz
-     * @param names The names to use to find this class
+     * @param clazz The class to register with this library
+     * @param primaryName The name to use to find this class
+     * @param additionalNames Additional names to use to find this class
      */
-    void register(Class<? extends T> clazz, String... names);
+    void register(Class<? extends T> clazz, String primaryName, String... additionalNames);
 
     /**
-     * @param clazz
+     * Registers a class with this library
+     *
+     * @param clazz The class to register with this library
+     * @param primaryName The name to use to find this class
+     * @param additionalNames Additional names to use to find this class
+     */
+    void register(Class<? extends T> clazz, String primaryName, Iterable<String> additionalNames);
+
+    /**
+     * @param clazz The class to retrieve metadata for
      * @return The metadata for the given clazz, or null if not registered.
      */
     <U extends T> ClassMetadata<U> getMetadata(Class<U> clazz);
 
+    /**
+     * Looks up the class metadata for the provided object. The specific class of the object must be registered in the class loader - super classes will not be checked.
+     * @param object The object to retrieve metadata for
+     * @param <U> The type of the object
+     * @return The metadata for the class of the given object, or null if it is not registered.
+     */
     <U extends T> ClassMetadata<U> getMetadata(U object);
 
     /**
-     * Copies registered class
+     * Copies the registered class
      *
-     * @param object
+     * @param object The object to create a copy of
      * @return A copy of the class, or null if not registered
      */
     <TYPE extends T> TYPE copy(TYPE object);
