@@ -610,6 +610,11 @@ public class TerasologyEngine implements GameEngine {
         return gameFocused && Display.isActive();
     }
 
+    @Override
+    public boolean hasMouseFocus() {
+        return gameFocused;
+    }
+
     public void setFocus(boolean focused) {
         gameFocused = focused;
     }

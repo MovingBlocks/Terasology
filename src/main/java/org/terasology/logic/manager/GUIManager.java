@@ -113,14 +113,18 @@ public class GUIManager implements ComponentSystem {
      * Updates all visible display elements and their child's. Will update the layout if the display was resized.
      */
     public void update() {
-        update(false);
+        renderer.update();
+
+        if (Display.wasResized()) {
+            renderer.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+            renderer.layout();
+        }
     }
 
     /**
      * Updates all visible display elements and their child's. Will update the layout if force is set to true.
      */
     public void update(boolean force) {
-        checkMouseGrabbing();
         renderer.update();
 
         if (Display.wasResized() || force) {
@@ -187,6 +191,7 @@ public class GUIManager implements ComponentSystem {
             logger.debug("Closed window by reference with ID \"{}\"", window.getId());
 
             removeWindow(window);
+            checkMouseGrabbing();
         }
     }
 
@@ -321,7 +326,7 @@ public class GUIManager implements ComponentSystem {
      * Check whether the mouse of the current focused window is visible and can be moved on the display.
      */
     public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasFocus()) {
+        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasMouseFocus()) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);
