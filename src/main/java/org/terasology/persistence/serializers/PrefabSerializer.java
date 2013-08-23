@@ -117,6 +117,8 @@ public class PrefabSerializer {
             AssetUri parentUri = new AssetUri(AssetType.PREFAB, prefabData.getParentName());
             if (parentUri.isValid()) {
                 result.setParent(Assets.get(parentUri, Prefab.class));
+            } else {
+                logger.error("Asset has invalid parent: {}", parentUri);
             }
         }
 

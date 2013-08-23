@@ -16,6 +16,7 @@
 
 package org.terasology.entitySystem.metadata.extension;
 
+import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -25,7 +26,6 @@ import org.terasology.protobuf.EntityData;
 /**
  * @author Immortius
  */
-// TODO: This won't really work when loading prefabs, as the prefab may not yet have been loaded
 public class PrefabTypeHandler extends AbstractTypeHandler<Prefab> {
 
     public PrefabTypeHandler() {
@@ -39,7 +39,7 @@ public class PrefabTypeHandler extends AbstractTypeHandler<Prefab> {
     @Override
     public Prefab deserialize(EntityData.Value value) {
         if (value.getStringCount() > 0) {
-            return CoreRegistry.get(PrefabManager.class).getPrefab(value.getString(0));
+            return Assets.getPrefab(value.getString(0));
         }
         return null;
     }
