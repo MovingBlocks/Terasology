@@ -21,6 +21,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.ForceBlockActive;
 
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -32,6 +34,12 @@ public class RigidBodyComponent implements Component {
     public float mass = 10.0f;
     @Replicate
     public boolean kinematic;
+
+    @Replicate(initialOnly = true)
+    public Vector3f velocity = new Vector3f();
+
+    @Replicate(initialOnly = true)
+    public Vector3f angularVelocity = new Vector3f();
 
     @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;

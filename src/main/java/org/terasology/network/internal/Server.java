@@ -75,7 +75,6 @@ public class Server implements ChunkReadyListener {
     private Channel channel;
     private NetMetricSource metricsSource;
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetData.EventMessage> queuedReceivedEvents = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private NetData.ServerInfoMessage serverInfo;
 
@@ -209,7 +208,7 @@ public class Server implements ChunkReadyListener {
         if (target.exists()) {
             target.send(event);
         } else {
-            queuedReceivedEvents.offer(message);
+            logger.info("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
         }
     }
 

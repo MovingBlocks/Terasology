@@ -996,10 +996,6 @@ public final class WorldRenderer {
         worldTimeEventManager.fireWorldTimeEvents();
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Physics Renderer");
-        bulletPhysics.update(delta);
-        PerformanceMonitor.endActivity();
-
         smoothedPlayerSunlightValue = TeraMath.lerpf(smoothedPlayerSunlightValue, getSunlightValue(), delta);
     }
 
