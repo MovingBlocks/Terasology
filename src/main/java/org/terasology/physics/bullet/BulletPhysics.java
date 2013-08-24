@@ -98,7 +98,7 @@ import org.terasology.physics.shapes.SphereShapeComponent;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysics implements EventReceiver<OnChangedBlock> {
+public class BulletPhysics {
 
     private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
@@ -129,7 +129,6 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         discreteDynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
         discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-        CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);
 
         wrapper = new PhysicsWorldWrapper(world);
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
@@ -555,12 +554,15 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         return entityRigidBodies.keySet().iterator();
     }
 
-    //******************To place in PhysicsSystem************************\\
-    @Override
-    public void onEvent(OnChangedBlock event, EntityRef entity) {
-        Vector3f min = event.getBlockPosition().toVector3f();
+    /**
+     * Wakes up any rigid bodies that are in a square around the given position.
+     * @param pos The position around which to wake up objects.
+     * @param radius the half-length of the sides of the square.
+     */
+    public void awakenArea(Vector3f pos, float radius) {
+        Vector3f min = new Vector3f(pos);
         min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
-        Vector3f max = event.getBlockPosition().toVector3f();
+        Vector3f max = new Vector3f(pos);
         max.add(new Vector3f(0.6f, 0.6f, 0.6f));
         discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }

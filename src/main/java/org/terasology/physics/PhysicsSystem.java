@@ -54,12 +54,19 @@ import javax.vecmath.Vector3f;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.terasology.entitySystem.event.EventReceiver;
+import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.world.OnChangedBlock;
+import org.terasology.world.block.BlockComponent;
 
 /**
+ * The PhysicsSystem is a bridging class between the event system and the 
+ * physics engine. It translates events into changes to the physics engine and
+ * translates output of the physics engine into events.
  * @author Immortius
  */
 @RegisterSystem
-public class PhysicsSystem implements UpdateSubscriberSystem {
+public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnChangedBlock>  {
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
 
     private static final long TIME_BETWEEN_NETSYNCS = 200;
@@ -81,6 +88,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         physics = CoreRegistry.get(BulletPhysics.class);
         skipProcessingFrames = 4;
         lastNetsync = 0;
+        CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);
     }
 
     @Override
@@ -120,6 +128,11 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void updateRigidBody(OnChangedComponent event, EntityRef entity) {
         physics.updateRigidBody(entity);
+    }
+    
+    @Override
+    public void onEvent(OnChangedBlock event, EntityRef entity) {
+        physics.awakenArea(event.getBlockPosition().toVector3f(), 0.6f);
     }
 
     @Override
