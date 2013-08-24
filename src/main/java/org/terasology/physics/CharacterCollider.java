@@ -9,7 +9,7 @@ import javax.vecmath.Vector3f;
  *
  * @author Rednax
  */
-public interface CharacterMoverCollider {
+public interface CharacterCollider {
     
     /**
      * Retrieves the location of this body.

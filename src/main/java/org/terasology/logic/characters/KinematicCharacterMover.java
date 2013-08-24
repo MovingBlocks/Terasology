@@ -27,7 +27,7 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.bullet.BulletPhysics;
-import org.terasology.physics.CharacterMoverCollider;
+import org.terasology.physics.CharacterCollider;
 import org.terasology.physics.MovedEvent;
 import org.terasology.world.WorldProvider;
 
@@ -177,7 +177,7 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param stepHeight
      * @return
      */
-    protected boolean checkStep(CharacterMoverCollider collider, Vector3f position, Vector3f direction, SweepCallback callback, float slopeFactor, float stepHeight) {
+    protected boolean checkStep(CharacterCollider collider, Vector3f position, Vector3f direction, SweepCallback callback, float slopeFactor, float stepHeight) {
         if (!stepped) {
             stepped = true;
             
@@ -213,7 +213,7 @@ public class KinematicCharacterMover implements CharacterMover {
         endVelocity.z += velocityDiff.z;
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
-        CharacterMoverCollider collider = physics.getCollider(entity);
+        CharacterCollider collider = physics.getCharacterCollider(entity);
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
@@ -298,7 +298,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
-    protected MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final CharacterMoverCollider collider) {
+    protected MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final CharacterCollider collider) {
         steppedUpDist = 0;
         stepped = false;
         Vector3f position = new Vector3f(startPosition);
@@ -326,7 +326,7 @@ public class KinematicCharacterMover implements CharacterMover {
         return new MoveResult(position, hitSide, hitBottom, hitTop);
     }
 
-    protected boolean moveDown(float dist, float slopeFactor, CharacterMoverCollider collider, Vector3f position) {
+    protected boolean moveDown(float dist, float slopeFactor, CharacterCollider collider, Vector3f position) {
         float remainingDist = -dist;
         Vector3f targetPos = new Vector3f(position);
         targetPos.y -= remainingDist + VERTICAL_PENETRATION_LEEWAY;
@@ -392,7 +392,7 @@ public class KinematicCharacterMover implements CharacterMover {
         return hit;
     }
 
-    protected boolean moveHorizontal(Vector3f horizMove, CharacterMoverCollider collider, Vector3f position, float slopeFactor, float stepHeight) {
+    protected boolean moveHorizontal(Vector3f horizMove, CharacterCollider collider, Vector3f position, float slopeFactor, float stepHeight) {
         float remainingFraction = 1.0f;
         float dist = horizMove.length();
         if (dist < physics.getEpsilon()) {
@@ -472,7 +472,7 @@ public class KinematicCharacterMover implements CharacterMover {
         return horizontalHit;
     }
 
-    protected float moveUp(float riseAmount, CharacterMoverCollider collider, Vector3f position) {
+    protected float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
         SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
@@ -529,7 +529,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         Vector3f moveDelta = new Vector3f(state.getVelocity());
         moveDelta.scale(input.getDelta());
-        CharacterMoverCollider collider = physics.getCollider(entity);
+        CharacterCollider collider = physics.getCharacterCollider(entity);
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
@@ -609,7 +609,7 @@ public class KinematicCharacterMover implements CharacterMover {
         endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - GRAVITY * input.getDelta());
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
-        CharacterMoverCollider collider = physics.getCollider(entity);
+        CharacterCollider collider = physics.getCharacterCollider(entity);
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());

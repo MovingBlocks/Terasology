@@ -77,7 +77,7 @@ import java.util.Map;
 import java.util.Set;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.physics.CharacterMoverCollider;
+import org.terasology.physics.CharacterCollider;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.physics.HitResult;
@@ -144,6 +144,56 @@ public class BulletPhysics {
     }
     
     //*****************Physics Interface methods******************\\
+    /**
+     * Return a list with all CollisionPairs that occurred in the previous
+     * physics simulation step.
+     * TODO: alter this method to return all collision pairs since the last call to this method.
+     *
+     * @return A newly allocated list with all pairs of entities that collided.
+     */
+    public List<PhysicsSystem.CollisionPair> getCollisionPairs() {
+        List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
+
+        DynamicsWorld world = discreteDynamicsWorld;
+        ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<PersistentManifold>();
+        for (PairCachingGhostObject trigger : entityTriggers.values()) {
+            EntityRef entity = (EntityRef) trigger.getUserPointer();
+            for (BroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {
+                EntityRef otherEntity = null;
+                if (initialPair.pProxy0.clientObject == trigger) {
+                    if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
+                        otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer();
+                    }
+                } else {
+                    if (((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof EntityRef) {
+                        otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
+                    }
+                }
+                if (otherEntity == null) {
+                    continue;
+                }
+                BroadphasePair pair = world.getPairCache().findPair(initialPair.pProxy0, initialPair.pProxy1);
+                if (pair == null) {
+                    continue;
+                }
+                manifolds.clear();
+                if (pair.algorithm != null) {
+                    pair.algorithm.getAllContactManifolds(manifolds);
+                }
+                for (PersistentManifold manifold : manifolds) {
+                    for (int point = 0; point < manifold.getNumContacts(); ++point) {
+                        ManifoldPoint manifoldPoint = manifold.getContactPoint(point);
+                        if (manifoldPoint.getDistance() < 0) {
+                            collisionPairs.add(new PhysicsSystem.CollisionPair(entity, otherEntity));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return collisionPairs;
+    }
+     
     public void dispose() {
         discreteDynamicsWorld.destroy();
         wrapper.dispose();
@@ -159,35 +209,6 @@ public class BulletPhysics {
             flags |= group.getFlag();
         }
         return flags;
-    }
-    
-    /**
-     * Creates a Collider for the given entity based on the LocationComponent 
-     * and CharacterMovementComponent. 
-     * All collision flags are set right for a character movement component.
-     *
-     * @param owner the entity to create the collider for.
-     * @return
-     */
-    public CharacterMoverCollider createCharacterCollider(EntityRef owner) {
-        LocationComponent locComp = owner.getComponent(LocationComponent.class);
-        CharacterMovementComponent movementComp = owner.getComponent(CharacterMovementComponent.class);
-        if(locComp == null || movementComp == null) {
-            throw new IllegalArgumentException("Expected an entity with a Location component and CharacterMovementComponent.");
-        }
-        Vector3f pos = locComp.getWorldPosition();
-        final float worldScale = locComp.getWorldScale();
-        final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
-        final float width = movementComp.radius * worldScale;
-        ConvexShape shape =  new CapsuleShape(width, height);
-        shape.setMargin(0.1f);
-        return createCustomCollider(pos, shape, movementComp.collisionGroup.getFlag(), combineGroups(movementComp.collidesWith),
-                CollisionFlags.CHARACTER_OBJECT, owner);
-    }
-    
-    public void removeCharacterCollider(EntityRef entity) {
-        BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);
-        removeCollider(toRemove.collider);
     }
     
     public List<EntityRef> scanArea(AABB area, CollisionGroup... collisionFilter) {
@@ -354,6 +375,26 @@ public class BulletPhysics {
     }
     
     /**
+     * @param entity
+     * @return Returns true if there is a rigidBody in the physics engine
+     * related to the given entity, false otherwise.
+     */
+    public boolean hasRigidBody(EntityRef entity) {
+        return entityRigidBodies.containsKey(entity);
+    }
+    
+    /**
+     * Returns the rigid body associated with the given entity.
+     *
+     * @param entity
+     * @return null if there is no rigid body for the given entity (yet),
+     * otherwise it returns the requested RigidBody instance.
+     */
+    public RigidBody getRigidBody(EntityRef entity) {
+        return entityRigidBodies.get(entity);
+    }
+   
+    /**
      * Creates a new trigger. An entity with a trigger attached to it will
      * generate collision pairs when it collides or intersects with other
      * objects. A good example of its usage is picking up items. By creating a
@@ -417,77 +458,36 @@ public class BulletPhysics {
     }
     
     /**
-     * Return a list with all CollisionPairs that occurred in the previous
-     * physics simulation step.
-     * TODO: alter this method to return all collision pairs since the last call to this method.
+     * Creates a Collider for the given entity based on the LocationComponent 
+     * and CharacterMovementComponent. 
+     * All collision flags are set right for a character movement component.
      *
-     * @return A newly allocated list with all pairs of entities that collided.
+     * @param owner the entity to create the collider for.
+     * @return
      */
-    public List<PhysicsSystem.CollisionPair> getCollisionPairs() {
-        List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
-
-        DynamicsWorld world = discreteDynamicsWorld;
-        ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<PersistentManifold>();
-        for (PairCachingGhostObject trigger : entityTriggers.values()) {
-            EntityRef entity = (EntityRef) trigger.getUserPointer();
-            for (BroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {
-                EntityRef otherEntity = null;
-                if (initialPair.pProxy0.clientObject == trigger) {
-                    if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
-                        otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer();
-                    }
-                } else {
-                    if (((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof EntityRef) {
-                        otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
-                    }
-                }
-                if (otherEntity == null) {
-                    continue;
-                }
-                BroadphasePair pair = world.getPairCache().findPair(initialPair.pProxy0, initialPair.pProxy1);
-                if (pair == null) {
-                    continue;
-                }
-                manifolds.clear();
-                if (pair.algorithm != null) {
-                    pair.algorithm.getAllContactManifolds(manifolds);
-                }
-                for (PersistentManifold manifold : manifolds) {
-                    for (int point = 0; point < manifold.getNumContacts(); ++point) {
-                        ManifoldPoint manifoldPoint = manifold.getContactPoint(point);
-                        if (manifoldPoint.getDistance() < 0) {
-                            collisionPairs.add(new PhysicsSystem.CollisionPair(entity, otherEntity));
-                            break;
-                        }
-                    }
-                }
-            }
+    public CharacterCollider createCharacterCollider(EntityRef owner) {
+        LocationComponent locComp = owner.getComponent(LocationComponent.class);
+        CharacterMovementComponent movementComp = owner.getComponent(CharacterMovementComponent.class);
+        if(locComp == null || movementComp == null) {
+            throw new IllegalArgumentException("Expected an entity with a Location component and CharacterMovementComponent.");
         }
-        return collisionPairs;
+        Vector3f pos = locComp.getWorldPosition();
+        final float worldScale = locComp.getWorldScale();
+        final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
+        final float width = movementComp.radius * worldScale;
+        ConvexShape shape =  new CapsuleShape(width, height);
+        shape.setMargin(0.1f);
+        return createCustomCollider(pos, shape, movementComp.collisionGroup.getFlag(), combineGroups(movementComp.collidesWith),
+                CollisionFlags.CHARACTER_OBJECT, owner);
     }
     
-    /**
-     * Returns the rigid body associated with the given entity.
-     *
-     * @param entity
-     * @return null if there is no rigid body for the given entity (yet),
-     * otherwise it returns the requested RigidBody instance.
-     */
-    public RigidBody getRigidBody(EntityRef entity) {
-        return entityRigidBodies.get(entity);
+    public void removeCharacterCollider(EntityRef entity) {
+        BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);
+        removeCollider(toRemove.collider);
     }
     
-    public CharacterMoverCollider getCollider(EntityRef entity) {
+    public CharacterCollider getCharacterCollider(EntityRef entity) {
         return entityColliders.get(entity);
-    }
-    
-    /**
-     * @param entity
-     * @return Returns true if there is a rigidBody in the physics engine
-     * related to the given entity, false otherwise.
-     */
-    public boolean hasRigidBody(EntityRef entity) {
-        return entityRigidBodies.containsKey(entity);
     }
     
     /**
@@ -536,7 +536,7 @@ public class BulletPhysics {
         return BulletGlobals.SIMD_EPSILON;
     }
 
-    //*******************Private methods**************************\\
+    //*******************Private helper methods**************************\\
     private void removeCollider(CollisionObject collider) {
         discreteDynamicsWorld.removeCollisionObject(collider);
     }
@@ -557,7 +557,7 @@ public class BulletPhysics {
      * @param entity The entity to associate this collider with. Can be null.
      * @return The newly created and added to the physics engine, Collider object.
      */
-    private CharacterMoverCollider createCustomCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef entity) {
+    private CharacterCollider createCustomCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef entity) {
         if(entityColliders.containsKey(entity)) {
             entityColliders.remove(entity);
         }
@@ -775,7 +775,7 @@ public class BulletPhysics {
         }
     }
 
-    private class BulletCharacterMoverCollider implements CharacterMoverCollider {
+    private class BulletCharacterMoverCollider implements CharacterCollider {
         
         private final Transform temp = new Transform();
         
