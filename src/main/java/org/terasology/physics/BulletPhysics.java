@@ -132,7 +132,6 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         short mask = (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER);
         discreteDynamicsWorld.addRigidBody(rigidBody.rb, combineGroups(StandardCollisionGroup.WORLD), mask);
     }
-
     
     //*****************Physics Interface methods******************\\
     public void dispose() {
@@ -166,7 +165,6 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         if(locComp == null || movementComp == null) {
             throw new IllegalArgumentException("Expected an entity with a Location component and CharacterMovementComponent.");
         }
-        
         Vector3f pos = locComp.getWorldPosition();
         final float worldScale = locComp.getWorldScale();
         final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
