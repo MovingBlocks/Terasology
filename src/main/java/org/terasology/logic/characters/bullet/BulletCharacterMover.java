@@ -50,7 +50,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CharacterMoverBody;
 
 /**
  * @author Immortius
@@ -247,7 +246,7 @@ public class BulletCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
 
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
-        BulletPhysics.BulletCollider collider = (BulletPhysics.BulletCollider) physics.getCollider(entity);
+        BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
@@ -325,7 +324,7 @@ public class BulletCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
 
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
-        BulletPhysics.BulletCollider collider = (BulletPhysics.BulletCollider) physics.getCollider(entity);
+        BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider.collider);
@@ -415,7 +414,7 @@ public class BulletCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
 
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
-        BulletPhysics.BulletCollider collider = (BulletPhysics.BulletCollider) physics.getCollider(entity);
+        BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());

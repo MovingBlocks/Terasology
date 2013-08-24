@@ -43,6 +43,7 @@ import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Lists;
@@ -103,7 +104,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
     private final CollisionGroupManager collisionGroupManager;
     private final PhysicsWorldWrapper wrapper;
     private Map<EntityRef, BulletRigidBody> entityRigidBodies = Maps.newHashMap();
-    private Map<EntityRef, BulletCollider> entityColliders = Maps.newHashMap();
+    private Map<EntityRef, BulletCharacterMoverCollider> entityColliders = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
 
     public BulletPhysics(WorldProvider world) {
@@ -159,7 +160,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
      * @param owner the entity to create the collider for.
      * @return
      */
-    public CharacterMoverBody createCollider(EntityRef owner) {
+    public CharacterMoverCollider createCollider(EntityRef owner) {
         LocationComponent locComp = owner.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = owner.getComponent(CharacterMovementComponent.class);
         if(locComp == null || movementComp == null) {
@@ -192,17 +193,17 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
      * @param entity The entity to associate this collider with. Can be null.
      * @return The newly created and added to the physics engine, Collider object.
      */
-    private CharacterMoverBody createCustomCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef entity) {
+    private CharacterMoverCollider createCustomCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef entity) {
         if(entityColliders.containsKey(entity)) {
             entityColliders.remove(entity);
         }
-        final BulletCollider bulletCollider = new BulletCollider(pos, shape, groups, filters, collisionFlags, entity);
+        final BulletCharacterMoverCollider bulletCollider = new BulletCharacterMoverCollider(pos, shape, groups, filters, collisionFlags, entity);
         entityColliders.put(entity, bulletCollider);
         return bulletCollider;
     }
     
     public void removeCollider(EntityRef entity) {
-        BulletCollider toRemove = entityColliders.remove(entity);
+        BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);
         removeCollider(toRemove.collider);
     }
     
@@ -311,7 +312,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
 
             Vector3f fallInertia = new Vector3f();
             shape.calculateLocalInertia(rigidBody.mass, fallInertia);
-            RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new PhysicsSystem.EntityMotionState(entity), shape, fallInertia);
+            RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.setUserPointer(entity);
             updateKinematicSettings(rigidBody, collider);
@@ -359,7 +360,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
             float scale = location.getWorldScale();
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
                 removeRigidBody(rigidBody);
-                newRigidBody(entity);
+                newRigidBody(entity); 
             }
 
             updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
@@ -497,7 +498,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         return entityRigidBodies.get(entity);
     }
     
-    public CharacterMoverBody getCollider(EntityRef entity) {
+    public CharacterMoverCollider getCollider(EntityRef entity) {
         return entityColliders.get(entity);
     }
     
@@ -580,7 +581,6 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
      */
     private void applyPendingImpulses() {
         for (Map.Entry<BulletRigidBody, Vector3f> impulse : pendingImpulses.entrySet()) {
-            System.err.println("Apply impulse: " + impulse.getValue());
             BulletRigidBody body = impulse.getKey();
             body.rb.applyCentralImpulse(impulse.getValue());
         }
@@ -674,6 +674,35 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         discreteDynamicsWorld.addCollisionObject(result, groups, filters);
         return result;
     }
+
+    public BulletRigidBody initCharacter(EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        if (location != null) {
+            ConvexShape shape = new CylinderShape(new Vector3f(0.5f, 0.5f, 0.5f));
+            float scale = location.getWorldScale();
+            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+
+            Vector3f fallInertia = new Vector3f();
+            shape.calculateLocalInertia(1, fallInertia);
+            RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(1, new EntityMotionState(entity), shape, fallInertia);
+            BulletRigidBody collider = new BulletRigidBody(info);
+            collider.rb.setUserPointer(entity);
+            collider.rb.setCollisionFlags(collider.rb.getCollisionFlags() & ~CollisionFlags.KINEMATIC_OBJECT);
+            collider.rb.setActivationState(CollisionObject.ACTIVE_TAG);
+            collider.rb.setFriction(100f);
+            //Force cylinder upright:
+            collider.rb.setAngularFactor(0.0f);
+            BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
+            addRigidBody(collider, StandardCollisionGroup.DEFAULT.getFlag(), combineGroups(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC));
+            collider.rb.activate();
+            if (oldBody != null) {
+                removeRigidBody(oldBody);
+            }
+            return collider;
+        } else {
+            throw new IllegalArgumentException("Can only create a new rigid body for entities with a LocationComponent, RigidBodyComponent and ShapeComponent");
+        }
+    }
     
     //********************Private helper classes*********************\\
 
@@ -689,9 +718,9 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         }
     }
    
-    private class BulletRigidBody implements RigidBody {
+    public class BulletRigidBody implements RigidBody {
         private final Transform temp = new Transform();
-        private final com.bulletphysics.dynamics.RigidBody rb;
+        public final com.bulletphysics.dynamics.RigidBody rb;
 
         BulletRigidBody(RigidBodyConstructionInfo info) {
             rb = new com.bulletphysics.dynamics.RigidBody(info);
@@ -699,7 +728,6 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
 
         @Override
         public void applyImpulse(Vector3f impulse) {
-            System.err.println("get Impulse:" + impulse);
             pendingImpulses.put(this, impulse);
         }
 
@@ -767,7 +795,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         }
     }
 
-    public class BulletCollider implements CharacterMoverBody {
+    public class BulletCharacterMoverCollider implements CharacterMoverCollider {
         
         private final Transform temp = new Transform();
         
@@ -775,15 +803,15 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         //is allowed to gain direct access to the bullet body:
         public final PairCachingGhostObject collider;
 
-        private BulletCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, EntityRef owner) {
+        private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, EntityRef owner) {
             this(pos, shape, groups, filters, 0, owner);
         }
         
-        private BulletCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, int collisionFlags, EntityRef owner) {
+        private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, int collisionFlags, EntityRef owner) {
             collider = createCollider(pos, shape, combineGroups(groups), combineGroups(filters), collisionFlags);
         }
         
-        private BulletCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef owner) {
+        private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef owner) {
             collider = createCollider(pos, shape, groups, filters, collisionFlags);
         }
         
@@ -818,5 +846,36 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
+    
+    private static class EntityMotionState extends MotionState {
+        private EntityRef entity;
 
+        public EntityMotionState(EntityRef entity) {
+            this.entity = entity;
+        }
+
+        @Override
+        public Transform getWorldTransform(Transform transform) {
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            if (loc != null) {
+                // NOTE: JBullet ignores scale anyway
+                transform.set(new Matrix4f(loc.getWorldRotation(), loc.getWorldPosition(), 1));
+            }
+            return transform;
+        }
+
+        @Override
+        public void setWorldTransform(Transform transform) {
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            if (loc != null) {
+                Quat4f rot = new Quat4f();
+                transform.getRotation(rot);
+                if (!transform.origin.equals(loc.getWorldPosition()) || !rot.equals(loc.getWorldRotation())) {
+                    loc.setWorldPosition(transform.origin);
+                    loc.setWorldRotation(transform.getRotation(new Quat4f()));
+                    entity.saveComponent(loc);
+                }
+            }
+        }
+    }
 }

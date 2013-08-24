@@ -220,39 +220,6 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         }
     }
 
-    //TODO move to BulletPhysics
-    public static class EntityMotionState extends MotionState {
-        private EntityRef entity;
-
-        public EntityMotionState(EntityRef entity) {
-            this.entity = entity;
-        }
-
-        @Override
-        public Transform getWorldTransform(Transform transform) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null) {
-                // NOTE: JBullet ignores scale anyway
-                transform.set(new Matrix4f(loc.getWorldRotation(), loc.getWorldPosition(), 1));
-            }
-            return transform;
-        }
-
-        @Override
-        public void setWorldTransform(Transform transform) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null) {
-                Quat4f rot = new Quat4f();
-                transform.getRotation(rot);
-                if (!transform.origin.equals(loc.getWorldPosition()) || !rot.equals(loc.getWorldRotation())) {
-                    loc.setWorldPosition(transform.origin);
-                    loc.setWorldRotation(transform.getRotation(new Quat4f()));
-                    entity.saveComponent(loc);
-                }
-            }
-        }
-    }
-
     private static class ResynchData {
         private Vector3f positionDelta = new Vector3f();
         private Quat4f rotationDelta = new Quat4f();

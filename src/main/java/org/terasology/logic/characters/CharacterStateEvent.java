@@ -27,7 +27,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CharacterMoverBody;
+import org.terasology.physics.CharacterMoverCollider;
 
 /**
  * @author Immortius
@@ -126,6 +126,10 @@ public class CharacterStateEvent extends NetworkEvent {
         this.sequenceNumber = sequenceNumber;
     }
 
+    /**
+     * Retrieve the pitch in degrees.
+     * @return 
+     */
     public float getPitch() {
         return pitch;
     }
@@ -134,6 +138,10 @@ public class CharacterStateEvent extends NetworkEvent {
         this.pitch = pitch;
     }
 
+    /**
+     * Retrieve the yaw in degrees.
+     * @return 
+     */
     public float getYaw() {
         return yaw;
     }
@@ -150,6 +158,16 @@ public class CharacterStateEvent extends NetworkEvent {
         this.footstepDelta = delta;
     }
 
+    /**
+     * Sets the state of the given entity to the state represented by the
+     * CharacterStateEvent. The state of the entity is determined by its
+     * LocationComponent (location and orientation of physics body),
+     * CharacterMovementComponent (velocity and various movement state
+     * variables) and CharacterComponent for pitch and yaw (used for the camera).
+     *
+     * @param entity
+     * @param state
+     */
     public static void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
@@ -234,7 +252,7 @@ public class CharacterStateEvent extends NetworkEvent {
      */
     private static void setPhysicsLocation(EntityRef entity, Vector3f newPos) {
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
-        CharacterMoverBody collider = physics.getCollider(entity);
+        CharacterMoverCollider collider = physics.getCollider(entity);
         collider.setLocation(newPos);
     }
 }

@@ -13,7 +13,7 @@ import org.terasology.entitySystem.EntityRef;
  *
  * @author Rednax
  */
-public interface CharacterMoverBody {
+public interface CharacterMoverCollider {
     
     /**
      * Retrieves the location of this body.
