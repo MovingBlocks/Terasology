@@ -566,6 +566,17 @@ public class BulletPhysics {
         max.add(new Vector3f(0.6f, 0.6f, 0.6f));
         discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }
+    
+    /**
+     * The epsilon value is the value that is considered to be so small that it
+     * could just as well be zero. Objects that are closer together than this
+     * value are assumes to be colliding.
+     *
+     * @return The simulation epsilon.
+     */
+    public float getEpsilon() {
+        return BulletGlobals.SIMD_EPSILON;
+    }
 
     //*******************Private methods**************************\\
     /**

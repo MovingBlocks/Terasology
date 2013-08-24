@@ -70,7 +70,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     @Override
     public void initialise() {
-        characterMover = new KinematicCharacterMover(worldProvider);
+        characterMover = new KinematicCharacterMover(worldProvider, physics);
     }
 
     @Override

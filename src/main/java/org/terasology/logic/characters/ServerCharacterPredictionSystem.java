@@ -78,7 +78,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @Override
     public void initialise() {
-        characterMover = new KinematicCharacterMover(worldProvider);
+        characterMover = new KinematicCharacterMover(worldProvider, physics);
         nextSendState = time.getGameTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
     }
 

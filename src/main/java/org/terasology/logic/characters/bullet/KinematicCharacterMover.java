@@ -5,18 +5,12 @@
 package org.terasology.logic.characters.bullet;
 
 import org.terasology.physics.SweepCallback;
-import org.terasology.physics.bullet.BulletSweepCallback;
 import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.linearmath.QuaternionUtil;
-import com.bulletphysics.linearmath.Transform;
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -77,9 +71,11 @@ public class KinematicCharacterMover implements CharacterMover {
     // Processing state variables
     protected float steppedUpDist;
     protected WorldProvider worldProvider;
+    private BulletPhysics physics;
     
-    public KinematicCharacterMover(WorldProvider wp) {
+    public KinematicCharacterMover(WorldProvider wp, BulletPhysics physicsEngine) {
         this.worldProvider = wp;
+        physics = physicsEngine;
     }
 
     /**
@@ -217,7 +213,6 @@ public class KinematicCharacterMover implements CharacterMover {
         endVelocity.z += velocityDiff.z;
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
-        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
         BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
@@ -264,7 +259,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
     protected Vector3f extractResidualMovement(Vector3f hitNormal, Vector3f direction, float normalMag) {
         float movementLength = direction.length();
-        if (movementLength > BulletGlobals.SIMD_EPSILON) {
+        if (movementLength > physics.getEpsilon()) {
             direction.normalize();
             Vector3f reflectDir = Vector3fUtil.reflect(direction, hitNormal, new Vector3f());
             reflectDir.normalize();
@@ -312,7 +307,7 @@ public class KinematicCharacterMover implements CharacterMover {
         boolean hitSide = false;
         // Actual upwards movement
         if (moveDelta.y > 0) {
-            hitTop = moveDelta.y - moveUp(moveDelta.y, collider, position) > BulletGlobals.SIMD_EPSILON;
+            hitTop = moveDelta.y - moveUp(moveDelta.y, collider, position) > physics.getEpsilon();
         }
         hitSide = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position, slopeFactor, stepHeight);
         if (moveDelta.y < 0 || steppedUpDist > 0) {
@@ -338,18 +333,18 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f normalizedDir = new Vector3f(0, -1, 0);
         boolean hit = false;
         int iteration = 0;
-        while (remainingDist > BulletGlobals.SIMD_EPSILON && iteration++ < 10) {
+        while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
             SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
             expectedMove.sub(position);
-            if (expectedMove.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
+            if (expectedMove.lengthSquared() > physics.getEpsilon()) {
                 expectedMove.normalize();
                 expectedMove.scale(actualDist);
                 position.add(expectedMove);
             }
             remainingDist -= actualDist;
-            if (remainingDist < BulletGlobals.SIMD_EPSILON) {
+            if (remainingDist < physics.getEpsilon()) {
                 break;
             }
             if (callback.hasHit()) {
@@ -362,7 +357,7 @@ public class KinematicCharacterMover implements CharacterMover {
                         expectedMove.sub(position);
                         extractResidualMovement(callback.getHitNormalWorld(), expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
-                        if (sqrDist > BulletGlobals.SIMD_EPSILON) {
+                        if (sqrDist > physics.getEpsilon()) {
                             expectedMove.normalize();
                             if (expectedMove.dot(normalizedDir) <= 0.0f) {
                                 hit = true;
@@ -372,7 +367,7 @@ public class KinematicCharacterMover implements CharacterMover {
                             hit = true;
                             break;
                         }
-                        if (expectedMove.y > -BulletGlobals.SIMD_EPSILON) {
+                        if (expectedMove.y > -physics.getEpsilon()) {
                             hit = true;
                             break;
                         }
@@ -400,7 +395,7 @@ public class KinematicCharacterMover implements CharacterMover {
     protected boolean moveHorizontal(Vector3f horizMove, CharacterMoverCollider collider, Vector3f position, float slopeFactor, float stepHeight) {
         float remainingFraction = 1.0f;
         float dist = horizMove.length();
-        if (dist < BulletGlobals.SIMD_EPSILON) {
+        if (dist < physics.getEpsilon()) {
             return false;
         }
         boolean horizontalHit = false;
@@ -419,7 +414,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 remainingFraction -= actualDist / dist;
             }
             if (callback.hasHit()) {
-                if (actualDist > BulletGlobals.SIMD_EPSILON) {
+                if (actualDist > physics.getEpsilon()) {
                     Vector3f actualMove = new Vector3f(normalizedDir);
                     actualMove.scale(actualDist);
                     position.add(actualMove);
@@ -430,15 +425,15 @@ public class KinematicCharacterMover implements CharacterMover {
                 float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
                 // We step up if we're hitting a big slope, or if we're grazing 
                 // the ground, otherwise we move up a shallow slope.
-                if (slope < slopeFactor || 1 - slope < BulletGlobals.SIMD_EPSILON) {
+                if (slope < slopeFactor || 1 - slope < physics.getEpsilon()) {
                     boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);
                     if (!stepping) {
                         horizontalHit = true;
                         Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
                         Vector3f horizNormal = new Vector3f(callback.getHitNormalWorld().x, 0, callback.getHitNormalWorld().z);
-                        if (horizNormal.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
+                        if (horizNormal.lengthSquared() > physics.getEpsilon()) {
                             horizNormal.normalize();
-                            if (lastHitNormal.dot(horizNormal) > BulletGlobals.SIMD_EPSILON) {
+                            if (lastHitNormal.dot(horizNormal) > physics.getEpsilon()) {
                                 break;
                             }
                             lastHitNormal.set(horizNormal);
@@ -455,7 +450,7 @@ public class KinematicCharacterMover implements CharacterMover {
                     newDir.scale(newHorizDir.length() / modHorizDir.length());
                 }
                 float sqrDist = newDir.lengthSquared();
-                if (sqrDist > BulletGlobals.SIMD_EPSILON) {
+                if (sqrDist > physics.getEpsilon()) {
                     newDir.normalize();
                     if (newDir.dot(normalizedDir) <= 0.0f) {
                         break;
@@ -534,7 +529,6 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         Vector3f moveDelta = new Vector3f(state.getVelocity());
         moveDelta.scale(input.getDelta());
-        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
         BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider);
@@ -615,7 +609,6 @@ public class KinematicCharacterMover implements CharacterMover {
         endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - GRAVITY * input.getDelta());
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
-        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
         BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
@@ -662,6 +655,40 @@ public class KinematicCharacterMover implements CharacterMover {
                     entity.send(new FootstepEvent());
                 }
             }
+        }
+    }
+
+    /**
+     * Holds the result of some movement.
+     */
+    public class MoveResult {
+
+        private Vector3f finalPosition;
+        private boolean horizontalHit;
+        private boolean bottomHit;
+        private boolean topHit;
+
+        public MoveResult(Vector3f finalPosition, boolean hitHorizontal, boolean hitBottom, boolean hitTop) {
+            this.finalPosition = finalPosition;
+            this.horizontalHit = hitHorizontal;
+            this.bottomHit = hitBottom;
+            this.topHit = hitTop;
+        }
+
+        public Vector3f getFinalPosition() {
+            return finalPosition;
+        }
+
+        public boolean isHorizontalHit() {
+            return horizontalHit;
+        }
+
+        public boolean isBottomHit() {
+            return bottomHit;
+        }
+
+        public boolean isTopHit() {
+            return topHit;
         }
     }
 }
