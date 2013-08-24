@@ -4,11 +4,9 @@
  */
 package org.terasology.logic.characters.bullet;
 
+import org.terasology.physics.SweepCallback;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.collision.dispatch.GhostObject;
-import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
-import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import javax.vecmath.AxisAngle4f;
@@ -34,6 +32,7 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CharacterMoverCollider;
 import org.terasology.physics.MovedEvent;
 import org.terasology.world.WorldProvider;
 
@@ -41,10 +40,11 @@ import org.terasology.world.WorldProvider;
  * The AbstractCharacterMover generalises the character movement to a physics
  * engine independent class. The physics engine will then only have to fill in
  * several smaller method calls.
- * 
+ *
  * @author Rednax
  */
 public abstract class AbstractCharacterMover implements CharacterMover {
+
     protected static final float CHECK_FORWARD_DIST = 0.05f;
     public static final float CLIMB_GRAVITY = 0f;
     public static final float GHOST_INERTIA = 4f;
@@ -54,7 +54,8 @@ public abstract class AbstractCharacterMover implements CharacterMover {
      */
     protected static final float HORIZONTAL_PENETRATION = 0.03f;
     /**
-     * The amount of extra distance added to horizontal movement to allow for penentration.
+     * The amount of extra distance added to horizontal movement to allow for
+     * penentration.
      */
     protected static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
     public static final float TERMINAL_VELOCITY = 64.0f;
@@ -65,7 +66,8 @@ public abstract class AbstractCharacterMover implements CharacterMover {
      */
     protected static final float VERTICAL_PENETRATION = 0.04f;
     /**
-     * The amount of extra distance added to vertical movement to allow for penetration.
+     * The amount of extra distance added to vertical movement to allow for
+     * penetration.
      */
     protected static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     //Logger is now based on implementing class:
@@ -74,30 +76,44 @@ public abstract class AbstractCharacterMover implements CharacterMover {
     // Processing state variables
     protected float steppedUpDist;
     protected WorldProvider worldProvider;
-
-    public AbstractCharacterMover() {
+    
+    public AbstractCharacterMover(WorldProvider wp) {
+        this.worldProvider = wp;
     }
 
     /**
-     * Updates whether a character should change movement mode (from being underwater or in a ladder). A higher and lower point of the character is tested for being in water,
-     * only if both points are in water does the character count as swimming.
+     * Updates whether a character should change movement mode (from being
+     * underwater or in a ladder). A higher and lower point of the character is
+     * tested for being in water, only if both points are in water does the
+     * character count as swimming. <br> <br>
      *
-     * @param movementComp
-     * @param state
+     * Sends the OnEnterLiquidEvent and OnLeaveLiquidEvent events.
+     *
+     * @param movementComp The movement component of the character.
+     * @param state The current state of the character.
      */
     protected void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state, final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+        //If we are ghosting, the mode cannot be changed!
         if (state.getMode() == MovementMode.GHOSTING) {
             return;
         }
+
+        //Determine top and bottom positions:
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
         top.y += 0.25f * movementComp.height;
         bottom.y -= 0.25f * movementComp.height;
+
+        //Check if they are under water:
         boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
         boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+
         boolean newSwimming = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
+
+        //In the new state, we are nor swimming, so we need to check if we will
+        //be climbing
         if (!newSwimming) {
             Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos)};
             float factor = 0.18f;
@@ -108,73 +124,70 @@ public abstract class AbstractCharacterMover implements CharacterMover {
             sides[4].y -= movementComp.height;
             for (Vector3f side : sides) {
                 if (worldProvider.getBlock(side).isClimbable()) {
+                    //If any of our sides are near a climbable block, climb!
                     newClimbing = true;
                     break;
                 }
             }
         }
+
+        //Now lets do someting with our newfound info about hte states:
         if (newSwimming) {
+            //Note that you cannot climb under water!
             if (state.getMode() != MovementMode.SWIMMING) {
+                //Only enter liquid if we were not swimming already!
                 if (firstRun) {
                     entity.send(new OnEnterLiquidEvent(worldProvider.getBlock(state.getPosition())));
                 }
                 state.setMode(MovementMode.SWIMMING);
             }
         } else if (state.getMode() == MovementMode.SWIMMING) {
+            //Note that newSwimming is false here! So we are nolonger swimming:
             if (firstRun) {
                 entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
             }
+            //Leaving liquid and instantly climbing:
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
                 state.getVelocity().y = 0;
             } else {
+                //Not swimming or climbing? So we must be walking!
                 if (state.getVelocity().y > 0) {
                     state.getVelocity().y += 8;
                 }
                 state.setMode(MovementMode.WALKING);
             }
         } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
+            //We need to toggle the climbing mode
             state.getVelocity().y = 0;
             state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+        } else {
+            /*
+             * We were walking and continue to do so. No changes, no code!
+             */
         }
     }
 
-    protected boolean checkStep(PairCachingGhostObject collider, Vector3f position, Vector3f direction, SweepCallback callback, float slopeFactor, float stepHeight) {
+    /**
+     * Checks of the player will step up to an object. In a single movement step
+     * the player can only step up a single item.
+     *
+     * @param collider
+     * @param position
+     * @param direction
+     * @param callback
+     * @param slopeFactor
+     * @param stepHeight
+     * @return
+     */
+    protected boolean checkStep(CharacterMoverCollider collider, Vector3f position, Vector3f direction, SweepCallbackInterface callback, float slopeFactor, float stepHeight) {
         if (!stepped) {
             stepped = true;
-            Vector3f lookAheadOffset = new Vector3f(direction);
-            lookAheadOffset.y = 0;
-            lookAheadOffset.normalize();
-            lookAheadOffset.scale(CHECK_FORWARD_DIST);
-            boolean hitStep = false;
-            float stepSlope = 1f;
-            Vector3f fromWorld = new Vector3f(callback.hitPointWorld);
-            fromWorld.y += stepHeight + 0.05f;
-            fromWorld.add(lookAheadOffset);
-            Vector3f toWorld = new Vector3f(callback.hitPointWorld);
-            toWorld.y -= 0.05f;
-            toWorld.add(lookAheadOffset);
-            CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-            Transform transformFrom = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-            Transform transformTo = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-            Transform targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
-            CollisionWorld.rayTestSingle(transformFrom, transformTo, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-            if (rayResult.hasHit()) {
-                hitStep = true;
-                stepSlope = rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0));
-            }
-            fromWorld.add(lookAheadOffset);
-            toWorld.add(lookAheadOffset);
-            rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-            transformFrom = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-            transformTo = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-            targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
-            CollisionWorld.rayTestSingle(transformFrom, transformTo, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-            if (rayResult.hasHit()) {
-                hitStep = true;
-                stepSlope = Math.min(stepSlope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
-            }
-            if (hitStep && stepSlope >= slopeFactor) {
+            
+            boolean moveUpStep = false;
+            moveUpStep = callback.checkForStep(direction, stepHeight, slopeFactor, CHECK_FORWARD_DIST);
+            
+            if (moveUpStep) {
                 steppedUpDist = moveUp(stepHeight, collider, position);
                 return true;
             }
@@ -205,14 +218,14 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
         BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
-        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider.collider);
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
-        collider.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
+        collider.setLocation(moveResult.getFinalPosition());
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 if (input.isFirstRun()) {
@@ -289,7 +302,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         }
     }
 
-    protected MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final PairCachingGhostObject collider) {
+    protected MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final CharacterMoverCollider collider) {
         steppedUpDist = 0;
         stepped = false;
         Vector3f position = new Vector3f(startPosition);
@@ -317,7 +330,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         return new MoveResult(position, hitSide, hitBottom, hitTop);
     }
 
-    protected boolean moveDown(float dist, float slopeFactor, PairCachingGhostObject collider, Vector3f position) {
+    protected boolean moveDown(float dist, float slopeFactor, CharacterMoverCollider collider, Vector3f position) {
         float remainingDist = -dist;
         Vector3f targetPos = new Vector3f(position);
         targetPos.y -= remainingDist + VERTICAL_PENETRATION_LEEWAY;
@@ -325,8 +338,8 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > BulletGlobals.SIMD_EPSILON && iteration++ < 10) {
-            SweepCallback callback = sweep(position, targetPos, collider, -1.0f, VERTICAL_PENETRATION);
-            float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction - VERTICAL_PENETRATION_LEEWAY);
+            SweepCallbackInterface callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
+            float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
             expectedMove.sub(position);
             if (expectedMove.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
@@ -339,48 +352,14 @@ public abstract class AbstractCharacterMover implements CharacterMover {
                 break;
             }
             if (callback.hasHit()) {
-                Vector3f contactPoint = callback.hitPointWorld;
-                float originalSlope = callback.hitNormalWorld.dot(new Vector3f(0, 1, 0));
+                float originalSlope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
                 if (originalSlope < slopeFactor) {
-                    float slope = 1;
-                    boolean foundSlope = false;
-                    // We do two ray traces, and use the steepest, to avoid incongruities with the slopes
-                    Vector3f fromWorld = new Vector3f(contactPoint);
-                    fromWorld.y += 0.2f;
-                    Vector3f toWorld = new Vector3f(contactPoint);
-                    toWorld.y -= 0.2f;
-                    CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-                    Transform from = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-                    Transform to = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-                    Transform targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
-                    CollisionWorld.rayTestSingle(from, to, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-                    if (rayResult.hasHit()) {
-                        foundSlope = true;
-                        slope = Math.min(slope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
-                    }
-                    Vector3f secondTraceOffset = new Vector3f(callback.hitNormalWorld);
-                    secondTraceOffset.y = 0;
-                    secondTraceOffset.normalize();
-                    secondTraceOffset.scale(CHECK_FORWARD_DIST);
-                    fromWorld.add(secondTraceOffset);
-                    toWorld.add(secondTraceOffset);
-                    rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-                    from = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-                    to = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-                    targetTransform = callback.hitCollisionObject.getWorldTransform(new Transform());
-                    CollisionWorld.rayTestSingle(from, to, callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-                    if (rayResult.hasHit()) {
-                        foundSlope = true;
-                        slope = Math.min(slope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
-                    }
-                    if (!foundSlope) {
-                        slope = originalSlope;
-                    }
+                    float slope = callback.calculateSafeSlope(originalSlope, CHECK_FORWARD_DIST);
                     if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
                         expectedMove.sub(position);
-                        extractResidualMovement(callback.hitNormalWorld, expectedMove);
+                        extractResidualMovement(callback.getHitNormalWorld(), expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
                         if (sqrDist > BulletGlobals.SIMD_EPSILON) {
                             expectedMove.normalize();
@@ -417,7 +396,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         return hit;
     }
 
-    protected boolean moveHorizontal(Vector3f horizMove, PairCachingGhostObject collider, Vector3f position, float slopeFactor, float stepHeight) {
+    protected boolean moveHorizontal(Vector3f horizMove, CharacterMoverCollider collider, Vector3f position, float slopeFactor, float stepHeight) {
         float remainingFraction = 1.0f;
         float dist = horizMove.length();
         if (dist < BulletGlobals.SIMD_EPSILON) {
@@ -431,10 +410,10 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
-            SweepCallback callback = sweep(position, targetPos, collider, slopeFactor, HORIZONTAL_PENETRATION);
+            SweepCallbackInterface callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
-            but probably close enough */
-            float actualDist = Math.max(0, (dist + HORIZONTAL_PENETRATION_LEEWAY) * callback.closestHitFraction - HORIZONTAL_PENETRATION_LEEWAY);
+             but probably close enough */
+            float actualDist = Math.max(0, (dist + HORIZONTAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - HORIZONTAL_PENETRATION_LEEWAY);
             if (actualDist != 0) {
                 remainingFraction -= actualDist / dist;
             }
@@ -447,14 +426,15 @@ public abstract class AbstractCharacterMover implements CharacterMover {
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
                 newDir.scale(dist);
-                float slope = callback.hitNormalWorld.dot(new Vector3f(0, 1, 0));
-                // We step up if we're hitting a big slope, or if we're grazing the ground)
+                float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
+                // We step up if we're hitting a big slope, or if we're grazing 
+                // the ground, otherwise we move up a shallow slope.
                 if (slope < slopeFactor || 1 - slope < BulletGlobals.SIMD_EPSILON) {
                     boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);
                     if (!stepping) {
                         horizontalHit = true;
                         Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                        Vector3f horizNormal = new Vector3f(callback.hitNormalWorld.x, 0, callback.hitNormalWorld.z);
+                        Vector3f horizNormal = new Vector3f(callback.getHitNormalWorld().x, 0, callback.getHitNormalWorld().z);
                         if (horizNormal.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
                             horizNormal.normalize();
                             if (lastHitNormal.dot(horizNormal) > BulletGlobals.SIMD_EPSILON) {
@@ -468,7 +448,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
                 } else {
                     // Hitting a shallow slope, move up it
                     Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                    extractResidualMovement(callback.hitNormalWorld, newDir);
+                    extractResidualMovement(callback.getHitNormalWorld(), newDir);
                     Vector3f modHorizDir = new Vector3f(newDir);
                     modHorizDir.y = 0;
                     newDir.scale(newHorizDir.length() / modHorizDir.length());
@@ -496,11 +476,11 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         return horizontalHit;
     }
 
-    protected float moveUp(float riseAmount, GhostObject collider, Vector3f position) {
+    protected float moveUp(float riseAmount, CharacterMoverCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
-        SweepCallback callback = sweep(position, to, collider, -1.0f, VERTICAL_PENETRATION_LEEWAY);
+        SweepCallbackInterface callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
-            float actualDist = Math.max(0, ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction) - VERTICAL_PENETRATION_LEEWAY);
+            float actualDist = Math.max(0, ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);
             position.y += actualDist;
             return actualDist;
         }
@@ -525,16 +505,6 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         result.setYaw(input.getYaw());
         input.runComplete();
         return result;
-    }
-
-    protected SweepCallback sweep(Vector3f from, Vector3f to, GhostObject collider, float slopeFactor, float allowedPenetration) {
-        Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), from, 1.0f));
-        Transform endTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), to, 1.0f));
-        SweepCallback callback = new SweepCallback(collider, new Vector3f(0, 1, 0), slopeFactor);
-        callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
-        callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
-        collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
-        return callback;
     }
 
     protected void swim(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
@@ -566,7 +536,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
         BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
         // Note: No stepping underwater, no issue with slopes
-        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider.collider);
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
@@ -646,14 +616,14 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
         BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
         BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
-        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider.collider);
+        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
-        collider.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
+        collider.setLocation(moveResult.getFinalPosition());
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 if (input.isFirstRun()) {
@@ -693,5 +663,4 @@ public abstract class AbstractCharacterMover implements CharacterMover {
             }
         }
     }
-    
 }

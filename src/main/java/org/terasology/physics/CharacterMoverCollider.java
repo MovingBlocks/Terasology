@@ -2,7 +2,7 @@ package org.terasology.physics;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.characters.bullet.SweepCallbackInterface;
 
 /**
  * This class provides an interface for interaction with colliders of the
@@ -49,4 +49,6 @@ public interface CharacterMoverCollider {
      * @param orientation
      */
     public void setTransform(Vector3f loc, Quat4f orientation);
+    
+    public SweepCallbackInterface sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
 }

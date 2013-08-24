@@ -799,7 +799,7 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         
         //If a class can figure out that its Collider is a BulletCollider, it 
         //is allowed to gain direct access to the bullet body:
-        public final PairCachingGhostObject collider;
+        private final PairCachingGhostObject collider;
 
         private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, EntityRef owner) {
             this(pos, shape, groups, filters, 0, owner);
@@ -842,6 +842,17 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         @Override
         public void setTransform(Vector3f loc, Quat4f orientation) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor) {
+            Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), startPos, 1.0f));
+            Transform endTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), endPos, 1.0f));
+            SweepCallback callback = new SweepCallback(collider, new Vector3f(0, 1, 0), slopeFactor);
+            callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
+            callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
+            collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
+            return callback;
         }
     }
     

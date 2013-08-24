@@ -57,6 +57,6 @@ import org.terasology.physics.BulletPhysics;
 public class BulletCharacterMover extends AbstractCharacterMover {
 
     public BulletCharacterMover(WorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
+        super(worldProvider);
     }
 }
