@@ -184,7 +184,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnCh
             }
             Vector3f change = new Vector3f();
             change.scale(applyDelta / RESYNC_TIME, data.positionDelta);
-            physics.translate(entry.getKey(), change);
+            physics.getRigidBody(entry.getKey()).translate(change);
         }
     }
 

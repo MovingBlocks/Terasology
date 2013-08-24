@@ -149,11 +149,11 @@ public class BulletPhysics {
         wrapper.dispose();
     }
     
-    public static short combineGroups(CollisionGroup... groups) {
+    public short combineGroups(CollisionGroup... groups) {
         return combineGroups(Arrays.asList(groups));
     }
 
-    public static short combineGroups(Iterable<CollisionGroup> groups) {
+    public short combineGroups(Iterable<CollisionGroup> groups) {
         short flags = 0;
         for (CollisionGroup group : groups) {
             flags |= group.getFlag();
@@ -169,7 +169,7 @@ public class BulletPhysics {
      * @param owner the entity to create the collider for.
      * @return
      */
-    public CharacterMoverCollider createCollider(EntityRef owner) {
+    public CharacterMoverCollider createCharacterCollider(EntityRef owner) {
         LocationComponent locComp = owner.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = owner.getComponent(CharacterMovementComponent.class);
         if(locComp == null || movementComp == null) {
@@ -185,40 +185,11 @@ public class BulletPhysics {
                 CollisionFlags.CHARACTER_OBJECT, owner);
     }
     
-    /**
-     * Creates a new Collider. Colliders are similar to rigid bodies, except
-     * that they do not respond to forces from the physics engine. They collide
-     * with other objects and other objects may move if colliding with a
-     * collider, but the collider itself will only respond to movement orders
-     * from outside the physics engine. Colliders also detect any objects
-     * colliding with them. Allowing them to be used as sensors.
-     *
-     * @param pos The initial position of the collider.
-     * @param shape The shape of this collider.
-     * @param groups
-     * @param filters 
-     * @param collisionFlags
-     * @param entity The entity to associate this collider with. Can be null.
-     * @return The newly created and added to the physics engine, Collider object.
-     */
-    private CharacterMoverCollider createCustomCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef entity) {
-        if(entityColliders.containsKey(entity)) {
-            entityColliders.remove(entity);
-        }
-        final BulletCharacterMoverCollider bulletCollider = new BulletCharacterMoverCollider(pos, shape, groups, filters, collisionFlags, entity);
-        entityColliders.put(entity, bulletCollider);
-        return bulletCollider;
-    }
-    
-    public void removeCollider(EntityRef entity) {
+    public void removeCharacterCollider(EntityRef entity) {
         BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);
         removeCollider(toRemove.collider);
     }
     
-    private void removeCollider(CollisionObject collider) {
-        discreteDynamicsWorld.removeCollisionObject(collider);
-    }
-
     public List<EntityRef> scanArea(AABB area, CollisionGroup... collisionFilter) {
         return scanArea(area, Arrays.asList(collisionFilter));
     }
@@ -511,19 +482,6 @@ public class BulletPhysics {
     }
     
     /**
-     * Translates the rigidBody of the given entity by the given translation.
-     * @param entity
-     * @param translation
-     */
-    public void translate(EntityRef entity, Vector3f translation) {
-        RigidBody body = entityRigidBodies.get(entity);
-        
-        if(body != null) {
-            body.translate(translation);
-        }
-    }
-    
-    /**
      * @param entity
      * @return Returns true if there is a rigidBody in the physics engine
      * related to the given entity, false otherwise.
@@ -579,6 +537,35 @@ public class BulletPhysics {
     }
 
     //*******************Private methods**************************\\
+    private void removeCollider(CollisionObject collider) {
+        discreteDynamicsWorld.removeCollisionObject(collider);
+    }
+
+    /**
+     * Creates a new Collider. Colliders are similar to rigid bodies, except
+     * that they do not respond to forces from the physics engine. They collide
+     * with other objects and other objects may move if colliding with a
+     * collider, but the collider itself will only respond to movement orders
+     * from outside the physics engine. Colliders also detect any objects
+     * colliding with them. Allowing them to be used as sensors.
+     *
+     * @param pos The initial position of the collider.
+     * @param shape The shape of this collider.
+     * @param groups
+     * @param filters 
+     * @param collisionFlags
+     * @param entity The entity to associate this collider with. Can be null.
+     * @return The newly created and added to the physics engine, Collider object.
+     */
+    private CharacterMoverCollider createCustomCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef entity) {
+        if(entityColliders.containsKey(entity)) {
+            entityColliders.remove(entity);
+        }
+        final BulletCharacterMoverCollider bulletCollider = new BulletCharacterMoverCollider(pos, shape, groups, filters, collisionFlags, entity);
+        entityColliders.put(entity, bulletCollider);
+        return bulletCollider;
+    }
+    
     /**
      * To make sure the state of the physics engine is constant, all changes are
      * stored and executed at the same time. This method executes the stored
@@ -696,35 +683,6 @@ public class BulletPhysics {
         discreteDynamicsWorld.addCollisionObject(result, groups, filters);
         return result;
     }
-
-    public BulletRigidBody initCharacter(EntityRef entity) {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        if (location != null) {
-            ConvexShape shape = new CylinderShape(new Vector3f(0.5f, 0.5f, 0.5f));
-            float scale = location.getWorldScale();
-            shape.setLocalScaling(new Vector3f(scale, scale, scale));
-
-            Vector3f fallInertia = new Vector3f();
-            shape.calculateLocalInertia(1, fallInertia);
-            RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(1, new EntityMotionState(entity), shape, fallInertia);
-            BulletRigidBody collider = new BulletRigidBody(info);
-            collider.rb.setUserPointer(entity);
-            collider.rb.setCollisionFlags(collider.rb.getCollisionFlags() & ~CollisionFlags.KINEMATIC_OBJECT);
-            collider.rb.setActivationState(CollisionObject.ACTIVE_TAG);
-            collider.rb.setFriction(100f);
-            //Force cylinder upright:
-            collider.rb.setAngularFactor(0.0f);
-            BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
-            addRigidBody(collider, StandardCollisionGroup.DEFAULT.getFlag(), combineGroups(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC));
-            collider.rb.activate();
-            if (oldBody != null) {
-                removeRigidBody(oldBody);
-            }
-            return collider;
-        } else {
-            throw new IllegalArgumentException("Can only create a new rigid body for entities with a LocationComponent, RigidBodyComponent and ShapeComponent");
-        }
-    }
     
     //********************Private helper classes*********************\\
 
@@ -740,7 +698,7 @@ public class BulletPhysics {
         }
     }
    
-    public class BulletRigidBody implements RigidBody {
+    private class BulletRigidBody implements RigidBody {
         private final Transform temp = new Transform();
         public final com.bulletphysics.dynamics.RigidBody rb;
 
@@ -817,7 +775,7 @@ public class BulletPhysics {
         }
     }
 
-    public class BulletCharacterMoverCollider implements CharacterMoverCollider {
+    private class BulletCharacterMoverCollider implements CharacterMoverCollider {
         
         private final Transform temp = new Transform();
         

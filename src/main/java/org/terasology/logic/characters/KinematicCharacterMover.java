@@ -213,7 +213,7 @@ public class KinematicCharacterMover implements CharacterMover {
         endVelocity.z += velocityDiff.z;
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
-        BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
+        CharacterMoverCollider collider = physics.getCollider(entity);
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
@@ -529,7 +529,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         Vector3f moveDelta = new Vector3f(state.getVelocity());
         moveDelta.scale(input.getDelta());
-        BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
+        CharacterMoverCollider collider = physics.getCollider(entity);
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
@@ -609,7 +609,7 @@ public class KinematicCharacterMover implements CharacterMover {
         endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - GRAVITY * input.getDelta());
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
-        BulletPhysics.BulletCharacterMoverCollider collider = (BulletPhysics.BulletCharacterMoverCollider) physics.getCollider(entity);
+        CharacterMoverCollider collider = physics.getCollider(entity);
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());

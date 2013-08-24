@@ -87,7 +87,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
-        physics.createCollider(entity);
+        physics.createCharacterCollider(entity);
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
         stateBuffer.add(createInitialState(entity));
         characterStates.put(entity, stateBuffer);
@@ -95,7 +95,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
-        physics.removeCollider(entity);
+        physics.removeCharacterCollider(entity);
         characterStates.remove(entity);
         lastInputEvent.remove(entity);
     }
