@@ -31,7 +31,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.StorageManagerInternal;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
@@ -104,7 +104,7 @@ public class InitialiseWorld implements LoadProcess {
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
-        CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
 
         // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing
         worldProvider.getTime().setMilliseconds(worldInfo.getTime());

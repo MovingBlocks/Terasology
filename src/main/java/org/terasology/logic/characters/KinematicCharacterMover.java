@@ -26,7 +26,7 @@ import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.physics.CharacterCollider;
 import org.terasology.physics.MovedEvent;
 import org.terasology.world.WorldProvider;
@@ -71,9 +71,9 @@ public class KinematicCharacterMover implements CharacterMover {
     // Processing state variables
     protected float steppedUpDist;
     protected WorldProvider worldProvider;
-    private BulletPhysics physics;
+    private PhysicsEngine physics;
     
-    public KinematicCharacterMover(WorldProvider wp, BulletPhysics physicsEngine) {
+    public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
         physics = physicsEngine;
     }

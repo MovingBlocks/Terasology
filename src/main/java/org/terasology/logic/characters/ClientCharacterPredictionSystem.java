@@ -32,7 +32,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
@@ -53,7 +53,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     private Time time;
 
     @In
-    private BulletPhysics physics;
+    private PhysicsEngine physics;
 
     @In
     private WorldProvider worldProvider;

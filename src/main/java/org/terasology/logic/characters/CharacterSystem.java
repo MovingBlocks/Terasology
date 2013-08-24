@@ -38,7 +38,7 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.ImpulseEvent;
@@ -54,7 +54,7 @@ import javax.vecmath.Vector3f;
 public class CharacterSystem implements ComponentSystem {
 
     @In
-    private BulletPhysics physics;
+    private PhysicsEngine physics;
 
     @In
     private WorldProvider worldProvider;

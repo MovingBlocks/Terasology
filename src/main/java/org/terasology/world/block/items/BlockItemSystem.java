@@ -32,7 +32,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -119,7 +119,7 @@ public class BlockItemSystem implements ComponentSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
+            PhysicsEngine physics = CoreRegistry.get(PhysicsEngine.class);
             return physics.scanArea(block.getBounds(blockPos), StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();
         }
         return true;

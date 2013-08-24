@@ -26,7 +26,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.physics.CharacterCollider;
 
 /**
@@ -251,7 +251,7 @@ public class CharacterStateEvent extends NetworkEvent {
      * @param newPos The new position of the entity.
      */
     private static void setPhysicsLocation(EntityRef entity, Vector3f newPos) {
-        BulletPhysics physics = CoreRegistry.get(BulletPhysics.class);
+        PhysicsEngine physics = CoreRegistry.get(PhysicsEngine.class);
         CharacterCollider collider = physics.getCharacterCollider(entity);
         collider.setLocation(newPos);
     }

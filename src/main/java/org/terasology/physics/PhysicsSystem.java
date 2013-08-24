@@ -16,7 +16,7 @@
 
 package org.terasology.physics;
 
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
@@ -78,14 +78,14 @@ public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnCh
     @In
     private NetworkSystem networkSystem;
 
-    private BulletPhysics physics;
+    private PhysicsEngine physics;
     private int skipProcessingFrames = 4;
     private long lastNetsync;
     private Map<EntityRef, ResynchData> pendingResynch = Maps.newLinkedHashMap();
 
     @Override
     public void initialise() {
-        physics = CoreRegistry.get(BulletPhysics.class);
+        physics = CoreRegistry.get(PhysicsEngine.class);
         skipProcessingFrames = 4;
         lastNetsync = 0;
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);

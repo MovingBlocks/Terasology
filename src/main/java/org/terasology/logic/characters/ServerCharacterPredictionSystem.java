@@ -33,7 +33,7 @@ import org.terasology.logic.characters.events.ToggleNoClipEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
@@ -59,7 +59,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
     private Time time;
 
     @In
-    private BulletPhysics physics;
+    private PhysicsEngine physics;
 
     @In
     private WorldProvider worldProvider;

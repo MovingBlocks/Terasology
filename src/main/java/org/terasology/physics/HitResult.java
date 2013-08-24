@@ -38,6 +38,12 @@ public class HitResult {
         worldHit = false;
     }
 
+    /**
+     * Creates a HitResult for hitting an other entity.
+     * @param entity
+     * @param hitPoint
+     * @param hitNormal 
+     */
     public HitResult(EntityRef entity, Vector3f hitPoint, Vector3f hitNormal) {
         this.hit = true;
         this.entity = entity;
@@ -47,6 +53,13 @@ public class HitResult {
         this.worldHit = false;
     }
 
+    /**
+     * Creates a HitResult for hitting a block from the world.
+     * @param entity
+     * @param hitPoint
+     * @param hitNormal
+     * @param blockPos 
+     */
     public HitResult(EntityRef entity, Vector3f hitPoint, Vector3f hitNormal, Vector3i blockPos) {
         this.hit = true;
         this.entity = entity;
