@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.terasology.logic.characters.bullet;
+package org.terasology.logic.characters;
 
 import org.terasology.physics.SweepCallback;
 import com.bulletphysics.BulletGlobals;

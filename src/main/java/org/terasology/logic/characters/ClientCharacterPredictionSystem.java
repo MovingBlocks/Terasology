@@ -40,7 +40,6 @@ import javax.vecmath.Vector3f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
-import org.terasology.logic.characters.bullet.KinematicCharacterMover;
 
 /**
  * @author Immortius

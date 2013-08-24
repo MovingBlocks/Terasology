@@ -39,7 +39,6 @@ import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.Map;
-import org.terasology.logic.characters.bullet.KinematicCharacterMover;
 
 /**
  * @author Immortius
