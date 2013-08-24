@@ -19,7 +19,7 @@ package org.terasology.logic.characters.bullet;
 import javax.vecmath.Vector3f;
 
 /**
- * Class for internal use by BulletCharacterMover
+ * Class for internal use by KinematicCharacterMover
  * @author Immortius
  */
 public class MoveResult {

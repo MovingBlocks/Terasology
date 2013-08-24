@@ -28,7 +28,7 @@ import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;

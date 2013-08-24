@@ -5,6 +5,7 @@
 package org.terasology.logic.characters.bullet;
 
 import org.terasology.physics.SweepCallback;
+import org.terasology.physics.bullet.BulletSweepCallback;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.linearmath.QuaternionUtil;
@@ -31,7 +32,7 @@ import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.CharacterMoverCollider;
 import org.terasology.physics.MovedEvent;
 import org.terasology.world.WorldProvider;
@@ -43,7 +44,7 @@ import org.terasology.world.WorldProvider;
  *
  * @author Rednax
  */
-public abstract class AbstractCharacterMover implements CharacterMover {
+public class KinematicCharacterMover implements CharacterMover {
 
     protected static final float CHECK_FORWARD_DIST = 0.05f;
     public static final float CLIMB_GRAVITY = 0f;
@@ -77,7 +78,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
     protected float steppedUpDist;
     protected WorldProvider worldProvider;
     
-    public AbstractCharacterMover(WorldProvider wp) {
+    public KinematicCharacterMover(WorldProvider wp) {
         this.worldProvider = wp;
     }
 
@@ -180,7 +181,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
      * @param stepHeight
      * @return
      */
-    protected boolean checkStep(CharacterMoverCollider collider, Vector3f position, Vector3f direction, SweepCallbackInterface callback, float slopeFactor, float stepHeight) {
+    protected boolean checkStep(CharacterMoverCollider collider, Vector3f position, Vector3f direction, SweepCallback callback, float slopeFactor, float stepHeight) {
         if (!stepped) {
             stepped = true;
             
@@ -338,7 +339,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > BulletGlobals.SIMD_EPSILON && iteration++ < 10) {
-            SweepCallbackInterface callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
+            SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
             expectedMove.sub(position);
@@ -410,7 +411,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
-            SweepCallbackInterface callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
+            SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
              but probably close enough */
             float actualDist = Math.max(0, (dist + HORIZONTAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - HORIZONTAL_PENETRATION_LEEWAY);
@@ -478,7 +479,7 @@ public abstract class AbstractCharacterMover implements CharacterMover {
 
     protected float moveUp(float riseAmount, CharacterMoverCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
-        SweepCallbackInterface callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+        SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
             float actualDist = Math.max(0, ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);
             position.y += actualDist;

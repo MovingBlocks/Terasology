@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics;
+package org.terasology.physics.bullet;
 
+import org.terasology.physics.bullet.BulletSweepCallback;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.BroadphasePair;
@@ -76,6 +77,16 @@ import java.util.Map;
 import java.util.Set;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.physics.CharacterMoverCollider;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.CollisionGroupManager;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.PhysicsSystem;
+import org.terasology.physics.PhysicsWorldWrapper;
+import org.terasology.physics.RigidBody;
+import org.terasology.physics.RigidBodyComponent;
+import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.TriggerComponent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.physics.shapes.CapsuleShapeComponent;
 import org.terasology.physics.shapes.CylinderShapeComponent;
@@ -845,46 +856,14 @@ public class BulletPhysics implements EventReceiver<OnChangedBlock> {
         }
 
         @Override
-        public SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor) {
+        public BulletSweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor) {
             Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), startPos, 1.0f));
             Transform endTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), endPos, 1.0f));
-            SweepCallback callback = new SweepCallback(collider, new Vector3f(0, 1, 0), slopeFactor);
+            BulletSweepCallback callback = new BulletSweepCallback(collider, new Vector3f(0, 1, 0), slopeFactor);
             callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
             callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
             collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
             return callback;
-        }
-    }
-    
-    private static class EntityMotionState extends MotionState {
-        private EntityRef entity;
-
-        public EntityMotionState(EntityRef entity) {
-            this.entity = entity;
-        }
-
-        @Override
-        public Transform getWorldTransform(Transform transform) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null) {
-                // NOTE: JBullet ignores scale anyway
-                transform.set(new Matrix4f(loc.getWorldRotation(), loc.getWorldPosition(), 1));
-            }
-            return transform;
-        }
-
-        @Override
-        public void setWorldTransform(Transform transform) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null) {
-                Quat4f rot = new Quat4f();
-                transform.getRotation(rot);
-                if (!transform.origin.equals(loc.getWorldPosition()) || !rot.equals(loc.getWorldRotation())) {
-                    loc.setWorldPosition(transform.origin);
-                    loc.setWorldRotation(transform.getRotation(new Quat4f()));
-                    entity.saveComponent(loc);
-                }
-            }
         }
     }
 }

@@ -29,11 +29,10 @@ import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
@@ -41,6 +40,7 @@ import javax.vecmath.Vector3f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
+import org.terasology.logic.characters.bullet.KinematicCharacterMover;
 
 /**
  * @author Immortius
@@ -70,7 +70,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     @Override
     public void initialise() {
-        characterMover = new BulletCharacterMover(worldProvider);
+        characterMover = new KinematicCharacterMover(worldProvider);
     }
 
     @Override

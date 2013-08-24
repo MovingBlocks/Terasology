@@ -29,17 +29,17 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.characters.events.ToggleNoClipEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.Map;
+import org.terasology.logic.characters.bullet.KinematicCharacterMover;
 
 /**
  * @author Immortius
@@ -78,7 +78,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @Override
     public void initialise() {
-        characterMover = new BulletCharacterMover(worldProvider);
+        characterMover = new KinematicCharacterMover(worldProvider);
         nextSendState = time.getGameTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
     }
 

@@ -2,14 +2,10 @@ package org.terasology.physics;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import org.terasology.logic.characters.bullet.SweepCallbackInterface;
 
 /**
  * This class provides an interface for interaction with colliders of the
- * physics engine. Colliders are similar to rigid bodies, except that they
- * cannot be moved by the physics engine. Instead they have some additional
- * functionality used by the character movement system. Hence the name
- * CharacterMoverBody.
+ * physics engine and is meant for character movement.
  *
  * @author Rednax
  */
@@ -50,5 +46,5 @@ public interface CharacterMoverCollider {
      */
     public void setTransform(Vector3f loc, Quat4f orientation);
     
-    public SweepCallbackInterface sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
+    public SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
 }

@@ -16,6 +16,7 @@
 
 package org.terasology.physics;
 
+import org.terasology.physics.bullet.BulletPhysics;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;

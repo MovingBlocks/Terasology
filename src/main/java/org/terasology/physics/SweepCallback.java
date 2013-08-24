@@ -1,41 +1,17 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.terasology.physics;
 
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.linearmath.Transform;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import org.terasology.logic.characters.bullet.SweepCallbackInterface;
 
 /**
- * A SweepCallback holds the results of a collision sweep. 
- * (detect what collisions would occur if something moved from a to b)
- * 
- * Note that hasHit() is implemented by ClosestConvexResultCallback, and is
- * required by SweepCallbackInterface.
- * @author Immortius
+ *
+ * @author Administrator
  */
-public class SweepCallback extends CollisionWorld.ClosestConvexResultCallback implements SweepCallbackInterface {
-    protected CollisionObject me;
-    protected final Vector3f up;
-    protected float minSlopeDot;
+public interface SweepCallback {
 
-    public SweepCallback(CollisionObject me, final Vector3f up, float minSlopeDot) {
-        super(new Vector3f(), new Vector3f());
-        this.me = me;
-        this.up = up;
-        this.minSlopeDot = minSlopeDot;
-    }
-
-    @Override
-    public float addSingleResult(CollisionWorld.LocalConvexResult convexResult, boolean normalInWorldSpace) {
-        if (convexResult.hitCollisionObject == me) {
-            return 1.0f;
-        }
-        return super.addSingleResult(convexResult, normalInWorldSpace);
-    }
-    
     /**
      * Given a SweepCallback, this method check for a safer slope to go with.
      * The main issue this is is used for is the voxel world. Each voxel is a
@@ -43,101 +19,57 @@ public class SweepCallback extends CollisionWorld.ClosestConvexResultCallback im
      * get a weird slope, even though the player is moving on a flat area. This
      * method therefore also checks the sides.<bk>
      *
-     * @param checkingOffset How far to change position for the different results.
+     * @param checkingOffset How far to go up and down from the current position
+     * for the positions to check between.
      * @param originalSlope If no different slope can be found, this value is
      * returned, making this method always return a decent number.
      * @return a safer slope to use for character movement calculations.
      */
-    @Override
-    public float calculateSafeSlope(float originalSlope, float checkingOffset) {
-        Vector3f contactPoint = this.hitPointWorld;
-        float slope = 1f;
-        boolean foundSlope = false;
-        Vector3f fromWorld = new Vector3f(contactPoint);
-        fromWorld.y += 0.2f;
-        Vector3f toWorld = new Vector3f(contactPoint);
-        toWorld.y -= 0.2f;
-        CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-        Transform from = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-        Transform to = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-        Transform targetTransform = this.hitCollisionObject.getWorldTransform(new Transform());
-        CollisionWorld.rayTestSingle(from, to, this.hitCollisionObject, this.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-        if (rayResult.hasHit()) {
-            foundSlope = true;
-            slope = Math.min(slope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
-        }
-        Vector3f secondTraceOffset = new Vector3f(this.hitNormalWorld);
-        secondTraceOffset.y = 0;
-        secondTraceOffset.normalize();
-        secondTraceOffset.scale(checkingOffset);
-        fromWorld.add(secondTraceOffset);
-        toWorld.add(secondTraceOffset);
-        rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-        from = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-        to = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-        targetTransform = this.hitCollisionObject.getWorldTransform(new Transform());
-        CollisionWorld.rayTestSingle(from, to, this.hitCollisionObject, this.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-        if (rayResult.hasHit()) {
-            foundSlope = true;
-            slope = Math.min(slope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
-        }
-        if (!foundSlope) {
-            slope = originalSlope;
-        }
-        return slope;
-    }
-
-    @Override
-    public Vector3f getHitNormalWorld() {
-        return hitNormalWorld;
-    }
-
-    @Override
-    public Vector3f getHitPointWorld() {
-        return hitPointWorld;
-    }
-
-    @Override
-    public float getClosestHitFraction() {
-        return closestHitFraction;
-    }
+    float calculateSafeSlope(float originalSlope, float checkingOffset);
     
-    @Override
-    public boolean checkForStep(Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance) {
-        boolean moveUpStep;
-        boolean hitStep = false;
-        float stepSlope = 1f;
-        Vector3f lookAheadOffset = new Vector3f(direction);
-        lookAheadOffset.y = 0;
-        lookAheadOffset.normalize();
-        lookAheadOffset.scale(checkForwardDistance);
-        Vector3f fromWorld = new Vector3f(this.getHitPointWorld());
-        fromWorld.y += stepHeight + 0.05f;
-        fromWorld.add(lookAheadOffset);
-        Vector3f toWorld = new Vector3f(this.getHitPointWorld());
-        toWorld.y -= 0.05f;
-        toWorld.add(lookAheadOffset);
-        CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-        Transform transformFrom = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-        Transform transformTo = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-        Transform targetTransform = this.hitCollisionObject.getWorldTransform(new Transform());
-        CollisionWorld.rayTestSingle(transformFrom, transformTo, this.hitCollisionObject, this.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-        if (rayResult.hasHit()) {
-            hitStep = true;
-            stepSlope = rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0));
-        }
-        fromWorld.add(lookAheadOffset);
-        toWorld.add(lookAheadOffset);
-        rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-        transformFrom = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f));
-        transformTo = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f));
-        targetTransform = this.hitCollisionObject.getWorldTransform(new Transform());
-        CollisionWorld.rayTestSingle(transformFrom, transformTo, this.hitCollisionObject, this.hitCollisionObject.getCollisionShape(), targetTransform, rayResult);
-        if (rayResult.hasHit()) {
-            hitStep = true;
-            stepSlope = Math.min(stepSlope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
-        }
-        moveUpStep = hitStep && stepSlope >= slopeFactor;
-        return moveUpStep;
-    }
+    /**
+     * Returns where the closest hit took place.
+     * @return 
+     */
+    Vector3f getHitNormalWorld();
+    
+    /**
+     * Returns the normal of the surface that has been hit in the closest hit.
+     * @return 
+     */
+    Vector3f getHitPointWorld();
+    
+    /**
+     * How many times the requested checking distance needs to be travelled to
+     * get to the location where the closes hit took place. When creating a
+     * SweepCallback, you need to enter a distance to check for. If you take the
+     * distance between the current location of your object and the location in
+     * which it will be when it collides, than the distance between those points
+     * is equal to this number times the distance given to check for.
+     *
+     * @return closestHitFraction
+     */
+    float getClosestHitFraction();
+    
+    /**
+     * Note that if this is false, the other method make no sense and their
+     * output may be not what you expect.
+     *
+     * @return true if there was at least one hit, false otherwise.
+     */
+    boolean hasHit();
+    
+    /**
+     * Checks if the hit from this callback can be stepped upon.
+     *
+     * @param direction The direction to check in.
+     * @param stepHeight The maximum step height.
+     * @param slopeFactor If the slope you are walking against is smaller than
+     * this, it is assumes the slope moving code activates and you no longer
+     * need to take a step.
+     * @param checkForwardDistance How far to check ahead for a place to step
+     * upon.
+     * @return true if it is possible to step up while moving into 'direction'.
+     */
+    public boolean checkForStep(Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance);
 }
