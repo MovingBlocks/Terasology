@@ -29,6 +29,8 @@ import org.terasology.physics.events.PhysicsSystem;
 import org.terasology.physics.RigidBody;
 
 /**
+ * This is the main interface for the physics engine. Any other sub-interfaces 
+ * can be accessed through this one.
  * 
  * @author Xanhou
  */
