@@ -7,7 +7,7 @@ import javax.vecmath.Vector3f;
  * This class provides an interface for interaction with colliders of the
  * physics engine and is meant for character movement.
  *
- * @author Rednax
+ * @author Xanhou
  */
 public interface CharacterCollider {
     

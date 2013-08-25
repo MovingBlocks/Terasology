@@ -5,13 +5,15 @@ import javax.vecmath.Vector3f;
 
 /**
  * This interface provides a simplified an generic view on rigid bodies of
- * physics systems. Note that this is no longer a Bullet rigid body.
- * 
+ * physics engines. Note that this is no longer a Bullet rigid body.
+ * <p/>
  * After removing this body from the physics engine (by using rigidBody methods
  * of the physics engine) this object is no longer valid and should not be used
  * anymore.
+ * 
+ * TODO: add the methods to apply forces
  *
- * @author Rednax
+ * @author Xanhou
  */
 public interface RigidBody {
 

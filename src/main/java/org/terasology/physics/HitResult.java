@@ -22,6 +22,7 @@ import org.terasology.math.Vector3i;
 import javax.vecmath.Vector3f;
 
 /**
+ * A HitResult holds the result of a ray-trace.
  * @author Immortius
  */
 public class HitResult {
@@ -49,6 +50,7 @@ public class HitResult {
         this.entity = entity;
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
+        //This is the block were the hitPoint is inside:
         this.blockPosition = new Vector3i(hitPoint, 0.5f);
         this.worldHit = false;
     }
@@ -69,6 +71,9 @@ public class HitResult {
         this.worldHit = true;
     }
 
+    /**
+     * @return true is something was hit.
+     */
     public boolean isHit() {
         return hit;
     }
@@ -77,18 +82,40 @@ public class HitResult {
         return entity;
     }
 
+    /**
+     * Returns the point where the hit took place.
+     *
+     * @return null if isHit() == false, otherwise the point where the hit took
+     * place.
+     */
     public Vector3f getHitPoint() {
         return hitPoint;
     }
 
+    /**
+     * Returns the normal of surface on which the hit took place.
+     *
+     * @return null if isHit() == false, otherwise the normal of surface on
+     * which the hit took place.
+     */
     public Vector3f getHitNormal() {
         return hitNormal;
     }
 
+    /**
+     * @return The block where the hit took place. If the world was hit, it will
+     * return the location of the block that was hit. Otherwise it returns the
+     * block location inside which the hit took place. This is different from
+     * the block position of the entity that got hit!
+     */
     public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
+    /**
+     * Returns true if the hit has hit the world, rather than an entity.
+     * @return true if the world has been hit, false otherwise.
+     */
     public boolean isWorldHit() {
         return worldHit;
     }

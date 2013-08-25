@@ -1,7 +1,19 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2013 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.terasology.physics;
 
 import java.util.Iterator;
@@ -13,12 +25,12 @@ import org.terasology.math.AABB;
 import org.terasology.physics.CharacterCollider;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
-import org.terasology.physics.PhysicsSystem;
+import org.terasology.physics.events.PhysicsSystem;
 import org.terasology.physics.RigidBody;
 
 /**
- *
- * @author Administrator
+ * 
+ * @author Xanhou
  */
 public interface PhysicsEngine {
 
@@ -116,6 +128,13 @@ public interface PhysicsEngine {
      * @return true if the entity has a trigger, false otherwise.
      */
     boolean hasTrigger(EntityRef entity);
+    
+    /**
+     * @param entity the entity to check for
+     * @return true if the physics engine has a character collider for the given
+     * entity, false otherwise.
+     */
+    boolean hasCharacterCollider(EntityRef entity);
 
     /**
      * Creates a new rigid body and adds it to the physics engine. The returned
@@ -144,8 +163,9 @@ public interface PhysicsEngine {
      * mechanism to generate normal Terasolegy events.
      *
      * @param entity the entity to create a trigger for.
+     * @return true of there was already a trigger for this entity.
      */
-    void newTrigger(EntityRef entity);
+    boolean newTrigger(EntityRef entity);
 
     /**
      * Warning: Using this iterator to remove elements has an unpredictable
@@ -161,15 +181,6 @@ public interface PhysicsEngine {
 
     /**
      * Executes a rayTrace on the physics engine.
-     * @param from Place to start tracing
-     * @param direction Directing in which to trace
-     * @param distance maximum distance to trace before giving up
-     * @return A HitResult that contains the info about the ray trace.
-     */
-    HitResult rayTrace(Vector3f from, Vector3f direction, float distance);
-
-    /**
-     * Executes a rayTrace on the physics engine.
      *
      * @param from Place to start tracing
      * @param direction Directing in which to trace
@@ -180,17 +191,47 @@ public interface PhysicsEngine {
      */
     HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups);
 
-    void removeCharacterCollider(EntityRef entity);
+    /**
+     * Removes the character collider associated with the given entity from the
+     * physics engine. The collider object of this entity will no longer be
+     * valid.
+     * </p>
+     * If no character collider was attached to the entity, a warning is logged
+     * and this method return false.
+     *
+     * @param entity the entity to remove the rigid body of.
+     * @return true if this entity had a character collider attached to it,
+     * false otherwise.
+     */
+    boolean removeCharacterCollider(EntityRef entity);
 
     /**
      * Removes the rigid body associated with the given entity from the physics
-     * engine. The RigidBody object returned by the newRigidBody(EntityRef)
-     * method will no longer be valid, so be careful!
+     * engine. The RigidBody object returned by the newRigidBody(EntityRef) or
+     * getRigifBody(EntityRef) method will no longer be valid for this entity un
+     * till newRigidBody is called again, so be careful!
+     * </p>
+     * If no rigid body was attached to the entity, a warning is logged and this
+     * method return false.
+     *
      * @param entity the entity to remove the rigid body of.
+     * @return true if this entity had a rigid body attached to it, false
+     * otherwise.
      */
-    void removeRigidBody(EntityRef entity);
+    boolean removeRigidBody(EntityRef entity);
 
-    void removeTrigger(EntityRef entity);
+    /**
+     * Removes the trigger associated with the given entity from the physics
+     * engine.
+     * </p>
+     * If no trigger was attached to the entity, a warning is logged and this
+     * method return false.
+     *
+     * @param entity the entity to remove the rigid body of.
+     * @return true if this entity had a trigger attached to it, false
+     * otherwise.
+     */
+    boolean removeTrigger(EntityRef entity);
 
     /**
      * Scans the given area for physics objects of the given groups and returns
@@ -238,11 +279,12 @@ public interface PhysicsEngine {
      * Updates the trigger of the given object. If the ShapeComponent has
      * changed, the shape of the trigger will also change. If the location
      * stored in the location component has changed, this will also be updated.
-     * If no trigger exists for the given entity, nothing is done by this
-     * method, except log a warning. TODO: update if detectGroups changed
+     * If no trigger exists for the given entity, a new one is created. This is
+     * however seen as bad behaviour and logged as warning.
+     * </p>TODO: update if detectGroups changed
      *
      * @param entity the entity of which the trigger may need updating.
      */
-    void updateTrigger(EntityRef entity);
+    boolean updateTrigger(EntityRef entity);
     
 }

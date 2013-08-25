@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.physics.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.world.block.ForceBlockActive;
 
 import java.util.List;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.StandardCollisionGroup;
 
 /**
  * @author Immortius

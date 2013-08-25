@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.physics.events;
 
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;

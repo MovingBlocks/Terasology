@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.physics.events;
 
+import org.terasology.physics.components.RigidBodyComponent;
+import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.PhysicsEngine;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
@@ -56,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import org.terasology.entitySystem.event.EventReceiver;
 import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.BlockComponent;
 

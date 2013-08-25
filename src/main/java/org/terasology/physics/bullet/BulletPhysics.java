@@ -82,12 +82,12 @@ import org.terasology.physics.CharacterCollider;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.physics.HitResult;
-import org.terasology.physics.PhysicsSystem;
+import org.terasology.physics.events.PhysicsSystem;
 import org.terasology.physics.PhysicsWorldWrapper;
 import org.terasology.physics.RigidBody;
-import org.terasology.physics.RigidBodyComponent;
+import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.TriggerComponent;
+import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.physics.shapes.CapsuleShapeComponent;
 import org.terasology.physics.shapes.CylinderShapeComponent;
@@ -113,15 +113,12 @@ public class BulletPhysics implements PhysicsEngine {
     private final SequentialImpulseConstraintSolver sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld discreteDynamicsWorld;
     private final BlockEntityRegistry blockEntityRegistry;
-    private final CollisionGroupManager collisionGroupManager;
     private final PhysicsWorldWrapper wrapper;
     private Map<EntityRef, BulletRigidBody> entityRigidBodies = Maps.newHashMap();
     private Map<EntityRef, BulletCharacterMoverCollider> entityColliders = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
 
     public BulletPhysics(WorldProvider world) {
-        collisionGroupManager = CoreRegistry.get(CollisionGroupManager.class);
-
         broadphase = new DbvtBroadphase();
         broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
         defaultCollisionConfiguration = new DefaultCollisionConfiguration();
@@ -242,26 +239,6 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {
-        Vector3f to = new Vector3f(direction);
-        to.scale(distance);
-        to.add(from);
-
-        CollisionWorld.ClosestRayResultWithUserDataCallback closest = 
-                new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
-        closest.collisionFilterGroup = CollisionFilterGroups.SENSOR_TRIGGER;
-        
-        discreteDynamicsWorld.rayTest(from, to, closest);
-        if (closest.userData instanceof Vector3i) {
-            final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) closest.userData);
-            return new HitResult(entityAt, closest.hitPointWorld, closest.hitNormalWorld);
-        } else if (closest.userData instanceof EntityRef) {
-            return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
-        }
-        return new HitResult();
-    }
-
-    @Override
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
         Vector3f to = new Vector3f(direction);
         to.scale(distance);
@@ -269,19 +246,25 @@ public class BulletPhysics implements PhysicsEngine {
 
         short filter = combineGroups(collisionGroups);
 
-        CollisionWorld.ClosestRayResultWithUserDataCallback closest = 
+        CollisionWorld.ClosestRayResultWithUserDataCallback closest =
                 new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
         closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
         closest.collisionFilterMask = filter;
-        
+
         discreteDynamicsWorld.rayTest(from, to, closest);
-        if (closest.userData instanceof Vector3i) { //We hit a world block
-            final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) closest.userData);
-            return new HitResult(entityAt, closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
-        } else if (closest.userData instanceof EntityRef) { //we hit an other entity
-            return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
-        } //we hit something we don't understand
-        return new HitResult();
+        if (closest.hasHit()) {
+            if (closest.userData instanceof Vector3i) { //We hit a world block
+                final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) closest.userData);
+                return new HitResult(entityAt, closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
+            } else if (closest.userData instanceof EntityRef) { //we hit an other entity
+                return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
+            } else { //we hit something we don't understand, assume its nothing and log a warning
+                logger.warn("Unidentified object was hit in the physics engine: " + closest.userData);
+                return new HitResult();
+            }
+        } else { //nothing was hit
+            return new HitResult();
+        }
     }
     
     /**
@@ -339,23 +322,19 @@ public class BulletPhysics implements PhysicsEngine {
             }
             return collider;
         } else {
-            throw new IllegalArgumentException("Can only create a new rigid body for entities with a LocationComponent, RigidBodyComponent and ShapeComponent");
+            throw new IllegalArgumentException("Can only create a new rigid body for entities with a LocationComponent, RigidBodyComponent and ShapeComponent, this entity misses at least one: " + entity);
         }
     }
     
-    /**
-     * Removes the rigid body associated with the given entity from the physics
-     * engine. The RigidBody object returned by the newRigidBody(EntityRef)
-     * method will no longer be valid, so be careful!
-     * @param entity the entity to remove the rigid body of.
-     */
     @Override
-    public void removeRigidBody(EntityRef entity) {
+    public boolean removeRigidBody(EntityRef entity) {
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
         if(rigidBody != null) {
             removeRigidBody(rigidBody);
+            return true;
         } else {
             logger.warn("Deleting non existing rigidBody from physics engine?!");
+            return false;
         }
     }
     
@@ -374,18 +353,26 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
-        if (rigidBody != null) {
+        if (location == null) {
+            logger.warn("Updating rigid body of entity that has no "
+                    + "LocationComponent?! Nothing is done, except log this"
+                    + " warning instead.");
+            return false;
+        } else if (rigidBody != null) {
             float scale = location.getWorldScale();
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
                 removeRigidBody(rigidBody);
-                newRigidBody(entity); 
+                newRigidBody(entity);
             }
 
             updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
             return true;
         } else {
             //If null, the rigid body did not exist yet in the map, which cannot happen, since we are processing a change to the rigid body.
-            logger.warn("A non existing or null rigidBody was updated?! Physics system expects a creation event first.");
+            logger.warn("Updating a non-existing rigid body. Creating a new one "
+                    + "instead, also logging this warning since it should not "
+                    + "happen. Entity: " + entity);
+            newRigidBody(entity);
             return false;
         }
 
@@ -411,7 +398,13 @@ public class BulletPhysics implements PhysicsEngine {
      */
     @Override
     public RigidBody getRigidBody(EntityRef entity) {
-        return entityRigidBodies.get(entity);
+        RigidBody rb = entityRigidBodies.get(entity);
+        if (rb == null) {
+            throw new IllegalStateException("Trying to retrieve the rigid body "
+                    + "of en entity that has none. Throwing exception with a "
+                    + "decent error message instead of returning null. Entity: " + entity);
+        }
+        return rb;
     }
    
     /**
@@ -427,11 +420,11 @@ public class BulletPhysics implements PhysicsEngine {
      * @param entity the entity to create a trigger for.
      */
     @Override
-    public void newTrigger(EntityRef entity) {
+    public boolean newTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
         ConvexShape shape = getShapeFor(entity);
-        if (shape != null) {
+        if (shape != null && location != null && trigger != null) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
@@ -442,23 +435,40 @@ public class BulletPhysics implements PhysicsEngine {
                     combineGroups(detectGroups), 
                     CollisionFlags.NO_CONTACT_RESPONSE);
             triggerObj.setUserPointer(entity);
-            entityTriggers.put(entity, triggerObj);
+            PairCachingGhostObject oldTrigger = entityTriggers.put(entity, triggerObj);
+            if(oldTrigger != null) {
+                logger.warn("Creating a trigger for an entity that already has a trigger. Multiple trigger pre entity are not supported. Removing old one.");
+                removeCollider(oldTrigger);
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            logger.warn("Tryig to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent");
+            return false;
         }
     }
 
     @Override
-    public void removeTrigger(EntityRef entity) {
+    public boolean removeTrigger(EntityRef entity) {
         GhostObject ghost = entityTriggers.remove(entity);
         if (ghost != null) {
             removeCollider(ghost);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
-    public void updateTrigger(EntityRef entity) {
+    public boolean updateTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
+        if(location == null) {
+            logger.warn("Trying to update trigger of entity that has no LocationComponent?!");
+            return false;
+        }
         if (triggerObj != null) {
             float scale = location.getWorldScale();
             if (Math.abs(triggerObj.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
@@ -467,8 +477,11 @@ public class BulletPhysics implements PhysicsEngine {
             } else {
                 triggerObj.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
             }
+            return true;
         } else {
-            logger.warn("Trying to update a trigger of an entity that has no trigger. Entity: " + entity);
+            logger.warn("Trying to update a trigger of an entity that has no trigger. Creating a new trigger instead. Entity: " + entity);
+            newTrigger(entity);
+            return false;
         }
     }
     
@@ -508,14 +521,27 @@ public class BulletPhysics implements PhysicsEngine {
     }
     
     @Override
-    public void removeCharacterCollider(EntityRef entity) {
+    public boolean removeCharacterCollider(EntityRef entity) {
         BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);
-        removeCollider(toRemove.collider);
+        if(toRemove == null) {
+            logger.warn("Trying to remove CharacterCollider of entity that has "
+                    + "no CharacterCollider in the physics engine. Entity: " + entity);
+            return false;
+        } else {
+            removeCollider(toRemove.collider);
+            return true;
+        }
     }
     
     @Override
     public CharacterCollider getCharacterCollider(EntityRef entity) {
-        return entityColliders.get(entity);
+        CharacterCollider cc = entityColliders.get(entity);
+        return cc;
+    }
+    
+    @Override
+    public boolean hasCharacterCollider(EntityRef entity) {
+        return entityColliders.containsKey(entity);
     }
     
     /**
