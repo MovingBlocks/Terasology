@@ -44,7 +44,7 @@ import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 
 /**
- * The AbstractCharacterMover generalises the character movement to a physics
+ * The KineticCharacterMover generalises the character movement to a physics
  * engine independent class. The physics engine will then only have to fill in
  * several smaller method calls.
  *

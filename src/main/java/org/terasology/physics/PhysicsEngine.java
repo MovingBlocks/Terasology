@@ -56,6 +56,12 @@ public interface PhysicsEngine {
     short combineGroups(Iterable<CollisionGroup> groups);
 
     /**
+     * Disposes this physics engine. Afterwards this physics engine cannot be
+     * used anymore.
+     */
+    void dispose();
+
+    /**
      * Creates a Collider for the given entity based on the LocationComponent
      * and CharacterMovementComponent.
      * All collision flags are set right for a character movement component.
@@ -64,24 +70,7 @@ public interface PhysicsEngine {
      * @return
      */
     CharacterCollider createCharacterCollider(EntityRef owner);
-
-    /**
-     * Disposes this physics engine. Afterwards this physics engine cannot be
-     * used anymore.
-     */
-    void dispose();
-
-    /**
-     * Get the character collider for the given entity. Returns null of no such
-     * collider exists. After calling createCharacterCollider(EntityRef owner)
-     * this method should return true (for the same entity).
-     *
-     * @param entity
-     * @return true if the given entity has a CharacterCollider associated to it.
-     */
-    CharacterCollider getCharacterCollider(EntityRef entity);
-
-    //*****************Physics Interface methods******************\\
+    
     /**
      * Return a list with all CollisionPairs that occurred in the previous
      * physics simulation step.
@@ -105,13 +94,24 @@ public interface PhysicsEngine {
      * the physics engine. A new set is created that is not backed by this class.
      */
     Set<EntityRef> getPhysicsEntities();
+    
+    /**
+     * Get the character collider for the given entity. Returns null of no such
+     * collider exists. After calling createCharacterCollider(EntityRef owner)
+     * this method should return true (for the same entity).
+     *
+     * @param entity
+     * @return true if the given entity has a CharacterCollider associated to it.
+     */
+    CharacterCollider getCharacterCollider(EntityRef entity);
 
     /**
      * Returns the rigid body associated with the given entity.
      *
-     * @param entity
-     * @return null if there is no rigid body for the given entity (yet),
-     * otherwise it returns the requested RigidBody instance.
+     * @param entity the entity to retrieve the rigid body of.
+     * @return A valid RigidBody instance.
+     * @throws IllegalStateException if there is no RigidBody in this
+     * PhysicsEngine for the given entity
      */
     RigidBody getRigidBody(EntityRef entity);
 
@@ -149,6 +149,8 @@ public interface PhysicsEngine {
      * exception is thrown.
      * @return The newly created RigidBody. All exposed methods are ready to be
      * used.
+     * @throws IlligalArgumentException if the given entity does not have a
+     * LocationComponent, ShapeComponent and RigidBodyComponent.
      */
     RigidBody newRigidBody(EntityRef entity);
 
@@ -172,7 +174,8 @@ public interface PhysicsEngine {
      * behaviour. Do not use this functionality! Instead, store the elements and
      * remove them later with removeRigidBody(EntityRef), or retrieve the
      * entities using getPhysicsEntities(), which is not backed hence you can
-     * call removeRigibBody while iterating over all elements.
+     * call removeRigibBody while iterating over all elements. This method is
+     * however more efficient than getPhysicsEntities().
      *
      * @return An iterator that iterates over all entities that have a rigidBody
      * that is active in the physics engine.
@@ -265,9 +268,9 @@ public interface PhysicsEngine {
 
     /**
      * Updates the shape and position of the rigidBody belonging to the given
-     * entity. If the given entity had no rigidBody in the physics engine,
-     * nothing will happen. The return value can be used to see whether or not
-     * something has happened.
+     * entity. If the given entity had no rigidBody in the physics engine, it
+     * will be created. Updating an entity without RigidBody is seen as bad
+     * practise and hence a warning is logged.
      *
      * @param entity the entity of which the rigidBody needs updating.
      * @return true if there was already a rigidBody registered for the entity
