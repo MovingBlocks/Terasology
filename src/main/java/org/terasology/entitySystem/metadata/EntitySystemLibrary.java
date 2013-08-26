@@ -16,8 +16,11 @@
 
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+
 /**
  * The set of class libraries used by the entity system
+ *
  * @author Immortius
  */
 public interface EntitySystemLibrary {
@@ -28,13 +31,13 @@ public interface EntitySystemLibrary {
     ComponentLibrary getComponentLibrary();
 
     /**
+     * @return The library of serializers for components
+     */
+    TypeSerializationLibrary getSerializationLibrary();
+
+    /**
      * @return The library of event metadata
      */
     EventLibrary getEventLibrary();
-
-    /**
-     * @return The library of type handlers
-     */
-    TypeHandlerLibrary getTypeHandlerLibrary();
 
 }

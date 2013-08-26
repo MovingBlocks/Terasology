@@ -45,6 +45,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.utilities.collection.NullIterator;
 
 import javax.vecmath.Quat4f;
@@ -78,7 +79,13 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
 
+    private TypeSerializationLibrary typeSerializerLibrary;
+
     public PojoEntityManager() {
+    }
+
+    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
+        this.typeSerializerLibrary = serializerLibrary;
     }
 
     public void setEntitySystemLibrary(EntitySystemLibrary entitySystemLibrary) {
@@ -391,6 +398,11 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     @Override
     public void setEventSystem(EventSystem eventSystem) {
         this.eventSystem = eventSystem;
+    }
+
+    @Override
+    public TypeSerializationLibrary getTypeSerializerLibrary() {
+        return typeSerializerLibrary;
     }
 
     @Override

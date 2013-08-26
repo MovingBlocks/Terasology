@@ -21,6 +21,10 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -28,6 +32,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -35,6 +40,10 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
+import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
+import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -82,9 +91,9 @@ public class StorageManagerTest {
         moduleManager = new ModuleManager();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
 
-        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry()));
+        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         testBlock = new Block();
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
 
@@ -184,7 +193,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
         newSM.loadGlobalStore();
         assertNotNull(newSM.loadPlayerStore(PLAYER_ID));
@@ -200,7 +209,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -223,7 +232,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -260,7 +269,7 @@ public class StorageManagerTest {
         esm.createGlobalStoreForSave().save();
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -283,7 +292,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 

@@ -17,6 +17,7 @@ package org.terasology.entitySystem;
 
 import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.event.EventSystem;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -121,4 +122,8 @@ public interface EngineEntityManager extends EntityManager {
      */
     void setEventSystem(EventSystem system);
 
+    /**
+     * @return The default serialization library to use for serializing components
+     */
+    TypeSerializationLibrary getTypeSerializerLibrary();
 }

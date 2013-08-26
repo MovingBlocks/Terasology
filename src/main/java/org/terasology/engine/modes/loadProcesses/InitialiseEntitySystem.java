@@ -20,6 +20,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
 import org.terasology.network.NetworkSystem;
 
 /**
@@ -34,7 +35,7 @@ public class InitialiseEntitySystem implements LoadProcess {
     @Override
     public boolean step() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        new EntitySystemBuilder().build(moduleManager, CoreRegistry.get(NetworkSystem.class));
+        new EntitySystemBuilder().build(moduleManager, CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
         return true;
     }
 

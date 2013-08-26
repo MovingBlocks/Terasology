@@ -34,6 +34,7 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.GlobalStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.utilities.concurrency.ShutdownTask;
@@ -81,6 +82,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private Path playersPath;
 
     private EngineEntityManager entityManager;
+    private PrefabSerializer prefabSerializer;
+
     private Map<String, EntityData.PlayerStore> playerStores = Maps.newHashMap();
     private TIntObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TIntObjectHashMap<>();
     private Map<StoreId, StoreMetadata> storeMetadata = Maps.newHashMap();
@@ -99,6 +102,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     public StorageManagerInternal(EngineEntityManager entityManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
         this.storeChunksInZips = storeChunksInZips;
+        this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entityManager.subscribe(this);
         playersPath = PathManager.getInstance().getCurrentSavePath().resolve(PLAYERS_PATH);
         storageTaskMaster = TaskMaster.createFIFOTaskMaster("Storage", BACKGROUND_THREADS);
@@ -118,7 +122,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     @Override
     public GlobalStore createGlobalStoreForSave() {
-        GlobalStoreSaver newGlobalStore = new GlobalStoreSaver(entityManager);
+        GlobalStoreSaver newGlobalStore = new GlobalStoreSaver(entityManager, prefabSerializer);
         for (StoreMetadata table : storeMetadata.values()) {
             newGlobalStore.addStoreMetadata(table);
         }
@@ -131,7 +135,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         if (Files.isRegularFile(globalDataFile)) {
             try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
                 EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
-                GlobalStoreLoader loader = new GlobalStoreLoader(entityManager);
+                GlobalStoreLoader loader = new GlobalStoreLoader(entityManager, prefabSerializer);
                 loader.load(store);
                 for (StoreMetadata refTable : loader.getStoreMetadata()) {
                     storeMetadata.put(refTable.getId(), refTable);

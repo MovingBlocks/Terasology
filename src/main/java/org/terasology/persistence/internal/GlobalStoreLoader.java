@@ -49,12 +49,12 @@ final class GlobalStoreLoader {
     private PrefabSerializer prefabSerializer;
     private List<StoreMetadata> refTables;
 
-    public GlobalStoreLoader(EngineEntityManager entityManager) {
+    public GlobalStoreLoader(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
-        this.prefabSerializer = new PrefabSerializer(componentLibrary);
+        this.prefabSerializer = prefabSerializer;
     }
 
     public void load(EntityData.GlobalStore globalStore) {

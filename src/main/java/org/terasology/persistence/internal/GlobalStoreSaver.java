@@ -42,7 +42,7 @@ final class GlobalStoreSaver {
 
     private TIntSet nonPersistentIds = new TIntHashSet();
 
-    public GlobalStoreSaver(EngineEntityManager entityManager) {
+    public GlobalStoreSaver(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.store = EntityData.GlobalStore.newBuilder();
         this.entitySerializer = new EntitySerializer(entityManager);
@@ -54,7 +54,6 @@ final class GlobalStoreSaver {
         }
         entitySerializer.setComponentIdMapping(componentIdTable);
 
-        PrefabSerializer prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary());
         prefabSerializer.setComponentIdMapping(componentIdTable);
         for (Prefab prefab : entityManager.getPrefabManager().listPrefabs()) {
             store.addPrefab(prefabSerializer.serialize(prefab));

@@ -26,12 +26,20 @@ public interface EventLibrary extends ClassLibrary<Event, EventMetadata<? extend
 
     /**
      * @param clazz
-     * @return The metadata for the given clazz, or null if not registered.
+     * @return The metadata for the given event class, or null if not registered.
      */
     <T extends Event> EventMetadata<T> getMetadata(Class<T> clazz);
 
-    <T extends Event> EventMetadata<T> getMetadata(T object);
+    /**
+     * @param event
+     * @return The metadata for the given event, or null if not registered.
+     */
+    <T extends Event> EventMetadata<T> getMetadata(T event);
 
-    EventMetadata<? extends Event> getMetadata(String className);
+    /**
+     * @param eventName
+     * @return The metadata for the given event name, or null if not registered.
+     */
+    EventMetadata<? extends Event> getMetadata(String eventName);
 
 }

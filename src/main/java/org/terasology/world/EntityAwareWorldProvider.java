@@ -40,7 +40,6 @@ import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.reflected.ReflectedComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
@@ -152,12 +151,14 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components) {
+    @SafeVarargs
+    public final boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components) {
         return setBlockRetainComponent(position.x, position.y, position.z, type, oldType, components);
     }
 
     @Override
-    public boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components) {
+    @SafeVarargs
+    public final boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components) {
         if (Thread.currentThread().equals(mainThread)) {
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
@@ -278,12 +279,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         if (newPrefab != null) {
             for (Component comp : newPrefab.iterateComponents()) {
-                ReflectedComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
-                if (!blockEntity.hasComponent(comp.getClass())) {
-                    blockEntity.addComponent(metadata.copy(comp));
-                } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
-                    updateComponent(blockEntity, metadata, comp);
-                }
+                copyIntoPrefab(blockEntity, comp, retainComponents);
             }
 
             EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
@@ -304,11 +300,20 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    private void updateComponent(EntityRef blockEntity, ComponentMetadata<?> metadata, Component targetComponent) {
-        Component currentComp = blockEntity.getComponent(targetComponent.getClass());
+    private <T extends Component> void copyIntoPrefab(EntityRef blockEntity, T comp, Set<Class<? extends Component>> retainComponents) {
+        ComponentMetadata<T> metadata = entityManager.getComponentLibrary().getMetadata((Class<T>) comp.getClass());
+        if (!blockEntity.hasComponent(comp.getClass())) {
+            blockEntity.addComponent(metadata.copyRaw(comp));
+        } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
+            updateComponent(blockEntity, metadata, comp);
+        }
+    }
+
+    private <T extends Component> void updateComponent(EntityRef blockEntity, ComponentMetadata<T> metadata, T targetComponent) {
+        T currentComp = blockEntity.getComponent(metadata.getType());
         if (currentComp != null) {
             boolean changed = false;
-            for (FieldMetadata field : metadata.getFields()) {
+            for (FieldMetadata<T, ?> field : metadata.getFields()) {
                 Object newVal = field.getValue(targetComponent);
                 if (!Objects.equal(field.getValue(currentComp), newVal)) {
                     field.setValue(currentComp, newVal);

@@ -24,9 +24,10 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.metadata.internal.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;
@@ -58,14 +59,14 @@ public class EntitySerializer {
      * @param entityManager The entityManager that deserialized entities will be placed in.
      */
     public EntitySerializer(EngineEntityManager entityManager) {
-        this(entityManager, entityManager.getComponentLibrary());
+        this(entityManager, entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
     }
 
-    public EntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary) {
+    public EntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
-        this.componentLibrary = entityManager.getComponentLibrary();
-        this.componentSerializer = new ComponentSerializer(componentLibrary);
+        this.componentLibrary = componentLibrary;
+        this.componentSerializer = new ComponentSerializer(componentLibrary, typeSerializationLibrary);
     }
 
     /**

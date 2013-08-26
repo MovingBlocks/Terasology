@@ -23,7 +23,7 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.OwnershipHelper;
 import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.typeHandlers.extension.EntityRefTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
 import org.terasology.protobuf.EntityData;

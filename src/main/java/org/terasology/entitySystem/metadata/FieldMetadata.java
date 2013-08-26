@@ -16,16 +16,19 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.network.Replicate;
-import org.terasology.protobuf.EntityData;
+
+import java.lang.reflect.Field;
 
 /**
+ * Provides information on a field, and the ability to set and get that field.
+ *
  * @param <T> The type of the object this field belongs to
  * @param <U> The type of the field itself
  */
 public interface FieldMetadata<T, U> {
 
     /**
-     * @return The ClassMetadata that owns this field
+     * @return The class that owns this field
      */
     ClassMetadata<T> getOwner();
 
@@ -51,25 +54,56 @@ public interface FieldMetadata<T, U> {
 
     /**
      * Obtains the value of the field from a object which is an instance of the owning type.
-     * @param obj The object to obtain the value of this field from
+     *
+     * @param from The object to obtain the value of this field from
      * @return The value of the field
      */
-    U getValue(T obj);
+    Object getValue(Object from);
+
+    /**
+     * Obtains the value of the field from a object which is an instance of the owning type.
+     * This method is checked to conform to the generic parameters of the FieldMetadata
+     *
+     * @param from The object to obtain the value of this field from
+     * @return The value of the field
+     */
+    U getValueChecked(T from);
 
     /**
      * For types that need to be copied (e.g. Vector3f) for safe usage, this method will create a new copy of a field from an object.
      * Otherwise it behaves the same as getValue
-     * @param obj The object to copy the field from
+     *
+     * @param from The object to copy the field from
      * @return A safe to use copy of the value of this field in the given object
      */
-    U getCopyOfValue(T obj);
+    Object getCopyOfValue(Object from);
+
+    /**
+     * For types that need to be copied (e.g. Vector3f) for safe usage, this method will create a new copy of a field from an object.
+     * Otherwise it behaves the same as getValue
+     * This method is checked to conform to the generic parameters of the FieldMetadata
+     *
+     * @param from The object to copy the field from
+     * @return A safe to use copy of the value of this field in the given object
+     */
+    U getCopyOfValueChecked(T from);
 
     /**
      * Sets the value of this field in a target object
+     *
      * @param target The object to set the field of
-     * @param value The value to set the field to
+     * @param value  The value to set the field to
      */
-    void setValue(T target, U value);
+    void setValue(Object target, Object value);
+
+    /**
+     * Sets the value of this field in a target object
+     * This method is checked to conform to the generic parameters of the FieldMetadata
+     *
+     * @param target The object to set the field of
+     * @param value  The value to set the field to
+     */
+    void setValueChecked(T target, U value);
 
     /**
      * @return Whether this field should be replicated on the network
@@ -87,41 +121,7 @@ public interface FieldMetadata<T, U> {
     Replicate getReplicationInfo();
 
     /**
-     * Serializes the given value, that was originally obtained from this field.
-     * <p/>
-     * This is provided for performance, to avoid obtaining the same value twice via reflection.
-     *
-     * @param rawValue The value to serialize
-     * @return The serialized value
+     * @return The underlying java field
      */
-    @SuppressWarnings("unchecked")
-    EntityData.Value serializeValue(U rawValue);
-
-    /**
-     * Serializes this field in container, returning the serialized value
-     * @param container The object to serialize this field for
-     * @return The serialized value
-     */
-    @SuppressWarnings("unchecked")
-    EntityData.Value serialize(T container);
-
-    /**
-     * Serializes the field for the given object
-     *
-     * @param container The object containing this field
-     * @return The Name-Value pair holding this field
-     */
-    EntityData.NameValue serializeNameValue(T container, boolean usingFieldIds);
-
-    /**
-     * @param value The serialized value
-     * @return The resultant deserialized value
-     */
-    U deserialize(EntityData.Value value);
-
-    /**
-     * @param target The object to deserialize the value onto
-     * @param value The serialized value
-     */
-    void deserializeOnto(T target, EntityData.Value value);
+    Field getField();
 }

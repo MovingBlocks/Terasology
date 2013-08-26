@@ -24,12 +24,7 @@ import java.util.Collection;
 public interface ClassMetadata<T> {
 
     /**
-     * @return A collection of the names that identify this class
-     */
-    Collection<String> getNames();
-
-    /**
-     * @return The primary name that identifies this class
+     * @return The name that identifies this class
      */
     String getName();
 
@@ -45,10 +40,19 @@ public interface ClassMetadata<T> {
     FieldMetadata<T, ?> getField(int id);
 
     /**
+     *
      * @param name The name of the field
      * @return The field identified by the given name, or null if there is no such field
      */
     FieldMetadata<T, ?> getField(String name);
+
+    /**
+     * @param fieldName The name of the field
+     * @param fieldType The expected type of the field
+     * @param <U> The expected type of the field
+     * @return The field metadata, or null if the field doesn't exist or is of the wrong type
+     */
+    <U> FieldMetadata<T, U> getField(String fieldName, Class<U> fieldType);
 
     /**
      * @return The fields that this class has.
@@ -67,7 +71,15 @@ public interface ClassMetadata<T> {
     T copy(T object);
 
     /**
+     * This method is for use in situations where metadata is being used generically and the actual type of the value cannot be
+     * @param object The instance of this class to copy
+     * @return A copy of the given object
+     */
+    T copyRaw(Object object);
+
+    /**
      * @return The number of fields this class has
      */
     int getFieldCount();
+
 }

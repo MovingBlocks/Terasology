@@ -20,9 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.MetadataUtil;
-import org.terasology.entitySystem.metadata.reflected.ReflectedComponentMetadata;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
+import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -30,24 +29,35 @@ import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 public final class ComponentLibraryImpl extends BaseLibraryImpl<Component, ComponentMetadata<? extends Component>> implements ComponentLibrary {
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibraryImpl.class);
 
-    private TypeHandlerLibrary metadataBuilder;
+    private CopyStrategyLibrary copyStrategies;
+    private ReflectFactory reflectFactory;
 
-    public ComponentLibraryImpl(TypeHandlerLibrary metadataBuilder) {
+    public ComponentLibraryImpl(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         super();
-        this.metadataBuilder = metadataBuilder;
+        this.reflectFactory = factory;
+        this.copyStrategies = copyStrategies;
     }
 
     @Override
-    public String[] getNamesFor(Class<? extends Component> clazz) {
-        return new String[]{
-                MetadataUtil.getComponentClassName(clazz),
-                clazz.getSimpleName()
-        };
+    public String getNameFor(Class<? extends Component> clazz) {
+        return MetadataUtil.getComponentClassName(clazz);
     }
 
     @Override
-    public <T extends Component> ReflectedComponentMetadata<T> getMetadata(Class<T> clazz) {
-        return (ReflectedComponentMetadata<T>) super.getMetadata(clazz);
+    protected <CLASS extends Component> ComponentMetadata<? extends Component> createMetadata(Class<CLASS> clazz, String name) {
+        ComponentMetadata<CLASS> info;
+        try {
+            info = new ComponentMetadataImpl<>(clazz, copyStrategies, reflectFactory, name);
+        } catch (NoSuchMethodException e) {
+            logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
+            return null;
+        }
+        return info;
+    }
+
+    @Override
+    public <T extends Component> ComponentMetadataImpl<T> getMetadata(Class<T> clazz) {
+        return (ComponentMetadataImpl<T>) super.getMetadata(clazz);
     }
 
     @Override
@@ -56,21 +66,9 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component, Compo
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ComponentMetadata<? extends Component> getMetadata(String className) {
         return (ComponentMetadata<? extends Component>) super.getMetadata(className);
     }
 
-    @Override
-    protected <U extends Component> ComponentMetadata<U> createMetadata(Class<U> clazz, String... names) {
-        ComponentMetadata<U> info;
-        try {
-            info = new ReflectedComponentMetadata<>(clazz, names);
-        } catch (NoSuchMethodException e) {
-            logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
-            return null;
-        }
-
-        metadataBuilder.populateFields(clazz, info, false);
-        return info;
-    }
 }

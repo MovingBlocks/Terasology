@@ -45,6 +45,7 @@ import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
@@ -201,7 +202,7 @@ public abstract class TerasologyTestingEnvironment {
         CoreRegistry.put(Time.class, mockTime);
         networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
-        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem);
+        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem, new ReflectionReflectFactory());
         CoreRegistry.put(StorageManager.class, new StorageManagerInternal(engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();

@@ -29,7 +29,7 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.metadata.internal.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -52,12 +52,12 @@ public class WorldSerializerImpl implements WorldSerializer {
     private EntitySerializer entitySerializer;
     private PrefabSerializer prefabSerializer;
 
-    public WorldSerializerImpl(EngineEntityManager entityManager) {
+    public WorldSerializerImpl(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
-        this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary());
+        this.prefabSerializer = prefabSerializer;
     }
 
     @Override

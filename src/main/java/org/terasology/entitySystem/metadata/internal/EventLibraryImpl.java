@@ -19,25 +19,40 @@ package org.terasology.entitySystem.metadata.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
 
 /**
  * @author Immortius
  */
 public class EventLibraryImpl extends BaseLibraryImpl<Event, EventMetadata<? extends Event>> implements EventLibrary {
     private static final Logger logger = LoggerFactory.getLogger(EventLibraryImpl.class);
-    private TypeHandlerLibrary metadataBuilder;
+    private CopyStrategyLibrary copyStrategies;
+    private ReflectFactory reflectFactory;
 
-    public EventLibraryImpl(TypeHandlerLibrary metadataBuilder) {
+    public EventLibraryImpl(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies) {
         super();
-        this.metadataBuilder = metadataBuilder;
+        this.copyStrategies = copyStrategies;
+        this.reflectFactory = reflectFactory;
     }
 
     @Override
-    public String[] getNamesFor(Class<? extends Event> clazz) {
-        return new String[]{clazz.getSimpleName()};
+    public String getNameFor(Class<? extends Event> clazz) {
+        return clazz.getSimpleName();
+    }
+
+    @Override
+    protected <CLASS extends Event> EventMetadata<? extends Event> createMetadata(Class<CLASS> clazz, String primaryName) {
+        EventMetadata<CLASS> info;
+        try {
+            info = new EventMetadataImpl<>(clazz, copyStrategies, reflectFactory, primaryName);
+        } catch (NoSuchMethodException e) {
+            logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
+            return null;
+        }
+        return info;
     }
 
     @Override
@@ -51,22 +66,9 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event, EventMetadata<? ext
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public EventMetadata<? extends Event> getMetadata(String className) {
         return (EventMetadata<? extends Event>) super.getMetadata(className);
-    }
-
-    @Override
-    protected <T extends Event> EventMetadata<T> createMetadata(Class<T> clazz, String... names) {
-        EventMetadata<T> info;
-        try {
-            info = new EventMetadata<>(clazz, names[0]);
-        } catch (NoSuchMethodException e) {
-            logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
-            return null;
-        }
-
-        metadataBuilder.populateFields(clazz, info, true);
-        return info;
     }
 
 }

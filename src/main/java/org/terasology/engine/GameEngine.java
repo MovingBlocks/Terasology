@@ -85,12 +85,22 @@ public interface GameEngine {
     void setHibernationAllowed(boolean allowed);
 
     // TODO: This probably should be elsewhere?
+
+    /**
+     * @return Whether the game window currently has focus
+     */
     boolean hasFocus();
+
+    /**
+     * @return Whether the game window controls if the mouse is captured.
+     */
+    boolean hasMouseFocus();
 
     void setFocus(boolean focused);
 
     void subscribeToStateChange(StateChangeSubscriber subscriber);
 
     void unsubscribeToStateChange(StateChangeSubscriber subscriber);
+
 
 }

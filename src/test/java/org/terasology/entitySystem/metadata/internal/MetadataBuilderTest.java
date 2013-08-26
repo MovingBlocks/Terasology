@@ -19,40 +19,43 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
-import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
+import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
+import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Immortius
  */
 public class MetadataBuilderTest {
 
-    private TypeHandlerLibrary metadataBuilder;
+    private ReflectFactory factory = new ReflectionReflectFactory();
+    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(factory);
+    private TypeSerializationLibrary metadataBuilder;
 
     @Before
     public void setup() {
-        this.metadataBuilder = new TypeHandlerLibraryBuilder().build();
+        this.metadataBuilder = new TypeSerializationLibrary(factory, copyStrategyLibrary);
+    }
+
+    @Test(expected = NoSuchMethodException.class)
+    public void requireDefaultConstructor() throws Exception {
+        new ClassMetadataImpl<>(NoDefaultConstructor.class, copyStrategyLibrary, factory, "");
     }
 
     @Test
-    public void requireDefaultConstructor() {
-        assertNull(metadataBuilder.build(NoDefaultConstructor.class, false));
-    }
-
-    @Test
-    public void trivialMetadata() {
-        ClassMetadata<Trivial> metadata = metadataBuilder.build(Trivial.class, false);
+    public void trivialMetadata() throws Exception {
+        ClassMetadata<Trivial> metadata = new ClassMetadataImpl<>(Trivial.class, copyStrategyLibrary, factory, "");
         assertNotNull(metadata);
         assertEquals(0, metadata.getFieldCount());
     }
 
     @Test
-    public void testPrivateField() {
-        ClassMetadata<PrivateField> metadata = metadataBuilder.build(PrivateField.class, false);
+    public void testPrivateField() throws Exception {
+        ClassMetadata<PrivateField> metadata = new ClassMetadataImpl<>(PrivateField.class, copyStrategyLibrary, factory, "");
         assertNotNull(metadata);
         assertEquals(1, metadata.getFieldCount());
         FieldMetadata fieldMetadata = metadata.getField("name");
@@ -63,8 +66,8 @@ public class MetadataBuilderTest {
     }
 
     @Test
-    public void testInheritsFields() {
-        ClassMetadata<Inheriting> metadata = metadataBuilder.build(Inheriting.class, false);
+    public void testInheritsFields() throws Exception {
+        ClassMetadata<Inheriting> metadata = new ClassMetadataImpl<>(Inheriting.class, copyStrategyLibrary, factory, "");
         assertNotNull(metadata);
         assertEquals(2, metadata.getFieldCount());
         assertNotNull(metadata.getField("name"));

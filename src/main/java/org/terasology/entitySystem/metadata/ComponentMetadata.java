@@ -15,11 +15,13 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.entitySystem.Component;
+
 /**
  * Metadata on a component class
  * @author Immortius
  */
-public interface ComponentMetadata<T> extends ClassMetadata<T> {
+public interface ComponentMetadata<T extends Component> extends ClassMetadata<T> {
     /**
      * @return Whether this component owns any references
      */

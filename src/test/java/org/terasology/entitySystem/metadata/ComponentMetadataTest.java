@@ -18,7 +18,11 @@ package org.terasology.entitySystem.metadata;
 
 import org.junit.Test;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.typeHandlers.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
+import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -32,9 +36,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class ComponentMetadataTest {
 
+    private ReflectFactory reflectFactory = new ReflectionReflectFactory();
+    private CopyStrategyLibrary copyStrategies = CopyStrategyLibrary.create(reflectFactory);
+
     @Test
     public void staticFieldsIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(new TypeHandlerLibraryBuilder().build());
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(StringComponent.class);
         ClassMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
@@ -42,19 +49,8 @@ public class ComponentMetadataTest {
     }
 
     @Test
-    public void typesWithNoPublicConstructorIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(new TypeHandlerLibraryBuilder().build());
-        ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(UnsupportedTypeComponent.class);
-        ClassMetadata<UnsupportedTypeComponent> metadata = lib.getMetadata(UnsupportedTypeComponent.class);
-        assertNull(metadata.getField("value"));
-        assertNull(metadata.getField("value2"));
-        assertNull(metadata.getField("value3"));
-    }
-
-    @Test
     public void ownsReferencesPopulated() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(new TypeHandlerLibraryBuilder().add(EntityRef.class, new EntityRefTypeHandler(null)).build());
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);

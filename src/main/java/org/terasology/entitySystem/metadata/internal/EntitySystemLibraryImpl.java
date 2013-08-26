@@ -17,22 +17,24 @@
 package org.terasology.entitySystem.metadata.internal;
 
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 
 /**
  * @author Immortius
  */
 public class EntitySystemLibraryImpl implements EntitySystemLibrary {
-    private final TypeHandlerLibrary typeHandlerLibrary;
+    private final TypeSerializationLibrary typeSerializationLibrary;
     private final ComponentLibrary componentLibrary;
     private final EventLibrary eventLibrary;
 
-    public EntitySystemLibraryImpl(TypeHandlerLibrary typeHandlerLibrary) {
-        this.typeHandlerLibrary = typeHandlerLibrary;
-        this.componentLibrary = new ComponentLibraryImpl(typeHandlerLibrary);
-        this.eventLibrary = new EventLibraryImpl(typeHandlerLibrary);
+    public EntitySystemLibraryImpl(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies, TypeSerializationLibrary typeSerializationLibrary) {
+        this.typeSerializationLibrary = typeSerializationLibrary;
+        this.componentLibrary = new ComponentLibraryImpl(reflectFactory, copyStrategies);
+        this.eventLibrary = new EventLibraryImpl(reflectFactory, copyStrategies);
     }
 
     @Override
@@ -41,13 +43,13 @@ public class EntitySystemLibraryImpl implements EntitySystemLibrary {
     }
 
     @Override
-    public EventLibrary getEventLibrary() {
-        return eventLibrary;
+    public TypeSerializationLibrary getSerializationLibrary() {
+        return typeSerializationLibrary;
     }
 
     @Override
-    public TypeHandlerLibrary getTypeHandlerLibrary() {
-        return typeHandlerLibrary;
+    public EventLibrary getEventLibrary() {
+        return eventLibrary;
     }
 
 }

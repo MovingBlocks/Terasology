@@ -27,7 +27,9 @@ import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.metadata.internal.MetadataUtil;
+import org.terasology.persistence.typeSerialization.Serializer;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -50,14 +52,16 @@ public class ComponentSerializer {
     private ComponentLibrary componentLibrary;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
     private boolean usingFieldIds;
+    private TypeSerializationLibrary typeSerializationLibrary;
 
     /**
      * Creates the component serializer.
      *
      * @param componentLibrary The component library used to provide information on each component and its fields.
      */
-    public ComponentSerializer(ComponentLibrary componentLibrary) {
+    public ComponentSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.componentLibrary = componentLibrary;
+        this.typeSerializationLibrary = typeSerializationLibrary;
     }
 
     public void setUsingFieldIds(boolean usingFieldIds) {
@@ -132,10 +136,11 @@ public class ComponentSerializer {
     }
 
 
-    private Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
-                                      ClassMetadata componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
+    private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
+                                                            ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
+        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         for (EntityData.NameValue field : componentData.getFieldList()) {
-            FieldMetadata fieldInfo = null;
+            FieldMetadata<T, ?> fieldInfo = null;
             if (field.hasNameIndex()) {
                 fieldInfo = componentMetadata.getField(field.getNameIndex());
             } else if (field.hasName()) {
@@ -145,7 +150,7 @@ public class ComponentSerializer {
                 continue;
             }
 
-            fieldInfo.deserializeOnto(targetComponent, field.getValue());
+            serializer.deserializeOnto(targetComponent, fieldInfo, field.getValue());
         }
         return targetComponent;
     }
@@ -177,9 +182,10 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(component, componentMessage);
 
+        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         for (FieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, component)) {
-                EntityData.NameValue fieldData = field.serializeNameValue(component, usingFieldIds);
+                EntityData.NameValue fieldData = serializer.serializeNameValue(field, component, usingFieldIds);
                 if (fieldData != null) {
                     componentMessage.addField(fieldData);
                 }
@@ -227,6 +233,7 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(delta, componentMessage);
 
+        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         boolean changed = false;
         for (FieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, delta)) {
@@ -234,7 +241,7 @@ public class ComponentSerializer {
                 Object deltaValue = field.getValue(delta);
 
                 if (!Objects.equal(origValue, deltaValue)) {
-                    EntityData.Value value = field.serializeValue(deltaValue);
+                    EntityData.Value value = serializer.serializeValue(field, deltaValue);
                     if (value != null) {
                         if (usingFieldIds) {
                             componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(value).build());

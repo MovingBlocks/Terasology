@@ -17,7 +17,6 @@
 package org.terasology.entitySystem.metadata.internal;
 
 import com.google.common.collect.Maps;
-import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
 import org.terasology.entitySystem.metadata.ClassLibrary;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 
@@ -28,29 +27,28 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public abstract class BaseLibraryImpl<T, U extends ReflectedClassMetadata<? extends T>> implements ClassLibrary<T, U> {
+public abstract class BaseLibraryImpl<T, U extends ClassMetadata<? extends T>> implements ClassLibrary<T, U> {
 
     private Map<Class<? extends T>, U> serializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
 
-    public abstract String[] getNamesFor(Class<? extends T> clazz);
+    public abstract String getNameFor(Class<? extends T> clazz);
+
+    protected abstract <CLASS extends T> U createMetadata(Class<CLASS> clazz, String name);
 
     @Override
     public void register(Class<? extends T> clazz) {
-        register(clazz, getNamesFor(clazz));
+        register(clazz, getNameFor(clazz));
     }
 
-    public void register(Class<? extends T> clazz, String... names) {
-        U metadata = createMetadata(clazz, names);
+    @Override
+    public void register(Class<? extends T> clazz, String name) {
+        U metadata = createMetadata(clazz, name);
 
         serializationLookup.put(clazz, metadata);
 
-        for (String name : names) {
-            typeLookup.put(name.toLowerCase(Locale.ENGLISH), clazz);
-        }
+        typeLookup.put(name.toLowerCase(Locale.ENGLISH), clazz);
     }
-
-    protected abstract <CLASS extends T> U createMetadata(Class<CLASS> clazz, String... names);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -65,14 +63,14 @@ public abstract class BaseLibraryImpl<T, U extends ReflectedClassMetadata<? exte
     @SuppressWarnings("unchecked")
     public <U extends T> ClassMetadata<U> getMetadata(U object) {
         if (object != null) {
-            return (ClassMetadata<U>) serializationLookup.get(object.getClass());
+            return getMetadata((Class<U>) (object.getClass()));
         }
         return null;
     }
 
     @Override
     public <TYPE extends T> TYPE copy(TYPE object) {
-        ClassMetadata<TYPE> info = (ClassMetadata<TYPE>) getMetadata(object);
+        ClassMetadata<TYPE> info = getMetadata(object);
         if (info != null) {
             return info.copy(object);
         }

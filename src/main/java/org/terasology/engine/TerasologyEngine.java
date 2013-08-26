@@ -39,6 +39,8 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
+import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -440,6 +442,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+        CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
@@ -608,6 +611,11 @@ public class TerasologyEngine implements GameEngine {
 
     public boolean hasFocus() {
         return gameFocused && Display.isActive();
+    }
+
+    @Override
+    public boolean hasMouseFocus() {
+        return gameFocused;
     }
 
     public void setFocus(boolean focused) {

@@ -371,7 +371,7 @@ public final class TeraMath {
         result = (result >> 8) | result;
         result = (result >> 16) | result;
         result++;
-        return val;
+        return result;
     }
 
     /**

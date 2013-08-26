@@ -18,6 +18,8 @@ package org.terasology.entitySystem.prefab;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
@@ -43,7 +45,8 @@ public class PrefabLoader implements AssetLoader<PrefabData> {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
         if (prefabData != null) {
-            return new PrefabSerializer(CoreRegistry.get(ComponentLibrary.class)).deserialize(prefabData);
+            EngineEntityManager entityManager = CoreRegistry.get(EngineEntityManager.class);
+            return new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary()).deserialize(prefabData);
         }
         return null;
     }

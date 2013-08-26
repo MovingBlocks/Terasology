@@ -15,10 +15,16 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.terasology.entitySystem.metadata.reflected.ReflectedFieldMetadata;
-import org.terasology.entitySystem.metadata.typeHandlers.core.ListTypeHandler;
-import org.terasology.entitySystem.metadata.typeHandlers.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
+import org.terasology.entitySystem.metadata.internal.ClassMetadataImpl;
+import org.terasology.entitySystem.metadata.internal.FieldMetadataImpl;
+import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
+import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeSerialization.typeHandlers.core.ListTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 
@@ -29,15 +35,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class FieldMetadataTest {
 
+    private ReflectFactory factory = new ReflectionReflectFactory();
+    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(factory);
+
     @Test
-    public void testOwnsAnnotationProcessed() throws NoSuchFieldException {
-        FieldMetadata metadata = new ReflectedFieldMetadata(OwnerComponent.class.getDeclaredField("child"), new EntityRefTypeHandler(null), false);
+    public void testOwnsAnnotationProcessed() throws NoSuchMethodException {
+        ClassMetadata<OwnerComponent> classMetadata = new ClassMetadataImpl<>(OwnerComponent.class, copyStrategyLibrary, factory, "");
+        FieldMetadata metadata = classMetadata.getField("child");
         assertTrue(metadata.isOwnedReference());
     }
 
     @Test
-    public void testOwnsAnnotationCollectionProcessed() throws NoSuchFieldException {
-        FieldMetadata metadata = new ReflectedFieldMetadata(InventoryComponent.class.getDeclaredField("itemSlots"), new ListTypeHandler<>(new EntityRefTypeHandler(null)), false);
+    public void testOwnsAnnotationCollectionProcessed() throws NoSuchMethodException {
+        ClassMetadata<InventoryComponent> classMetadata = new ClassMetadataImpl<>(InventoryComponent.class, copyStrategyLibrary, factory, "");
+        FieldMetadata metadata = classMetadata.getField("itemSlots");
         assertTrue(metadata.isOwnedReference());
     }
 

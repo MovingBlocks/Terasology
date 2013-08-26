@@ -18,8 +18,10 @@ package org.terasology.persistence;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedWriter;
@@ -36,8 +38,8 @@ public class WorldDumper {
 
     private WorldSerializer persisterHelper;
 
-    public WorldDumper(EngineEntityManager entityManager) {
-        this.persisterHelper = new WorldSerializerImpl(entityManager);
+    public WorldDumper(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
+        this.persisterHelper = new WorldSerializerImpl(entityManager, prefabSerializer);
     }
 
     public void save(Path file) throws IOException {

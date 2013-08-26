@@ -16,8 +16,6 @@
 
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
-
 /**
  * The interface for a class library. These store metadata on a type of class, and provide the ability to copy them.
  * @author Immortius
@@ -36,19 +34,9 @@ public interface ClassLibrary<T, U extends ClassMetadata<? extends T>> extends I
      * Registers a class with this library
      *
      * @param clazz The class to register with this library
-     * @param primaryName The name to use to find this class
-     * @param additionalNames Additional names to use to find this class
+     * @param name The name to use to find this class
      */
-    void register(Class<? extends T> clazz, String primaryName, String... additionalNames);
-
-    /**
-     * Registers a class with this library
-     *
-     * @param clazz The class to register with this library
-     * @param primaryName The name to use to find this class
-     * @param additionalNames Additional names to use to find this class
-     */
-    void register(Class<? extends T> clazz, String primaryName, Iterable<String> additionalNames);
+    void register(Class<? extends T> clazz, String name);
 
     /**
      * @param clazz The class to retrieve metadata for

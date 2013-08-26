@@ -13,56 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.entitySystem.metadata;
-
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.reflected.ReflectedClassMetadata;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.network.OwnerEvent;
-import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
  */
-public class EventMetadata<T extends Event> extends ReflectedClassMetadata<T> {
+public interface EventMetadata<T> extends ClassMetadata<T> {
 
-    private NetworkEventType networkEventType;
-    private String uri;
-    private boolean lagCompensated;
-    private boolean skipInstigator;
+    /**
+     * @return Whether this event is a network event.
+     */
+    boolean isNetworkEvent();
 
-    public EventMetadata(Class<T> simpleClass, String uri) throws NoSuchMethodException {
-        super(simpleClass, uri);
-        this.uri = uri;
-        if (simpleClass.getAnnotation(ServerEvent.class) != null) {
-            networkEventType = NetworkEventType.SERVER;
-            lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();
-        } else if (simpleClass.getAnnotation(OwnerEvent.class) != null) {
-            networkEventType = NetworkEventType.OWNER;
-        } else if (simpleClass.getAnnotation(BroadcastEvent.class) != null) {
-            networkEventType = NetworkEventType.BROADCAST;
-            skipInstigator = simpleClass.getAnnotation(BroadcastEvent.class).skipInstigator();
-        }
-    }
+    /**
+     * @return The type of network event this event is.
+     */
+    NetworkEventType getNetworkEventType();
 
-    public boolean isNetworkEvent() {
-        return networkEventType != null;
-    }
+    /**
+     * @return Whether this event is compensated for lag.
+     */
+    boolean isLagCompensated();
 
-    public boolean isLagCompensated() {
-        return lagCompensated;
-    }
+    /**
+     * @return Whether this event should not be replicated to the instigator
+     */
+    boolean isSkipInstigator();
 
-    public boolean isSkipInstigator() {
-        return skipInstigator;
-    }
-
-    public NetworkEventType getNetworkEventType() {
-        return networkEventType;
-    }
-
-    public String getId() {
-        return uri;
-    }
 }
