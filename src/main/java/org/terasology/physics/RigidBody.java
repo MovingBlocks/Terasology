@@ -35,8 +35,7 @@ public interface RigidBody {
 
     /**
      * Applies an impulse to this rigid body. The impulse is applied to the
-     * centre of mass. The implementation of this method is allowed to assume
-     * the impulse is not changed after being given to this method as parameter.
+     * centre of mass. Impulse is stored as reference, not by value.
      *
      * @param impulse the impulse to apply.
      */
@@ -99,4 +98,10 @@ public interface RigidBody {
     public void setLocation(Vector3f location);
     
     public void setTransform(Vector3f location, Quat4f orientation);
+    
+    /**
+     * Active means that the entity is not sleeping, or requesting to sleep.
+     * @return True if this entity is active, false otherwise.
+     */
+    public boolean isActive();
 }

@@ -105,7 +105,6 @@ public class BulletPhysics implements PhysicsEngine {
 
     private final Deque<RigidBodyRequest> insertionQueue = Lists.newLinkedList();
     private final Deque<BulletRigidBody> removalQueue = Lists.newLinkedList();
-    private Map<BulletRigidBody, Vector3f> pendingImpulses = Maps.newLinkedHashMap();
 
     private final CollisionDispatcher dispatcher;
     private final BroadphaseInterface broadphase;
@@ -328,7 +327,7 @@ public class BulletPhysics implements PhysicsEngine {
     
     @Override
     public boolean removeRigidBody(EntityRef entity) {
-        BulletRigidBody rigidBody = entityRigidBodies.get(entity);
+        BulletRigidBody rigidBody = entityRigidBodies.remove(entity);
         if(rigidBody != null) {
             removeRigidBody(rigidBody);
             return true;
@@ -647,11 +646,13 @@ public class BulletPhysics implements PhysicsEngine {
      * the pending impulses.
      */
     private void applyPendingImpulses() {
-        for (Map.Entry<BulletRigidBody, Vector3f> impulse : pendingImpulses.entrySet()) {
-            BulletRigidBody body = impulse.getKey();
-            body.rb.applyCentralImpulse(impulse.getValue());
+        for (Map.Entry<EntityRef, BulletRigidBody> entree : entityRigidBodies.entrySet()) {
+            BulletRigidBody body = entree.getValue();
+            body.rb.applyCentralImpulse(body.pendingImpulse);
+            body.pendingImpulse.x = 0;
+            body.pendingImpulse.y = 0;
+            body.pendingImpulse.z = 0;
         }
-        pendingImpulses.clear();
     }
 
     private void addRigidBody(BulletRigidBody body) {
@@ -758,7 +759,8 @@ public class BulletPhysics implements PhysicsEngine {
    
     private class BulletRigidBody implements RigidBody {
         private final Transform temp = new Transform();
-        public final com.bulletphysics.dynamics.RigidBody rb;
+        private final com.bulletphysics.dynamics.RigidBody rb;
+        private final Vector3f pendingImpulse = new Vector3f();
 
         BulletRigidBody(RigidBodyConstructionInfo info) {
             rb = new com.bulletphysics.dynamics.RigidBody(info);
@@ -766,7 +768,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         @Override
         public void applyImpulse(Vector3f impulse) {
-            pendingImpulses.put(this, impulse);
+            pendingImpulse.add(impulse);
         }
 
         @Override
@@ -831,10 +833,14 @@ public class BulletPhysics implements PhysicsEngine {
             temp.setRotation(orientation);
             rb.proceedToTransform(temp);
         }
+
+        @Override
+        public boolean isActive() {
+            return rb.isActive();
+        }
     }
 
     private class BulletCharacterMoverCollider implements CharacterCollider {
-        
         private final Transform temp = new Transform();
         
         //If a class can figure out that its Collider is a BulletCollider, it 
