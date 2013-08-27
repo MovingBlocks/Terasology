@@ -308,6 +308,9 @@ public class BulletPhysics implements PhysicsEngine {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
 
+            if(rigidBody.mass < 1) {
+                logger.warn("RigidBodyComponent.mass is set to less than 1.0, this can lead to strange behaviour, such as the objects moving through walls. Entity: {}", entity);
+            }
             Vector3f fallInertia = new Vector3f();
             shape.calculateLocalInertia(rigidBody.mass, fallInertia);
             RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
@@ -757,9 +760,9 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
    
-    private class BulletRigidBody implements RigidBody {
+    public class BulletRigidBody implements RigidBody {
         private final Transform temp = new Transform();
-        private final com.bulletphysics.dynamics.RigidBody rb;
+        public final com.bulletphysics.dynamics.RigidBody rb;
         private final Vector3f pendingImpulse = new Vector3f();
 
         BulletRigidBody(RigidBodyConstructionInfo info) {
