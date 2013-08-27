@@ -38,9 +38,9 @@ public final class DefaultClassLibrary<T> extends AbstractClassLibrary<T> {
         return type.getSimpleName();
     }
 
-    protected <CLASS extends T> ClassMetadata<CLASS> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
+    protected <CLASS extends T> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
         try {
-            return new ClassMetadata<>(type, factory, copyStrategies, name);
+            return new DefaultClassMetadata<>(type, factory, copyStrategies, name);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
             return null;

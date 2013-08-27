@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.event.Event;
@@ -23,10 +24,12 @@ import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 
+import java.lang.reflect.Field;
+
 /**
  * @author Immortius
  */
-public class EventMetadata<T extends Event> extends ClassMetadata<T> {
+public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedFieldMetadata<T, ?>> {
 
     private NetworkEventType networkEventType = NetworkEventType.NONE;
     private boolean lagCompensated;
@@ -73,4 +76,8 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
         return skipInstigator;
     }
 
+    @Override
+    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) {
+        return new ReplicatedFieldMetadata<>(this, field, copyStrategy, factory, true);
+    }
 }

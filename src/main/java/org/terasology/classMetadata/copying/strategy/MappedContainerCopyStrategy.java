@@ -23,9 +23,9 @@ import org.terasology.classMetadata.copying.CopyStrategy;
  */
 public class MappedContainerCopyStrategy<T> implements CopyStrategy<T> {
 
-    private ClassMetadata<T> classMetadata;
+    private ClassMetadata<T, ?> classMetadata;
 
-    public MappedContainerCopyStrategy(ClassMetadata<T> classMetadata) {
+    public MappedContainerCopyStrategy(ClassMetadata<T, ?> classMetadata) {
         this.classMetadata = classMetadata;
     }
 

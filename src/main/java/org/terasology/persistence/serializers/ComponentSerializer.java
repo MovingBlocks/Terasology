@@ -22,9 +22,8 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
@@ -140,7 +139,7 @@ public class ComponentSerializer {
                                                             ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         for (EntityData.NameValue field : componentData.getFieldList()) {
-            FieldMetadata<T, ?> fieldInfo = null;
+            ReplicatedFieldMetadata<T, ?> fieldInfo = null;
             if (field.hasNameIndex()) {
                 fieldInfo = componentMetadata.getField(field.getNameIndex());
             } else if (field.hasName()) {
@@ -174,7 +173,7 @@ public class ComponentSerializer {
      * @return The serialized component, or null if it could not be serialized.
      */
     public EntityData.Component serialize(Component component, FieldSerializeCheck<Component> check) {
-        ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
+        ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
             return null;
@@ -183,7 +182,7 @@ public class ComponentSerializer {
         serializeComponentType(component, componentMessage);
 
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        for (FieldMetadata field : componentMetadata.getFields()) {
+        for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, component)) {
                 EntityData.NameValue fieldData = serializer.serializeNameValue(field, component, usingFieldIds);
                 if (fieldData != null) {
@@ -224,7 +223,7 @@ public class ComponentSerializer {
      * @return The serialized component, or null if it could not be serialized
      */
     public EntityData.Component serialize(Component base, Component delta, FieldSerializeCheck<Component> check) {
-        ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(base.getClass());
+        ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(base.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", base.getClass());
             return null;
@@ -235,7 +234,7 @@ public class ComponentSerializer {
 
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         boolean changed = false;
-        for (FieldMetadata field : componentMetadata.getFields()) {
+        for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, delta)) {
                 Object origValue = field.getValue(base);
                 Object deltaValue = field.getValue(delta);

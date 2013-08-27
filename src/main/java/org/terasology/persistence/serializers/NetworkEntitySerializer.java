@@ -25,13 +25,12 @@ import com.google.common.primitives.UnsignedBytes;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.MutableComponentContainer;
+import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -142,7 +141,7 @@ public class NetworkEntitySerializer {
     private void serializeComponentDelta(Component oldComponent, Component newComponent, FieldSerializeCheck<Component> fieldCheck,
                                          EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
                                          boolean componentInitial) {
-        ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(oldComponent.getClass());
+        ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(oldComponent.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", oldComponent.getClass());
             return;
@@ -150,7 +149,7 @@ public class NetworkEntitySerializer {
 
         byte fieldCount = 0;
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        for (FieldMetadata field : componentMetadata.getFields()) {
+        for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, newComponent, componentInitial)) {
                 Object oldValue = field.getValue(oldComponent);
                 Object newValue = field.getValue(newComponent);
@@ -176,7 +175,7 @@ public class NetworkEntitySerializer {
     private void serializeComponentFull(Component component, boolean ignoreIfNoFields, FieldSerializeCheck<Component> fieldCheck,
                                         EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
                                         boolean componentInitial) {
-        ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
+        ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
             return;
@@ -184,7 +183,7 @@ public class NetworkEntitySerializer {
 
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         byte fieldCount = 0;
-        for (FieldMetadata field : componentMetadata.getFields()) {
+        for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, component, componentInitial)) {
                 EntityData.Value fieldValue = serializer.serialize(field, component);
                 if (fieldValue != null) {
@@ -231,7 +230,7 @@ public class NetworkEntitySerializer {
             Serializer serializer = typeSerializationLibrary.getSerializerFor(metadata);
             for (int fieldIndex = 0; fieldIndex < UnsignedBytes.toInt(entityData.getComponentFieldCounts().byteAt(componentIndex)); ++fieldIndex) {
                 byte fieldId = entityData.getFieldIds().byteAt(fieldPos);
-                FieldMetadata fieldMetadata = metadata.getField(fieldId);
+                ReplicatedFieldMetadata fieldMetadata = metadata.getField(fieldId);
                 if (fieldMetadata != null && fieldCheck.shouldDeserializeField(fieldMetadata)) {
                     logger.trace("Deserializing field {} of component {} as value {}", fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
                     serializer.deserializeOnto(component, fieldMetadata, entityData.getFieldValue(fieldPos));

@@ -29,6 +29,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -149,7 +150,7 @@ public class WorldSerializerImpl implements WorldSerializer {
 
     private void writeComponentTypeTable(EntityData.GlobalStore.Builder world) {
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
-        for (ClassMetadata<? extends Component> componentMetadata : componentLibrary) {
+        for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             int index = componentIdTable.size();
             componentIdTable.put(componentMetadata.getType(), index);
             world.addComponentClass(MetadataUtil.getComponentClassName(componentMetadata.getType()));

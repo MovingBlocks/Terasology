@@ -41,7 +41,7 @@ public class ComponentMetadataTest {
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(StringComponent.class);
-        ClassMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
+        ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
         assertNull(metadata.getField("STATIC_VALUE"));
     }
 

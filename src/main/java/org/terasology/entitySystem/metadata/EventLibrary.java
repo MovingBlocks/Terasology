@@ -42,7 +42,7 @@ public class EventLibrary extends AbstractClassLibrary<Event> {
     }
 
     @Override
-    protected <CLASS extends Event> ClassMetadata<CLASS> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
+    protected <CLASS extends Event> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
         try {
             return new EventMetadata<>(type, copyStrategies, factory, name);
         } catch (NoSuchMethodException e) {

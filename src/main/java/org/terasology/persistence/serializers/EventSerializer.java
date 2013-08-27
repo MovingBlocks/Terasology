@@ -22,10 +22,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.persistence.typeSerialization.Serializer;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
@@ -76,7 +76,7 @@ public class EventSerializer {
     public Event deserialize(EntityData.Event eventData) {
         Class<? extends Event> eventClass = getEventClass(eventData);
         if (eventClass != null) {
-            ClassMetadata<? extends Event> eventMetadata = eventLibrary.getMetadata(eventClass);
+            EventMetadata<?> eventMetadata = eventLibrary.getMetadata(eventClass);
             Event event = eventMetadata.newInstance();
             return deserializeOnto(event, eventData, eventMetadata);
         } else {
@@ -86,11 +86,11 @@ public class EventSerializer {
     }
 
 
-    private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, ClassMetadata<? extends Event> eventMetadata) {
+    private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, EventMetadata<? extends Event> eventMetadata) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(eventMetadata);
         for (int i = 0; i < eventData.getFieldIds().size(); ++i) {
             byte fieldId = eventData.getFieldIds().byteAt(i);
-            FieldMetadata fieldInfo = eventMetadata.getField(fieldId);
+            ReplicatedFieldMetadata<?, ?> fieldInfo = eventMetadata.getField(fieldId);
             if (fieldInfo == null) {
                 logger.error("Unable to serialize field {}, out of bounds", fieldId);
                 continue;
@@ -109,7 +109,7 @@ public class EventSerializer {
      * @return The serialized event, or null if it could not be serialized.
      */
     public EntityData.Event serialize(Event event) {
-        ClassMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());
+        EventMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());
         if (eventMetadata == null) {
             logger.error("Unregistered event type: {}", event.getClass());
             return null;
@@ -119,7 +119,7 @@ public class EventSerializer {
 
         Serializer eventSerializer = typeSerializationLibrary.getSerializerFor(eventMetadata);
         ByteString.Output fieldIds = ByteString.newOutput();
-        for (FieldMetadata field : eventMetadata.getFields()) {
+        for (ReplicatedFieldMetadata field : eventMetadata.getFields()) {
             if (field.isReplicated()) {
                 EntityData.Value serializedValue = eventSerializer.serialize(field, event);
                 if (serializedValue != null) {
@@ -146,7 +146,7 @@ public class EventSerializer {
      */
     public Class<? extends Event> getEventClass(EntityData.Event eventData) {
         if (eventData.hasType()) {
-            ClassMetadata<? extends Event> metadata = null;
+            EventMetadata<? extends Event> metadata = null;
             if (!idTable.isEmpty()) {
                 Class<? extends Event> eventClass = idTable.inverse().get(eventData.getType());
                 if (eventClass != null) {

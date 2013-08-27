@@ -18,10 +18,10 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
@@ -53,7 +53,7 @@ final class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor 
         EntityRefTypeHandler.setReferenceInterceptor(this);
         Map<Class<? extends Component>, Integer> idMap = Maps.newHashMap();
         for (int i = 0; i < store.getComponentClassCount(); ++i) {
-            ClassMetadata<? extends Component> metadata = entityManager.getComponentLibrary().getMetadata(store.getComponentClass(i));
+            ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(store.getComponentClass(i));
             if (metadata != null) {
                 idMap.put(metadata.getType(), i);
             }

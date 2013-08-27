@@ -43,10 +43,10 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
     }
 
     @Override
-    protected <CLASS extends Component> ClassMetadata<CLASS> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
+    protected <CLASS extends Component> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
         ComponentMetadata<CLASS> info;
         try {
-            info = new ComponentMetadata<>(type, copyStrategies, factory, name);
+            info = new ComponentMetadata<>(type, factory, copyStrategies, name);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
             return null;

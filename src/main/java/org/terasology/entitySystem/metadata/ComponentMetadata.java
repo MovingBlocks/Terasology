@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.Component;
@@ -24,12 +24,14 @@ import org.terasology.network.Replicate;
 import org.terasology.world.block.ForceBlockActive;
 import org.terasology.world.block.RequiresBlockLifecycleEvents;
 
+import java.lang.reflect.Field;
+
 /**
  * Metadata on a component class and its fields.
  *
  * @author Immortius
  */
-public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
+public class ComponentMetadata<T extends Component> extends ClassMetadata<T, ComponentFieldMetadata<T, ?>> {
 
     private boolean replicated;
     private boolean replicatedFromOwner;
@@ -39,13 +41,14 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
     private boolean blockLifecycleEventsRequired;
 
     /**
+     *
      * @param type           The type to create the metadata for
-     * @param copyStrategies A copy strategy library
      * @param factory        A reflection library to provide class construction and field get/set functionality
+     * @param copyStrategies A copy strategy library
      * @param name           The name to identify the component with.
      * @throws NoSuchMethodException If the component has no default constructor
      */
-    public ComponentMetadata(Class<T> type, CopyStrategyLibrary copyStrategies, ReflectFactory factory, String name) throws NoSuchMethodException {
+    public ComponentMetadata(Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) throws NoSuchMethodException {
         super(type, factory, copyStrategies, name);
         replicated = type.getAnnotation(Replicate.class) != null;
         blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
@@ -55,7 +58,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
             retainUnalteredOnBlockChange = forceBlockActiveAnnotation.retainUnalteredOnBlockChange();
         }
 
-        for (FieldMetadata<T, ?> field : getFields()) {
+        for (ComponentFieldMetadata<T, ?> field : getFields()) {
             if (field.isReplicated()) {
                 replicated = true;
                 if (field.getReplicationInfo().value().isReplicateFromOwner()) {
@@ -66,6 +69,10 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
                 referenceOwner = true;
             }
         }
+    }
+
+    protected <U> ComponentFieldMetadata<T, U> createField(Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) {
+        return new ComponentFieldMetadata<>(this, field, copyStrategy, factory, false);
     }
 
     /**

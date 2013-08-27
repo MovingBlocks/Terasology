@@ -29,7 +29,7 @@ package org.terasology.classMetadata;
  *
 
  */
-public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
+public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>> {
 
     /**
      * Registers a class with this library.
@@ -51,7 +51,7 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
      * @param clazz The class to retrieve metadata for
      * @return The metadata for the given clazz, or null if not registered.
      */
-    <U extends T> ClassMetadata<U> getMetadata(Class<U> clazz);
+    <U extends T> ClassMetadata<U, ?> getMetadata(Class<U> clazz);
 
     /**
      * Looks up the class metadata for the provided object. The specific class of the object must be registered in the class loader - super classes will not be checked.
@@ -60,7 +60,7 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
      * @param <U>    The type of the object
      * @return The metadata for the class of the given object, or null if it is not registered.
      */
-    <U extends T> ClassMetadata<U> getMetadata(U object);
+    <U extends T> ClassMetadata<U, ?> getMetadata(U object);
 
     /**
      * Copies the registered class
@@ -74,6 +74,6 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
      * @param className The simple name of the class - no packages, and may exclude any common suffix. Case doesn't matter.
      * @return The metadata for the given class, or null if not registered.
      */
-    ClassMetadata<? extends T> getMetadata(String className);
+    ClassMetadata<? extends T, ?> getMetadata(String className);
 
 }

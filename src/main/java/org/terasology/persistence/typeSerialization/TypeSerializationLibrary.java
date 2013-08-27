@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.DefaultClassMetadata;
 import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.classMetadata.MappedContainer;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
@@ -62,7 +63,7 @@ public class TypeSerializationLibrary {
     private ReflectFactory reflectFactory;
     private CopyStrategyLibrary copyStrategies;
 
-    private Map<ClassMetadata<?>, Serializer> serializerMap = Maps.newHashMap();
+    private Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
     /**
      * @param factory        The factory providing reflect implementation.
@@ -123,7 +124,7 @@ public class TypeSerializationLibrary {
      * @return A serializer for serializing/deserializing the type
      */
     @SuppressWarnings("unchecked")
-    public Serializer getSerializerFor(ClassMetadata<?> type) {
+    public Serializer getSerializerFor(ClassMetadata<?, ?> type) {
         Serializer serializer = serializerMap.get(type);
         if (serializer == null) {
             Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlerMap = getFieldHandlerMap(type);
@@ -190,7 +191,7 @@ public class TypeSerializationLibrary {
                 && !(typeClass.isMemberClass()
                 && !Modifier.isStatic(typeClass.getModifiers()))) {
             try {
-                ClassMetadata<?> metadata = new ClassMetadata<>(typeClass, reflectFactory, copyStrategies, "");
+                ClassMetadata<?, ?> metadata = new DefaultClassMetadata<>(typeClass, reflectFactory, copyStrategies, "");
                 MappedContainerTypeHandler<?> mappedHandler = new MappedContainerTypeHandler(typeClass, getFieldHandlerMap(metadata));
                 typeHandlers.put(typeClass, mappedHandler);
                 return mappedHandler;
@@ -205,7 +206,7 @@ public class TypeSerializationLibrary {
         return null;
     }
 
-    private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?> type) {
+    private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
             TypeHandler<?> handler = getHandlerFor(field.getField().getGenericType());

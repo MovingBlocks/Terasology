@@ -45,13 +45,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Immortius
  */
-public class ClassMetadata<T> {
+public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
 
     private final Class<T> clazz;
     private final ObjectConstructor<T> constructor;
     private final String name;
-    private Map<String, FieldMetadata<T, ?>> fields = Maps.newHashMap();
-    private TIntObjectMap<FieldMetadata<T, ?>> fieldsById = new TIntObjectHashMap<>();
+    private Map<String, U> fields = Maps.newHashMap();
+    private TIntObjectMap<U> fieldsById = new TIntObjectHashMap<>();
 
     /**
      * Creates a class metatdata
@@ -85,7 +85,7 @@ public class ClassMetadata<T> {
                 continue;
             }
             CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType());
-            FieldMetadata<T, ?> metadata = createField(field, copyStrategy, factory);
+            U metadata = createField(field, copyStrategy, factory);
             if (metadata != null) {
                 fields.put(metadata.getName().toLowerCase(Locale.ENGLISH), metadata);
             }
@@ -98,13 +98,9 @@ public class ClassMetadata<T> {
      * @param field        The field to create metadata for
      * @param copyStrategy The copy strategy library
      * @param factory      The reflection provider
-     * @param <U>          The type of the field
      * @return A FieldMetadata describing the field, or null to ignore this field
      */
-    @SuppressWarnings("unchecked")
-    protected <U> FieldMetadata<T, U> createField(Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) {
-        return new FieldMetadata<>(this, field, copyStrategy, factory, false);
-    }
+    protected abstract <V> U createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory);
 
     /**
      * @return The name that identifies this class
@@ -124,7 +120,7 @@ public class ClassMetadata<T> {
      * @param id The previously set id of the field
      * @return The field identified by the given id, or null if there is no such field
      */
-    public FieldMetadata<T, ?> getField(int id) {
+    public U getField(int id) {
         return fieldsById.get(id);
     }
 
@@ -132,29 +128,14 @@ public class ClassMetadata<T> {
      * @param fieldName The name of the field
      * @return The field identified by the given name, or null if there is no such field
      */
-    public FieldMetadata<T, ?> getField(String fieldName) {
+    public U getField(String fieldName) {
         return fields.get(fieldName.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
-     * @param fieldName The name of the field
-     * @param fieldType The expected type of the field
-     * @param <U>       The expected type of the field
-     * @return The field metadata, or null if the field doesn't exist or is of the wrong type
-     */
-    @SuppressWarnings("unchecked")
-    public <U> FieldMetadata<T, U> getField(String fieldName, Class<U> fieldType) {
-        FieldMetadata<T, ?> metadata = fields.get(fieldName.toLowerCase(Locale.ENGLISH));
-        if (fieldType.isAssignableFrom(metadata.getType())) {
-            return (FieldMetadata<T, U>) metadata;
-        }
-        return null;
     }
 
     /**
      * @return The fields that this class has.
      */
-    public Collection<FieldMetadata<T, ?>> getFields() {
+    public Collection<U> getFields() {
         return ImmutableList.copyOf(fields.values());
     }
 
@@ -228,9 +209,10 @@ public class ClassMetadata<T> {
      * @param field The field to update the id for
      * @param id    The new id of the field
      */
+    @SuppressWarnings("unchecked")
     void setFieldId(FieldMetadata<T, ?> field, byte id) {
-        if (fields.containsValue(field)) {
-            fieldsById.put(id, field);
+        if (fields.containsValue((U) field)) {
+            fieldsById.put(id, (U) field);
         }
     }
 

@@ -34,7 +34,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     private CopyStrategyLibrary copyStrategyLibrary;
     private ReflectFactory reflectFactory;
 
-    private Map<Class<? extends T>, ClassMetadata<? extends T>> serializationLookup = Maps.newHashMap();
+    private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> serializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
 
     public AbstractClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
@@ -54,7 +54,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
      * @param <CLASS> The class of the type
      * @return An instance of ClassMetadata (or a subtype) providing metadata for the given type
      */
-    protected abstract <CLASS extends T> ClassMetadata<CLASS> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name);
+    protected abstract <CLASS extends T> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name);
 
     @Override
     public void register(Class<? extends T> clazz) {
@@ -63,7 +63,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     @Override
     public void register(Class<? extends T> clazz, String name) {
-        ClassMetadata<? extends T> metadata = createMetadata(clazz, reflectFactory, copyStrategyLibrary, name);
+        ClassMetadata<? extends T, ?> metadata = createMetadata(clazz, reflectFactory, copyStrategyLibrary, name);
 
         serializationLookup.put(clazz, metadata);
 
@@ -72,16 +72,16 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U extends T> ClassMetadata<U> getMetadata(Class<U> clazz) {
+    public <U extends T> ClassMetadata<U, ?> getMetadata(Class<U> clazz) {
         if (clazz == null) {
             return null;
         }
-        return (ClassMetadata<U>) serializationLookup.get(clazz);
+        return (ClassMetadata<U, ?>) serializationLookup.get(clazz);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U extends T> ClassMetadata<U> getMetadata(U object) {
+    public <U extends T> ClassMetadata<U, ?> getMetadata(U object) {
         if (object != null) {
             return getMetadata((Class<U>) (object.getClass()));
         }
@@ -90,7 +90,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     @Override
     public <TYPE extends T> TYPE copy(TYPE object) {
-        ClassMetadata<TYPE> info = getMetadata(object);
+        ClassMetadata<TYPE, ?> info = getMetadata(object);
         if (info != null) {
             return info.copy(object);
         }
@@ -98,12 +98,12 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     }
 
     @Override
-    public ClassMetadata<? extends T> getMetadata(String className) {
+    public ClassMetadata<? extends T, ?> getMetadata(String className) {
         return getMetadata(typeLookup.get(className.toLowerCase(Locale.ENGLISH)));
     }
 
     @Override
-    public Iterator<ClassMetadata<? extends T>> iterator() {
+    public Iterator<ClassMetadata<? extends T, ?>> iterator() {
         return serializationLookup.values().iterator();
     }
 }

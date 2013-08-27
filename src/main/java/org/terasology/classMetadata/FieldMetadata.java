@@ -38,54 +38,33 @@ import java.util.Map;
  */
 public class FieldMetadata<T, U> {
 
-    private final ClassMetadata<T> owner;
+    private final ClassMetadata<T, ?> owner;
     private final Class<U> type;
     private final Field field;
     private final FieldAccessor<T, U> accessor;
     private final CopyStrategy<U> copyStrategy;
 
     private byte id;
-    private boolean replicated;
-    private Replicate replicationInfo;
-    private boolean ownedReference;
 
     /**
      * @param owner               The ClassMetadata that owns this field
      * @param field               The field this metadata is for
      * @param copyStrategy        The CopyStrategy appropriate for the type of the field
      * @param factory             The reflection provider
-     * @param replicatedByDefault Whether this field is replicated by default
      */
     @SuppressWarnings("unchecked")
-    public FieldMetadata(ClassMetadata<T> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory, boolean replicatedByDefault) {
+    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) {
         this.owner = owner;
         this.copyStrategy = copyStrategy;
         this.type = (Class<U>) field.getType();
         this.accessor = factory.createFieldAccessor(owner.getType(), field, type);
         this.field = field;
-
-        // TODO: Maybe move these into child classes.
-        this.replicated = replicatedByDefault;
-        if (field.getAnnotation(NoReplicate.class) != null) {
-            replicated = false;
-        }
-        if (field.getAnnotation(Replicate.class) != null) {
-            replicated = true;
-        }
-        this.replicationInfo = field.getAnnotation(Replicate.class);
-        ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType())
-                || isCollectionOf(EntityRef.class, field.getGenericType()));
-    }
-
-    private boolean isCollectionOf(Class<?> targetType, Type genericType) {
-        return (Collection.class.isAssignableFrom(type) && ReflectionUtil.getTypeParameter(genericType, 0).equals(targetType))
-                || (Map.class.isAssignableFrom(type) && ReflectionUtil.getTypeParameter(genericType, 1).equals(targetType));
     }
 
     /**
      * @return The class that owns this field
      */
-    public ClassMetadata<T> getOwner() {
+    public ClassMetadata<T, ?> getOwner() {
         return owner;
     }
 
@@ -192,27 +171,6 @@ public class FieldMetadata<T, U> {
      */
     public void setValueChecked(T target, U value) {
         accessor.setValue(target, value);
-    }
-
-    /**
-     * @return Whether this field should be replicated on the network
-     */
-    public boolean isReplicated() {
-        return replicated;
-    }
-
-    /**
-     * @return Whether this field is marked with the @Owned annotation
-     */
-    public boolean isOwnedReference() {
-        return ownedReference;
-    }
-
-    /**
-     * @return The replication information for this field, or null if it isn't marked with the Replicate annotation
-     */
-    public Replicate getReplicationInfo() {
-        return replicationInfo;
     }
 
     @Override

@@ -786,7 +786,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private <T> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> result = Maps.newHashMap();
-        for (ClassMetadata<? extends T> metadata : classLibrary) {
+        for (ClassMetadata<? extends T, ?> metadata : classLibrary) {
             int index = result.size();
             result.put(metadata.getType(), index);
 
@@ -812,7 +812,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T> metadata = classLibrary.getMetadata(info.getName());
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {

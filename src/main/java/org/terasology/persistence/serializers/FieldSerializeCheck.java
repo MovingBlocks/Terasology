@@ -16,7 +16,7 @@
 
 package org.terasology.persistence.serializers;
 
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 
 /**
  * Interface for providing serializers with a method to check whether a given field should be serialized.
@@ -30,7 +30,7 @@ public interface FieldSerializeCheck<T> {
      * @param object The object it belongs to
      * @return Whether the field should be serialized
      */
-    boolean shouldSerializeField(FieldMetadata field, T object);
+    boolean shouldSerializeField(ReplicatedFieldMetadata field, T object);
 
     /**
      * @param field            The field to check
@@ -38,9 +38,9 @@ public interface FieldSerializeCheck<T> {
      * @param componentInitial In a network situation, whether the component is newly added or not
      * @return Whether the field should be serialized
      */
-    boolean shouldSerializeField(FieldMetadata field, T object, boolean componentInitial);
+    boolean shouldSerializeField(ReplicatedFieldMetadata field, T object, boolean componentInitial);
 
-    boolean shouldDeserializeField(FieldMetadata fieldInfo);
+    boolean shouldDeserializeField(ReplicatedFieldMetadata fieldInfo);
 
     /**
      * Null implementation, returns true for all fields
@@ -58,17 +58,17 @@ public interface FieldSerializeCheck<T> {
         }
 
         @Override
-        public boolean shouldSerializeField(FieldMetadata field, T object) {
+        public boolean shouldSerializeField(ReplicatedFieldMetadata field, T object) {
             return true;
         }
 
         @Override
-        public boolean shouldSerializeField(FieldMetadata field, T object, boolean componentInitial) {
+        public boolean shouldSerializeField(ReplicatedFieldMetadata field, T object, boolean componentInitial) {
             return true;
         }
 
         @Override
-        public boolean shouldDeserializeField(FieldMetadata fieldInfo) {
+        public boolean shouldDeserializeField(ReplicatedFieldMetadata fieldInfo) {
             return true;
         }
     }

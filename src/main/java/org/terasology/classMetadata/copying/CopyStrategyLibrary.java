@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.DefaultClassMetadata;
 import org.terasology.classMetadata.MappedContainer;
 import org.terasology.classMetadata.copying.strategy.Color4fCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.ListCopyStrategy;
@@ -162,7 +163,7 @@ public class CopyStrategyLibrary {
             }
 
             try {
-                ClassMetadata<?> classMetadata = new ClassMetadata<>(typeClass, reflectFactory, this, typeClass.getSimpleName());
+                ClassMetadata<?, ?> classMetadata = new DefaultClassMetadata<>(typeClass, reflectFactory, this, typeClass.getSimpleName());
                 return new MappedContainerCopyStrategy<>(classMetadata);
             } catch (NoSuchMethodException e) {
                 logger.error("Unable to create copy strategy for field of type {}: no publicly accessible default constructor", typeClass.getSimpleName());
