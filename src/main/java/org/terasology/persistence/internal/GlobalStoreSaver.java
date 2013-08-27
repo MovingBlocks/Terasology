@@ -23,7 +23,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
@@ -42,19 +42,18 @@ final class GlobalStoreSaver {
 
     private TIntSet nonPersistentIds = new TIntHashSet();
 
-    public GlobalStoreSaver(EngineEntityManager entityManager) {
+    public GlobalStoreSaver(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.store = EntityData.GlobalStore.newBuilder();
         this.entitySerializer = new EntitySerializer(entityManager);
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
-        for (ClassMetadata<? extends Component> componentMetadata : entityManager.getComponentLibrary()) {
+        for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             store.addComponentClass(componentMetadata.getName());
             componentIdTable.put(componentMetadata.getType(), componentIdTable.size());
         }
         entitySerializer.setComponentIdMapping(componentIdTable);
 
-        PrefabSerializer prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary());
         prefabSerializer.setComponentIdMapping(componentIdTable);
         for (Prefab prefab : entityManager.getPrefabManager().listPrefabs()) {
             store.addPrefab(prefabSerializer.serialize(prefab));

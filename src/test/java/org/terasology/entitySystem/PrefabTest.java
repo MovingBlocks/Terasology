@@ -28,6 +28,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -62,7 +63,7 @@ public class PrefabTest {
         AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", url, ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         prefabManager = new PojoPrefabManager();
 
         for (AssetUri prefabUri : AssetManager.getInstance().listAssets(AssetType.PREFAB)) {

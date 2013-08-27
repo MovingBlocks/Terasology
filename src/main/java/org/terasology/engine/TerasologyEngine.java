@@ -33,6 +33,8 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
@@ -440,6 +442,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+        CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
@@ -608,6 +611,11 @@ public class TerasologyEngine implements GameEngine {
 
     public boolean hasFocus() {
         return gameFocused && Display.isActive();
+    }
+
+    @Override
+    public boolean hasMouseFocus() {
+        return gameFocused;
     }
 
     public void setFocus(boolean focused) {

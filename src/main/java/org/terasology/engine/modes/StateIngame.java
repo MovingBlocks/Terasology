@@ -116,7 +116,7 @@ public class StateIngame implements GameState {
         eventSystem.process();
         componentSystemManager.shutdown();
         guiManager.closeAllWindows();
-        CoreRegistry.get(PhysicsEngine.class).dispose();
+        
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
@@ -125,6 +125,8 @@ public class StateIngame implements GameState {
         if (save) {
             CoreRegistry.get(Game.class).save();
         }
+
+        CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
         CoreRegistry.get(Console.class).dispose();

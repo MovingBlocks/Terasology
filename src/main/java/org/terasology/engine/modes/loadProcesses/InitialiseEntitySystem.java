@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.LoadProcess;
@@ -34,7 +35,7 @@ public class InitialiseEntitySystem implements LoadProcess {
     @Override
     public boolean step() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        new EntitySystemBuilder().build(moduleManager, CoreRegistry.get(NetworkSystem.class));
+        new EntitySystemBuilder().build(moduleManager, CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
         return true;
     }
 

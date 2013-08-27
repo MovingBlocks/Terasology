@@ -22,9 +22,9 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -49,12 +49,12 @@ final class GlobalStoreLoader {
     private PrefabSerializer prefabSerializer;
     private List<StoreMetadata> refTables;
 
-    public GlobalStoreLoader(EngineEntityManager entityManager) {
+    public GlobalStoreLoader(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
-        this.prefabSerializer = new PrefabSerializer(componentLibrary);
+        this.prefabSerializer = prefabSerializer;
     }
 
     public void load(EntityData.GlobalStore globalStore) {

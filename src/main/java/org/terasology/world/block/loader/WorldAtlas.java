@@ -18,7 +18,6 @@ package org.terasology.world.block.loader;
 import com.google.common.collect.Lists;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import org.lwjgl.opengl.Util;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,7 +189,6 @@ public class WorldAtlas {
         terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
         terrainMatData.setParam("textured", true);
         Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
-        Util.checkGLError();
     }
 
     private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<TileData> tileImages, String screenshotName) {

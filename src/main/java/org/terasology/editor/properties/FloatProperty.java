@@ -15,32 +15,28 @@
  */
 package org.terasology.editor.properties;
 
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.core.FloatTypeHandler;
+import org.terasology.classMetadata.FieldMetadata;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 
 /**
  * @author Immortius
  */
-public class FloatProperty implements Property<Float> {
+public class FloatProperty<T> implements Property<Float> {
 
     private static final DecimalFormat DEFAULT_DECIMAL_FORMAT = new DecimalFormat("0.0000000");
 
-    private final String title;
     private final float min;
     private final float max;
-    private final Object target;
-    private final FieldMetadata accessor;
+    private final T target;
+    private final FieldMetadata<T, Float> field;
 
 
-    public FloatProperty(Object target, Field field, String title, float min, float max) {
+    public FloatProperty(T target, FieldMetadata<T, Float> field, float min, float max) {
         this.target = target;
         this.min = min;
         this.max = max;
-        this.title = title;
-        this.accessor = new FieldMetadata(field, new FloatTypeHandler(), false);
+        this.field = field;
     }
 
     public float getMinValue() {
@@ -53,12 +49,12 @@ public class FloatProperty implements Property<Float> {
 
     @Override
     public Float getValue() {
-        return (Float) accessor.getValue(target);
+        return field.getValueChecked(target);
     }
 
     @Override
     public void setValue(Float value) {
-        accessor.setValue(target, value);
+        field.setValue(target, value);
     }
 
     @Override
@@ -68,7 +64,7 @@ public class FloatProperty implements Property<Float> {
 
     @Override
     public String getTitle() {
-        return title;
+        return field.getName();
     }
 
     @Override

@@ -20,11 +20,11 @@ import java.util.List;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface PropertyProvider {
+public interface PropertyProvider<T> {
     /**
      * Adds the properties of this Object to the given property list.
      *
      * @return a list of the properties of this object
      */
-    List<Property<?>> getProperties();
+    List<Property<T>> getProperties();
 }

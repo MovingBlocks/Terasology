@@ -326,7 +326,7 @@ public class GUIManager implements ComponentSystem {
      * Check whether the mouse of the current focused window is visible and can be moved on the display.
      */
     public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasFocus()) {
+        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasMouseFocus()) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);

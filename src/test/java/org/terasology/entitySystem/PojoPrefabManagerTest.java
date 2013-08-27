@@ -23,11 +23,12 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
-import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
-import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;
-import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -52,11 +53,12 @@ public class PojoPrefabManagerTest {
 
     @Before
     public void setup() {
-        TypeHandlerLibrary lib = new TypeHandlerLibraryBuilder()
-                .add(Vector3f.class, new Vector3fTypeHandler())
-                .add(Quat4f.class, new Quat4fTypeHandler())
-                .build();
-        entitySystemLibrary = new EntitySystemLibraryImpl(lib);
+        ReflectFactory reflectFactory = new ReflectionReflectFactory();
+        CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(reflectFactory);
+        TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
+        lib.add(Vector3f.class, new Vector3fTypeHandler());
+        lib.add(Quat4f.class, new Quat4fTypeHandler());
+        entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
     }

@@ -24,11 +24,12 @@ import gnu.trove.procedure.TIntProcedure;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -52,12 +53,12 @@ public class WorldSerializerImpl implements WorldSerializer {
     private EntitySerializer entitySerializer;
     private PrefabSerializer prefabSerializer;
 
-    public WorldSerializerImpl(EngineEntityManager entityManager) {
+    public WorldSerializerImpl(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
-        this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary());
+        this.prefabSerializer = prefabSerializer;
     }
 
     @Override
@@ -149,7 +150,7 @@ public class WorldSerializerImpl implements WorldSerializer {
 
     private void writeComponentTypeTable(EntityData.GlobalStore.Builder world) {
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
-        for (ClassMetadata<? extends Component> componentMetadata : componentLibrary) {
+        for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             int index = componentIdTable.size();
             componentIdTable.put(componentMetadata.getType(), index);
             world.addComponentClass(MetadataUtil.getComponentClassName(componentMetadata.getType()));

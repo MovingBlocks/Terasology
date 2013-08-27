@@ -111,7 +111,6 @@ public class Chunk {
     }
 
 
-
     private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;

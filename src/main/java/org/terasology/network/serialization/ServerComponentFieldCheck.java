@@ -17,7 +17,7 @@
 package org.terasology.network.serialization;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
@@ -37,12 +37,12 @@ public class ServerComponentFieldCheck implements FieldSerializeCheck<Component>
     }
 
     @Override
-    public boolean shouldSerializeField(FieldMetadata field, Component object) {
+    public boolean shouldSerializeField(ReplicatedFieldMetadata field, Component object) {
         return shouldSerializeField(field, object, false);
     }
 
     @Override
-    public boolean shouldSerializeField(FieldMetadata field, Component component, boolean componentInitial) {
+    public boolean shouldSerializeField(ReplicatedFieldMetadata field, Component component, boolean componentInitial) {
         // The server will send fields that are replicated when
         // 1. It is the initial send of the component
         // 2. The field is replicated from Server to Client
@@ -62,7 +62,7 @@ public class ServerComponentFieldCheck implements FieldSerializeCheck<Component>
     }
 
     @Override
-    public boolean shouldDeserializeField(FieldMetadata fieldInfo) {
+    public boolean shouldDeserializeField(ReplicatedFieldMetadata fieldInfo) {
         // The server only accepts fields that are replicated from owner
         return fieldInfo.isReplicated() && fieldInfo.getReplicationInfo().value().isReplicateFromOwner();
     }

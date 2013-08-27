@@ -16,8 +16,9 @@
 package org.terasology.entitySystem.metadata;
 
 import org.junit.Test;
-import org.terasology.entitySystem.metadata.core.ListTypeHandler;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 
@@ -28,15 +29,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class FieldMetadataTest {
 
+    private ReflectFactory factory = new ReflectionReflectFactory();
+    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(factory);
+
     @Test
-    public void testOwnsAnnotationProcessed() throws NoSuchFieldException {
-        FieldMetadata metadata = new FieldMetadata(OwnerComponent.class.getDeclaredField("child"), new EntityRefTypeHandler(null), false);
+    public void testOwnsAnnotationProcessed() throws NoSuchMethodException {
+        ComponentMetadata<OwnerComponent> classMetadata = new ComponentMetadata<>(OwnerComponent.class, factory, copyStrategyLibrary, "");
+        ComponentFieldMetadata metadata = classMetadata.getField("child");
         assertTrue(metadata.isOwnedReference());
     }
 
     @Test
-    public void testOwnsAnnotationCollectionProcessed() throws NoSuchFieldException {
-        FieldMetadata metadata = new FieldMetadata(InventoryComponent.class.getDeclaredField("itemSlots"), new ListTypeHandler<>(new EntityRefTypeHandler(null)), false);
+    public void testOwnsAnnotationCollectionProcessed() throws NoSuchMethodException {
+        ComponentMetadata<InventoryComponent> classMetadata = new ComponentMetadata<>(InventoryComponent.class, factory, copyStrategyLibrary, "");
+        ComponentFieldMetadata metadata = classMetadata.getField("itemSlots");
         assertTrue(metadata.isOwnedReference());
     }
 

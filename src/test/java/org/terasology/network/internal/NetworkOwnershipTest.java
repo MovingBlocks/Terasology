@@ -29,6 +29,7 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.BlockEntityRegistry;
 
@@ -59,7 +60,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime);
 
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem);
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem, new ReflectionReflectFactory());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
         entityManager.clear();
         client = mock(NetClient.class);

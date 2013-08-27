@@ -38,6 +38,9 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.ClassLibrary;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
@@ -51,17 +54,9 @@ import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.OwnershipHelper;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.ClassLibrary;
-import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.TypeHandler;
-import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
@@ -78,6 +73,7 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -470,28 +466,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         this.blockManager = CoreRegistry.get(BlockManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = CoreRegistry.get(StorageManager.class);
+        this.entitySystemLibrary = library;
 
         CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeHandlerLibraryBuilder builder = new TypeHandlerLibraryBuilder();
-        for (Map.Entry<Class<?>, TypeHandler<?>> entry : library.getTypeHandlerLibrary()) {
-            builder.addRaw(entry.getKey(), entry.getValue());
-        }
-        builder.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
+        TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary(library.getSerializationLibrary());
+        typeSerializationLibrary.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
-        this.entitySystemLibrary = new EntitySystemLibraryImpl(builder.build());
-        EventLibrary eventLibrary = entitySystemLibrary.getEventLibrary();
-        for (ClassMetadata<? extends Event> eventMetadata : library.getEventLibrary()) {
-            eventLibrary.register(eventMetadata.getType(), eventMetadata.getNames());
-        }
-        ComponentLibrary componentLibrary = entitySystemLibrary.getComponentLibrary();
-        for (ClassMetadata<? extends Component> componentMetadata : library.getComponentLibrary()) {
-            componentLibrary.register(componentMetadata.getType(), componentMetadata.getNames());
-        }
-
-        eventSerializer = new EventSerializer(eventLibrary);
-        entitySerializer = new NetworkEntitySerializer(newEntityManager, componentLibrary);
+        eventSerializer = new EventSerializer(library.getEventLibrary(), typeSerializationLibrary);
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeSerializationLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -764,7 +748,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
                     .setName(metadata.getName());
-            for (FieldMetadata field : metadata.iterateFields()) {
+            for (FieldMetadata field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
             }
@@ -781,7 +765,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
                     .setName(metadata.getName());
-            for (FieldMetadata field : metadata.iterateFields()) {
+            for (FieldMetadata field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
             }
@@ -800,19 +784,19 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         eventSerializer.setIdMapping(generateIds(entitySystemLibrary.getEventLibrary()));
     }
 
-    private <T, U extends ClassMetadata<? extends T>> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T, U> classLibrary) {
+    private <T> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> result = Maps.newHashMap();
-        for (ClassMetadata<? extends T> metadata : classLibrary) {
+        for (ClassMetadata<? extends T, ?> metadata : classLibrary) {
             int index = result.size();
             result.put(metadata.getType(), index);
 
             int fieldId = 0;
-            for (FieldMetadata field : metadata.iterateFields()) {
+            for (FieldMetadata field : metadata.getFields()) {
                 if (fieldId >= 256) {
                     logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getName());
                     break;
                 }
-                metadata.setFieldId(field, (byte) fieldId);
+                field.setId((byte) fieldId);
                 fieldId++;
             }
         }
@@ -825,17 +809,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), entitySystemLibrary.getEventLibrary()));
     }
 
-    private <T, U extends ClassMetadata<? extends T>> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList,
-                                                                                                              ClassLibrary<T, U> classLibrary) {
+    private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T> metadata = classLibrary.getMetadata(info.getName());
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {
                     FieldMetadata field = metadata.getField(info.getFieldName(i));
                     if (field != null) {
-                        metadata.setFieldId(field, info.getFieldIds().byteAt(i));
+                        field.setId(info.getFieldIds().byteAt(i));
                     } else {
                         logger.error("Server has unknown field '{}' on '{}'", info.getFieldName(i), info.getName());
                     }

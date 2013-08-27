@@ -24,6 +24,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.Component;
@@ -39,7 +40,6 @@ import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
@@ -151,12 +151,14 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components) {
+    @SafeVarargs
+    public final boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components) {
         return setBlockRetainComponent(position.x, position.y, position.z, type, oldType, components);
     }
 
     @Override
-    public boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components) {
+    @SafeVarargs
+    public final boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components) {
         if (Thread.currentThread().equals(mainThread)) {
             Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
@@ -231,7 +233,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             return false;
         }
 
-        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
+        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType()) {
                 if (entity.hasComponent(metadata.getType())) {
                     return false;
@@ -253,7 +255,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         Prefab oldPrefab = entityManager.getPrefabManager().getPrefab(oldType.getPrefab());
         Prefab newPrefab = entityManager.getPrefabManager().getPrefab(type.getPrefab());
 
-        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
+        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()
                     && (newPrefab == null || !newPrefab.hasComponent(metadata.getType())) && !retainComponents.contains(metadata.getType())) {
                 blockEntity.removeComponent(metadata.getType());
@@ -277,12 +279,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         if (newPrefab != null) {
             for (Component comp : newPrefab.iterateComponents()) {
-                ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
-                if (!blockEntity.hasComponent(comp.getClass())) {
-                    blockEntity.addComponent(metadata.clone(comp));
-                } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
-                    updateComponent(blockEntity, metadata, comp);
-                }
+                copyIntoPrefab(blockEntity, comp, retainComponents);
             }
 
             EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
@@ -303,11 +300,21 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    private void updateComponent(EntityRef blockEntity, ComponentMetadata<?> metadata, Component targetComponent) {
-        Component currentComp = blockEntity.getComponent(targetComponent.getClass());
+    @SuppressWarnings("unchecked")
+    private <T extends Component> void copyIntoPrefab(EntityRef blockEntity, T comp, Set<Class<? extends Component>> retainComponents) {
+        ComponentMetadata<T> metadata = entityManager.getComponentLibrary().getMetadata((Class<T>) comp.getClass());
+        if (!blockEntity.hasComponent(comp.getClass())) {
+            blockEntity.addComponent(metadata.copyRaw(comp));
+        } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
+            updateComponent(blockEntity, metadata, comp);
+        }
+    }
+
+    private <T extends Component> void updateComponent(EntityRef blockEntity, ComponentMetadata<T> metadata, T targetComponent) {
+        T currentComp = blockEntity.getComponent(metadata.getType());
         if (currentComp != null) {
             boolean changed = false;
-            for (FieldMetadata field : metadata.iterateFields()) {
+            for (FieldMetadata<T, ?> field : metadata.getFields()) {
                 Object newVal = field.getValue(targetComponent);
                 if (!Objects.equal(field.getValue(currentComp), newVal)) {
                     field.setValue(currentComp, newVal);
@@ -481,7 +488,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                 } else {
                     ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                     boolean changed = false;
-                    for (FieldMetadata field : metadata.iterateFields()) {
+                    for (FieldMetadata field : metadata.getFields()) {
                         Object expected = field.getValue(comp);
                         if (!Objects.equal(expected, field.getValue(currentComp))) {
                             field.setValue(currentComp, expected);

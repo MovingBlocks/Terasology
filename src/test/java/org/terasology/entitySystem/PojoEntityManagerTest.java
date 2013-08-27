@@ -31,6 +31,7 @@ import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -71,7 +72,7 @@ public class PojoEntityManagerTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = (PojoEntityManager) builder.build(moduleManager, mock(NetworkSystem.class));
+        entityManager = (PojoEntityManager) builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
 
         PrefabManager prefabManager = entityManager.getPrefabManager();
         PrefabData protoPrefab = new PrefabData();

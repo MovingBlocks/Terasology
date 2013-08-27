@@ -28,6 +28,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -82,9 +83,9 @@ public class StorageManagerTest {
         moduleManager = new ModuleManager();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
 
-        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry()));
+        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         testBlock = new Block();
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
 
@@ -184,7 +185,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager);
         newSM.loadGlobalStore();
         assertNotNull(newSM.loadPlayerStore(PLAYER_ID));
@@ -200,7 +201,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -223,7 +224,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -260,7 +261,7 @@ public class StorageManagerTest {
         esm.createGlobalStoreForSave().save();
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -283,7 +284,7 @@ public class StorageManagerTest {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(newEntityManager, false);
         newSM.loadGlobalStore();
 

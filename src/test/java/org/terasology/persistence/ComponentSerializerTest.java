@@ -23,16 +23,22 @@ import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,6 +51,8 @@ import static org.mockito.Mockito.mock;
 public class ComponentSerializerTest {
     private static ModuleManager moduleManager;
     private ComponentSerializer componentSerializer;
+    private ReflectFactory reflectFactory = new ReflectionReflectFactory();
+    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(reflectFactory);
 
     @BeforeClass
     public static void setupClass() {
@@ -53,22 +61,23 @@ public class ComponentSerializerTest {
 
     @Before
     public void setup() {
+        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
+        serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
+
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        EngineEntityManager entityManager = builder.build(moduleManager, networkSystem);
+        EngineEntityManager entityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
         entityManager.getComponentLibrary().register(GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(StringComponent.class);
         entityManager.getComponentLibrary().register(IntegerComponent.class);
         ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
-        componentSerializer = new ComponentSerializer(componentLibrary);
+        componentSerializer = new ComponentSerializer(componentLibrary, serializationLibrary);
 
     }
 
     @Test
     public void testGetterSetterUtilization() throws Exception {
-        ClassMetadata<?> info = new ClassMetadata<>(GetterSetterComponent.class);
-        info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), new Vector3fTypeHandler(), false));
-
         GetterSetterComponent comp = new GetterSetterComponent();
         GetterSetterComponent newComp = (GetterSetterComponent) componentSerializer.deserialize(componentSerializer.serialize(comp));
         assertTrue(comp.getterUsed);

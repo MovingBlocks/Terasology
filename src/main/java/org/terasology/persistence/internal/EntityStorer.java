@@ -18,14 +18,15 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.OwnershipHelper;
-import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -49,7 +50,7 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
 
         Map<Class<? extends Component>, Integer> componentIds = Maps.newHashMap();
-        for (ClassMetadata<? extends Component> componentMetadata : entityManager.getComponentLibrary()) {
+        for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             entityStoreBuilder.addComponentClass(componentMetadata.getName());
             componentIds.put(componentMetadata.getType(), componentIds.size());
         }

@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.copying.CopyStrategy;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 
+import java.lang.reflect.Field;
+
 /**
  * @author Immortius
  */
-public class EventMetadata<T extends Event> extends ClassMetadata<T> {
+public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedFieldMetadata<T, ?>> {
 
-    private NetworkEventType networkEventType;
-    private String uri;
+    private NetworkEventType networkEventType = NetworkEventType.NONE;
     private boolean lagCompensated;
     private boolean skipInstigator;
 
-    public EventMetadata(Class<T> simpleClass, String uri) throws NoSuchMethodException {
-        super(simpleClass, uri);
-        this.uri = uri;
+    public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, String uri) throws NoSuchMethodException {
+        super(simpleClass, factory, copyStrategies, uri);
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
             lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();
@@ -45,23 +48,36 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
         }
     }
 
+    /**
+     * @return Whether this event is a network event.
+     */
     public boolean isNetworkEvent() {
-        return networkEventType != null;
+        return networkEventType != NetworkEventType.NONE;
     }
 
-    public boolean isLagCompensated() {
-        return lagCompensated;
-    }
-
-    public boolean isSkipInstigator() {
-        return skipInstigator;
-    }
-
+    /**
+     * @return The type of network event this event is.
+     */
     public NetworkEventType getNetworkEventType() {
         return networkEventType;
     }
 
-    public String getId() {
-        return uri;
+    /**
+     * @return Whether this event is compensated for lag.
+     */
+    public boolean isLagCompensated() {
+        return lagCompensated;
+    }
+
+    /**
+     * @return Whether this event should not be replicated to the instigator
+     */
+    public boolean isSkipInstigator() {
+        return skipInstigator;
+    }
+
+    @Override
+    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) {
+        return new ReplicatedFieldMetadata<>(this, field, copyStrategy, factory, true);
     }
 }

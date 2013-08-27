@@ -18,11 +18,11 @@ package org.terasology.network.serialization;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
@@ -65,19 +65,13 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
             return blockEntityRegistry.getBlockEntityAt(pos);
         }
         if (value.getIntegerCount() > 0) {
-            EntityRef result = new NetEntityRef(value.getInteger(0), networkSystem);
-            return result;
+            return new NetEntityRef(value.getInteger(0), networkSystem);
         }
         return EntityRef.NULL;
     }
 
     @Override
-    public EntityRef copy(EntityRef value) {
-        return value;
-    }
-
-    @Override
-    public EntityData.Value serialize(Iterable<EntityRef> value) {
+    public EntityData.Value serializeCollection(Iterable<EntityRef> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (EntityRef ref : value) {
             BlockComponent blockComponent = ref.getComponent(BlockComponent.class);
@@ -97,10 +91,10 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public List<EntityRef> deserializeList(EntityData.Value value) {
+    public List<EntityRef> deserializeCollection(EntityData.Value value) {
         List<EntityRef> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
         for (Integer item : value.getIntegerList()) {
-            if (item.intValue() == 0) {
+            if (item == 0) {
                 result.add(EntityRef.NULL);
             } else {
                 result.add(new NetEntityRef(item, networkSystem));

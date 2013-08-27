@@ -37,6 +37,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.network.ClientComponent;
 import org.terasology.persistence.WorldDumper;
+import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.family.BlockFamily;
@@ -132,7 +133,9 @@ public class CoreCommands implements ComponentSystem {
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
-        WorldDumper worldDumper = new WorldDumper((EngineEntityManager) entityManager);
+        EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
+        PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
+        WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
         worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
     }
 

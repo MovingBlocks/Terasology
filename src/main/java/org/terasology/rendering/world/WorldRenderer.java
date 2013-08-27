@@ -996,10 +996,6 @@ public final class WorldRenderer {
         worldTimeEventManager.fireWorldTimeEvents();
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Physics Renderer");
-        bulletPhysics.update(delta);
-        PerformanceMonitor.endActivity();
-
         smoothedPlayerSunlightValue = TeraMath.lerpf(smoothedPlayerSunlightValue, getSunlightValue(), delta);
     }
 
@@ -1043,8 +1039,11 @@ public final class WorldRenderer {
             cameraPos.y += 0.5f;
         }
 
-        Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
-        return block.isLiquid();
+        if (worldProvider.isBlockRelevant(new Vector3f(cameraPos))) {
+            Block block = worldProvider.getBlock(new Vector3f(cameraPos));
+            return block.isLiquid();
+        }
+        return false;
     }
 
     /**

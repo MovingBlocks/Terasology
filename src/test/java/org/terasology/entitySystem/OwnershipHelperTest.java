@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.network.NetworkSystem;
 
@@ -45,7 +46,7 @@ public class OwnershipHelperTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = builder.build(moduleManager, mock(NetworkSystem.class));
+        entityManager = builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
     }
 
     @Test

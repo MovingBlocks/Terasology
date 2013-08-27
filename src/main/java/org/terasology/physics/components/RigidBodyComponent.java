@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.components;
+package org.terasology.physics;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.ForceBlockActive;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.StandardCollisionGroup;
 
 /**
- * This component is used by the PhysicsEngine interface to create a rigid body.
- * Most functionality requires the same entity to also hold a LocationComponent.
  * @author Immortius
  */
 @ForceBlockActive
@@ -37,16 +34,14 @@ public class RigidBodyComponent implements Component {
     @Replicate
     public boolean kinematic;
 
-    /**
-     * If something collides with the following group, it will collide with this
-     * rigid body:
-     */
+    @Replicate(initialOnly = true)
+    public Vector3f velocity = new Vector3f();
+
+    @Replicate(initialOnly = true)
+    public Vector3f angularVelocity = new Vector3f();
+
     @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
-    
-    /**
-     * This rigid body should collide with bodies from the following groups:
-     */
     @Replicate
     public List<CollisionGroup> collidesWith =
             Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);

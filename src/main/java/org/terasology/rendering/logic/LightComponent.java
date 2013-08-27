@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.logic;
 
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 

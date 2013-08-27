@@ -26,6 +26,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -47,9 +48,9 @@ public class PrefabSerializer {
     private ComponentSerializer componentSerializer;
     private ComponentLibrary componentLibrary;
 
-    public PrefabSerializer(ComponentLibrary componentLibrary) {
+    public PrefabSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.componentLibrary = componentLibrary;
-        this.componentSerializer = new ComponentSerializer(componentLibrary);
+        this.componentSerializer = new ComponentSerializer(componentLibrary, typeSerializationLibrary);
     }
 
     /**
@@ -117,6 +118,8 @@ public class PrefabSerializer {
             AssetUri parentUri = new AssetUri(AssetType.PREFAB, prefabData.getParentName());
             if (parentUri.isValid()) {
                 result.setParent(Assets.get(parentUri, Prefab.class));
+            } else {
+                logger.error("Asset has invalid parent: {}", parentUri);
             }
         }
 
