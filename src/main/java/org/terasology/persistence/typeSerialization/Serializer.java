@@ -15,13 +15,15 @@
  */
 package org.terasology.persistence.typeSerialization;
 
-import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
 /**
+ * A serializer provides low-level serialization support for a type, using a mapping of type handlers for each field of that type.
+ *
  * @author Immortius
  */
 public class Serializer {
@@ -32,11 +34,22 @@ public class Serializer {
         this.fieldHandlers = fieldHandlers;
     }
 
+    /**
+     * @param field The metadata for a field of the type handled by this serializer.
+     * @return The TypeHandler for the given field
+     */
     @SuppressWarnings("unchecked")
     public TypeHandler<?> getHandlerFor(FieldMetadata<?, ?> field) {
         return fieldHandlers.get(field);
     }
 
+    /**
+     * Serializes a field of a provided container
+     *
+     * @param field     The metadata for the field to serialize
+     * @param container The object containing the field
+     * @return The serialized value of the field
+     */
     @SuppressWarnings("unchecked")
     public EntityData.Value serialize(FieldMetadata<?, ?> field, Object container) {
         Object rawValue = field.getValue(container);
@@ -48,9 +61,9 @@ public class Serializer {
     }
 
     /**
-     * Serializes the given value, that was originally obtained from this field.
+     * Serializes the given value, that was originally obtained from the given field.
      * <p/>
-     * This is provided for performance, to avoid obtaining the same value twice via reflection.
+     * This is provided for performance, to avoid obtaining the same value twice.
      *
      * @param rawValue The value to serialize
      * @return The serialized value
@@ -83,6 +96,13 @@ public class Serializer {
         return null;
     }
 
+    /**
+     * Deserializes a value onto an object
+     *
+     * @param target        The object to deserialize the field onto
+     * @param fieldMetadata The metadata of the field
+     * @param value         The serialized value of the field
+     */
     public void deserializeOnto(Object target, FieldMetadata<?, ?> fieldMetadata, EntityData.Value value) {
         TypeHandler<?> handler = getHandlerFor(fieldMetadata);
         Object deserializedValue = handler.deserialize(value);

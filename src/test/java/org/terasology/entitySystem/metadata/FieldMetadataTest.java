@@ -15,16 +15,12 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
-import org.terasology.entitySystem.metadata.internal.ClassMetadataImpl;
-import org.terasology.entitySystem.metadata.internal.FieldMetadataImpl;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.persistence.typeSerialization.typeHandlers.core.ListTypeHandler;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 
@@ -40,14 +36,14 @@ public class FieldMetadataTest {
 
     @Test
     public void testOwnsAnnotationProcessed() throws NoSuchMethodException {
-        ClassMetadata<OwnerComponent> classMetadata = new ClassMetadataImpl<>(OwnerComponent.class, copyStrategyLibrary, factory, "");
+        ClassMetadata<OwnerComponent> classMetadata = new ClassMetadata<>(OwnerComponent.class, factory, copyStrategyLibrary, "");
         FieldMetadata metadata = classMetadata.getField("child");
         assertTrue(metadata.isOwnedReference());
     }
 
     @Test
     public void testOwnsAnnotationCollectionProcessed() throws NoSuchMethodException {
-        ClassMetadata<InventoryComponent> classMetadata = new ClassMetadataImpl<>(InventoryComponent.class, copyStrategyLibrary, factory, "");
+        ClassMetadata<InventoryComponent> classMetadata = new ClassMetadata<>(InventoryComponent.class, factory, copyStrategyLibrary, "");
         FieldMetadata metadata = classMetadata.getField("itemSlots");
         assertTrue(metadata.isOwnedReference());
     }

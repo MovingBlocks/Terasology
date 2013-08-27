@@ -24,7 +24,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.internal.MetadataUtil;
+import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;

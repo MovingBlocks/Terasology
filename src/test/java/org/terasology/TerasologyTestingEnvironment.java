@@ -45,7 +45,7 @@ import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;

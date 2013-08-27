@@ -15,8 +15,8 @@
  */
 package org.terasology.persistence.typeSerialization.typeHandlers.extension;
 
-import org.terasology.persistence.typeSerialization.typeHandlers.SimpleTypeHandler;
 import org.terasology.math.Vector3i;
+import org.terasology.persistence.typeSerialization.typeHandlers.SimpleTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 /**

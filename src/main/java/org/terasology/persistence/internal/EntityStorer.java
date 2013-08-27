@@ -18,14 +18,14 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.OwnershipHelper;
-import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

@@ -38,6 +38,9 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.ClassLibrary;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
@@ -51,12 +54,9 @@ import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.OwnershipHelper;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.ClassLibrary;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
@@ -784,7 +784,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         eventSerializer.setIdMapping(generateIds(entitySystemLibrary.getEventLibrary()));
     }
 
-    private <T, U extends ClassMetadata<? extends T>> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T, U> classLibrary) {
+    private <T> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> result = Maps.newHashMap();
         for (ClassMetadata<? extends T> metadata : classLibrary) {
             int index = result.size();
@@ -809,8 +809,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), entitySystemLibrary.getEventLibrary()));
     }
 
-    private <T, U extends ClassMetadata<? extends T>> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList,
-                                                                                                              ClassLibrary<T, U> classLibrary) {
+    private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
             ClassMetadata<? extends T> metadata = classLibrary.getMetadata(info.getName());

@@ -15,7 +15,7 @@
  */
 package org.terasology.editor.properties;
 
-import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 
 import java.text.DecimalFormat;
 

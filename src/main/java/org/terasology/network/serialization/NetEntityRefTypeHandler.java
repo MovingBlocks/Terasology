@@ -18,11 +18,11 @@ package org.terasology.network.serialization;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;

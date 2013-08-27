@@ -17,16 +17,13 @@
 package org.terasology.entitySystem.metadata;
 
 import org.junit.Test;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.entitySystem.stubs.UnsupportedTypeComponent;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +38,7 @@ public class ComponentMetadataTest {
 
     @Test
     public void staticFieldsIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(StringComponent.class);
         ClassMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
@@ -50,7 +47,7 @@ public class ComponentMetadataTest {
 
     @Test
     public void ownsReferencesPopulated() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);

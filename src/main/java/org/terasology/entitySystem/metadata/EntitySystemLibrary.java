@@ -16,28 +16,46 @@
 
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 
 /**
- * The set of class libraries used by the entity system
+ * The set of metadata libraries used by the entity system
  *
  * @author Immortius
  */
-public interface EntitySystemLibrary {
+public class EntitySystemLibrary {
+
+    private final TypeSerializationLibrary typeSerializationLibrary;
+    private final ComponentLibrary componentLibrary;
+    private final EventLibrary eventLibrary;
+
+    public EntitySystemLibrary(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies, TypeSerializationLibrary typeSerializationLibrary) {
+        this.typeSerializationLibrary = typeSerializationLibrary;
+        this.componentLibrary = new ComponentLibrary(reflectFactory, copyStrategies);
+        this.eventLibrary = new EventLibrary(reflectFactory, copyStrategies);
+    }
 
     /**
      * @return The library of component metadata
      */
-    ComponentLibrary getComponentLibrary();
+    public ComponentLibrary getComponentLibrary() {
+        return componentLibrary;
+    }
 
     /**
-     * @return The library of serializers for components
+     * @return The library of serializers
      */
-    TypeSerializationLibrary getSerializationLibrary();
+    public TypeSerializationLibrary getSerializationLibrary() {
+        return typeSerializationLibrary;
+    }
 
     /**
      * @return The library of event metadata
      */
-    EventLibrary getEventLibrary();
+    public EventLibrary getEventLibrary() {
+        return eventLibrary;
+    }
 
 }

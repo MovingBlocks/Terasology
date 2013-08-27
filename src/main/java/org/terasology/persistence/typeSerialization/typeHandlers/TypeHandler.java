@@ -37,6 +37,7 @@ public interface TypeHandler<T> {
 
     /**
      * Deserializes a single value.
+     *
      * @param value The serialized info to deserialize
      * @return The deserialized value - this may be null
      */
@@ -44,6 +45,7 @@ public interface TypeHandler<T> {
 
     /**
      * Serializes a collection of this type.  This allows for efficiency for types that can be serialized more efficiently in this way, such as primitives
+     *
      * @param value The values to serialize
      * @return The serialized values.
      */
@@ -51,6 +53,7 @@ public interface TypeHandler<T> {
 
     /**
      * Deserializes a collection of this type.
+     *
      * @param value The serialized collection
      * @return A list of the resultant values.
      */

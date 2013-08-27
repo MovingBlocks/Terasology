@@ -21,7 +21,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.ForceBlockActive;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.List;
 

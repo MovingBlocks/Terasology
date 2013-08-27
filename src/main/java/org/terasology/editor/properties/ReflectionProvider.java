@@ -18,13 +18,12 @@ package org.terasology.editor.properties;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.internal.ClassMetadataImpl;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -48,7 +47,7 @@ public class ReflectionProvider<T> implements PropertyProvider<T> {
 
     public ReflectionProvider(T target) {
         try {
-            ClassMetadataImpl<T> classMetadata = new ClassMetadataImpl(target.getClass(), copyStrategies, reflectFactory, "");
+            ClassMetadata<T> classMetadata = new ClassMetadata(target.getClass(), reflectFactory, copyStrategies, "");
             for (Field field : getAllFields(target.getClass(), and(withAnnotation(EditorRange.class), or(withType(Float.TYPE), withType(Float.class))))) {
                 EditorRange range = field.getAnnotation(EditorRange.class);
                 FieldMetadata<T, Float> fieldMetadata = classMetadata.getField(field.getName(), Float.class);

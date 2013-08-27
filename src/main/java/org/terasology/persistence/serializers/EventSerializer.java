@@ -22,12 +22,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.persistence.typeSerialization.Serializer;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

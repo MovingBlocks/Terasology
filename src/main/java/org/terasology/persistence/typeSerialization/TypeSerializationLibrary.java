@@ -20,12 +20,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.MappedContainer;
-import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
-import org.terasology.entitySystem.metadata.internal.ClassMetadataImpl;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.classMetadata.MappedContainer;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.core.BooleanTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.core.ByteTypeHandler;
@@ -50,6 +49,8 @@ import java.util.Set;
 
 /**
  * A library of type handlers. This is used for the construction of class metadata.
+ * This library should be initialised by adding a number of base type handlers, describing how to serialize each supported type.
+ * It will then produce serializers for classes (through their ClassMetadata) on request.
  *
  * @author Immortius
  */
@@ -64,7 +65,7 @@ public class TypeSerializationLibrary {
     private Map<ClassMetadata<?>, Serializer> serializerMap = Maps.newHashMap();
 
     /**
-     * @param factory      The factory providing reflect implementation.
+     * @param factory        The factory providing reflect implementation.
      * @param copyStrategies The provider of copy strategies
      */
     public TypeSerializationLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
@@ -86,15 +87,30 @@ public class TypeSerializationLibrary {
         add(Number.class, new NumberTypeHandler());
     }
 
-    public TypeSerializationLibrary(TypeSerializationLibrary copy) {
-        this.reflectFactory = copy.reflectFactory;
-        this.copyStrategies = copy.copyStrategies;
-        for (Class<?> type : copy.coreTypeHandlers) {
-            typeHandlers.put(type, copy.typeHandlers.get(type));
+    /**
+     * Creates a copy of an existing serialization library. This copy is initialised with all type handlers that were added to the original, but does not retain any
+     * serializers or type handlers that were generated. This can be used to override specific types handlers from another type serializer.
+     *
+     * @param original The original type serialization library to copy.
+     */
+    public TypeSerializationLibrary(TypeSerializationLibrary original) {
+        this.reflectFactory = original.reflectFactory;
+        this.copyStrategies = original.copyStrategies;
+        for (Class<?> type : original.coreTypeHandlers) {
+            typeHandlers.put(type, original.typeHandlers.get(type));
             coreTypeHandlers.add(type);
         }
     }
 
+    /**
+     * Adds a type handler that will be to serialize a specified type.
+     * If a type handler was previously registered for that type, it will be replaced with the new type handler.
+     * Existing serializers will not be updated.
+     *
+     * @param type    The type to handle.
+     * @param handler The TypeHandler
+     * @param <T>     The type to handle.
+     */
     public <T> void add(Class<T> type, TypeHandler<? super T> handler) {
         typeHandlers.put(type, handler);
         coreTypeHandlers.add(type);
@@ -174,7 +190,7 @@ public class TypeSerializationLibrary {
                 && !(typeClass.isMemberClass()
                 && !Modifier.isStatic(typeClass.getModifiers()))) {
             try {
-                ClassMetadata<?> metadata = new ClassMetadataImpl<>(typeClass, copyStrategies, reflectFactory, "");
+                ClassMetadata<?> metadata = new ClassMetadata<>(typeClass, reflectFactory, copyStrategies, "");
                 MappedContainerTypeHandler<?> mappedHandler = new MappedContainerTypeHandler(typeClass, getFieldHandlerMap(metadata));
                 typeHandlers.put(typeClass, mappedHandler);
                 return mappedHandler;

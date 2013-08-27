@@ -16,7 +16,7 @@
 
 package org.terasology.persistence.serializers;
 
-import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 
 /**
  * Interface for providing serializers with a method to check whether a given field should be serialized.
@@ -33,8 +33,8 @@ public interface FieldSerializeCheck<T> {
     boolean shouldSerializeField(FieldMetadata field, T object);
 
     /**
-     * @param field  The field to check
-     * @param object The object it belongs to
+     * @param field            The field to check
+     * @param object           The object it belongs to
      * @param componentInitial In a network situation, whether the component is newly added or not
      * @return Whether the field should be serialized
      */

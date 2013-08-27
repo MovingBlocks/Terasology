@@ -26,10 +26,9 @@ import org.terasology.entitySystem.internal.PojoEntityManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -60,7 +59,7 @@ public class PojoEventSystemTests {
         CopyStrategyLibrary copyStrategies = CopyStrategyLibrary.create(reflectFactory);
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategies);
 
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(reflectFactory, copyStrategies, serializationLibrary);
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, serializationLibrary);
         compLibrary = entitySystemLibrary.getComponentLibrary();
         entityManager = new PojoEntityManager();
         entityManager.setEntitySystemLibrary(entitySystemLibrary);

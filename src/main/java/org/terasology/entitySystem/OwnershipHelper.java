@@ -16,9 +16,9 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Sets;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
 
 import java.util.Collection;
 import java.util.Map;
@@ -38,12 +38,12 @@ public final class OwnershipHelper {
      * Produces a collection of entities that are owned by the provided entity.
      * This is immediate ownership only - it does not recursively follow ownership.
      *
-     * @param entity
+     * @param entity The owning entity
      * @return A collection of owned entities of the given entity
      */
     public Collection<EntityRef> listOwnedEntities(EntityRef entity) {
         Set<EntityRef> entityRefList = Sets.newHashSet();
-        for (ComponentMetadata<?> componentMetadata : componentLibrary) {
+        for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             if (componentMetadata.isReferenceOwner()) {
                 Component comp = entity.getComponent(componentMetadata.getType());
                 if (comp != null) {

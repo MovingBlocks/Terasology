@@ -16,8 +16,8 @@
 package org.terasology.logic.particles;
 
 import com.google.common.collect.Lists;
+import org.terasology.classMetadata.MappedContainer;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.MappedContainer;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.block.family.BlockFamily;
 

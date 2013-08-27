@@ -16,11 +16,11 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
 import org.terasology.network.NetworkSystem;
 
 /**

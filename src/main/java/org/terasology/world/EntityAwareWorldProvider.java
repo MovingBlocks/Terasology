@@ -24,6 +24,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.Component;
@@ -39,7 +40,6 @@ import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
@@ -233,7 +233,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             return false;
         }
 
-        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
+        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType()) {
                 if (entity.hasComponent(metadata.getType())) {
                     return false;
@@ -255,7 +255,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         Prefab oldPrefab = entityManager.getPrefabManager().getPrefab(oldType.getPrefab());
         Prefab newPrefab = entityManager.getPrefabManager().getPrefab(type.getPrefab());
 
-        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary()) {
+        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()
                     && (newPrefab == null || !newPrefab.hasComponent(metadata.getType())) && !retainComponents.contains(metadata.getType())) {
                 blockEntity.removeComponent(metadata.getType());
@@ -300,6 +300,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends Component> void copyIntoPrefab(EntityRef blockEntity, T comp, Set<Class<? extends Component>> retainComponents) {
         ComponentMetadata<T> metadata = entityManager.getComponentLibrary().getMetadata((Class<T>) comp.getClass());
         if (!blockEntity.hasComponent(comp.getClass())) {

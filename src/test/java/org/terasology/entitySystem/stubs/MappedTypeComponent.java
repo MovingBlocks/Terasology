@@ -17,7 +17,7 @@
 package org.terasology.entitySystem.stubs;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.MappedContainer;
+import org.terasology.classMetadata.MappedContainer;
 
 /**
  * @author Immortius

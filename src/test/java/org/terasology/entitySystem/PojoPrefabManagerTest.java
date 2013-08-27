@@ -23,13 +23,12 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.copying.CopyStrategyLibrary;
-import org.terasology.entitySystem.metadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.metadata.reflect.ReflectionReflectFactory;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
-import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -59,7 +58,7 @@ public class PojoPrefabManagerTest {
         TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         lib.add(Vector3f.class, new Vector3fTypeHandler());
         lib.add(Quat4f.class, new Quat4fTypeHandler());
-        entitySystemLibrary = new EntitySystemLibraryImpl(reflectFactory, copyStrategyLibrary, lib);
+        entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
     }

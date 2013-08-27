@@ -16,8 +16,8 @@
 package org.terasology.persistence.typeSerialization.typeHandlers.core;
 
 import com.google.common.collect.Lists;
-import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.math.TeraMath;
+import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;

@@ -15,40 +15,98 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
+import org.terasology.world.block.ForceBlockActive;
+import org.terasology.world.block.RequiresBlockLifecycleEvents;
 
 /**
- * Metadata on a component class
+ * Metadata on a component class and its fields.
+ *
  * @author Immortius
  */
-public interface ComponentMetadata<T extends Component> extends ClassMetadata<T> {
+public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
+
+    private boolean replicated;
+    private boolean replicatedFromOwner;
+    private boolean referenceOwner;
+    private boolean forceBlockActive;
+    private boolean retainUnalteredOnBlockChange;
+    private boolean blockLifecycleEventsRequired;
+
+    /**
+     * @param type           The type to create the metadata for
+     * @param copyStrategies A copy strategy library
+     * @param factory        A reflection library to provide class construction and field get/set functionality
+     * @param name           The name to identify the component with.
+     * @throws NoSuchMethodException If the component has no default constructor
+     */
+    public ComponentMetadata(Class<T> type, CopyStrategyLibrary copyStrategies, ReflectFactory factory, String name) throws NoSuchMethodException {
+        super(type, factory, copyStrategies, name);
+        replicated = type.getAnnotation(Replicate.class) != null;
+        blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
+        ForceBlockActive forceBlockActiveAnnotation = type.getAnnotation(ForceBlockActive.class);
+        if (forceBlockActiveAnnotation != null) {
+            forceBlockActive = true;
+            retainUnalteredOnBlockChange = forceBlockActiveAnnotation.retainUnalteredOnBlockChange();
+        }
+
+        for (FieldMetadata<T, ?> field : getFields()) {
+            if (field.isReplicated()) {
+                replicated = true;
+                if (field.getReplicationInfo().value().isReplicateFromOwner()) {
+                    replicatedFromOwner = true;
+                }
+            }
+            if (field.isOwnedReference()) {
+                referenceOwner = true;
+            }
+        }
+    }
+
     /**
      * @return Whether this component owns any references
      */
-    boolean isReferenceOwner();
+    public boolean isReferenceOwner() {
+        return referenceOwner;
+    }
 
     /**
      * @return Whether this component replicates any fields from owner to server
      */
-    boolean isReplicatedFromOwner();
+    public boolean isReplicatedFromOwner() {
+        return replicatedFromOwner;
+    }
 
     /**
      * @return Whether this component needs to be replicated
      */
-    boolean isReplicated();
+    public boolean isReplicated() {
+        return replicated;
+    }
 
     /**
      * @return Whether this component forces a block active
      */
-    boolean isForceBlockActive();
+    public boolean isForceBlockActive() {
+        return forceBlockActive;
+    }
 
     /**
      * @return Whether this component should be retained unaltered on block change
      */
-    boolean isRetainUnalteredOnBlockChange();
+    public boolean isRetainUnalteredOnBlockChange() {
+        return retainUnalteredOnBlockChange;
+    }
 
     /**
      * @return Whether this component makes a block valid for block lifecycle events
      */
-    boolean isBlockLifecycleEventsRequired();
+    public boolean isBlockLifecycleEventsRequired() {
+        return blockLifecycleEventsRequired;
+    }
 }

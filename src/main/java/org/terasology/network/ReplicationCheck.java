@@ -16,7 +16,7 @@
 
 package org.terasology.network;
 
-import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 
 /**
  * Interface for providing a method to more tightly control when a field should be replicated.

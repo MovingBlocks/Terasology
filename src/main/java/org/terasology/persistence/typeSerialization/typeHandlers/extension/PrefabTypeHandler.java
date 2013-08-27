@@ -17,8 +17,8 @@
 package org.terasology.persistence.typeSerialization.typeHandlers.extension;
 
 import org.terasology.asset.Assets;
-import org.terasology.persistence.typeSerialization.typeHandlers.SimpleTypeHandler;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.persistence.typeSerialization.typeHandlers.SimpleTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 /**
