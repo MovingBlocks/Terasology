@@ -59,5 +59,7 @@ public interface StorageManager {
 
     void loadGlobalEntities() throws IOException;
 
+    void shutdown();
+
 
 }

@@ -121,7 +121,7 @@ dependencies {
 	compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
 	compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
     // Would have liked to have left this runtime, but needed to "compile" the groovy config in IntelliJ
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
     compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
@@ -469,12 +469,36 @@ ideaModule.dependsOn extractNatives
 eclipseClasspath.dependsOn extractNatives
 
 idea { 
-	project.jdkName = '1.7'
+	project {
+		jdkName = '1.7'
+		ipr {
+			withXml {
+				def node = it.asNode()
+				def copyrightManager = node.find {it.@name == 'CopyrightManager'}
+				copyrightManager.@default = "TerasologyEngine"
+				def copyright = copyrightManager.appendNode("copyright")
+				copyright.appendNode("option", [name : "notice", value : 'Copyright 2013 Moving Blocks\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n     http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.']) 
+				copyright.appendNode("option", [name : "keyword", value : "Copyright"])
+				copyright.appendNode("option", [name : "allowReplaceKeywod", value : ""])
+				copyright.appendNode("option", [name : "myName", value : "TerasologyEngine"])
+				copyright.appendNode("option", [name : "myLocal", value : "true"])
+				def langOptions = copyrightManager.appendNode("LanguageOptions", [name : "__TEMPLATE__"])
+				langOptions.appendNode("option", [name : "addBlankAfter", value : "false"])
+				
+				def entryPointsManager = node.appendNode('component', [name : "EntryPointsManager"])
+				def entryPoints = entryPointsManager.appendNode('entry_points', [version : '2.0'])
+				def entryPointsList = entryPointsManager.appendNode('list', [size : '3'])
+				entryPointsList.appendNode('item', [index : '0', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.event.ReceiveEvent'])
+				entryPointsList.appendNode('item', [index : '1', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.In'])
+				entryPointsList.appendNode('item', [index : '2', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.RegisterSystem'])
+			}
+		}
+	}
     module.excludeDirs += file('bin')
     module.excludeDirs += file('logs') 
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
-    module.excludeDirs += file('worlds')
+    module.excludeDirs += file('saves')
     module.excludeDirs += file('screenshots')
 }
     
