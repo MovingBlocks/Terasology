@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.logic.characters;
 
 import org.terasology.physics.SweepCallback;
@@ -44,87 +43,81 @@ import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 
 /**
- * The KineticCharacterMover generalises the character movement to a physics
- * engine independent class. The physics engine will then only have to fill in
- * several smaller method calls.
+ * The KineticCharacterMover generalises the character movement to a physics engine independent class. The physics engine will then only
+ * have to fill in several smaller method calls.
  *
  * @author Immortius
  */
 public class KinematicCharacterMover implements CharacterMover {
 
-    protected static final float CHECK_FORWARD_DIST = 0.05f;
+    private static final float CHECK_FORWARD_DIST = 0.05f;
     public static final float CLIMB_GRAVITY = 0f;
     public static final float GHOST_INERTIA = 4f;
     public static final float GRAVITY = 28.0f;
     /**
      * The amount of horizontal penetration to allow.
      */
-    protected static final float HORIZONTAL_PENETRATION = 0.03f;
+    private static final float HORIZONTAL_PENETRATION = 0.03f;
     /**
-     * The amount of extra distance added to horizontal movement to allow for
-     * penentration.
+     * The amount of extra distance added to horizontal movement to allow for penentration.
      */
-    protected static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
+    private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
     public static final float TERMINAL_VELOCITY = 64.0f;
     public static final float UNDERWATER_GRAVITY = 0.25f;
     public static final float UNDERWATER_INERTIA = 2.0f;
     /**
      * The amount of vertical penetration to allow.
      */
-    protected static final float VERTICAL_PENETRATION = 0.04f;
+    private static final float VERTICAL_PENETRATION = 0.04f;
     /**
-     * The amount of extra distance added to vertical movement to allow for
-     * penetration.
+     * The amount of extra distance added to vertical movement to allow for penetration.
      */
-    protected static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
+    private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     //Logger is now based on implementing class:
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    protected boolean stepped;
+    private final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
+    private boolean stepped;
     // Processing state variables
-    protected float steppedUpDist;
-    protected WorldProvider worldProvider;
+    private float steppedUpDist;
+    private WorldProvider worldProvider;
     private PhysicsEngine physics;
-    
+
     public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
         physics = physicsEngine;
     }
 
     /**
-     * Updates whether a character should change movement mode (from being
-     * underwater or in a ladder). A higher and lower point of the character is
-     * tested for being in water, only if both points are in water does the
-     * character count as swimming. <br> <br>
+     * Updates whether a character should change movement mode (from being underwater or in a ladder). A higher and lower point of the
+     * character is tested for being in water, only if both points are in water does the character count as swimming. <br> <br>
      *
      * Sends the OnEnterLiquidEvent and OnLeaveLiquidEvent events.
      *
      * @param movementComp The movement component of the character.
      * @param state The current state of the character.
      */
-    protected void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state, final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
-        //If we are ghosting, the mode cannot be changed!
+    private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+            final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+        //If we are ghosting, the mode cannot be changed.
         if (state.getMode() == MovementMode.GHOSTING) {
             return;
         }
 
-        //Determine top and bottom positions:
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
         top.y += 0.25f * movementComp.height;
         bottom.y -= 0.25f * movementComp.height;
 
-        //Check if they are under water:
-        boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
-        boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
+        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
 
-        boolean newSwimming = topUnderwater && bottomUnderwater;
+        final boolean newSwimming = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
 
-        //In the new state, we are nor swimming, so we need to check if we will
-        //be climbing
+        //TODO: refactor this knot of if-else statements into something easy to read. Some sub-methods and switch statements would be nice.
         if (!newSwimming) {
-            Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos)};
+            Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
+                worldPos), new Vector3f(worldPos)};
             float factor = 0.18f;
             sides[0].x += factor * movementComp.radius;
             sides[1].x -= factor * movementComp.radius;
@@ -140,27 +133,22 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
 
-        //Now lets do someting with our newfound info about hte states:
         if (newSwimming) {
             //Note that you cannot climb under water!
             if (state.getMode() != MovementMode.SWIMMING) {
-                //Only enter liquid if we were not swimming already!
                 if (firstRun) {
                     entity.send(new OnEnterLiquidEvent(worldProvider.getBlock(state.getPosition())));
                 }
                 state.setMode(MovementMode.SWIMMING);
             }
         } else if (state.getMode() == MovementMode.SWIMMING) {
-            //Note that newSwimming is false here! So we are nolonger swimming:
             if (firstRun) {
                 entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
             }
-            //Leaving liquid and instantly climbing:
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
                 state.getVelocity().y = 0;
             } else {
-                //Not swimming or climbing? So we must be walking!
                 if (state.getVelocity().y > 0) {
                     state.getVelocity().y += 8;
                 }
@@ -170,16 +158,11 @@ public class KinematicCharacterMover implements CharacterMover {
             //We need to toggle the climbing mode
             state.getVelocity().y = 0;
             state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
-        } else {
-            /*
-             * We were walking and continue to do so. No changes, no code!
-             */
         }
     }
 
     /**
-     * Checks of the player will step up to an object. In a single movement step
-     * the player can only step up a single item.
+     * Checks of the player will step up to an object. In a single movement step the player can only step up a single item.
      *
      * @param collider
      * @param position
@@ -189,13 +172,14 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param stepHeight
      * @return
      */
-    protected boolean checkStep(CharacterCollider collider, Vector3f position, Vector3f direction, SweepCallback callback, float slopeFactor, float stepHeight) {
+    private boolean checkStep(CharacterCollider collider, Vector3f position, Vector3f direction, SweepCallback callback,
+            float slopeFactor, float stepHeight) {
         if (!stepped) {
             stepped = true;
-            
+
             boolean moveUpStep = false;
             moveUpStep = callback.checkForStep(direction, stepHeight, slopeFactor, CHECK_FORWARD_DIST);
-            
+
             if (moveUpStep) {
                 steppedUpDist = moveUp(stepHeight, collider, position);
                 return true;
@@ -204,7 +188,8 @@ public class KinematicCharacterMover implements CharacterMover {
         return false;
     }
 
-    protected void climb(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
+    private void climb(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+            CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         if (lengthSquared > 1) {
@@ -255,7 +240,8 @@ public class KinematicCharacterMover implements CharacterMover {
             entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
         }
         if (state.isGrounded()) {
-            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
+            state.setFootstepDelta(
+                    state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
             if (state.getFootstepDelta() > 1) {
                 state.setFootstepDelta(state.getFootstepDelta() - 1);
                 if (input.isFirstRun()) {
@@ -265,11 +251,11 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
-    protected Vector3f extractResidualMovement(Vector3f hitNormal, Vector3f direction) {
+    private Vector3f extractResidualMovement(Vector3f hitNormal, Vector3f direction) {
         return extractResidualMovement(hitNormal, direction, 1f);
     }
 
-    protected Vector3f extractResidualMovement(Vector3f hitNormal, Vector3f direction, float normalMag) {
+    private Vector3f extractResidualMovement(Vector3f hitNormal, Vector3f direction, float normalMag) {
         float movementLength = direction.length();
         if (movementLength > physics.getEpsilon()) {
             direction.normalize();
@@ -285,7 +271,8 @@ public class KinematicCharacterMover implements CharacterMover {
         return direction;
     }
 
-    protected void ghost(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
+    private void ghost(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+            CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         if (lengthSquared > 1) {
@@ -310,7 +297,8 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
-    protected MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final CharacterCollider collider) {
+    private MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight,
+            final float slopeFactor, final CharacterCollider collider) {
         steppedUpDist = 0;
         stepped = false;
         Vector3f position = new Vector3f(startPosition);
@@ -338,7 +326,7 @@ public class KinematicCharacterMover implements CharacterMover {
         return new MoveResult(position, hitSide, hitBottom, hitTop);
     }
 
-    protected boolean moveDown(float dist, float slopeFactor, CharacterCollider collider, Vector3f position) {
+    private boolean moveDown(float dist, float slopeFactor, CharacterCollider collider, Vector3f position) {
         float remainingDist = -dist;
         Vector3f targetPos = new Vector3f(position);
         targetPos.y -= remainingDist + VERTICAL_PENETRATION_LEEWAY;
@@ -347,7 +335,8 @@ public class KinematicCharacterMover implements CharacterMover {
         int iteration = 0;
         while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
             SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
-            float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
+            float actualDist = Math.max(0,
+                    (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
             expectedMove.sub(position);
             if (expectedMove.lengthSquared() > physics.getEpsilon()) {
@@ -404,7 +393,8 @@ public class KinematicCharacterMover implements CharacterMover {
         return hit;
     }
 
-    protected boolean moveHorizontal(Vector3f horizMove, CharacterCollider collider, Vector3f position, float slopeFactor, float stepHeight) {
+    private boolean moveHorizontal(Vector3f horizMove, CharacterCollider collider, Vector3f position, float slopeFactor,
+            float stepHeight) {
         float remainingFraction = 1.0f;
         float dist = horizMove.length();
         if (dist < physics.getEpsilon()) {
@@ -421,7 +411,8 @@ public class KinematicCharacterMover implements CharacterMover {
             SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
              but probably close enough */
-            float actualDist = Math.max(0, (dist + HORIZONTAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - HORIZONTAL_PENETRATION_LEEWAY);
+            float actualDist = Math.max(0,
+                    (dist + HORIZONTAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - HORIZONTAL_PENETRATION_LEEWAY);
             if (actualDist != 0) {
                 remainingFraction -= actualDist / dist;
             }
@@ -442,7 +433,8 @@ public class KinematicCharacterMover implements CharacterMover {
                     if (!stepping) {
                         horizontalHit = true;
                         Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                        Vector3f horizNormal = new Vector3f(callback.getHitNormalWorld().x, 0, callback.getHitNormalWorld().z);
+                        Vector3f horizNormal = new Vector3f(callback.getHitNormalWorld().x, 0,
+                                callback.getHitNormalWorld().z);
                         if (horizNormal.lengthSquared() > physics.getEpsilon()) {
                             horizNormal.normalize();
                             if (lastHitNormal.dot(horizNormal) > physics.getEpsilon()) {
@@ -484,11 +476,12 @@ public class KinematicCharacterMover implements CharacterMover {
         return horizontalHit;
     }
 
-    protected float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
+    private float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
         SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
-            float actualDist = Math.max(0, ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);
+            float actualDist = Math.max(0,
+                    ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);
             position.y += actualDist;
             return actualDist;
         }
@@ -515,7 +508,8 @@ public class KinematicCharacterMover implements CharacterMover {
         return result;
     }
 
-    protected void swim(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
+    private void swim(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+            CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         if (lengthSquared > 1) {
@@ -549,7 +543,8 @@ public class KinematicCharacterMover implements CharacterMover {
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
-            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenSwimStrokes);
+            state.setFootstepDelta(
+                    state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenSwimStrokes);
             if (state.getFootstepDelta() > 1) {
                 state.setFootstepDelta(state.getFootstepDelta() - 1);
                 if (input.isFirstRun()) {
@@ -559,7 +554,8 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
-    protected void updatePosition(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
+    private void updatePosition(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+            CharacterMoveInputEvent input, EntityRef entity) {
         switch (state.getMode()) {
             case GHOSTING:
                 ghost(movementComp, state, input, entity);
@@ -580,7 +576,8 @@ public class KinematicCharacterMover implements CharacterMover {
     }
 
     @SuppressWarnings(value = "SuspiciousNameCombination")
-    protected void updateRotation(CharacterMovementComponent movementComp, CharacterStateEvent result, CharacterMoveInputEvent input) {
+    private void updateRotation(CharacterMovementComponent movementComp, CharacterStateEvent result,
+            CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
             AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
@@ -590,7 +587,8 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
-    protected void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input, EntityRef entity) {
+    private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+            CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         //If the movement direction length is smaller than 1, so will be the movement speed?? huh? Shouldnt this be lengthSquared != 0
@@ -622,7 +620,8 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
         CharacterCollider collider = physics.getCharacterCollider(entity);
-        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, collider);
+        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0,
+                movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
@@ -660,7 +659,8 @@ public class KinematicCharacterMover implements CharacterMover {
             entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
         }
         if (state.isGrounded()) {
-            state.setFootstepDelta(state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
+            state.setFootstepDelta(
+                    state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
             if (state.getFootstepDelta() > 1) {
                 state.setFootstepDelta(state.getFootstepDelta() - 1);
                 if (input.isFirstRun()) {

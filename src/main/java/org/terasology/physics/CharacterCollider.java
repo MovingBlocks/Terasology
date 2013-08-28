@@ -62,5 +62,13 @@ public interface CharacterCollider {
      */
     public void setTransform(Vector3f loc, Quat4f orientation);
     
+    /**
+     * //TODO explain what a sweep does exactly, yet in a few simple words.
+     * @param startPos
+     * @param endPos
+     * @param allowedPenetration
+     * @param slopeFactor
+     * @return 
+     */
     public SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
 }

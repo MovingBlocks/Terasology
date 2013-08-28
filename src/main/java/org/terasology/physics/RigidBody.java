@@ -20,13 +20,13 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 /**
- * This interface provides a simplified an generic view on rigid bodies of
- * physics engines. Note that this is no longer a Bullet rigid body.
+ * This interface provides a simplified an generic view on rigid bodies of physics engines. This may is not a direct implementation, so the
+ * behaviour and names of method may differ from what is used in specific physics implementations. Read the documentation of individual
+ * method when uncertain.
  * <p/>
- * After removing this body from the physics engine (by using rigidBody methods
- * of the physics engine) this object is no longer valid and should not be used
- * anymore.
- * 
+ * After removing this body from the physics engine (by using rigidBody methods of the physics engine) this object is no longer valid and
+ * should not be used anymore.
+ *
  * TODO: add the methods to apply forces
  *
  * @author Xanhou
@@ -87,16 +87,43 @@ public interface RigidBody {
      */
     public Vector3f getAngularVelocity(Vector3f out);
     
+    /**
+     * Sets the linear velocity
+     * @param lin_vel new linear velocity
+     */
     public void setLinearVelocity(Vector3f lin_vel);
     
+    /**
+     * Sets the angular velocity
+     * @param lin_vel new angular velocity
+     */
     public void setAngularVelocity(Vector3f ang_vel);
     
+    /**
+     * Sets both linear and angular velocity in a slightly more efficient way than calling both the individual methods.
+     * @param lin_vel new linear velocity
+     * @param ang_vel new angular velocity
+     */
     public void setVelocity(Vector3f lin_vel, Vector3f ang_vel);
 
+    /**
+     * Sets the orientation or rotation.
+     * @param orientation the new rotation.
+     */
     public void setOrientation(Quat4f orientation);
 
+    /**
+     * Sets the world location or position.
+     * @param location new world position
+     */
     public void setLocation(Vector3f location);
     
+    /**
+     * Sets both rotation and position in a more efficient way than calling both the individual methods.
+     * A transform is simply an expensive word for the combination of the location and orientation of an object.
+     * @param location
+     * @param orientation 
+     */
     public void setTransform(Vector3f location, Quat4f orientation);
     
     /**

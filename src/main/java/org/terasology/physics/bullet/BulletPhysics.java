@@ -217,7 +217,7 @@ public class BulletPhysics implements PhysicsEngine {
             } else if (closest.userData instanceof EntityRef) { //we hit an other entity
                 return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
             } else { //we hit something we don't understand, assume its nothing and log a warning
-                logger.warn("Unidentified object was hit in the physics engine: " + closest.userData);
+                logger.warn("Unidentified object was hit in the physics engine: {}", closest.userData);
                 return new HitResult();
             }
         } else { //nothing was hit
@@ -309,7 +309,7 @@ public class BulletPhysics implements PhysicsEngine {
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
         if(location == null) {
-            logger.warn("Trying to update or create trigger of entity that has no LocationComponent?!");
+            logger.warn("Trying to update or create trigger of entity that has no LocationComponent?! Entity: {}", entity);
             return false;
         }
         if (triggerObj != null) {
@@ -337,7 +337,7 @@ public class BulletPhysics implements PhysicsEngine {
         BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);
         if(toRemove == null) {
             logger.warn("Trying to remove CharacterCollider of entity that has "
-                    + "no CharacterCollider in the physics engine. Entity: " + entity);
+                    + "no CharacterCollider in the physics engine. Entity: {}", entity);
             return false;
         } else {
             removeCollider(toRemove.collider);
@@ -407,14 +407,14 @@ public class BulletPhysics implements PhysicsEngine {
             triggerObj.setUserPointer(entity);
             PairCachingGhostObject oldTrigger = entityTriggers.put(entity, triggerObj);
             if(oldTrigger != null) {
-                logger.warn("Creating a trigger for an entity that already has a trigger. Multiple trigger pre entity are not supported. Removing old one.");
+                logger.warn("Creating a trigger for an entity that already has a trigger. Multiple trigger pre entity are not supported. Removing old one. Entity: {}", entity);
                 removeCollider(oldTrigger);
                 return false;
             } else {
                 return true;
             }
         } else {
-            logger.warn("Tryig to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent");
+            logger.warn("Tryig to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent. Entity: {}", entity);
             return false;
         }
     }

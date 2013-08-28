@@ -72,7 +72,7 @@ public class HitResult {
     }
 
     /**
-     * @return true is something was hit.
+     * @return true if something was hit, false otherwise.
      */
     public boolean isHit() {
         return hit;
