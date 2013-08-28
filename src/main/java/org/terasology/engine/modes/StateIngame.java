@@ -36,7 +36,7 @@ import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -116,6 +116,7 @@ public class StateIngame implements GameState {
         eventSystem.process();
         componentSystemManager.shutdown();
         guiManager.closeAllWindows();
+        
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
@@ -125,7 +126,7 @@ public class StateIngame implements GameState {
             CoreRegistry.get(Game.class).save();
         }
 
-        CoreRegistry.get(BulletPhysics.class).dispose();
+        CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
         CoreRegistry.get(Console.class).dispose();

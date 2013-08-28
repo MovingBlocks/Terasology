@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.physics.events;
 
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
-import javax.vecmath.Vector3f;
-
 /**
- * Created with IntelliJ IDEA.
- * User: Pencilcheck
- * Date: 12/23/12
- * Time: 12:30 AM
+ * @author Immortius
  */
-public class MovedEvent implements Event {
-    private Vector3f delta;
-    private Vector3f finalPosition;
+public class CollideEvent implements Event {
+    private EntityRef otherEntity;
 
-    public MovedEvent(Vector3f delta, Vector3f finalPosition) {
-        this.delta = delta;
-        this.finalPosition = finalPosition;
+    public CollideEvent(EntityRef other) {
+        otherEntity = other;
     }
 
-    public Vector3f getDelta() {
-        return delta;
-    }
-
-    public Vector3f getPosition() {
-        return finalPosition;
+    public EntityRef getOtherEntity() {
+        return otherEntity;
     }
 }

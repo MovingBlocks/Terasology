@@ -75,11 +75,8 @@ public final class CharacterMovementComponent implements Component {
     // Distance since last footstep
     public float footstepDelta;
 
-    // TODO: Remove this from here, put in system instead
-    public transient PairCachingGhostObject collider;
 
     private Vector3f velocity = new Vector3f();
-
     public Vector3f getVelocity() {
         return velocity;
     }

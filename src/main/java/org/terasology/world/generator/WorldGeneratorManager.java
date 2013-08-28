@@ -26,6 +26,7 @@ import org.terasology.engine.module.ModuleManager;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import org.reflections.Reflections;
 
 /**
  * @author Immortius

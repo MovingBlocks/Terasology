@@ -24,7 +24,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
@@ -69,7 +69,7 @@ public class InitialiseRemoteWorld implements LoadProcess {
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
-        CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
 
         CoreRegistry.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
 

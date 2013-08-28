@@ -25,6 +25,9 @@ import org.terasology.network.NetworkEvent;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.physics.PhysicsEngine;
+import org.terasology.physics.CharacterCollider;
 
 /**
  * @author Immortius
@@ -123,6 +126,10 @@ public class CharacterStateEvent extends NetworkEvent {
         this.sequenceNumber = sequenceNumber;
     }
 
+    /**
+     * Retrieve the pitch in degrees.
+     * @return 
+     */
     public float getPitch() {
         return pitch;
     }
@@ -131,6 +138,10 @@ public class CharacterStateEvent extends NetworkEvent {
         this.pitch = pitch;
     }
 
+    /**
+     * Retrieve the yaw in degrees.
+     * @return 
+     */
     public float getYaw() {
         return yaw;
     }
@@ -147,6 +158,16 @@ public class CharacterStateEvent extends NetworkEvent {
         this.footstepDelta = delta;
     }
 
+    /**
+     * Sets the state of the given entity to the state represented by the
+     * CharacterStateEvent. The state of the entity is determined by its
+     * LocationComponent (location and orientation of physics body),
+     * CharacterMovementComponent (velocity and various movement state
+     * variables) and CharacterComponent for pitch and yaw (used for the camera).
+     *
+     * @param entity
+     * @param state
+     */
     public static void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
@@ -165,7 +186,7 @@ public class CharacterStateEvent extends NetworkEvent {
         characterComponent.pitch = state.pitch;
         characterComponent.yaw = state.yaw;
         entity.saveComponent(characterComponent);
-        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), state.getPosition(), 1.0f)));
+        setPhysicsLocation(entity, state.getPosition());
     }
 
     public static void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
@@ -197,8 +218,7 @@ public class CharacterStateEvent extends NetworkEvent {
         characterComponent.pitch = b.pitch;
         characterComponent.yaw = b.yaw;
         entity.saveComponent(characterComponent);
-
-        movementComponent.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), newPos, 1.0f)));
+        setPhysicsLocation(entity, newPos);
     }
 
     public static void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
@@ -221,8 +241,18 @@ public class CharacterStateEvent extends NetworkEvent {
         characterComponent.pitch = state.pitch;
         characterComponent.yaw = state.yaw;
         entity.saveComponent(characterComponent);
-
-        movementComponent.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), newPos, 1.0f)));
+        setPhysicsLocation(entity, newPos);
     }
-
+    
+    /**
+     * Sets the location in the physics engine.
+     * 
+     * @param entity The entity to set the location of.
+     * @param newPos The new position of the entity.
+     */
+    private static void setPhysicsLocation(EntityRef entity, Vector3f newPos) {
+        PhysicsEngine physics = CoreRegistry.get(PhysicsEngine.class);
+        CharacterCollider collider = physics.getCharacterCollider(entity);
+        collider.setLocation(newPos);
+    }
 }
