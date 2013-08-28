@@ -17,7 +17,6 @@ package org.terasology.entitySystem.metadata.internal;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.DefaultClassMetadata;
 import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;

@@ -16,7 +16,6 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Sets;
-import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentFieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;

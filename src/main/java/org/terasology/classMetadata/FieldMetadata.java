@@ -19,16 +19,8 @@ import com.google.common.base.Objects;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.reflect.FieldAccessor;
 import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Owns;
-import org.terasology.network.NoReplicate;
-import org.terasology.network.Replicate;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Provides information on a field, and the ability to set and get that field.
@@ -47,10 +39,10 @@ public class FieldMetadata<T, U> {
     private byte id;
 
     /**
-     * @param owner               The ClassMetadata that owns this field
-     * @param field               The field this metadata is for
-     * @param copyStrategy        The CopyStrategy appropriate for the type of the field
-     * @param factory             The reflection provider
+     * @param owner        The ClassMetadata that owns this field
+     * @param field        The field this metadata is for
+     * @param copyStrategy The CopyStrategy appropriate for the type of the field
+     * @param factory      The reflection provider
      */
     @SuppressWarnings("unchecked")
     public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) {

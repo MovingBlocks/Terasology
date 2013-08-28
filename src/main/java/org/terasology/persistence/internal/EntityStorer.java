@@ -18,7 +18,6 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;

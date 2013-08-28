@@ -17,13 +17,12 @@
 package org.terasology.entitySystem.metadata;
 
 import org.junit.Test;
-import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
