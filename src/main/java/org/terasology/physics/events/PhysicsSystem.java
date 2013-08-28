@@ -86,18 +86,19 @@ public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnCh
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void newRigidBody(OnActivatedComponent event, EntityRef entity) {
-        physics.newRigidBody(entity);
+        //getter also creates the rigid body
+        physics.getRigidBody(entity);
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    //update also creates the trigger
     public void newTrigger(OnActivatedComponent event, EntityRef entity) {
-        physics.newTrigger(entity);
+        physics.updateTrigger(entity);
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
-        //TODO possibly the creation of a new vector is not needed here.
-        physics.getRigidBody(entity).applyImpulse(new Vector3f(event.getImpulse()));
+        physics.getRigidBody(entity).applyImpulse(event.getImpulse());
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})

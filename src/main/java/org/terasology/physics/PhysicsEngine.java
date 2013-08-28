@@ -46,14 +46,14 @@ public interface PhysicsEngine {
     /**
      * Combines the flags of the given collision groups into a single flag.
      * @param groups
-     * @return 
+     * @return A single flag representing all the given groups.
      */
     short combineGroups(CollisionGroup... groups);
 
     /**
      * Combines the flags of the given collision groups into a single flag.
      * @param groups
-     * @return 
+     * @return A single flag representing all the given groups.
      */
     short combineGroups(Iterable<CollisionGroup> groups);
 
@@ -62,21 +62,12 @@ public interface PhysicsEngine {
      * used anymore.
      */
     void dispose();
-
-    /**
-     * Creates a Collider for the given entity based on the LocationComponent
-     * and CharacterMovementComponent.
-     * All collision flags are set right for a character movement component.
-     *
-     * @param owner the entity to create the collider for.
-     * @return
-     */
-    CharacterCollider createCharacterCollider(EntityRef owner);
     
     /**
-     * Return a list with all CollisionPairs that occurred in the previous
-     * physics simulation step.
-     * TODO: alter this method to return all collision pairs since the last call to this method.
+     * Return a list with all CollisionPairs created since the last call to this
+     * method. A collisionPair is created when a Trigger hits an other object.
+     * Therefore, one of the entities in the CollisionPair should have a Trigger
+     * attached to it.
      *
      * @return A newly allocated list with all pairs of entities that collided.
      */
@@ -98,9 +89,8 @@ public interface PhysicsEngine {
     Set<EntityRef> getPhysicsEntities();
     
     /**
-     * Get the character collider for the given entity. Returns null of no such
-     * collider exists. After calling createCharacterCollider(EntityRef owner)
-     * this method should return true (for the same entity).
+     * Get the character collider for the given entity. Will create a new 
+     * CharacterCollider if non exists and return that one.
      *
      * @param entity
      * @return true if the given entity has a CharacterCollider associated to it.
@@ -108,12 +98,19 @@ public interface PhysicsEngine {
     CharacterCollider getCharacterCollider(EntityRef entity);
 
     /**
-     * Returns the rigid body associated with the given entity.
+     * Returns the rigid body associated with the given entity. If no such
+     * RigidBody exists, a new one is created and returned.
+     * </p>
+     * Note that you should not wait with calling this method until using the
+     * rigid body. As soon as the rigid body should exist in the physics engine,
+     * this method should be called to create the rigid body.
      *
      * @param entity the entity to retrieve the rigid body of.
      * @return A valid RigidBody instance.
-     * @throws IllegalStateException if there is no RigidBody in this
-     * PhysicsEngine for the given entity
+     * @throws IllegalArgumentException if there is no RigidBody in this
+     * PhysicsEngine for the given entity and one cannot be created because the
+     * given entity does not have a LocationComponent, RigidBodyComponent and
+     * ShapeComponent.
      */
     RigidBody getRigidBody(EntityRef entity);
 
@@ -139,39 +136,6 @@ public interface PhysicsEngine {
     boolean hasCharacterCollider(EntityRef entity);
 
     /**
-     * Creates a new rigid body and adds it to the physics engine. The returned
-     * RigidBody can be used for various operations. Most of these operations
-     * can also be executed by method of this class by giving the entity the
-     * body belongs to as additional parameter. If the given entity already had
-     * a rigid body attached to it, this body is removed from the physics
-     * engine and will no longer be valid.
-     *
-     * @param entity the entity to create a rigid body for. Must have a
-     * LocationComponent, RigidBodyComponent and ShapeComponent. If not an
-     * exception is thrown.
-     * @return The newly created RigidBody. All exposed methods are ready to be
-     * used.
-     * @throws IlligalArgumentException if the given entity does not have a
-     * LocationComponent, ShapeComponent and RigidBodyComponent.
-     */
-    RigidBody newRigidBody(EntityRef entity);
-
-    /**
-     * Creates a new trigger. An entity with a trigger attached to it will
-     * generate collision pairs when it collides or intersects with other
-     * objects. A good example of its usage is picking up items. By creating a
-     * trigger for a player, a collision event will be generated when the shape
-     * of the player collides with the shape of a dropped item. This event is
-     * send by the physics class. Instead it is stored and can be retrieved by
-     * the getCollisionPairs() method. The PhysicsSystem class uses this
-     * mechanism to generate normal Terasolegy events.
-     *
-     * @param entity the entity to create a trigger for.
-     * @return true of there was already a trigger for this entity.
-     */
-    boolean newTrigger(EntityRef entity);
-
-    /**
      * Warning: Using this iterator to remove elements has an unpredictable
      * behaviour. Do not use this functionality! Instead, store the elements and
      * remove them later with removeRigidBody(EntityRef), or retrieve the
@@ -190,19 +154,23 @@ public interface PhysicsEngine {
      * @param from Place to start tracing
      * @param direction Directing in which to trace
      * @param distance maximum distance to trace before giving up
-     * @param collisionGroups the collision groups to test for. Only if an
+     * @param collisionGroups the collision groups to collide with. Only if an
      * object of any of these groups is hit it will be registered.
-     * @return A HitResult that contains the info about the ray trace.
+     * @return A HitResult object that contains the info about the ray trace.
      */
     HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups);
 
     /**
-     * Removes the character collider associated with the given entity from the
+     * Removes the CharacterCollider associated with the given entity from the
      * physics engine. The collider object of this entity will no longer be
      * valid.
      * </p>
-     * If no character collider was attached to the entity, a warning is logged
+     * If no CharacterCollider was attached to the entity, a warning is logged
      * and this method return false.
+     * </p>
+     * Make sure not to make another call to getCharacterCollider() if you are
+     * destroying the entity, as this will create a new CharacterCollider for
+     * the entity.
      *
      * @param entity the entity to remove the rigid body of.
      * @return true if this entity had a character collider attached to it,
@@ -218,6 +186,10 @@ public interface PhysicsEngine {
      * </p>
      * If no rigid body was attached to the entity, a warning is logged and this
      * method return false.
+     * </p>
+     * Make sure not to make another call to getRigidBody() if you are
+     * destroying the entity, as this will create a new RigidBody for
+     * the entity.
      *
      * @param entity the entity to remove the rigid body of.
      * @return true if this entity had a rigid body attached to it, false
@@ -231,7 +203,10 @@ public interface PhysicsEngine {
      * </p>
      * If no trigger was attached to the entity, a warning is logged and this
      * method return false.
-     *
+     * </p>
+     * Make sure not to make another call to updateTrigger() if you are
+     * destroying the entity, as this will create a new trigger for
+     * the entity.
      * @param entity the entity to remove the rigid body of.
      * @return true if this entity had a trigger attached to it, false
      * otherwise.
@@ -241,22 +216,24 @@ public interface PhysicsEngine {
     /**
      * Scans the given area for physics objects of the given groups and returns
      * a list of the entities of the physics objects in the given area.
+     * </p>
+     * If an Entity has multiple physics objects with the right collision group
+     * in this area, this entity will be found multiple times in the returned
+     * list. Although it is not likely to happen since a singe entity can only
+     * have a singel RigidBody, CharacterCollider or and Trigger, the
+     * collisionFilter may check for all three.
      *
-     * @param area
-     * @param collisionFilter
+     * @param area The area to scan
+     * @param collisionFilter only objects in these collision groups are
+     * returned.
      * @return A valid, non null List with EntityRefs. Each entity in this list
-     * has an associated RigidBody, CharacterCollider or Trigger.
+     * has an associated RigidBody, CharacterCollider or Trigger in any of the
+     * given collision groups.
      */
     List<EntityRef> scanArea(AABB area, CollisionGroup... collisionFilter);
 
     /**
-     * Scans the given area for physics objects of the given groups and returns
-     * a list of the entities of the physics objects in the given area.
-     *
-     * @param area
-     * @param collisionFilter
-     * @return A valid, non null List with EntityRefs. Each entity in this list
-     * has an associated RigidBody, CharacterCollider or Trigger.
+     * See the overloaded version for proper documentation.
      */
     List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter);
 
@@ -273,23 +250,43 @@ public interface PhysicsEngine {
      * entity. If the given entity had no rigidBody in the physics engine, it
      * will be created. Updating an entity without RigidBody is seen as bad
      * practise and hence a warning is logged.
+     * </p>
+     * Usually the LocationComponent (location) and RigidBodyComponent
+     * (velocity) are updated by the physics engine. If this dataflow needs to
+     * be turned around and the physics position needs to be updated, this
+     * method should be called. It is therefor used by the PhysicsSystem class,
+     * which captures the event which should occur when a LocationComponent is
+     * saved. Hence this method should not be needed by anyone else then the
+     * PhysicsSystem class. Instead change the LocationComponent and save it.
      *
      * @param entity the entity of which the rigidBody needs updating.
      * @return true if there was already a rigidBody registered for the entity
      * (which is now updated), false otherwise.
      */
     boolean updateRigidBody(EntityRef entity);
-
+    
     /**
-     * Updates the trigger of the given object. If the ShapeComponent has
-     * changed, the shape of the trigger will also change. If the location
-     * stored in the location component has changed, this will also be updated.
-     * If no trigger exists for the given entity, a new one is created. This is
-     * however seen as bad behaviour and logged as warning.
+     * Updates or creates the trigger of the given object. The entity must have
+     * a TriggerComponent, LocationComponent and ShapeComponent to have a
+     * trigger. When updating an existing trigger the location and scale are
+     * updated.
+     * </p>
+     * An entity with a trigger attached to it will generate collision pairs
+     * when it collides or intersects with other objects. A good example of its
+     * usage is picking up items. By creating a trigger for a player, a
+     * collision event will be generated when the shape of the player collides
+     * with the shape of a dropped item. This event is not send by the
+     * PhysicsEngine class. Instead it is stored and can be retrieved by the
+     * getCollisionPairs() method. The PhysicsSystem class uses this mechanism
+     * to generate normal Terasology events.
      * </p>TODO: update if detectGroups changed
      *
      * @param entity the entity of which the trigger may need updating.
+     * @return true if there was already a trigger for the given entity, false
+     * otherwise.
+     * @throws IllegalArgumentException if a new trigger must be made, but the
+     * entity does not have a LocationComponent, TriggerComponent and
+     * ShapeComponent.
      */
     boolean updateTrigger(EntityRef entity);
-    
 }
