@@ -68,14 +68,12 @@ public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnCh
     @In
     private EntityManager entityManager;
     private PhysicsEngine physics;
-    ;
-    private int skipProcessingFrames = 4;
+    
     private long lastNetsync;
 
     @Override
     public void initialise() {
         physics = CoreRegistry.get(PhysicsEngine.class);
-        skipProcessingFrames = 4;
         lastNetsync = 0;
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, OnChangedBlock.class, BlockComponent.class);
     }
@@ -147,13 +145,6 @@ public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnCh
         if (networkSystem.getMode() == NetworkMode.SERVER && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             sendSyncMessages();
             lastNetsync = time.getGameTimeInMs();
-        }
-
-        // TODO: This shouldn't be necessary once this is correctly sequenced after the main physics update
-        // TODO: Is the physics.update() method not what is meant here???
-        if (skipProcessingFrames > 0) {
-            skipProcessingFrames--;
-            return;
         }
 
         List<CollisionPair> collisionPairs = physics.getCollisionPairs();

@@ -45,6 +45,8 @@ import org.terasology.world.WorldProvider;
 /**
  * The KineticCharacterMover generalises the character movement to a physics engine independent class. The physics engine will then only
  * have to fill in several smaller method calls.
+ * 
+ * TODO: Refactor to allow additional movement modes.
  *
  * @author Immortius
  */
