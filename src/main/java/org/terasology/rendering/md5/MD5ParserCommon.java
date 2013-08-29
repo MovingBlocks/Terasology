@@ -16,6 +16,8 @@
 
 package org.terasology.rendering.md5;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
+
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -76,6 +78,10 @@ public final class MD5ParserCommon {
         Quat4f result = new Quat4f(CORRECTION_QUATERNION);
         result.mul(rot);
         return result;
+    }
+
+    public static Vector3f correctOffset(Vector3f offset) {
+        return QuaternionUtil.quatRotate(CORRECTION_QUATERNION, offset, new Vector3f());
     }
 
 

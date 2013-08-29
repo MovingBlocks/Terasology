@@ -120,6 +120,8 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimationData> {
 
             // Rotate just the root bone to correct for coordinate system differences
             rotations.set(0, MD5ParserCommon.correctQuat4f(rotations.get(0)));
+            positions.set(0, MD5ParserCommon.correctOffset(positions.get(0)));
+
 
             frames.add(new MeshAnimationFrame(positions, rotations));
 

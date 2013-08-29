@@ -109,6 +109,18 @@ public class CoreCommands implements ComponentSystem {
         }
     }
 
+    @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
+    public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
+        Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+        if (prefab != null) {
+            for (EntityRef entity : entityManager.getAllEntities()) {
+                if (prefab.getURI().equals(entity.getPrefabURI())) {
+                    entity.destroy();
+                }
+            }
+        }
+    }
+
     @Command(shortDescription = "Teleports you to a location", runOnServer = true)
     public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);

@@ -19,6 +19,7 @@ package org.terasology.config;
  * @author Immortius
  */
 public class RenderingDebugConfig {
+
     public enum DebugRenderingStage {
         OPAQUE_COLOR(0, "DEBUG_STAGE_OPAQUE_COLOR"),
         TRANSPARENT_COLOR(1, "DEBUG_STAGE_TRANSPARENT_COLOR"),
@@ -59,6 +60,7 @@ public class RenderingDebugConfig {
     private boolean hudHidden;
     private boolean wireframe;
     private boolean renderChunkBoundingBoxes;
+    private boolean renderSkeletons;
 
     public boolean isWireframe() {
         return wireframe;
@@ -110,6 +112,14 @@ public class RenderingDebugConfig {
 
     public void setRenderChunkBoundingBoxes(boolean renderChunkBoundingBoxes) {
         this.renderChunkBoundingBoxes = renderChunkBoundingBoxes;
+    }
+
+    public boolean isRenderSkeletons() {
+        return renderSkeletons;
+    }
+
+    public void setRenderSkeletons(boolean renderSkeletons) {
+        this.renderSkeletons = renderSkeletons;
     }
 
 }

@@ -1,0 +1,8 @@
+{
+    "shader" : "engine:genericMeshMaterial",
+    "params" : {
+        "diffuse" : "engine:default",
+        "colorOffset" : [1.0, 1.0, 1.0],
+        "textured" : false
+    }
+}
