@@ -34,7 +34,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.physics.ImpulseEvent;
+import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

@@ -17,17 +17,36 @@
 package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.characters.events.VerticalCollisionEvent;
 
 /**
+ * A CharacterMover is responsible for calculating character movement and 
+ * generating several related events.
  * @author Immortius
  */
 public interface CharacterMover {
+    
     /**
-     * Steps the state of a character
+     * Calculate the new state of a character based on the previous state and
+     * the input. Note that input is not always player input. Input can also be
+     * for an AI character.<br>
+     *
+     * The step method is responsible for generating the following events when
+     * appropriate:
+     * <ul>
+     * <li> OnEnterLiquidEvent </li>
+     * <li> OnLeaveLiquidEvent </li>
+     * <li> MovedEvent </li>
+     * <li> VerticalCollisionEvent </li>
+     * <li> FootstepEvent </li>
+     * <li> SwimStrokeEvent </li>
+     * <li> JumpEvent </li>
+     * <li> HorizontalCollisionEvent </li>
+     * </ul>
      *
      * @param initial The initial state to start from
-     * @param input   The input driving the movement change
-     * @param entity  The character
+     * @param input The input driving the movement change
+     * @param entity The character
      * @return The new state of the character
      */
     CharacterStateEvent step(CharacterStateEvent initial, CharacterMoveInputEvent input, EntityRef entity);
