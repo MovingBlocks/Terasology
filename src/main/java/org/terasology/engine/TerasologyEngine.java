@@ -142,12 +142,12 @@ public class TerasologyEngine implements GameEngine {
         initConfig();
 
         initNativeLibs();
+        initTimer(); // Dependent on LWJGL
+        initManagers();
         initDisplay();
         initOpenGL();
         initOpenAL();
         initControls();
-        initTimer(); // Dependent on LWJGL
-        initManagers();
         updateInputConfig();
         CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
         initSecurity();
@@ -333,8 +333,9 @@ public class TerasologyEngine implements GameEngine {
             audioManager = new OpenALManager(config.getAudio());
         }
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
-        AssetManager.getInstance().setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
-        AssetManager.getInstance().setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
+        assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }
 
     private void initDisplay() {
@@ -353,49 +354,52 @@ public class TerasologyEngine implements GameEngine {
         checkOpenGL();
         resizeViewport();
         initOpenGLParams();
-        AssetManager.getInstance().setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
                 return new OpenGLTexture(uri, data);
             }
         });
-        AssetManager.getInstance().setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
             @Override
             public Font buildAsset(AssetUri uri, FontData data) {
                 return new OpenGLFont(uri, data);
             }
         });
-        AssetManager.getInstance().setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
+        assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
             @Override
             public Shader buildAsset(AssetUri uri, ShaderData data) {
                 return new GLSLShader(uri, data);
             }
         });
-        AssetManager.getInstance().setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
+        assetManager.setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
             @Override
             public Material buildAsset(AssetUri uri, MaterialData data) {
                 return new GLSLMaterial(uri, data);
             }
         });
-        AssetManager.getInstance().setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
+        assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
             @Override
             public Mesh buildAsset(AssetUri uri, MeshData data) {
                 return new OpenGLMesh(uri, data);
             }
         });
-        AssetManager.getInstance().setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
+        assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
             @Override
             public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
                 return new OpenGLSkeletalMesh(uri, data);
             }
         });
-        AssetManager.getInstance().setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
+        assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
             @Override
             public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
                 return new MeshAnimationImpl(uri, data);
             }
         });
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
+        CoreRegistry.get(ShaderManager.class).initShaders();
+        VertexBufferObjectManager.getInstance();
 
     }
 
@@ -442,21 +446,19 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
+        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
         CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
-        CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
         CoreRegistry.putPermanently(Game.class, new Game(time));
 
-        AssetType.registerAssetTypes();
+        AssetType.registerAssetTypes(assetManager);
         ClasspathSource source = new ClasspathSource(ModuleManager.ENGINE_MODULE,
                 getClass().getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY);
-        AssetManager.getInstance().addAssetSource(source);
-        CoreRegistry.get(ShaderManager.class).initShaders();
-
-        VertexBufferObjectManager.getInstance();
+        assetManager.addAssetSource(source);
     }
 
     private void initTimer() {

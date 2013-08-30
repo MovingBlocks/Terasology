@@ -18,6 +18,7 @@ package org.terasology.world.generator;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
@@ -35,14 +36,14 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
     private WorldBiomeProvider biomeProvider;
     private final List<FirstPassGenerator> firstPassGenerators = Lists.newArrayList();
     private final List<SecondPassGenerator> secondPassGenerators = Lists.newArrayList();
-    private final WorldGeneratorUri uri;
+    private final SimpleUri uri;
 
-    public AbstractBaseWorldGenerator(WorldGeneratorUri uri) {
+    public AbstractBaseWorldGenerator(SimpleUri uri) {
         this.uri = uri;
     }
 
     @Override
-    public final WorldGeneratorUri getUri() {
+    public final SimpleUri getUri() {
         return uri;
     }
 

@@ -22,7 +22,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
+import org.terasology.engine.module.Module;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -59,7 +59,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
     private Pattern weightPattern = Pattern.compile("weight\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + VECTOR3_PATTERN);
 
     @Override
-    public SkeletalMeshData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public SkeletalMeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         try {
             MD5 md5 = parse(stream);
             SkeletalMeshDataBuilder skeletonBuilder = new SkeletalMeshDataBuilder();
@@ -101,7 +101,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
 
             return skeletonBuilder.build();
         } catch (NumberFormatException e) {
-            throw new IOException("Error parsing " + uri.toString(), e);
+            throw new IOException("Error parsing " + module.toString(), e);
         }
     }
 

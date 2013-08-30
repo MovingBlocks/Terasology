@@ -22,6 +22,8 @@ import org.reflections.Reflections;
  */
 public interface Module {
 
+    String getId();
+
     Reflections getReflections();
 
     boolean isCodeModule();

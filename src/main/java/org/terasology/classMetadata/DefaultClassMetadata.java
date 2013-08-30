@@ -18,11 +18,13 @@ package org.terasology.classMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 
 /**
  * A standard class metadata implementation using FieldMetadata.
+ *
  * @author Immortius
  */
 public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?>> {
@@ -30,15 +32,14 @@ public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?
     /**
      * Creates a class metatdata
      *
+     * @param uri                 The uri that identifies this class
      * @param type                The type to create the metadata for
      * @param factory             A reflection library to provide class construction and field get/set functionality
      * @param copyStrategyLibrary A copy strategy library
-     * @param name                The name to identify the class with.
-     * @throws NoSuchMethodException
-     *          If the class has no default constructor
+     * @throws NoSuchMethodException If the class has no default constructor
      */
-    public DefaultClassMetadata(Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary, String name) throws NoSuchMethodException {
-        super(type, factory, copyStrategyLibrary, name);
+    public DefaultClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
+        super(uri, type, factory, copyStrategyLibrary);
     }
 
     @Override

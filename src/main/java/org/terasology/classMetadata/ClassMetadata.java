@@ -26,14 +26,13 @@ import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ObjectConstructor;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class Metadata provides information on a class and its fields, and the ability to create, copy or manipulate an instance of the class.
@@ -45,32 +44,35 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Immortius
  */
-public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
+public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
+    private final SimpleUri uri;
     private final Class<T> clazz;
     private final ObjectConstructor<T> constructor;
-    private final String name;
-    private Map<String, U> fields = Maps.newHashMap();
-    private TIntObjectMap<U> fieldsById = new TIntObjectHashMap<>();
+    private Map<String, FIELD> fields = Maps.newHashMap();
+    private TIntObjectMap<FIELD> fieldsById = new TIntObjectHashMap<>();
 
     /**
      * Creates a class metatdata
      *
+     * @param uri                 The uri that identifies this type
      * @param type                The type to create the metadata for
      * @param factory             A reflection library to provide class construction and field get/set functionality
      * @param copyStrategyLibrary A copy strategy library
-     * @param name                The name to identify the class with.
      * @throws NoSuchMethodException If the class has no default constructor
      */
-    public ClassMetadata(Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary, String name)
+    public ClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary)
             throws NoSuchMethodException {
-        checkNotNull(name);
 
+        this.uri = uri;
         this.clazz = type;
-        this.name = name;
         this.constructor = factory.createConstructor(type);
 
         addFields(copyStrategyLibrary, factory);
+    }
+
+    public final SimpleUri getUri() {
+        return uri;
     }
 
     /**
@@ -85,7 +87,7 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
                 continue;
             }
             CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType());
-            U metadata = createField(field, copyStrategy, factory);
+            FIELD metadata = createField(field, copyStrategy, factory);
             if (metadata != null) {
                 fields.put(metadata.getName().toLowerCase(Locale.ENGLISH), metadata);
             }
@@ -100,14 +102,7 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
      * @param factory      The reflection provider
      * @return A FieldMetadata describing the field, or null to ignore this field
      */
-    protected abstract <V> U createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory);
-
-    /**
-     * @return The name that identifies this class
-     */
-    public String getName() {
-        return name;
-    }
+    protected abstract <V> FIELD createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory);
 
     /**
      * @return The class described by this metadata
@@ -120,7 +115,7 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
      * @param id The previously set id of the field
      * @return The field identified by the given id, or null if there is no such field
      */
-    public U getField(int id) {
+    public FIELD getField(int id) {
         return fieldsById.get(id);
     }
 
@@ -128,14 +123,14 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
      * @param fieldName The name of the field
      * @return The field identified by the given name, or null if there is no such field
      */
-    public U getField(String fieldName) {
+    public FIELD getField(String fieldName) {
         return fields.get(fieldName.toLowerCase(Locale.ENGLISH));
     }
 
     /**
      * @return The fields that this class has.
      */
-    public Collection<U> getFields() {
+    public Collection<FIELD> getFields() {
         return ImmutableList.copyOf(fields.values());
     }
 
@@ -182,11 +177,6 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
     }
 
     @Override
-    public String toString() {
-        return getName();
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -203,6 +193,14 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
         return clazz.hashCode();
     }
 
+    @Override
+    public String toString() {
+        if (uri.isValid()) {
+            return uri.toString();
+        }
+        return getType().toString();
+    }
+
     /**
      * Used by FieldMetadata to update the id lookup table
      *
@@ -211,9 +209,10 @@ public abstract class ClassMetadata<T, U extends FieldMetadata<T, ?>> {
      */
     @SuppressWarnings("unchecked")
     void setFieldId(FieldMetadata<T, ?> field, byte id) {
-        if (fields.containsValue((U) field)) {
-            fieldsById.put(id, (U) field);
+        if (fields.containsValue((FIELD) field)) {
+            fieldsById.put(id, (FIELD) field);
         }
     }
+
 
 }

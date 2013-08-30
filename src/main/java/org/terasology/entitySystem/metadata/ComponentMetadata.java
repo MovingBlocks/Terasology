@@ -23,6 +23,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.ForceBlockActive;
 import org.terasology.world.block.RequiresBlockLifecycleEvents;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 
@@ -42,14 +43,15 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
 
     /**
      *
+     *
+     * @param uri           The uri to identify the component with.
      * @param type           The type to create the metadata for
      * @param factory        A reflection library to provide class construction and field get/set functionality
      * @param copyStrategies A copy strategy library
-     * @param name           The name to identify the component with.
      * @throws NoSuchMethodException If the component has no default constructor
      */
-    public ComponentMetadata(Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) throws NoSuchMethodException {
-        super(type, factory, copyStrategies, name);
+    public ComponentMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
+        super(uri, type, factory, copyStrategies);
         replicated = type.getAnnotation(Replicate.class) != null;
         blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
         ForceBlockActive forceBlockActiveAnnotation = type.getAnnotation(ForceBlockActive.class);

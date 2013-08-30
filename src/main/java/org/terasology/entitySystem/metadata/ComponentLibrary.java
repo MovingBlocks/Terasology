@@ -22,7 +22,11 @@ import org.terasology.classMetadata.AbstractClassLibrary;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
+import org.terasology.engine.SimpleUri;
 
 /**
  * The library for metadata about components (and their fields).
@@ -32,21 +36,17 @@ import org.terasology.entitySystem.Component;
 public class ComponentLibrary extends AbstractClassLibrary<Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibrary.class);
+    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
     public ComponentLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         super(factory, copyStrategies);
     }
 
     @Override
-    protected String getNameFor(Class<? extends Component> type) {
-        return MetadataUtil.getComponentClassName(type);
-    }
-
-    @Override
-    protected <CLASS extends Component> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
-        ComponentMetadata<CLASS> info;
+    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {
+        ComponentMetadata<C> info;
         try {
-            info = new ComponentMetadata<>(type, factory, copyStrategies, name);
+            info = new ComponentMetadata<>(uri, type, factory, copyStrategies);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
             return null;
@@ -55,19 +55,35 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Component> ComponentMetadata<T> getMetadata(Class<T> clazz) {
         return (ComponentMetadata<T>) super.getMetadata(clazz);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Component> ComponentMetadata<T> getMetadata(T object) {
         return (ComponentMetadata<T>) super.getMetadata(object);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public ComponentMetadata<? extends Component> getMetadata(String className) {
-        return (ComponentMetadata<? extends Component>) super.getMetadata(className);
+    public ComponentMetadata<? extends Component> getMetadata(SimpleUri uri) {
+        return (ComponentMetadata<? extends Component>) super.getMetadata(uri);
+    }
+
+    @Override
+    public ComponentMetadata<? extends Component> resolve(String name) {
+        return (ComponentMetadata<? extends Component>) super.resolve(name);
+    }
+
+    @Override
+    public ComponentMetadata<?> resolve(String name, String context) {
+        return (ComponentMetadata<?>) super.resolve(name, context);
+    }
+
+    @Override
+    public ComponentMetadata<?> resolve(String name, Module context) {
+        return (ComponentMetadata<?>) super.resolve(name, context);
     }
 
     public Iterable<ComponentMetadata> iterateComponentMetadata() {

@@ -22,6 +22,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.editor.TeraEd;
 import org.terasology.editor.properties.PropertyProvider;
 import org.terasology.editor.properties.ReflectionProvider;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.StateChangeSubscriber;
 import org.terasology.rendering.opengl.GLSLMaterial;
 
@@ -122,7 +123,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     public void onStateChange() {
         shaderPropertyMenuEntries.clear();
         shaderPropertiesMenu.removeAll();
-        for (GLSLMaterial material : AssetManager.getInstance().listLoadedAssets(AssetType.MATERIAL, GLSLMaterial.class)) {
+        for (GLSLMaterial material : CoreRegistry.get(AssetManager.class).listLoadedAssets(AssetType.MATERIAL, GLSLMaterial.class)) {
             if (material.getShaderParameters() != null) {
                 GLSLMaterial finalMat = material;
                 final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters());

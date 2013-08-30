@@ -16,7 +16,7 @@
 
 package org.terasology.world;
 
-import org.terasology.world.generator.WorldGeneratorUri;
+import org.terasology.engine.SimpleUri;
 
 /**
  * Summary information on a world.
@@ -28,12 +28,12 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time;
-    private WorldGeneratorUri worldGenerator = new WorldGeneratorUri("engine", "perlin");
+    private SimpleUri worldGenerator = new SimpleUri("engine", "perlin");
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, WorldGeneratorUri worldGenerator) {
+    public WorldInfo(String title, String seed, long time, SimpleUri worldGenerator) {
         if (title != null) {
             this.title = title;
         }
@@ -74,11 +74,11 @@ public class WorldInfo {
         this.time = time;
     }
 
-    public WorldGeneratorUri getWorldGenerator() {
+    public SimpleUri getWorldGenerator() {
         return worldGenerator;
     }
 
-    public void setWorldGenerator(WorldGeneratorUri worldGenerator) {
+    public void setWorldGenerator(SimpleUri worldGenerator) {
         this.worldGenerator = worldGenerator;
     }
 }

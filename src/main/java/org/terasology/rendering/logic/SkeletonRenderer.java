@@ -275,7 +275,7 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
                 worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
                 float worldScale = location.getWorldScale();
-                matrixCameraSpace.set(new Quat4f(0,0,0,1), worldPositionCameraSpace, worldScale);
+                matrixCameraSpace.set(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, worldScale);
 
                 Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                 TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);

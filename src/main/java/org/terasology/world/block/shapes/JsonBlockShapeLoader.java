@@ -36,7 +36,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
+import org.terasology.engine.module.Module;
 import org.terasology.math.Rotation;
 import org.terasology.utilities.gson.Vector2fHandler;
 import org.terasology.utilities.gson.Vector3fHandler;
@@ -71,7 +71,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
     }
 
     @Override
-    public BlockShapeData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public BlockShapeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         return gson.fromJson(new InputStreamReader(stream), BlockShapeData.class);
     }
 

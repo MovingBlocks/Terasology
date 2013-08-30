@@ -18,6 +18,7 @@ package org.terasology.entitySystem.event;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.SimpleUri;
 
 /**
  * Event system propagates events to registered handlers
@@ -34,10 +35,10 @@ public interface EventSystem {
     /**
      * Registers an event
      *
-     * @param id
+     * @param uri
      * @param eventType
      */
-    void registerEvent(String id, Class<? extends Event> eventType);
+    void registerEvent(SimpleUri uri, Class<? extends Event> eventType);
 
     /**
      * Registers an object as an event handler - all methods with the {@link ReceiveEvent} annotation will be registered

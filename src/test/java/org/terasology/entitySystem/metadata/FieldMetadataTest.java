@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 
@@ -34,14 +35,15 @@ public class FieldMetadataTest {
 
     @Test
     public void testOwnsAnnotationProcessed() throws NoSuchMethodException {
-        ComponentMetadata<OwnerComponent> classMetadata = new ComponentMetadata<>(OwnerComponent.class, factory, copyStrategyLibrary, "");
+        ComponentMetadata<OwnerComponent> classMetadata = new ComponentMetadata<>(new SimpleUri("unittest:owner"), OwnerComponent.class, factory, copyStrategyLibrary);
         ComponentFieldMetadata metadata = classMetadata.getField("child");
         assertTrue(metadata.isOwnedReference());
     }
 
     @Test
     public void testOwnsAnnotationCollectionProcessed() throws NoSuchMethodException {
-        ComponentMetadata<InventoryComponent> classMetadata = new ComponentMetadata<>(InventoryComponent.class, factory, copyStrategyLibrary, "");
+        ComponentMetadata<InventoryComponent> classMetadata =
+                new ComponentMetadata<>(new SimpleUri("unittest:inventory"), InventoryComponent.class, factory, copyStrategyLibrary);
         ComponentFieldMetadata metadata = classMetadata.getField("itemSlots");
         assertTrue(metadata.isOwnedReference());
     }

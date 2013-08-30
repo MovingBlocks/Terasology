@@ -53,7 +53,7 @@ final class EntityRestorer implements EntityRefTypeHandler.EntityRefInterceptor 
         EntityRefTypeHandler.setReferenceInterceptor(this);
         Map<Class<? extends Component>, Integer> idMap = Maps.newHashMap();
         for (int i = 0; i < store.getComponentClassCount(); ++i) {
-            ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(store.getComponentClass(i));
+            ComponentMetadata<?> metadata = entityManager.getComponentLibrary().resolve(store.getComponentClass(i));
             if (metadata != null) {
                 idMap.put(metadata.getType(), i);
             }

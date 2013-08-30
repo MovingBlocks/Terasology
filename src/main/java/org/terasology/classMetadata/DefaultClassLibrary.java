@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 
 /**
  * A simple implementation of ClassLibrary. It provides ClassMetadata for a type of class. These classes are identified through their simple name.
@@ -33,14 +34,9 @@ public final class DefaultClassLibrary<T> extends AbstractClassLibrary<T> {
         super(factory, copyStrategies);
     }
 
-    @Override
-    protected String getNameFor(Class<? extends T> type) {
-        return type.getSimpleName();
-    }
-
-    protected <CLASS extends T> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
+    protected <C extends T> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {
         try {
-            return new DefaultClassMetadata<>(type, factory, copyStrategies, name);
+            return new DefaultClassMetadata<>(uri, type, factory, copyStrategies);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
             return null;

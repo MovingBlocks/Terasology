@@ -16,13 +16,21 @@
 
 package org.terasology.classMetadata;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 
 import java.util.Iterator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract base implement of ClassLibrary.
@@ -31,11 +39,12 @@ import java.util.Map;
  */
 public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
+    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
     private CopyStrategyLibrary copyStrategyLibrary;
     private ReflectFactory reflectFactory;
 
-    private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> serializationLookup = Maps.newHashMap();
-    private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
+    private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> classLookup = Maps.newHashMap();
+    private Table<String, String, ClassMetadata<? extends T, ?>> uriLookup = HashBasedTable.create();
 
     public AbstractClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         this.reflectFactory = factory;
@@ -44,30 +53,18 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     /**
      * @param type A type being registered into the library
-     * @return The name to use to identify the provided type
-     */
-    protected abstract String getNameFor(Class<? extends T> type);
-
-    /**
-     * @param type    A type being registered into the library
-     * @param name    The name for the type
-     * @param <CLASS> The class of the type
+     * @param name The name for the type
+     * @param <C>  The class of the type
      * @return An instance of ClassMetadata (or a subtype) providing metadata for the given type
      */
-    protected abstract <CLASS extends T> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name);
+    protected abstract <C extends T> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri name);
 
     @Override
-    public void register(Class<? extends T> clazz) {
-        register(clazz, getNameFor(clazz));
-    }
+    public void register(SimpleUri uri, Class<? extends T> clazz) {
+        ClassMetadata<? extends T, ?> metadata = createMetadata(clazz, reflectFactory, copyStrategyLibrary, uri);
 
-    @Override
-    public void register(Class<? extends T> clazz, String name) {
-        ClassMetadata<? extends T, ?> metadata = createMetadata(clazz, reflectFactory, copyStrategyLibrary, name);
-
-        serializationLookup.put(clazz, metadata);
-
-        typeLookup.put(name.toLowerCase(Locale.ENGLISH), clazz);
+        classLookup.put(clazz, metadata);
+        uriLookup.put(uri.getNormalisedObjectName(), uri.getNormalisedModuleName(), metadata);
     }
 
     @Override
@@ -76,7 +73,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
         if (clazz == null) {
             return null;
         }
-        return (ClassMetadata<U, ?>) serializationLookup.get(clazz);
+        return (ClassMetadata<U, ?>) classLookup.get(clazz);
     }
 
     @Override
@@ -98,12 +95,69 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     }
 
     @Override
-    public ClassMetadata<? extends T, ?> getMetadata(String className) {
-        return getMetadata(typeLookup.get(className.toLowerCase(Locale.ENGLISH)));
+    public ClassMetadata<? extends T, ?> getMetadata(SimpleUri uri) {
+        return uriLookup.get(uri.getNormalisedObjectName(), uri.getNormalisedModuleName());
     }
 
     @Override
     public Iterator<ClassMetadata<? extends T, ?>> iterator() {
-        return serializationLookup.values().iterator();
+        return classLookup.values().iterator();
+    }
+
+    @Override
+    public List<ClassMetadata<? extends T, ?>> getMetadata(String name) {
+        return Lists.newArrayList(uriLookup.row(SimpleUri.normalise(name)).values());
+    }
+
+    @Override
+    public ClassMetadata<? extends T, ?> resolve(String name, String context) {
+        Module moduleContext = moduleManager.getModule(context);
+        if (moduleContext != null) {
+            return resolve(name, moduleContext);
+        }
+        return null;
+    }
+
+    @Override
+    public ClassMetadata<? extends T, ?> resolve(String name) {
+        SimpleUri uri = new SimpleUri(name);
+        if (uri.isValid()) {
+            return getMetadata(uri);
+        }
+        List<ClassMetadata<? extends T, ?>> possibilities = getMetadata(name);
+        if (possibilities.size() == 1) {
+            return possibilities.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public ClassMetadata<? extends T, ?> resolve(String name, Module context) {
+        SimpleUri uri = new SimpleUri(name);
+        if (uri.isValid()) {
+            return getMetadata(uri);
+        }
+        List<ClassMetadata<? extends T, ?>> possibilities = getMetadata(name);
+        switch (possibilities.size()) {
+            case 0:
+                return null;
+            case 1:
+                return possibilities.get(0);
+            default:
+                if (context != null) {
+                    Set<String> dependencies = moduleManager.getDependencyNamesOf(context);
+                    Iterator<ClassMetadata<? extends T, ?>> iterator = possibilities.iterator();
+                    while (iterator.hasNext()) {
+                        ClassMetadata<? extends T, ?> metadata = iterator.next();
+                        if (!dependencies.contains(metadata.getUri().getModuleName())) {
+                            iterator.remove();
+                        }
+                    }
+                    if (possibilities.size() == 1) {
+                        return possibilities.get(0);
+                    }
+                }
+                return null;
+        }
     }
 }

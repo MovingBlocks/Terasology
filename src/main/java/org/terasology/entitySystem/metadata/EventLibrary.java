@@ -22,6 +22,7 @@ import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.SimpleUri;
 
 /**
  * The library for metadata about events (and their fields).
@@ -37,14 +38,9 @@ public class EventLibrary extends AbstractClassLibrary<Event> {
     }
 
     @Override
-    protected String getNameFor(Class<? extends Event> type) {
-        return type.getSimpleName();
-    }
-
-    @Override
-    protected <CLASS extends Event> ClassMetadata<CLASS, ?> createMetadata(Class<CLASS> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, String name) {
+    protected <C extends Event> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {
         try {
-            return new EventMetadata<>(type, copyStrategies, factory, name);
+            return new EventMetadata<>(type, copyStrategies, factory, uri);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
             return null;
@@ -53,18 +49,21 @@ public class EventLibrary extends AbstractClassLibrary<Event> {
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Event> EventMetadata<T> getMetadata(Class<T> clazz) {
         return (EventMetadata<T>) super.getMetadata(clazz);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Event> EventMetadata<T> getMetadata(T object) {
         return (EventMetadata<T>) super.getMetadata(object);
     }
 
     @Override
-    public EventMetadata<? extends Event> getMetadata(String className) {
-        return (EventMetadata<? extends Event>) super.getMetadata(className);
+    @SuppressWarnings("unchecked")
+    public EventMetadata<? extends Event> getMetadata(SimpleUri uri) {
+        return (EventMetadata<? extends Event>) super.getMetadata(uri);
     }
 
 }

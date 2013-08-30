@@ -16,36 +16,26 @@
 
 package org.terasology.classMetadata;
 
+import org.terasology.engine.module.Module;
+import org.terasology.engine.SimpleUri;
+
+import java.util.List;
+
 /**
  * The interface for a class library. These store metadata on a type of class, and provide the ability to copy them.
  *
  * @param <T> The base type of all classes that belong to this library.
- * @param <U> The type of metadata provided by this library
- *
  * @author Immortius
- */
-
-/**
- *
-
  */
 public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>> {
 
     /**
-     * Registers a class with this library.
-     * Its name for lookup purposes will be the simple name of the class.
-     *
-     * @param clazz The class to register with this library
-     */
-    void register(Class<? extends T> clazz);
-
-    /**
      * Registers a class with this library
      *
+     * @param uri  The uri to use to find this class
      * @param clazz The class to register with this library
-     * @param name  The name to use to find this class
      */
-    void register(Class<? extends T> clazz, String name);
+    void register(SimpleUri uri, Class<? extends T> clazz);
 
     /**
      * @param clazz The class to retrieve metadata for
@@ -71,9 +61,51 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
     <TYPE extends T> TYPE copy(TYPE object);
 
     /**
-     * @param className The simple name of the class - no packages, and may exclude any common suffix. Case doesn't matter.
+     * @param uri The uri identifying the class to look up
      * @return The metadata for the given class, or null if not registered.
      */
-    ClassMetadata<? extends T, ?> getMetadata(String className);
+    ClassMetadata<? extends T, ?> getMetadata(SimpleUri uri);
+
+    /**
+     * @param name The object name of the class to look up
+     * @return A list of ClassMetadata identified by this name.
+     */
+    List<ClassMetadata<? extends T, ?>> getMetadata(String name);
+
+    /**
+     * Resolves metadata for a class given a string that may either be a uri or just a name. T
+     * his will return null if either there is no class identified by that name, or more than one.
+     * @param name The uri or name of a class
+     * @return The metadata for the given class, or null if it couldn't be resolved to a single option.
+     */
+    ClassMetadata<? extends T, ?> resolve(String name);
+
+    /**
+     * Resolves a name referring to a component. This may be a uri ('engine:component') or just the name ('component').
+     * The process used for resolution is:
+     * <ol>
+     *     <li>If the name is a uri, return the component metadata linked to that uri</li>
+     *     <li>Find within the context module</li>
+     *     <li>Find within the context module's dependencies</li>
+     * </ol>
+     * @param name The name of the component. This may be the full uri, or just part of it.
+     * @param context The module from which it has been referred
+     * @return The resolved component metadata, or null if it could not be resolve (or multiple matches were found)
+     */
+    ClassMetadata<? extends T, ?> resolve(String name, String context);
+
+    /**
+     * Resolves a name referring to a component. This may be a uri ('engine:component') or just the component name ('component').
+     * The process used for resolution is:
+     * <ol>
+     *     <li>If the name is a uri, return the component metadata linked to that uri</li>
+     *     <li>Find within the context module</li>
+     *     <li>Find within the context module's dependencies</li>
+     * </ol>
+     * @param name The name of the component. This may be the full uri, or just part of it.
+     * @param context The module from which it has been referred
+     * @return The resolved component metadata, or null if it could not be resolve (or multiple matches were found)
+     */
+    ClassMetadata<? extends T, ?> resolve(String name, Module context);
 
 }

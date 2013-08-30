@@ -181,7 +181,7 @@ public enum AssetType {
      * Registers all asset types with the AssetManager if they have an AssetLoader
      * class associated with them.
      */
-    public static void registerAssetTypes() {
+    public static void registerAssetTypes(AssetManager assetManager) {
         for (AssetType type : AssetType.values()) {
             AssetLoader loader = type.getAssetLoader();
             if (loader == null) {
@@ -189,7 +189,7 @@ public enum AssetType {
             }
 
             for (String extension : type.getFileExtension()) {
-                AssetManager.getInstance().register(
+                assetManager.register(
                         type,
                         extension,
                         loader

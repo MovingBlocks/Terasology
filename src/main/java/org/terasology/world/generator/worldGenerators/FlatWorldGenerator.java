@@ -18,7 +18,7 @@ package org.terasology.world.generator.worldGenerators;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.world.generator.RegisterWorldGenerator;
-import org.terasology.world.generator.WorldGeneratorUri;
+import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.chunkGenerators.FlatTerrainGenerator;
 import org.terasology.world.generator.chunkGenerators.FloraGenerator;
 import org.terasology.world.generator.chunkGenerators.ForestGenerator;
@@ -30,7 +30,7 @@ import org.terasology.world.liquid.LiquidsGenerator;
 @RegisterWorldGenerator(id = "flat", displayName = "Flat")
 public class FlatWorldGenerator extends AbstractBaseWorldGenerator {
 
-    public FlatWorldGenerator(WorldGeneratorUri uri) {
+    public FlatWorldGenerator(SimpleUri uri) {
         super(uri);
         register(new FlatTerrainGenerator());
         register(new FloraGenerator());

@@ -22,7 +22,6 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -654,9 +653,6 @@ public final class Block {
             }
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
-        if (mesh != null) {
-            AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
-        }
     }
 
     @Override

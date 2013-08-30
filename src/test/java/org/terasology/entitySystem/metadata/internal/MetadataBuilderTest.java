@@ -23,6 +23,7 @@ import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -43,19 +44,19 @@ public class MetadataBuilderTest {
 
     @Test(expected = NoSuchMethodException.class)
     public void requireDefaultConstructor() throws Exception {
-        new DefaultClassMetadata<>(NoDefaultConstructor.class, factory, copyStrategyLibrary, "");
+        new DefaultClassMetadata<>(new SimpleUri(), NoDefaultConstructor.class, factory, copyStrategyLibrary);
     }
 
     @Test
     public void trivialMetadata() throws Exception {
-        DefaultClassMetadata<Trivial> metadata = new DefaultClassMetadata<>(Trivial.class, factory, copyStrategyLibrary, "");
+        DefaultClassMetadata<Trivial> metadata = new DefaultClassMetadata<>(new SimpleUri(), Trivial.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(0, metadata.getFieldCount());
     }
 
     @Test
     public void testPrivateField() throws Exception {
-        DefaultClassMetadata<PrivateField> metadata = new DefaultClassMetadata<>(PrivateField.class, factory, copyStrategyLibrary, "");
+        DefaultClassMetadata<PrivateField> metadata = new DefaultClassMetadata<>(new SimpleUri(), PrivateField.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(1, metadata.getFieldCount());
         FieldMetadata fieldMetadata = metadata.getField("name");
@@ -67,7 +68,7 @@ public class MetadataBuilderTest {
 
     @Test
     public void testInheritsFields() throws Exception {
-        DefaultClassMetadata<Inheriting> metadata = new DefaultClassMetadata<>(Inheriting.class, factory, copyStrategyLibrary, "");
+        DefaultClassMetadata<Inheriting> metadata = new DefaultClassMetadata<>(new SimpleUri(), Inheriting.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(2, metadata.getFieldCount());
         assertNotNull(metadata.getField("name"));

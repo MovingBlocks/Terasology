@@ -24,14 +24,11 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -184,13 +181,20 @@ public class EntitySerializer {
      * @return The mapping of components
      */
     private Map<Class<? extends Component>, Component> createInitialComponents(EntityData.Entity entityData) {
+        Set<ComponentMetadata<?>> removedComponents = Sets.newHashSet();
+        for (String removedComp : entityData.getRemovedComponentList()) {
+            ComponentMetadata<?> removedMetadata = componentLibrary.resolve(removedComp);
+            if (removedMetadata != null) {
+                removedComponents.add(removedMetadata);
+            }
+        }
+
         Map<Class<? extends Component>, Component> componentMap = Maps.newHashMap();
         if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
             Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
             for (Component component : prefab.iterateComponents()) {
-                String componentName = MetadataUtil.getComponentClassName(component.getClass());
-                // TODO: Use a set and convert to lower case
-                if (!containsIgnoreCase(componentName, entityData.getRemovedComponentList())) {
+                ComponentMetadata<?> metadata = componentLibrary.getMetadata(component);
+                if (!removedComponents.contains(metadata)) {
                     componentMap.put(component.getClass(), componentLibrary.copy(component));
                 }
             }
@@ -291,22 +295,13 @@ public class EntitySerializer {
             }
         }
         for (Component prefabComponent : prefab.iterateComponents()) {
-            if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(prefabComponent.getClass()))) {
-                entity.addRemovedComponent(MetadataUtil.getComponentClassName(prefabComponent.getClass()));
+            ComponentMetadata<?> metadata = componentLibrary.getMetadata(prefabComponent.getClass());
+            if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(metadata)) {
+                // TODO: Use component ids here
+                entity.addRemovedComponent(metadata.getUri().toString());
             }
         }
         return entity.build();
     }
-
-    private boolean containsIgnoreCase(String componentName, List<String> removedComponentList) {
-        String lowerCaseName = componentName.toLowerCase(Locale.ENGLISH);
-        for (String removed : removedComponentList) {
-            if (lowerCaseName.equals(removed.toLowerCase(Locale.ENGLISH))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
 }

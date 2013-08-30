@@ -36,6 +36,7 @@ import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
+import org.terasology.engine.SimpleUri;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -68,9 +69,9 @@ public class ComponentSerializerTest {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         EntitySystemBuilder builder = new EntitySystemBuilder();
         EngineEntityManager entityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
-        entityManager.getComponentLibrary().register(GetterSetterComponent.class);
-        entityManager.getComponentLibrary().register(StringComponent.class);
-        entityManager.getComponentLibrary().register(IntegerComponent.class);
+        entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
+        entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
         ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
         componentSerializer = new ComponentSerializer(componentLibrary, serializationLibrary);
 

@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 
@@ -53,7 +54,7 @@ public class WorldGeneratorManager {
             for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                 if (isValidWorldGenerator(generatorClass)) {
-                    WorldGeneratorUri uri = new WorldGeneratorUri(module.getModuleInfo().getId(), annotation.id());
+                    SimpleUri uri = new SimpleUri(module.getModuleInfo().getId(), annotation.id());
                     infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
                 } else {
                     logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
@@ -72,7 +73,7 @@ public class WorldGeneratorManager {
      * @param uri
      * @return The instantiated world generator.
      */
-    public WorldGenerator createGenerator(WorldGeneratorUri uri) throws UnresolvedWorldGeneratorException {
+    public WorldGenerator createGenerator(SimpleUri uri) throws UnresolvedWorldGeneratorException {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         Module module = moduleManager.getModule(uri.getModuleName());
         if (module == null) {
@@ -81,7 +82,7 @@ public class WorldGeneratorManager {
         if (moduleManager.isEnabled(module)) {
             for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
-                WorldGeneratorUri generatorUri = new WorldGeneratorUri(module.getModuleInfo().getId(), annotation.id());
+                SimpleUri generatorUri = new SimpleUri(module.getModuleInfo().getId(), annotation.id());
                 if (generatorUri.equals(uri)) {
                     return loadGenerator(generatorClass, generatorUri);
                 }
@@ -92,10 +93,10 @@ public class WorldGeneratorManager {
         }
     }
 
-    private WorldGenerator loadGenerator(Class<?> generatorClass, WorldGeneratorUri uri) throws UnresolvedWorldGeneratorException {
+    private WorldGenerator loadGenerator(Class<?> generatorClass, SimpleUri uri) throws UnresolvedWorldGeneratorException {
         if (isValidWorldGenerator(generatorClass)) {
             try {
-                return (WorldGenerator) generatorClass.getConstructor(WorldGeneratorUri.class).newInstance(uri);
+                return (WorldGenerator) generatorClass.getConstructor(SimpleUri.class).newInstance(uri);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new UnresolvedWorldGeneratorException("Failed to instantiate world generator '" + uri + "'", e);
             }
@@ -106,7 +107,7 @@ public class WorldGeneratorManager {
 
     private boolean isValidWorldGenerator(Class<?> generatorClass) {
         try {
-            return WorldGenerator.class.isAssignableFrom(generatorClass) && generatorClass.getConstructor(WorldGeneratorUri.class) != null;
+            return WorldGenerator.class.isAssignableFrom(generatorClass) && generatorClass.getConstructor(SimpleUri.class) != null;
         } catch (NoSuchMethodException e) {
             return false;
         }

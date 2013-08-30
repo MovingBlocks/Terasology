@@ -32,6 +32,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
@@ -73,6 +74,8 @@ public class BlockLoader implements BlockBuilderHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
 
+    private AssetManager assetManager;
+
     private JsonParser parser;
     private Gson gson;
 
@@ -83,8 +86,9 @@ public class BlockLoader implements BlockBuilderHelper {
     private final WorldAtlas atlas;
     private BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
-    public BlockLoader(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, WorldAtlas atlas) {
+    public BlockLoader(AssetManager assetManager, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, WorldAtlas atlas) {
         this.atlas = atlas;
+        this.assetManager = assetManager;
         parser = new JsonParser();
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
@@ -168,7 +172,7 @@ public class BlockLoader implements BlockBuilderHelper {
         }
         AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getModuleName(), uri.getFamilyName());
         BlockDefinition def;
-        if (AssetManager.getInstance().getAssetURLs(blockDefUri).isEmpty()) {
+        if (assetManager.getAssetURLs(blockDefUri).isEmpty()) {
             // An auto-block
             def = new BlockDefinition();
         } else {
@@ -190,7 +194,7 @@ public class BlockLoader implements BlockBuilderHelper {
         logger.debug("Loading Auto Blocks...");
         List<FreeformFamily> result = Lists.newArrayList();
         for (AssetUri blockTileUri : Assets.list(AssetType.BLOCK_TILE)) {
-            if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
+            if (assetManager.getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
                 logger.debug("Loading auto block {}", blockTileUri);
                 BlockUri uri = new BlockUri(blockTileUri.getModuleName(), blockTileUri.getAssetName());
                 result.add(new FreeformFamily(uri));
@@ -453,7 +457,7 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     private JsonElement readJson(AssetUri blockDefUri) {
-        try (InputStream stream = AssetManager.assetStream(blockDefUri)) {
+        try (InputStream stream = CoreRegistry.get(AssetManager.class).getAssetStream(blockDefUri)) {
             if (stream != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 return parser.parse(reader);

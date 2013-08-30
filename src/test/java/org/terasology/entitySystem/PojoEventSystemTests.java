@@ -35,6 +35,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.engine.SimpleUri;
 
 import java.util.List;
 
@@ -171,7 +172,7 @@ public class PojoEventSystemTests {
     public void testChildEvent() {
         entity.addComponent(new IntegerComponent());
         TestEventHandler handler = new TestEventHandler();
-        eventSystem.registerEvent("test:childEvent", TestChildEvent.class);
+        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
         eventSystem.registerEventHandler(handler);
 
         TestChildEvent event = new TestChildEvent();

@@ -23,6 +23,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 
@@ -35,8 +36,8 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     private boolean lagCompensated;
     private boolean skipInstigator;
 
-    public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, String uri) throws NoSuchMethodException {
-        super(simpleClass, factory, copyStrategies, uri);
+    public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, SimpleUri uri) throws NoSuchMethodException {
+        super(uri, simpleClass, factory, copyStrategies);
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
             lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();

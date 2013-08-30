@@ -25,6 +25,7 @@ import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ReflectionProvider<T> implements PropertyProvider<T> {
         try {
             ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
             CopyStrategyLibrary copyStrategies = CopyStrategyLibrary.create(reflectFactory);
-            ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>((Class<T>) target.getClass(), reflectFactory, copyStrategies, "");
+            ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), (Class<T>) target.getClass(), reflectFactory, copyStrategies);
             for (Field field : getAllFields(target.getClass(), and(withAnnotation(EditorRange.class), or(withType(Float.TYPE), withType(Float.class))))) {
                 EditorRange range = field.getAnnotation(EditorRange.class);
                 FieldMetadata<T, Float> fieldMetadata = (FieldMetadata<T, Float>) classMetadata.getField(field.getName());

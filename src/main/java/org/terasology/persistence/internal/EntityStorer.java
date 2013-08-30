@@ -50,7 +50,7 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
 
         Map<Class<? extends Component>, Integer> componentIds = Maps.newHashMap();
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            entityStoreBuilder.addComponentClass(componentMetadata.getName());
+            entityStoreBuilder.addComponentClass(componentMetadata.getUri().toString());
             componentIds.put(componentMetadata.getType(), componentIds.size());
         }
         serializer.setComponentIdMapping(componentIds);

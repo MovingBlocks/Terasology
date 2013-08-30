@@ -19,8 +19,8 @@ package org.terasology.audio.loaders;
 import com.google.common.io.ByteStreams;
 import org.lwjgl.BufferUtils;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
 import org.terasology.audio.StaticSoundData;
+import org.terasology.engine.module.Module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.List;
 public class OggSoundLoader implements AssetLoader<StaticSoundData> {
 
     @Override
-    public StaticSoundData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public StaticSoundData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         try (OggReader reader = new OggReader(stream)) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ByteStreams.copy(reader, bos);

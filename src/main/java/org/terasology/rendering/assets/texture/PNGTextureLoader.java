@@ -22,7 +22,7 @@ import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
+import org.terasology.engine.module.Module;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
     }
 
     @Override
-    public TextureData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public TextureData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         InputStream pngStream = null;
         if (urls.get(0).toString().endsWith(".png")) {
             pngStream = stream;

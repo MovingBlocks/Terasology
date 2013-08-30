@@ -25,6 +25,7 @@ import gnu.trove.set.TIntSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityDestroySubscriber;
@@ -81,6 +82,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private Path playersPath;
 
+    private ModuleManager moduleManager;
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
@@ -95,11 +97,12 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private boolean storeChunksInZips = true;
 
-    public StorageManagerInternal(EngineEntityManager entityManager) {
-        this(entityManager, true);
+    public StorageManagerInternal(ModuleManager moduleManager, EngineEntityManager entityManager) {
+        this(moduleManager, entityManager, true);
     }
 
-    public StorageManagerInternal(EngineEntityManager entityManager, boolean storeChunksInZips) {
+    public StorageManagerInternal(ModuleManager moduleManager, EngineEntityManager entityManager, boolean storeChunksInZips) {
+        this.moduleManager = moduleManager;
         this.entityManager = entityManager;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
@@ -135,7 +138,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         if (Files.isRegularFile(globalDataFile)) {
             try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
                 EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
-                GlobalStoreLoader loader = new GlobalStoreLoader(entityManager, prefabSerializer);
+                GlobalStoreLoader loader = new GlobalStoreLoader(moduleManager, entityManager, prefabSerializer);
                 loader.load(store);
                 for (StoreMetadata refTable : loader.getStoreMetadata()) {
                     storeMetadata.put(refTable.getId(), refTable);
@@ -300,6 +303,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             if ("jar".equalsIgnoreCase(provider.getScheme())) {
                 zipProvider = provider;
             }
+        }
+
+        if (zipProvider == null) {
+            logger.error("Zip archive support missing! Unable to save chunks.");
+            return;
         }
 
         storageTaskMaster.shutdown(new ShutdownTask(), true);

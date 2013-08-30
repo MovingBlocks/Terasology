@@ -34,6 +34,11 @@ public class EngineModule implements Module {
     }
 
     @Override
+    public String getId() {
+        return info.getId();
+    }
+
+    @Override
     public Reflections getReflections() {
         return reflections;
     }
@@ -48,4 +53,19 @@ public class EngineModule implements Module {
         return info;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof EngineModule) {
+            return ((EngineModule) obj).getId().equals(getId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return info.getId().hashCode();
+    }
 }

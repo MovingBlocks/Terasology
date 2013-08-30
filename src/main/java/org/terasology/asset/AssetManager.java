@@ -19,6 +19,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -43,62 +45,50 @@ import java.util.UUID;
 public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);
-    private static AssetManager instance;
 
+    private ModuleManager moduleManager;
     private Map<String, AssetSource> assetSources = Maps.newHashMap();
     private EnumMap<AssetType, Map<String, AssetLoader>> assetLoaders = Maps.newEnumMap(AssetType.class);
     private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
     private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
     private Map<AssetType, AssetFactory> factories = Maps.newHashMap();
 
-    protected AssetManager() {
-    }
+    public AssetManager(ModuleManager moduleManager) {
+        this.moduleManager = moduleManager;
+        setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
-    public static AssetManager getInstance() {
-        if (instance == null) {
-            instance = new AssetManager();
-            instance.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+            @Override
+            public Prefab buildAsset(AssetUri uri, PrefabData data) {
+                return new PojoPrefab(uri, data);
+            }
+        });
+        setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
 
-                @Override
-                public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                    return new PojoPrefab(uri, data);
-                }
-            });
-            instance.setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
-
-                @Override
-                public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
-                    return new BlockShapeImpl(uri, data);
-                }
-            });
-        }
-
-        return instance;
+            @Override
+            public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
+                return new BlockShapeImpl(uri, data);
+            }
+        });
     }
 
     public void setAssetFactory(AssetType type, AssetFactory factory) {
         factories.put(type, factory);
     }
 
-    // Static syntax sugar
-    public static InputStream assetStream(AssetUri uri) throws IOException {
-        return getInstance().getAssetStream(uri);
+    public Asset tryLoad(AssetUri uri) {
+        return tryLoadAsset(uri);
     }
 
-    public static Asset tryLoad(AssetUri uri) {
-        return getInstance().tryLoadAsset(uri);
-    }
-
-    public static <T> T tryLoadAssetData(AssetUri uri, Class<T> type) {
-        AssetData data = getInstance().loadAssetData(uri, false);
+    public <T> T tryLoadAssetData(AssetUri uri, Class<T> type) {
+        AssetData data = loadAssetData(uri, false);
         if (type.isInstance(data)) {
             return type.cast(data);
         }
         return null;
     }
 
-    public static <T> T loadAssetData(AssetUri uri, Class<T> type) {
-        AssetData data = getInstance().loadAssetData(uri, true);
+    public <T> T loadAssetData(AssetUri uri, Class<T> type) {
+        AssetData data = loadAssetData(uri, true);
         if (type.isInstance(data)) {
             return type.cast(data);
         }
@@ -169,12 +159,13 @@ public class AssetManager {
                 continue;
             }
 
+            Module module = moduleManager.getModule(uri.getModuleName());
             InputStream stream = null;
             try {
                 stream = url.openStream();
                 urls.remove(url);
                 urls.add(0, url);
-                return loader.load(uri, stream, urls);
+                return loader.load(module, stream, urls);
             } catch (IOException ioe) {
                 logger.error("Error reading asset {}", uri, ioe);
                 return null;

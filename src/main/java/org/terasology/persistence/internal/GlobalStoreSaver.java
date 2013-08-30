@@ -49,7 +49,7 @@ final class GlobalStoreSaver {
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            store.addComponentClass(componentMetadata.getName());
+            store.addComponentClass(componentMetadata.getUri().toString());
             componentIdTable.put(componentMetadata.getType(), componentIdTable.size());
         }
         entitySerializer.setComponentIdMapping(componentIdTable);

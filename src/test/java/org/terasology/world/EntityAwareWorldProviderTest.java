@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -103,6 +104,7 @@ public class EntityAwareWorldProviderTest {
 
     @Before
     public void setup() {
+        CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManager()));
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
         CoreRegistry.put(ComponentSystemManager.class, mock(ComponentSystemManager.class));

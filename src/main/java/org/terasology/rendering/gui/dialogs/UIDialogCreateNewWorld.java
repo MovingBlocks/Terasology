@@ -40,9 +40,9 @@ import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldInfo;
+import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.WorldGeneratorInfo;
 import org.terasology.world.generator.WorldGeneratorManager;
-import org.terasology.world.generator.WorldGeneratorUri;
 import org.terasology.world.time.WorldTime;
 
 import javax.vecmath.Vector2f;
@@ -148,7 +148,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         final WorldGeneratorManager worldGeneratorManager = CoreRegistry.get(WorldGeneratorManager.class);
         worldGenerators = worldGeneratorManager.getWorldGenerators();
         worldGenerator = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2 * COMPONENT_HEIGHT));
-        WorldGeneratorUri defaultMapGenerator = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultGenerator();
+        SimpleUri defaultMapGenerator = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultGenerator();
         UIListItem item;
         int index = 0;
         int defaultIndex = 0;

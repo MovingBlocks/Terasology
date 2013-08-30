@@ -28,7 +28,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.generator.WorldGeneratorUri;
+import org.terasology.engine.SimpleUri;
 import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.lighting.LightingUtil;
 import org.terasology.world.lighting.PropagationComparison;
@@ -46,7 +46,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;
     private String seed = "";
-    private WorldGeneratorUri worldGenerator;
+    private SimpleUri worldGenerator;
 
     private WorldBiomeProvider biomeProvider;
     private ChunkProvider chunkProvider;
@@ -56,7 +56,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, WorldGeneratorUri worldGenerator, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, ChunkProvider chunkProvider) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;

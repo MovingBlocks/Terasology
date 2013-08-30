@@ -327,6 +327,17 @@ public class ModuleManager {
         return ImmutableSet.copyOf(activeModules);
     }
 
+    public Iterable<Module> getActiveCodeModules() {
+        List<Module> result = Lists.newArrayList();
+        result.add(engineModule);
+        for (Module module : activeModules) {
+            if (module.isCodeModule()) {
+                result.add(module);
+            }
+        }
+        return result;
+    }
+
     private List<ExtensionModule> getActiveExtensionCodeModules() {
         List<ExtensionModule> result = Lists.newArrayListWithCapacity(modules.size() + 1);
         for (Module module : activeModules) {
@@ -339,5 +350,39 @@ public class ModuleManager {
 
     public boolean isEnabled(Module module) {
         return activeModules.contains(module);
+    }
+
+    public Iterable<Module> getAllDependencies(Module module) {
+        Set<Module> dependencies = Sets.newHashSet();
+        addDependenciesRecursive(module, dependencies);
+        dependencies.add(engineModule);
+        return dependencies;
+    }
+
+    private void addDependenciesRecursive(Module module, Set<Module> dependencies) {
+        for (String dependencyId : module.getModuleInfo().getDependencies()) {
+            Module dependency = getModule(dependencyId);
+            if (dependency != null) {
+                dependencies.add(module);
+                addDependenciesRecursive(dependency, dependencies);
+            }
+        }
+    }
+
+    public Set<String> getDependencyNamesOf(Module context) {
+        Set<String> dependencies = Sets.newHashSet();
+        addDependencyNamesRecursive(context, dependencies);
+        dependencies.add(engineModule.getId());
+        return dependencies;
+    }
+
+    private void addDependencyNamesRecursive(Module module, Set<String> dependencies) {
+        for (String dependencyId : module.getModuleInfo().getDependencies()) {
+            Module dependency = getModule(dependencyId);
+            if (dependency != null) {
+                dependencies.add(module.getId());
+                addDependencyNamesRecursive(dependency, dependencies);
+            }
+        }
     }
 }

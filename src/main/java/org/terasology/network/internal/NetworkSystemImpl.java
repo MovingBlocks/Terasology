@@ -80,6 +80,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
+import org.terasology.engine.SimpleUri;
 
 import java.net.BindException;
 import java.net.InetSocketAddress;
@@ -747,7 +748,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
-                    .setName(metadata.getName());
+                    .setName(metadata.getUri().toString());
             for (FieldMetadata field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -764,7 +765,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
-                    .setName(metadata.getName());
+                    .setName(metadata.getUri().toString());
             for (FieldMetadata field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -793,7 +794,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             int fieldId = 0;
             for (FieldMetadata field : metadata.getFields()) {
                 if (fieldId >= 256) {
-                    logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getName());
+                    logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getUri());
                     break;
                 }
                 field.setId((byte) fieldId);
@@ -812,7 +813,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(new SimpleUri(info.getName()));
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {

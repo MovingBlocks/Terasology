@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
@@ -97,7 +98,7 @@ public class PrefabSerializer {
         if (prefab.getParent() != null) {
             for (Component parentComp : prefab.getParent().iterateComponents()) {
                 if (!prefab.hasComponent(parentComp.getClass())) {
-                    prefabData.addRemovedComponent(componentLibrary.getMetadata(parentComp).getName());
+                    prefabData.addRemovedComponent(componentLibrary.getMetadata(parentComp).getUri().toString());
                 }
             }
         }
@@ -110,7 +111,7 @@ public class PrefabSerializer {
      * @param prefabData
      * @return The deserialized prefab
      */
-    public PrefabData deserialize(EntityData.Prefab prefabData) {
+    public PrefabData deserialize(EntityData.Prefab prefabData, Module context) {
         PrefabData result = new PrefabData();
         result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
         result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() ? prefabData.getAlwaysRelevant() : false);
@@ -129,23 +130,25 @@ public class PrefabSerializer {
             }
         }
         for (String removedComponent : prefabData.getRemovedComponentList()) {
-            ComponentMetadata<?> metadata = componentLibrary.getMetadata(removedComponent);
+            ComponentMetadata<?> metadata = componentLibrary.resolve(removedComponent, context);
             if (metadata != null) {
                 result.removeComponent(metadata.getType());
             }
         }
         for (EntityData.Component componentData : prefabData.getComponentList()) {
-            ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentData.getType());
+            ComponentMetadata<?> metadata = componentLibrary.resolve(componentData.getType(), context);
             if (metadata != null) {
                 Component existing = result.getComponent(metadata.getType());
                 if (existing != null) {
-                    componentSerializer.deserializeOnto(existing, componentData);
+                    componentSerializer.deserializeOnto(existing, componentData, context);
                 } else {
-                    Component newComponent = componentSerializer.deserialize(componentData);
+                    Component newComponent = componentSerializer.deserialize(componentData, context);
                     if (newComponent != null) {
                         result.addComponent(newComponent);
                     }
                 }
+            } else {
+                logger.error("Prefab contains unknown component '{}'", componentData.getType());
             }
         }
 

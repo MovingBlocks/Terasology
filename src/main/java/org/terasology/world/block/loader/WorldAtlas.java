@@ -25,6 +25,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
@@ -73,7 +74,7 @@ public class WorldAtlas {
      */
     public WorldAtlas(int maxAtlasSize) {
         this.maxAtlasSize = maxAtlasSize;
-        for (AssetUri tile : AssetManager.getInstance().listAssets(AssetType.BLOCK_TILE)) {
+        for (AssetUri tile : Assets.list(AssetType.BLOCK_TILE)) {
             indexTile(tile, false);
         }
         buildAtlas();
@@ -123,7 +124,7 @@ public class WorldAtlas {
             logger.error("Maximum tiles exceeded");
             return 0;
         }
-        TileData tile = AssetManager.tryLoadAssetData(uri, TileData.class);
+        TileData tile = CoreRegistry.get(AssetManager.class).tryLoadAssetData(uri, TileData.class);
         if (tile != null) {
             if (checkTile(tile)) {
                 int index = tiles.size();
@@ -149,7 +150,7 @@ public class WorldAtlas {
 
     private void addNormal(AssetUri uri) {
         String name = uri.toSimpleString() + "Normal";
-        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        TileData tile = CoreRegistry.get(AssetManager.class).tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
         if (tile != null) {
             tilesNormal.add(tile);
         } else {
@@ -159,7 +160,7 @@ public class WorldAtlas {
 
     private void addHeightMap(AssetUri uri) {
         String name = uri.toSimpleString() + "Height";
-        TileData tile = AssetManager.tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        TileData tile = CoreRegistry.get(AssetManager.class).tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
         if (tile != null) {
             tilesHeight.add(tile);
         } else {

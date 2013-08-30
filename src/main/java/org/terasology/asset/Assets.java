@@ -17,6 +17,7 @@
 package org.terasology.asset;
 
 import org.terasology.audio.Sound;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.font.Font;
@@ -41,7 +42,7 @@ public final class Assets {
      * @return An iterable over the complete list of available assets
      */
     public static Iterable<AssetUri> list() {
-        return AssetManager.getInstance().listAssets();
+        return CoreRegistry.get(AssetManager.class).listAssets();
     }
 
     /**
@@ -49,14 +50,14 @@ public final class Assets {
      * @return An iterable over the assets belonging to the given AssetType
      */
     public static Iterable<AssetUri> list(AssetType type) {
-        return AssetManager.getInstance().listAssets(type);
+        return CoreRegistry.get(AssetManager.class).listAssets(type);
     }
 
     /**
      * @return An iterable over the list of available modules
      */
     public static Iterable<String> listModules() {
-        return AssetManager.getInstance().listModuleNames();
+        return CoreRegistry.get(AssetManager.class).listModuleNames();
     }
 
     /**
@@ -64,7 +65,7 @@ public final class Assets {
      * @return The requested asset, or null if it doesn't exist.
      */
     public static Asset get(AssetUri uri) {
-        return AssetManager.getInstance().loadAsset(uri);
+        return CoreRegistry.get(AssetManager.class).loadAsset(uri);
     }
 
     /**
@@ -239,7 +240,7 @@ public final class Assets {
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {
-        Asset<U> asset = AssetManager.getInstance().generateAsset(uri, data);
+        Asset<U> asset = CoreRegistry.get(AssetManager.class).generateAsset(uri, data);
         if (assetClass.isInstance(asset)) {
             return assetClass.cast(asset);
         }
@@ -247,7 +248,7 @@ public final class Assets {
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetType type, U data, Class<T> assetClass) {
-        Asset<U> asset = AssetManager.getInstance().generateTemporaryAsset(type, data);
+        Asset<U> asset = CoreRegistry.get(AssetManager.class).generateTemporaryAsset(type, data);
         if (assetClass.isInstance(asset)) {
             return assetClass.cast(asset);
         }

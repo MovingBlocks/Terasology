@@ -23,6 +23,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
+import org.terasology.engine.CoreRegistry;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,11 +51,11 @@ public class ExtensionModule implements Module {
     }
 
     void enable() {
-        AssetManager.getInstance().addAssetSource(moduleSource);
+        CoreRegistry.get(AssetManager.class).addAssetSource(moduleSource);
     }
 
     void disable() {
-        AssetManager.getInstance().removeAssetSource(moduleSource);
+        CoreRegistry.get(AssetManager.class).removeAssetSource(moduleSource);
     }
 
     URL getModuleClasspathUrl() {
@@ -74,6 +75,11 @@ public class ExtensionModule implements Module {
             return null;
         }
         return null;
+    }
+
+    @Override
+    public String getId() {
+        return moduleInfo.getId();
     }
 
     @Override
@@ -128,4 +134,6 @@ public class ExtensionModule implements Module {
     public int hashCode() {
         return moduleInfo.getId().hashCode();
     }
+
+
 }

@@ -30,7 +30,9 @@ import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
@@ -86,7 +88,7 @@ public class BlockManagerImpl extends BlockManager {
                             boolean generateNewIds,
                             BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
-        blockLoader = new BlockLoader(blockFamilyFactoryRegistry, atlas);
+        blockLoader = new BlockLoader(CoreRegistry.get(AssetManager.class), blockFamilyFactoryRegistry, atlas);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
         for (BlockFamily family : blockDefinitions.families) {

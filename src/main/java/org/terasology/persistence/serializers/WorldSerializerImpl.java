@@ -24,17 +24,18 @@ import gnu.trove.procedure.TIntProcedure;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.protobuf.EntityData;
+import org.terasology.engine.SimpleUri;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,6 +48,7 @@ import java.util.Map;
  */
 public class WorldSerializerImpl implements WorldSerializer {
 
+    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
     private ComponentLibrary componentLibrary;
     private PrefabManager prefabManager;
     private EngineEntityManager entityManager;
@@ -99,7 +101,7 @@ public class WorldSerializerImpl implements WorldSerializer {
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < world.getComponentClassCount(); ++index) {
-            ClassMetadata componentMetadata = componentLibrary.getMetadata(world.getComponentClass(index));
+            ComponentMetadata<?> componentMetadata = componentLibrary.resolve(world.getComponentClass(index));
             if (componentMetadata != null) {
                 componentIdTable.put(componentMetadata.getType(), index);
             }
@@ -143,7 +145,8 @@ public class WorldSerializerImpl implements WorldSerializer {
 
 
     private void createPrefab(EntityData.Prefab prefabData) {
-        PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
+        SimpleUri uri = new SimpleUri(prefabData.getName());
+        PrefabData protoPrefab = prefabSerializer.deserialize(prefabData, moduleManager.getModule(uri.getModuleName()));
         Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
         prefabManager.registerPrefab(prefab);
     }
@@ -153,7 +156,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             int index = componentIdTable.size();
             componentIdTable.put(componentMetadata.getType(), index);
-            world.addComponentClass(MetadataUtil.getComponentClassName(componentMetadata.getType()));
+            world.addComponentClass(componentMetadata.getUri().toString());
         }
         entitySerializer.setComponentIdMapping(componentIdTable);
         prefabSerializer.setComponentIdMapping(componentIdTable);

@@ -51,6 +51,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -78,7 +79,7 @@ public class EventSystemImpl implements EventSystem {
     private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
 
     // Event metadata
-    private BiMap<String, Class<? extends Event>> eventIdMap = HashBiMap.create();
+    private BiMap<SimpleUri, Class<? extends Event>> eventIdMap = HashBiMap.create();
     private SetMultimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
 
     private Thread mainThread;
@@ -104,10 +105,8 @@ public class EventSystemImpl implements EventSystem {
     }
 
     @Override
-    public void registerEvent(String name, Class<? extends Event> eventType) {
-        if (name != null && !name.isEmpty()) {
-            eventIdMap.put(name, eventType);
-        }
+    public void registerEvent(SimpleUri uri, Class<? extends Event> eventType) {
+        eventIdMap.put(uri, eventType);
         logger.debug("Registering event {}", eventType.getSimpleName());
         for (Class parent : Reflections.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
@@ -115,7 +114,7 @@ public class EventSystemImpl implements EventSystem {
             }
         }
         if (shouldAddToLibrary(eventType)) {
-            eventLibrary.register(eventType, name);
+            eventLibrary.register(uri, eventType);
         }
     }
 

@@ -13,43 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+package org.terasology.engine;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.engine.AbstractBaseUri;
 
 /**
- * A URI to identify a map generator. This URI is always in the form: <package-name>:<generator-name>
+ * A URI to identify standard objects in Terasology - components, events, etc. These URIs are always in the form: <module-name>:<object-name>
  *
  * @author synopia
  */
-public class WorldGeneratorUri extends AbstractBaseUri {
+public class SimpleUri extends AbstractBaseUri {
     private String moduleName = "";
-    private String generatorName = "";
+    private String objectName = "";
 
     private String normalisedModuleName = "";
-    private String normalisedGeneratorName = "";
+    private String normalisedObjectName = "";
 
-    public WorldGeneratorUri() {
+    public SimpleUri() {
     }
 
-    public WorldGeneratorUri(String moduleName, String generatorName) {
+    public SimpleUri(String moduleName, String objectName) {
         Preconditions.checkNotNull(moduleName);
-        Preconditions.checkNotNull(generatorName);
+        Preconditions.checkNotNull(objectName);
         this.moduleName = moduleName;
-        this.generatorName = generatorName;
+        this.objectName = objectName;
         this.normalisedModuleName = normalise(moduleName);
-        this.normalisedGeneratorName = normalise(generatorName);
+        this.normalisedObjectName = normalise(objectName);
     }
 
-    public WorldGeneratorUri(String simpleUri) {
+    public SimpleUri(String simpleUri) {
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
             moduleName = split[0];
             normalisedModuleName = normalise(split[0]);
-            generatorName = split[1];
-            normalisedGeneratorName = normalise(split[1]);
+            objectName = split[1];
+            normalisedObjectName = normalise(split[1]);
         }
     }
 
@@ -63,16 +62,16 @@ public class WorldGeneratorUri extends AbstractBaseUri {
         return normalisedModuleName;
     }
 
-    public String getGeneratorName() {
-        return generatorName;
+    public String getObjectName() {
+        return objectName;
     }
 
-    public String getNormalisedGeneratorName() {
-        return normalisedGeneratorName;
+    public String getNormalisedObjectName() {
+        return normalisedObjectName;
     }
 
     public boolean isValid() {
-        return !normalisedModuleName.isEmpty() && !normalisedGeneratorName.isEmpty();
+        return !normalisedModuleName.isEmpty() && !normalisedObjectName.isEmpty();
     }
 
     @Override
@@ -80,7 +79,7 @@ public class WorldGeneratorUri extends AbstractBaseUri {
         if (!isValid()) {
             return "";
         }
-        return moduleName + MODULE_SEPARATOR + generatorName;
+        return moduleName + MODULE_SEPARATOR + objectName;
     }
 
     @Override
@@ -88,7 +87,7 @@ public class WorldGeneratorUri extends AbstractBaseUri {
         if (!isValid()) {
             return "";
         }
-        return normalisedModuleName + MODULE_SEPARATOR + normalisedGeneratorName;
+        return normalisedModuleName + MODULE_SEPARATOR + normalisedObjectName;
     }
 
     @Override
@@ -96,16 +95,16 @@ public class WorldGeneratorUri extends AbstractBaseUri {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof WorldGeneratorUri) {
-            WorldGeneratorUri other = (WorldGeneratorUri) obj;
-            return Objects.equal(normalisedModuleName, other.normalisedModuleName) && Objects.equal(normalisedGeneratorName, other.normalisedGeneratorName);
+        if (obj instanceof SimpleUri) {
+            SimpleUri other = (SimpleUri) obj;
+            return Objects.equal(normalisedModuleName, other.normalisedModuleName) && Objects.equal(normalisedObjectName, other.normalisedObjectName);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(normalisedModuleName, normalisedGeneratorName);
+        return Objects.hashCode(normalisedModuleName, normalisedObjectName);
     }
 
 }

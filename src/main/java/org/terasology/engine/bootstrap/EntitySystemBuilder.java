@@ -43,6 +43,7 @@ import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.math.Region3i;
@@ -70,13 +71,13 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.engine.SimpleUri;
 
 import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.util.Set;
 
 /**
  * @author Immortius
@@ -151,29 +152,26 @@ public class EntitySystemBuilder {
     }
 
     private void registerComponents(ComponentLibrary library, ModuleManager moduleManager) {
-        Reflections reflections = moduleManager.getActiveModuleReflections();
-
-        Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
-        for (Class<? extends Component> componentType : componentTypes) {
-            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
-                library.register(componentType);
+        for (Module module : moduleManager.getActiveCodeModules()) {
+            for (Class<? extends Component> componentType : module.getReflections().getSubTypesOf(Component.class)) {
+                if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+                    String componentName = MetadataUtil.getComponentClassName(componentType);
+                    library.register(new SimpleUri(module.getModuleInfo().getId(), componentName), componentType);
+                }
             }
         }
     }
 
     private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
-        for (Module module : moduleManager.getActiveModules()) {
-            if (module.isCodeModule()) {
-                registerEvents(module.getModuleInfo().getId(), eventSystem, module.getReflections());
-            }
+        for (Module module : moduleManager.getActiveCodeModules()) {
+            registerEvents(module.getModuleInfo().getId(), eventSystem, module.getReflections());
         }
     }
 
-    private void registerEvents(String packageName, EventSystem eventSystem, Reflections reflections) {
-        Set<Class<? extends Event>> eventTypes = reflections.getSubTypesOf(Event.class);
-        for (Class<? extends Event> eventType : eventTypes) {
+    private void registerEvents(String moduleName, EventSystem eventSystem, Reflections reflections) {
+        for (Class<? extends Event> eventType : reflections.getSubTypesOf(Event.class)) {
             if (eventType.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(packageName + ":" + eventType.getSimpleName(), eventType);
+                eventSystem.registerEvent(new SimpleUri(moduleName, eventType.getSimpleName()), eventType);
             }
         }
     }

@@ -19,9 +19,11 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.event.EventSystem;
@@ -66,6 +68,8 @@ public class PojoEntityManagerTest {
     @BeforeClass
     public static void setupClass() {
         moduleManager = new ModuleManager();
+        AssetManager assetManager = new AssetManager(moduleManager);
+        CoreRegistry.put(AssetManager.class, assetManager);
     }
 
     @Before

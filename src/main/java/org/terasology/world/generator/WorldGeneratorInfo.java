@@ -15,6 +15,8 @@
  */
 package org.terasology.world.generator;
 
+import org.terasology.engine.SimpleUri;
+
 import java.util.Locale;
 
 /**
@@ -22,17 +24,17 @@ import java.util.Locale;
  */
 public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
 
-    private WorldGeneratorUri uri;
+    private SimpleUri uri;
     private String displayName;
     private String description;
 
-    public WorldGeneratorInfo(WorldGeneratorUri uri, String displayName, String description) {
+    public WorldGeneratorInfo(SimpleUri uri, String displayName, String description) {
         this.uri = uri;
         this.displayName = displayName;
         this.description = description;
     }
 
-    public WorldGeneratorUri getUri() {
+    public SimpleUri getUri() {
         return uri;
     }
 

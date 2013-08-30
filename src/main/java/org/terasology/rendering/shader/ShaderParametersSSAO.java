@@ -121,7 +121,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     }
 
     private Texture updateNoiseTexture() {
-        Texture texture = AssetManager.getInstance().tryLoadAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), Texture.class);
+        Texture texture = CoreRegistry.get(AssetManager.class).tryLoadAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), Texture.class);
         if (texture == null) {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
 

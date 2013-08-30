@@ -23,6 +23,7 @@ import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +40,7 @@ public class ComponentMetadataTest {
     public void staticFieldsIgnored() {
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(StringComponent.class);
+        lib.register(new SimpleUri("unittest:string"), StringComponent.class);
         ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
         assertNull(metadata.getField("STATIC_VALUE"));
     }
@@ -48,7 +49,7 @@ public class ComponentMetadataTest {
     public void ownsReferencesPopulated() {
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, new TypeSerializationLibrary(reflectFactory, copyStrategies));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(OwnerComponent.class);
+        lib.register(new SimpleUri("unittest:owner"), OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);
         assertTrue(metadata.isReferenceOwner());
     }

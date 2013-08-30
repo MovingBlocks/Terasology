@@ -50,7 +50,11 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
     private void connectExistingEntities() {
         for (EntityRef entity : entityManager.getEntitiesWith(BlockTypeComponent.class)) {
             BlockTypeComponent blockTypeComp = entity.getComponent(BlockTypeComponent.class);
-            blockTypeComp.block.setEntity(entity);
+            if (blockTypeComp.block == null) {
+                entity.destroy();
+            } else {
+                blockTypeComp.block.setEntity(entity);
+            }
         }
     }
 

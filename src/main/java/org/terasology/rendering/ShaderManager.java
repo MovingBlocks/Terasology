@@ -24,6 +24,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
@@ -121,7 +122,7 @@ public class ShaderManager {
     }
 
     public void recompileAllShaders() {
-        for (Shader shader : AssetManager.getInstance().listLoadedAssets(AssetType.SHADER, Shader.class)) {
+        for (Shader shader : CoreRegistry.get(AssetManager.class).listLoadedAssets(AssetType.SHADER, Shader.class)) {
             shader.recompile();
         }
 

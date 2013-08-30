@@ -18,7 +18,7 @@ package org.terasology.world.generator.worldGenerators;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.world.generator.RegisterWorldGenerator;
-import org.terasology.world.generator.WorldGeneratorUri;
+import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.chunkGenerators.FloraGenerator;
 import org.terasology.world.generator.chunkGenerators.ForestGenerator;
 import org.terasology.world.generator.chunkGenerators.MultiTerrainGenerator;
@@ -30,7 +30,7 @@ import org.terasology.world.liquid.LiquidsGenerator;
 @RegisterWorldGenerator(id = "mixed", displayName = "Mixed", description = "A world generator that uses a mixture of techniques")
 public class MixedWorldGenerator extends AbstractBaseWorldGenerator {
 
-    public MixedWorldGenerator(WorldGeneratorUri uri) {
+    public MixedWorldGenerator(SimpleUri uri) {
         super(uri);
         register(new MultiTerrainGenerator());
         register(new FloraGenerator());

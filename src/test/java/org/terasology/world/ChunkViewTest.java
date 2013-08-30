@@ -18,6 +18,7 @@ package org.terasology.world;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
@@ -30,18 +31,20 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius
  */
-public class ChunkViewTest {
+public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     Block airBlock;
     Block solidBlock;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = BlockManager.getAir();

@@ -17,8 +17,8 @@
 package org.terasology.rendering.assets.font;
 
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.module.Module;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.io.BufferedReader;
@@ -56,14 +56,14 @@ public class FontLoader implements AssetLoader<FontData> {
             "chnl=" + INTEGER_PATTERN + "\\s*");
 
     @Override
-    public FontData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public FontData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         FontDataBuilder builder = new FontDataBuilder();
         parseHeader(reader.readLine());
         int numPages = parseCommon(builder, reader.readLine());
 
         for (int i = 0; i < numPages; ++i) {
-            parsePage(builder, uri.getModuleName(), reader.readLine());
+            parsePage(builder, module.getId(), reader.readLine());
         }
 
         int charCount = getCharacterCount(reader.readLine());

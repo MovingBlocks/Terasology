@@ -22,10 +22,12 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -33,6 +35,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.engine.SimpleUri;
 
 import java.util.List;
 import java.util.Map;
@@ -42,6 +45,7 @@ import java.util.Map;
  */
 final class GlobalStoreLoader {
 
+    private ModuleManager moduleManager;
     private EngineEntityManager entityManager;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
@@ -49,7 +53,7 @@ final class GlobalStoreLoader {
     private PrefabSerializer prefabSerializer;
     private List<StoreMetadata> refTables;
 
-    public GlobalStoreLoader(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
+    public GlobalStoreLoader(ModuleManager moduleManager, EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
@@ -93,11 +97,11 @@ final class GlobalStoreLoader {
     private void loadMissingPrefabs(EntityData.GlobalStore globalStore) {
         // Prefabs that still need to be created, by their name
         Map<String, EntityData.Prefab> pendingPrefabs = Maps.newHashMap();
-
         for (EntityData.Prefab prefabData : globalStore.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
+                Module module = moduleManager.getModule(new SimpleUri(prefabData.getName()).getModuleName());
                 if (!prefabData.hasParentName()) {
-                    createPrefab(prefabData);
+                    createPrefab(prefabData, module);
                 } else {
                     pendingPrefabs.put(prefabData.getName(), prefabData);
                 }
@@ -115,13 +119,14 @@ final class GlobalStoreLoader {
             if (prefabManager.getPrefab(prefabData.getParentName()) == null) {
                 loadPrefab(pendingPrefabs.get(prefabData.getParentName()), pendingPrefabs);
             }
-            result = createPrefab(prefabData);
+            Module module = moduleManager.getModule(new SimpleUri(prefabData.getName()).getModuleName());
+            result = createPrefab(prefabData, module);
         }
         return result;
     }
 
-    private Prefab createPrefab(EntityData.Prefab prefabData) {
-        PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
+    private Prefab createPrefab(EntityData.Prefab prefabData, Module context) {
+        PrefabData protoPrefab = prefabSerializer.deserialize(prefabData, context);
         Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
         prefabManager.registerPrefab(prefab);
         return prefab;
@@ -130,7 +135,7 @@ final class GlobalStoreLoader {
     private void loadComponentMapping(EntityData.GlobalStore globalStore) {
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < globalStore.getComponentClassCount(); ++index) {
-            ClassMetadata componentMetadata = componentLibrary.getMetadata(globalStore.getComponentClass(index));
+            ComponentMetadata<?> componentMetadata = componentLibrary.resolve(globalStore.getComponentClass(index));
             if (componentMetadata != null) {
                 componentIdTable.put(componentMetadata.getType(), index);
             }

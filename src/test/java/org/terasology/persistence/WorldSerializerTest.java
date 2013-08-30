@@ -31,6 +31,7 @@ import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
+import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -55,9 +56,9 @@ public class WorldSerializerTest {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
         entityManager = builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
-        entityManager.getComponentLibrary().register(GetterSetterComponent.class);
-        entityManager.getComponentLibrary().register(StringComponent.class);
-        entityManager.getComponentLibrary().register(IntegerComponent.class);
+        entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
+        entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
         worldSerializer = new WorldSerializerImpl(entityManager, new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary()));
     }
 

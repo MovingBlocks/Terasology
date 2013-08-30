@@ -34,6 +34,7 @@ import org.terasology.classMetadata.copying.strategy.Vector4fCopyStrategy;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.engine.SimpleUri;
 
 import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
@@ -163,7 +164,7 @@ public class CopyStrategyLibrary {
             }
 
             try {
-                ClassMetadata<?, ?> classMetadata = new DefaultClassMetadata<>(typeClass, reflectFactory, this, typeClass.getSimpleName());
+                ClassMetadata<?, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), typeClass, reflectFactory, this);
                 return new MappedContainerCopyStrategy<>(classMetadata);
             } catch (NoSuchMethodException e) {
                 logger.error("Unable to create copy strategy for field of type {}: no publicly accessible default constructor", typeClass.getSimpleName());

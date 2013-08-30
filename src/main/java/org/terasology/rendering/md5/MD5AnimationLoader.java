@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
+import org.terasology.engine.module.Module;
 import org.terasology.math.AABB;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
@@ -58,12 +58,12 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimationData> {
     private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
 
     @Override
-    public MeshAnimationData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public MeshAnimationData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         try {
             MD5 md5 = parse(stream);
             return createAnimation(md5);
         } catch (NumberFormatException e) {
-            throw new IOException("Error parsing " + uri.toString(), e);
+            throw new IOException("Error parsing " + module.toString(), e);
         }
     }
 

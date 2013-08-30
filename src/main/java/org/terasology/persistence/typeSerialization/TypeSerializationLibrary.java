@@ -41,6 +41,7 @@ import org.terasology.persistence.typeSerialization.typeHandlers.core.SetTypeHan
 import org.terasology.persistence.typeSerialization.typeHandlers.core.StringMapTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.core.StringTypeHandler;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -191,7 +192,7 @@ public class TypeSerializationLibrary {
                 && !(typeClass.isMemberClass()
                 && !Modifier.isStatic(typeClass.getModifiers()))) {
             try {
-                ClassMetadata<?, ?> metadata = new DefaultClassMetadata<>(typeClass, reflectFactory, copyStrategies, "");
+                ClassMetadata<?, ?> metadata = new DefaultClassMetadata<>(new SimpleUri(), typeClass, reflectFactory, copyStrategies);
                 MappedContainerTypeHandler<?> mappedHandler = new MappedContainerTypeHandler(typeClass, getFieldHandlerMap(metadata));
                 typeHandlers.put(typeClass, mappedHandler);
                 return mappedHandler;

@@ -16,7 +16,7 @@
 
 package org.terasology.config;
 
-import org.terasology.world.generator.WorldGeneratorUri;
+import org.terasology.engine.SimpleUri;
 
 /**
  * @author Immortius
@@ -30,7 +30,7 @@ public class WorldGenerationConfig {
     private float desertGrassDensity = 0.001f;
     private String defaultSeed = "Terasology";
 
-    private WorldGeneratorUri defaultGenerator = new WorldGeneratorUri("engine:perlin");
+    private SimpleUri defaultGenerator = new SimpleUri("engine:perlin");
 
     public String getWorldTitle() {
         return worldTitle;
@@ -88,11 +88,11 @@ public class WorldGenerationConfig {
         this.defaultSeed = defaultSeed;
     }
 
-    public WorldGeneratorUri getDefaultGenerator() {
+    public SimpleUri getDefaultGenerator() {
         return defaultGenerator;
     }
 
-    public void setDefaultGenerator(WorldGeneratorUri defaultGenerator) {
+    public void setDefaultGenerator(SimpleUri defaultGenerator) {
         this.defaultGenerator = defaultGenerator;
     }
 }

@@ -34,6 +34,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
@@ -45,7 +46,6 @@ import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
@@ -117,10 +117,12 @@ public abstract class TerasologyTestingEnvironment {
             moduleManager = new ModuleManager();
             moduleManager.applyActiveModules();
             CoreRegistry.put(ModuleManager.class, moduleManager);
-            AssetType.registerAssetTypes();
-            AssetManager.getInstance().addAssetSource(new ClasspathSource(ModuleManager.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(),
+            AssetManager assetManager = new AssetManager(moduleManager);
+            CoreRegistry.put(AssetManager.class, assetManager);
+            AssetType.registerAssetTypes(assetManager);
+            assetManager.addAssetSource(new ClasspathSource(ModuleManager.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(),
                     ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
-            AssetManager.getInstance().addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(),
+            assetManager.addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(),
                     ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
 
             config = new Config();
@@ -129,43 +131,43 @@ public abstract class TerasologyTestingEnvironment {
             Display.setDisplayMode(new DisplayMode(0, 0));
             Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
 
-            AssetManager.getInstance().setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
+            assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
                 @Override
                 public Texture buildAsset(AssetUri uri, TextureData data) {
                     return new OpenGLTexture(uri, data);
                 }
             });
-            AssetManager.getInstance().setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+            assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
                 @Override
                 public Font buildAsset(AssetUri uri, FontData data) {
                     return new OpenGLFont(uri, data);
                 }
             });
-            AssetManager.getInstance().setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
+            assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
                 @Override
                 public Shader buildAsset(AssetUri uri, ShaderData data) {
                     return new GLSLShader(uri, data);
                 }
             });
-            AssetManager.getInstance().setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
+            assetManager.setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
                 @Override
                 public Material buildAsset(AssetUri uri, MaterialData data) {
                     return new GLSLMaterial(uri, data);
                 }
             });
-            AssetManager.getInstance().setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
+            assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
                 @Override
                 public Mesh buildAsset(AssetUri uri, MeshData data) {
                     return new OpenGLMesh(uri, data);
                 }
             });
-            AssetManager.getInstance().setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
+            assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
                 @Override
                 public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
                     return new OpenGLSkeletalMesh(uri, data);
                 }
             });
-            AssetManager.getInstance().setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
+            assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
                 @Override
                 public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
                     return new MeshAnimationImpl(uri, data);
@@ -203,7 +205,7 @@ public abstract class TerasologyTestingEnvironment {
         networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem, new ReflectionReflectFactory());
-        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(engineEntityManager));
+        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager, engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);

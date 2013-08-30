@@ -19,7 +19,7 @@ package org.terasology.world.block.loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
+import org.terasology.engine.module.Module;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,12 +43,12 @@ public class TileLoader implements AssetLoader<TileData> {
     }
 
     @Override
-    public TileData load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public TileData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         BufferedImage image = ImageIO.read(stream);
         if (image.getHeight() == TILE_SIZE && image.getWidth() == TILE_SIZE) {
             return new TileData(image);
         }
-        logger.error("Invalid tile '{}', tiles must be 16x16", uri);
+        logger.error("Invalid tile '{}', tiles must be 16x16", module);
         return null;
     }
 }

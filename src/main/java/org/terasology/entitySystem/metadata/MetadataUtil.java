@@ -27,10 +27,6 @@ public final class MetadataUtil {
     private MetadataUtil() {
     }
 
-    public static String getComponentClassName(Component component) {
-        return getComponentClassName(component.getClass());
-    }
-
     public static String getComponentClassName(Class<? extends Component> componentClass) {
         String name = componentClass.getSimpleName();
         int index = name.toLowerCase(Locale.ENGLISH).lastIndexOf("component");
