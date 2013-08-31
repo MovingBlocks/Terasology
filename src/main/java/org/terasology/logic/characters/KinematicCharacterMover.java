@@ -16,7 +16,6 @@
 package org.terasology.logic.characters;
 
 import org.terasology.physics.SweepCallback;
-import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
@@ -75,7 +74,6 @@ public class KinematicCharacterMover implements CharacterMover {
      * The amount of extra distance added to vertical movement to allow for penetration.
      */
     private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
-    //Logger is now based on implementing class:
     private final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
     private boolean stepped;
     // Processing state variables
@@ -220,7 +218,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
-        collider.setLocation(moveResult.getFinalPosition());
+        
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 if (input.isFirstRun()) {
@@ -630,7 +628,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
-        collider.setLocation(moveResult.getFinalPosition());
+        
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 if (input.isFirstRun()) {
