@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.primitives.Tessellator;
@@ -43,7 +44,7 @@ public class InitialiseGraphics implements LoadProcess {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
-        tessellator.generateMesh(new AssetUri(AssetType.MESH, "engine", "gelatinousCube"));
+        tessellator.generateMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "gelatinousCube"));
         return true;
     }
 

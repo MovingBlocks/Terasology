@@ -18,6 +18,7 @@ package org.terasology.world.generator;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -38,13 +39,14 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Immortius
  */
-public class InternalLightGeneratorTest {
+public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     Block airBlock;
     Block solidBlock;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        super.setup();
         BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = BlockManager.getAir();

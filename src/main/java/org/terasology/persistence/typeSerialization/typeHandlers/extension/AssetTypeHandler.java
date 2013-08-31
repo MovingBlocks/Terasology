@@ -19,7 +19,6 @@ package org.terasology.persistence.typeSerialization.typeHandlers.extension;
 import com.google.common.collect.Lists;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
@@ -49,12 +48,9 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
     @Override
     public T deserialize(EntityData.Value value) {
         if (value.getStringCount() > 0) {
-            AssetUri uri = new AssetUri(type, value.getString(0));
-            if (uri.isValid()) {
-                Asset asset = Assets.get(uri);
-                if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
-                    return assetClass.cast(asset);
-                }
+            Asset asset = Assets.resolve(type, value.getString(0));
+            if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
+                return assetClass.cast(asset);
             }
         }
         return null;
@@ -73,12 +69,9 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
     public List<T> deserializeCollection(EntityData.Value value) {
         List<T> result = Lists.newArrayListWithCapacity(value.getStringCount());
         for (String item : value.getStringList()) {
-            AssetUri uri = new AssetUri(type, item);
-            if (uri.isValid()) {
-                Asset asset = Assets.get(uri);
-                if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
-                    result.add(assetClass.cast(asset));
-                }
+            Asset asset = Assets.resolve(type, item);
+            if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
+                result.add(assetClass.cast(asset));
             }
         }
         return result;

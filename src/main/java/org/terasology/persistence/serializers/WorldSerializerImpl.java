@@ -21,6 +21,8 @@ import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -34,6 +36,7 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.protobuf.EntityData;
 import org.terasology.engine.SimpleUri;
 
@@ -47,6 +50,8 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 public class WorldSerializerImpl implements WorldSerializer {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldSerializerImpl.class);
 
     private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
     private ComponentLibrary componentLibrary;
@@ -146,9 +151,13 @@ public class WorldSerializerImpl implements WorldSerializer {
 
     private void createPrefab(EntityData.Prefab prefabData) {
         SimpleUri uri = new SimpleUri(prefabData.getName());
-        PrefabData protoPrefab = prefabSerializer.deserialize(prefabData, moduleManager.getModule(uri.getModuleName()));
-        Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
-        prefabManager.registerPrefab(prefab);
+        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getModule(uri.getModuleName()))) {
+            PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
+            Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
+        } catch (Exception e) {
+            logger.error("Failed to create prefab {}", prefabData.getName());
+        }
+
     }
 
     private void writeComponentTypeTable(EntityData.GlobalStore.Builder world) {

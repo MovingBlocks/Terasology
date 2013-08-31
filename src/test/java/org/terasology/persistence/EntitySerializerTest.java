@@ -23,17 +23,17 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.MappedTypeComponent;
@@ -41,7 +41,6 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -76,12 +75,10 @@ public class EntitySerializerTest {
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
         entitySerializer = new EntitySerializer(entityManager);
         componentLibrary = entityManager.getComponentLibrary();
-        PrefabManager prefabManager = entityManager.getPrefabManager();
 
         PrefabData prefabData = new PrefabData();
         prefabData.addComponent(new StringComponent("Value"));
         prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "test:Test"), prefabData, Prefab.class);
-        prefabManager.registerPrefab(prefab);
     }
 
     @Test
@@ -110,7 +107,7 @@ public class EntitySerializerTest {
         assertEquals(1, entityData.getComponentCount());
         assertEquals(0, entityData.getRemovedComponentCount());
         EntityData.Component componentData = entityData.getComponent(0);
-        assertEquals("Integer", componentData.getType());
+        assertEquals("test:integer", componentData.getType());
         assertEquals(1, componentData.getFieldCount());
         EntityData.NameValue field = componentData.getField(0);
         assertEquals("value", field.getName());
@@ -127,7 +124,7 @@ public class EntitySerializerTest {
         assertEquals(entity.getId(), entityData.getId());
         assertEquals(prefab.getName(), entityData.getParentPrefab());
         assertEquals(0, entityData.getComponentCount());
-        assertEquals(Lists.newArrayList("String"), entityData.getRemovedComponentList());
+        assertEquals(Lists.newArrayList("test:string"), entityData.getRemovedComponentList());
     }
 
     @Test
@@ -143,7 +140,7 @@ public class EntitySerializerTest {
         assertEquals(1, entityData.getComponentCount());
         assertEquals(0, entityData.getRemovedComponentCount());
         EntityData.Component componentData = entityData.getComponent(0);
-        assertEquals("String", componentData.getType());
+        assertEquals("test:string", componentData.getType());
         assertEquals(Lists.newArrayList(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("Delta").build()).build()),
                 componentData.getFieldList());
     }

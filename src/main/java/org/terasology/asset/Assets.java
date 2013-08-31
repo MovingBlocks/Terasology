@@ -27,6 +27,8 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 
+import java.util.List;
+
 /**
  * Assets provides a collection of static methods for obtaining assets and registering procedural assets
  *
@@ -68,6 +70,30 @@ public final class Assets {
         return CoreRegistry.get(AssetManager.class).loadAsset(uri);
     }
 
+    public static Asset get(AssetType type, String uri) {
+        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri);
+    }
+
+    public static <T extends Asset> T get(AssetType type, String uri, Class<T> assetClass) {
+        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri, assetClass);
+    }
+
+    /**
+     * @param name
+     * @return The resolved asset, or
+     */
+    public static Asset resolve(AssetType type, String name) {
+        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, name);
+    }
+
+    /**
+     * @param name
+     * @return The resolved Asset URIs.
+     */
+    public static List<AssetUri> resolveAllUri(AssetType type, String name) {
+        return CoreRegistry.get(AssetManager.class).resolveAll(type, name);
+    }
+
     /**
      * @param uri
      * @param assetClass The expected class of the asset
@@ -87,7 +113,7 @@ public final class Assets {
      * @return The requested texture, or null if it doesn't exist
      */
     public static Texture getTexture(String simpleUri) {
-        return get(new AssetUri(AssetType.TEXTURE, simpleUri), Texture.class);
+        return get(AssetType.TEXTURE, simpleUri, Texture.class);
     }
 
     /**
@@ -104,7 +130,7 @@ public final class Assets {
      * @return The requested shader, or null if it doesn't exist
      */
     public static Shader getShader(String simpleUri) {
-        return get(new AssetUri(AssetType.SHADER, simpleUri), Shader.class);
+        return get(AssetType.SHADER, simpleUri, Shader.class);
     }
 
     /**
@@ -121,7 +147,7 @@ public final class Assets {
      * @return The requested font, or null if it doesn't exist
      */
     public static Font getFont(String simpleUri) {
-        return get(new AssetUri(AssetType.FONT, simpleUri), Font.class);
+        return get(AssetType.FONT, simpleUri, Font.class);
     }
 
     /**
@@ -138,7 +164,7 @@ public final class Assets {
      * @return The requested sound, or null if it doesn't exist
      */
     public static Sound getSound(String simpleUri) {
-        return get(new AssetUri(AssetType.SOUND, simpleUri), Sound.class);
+        return get(AssetType.SOUND, simpleUri, Sound.class);
     }
 
     /**
@@ -155,7 +181,7 @@ public final class Assets {
      * @return The requested music, or null if it doesn't exist
      */
     public static Sound getMusic(String simpleUri) {
-        return get(new AssetUri(AssetType.MUSIC, simpleUri), Sound.class);
+        return get(AssetType.MUSIC, simpleUri, Sound.class);
     }
 
     /**
@@ -172,7 +198,7 @@ public final class Assets {
      * @return The requested mesh, or null if it doesn't exist
      */
     public static Mesh getMesh(String simpleUri) {
-        return get(new AssetUri(AssetType.MESH, simpleUri), Mesh.class);
+        return get(AssetType.MESH, simpleUri, Mesh.class);
     }
 
     /**
@@ -189,7 +215,7 @@ public final class Assets {
      * @return The requested material, or null if it doesn't exist
      */
     public static Material getMaterial(String simpleUri) {
-        return get(new AssetUri(AssetType.MATERIAL, simpleUri), Material.class);
+        return get(AssetType.MATERIAL, simpleUri, Material.class);
     }
 
     /**
@@ -206,7 +232,7 @@ public final class Assets {
      * @return The requested SkeletalMesh, or null if it doesn't exist
      */
     public static SkeletalMesh getSkeletalMesh(String simpleUri) {
-        return get(new AssetUri(AssetType.SKELETON_MESH, simpleUri), SkeletalMesh.class);
+        return get(AssetType.SKELETON_MESH, simpleUri, SkeletalMesh.class);
     }
 
     /**
@@ -223,7 +249,7 @@ public final class Assets {
      * @return The requested MeshAnimation, or null if it doesn't exist
      */
     public static MeshAnimation getAnimation(String simpleUri) {
-        return get(new AssetUri(AssetType.ANIMATION, simpleUri), MeshAnimation.class);
+        return get(AssetType.ANIMATION, simpleUri, MeshAnimation.class);
     }
 
     /**
@@ -236,7 +262,7 @@ public final class Assets {
     }
 
     public static Prefab getPrefab(String simpleUri) {
-        return get(new AssetUri(AssetType.PREFAB, simpleUri), Prefab.class);
+        return get(AssetType.PREFAB, simpleUri, Prefab.class);
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {

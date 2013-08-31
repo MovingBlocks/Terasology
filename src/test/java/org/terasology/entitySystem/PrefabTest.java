@@ -21,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
@@ -67,10 +65,6 @@ public class PrefabTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
         prefabManager = new PojoPrefabManager();
-
-        for (AssetUri prefabUri : assetManager.listAssets(AssetType.PREFAB)) {
-            prefabManager.registerPrefab(Assets.get(prefabUri, Prefab.class));
-        }
     }
 
     @Test

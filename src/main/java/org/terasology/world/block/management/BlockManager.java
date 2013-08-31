@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.management;
 
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
@@ -45,7 +45,7 @@ public abstract class BlockManager {
         AIR.setHardness((byte) 0);
         AIR.setId((short) 0);
         AIR.setDisplayName("Air");
-        AIR.setUri(new BlockUri(ModuleManager.ENGINE_MODULE, AIR_ID));
+        AIR.setUri(new BlockUri(TerasologyConstants.ENGINE_MODULE, AIR_ID));
         AIR_FAMILY = new SymmetricFamily(AIR.getURI(), AIR);
     }
 

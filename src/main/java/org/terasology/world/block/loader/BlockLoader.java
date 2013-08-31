@@ -35,6 +35,7 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector3fHandler;
@@ -98,9 +99,9 @@ public class BlockLoader implements BlockBuilderHelper {
                 .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
                 .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
                 .create();
-        cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
-        loweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
-        trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
+        cubeShape = (BlockShape) Assets.get(AssetType.SHAPE, "engine:cube");
+        loweredShape = (BlockShape) Assets.get(AssetType.SHAPE, "engine:loweredCube");
+        trimmedLoweredShape = (BlockShape) Assets.get(AssetType.SHAPE, "engine:trimmedLoweredCube");
         this.blockFamilyFactoryRegistry = blockFamilyFactoryRegistry;
     }
 
@@ -159,35 +160,40 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     public BlockFamily loadWithShape(BlockUri uri) {
-        BlockShape shape = cubeShape;
-        if (uri.hasShape()) {
-            AssetUri shapeUri = uri.getShapeUri();
-            if (!shapeUri.isValid()) {
-                return null;
+        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(uri.getModuleName())) {
+            BlockShape shape = cubeShape;
+            if (uri.hasShape()) {
+                AssetUri shapeUri = uri.getShapeUri();
+                if (!shapeUri.isValid()) {
+                    return null;
+                }
+                shape = (BlockShape) Assets.get(shapeUri);
+                if (shape == null) {
+                    return null;
+                }
             }
-            shape = (BlockShape) Assets.get(shapeUri);
-            if (shape == null) {
-                return null;
+            AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getModuleName(), uri.getFamilyName());
+            BlockDefinition def;
+            if (assetManager.getAssetURLs(blockDefUri).isEmpty()) {
+                // An auto-block
+                def = new BlockDefinition();
+            } else {
+                def = createBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
             }
-        }
-        AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getModuleName(), uri.getFamilyName());
-        BlockDefinition def;
-        if (assetManager.getAssetURLs(blockDefUri).isEmpty()) {
-            // An auto-block
-            def = new BlockDefinition();
-        } else {
-            def = createBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
-        }
 
-        def.shape = (shape.getURI().toSimpleString());
-        if (shape.isCollisionYawSymmetric()) {
-            Block block = constructSingleBlock(blockDefUri, def);
-            return new SymmetricFamily(uri, block, def.categories);
-        } else {
-            Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-            constructHorizontalBlocks(blockDefUri, def, blockMap);
-            return new HorizontalBlockFamily(uri, blockMap, def.categories);
+            def.shape = (shape.getURI().toSimpleString());
+            if (shape.isCollisionYawSymmetric()) {
+                Block block = constructSingleBlock(blockDefUri, def);
+                return new SymmetricFamily(uri, block, def.categories);
+            } else {
+                Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
+                constructHorizontalBlocks(blockDefUri, def, blockMap);
+                return new HorizontalBlockFamily(uri, blockMap, def.categories);
+            }
+        } catch (Exception e) {
+            logger.error("Error loading block shape {}", uri, e);
         }
+        return null;
     }
 
     private List<FreeformFamily> loadAutoBlocks() {
@@ -228,14 +234,13 @@ public class BlockLoader implements BlockBuilderHelper {
     private List<BlockFamily> processMultiBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
         List<BlockFamily> result = Lists.newArrayList();
         for (String shapeString : blockDef.shapes) {
-            AssetUri shapeUri = new AssetUri(AssetType.SHAPE, shapeString);
-            BlockShape shape = (BlockShape) Assets.get(shapeUri);
+            BlockShape shape = (BlockShape) Assets.get(AssetType.SHAPE, shapeString);
             if (shape != null) {
                 BlockUri familyUri;
                 if (shape.equals(cubeShape)) {
                     familyUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName());
                 } else {
-                    familyUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName(), shapeUri.getModuleName(), shapeUri.getAssetName());
+                    familyUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName(), shape.getURI().getModuleName(), shape.getURI().getAssetName());
                 }
                 blockDef.shape = shapeString;
                 if (shape.isCollisionYawSymmetric()) {
@@ -346,7 +351,7 @@ public class BlockLoader implements BlockBuilderHelper {
     private BlockShape getShape(BlockDefinition blockDef) {
         BlockShape shape = null;
         if (!blockDef.shape.isEmpty()) {
-            shape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, blockDef.shape));
+            shape = (BlockShape) Assets.get(AssetType.SHAPE, blockDef.shape);
         }
         if (shape == null) {
             return cubeShape;
@@ -440,7 +445,7 @@ public class BlockLoader implements BlockBuilderHelper {
             for (BlockPart part : BlockPart.values()) {
                 String partTile = blockDef.tiles.map.get(part);
                 if (partTile != null) {
-                    tileUri = new AssetUri(AssetType.BLOCK_TILE, blockDef.tiles.map.get(part));
+                    tileUri = assetManager.resolve(AssetType.BLOCK_TILE, blockDef.tiles.map.get(part));
                     tileUris.put(part, tileUri);
                 }
             }

@@ -18,7 +18,6 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -256,7 +255,7 @@ public class BlockCommands implements ComponentSystem {
             Joiner.on(", ").appendTo(builder, resolvedBlockUris);
             return builder.toString();
         }
-        List<AssetUri> resolvedShapeUris = resolveShapeUri(shapeUri);
+        List<AssetUri> resolvedShapeUris = Assets.resolveAllUri(AssetType.SHAPE, shapeUri);
         if (resolvedShapeUris.isEmpty()) {
             return "No shape found for '" + shapeUri + "'";
         } else if (resolvedShapeUris.size() > 1) {
@@ -302,35 +301,6 @@ public class BlockCommands implements ComponentSystem {
         }
 
         return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
-    }
-
-
-    /**
-     * Retrieve all {@code AssetUri}s that match the given string pattern.
-     * <p/>
-     * In order to find all fitting shapes, all asset packages are searched and a list of matching asset uris is returned.
-     *
-     * @param uri the uri pattern to match
-     * @return a list of matching asset uris
-     */
-    private List<AssetUri> resolveShapeUri(String uri) {
-        List<AssetUri> matches = Lists.newArrayList();
-        AssetUri straightUri = new AssetUri(AssetType.SHAPE, uri);
-        if (straightUri.isValid()) {
-            Asset asset = Assets.get(straightUri);
-            if (asset != null) {
-                matches.add(straightUri);
-            }
-        } else {
-            for (String packageName : Assets.listModules()) {
-                AssetUri modUri = new AssetUri(AssetType.SHAPE, packageName, uri);
-                Asset asset = Assets.get(modUri);
-                if (asset != null) {
-                    matches.add(modUri);
-                }
-            }
-        }
-        return matches;
     }
 
     private <T extends Comparable<? super T>> List<T> sortItems(Iterable<T> items) {

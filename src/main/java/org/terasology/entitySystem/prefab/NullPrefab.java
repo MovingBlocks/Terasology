@@ -17,6 +17,7 @@ package org.terasology.entitySystem.prefab;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.Component;
 import org.terasology.utilities.collection.NullIterator;
 
@@ -29,7 +30,7 @@ import java.util.List;
 public class NullPrefab extends Prefab {
 
     public NullPrefab() {
-        super(new AssetUri(AssetType.PREFAB, "engine", "null"));
+        super(new AssetUri(AssetType.PREFAB, TerasologyConstants.ENGINE_MODULE, "null"));
     }
 
     @Override

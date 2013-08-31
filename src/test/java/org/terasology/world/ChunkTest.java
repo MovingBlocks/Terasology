@@ -30,7 +30,6 @@ import org.terasology.world.block.management.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
-import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,7 +40,8 @@ public class ChunkTest extends TerasologyTestingEnvironment {
     private BlockManagerImpl blockManager;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws Exception {
+        super.setup();
         blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         chunk = new Chunk(new Vector3i(0, 0, 0));

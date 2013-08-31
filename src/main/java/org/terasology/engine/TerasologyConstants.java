@@ -29,6 +29,7 @@ public final class TerasologyConstants {
     public static final String WORLD_DATA_FILE = "world.dat";
     public static final String MAIN_WORLD = "main";
     public static final Charset CHARSET = Charsets.UTF_8;
+    public static final String ENGINE_MODULE = "engine";
 
     private TerasologyConstants() {
     }

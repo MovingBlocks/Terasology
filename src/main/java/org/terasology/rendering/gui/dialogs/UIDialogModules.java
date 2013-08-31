@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.newdawn.slick.Color;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -81,7 +82,7 @@ public class UIDialogModules extends UIDialog {
         });
 
         for (Module module : modules) {
-            if (!module.getModuleInfo().getId().equals(ModuleManager.ENGINE_MODULE)) {
+            if (!module.getModuleInfo().getId().equals(TerasologyConstants.ENGINE_MODULE)) {
                 UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
                 item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
                 if (moduleConfig.hasMod(module.getModuleInfo().getId())) {

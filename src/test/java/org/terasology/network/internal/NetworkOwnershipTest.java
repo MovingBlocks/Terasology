@@ -56,7 +56,8 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        super.setup();
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime);
 

@@ -22,10 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 
 import java.util.Iterator;
 
@@ -35,7 +33,6 @@ import java.util.Iterator;
 public class LoadPrefabs implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(LoadPrefabs.class);
 
-    private PrefabManager prefabManager;
     private Iterator<AssetUri> prefabs;
 
     @Override
@@ -46,17 +43,13 @@ public class LoadPrefabs implements LoadProcess {
     @Override
     public boolean step() {
         if (prefabs.hasNext()) {
-            Prefab prefab = Assets.get(prefabs.next(), Prefab.class);
-            if (prefab != null) {
-                prefabManager.registerPrefab(prefab);
-            }
+            Assets.get(prefabs.next(), Prefab.class);
         }
         return !prefabs.hasNext();
     }
 
     @Override
     public int begin() {
-        prefabManager = CoreRegistry.get(PrefabManager.class);
         prefabs = Assets.list(AssetType.PREFAB).iterator();
         return Lists.newArrayList(Assets.list(AssetType.PREFAB)).size();
     }

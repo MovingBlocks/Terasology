@@ -23,6 +23,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
@@ -33,10 +34,8 @@ import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -78,11 +77,9 @@ public class PojoEntityManagerTest {
 
         entityManager = (PojoEntityManager) builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
 
-        PrefabManager prefabManager = entityManager.getPrefabManager();
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.addComponent(new StringComponent("Test"));
         prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), protoPrefab, Prefab.class);
-        prefabManager.registerPrefab(prefab);
     }
 
     @Test
@@ -326,7 +323,6 @@ public class PojoEntityManagerTest {
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.setPersisted(false);
         prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "unittest:nonpersistentPrefab"), protoPrefab, Prefab.class);
-        entityManager.getPrefabManager().registerPrefab(prefab);
 
         EntityRef entity1 = entityManager.create(prefab);
         assertFalse(entity1.isPersistent());

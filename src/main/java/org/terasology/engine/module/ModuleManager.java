@@ -62,8 +62,6 @@ import java.util.zip.ZipFile;
  */
 public class ModuleManager {
 
-    public static final String ENGINE_MODULE = "engine";
-
     public static final String ASSETS_SUBDIRECTORY = "assets";
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
 
@@ -317,7 +315,7 @@ public class ModuleManager {
 
     public Module getModule(String modName) {
         String normalisedName = modName.toLowerCase(Locale.ENGLISH);
-        if (ENGINE_MODULE.equals(normalisedName)) {
+        if (TerasologyConstants.ENGINE_MODULE.equals(normalisedName)) {
             return engineModule;
         }
         return modules.get(normalisedName);

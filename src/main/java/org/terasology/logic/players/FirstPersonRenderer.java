@@ -23,6 +23,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.systems.In;
@@ -189,7 +190,8 @@ public class FirstPersonRenderer implements RenderSystem {
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
             Icon icon = Icon.get(iconName);
-            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, "engine", "icon." + iconName), icon.getTexture(), icon.getX(), icon.getY());
+            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "icon." + iconName),
+                    icon.getTexture(), icon.getX(), icon.getY());
             iconMeshes.put(iconName, itemMesh);
         }
 

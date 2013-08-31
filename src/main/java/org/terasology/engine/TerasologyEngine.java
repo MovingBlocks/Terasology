@@ -456,7 +456,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(Game.class, new Game(time));
 
         AssetType.registerAssetTypes(assetManager);
-        ClasspathSource source = new ClasspathSource(ModuleManager.ENGINE_MODULE,
+        ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
                 getClass().getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY);
         assetManager.addAssetSource(source);
     }

@@ -16,6 +16,7 @@
 package org.terasology.logic.console;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
@@ -168,7 +169,7 @@ public class CoreCommands implements ComponentSystem {
         }
         Quat4f rotation = QuaternionUtil.shortestArcQuat(Direction.FORWARD.getVector3f(), dir, new Quat4f());
 
-        Prefab prefab = prefabManager.getPrefab(prefabName);
+        Prefab prefab = Assets.getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
             entityManager.create(prefab, spawnPos, rotation);
         }

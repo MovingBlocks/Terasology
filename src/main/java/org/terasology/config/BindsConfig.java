@@ -29,6 +29,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.lwjgl.input.Keyboard;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.DefaultBinding;
@@ -180,8 +181,8 @@ public final class BindsConfig {
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {
-            if (!hasBinds(ModuleManager.ENGINE_MODULE, "toolbarSlot" + i)) {
-                setBinds(ModuleManager.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
+            if (!hasBinds(TerasologyConstants.ENGINE_MODULE, "toolbarSlot" + i)) {
+                setBinds(TerasologyConstants.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
             }
         }
     }
@@ -206,7 +207,7 @@ public final class BindsConfig {
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {
-            setBinds(ModuleManager.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
+            setBinds(TerasologyConstants.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
         }
     }
 

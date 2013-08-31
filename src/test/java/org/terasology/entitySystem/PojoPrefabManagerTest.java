@@ -78,7 +78,6 @@ public class PojoPrefabManagerTest {
         PrefabData data = new PrefabData();
         data.addComponent(new StringComponent("Test"));
         Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, PREFAB_NAME), data, Prefab.class);
-        prefabManager.registerPrefab(prefab);
         Prefab ref = prefabManager.getPrefab(PREFAB_NAME);
         assertNotNull(ref);
         assertEquals(PREFAB_NAME, ref.getName());

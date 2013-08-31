@@ -75,7 +75,7 @@ public class WorldAtlas {
     public WorldAtlas(int maxAtlasSize) {
         this.maxAtlasSize = maxAtlasSize;
         for (AssetUri tile : Assets.list(AssetType.BLOCK_TILE)) {
-            indexTile(tile, false);
+            indexTile(tile);
         }
         buildAtlas();
     }
@@ -116,15 +116,18 @@ public class WorldAtlas {
         if (tileIndexes.containsKey(uri)) {
             return tileIndexes.get(uri);
         }
-        return indexTile(uri, warnOnError);
+        if (warnOnError) {
+            logger.warn("Tile {} could not be resolved", uri);
+        }
+        return 0;
     }
 
-    private int indexTile(AssetUri uri, boolean warnOnError) {
+    private int indexTile(AssetUri uri) {
         if (tiles.size() == MAX_TILES) {
             logger.error("Maximum tiles exceeded");
             return 0;
         }
-        TileData tile = CoreRegistry.get(AssetManager.class).tryLoadAssetData(uri, TileData.class);
+        TileData tile = CoreRegistry.get(AssetManager.class).loadAssetData(uri, TileData.class);
         if (tile != null) {
             if (checkTile(tile)) {
                 int index = tiles.size();
@@ -137,8 +140,6 @@ public class WorldAtlas {
                 logger.error("Invalid tile {}, must be a square with power-of-two sides.", uri);
                 return 0;
             }
-        } else if (warnOnError) {
-            logger.warn("Unable to resolve block tile '{}'", uri);
         }
         return 0;
     }
@@ -150,7 +151,7 @@ public class WorldAtlas {
 
     private void addNormal(AssetUri uri) {
         String name = uri.toSimpleString() + "Normal";
-        TileData tile = CoreRegistry.get(AssetManager.class).tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        TileData tile = CoreRegistry.get(AssetManager.class).resolveAndTryLoadData(AssetType.BLOCK_TILE, name, TileData.class);
         if (tile != null) {
             tilesNormal.add(tile);
         } else {
@@ -160,7 +161,7 @@ public class WorldAtlas {
 
     private void addHeightMap(AssetUri uri) {
         String name = uri.toSimpleString() + "Height";
-        TileData tile = CoreRegistry.get(AssetManager.class).tryLoadAssetData(new AssetUri(AssetType.BLOCK_TILE, name), TileData.class);
+        TileData tile = CoreRegistry.get(AssetManager.class).resolveAndTryLoadData(AssetType.BLOCK_TILE, name, TileData.class);
         if (tile != null) {
             tilesHeight.add(tile);
         } else {

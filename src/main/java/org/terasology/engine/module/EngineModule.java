@@ -16,6 +16,7 @@
 package org.terasology.engine.module;
 
 import org.reflections.Reflections;
+import org.terasology.engine.TerasologyConstants;
 
 /**
  * @author Immortius
@@ -28,7 +29,7 @@ public class EngineModule implements Module {
     public EngineModule(Reflections reflections) {
         this.reflections = reflections;
         this.info = new ModuleInfo();
-        this.info.setId("engine");
+        this.info.setId(TerasologyConstants.ENGINE_MODULE);
         this.info.setDisplayName("Engine");
         this.info.setDescription("The engine module");
     }

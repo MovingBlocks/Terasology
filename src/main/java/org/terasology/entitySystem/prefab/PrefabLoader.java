@@ -44,7 +44,7 @@ public class PrefabLoader implements AssetLoader<PrefabData> {
         EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
         if (prefabData != null) {
             EngineEntityManager entityManager = CoreRegistry.get(EngineEntityManager.class);
-            return new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary()).deserialize(prefabData, module);
+            return new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary()).deserialize(prefabData);
         }
         return null;
     }

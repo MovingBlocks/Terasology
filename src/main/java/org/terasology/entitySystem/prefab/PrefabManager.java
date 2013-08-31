@@ -44,19 +44,11 @@ public interface PrefabManager {
     boolean exists(String name);
 
     /**
-     * Registers a Prefab to a table by its contained name if it doesn't already exist, otherwise throws an exception.
-     *
-     * @param prefab The Prefab to register (which also holds its name)
-     * @return The provided Prefab
-     */
-    Prefab registerPrefab(Prefab prefab);
-
-    /**
      * Returns all loaded prefabs.
      *
      * @return Collection containing all prefabs
      */
-    Collection<Prefab> listPrefabs();
+    Iterable<Prefab> listPrefabs();
 
     /**
      * Returns all loaded prefabs that include the supplied Component (which may result in an empty set).

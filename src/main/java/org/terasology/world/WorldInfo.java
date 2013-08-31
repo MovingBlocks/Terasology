@@ -17,6 +17,7 @@
 package org.terasology.world;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.TerasologyConstants;
 
 /**
  * Summary information on a world.
@@ -28,7 +29,7 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time;
-    private SimpleUri worldGenerator = new SimpleUri("engine", "perlin");
+    private SimpleUri worldGenerator = new SimpleUri(TerasologyConstants.ENGINE_MODULE, "perlin");
 
     public WorldInfo() {
     }

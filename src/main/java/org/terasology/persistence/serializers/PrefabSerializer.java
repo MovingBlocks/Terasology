@@ -19,7 +19,6 @@ package org.terasology.persistence.serializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.Component;
@@ -27,6 +26,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
@@ -111,17 +111,14 @@ public class PrefabSerializer {
      * @param prefabData
      * @return The deserialized prefab
      */
-    public PrefabData deserialize(EntityData.Prefab prefabData, Module context) {
+    public PrefabData deserialize(EntityData.Prefab prefabData) {
+        Module context = ModuleContext.getContext();
         PrefabData result = new PrefabData();
         result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
         result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() ? prefabData.getAlwaysRelevant() : false);
         if (prefabData.hasParentName()) {
-            AssetUri parentUri = new AssetUri(AssetType.PREFAB, prefabData.getParentName());
-            if (parentUri.isValid()) {
-                result.setParent(Assets.get(parentUri, Prefab.class));
-            } else {
-                logger.error("Asset has invalid parent: {}", parentUri);
-            }
+            Prefab parent = Assets.get(AssetType.PREFAB, prefabData.getParentName(), Prefab.class);
+            result.setParent(parent);
         }
 
         if (result.getParent() != null) {
