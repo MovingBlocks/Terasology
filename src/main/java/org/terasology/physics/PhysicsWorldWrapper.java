@@ -26,6 +26,9 @@ import org.terasology.world.block.Block;
 import javax.vecmath.Vector3f;
 
 /**
+ * This class describes the voxel world in such a way that the physics engine
+ * can use it.
+ *
  * @author Immortius
  */
 public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
