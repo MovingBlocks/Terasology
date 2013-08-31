@@ -21,6 +21,7 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.asset.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
@@ -61,7 +62,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Immortius
  */
-public class StorageManagerTest {
+public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     public static final String PLAYER_ID = "someId";
     public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
@@ -74,6 +75,7 @@ public class StorageManagerTest {
 
     @Before
     public void setup() throws Exception {
+        super.setup();
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
