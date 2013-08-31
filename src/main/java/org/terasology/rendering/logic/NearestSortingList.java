@@ -105,7 +105,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      */
     public synchronized void add(EntityRef e) {
         if (e.getComponent(LocationComponent.class) == null) {
-            logger.warn("Ädding entity without LocationComponent to container that sorts on location");
+            logger.warn("Ädding entity without LocationComponent to container that sorts on location. Entity: {}", e);
         }
         //new entities are inserted to make sure that new entities are drawn first.
         //Since it is likely the players wants to see new entities over existing ones

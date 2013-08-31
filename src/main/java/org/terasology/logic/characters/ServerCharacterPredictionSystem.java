@@ -16,10 +16,6 @@
 
 package org.terasology.logic.characters;
 
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +29,11 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.characters.events.ToggleNoClipEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
@@ -64,7 +59,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
     private Time time;
 
     @In
-    private BulletPhysics physics;
+    private PhysicsEngine physics;
 
     @In
     private WorldProvider worldProvider;
@@ -82,7 +77,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @Override
     public void initialise() {
-        characterMover = new BulletCharacterMover(worldProvider);
+        characterMover = new KinematicCharacterMover(worldProvider, physics);
         nextSendState = time.getGameTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
     }
 
@@ -92,16 +87,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
-        float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
-        float width = movementComp.radius * location.getWorldScale();
-        ConvexShape capsule = new CapsuleShape(width, height);
-        capsule.setMargin(0.1f);
-        movementComp.collider = physics.createCollider(
-                location.getWorldPosition(), capsule, Lists.newArrayList(movementComp.collisionGroup), movementComp.collidesWith, CollisionFlags.CHARACTER_OBJECT);
-        movementComp.collider.setUserPointer(entity);
-
+        physics.getCharacterCollider(entity);
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
         stateBuffer.add(createInitialState(entity));
         characterStates.put(entity, stateBuffer);
@@ -109,10 +95,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
-        CharacterMovementComponent comp = entity.getComponent(CharacterMovementComponent.class);
-        if (comp.collider != null) {
-            physics.removeCollider(comp.collider);
-        }
+        physics.removeCharacterCollider(entity);
         characterStates.remove(entity);
         lastInputEvent.remove(entity);
     }
