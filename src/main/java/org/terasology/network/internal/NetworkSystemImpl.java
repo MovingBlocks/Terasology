@@ -46,6 +46,7 @@ import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
@@ -80,7 +81,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
-import org.terasology.engine.SimpleUri;
 
 import java.net.BindException;
 import java.net.InetSocketAddress;

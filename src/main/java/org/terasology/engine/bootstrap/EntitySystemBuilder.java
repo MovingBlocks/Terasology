@@ -28,6 +28,7 @@ import org.terasology.classMetadata.copying.strategy.Vector3iCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.Vector4fCopyStrategy;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
@@ -71,7 +72,6 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.engine.SimpleUri;
 
 import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;

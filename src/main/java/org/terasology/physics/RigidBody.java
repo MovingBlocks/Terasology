@@ -20,13 +20,10 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 /**
- * This interface provides a simplified an generic view on rigid bodies of physics engines. This may is not a direct implementation, so the
- * behaviour and names of method may differ from what is used in specific physics implementations. Read the documentation of individual
- * method when uncertain.
+ * A rigid body is a physics object whose movement and location is controlled by the physics engine. Rigid bodies move under gravity and bounce off each other and the world.
  * <p/>
- * After removing this body from the physics engine (by using rigidBody methods of the physics engine) this object is no longer valid and
- * should not be used anymore.
- *
+ * After being removed from the physics engine this object is no longer valid and should not be used anymore.
+ * <p/>
  * TODO: add the methods to apply forces
  *
  * @author Xanhou
@@ -39,7 +36,7 @@ public interface RigidBody {
      *
      * @param impulse the impulse to apply.
      */
-    public void applyImpulse(Vector3f impulse);
+    void applyImpulse(Vector3f impulse);
 
     /**
      * Changes to location of this rigid body by the given translation. Note
@@ -47,7 +44,7 @@ public interface RigidBody {
      *
      * @param translation the translation to apply.
      */
-    public void translate(Vector3f translation);
+    void translate(Vector3f translation);
 
     /**
      * Returns the orientation of this body.
@@ -55,7 +52,7 @@ public interface RigidBody {
      * @param out output parameter to put the orientation in.
      * @return out, for easy of use.
      */
-    public Quat4f getOrientation(Quat4f out);
+    Quat4f getOrientation(Quat4f out);
 
     /**
      * Returns the non interpolated location of this body. Note that the
@@ -67,7 +64,7 @@ public interface RigidBody {
      * @param out output parameter to put the location in.
      * @return out, for easy of use.
      */
-    public Vector3f getLocation(Vector3f out);
+    Vector3f getLocation(Vector3f out);
 
     /**
      * Returns the linear velocity of this body. The linear velocity alters the
@@ -76,7 +73,7 @@ public interface RigidBody {
      * @param out output parameter to put the location in.
      * @return out, for easy of use.
      */
-    public Vector3f getLinearVelocity(Vector3f out);
+    Vector3f getLinearVelocity(Vector3f out);
 
     /**
      * Returns the angular velocity of this body. The angular velocity alters
@@ -85,50 +82,57 @@ public interface RigidBody {
      * @param out output parameter to put the location in.
      * @return out, for easy of use.
      */
-    public Vector3f getAngularVelocity(Vector3f out);
-    
+    Vector3f getAngularVelocity(Vector3f out);
+
     /**
      * Sets the linear velocity
-     * @param lin_vel new linear velocity
+     *
+     * @param value new linear velocity
      */
-    public void setLinearVelocity(Vector3f lin_vel);
-    
+    void setLinearVelocity(Vector3f value);
+
     /**
      * Sets the angular velocity
-     * @param lin_vel new angular velocity
+     *
+     * @param value new angular velocity
      */
-    public void setAngularVelocity(Vector3f ang_vel);
-    
+    void setAngularVelocity(Vector3f value);
+
     /**
      * Sets both linear and angular velocity in a slightly more efficient way than calling both the individual methods.
-     * @param lin_vel new linear velocity
-     * @param ang_vel new angular velocity
+     *
+     * @param linear  new linear velocity
+     * @param angular new angular velocity
      */
-    public void setVelocity(Vector3f lin_vel, Vector3f ang_vel);
+    void setVelocity(Vector3f linear, Vector3f angular);
 
     /**
      * Sets the orientation or rotation.
+     *
      * @param orientation the new rotation.
      */
-    public void setOrientation(Quat4f orientation);
+    void setOrientation(Quat4f orientation);
 
     /**
      * Sets the world location or position.
+     *
      * @param location new world position
      */
-    public void setLocation(Vector3f location);
-    
+    void setLocation(Vector3f location);
+
     /**
      * Sets both rotation and position in a more efficient way than calling both the individual methods.
      * A transform is simply an expensive word for the combination of the location and orientation of an object.
+     *
      * @param location
-     * @param orientation 
+     * @param orientation
      */
-    public void setTransform(Vector3f location, Quat4f orientation);
-    
+    void setTransform(Vector3f location, Quat4f orientation);
+
     /**
      * Active means that the entity is not sleeping, or requesting to sleep.
+     *
      * @return True if this entity is active, false otherwise.
      */
-    public boolean isActive();
+    boolean isActive();
 }

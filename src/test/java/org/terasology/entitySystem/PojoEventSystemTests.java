@@ -18,6 +18,10 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -26,16 +30,12 @@ import org.terasology.entitySystem.internal.PojoEntityManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.engine.SimpleUri;
 
 import java.util.List;
 

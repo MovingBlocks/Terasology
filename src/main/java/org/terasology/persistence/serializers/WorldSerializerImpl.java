@@ -27,6 +27,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
@@ -38,7 +39,6 @@ import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.protobuf.EntityData;
-import org.terasology.engine.SimpleUri;
 
 import java.util.Collection;
 import java.util.Iterator;

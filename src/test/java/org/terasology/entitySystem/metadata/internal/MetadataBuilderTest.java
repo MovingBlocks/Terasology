@@ -22,8 +22,8 @@ import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.engine.SimpleUri;
+import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

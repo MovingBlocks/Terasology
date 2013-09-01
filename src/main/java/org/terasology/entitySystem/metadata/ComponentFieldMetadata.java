@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * Field Metadata for the fields of components. In addition to the standard and replication metadata, has information on whether the field declares ownership over an entity.
+ *
  * @author Immortius
  */
 public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFieldMetadata<T, U> {

@@ -25,6 +25,7 @@ public abstract class AbstractBaseUri implements Uri {
     /**
      * Normalises a uri or uri part. The normal form is used for comparison/string matching.
      * This process includes lower-casing the uri.
+     *
      * @param value A uri or uri part
      * @return The normal form of the given value.
      */

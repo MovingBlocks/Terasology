@@ -19,11 +19,11 @@ import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.world.block.ForceBlockActive;
 import org.terasology.world.block.RequiresBlockLifecycleEvents;
-import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 
@@ -42,9 +42,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     private boolean blockLifecycleEventsRequired;
 
     /**
-     *
-     *
-     * @param uri           The uri to identify the component with.
+     * @param uri            The uri to identify the component with.
      * @param type           The type to create the metadata for
      * @param factory        A reflection library to provide class construction and field get/set functionality
      * @param copyStrategies A copy strategy library

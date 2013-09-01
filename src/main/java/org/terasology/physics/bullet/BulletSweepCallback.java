@@ -19,18 +19,15 @@ package org.terasology.physics.bullet;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.linearmath.Transform;
+import org.terasology.physics.SweepCallback;
+
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import org.terasology.physics.SweepCallback;
 
 /**
- * A SweepCallback holds the results of a collision sweep. (detect what
+ * The bullet implementation of SweepCallback, that holds the results of a collision sweep. (detect what
  * collisions would occur if something moved from a to b)
- * </p>
- * Note that hasHit() is implemented by ClosestConvexResultCallback, and is
- * required by SweepCallbackInterface. It is therefore not present in this
- * source file, but is available as method for this class.
  *
  * @author Immortius
  */
@@ -53,21 +50,9 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
         }
         return super.addSingleResult(convexResult, normalInWorldSpace);
     }
-    
-    /**
-     * Given a SweepCallback, this method check for a safer slope to go with.
-     * The main issue this is is used for is the voxel world. Each voxel is a
-     * cube for the physics engine. If a player jumps between those voxels, you
-     * get a weird slope, even though the player is moving on a flat area. This
-     * method therefore also checks the sides.<bk>
-     *
-     * @param checkingOffset How far to change position for the different results.
-     * @param originalSlope If no different slope can be found, this value is
-     * returned, making this method always return a decent number.
-     * @return a safer slope to use for character movement calculations.
-     */
+
     @Override
-    public float calculateSafeSlope(float originalSlope, float checkingOffset) {
+    public float calculateAverageSlope(float originalSlope, float checkingOffset) {
         Vector3f contactPoint = this.hitPointWorld;
         float slope = 1f;
         boolean foundSlope = false;
@@ -119,7 +104,7 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     public float getClosestHitFraction() {
         return closestHitFraction;
     }
-    
+
     @Override
     public boolean checkForStep(Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance) {
         boolean moveUpStep;

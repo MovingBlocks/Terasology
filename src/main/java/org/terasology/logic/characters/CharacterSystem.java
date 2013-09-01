@@ -38,11 +38,11 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.PhysicsEngine;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
-import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.physics.PhysicsEngine;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;

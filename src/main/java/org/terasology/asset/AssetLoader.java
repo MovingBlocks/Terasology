@@ -38,7 +38,6 @@ public interface AssetLoader<T extends AssetData> {
      * <p/>
      * The provided stream is cleaned up by the caller, and doesn't have to be closed by this method.
      *
-     *
      * @param module The module providing the asset
      * @param stream A stream containing the assets data.
      * @param urls   The urls related to the asset. The first url is the url providing the stream

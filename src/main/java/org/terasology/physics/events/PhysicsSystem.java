@@ -15,10 +15,6 @@
  */
 package org.terasology.physics.events;
 
-import java.util.Iterator;
-import java.util.List;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
@@ -48,6 +44,11 @@ import org.terasology.physics.components.TriggerComponent;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.BlockComponent;
 
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * The PhysicsSystem is a bridging class between the event system and the
  * physics engine. It translates events into changes to the physics engine and
@@ -68,7 +69,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem, EventReceiver<OnCh
     @In
     private EntityManager entityManager;
     private PhysicsEngine physics;
-    
+
     private long lastNetsync;
 
     @Override

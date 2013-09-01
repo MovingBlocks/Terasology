@@ -26,8 +26,7 @@ import org.terasology.world.block.Block;
 import javax.vecmath.Vector3f;
 
 /**
- * This class describes the voxel world in such a way that the physics engine
- * can use it.
+ * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.
  *
  * @author Immortius
  */

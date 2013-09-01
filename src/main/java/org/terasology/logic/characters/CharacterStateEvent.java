@@ -16,18 +16,16 @@
 
 package org.terasology.logic.characters;
 
-import com.bulletphysics.linearmath.Transform;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
+import org.terasology.physics.CharacterCollider;
+import org.terasology.physics.PhysicsEngine;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.physics.PhysicsEngine;
-import org.terasology.physics.CharacterCollider;
 
 /**
  * @author Immortius
@@ -128,7 +126,8 @@ public class CharacterStateEvent extends NetworkEvent {
 
     /**
      * Retrieve the pitch in degrees.
-     * @return 
+     *
+     * @return
      */
     public float getPitch() {
         return pitch;
@@ -140,7 +139,8 @@ public class CharacterStateEvent extends NetworkEvent {
 
     /**
      * Retrieve the yaw in degrees.
-     * @return 
+     *
+     * @return
      */
     public float getYaw() {
         return yaw;
@@ -243,10 +243,10 @@ public class CharacterStateEvent extends NetworkEvent {
         entity.saveComponent(characterComponent);
         setPhysicsLocation(entity, newPos);
     }
-    
+
     /**
      * Sets the location in the physics engine.
-     * 
+     *
      * @param entity The entity to set the location of.
      * @param newPos The new position of the entity.
      */

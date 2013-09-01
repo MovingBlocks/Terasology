@@ -18,17 +18,16 @@ package org.terasology.physics.bullet;
 
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+
 /**
- * This motion state is used for rigid bodies. The character mover is not
- * relocated by the physics engine, and triggers are also dependant on the
- * LocationComponent. For normal rigid bodies this dependency is inverted and
- * the location is determined by the physics engine, which occurs though the use
- * of this type of MotionState.
+ * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.
+ * Bullet reads the initial state of the rigid body out of the entity, and then updates its location and rotation
+ * as it moves under physics.
  *
  * @author Immortius
  */
@@ -39,7 +38,7 @@ public class EntityMotionState extends MotionState {
      * Only the BulletPhysics class is expected to create instances.
      *
      * @param entity The entity to relate this motion state to and set the
-     * LocationComponent of.
+     *               LocationComponent of.
      */
     EntityMotionState(EntityRef entity) {
         this.entity = entity;
@@ -68,5 +67,5 @@ public class EntityMotionState extends MotionState {
             }
         }
     }
-    
+
 }

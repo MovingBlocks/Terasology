@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
@@ -29,7 +30,6 @@ import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.BlockEntityRegistry;
 

@@ -21,8 +21,8 @@ import org.terasology.classMetadata.AbstractClassLibrary;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.entitySystem.event.Event;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * The library for metadata about events (and their fields).

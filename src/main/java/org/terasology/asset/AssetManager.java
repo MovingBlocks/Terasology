@@ -218,7 +218,7 @@ public class AssetManager {
     }
 
     public <T extends Asset> T loadAsset(AssetUri uri, Class<T> assetClass) {
-        Asset result =  loadAsset(uri, true);
+        Asset result = loadAsset(uri, true);
         if (assetClass.isInstance(result)) {
             return assetClass.cast(result);
         }

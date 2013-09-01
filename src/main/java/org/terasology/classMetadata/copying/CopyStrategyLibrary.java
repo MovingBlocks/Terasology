@@ -32,9 +32,9 @@ import org.terasology.classMetadata.copying.strategy.Vector3fCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.Vector3iCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.Vector4fCopyStrategy;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.ReflectionUtil;
-import org.terasology.engine.SimpleUri;
 
 import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;

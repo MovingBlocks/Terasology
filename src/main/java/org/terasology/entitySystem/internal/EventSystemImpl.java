@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
@@ -51,7 +52,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

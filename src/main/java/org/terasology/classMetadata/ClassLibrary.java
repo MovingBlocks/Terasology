@@ -16,8 +16,8 @@
 
 package org.terasology.classMetadata;
 
-import org.terasology.engine.module.Module;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.Module;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
     /**
      * Registers a class with this library
      *
-     * @param uri  The uri to use to find this class
+     * @param uri   The uri to use to find this class
      * @param clazz The class to register with this library
      */
     void register(SimpleUri uri, Class<? extends T> clazz);
@@ -75,6 +75,7 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
     /**
      * Resolves metadata for a class given a string that may either be a uri or just a name. T
      * his will return null if either there is no class identified by that name, or more than one.
+     *
      * @param name The uri or name of a class
      * @return The metadata for the given class, or null if it couldn't be resolved to a single option.
      */
@@ -84,11 +85,12 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
      * Resolves a name referring to a component. This may be a uri ('engine:component') or just the name ('component').
      * The process used for resolution is:
      * <ol>
-     *     <li>If the name is a uri, return the component metadata linked to that uri</li>
-     *     <li>Find within the context module</li>
-     *     <li>Find within the context module's dependencies</li>
+     * <li>If the name is a uri, return the component metadata linked to that uri</li>
+     * <li>Find within the context module</li>
+     * <li>Find within the context module's dependencies</li>
      * </ol>
-     * @param name The name of the component. This may be the full uri, or just part of it.
+     *
+     * @param name    The name of the component. This may be the full uri, or just part of it.
      * @param context The module from which it has been referred
      * @return The resolved component metadata, or null if it could not be resolve (or multiple matches were found)
      */
@@ -98,11 +100,12 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
      * Resolves a name referring to a component. This may be a uri ('engine:component') or just the component name ('component').
      * The process used for resolution is:
      * <ol>
-     *     <li>If the name is a uri, return the component metadata linked to that uri</li>
-     *     <li>Find within the context module</li>
-     *     <li>Find within the context module's dependencies</li>
+     * <li>If the name is a uri, return the component metadata linked to that uri</li>
+     * <li>Find within the context module</li>
+     * <li>Find within the context module's dependencies</li>
      * </ol>
-     * @param name The name of the component. This may be the full uri, or just part of it.
+     *
+     * @param name    The name of the component. This may be the full uri, or just part of it.
      * @param context The module from which it has been referred
      * @return The resolved component metadata, or null if it could not be resolve (or multiple matches were found)
      */

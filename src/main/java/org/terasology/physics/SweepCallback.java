@@ -18,21 +18,21 @@ package org.terasology.physics;
 import javax.vecmath.Vector3f;
 
 /**
+ * Provides the results from a CharacterCollider sweep()
  *
  * @author Xanhou
  */
 public interface SweepCallback {
 
     /**
-     * Given a SweepCallback, this method check for a safer slope to go with. The main issue this is is used for is the voxel world. Each
-     * voxel is a cube for the physics engine. If a player jumps between those voxels, you get a weird slope, even though the player is
-     * moving on a flat area. This method therefore also checks the sides.<bk>
+     * This method determines the average slope of the hit location. This can differ from that provided by the hit normal, as the hit normal
+     * is subject to local features and discontinuities. Using an average protects against this.
      *
+     * @param originalSlope  If no different slope can be found, this value is returned, making this method always return a decent number.
      * @param checkingOffset How far to go up and down from the current position for the positions to check between.
-     * @param originalSlope If no different slope can be found, this value is returned, making this method always return a decent number.
      * @return a safer slope to use for character movement calculations.
      */
-    float calculateSafeSlope(float originalSlope, float checkingOffset);
+    float calculateAverageSlope(float originalSlope, float checkingOffset);
 
     /**
      * Returns where the closest hit took place.
@@ -65,12 +65,12 @@ public interface SweepCallback {
     /**
      * Checks if the hit from this callback can be stepped upon.
      *
-     * @param direction The direction to check in.
-     * @param stepHeight The maximum step height.
-     * @param slopeFactor If the slope you are walking against is smaller than this, it is assumes the slope moving code activates and you
-     * no longer need to take a step.
+     * @param direction            The direction to check in.
+     * @param stepHeight           The maximum step height.
+     * @param slopeFactor          If the slope you are walking against is smaller than this, it is assumes the slope moving code activates and you
+     *                             no longer need to take a step.
      * @param checkForwardDistance How far to check ahead for a place to step upon.
      * @return true if it is possible to step up while moving into 'direction'.
      */
-    public boolean checkForStep(Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance);
+    boolean checkForStep(Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance);
 }

@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.characters;
 
-import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.network.FieldReplicateType;
@@ -77,6 +76,7 @@ public final class CharacterMovementComponent implements Component {
 
 
     private Vector3f velocity = new Vector3f();
+
     public Vector3f getVelocity() {
         return velocity;
     }

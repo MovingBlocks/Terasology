@@ -19,11 +19,11 @@ import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
-import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 

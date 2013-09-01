@@ -15,10 +15,10 @@
  */
 package org.terasology.world.generator.worldGenerators;
 
+import org.terasology.engine.SimpleUri;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.world.generator.RegisterWorldGenerator;
-import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.chunkGenerators.FloraGenerator;
 import org.terasology.world.generator.chunkGenerators.ForestGenerator;
 import org.terasology.world.generator.chunkGenerators.MultiTerrainGenerator;

@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;

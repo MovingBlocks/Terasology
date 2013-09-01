@@ -26,6 +26,7 @@ import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.classMetadata.MappedContainer;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.core.BooleanTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.core.ByteTypeHandler;
@@ -41,7 +42,6 @@ import org.terasology.persistence.typeSerialization.typeHandlers.core.SetTypeHan
 import org.terasology.persistence.typeSerialization.typeHandlers.core.StringMapTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.core.StringTypeHandler;
 import org.terasology.utilities.ReflectionUtil;
-import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;

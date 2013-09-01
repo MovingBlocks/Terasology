@@ -43,37 +43,28 @@ public class PhysicsResynchEvent implements Event {
     }
 
     /**
-     * Returns the position of this event. The returned object is backed by the
-     * event, so any changes to it also change the event.
-     *
-     * @return
+     * @return The position of the physics entity when this event is sent. Copy to use.
      */
     public Vector3f getPosition() {
         return position;
     }
 
     /**
-     * Returns the rotation of this event. The returned object is backed by the
-     * event, so any changes to it also change the event.
-     *
-     * @return
+     * @return The rotation of the physics entity when this event is sent. Copy to use.
      */
     public Quat4f getRotation() {
         return rotation;
     }
 
     /**
-     * @return the linear velocity for this event. The returned object is backed
-     * by the event, so any changes to it also change the event.
+     * @return the linear velocity of the physics entity when this event is sent. Copy to use.
      */
     public Vector3f getVelocity() {
         return velocity;
     }
 
     /**
-     * @return The angular or rotational velocity of this event. The returned
-     * object is backed by the event, so any changes to it also change the
-     * event.
+     * @return The angular or rotational velocity of the physics entity when this event is sent. Copy to use.
      */
     public Vector3f getAngularVelocity() {
         return angularVelocity;

@@ -15,10 +15,10 @@
  */
 package org.terasology.entitySystem.event;
 
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.engine.SimpleUri;
 
 /**
  * Event system propagates events to registered handlers

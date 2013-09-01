@@ -116,7 +116,7 @@ public class StateIngame implements GameState {
         eventSystem.process();
         componentSystemManager.shutdown();
         guiManager.closeAllWindows();
-        
+
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
