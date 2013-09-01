@@ -33,7 +33,6 @@ import javax.vecmath.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.config.AdvancedConfig;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
@@ -49,6 +48,7 @@ import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkReadyEvent;
 import org.terasology.world.chunks.ChunkState;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 import org.terasology.world.chunks.store.ChunkStore;
 import org.terasology.world.localChunkProvider.AbstractChunkTask;
 import org.terasology.world.localChunkProvider.ChunkRequest;
@@ -71,6 +71,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
 
+    private final PerBlockStorageManager perBlockStorageManager;
     private final ChunkStore farStore;
 
     private BlockingQueue<ChunkTask> chunkTasksQueue;
@@ -89,6 +90,11 @@ public class LocalChunkProvider implements ChunkProvider {
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
     public LocalChunkProvider(ChunkStore farStore, MapGenerator generator) {
+        this.perBlockStorageManager = CoreRegistry.get(PerBlockStorageManager.class);
+        if (perBlockStorageManager == null) {
+            logger.warn("Unable to retrieve per-block-storage manager");
+        }
+        
         this.farStore = farStore;
         this.generator = generator;
         
@@ -505,19 +511,15 @@ public class LocalChunkProvider implements ChunkProvider {
             }
             logger.debug("Now complete {}", pos);
             chunk.setChunkState(ChunkState.COMPLETE);
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
-            if (config.isChunkDeflationEnabled()) {
-                if (!chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
+            if (perBlockStorageManager != null && perBlockStorageManager.isChunkDeflationEnabled()) {
+                chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
                     @Override
                     public void enact() {
                         Chunk chunk = getChunk(getPosition());
-                        if (chunk != null) {
-                            chunk.deflate();
-                        }
+                        if (chunk != null)
+                            perBlockStorageManager.deflate(chunk);
                     }
-                })) {
-                    logger.warn("LocalChunkProvider.chunkTasksQueue rejected deflation task for chunk {}", pos);
-                }
+                });
             }
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
                 checkChunkReady(adjPos);

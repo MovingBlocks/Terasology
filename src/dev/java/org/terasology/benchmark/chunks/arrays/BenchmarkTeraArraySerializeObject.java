@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import org.terasology.benchmark.BenchmarkResult;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraArray.SerializationHandler;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArray.SerializationHandler;
 
 public class BenchmarkTeraArraySerializeObject extends BenchmarkTeraArraySerialization {
 

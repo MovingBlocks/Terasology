@@ -1,5 +1,7 @@
 package org.terasology.rendering.gui.windows;
 
+import java.util.Arrays;
+
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
@@ -20,6 +22,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 
 /**
  * Exposes internal configurable details of the Terasology engine to the user.
@@ -38,6 +41,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
     private final UIDisplayElement mainContainer, chunkConfig, monitoringConfig;
     
     private final AdvancedConfig config; 
+    private final PerBlockStorageManager manager;
     
     protected UIComposite initFactoryCombo(String title, String id, String selectedFactory, SelectionListener listener) {
         final GridLayout layout = new GridLayout(1);
@@ -57,7 +61,8 @@ public class UIMenuConfigAdvanced extends UIWindow {
         final UIComboBox combo = new UIComboBox(new Vector2f(256f, 32f), new Vector2f(256f, 96f));
         combo.setVisible(true);
         combo.setId(id+":combo");
-        String[] factories = AdvancedConfig.getTeraArrayFactories();
+        String[] factories = manager.getArrayFactoryIds();
+        Arrays.sort(factories);
         for (String factory : factories) {
             String name = factory.substring(factory.lastIndexOf('.')+1);
             UIListItem item = new UIListItem(name, factory);
@@ -117,6 +122,8 @@ public class UIMenuConfigAdvanced extends UIWindow {
         
         comp.addDisplayElement(chunkConfig);
         comp.addDisplayElement(monitoringConfig);
+        
+        comp.orderDisplayElementTop(chunkConfig);
         
         return comp;
     }
@@ -218,6 +225,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
         maximize();
         
         config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
+        manager = CoreRegistry.get(PerBlockStorageManager.class);
         
         title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -248,6 +256,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
+                manager.loadConfig(config);
                 getGUIManager().openWindow("config");
             }
         });

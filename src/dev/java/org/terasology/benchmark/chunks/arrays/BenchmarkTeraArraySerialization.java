@@ -3,7 +3,7 @@ package org.terasology.benchmark.chunks.arrays;
 import org.terasology.benchmark.BasicBenchmarkResult;
 import org.terasology.benchmark.Benchmark;
 import org.terasology.benchmark.BenchmarkResult;
-import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.perBlockStorage.TeraArray;
 
 import com.google.common.base.Preconditions;
 
@@ -15,11 +15,9 @@ public abstract class BenchmarkTeraArraySerialization extends Benchmark {
     public final TeraArray.SerializationHandler handler;
     public final TeraArray array;
     
-    @SuppressWarnings("unchecked")
     public BenchmarkTeraArraySerialization(TeraArray.SerializationHandler handler, TeraArray array) {
         this.handler = Preconditions.checkNotNull(handler);
         this.array = Preconditions.checkNotNull(array);
-        Preconditions.checkArgument(handler.canHandle(array.getClass()), "The supplied serialization handler is incompatible to the supplied array");
     }
 
     @Override

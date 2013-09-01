@@ -19,7 +19,6 @@ package org.terasology.logic.mod;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -27,6 +26,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
+import org.terasology.game.CoreRegistry;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 
 /**
  * @author Immortius
@@ -55,8 +56,10 @@ public class Mod {
             this.enabled = enabled;
             if (enabled) {
                 AssetManager.getInstance().addAssetSource(modSource);
+                CoreRegistry.get(PerBlockStorageManager.class).registerStorageExtensions(this);
             } else {
                 AssetManager.getInstance().removeAssetSource(modSource);
+                CoreRegistry.get(PerBlockStorageManager.class).removeStorageExtensions(this);
             }
         }
     }

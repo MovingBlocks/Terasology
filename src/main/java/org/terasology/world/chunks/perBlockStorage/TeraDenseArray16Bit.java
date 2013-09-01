@@ -1,12 +1,10 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
+import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.ChunksProtobuf.Type;
 
 import com.google.common.base.Preconditions;
 
@@ -26,13 +24,75 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         this.data = new short[getSizeXYZ()];
     }
 
+    public static class Deflator implements TeraArray.Deflator<TeraDenseArray16Bit> {
+
+        /*
+         *  16-bit variant
+         *  ==============
+         *  
+         *  dense chunk  : 4 + 12 + (65536 * 2)                                                   = 131088
+         *  sparse chunk : (4 + 12 + (256 * 2)) + (4 + 12 + (256 × 4)) + ((12 + (256 * 2)) × 256) = 135712
+         *  difference   : 135712 - 131088                                                        =   4624
+         *  min. deflate : 4624 / (12 + (256 * 2))                                                =      8.8
+         *  
+         */
+        protected final static int DEFLATE_MINIMUM_16BIT = 8;
+        
+        @Override
+        public TeraArray deflate(TeraDenseArray16Bit array) {
+            final int sizeX = array.getSizeX();
+            final int sizeY = array.getSizeY();
+            final int sizeZ = array.getSizeZ();
+            final int rowSize = array.getSizeXZ();
+            final short[] data = array.data;
+            final short[][] inflated = new short[sizeY][];
+            final short[] deflated = new short[sizeY];
+            int packed = 0;
+            for (int y = 0; y < sizeY; y++) {
+                final int start = y * rowSize;
+                final short first = data[start];
+                boolean packable = true;
+                for (int i = 1; i < rowSize; i++) {
+                    if (data[start + i] != first) {
+                        packable = false;
+                        break;
+                    }
+                }
+                if (packable) {
+                    deflated[y] = first;
+                    ++packed;
+                } else {
+                    short[] tmp = new short[rowSize];
+                    System.arraycopy(data, start, tmp, 0, rowSize);
+                    inflated[y] = tmp;
+                }
+            }
+            if (packed == sizeY) {
+                final short first = deflated[0];
+                boolean packable = true;
+                for (int i = 1; i < sizeY; i++) {
+                    if (deflated[i] != first) {
+                        packable = false;
+                        break;
+                    }
+                }
+                if (packable)
+                    return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, first);
+            }
+            if (packed > DEFLATE_MINIMUM_16BIT) {
+                return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, inflated, deflated);
+            }
+            return null;
+        }
+    }
+    
     public static class SerializationHandler extends TeraArray.BasicSerializationHandler<TeraDenseArray16Bit> {
 
         @Override
-        public boolean canHandle(Class<?> clazz) {
-            return TeraDenseArray16Bit.class.equals(clazz);
+        public Type getProtobufType() {
+            return ChunksProtobuf.Type.DenseArray16Bit;
         }
-
+        
         @Override
         protected int internalComputeMinimumBufferSize(TeraDenseArray16Bit array) {
             final short[] data = array.data;
@@ -69,31 +129,17 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         }
     }
     
-    public static class Factory implements TeraArray.Factory<TeraDenseArray16Bit> {
+    public static class Factory implements TeraArray.Factory {
         
         @Override
-        public Class<TeraDenseArray16Bit> getArrayClass() {
-            return TeraDenseArray16Bit.class;
-        }
-
-        @Override
-        public SerializationHandler createSerializationHandler() {
-            return new SerializationHandler();
-        }
-        
-        @Override
-        public TeraDenseArray16Bit create() {
-            return new TeraDenseArray16Bit();
+        public String getId() {
+            return "16-bit-dense";
         }
         
         @Override
         public TeraDenseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraDenseArray16Bit(sizeX, sizeY, sizeZ);
         }
-    }
-
-    public TeraDenseArray16Bit() {
-        super();
     }
 
     public TeraDenseArray16Bit(int sizeX, int sizeY, int sizeZ) {
@@ -115,11 +161,6 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         short[] tmp = new short[getSizeXYZ()];
         System.arraycopy(data, 0, tmp, 0, getSizeXYZ());
         return new TeraDenseArray16Bit(getSizeX(), getSizeY(), getSizeZ(), tmp);
-    }
-
-    @Override
-    public TeraArray deflate(TeraVisitingDeflator deflator) {
-        return Preconditions.checkNotNull(deflator).deflateDenseArray16Bit(data, getSizeXZ(), getSizeX(), getSizeY(), getSizeZ());
     }
 
     @Override
@@ -158,17 +199,4 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         }
         return false;
     }
-
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        writeExternalHeader(out);
-        out.writeObject(data);
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        readExternalHeader(in);
-        data = (short[]) in.readObject();
-    } 
-
 }

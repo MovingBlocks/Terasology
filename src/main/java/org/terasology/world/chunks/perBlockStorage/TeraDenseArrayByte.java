@@ -1,8 +1,5 @@
-package org.terasology.world.chunks.blockdata;
+package org.terasology.world.chunks.perBlockStorage;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
 import com.google.common.base.Preconditions;
@@ -67,10 +64,6 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         }
     }
     
-    protected TeraDenseArrayByte() {
-        super();
-    }
-
     protected TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ, true);
     }
@@ -99,17 +92,4 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         System.arraycopy(data, 0, result, 0, dataSize());
         return createDense(result);
     }
-
-    @Override
-    public final void writeExternal(ObjectOutput out) throws IOException {
-        writeExternalHeader(out);
-        out.writeObject(data);
-    }
-
-    @Override
-    public final void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        readExternalHeader(in);
-        data = (byte[]) in.readObject();
-    }
-    
 }

@@ -38,6 +38,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
@@ -46,7 +47,7 @@ import org.terasology.protobuf.ChunksProtobuf.CompressedChunks;
 import org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressedChunk;
 import org.terasology.protobuf.ChunksProtobuf.CompressedChunks.CompressionMethod;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.world.chunks.perBlockStorage.PerBlockStorageManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -71,6 +72,8 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(ChunkStoreProtobuf.class);
 
+    private transient PerBlockStorageManager perBlockStorageManager;
+    
     private transient boolean initialized = false;
     private transient ConcurrentMap<Vector3i, Chunk> queuedChunks;
     private transient BlockingQueue<Chunk> compressionQueue;
@@ -87,12 +90,12 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
         final GZIPInputStream gzIn = new GZIPInputStream(baIn);
         final CodedInputStream cIn = CodedInputStream.newInstance(gzIn);
         final ChunksProtobuf.Chunk message = ChunksProtobuf.Chunk.parseFrom(cIn);
-        return Chunks.getInstance().decode(message); 
+        return perBlockStorageManager.decode(message); 
     }
     
     protected byte[] encode(Chunk chunk) throws IOException {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        final ChunksProtobuf.Chunk message = Chunks.getInstance().encode(chunk);
+        final ChunksProtobuf.Chunk message = perBlockStorageManager.encode(chunk);
         final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
         final GZIPOutputStream gzOut = new GZIPOutputStream(baOut);
         final CodedOutputStream cOut = CodedOutputStream.newInstance(gzOut);
@@ -250,6 +253,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     public void setup() {
         if (initialized) return;
         initialized = true;
+        perBlockStorageManager = CoreRegistry.get(PerBlockStorageManager.class);
         queuedChunks = Maps.newConcurrentMap();
         compressionQueue = Queues.newLinkedBlockingDeque();
         finishedThreads = new AtomicInteger(0);
