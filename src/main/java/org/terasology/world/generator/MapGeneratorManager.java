@@ -132,6 +132,25 @@ public class MapGeneratorManager extends ModAwareManager<MapGenerator, MapGenera
         }
     }
 
+    public static class Hills extends BaseMapGenerator {
+        public Hills() {
+            super(new MapGeneratorUri("core:hills"));
+        }
+
+        @Override
+        public String name() {
+            return "Hills";
+        }
+
+        @Override
+        public void setup() {
+            registerChunkGenerator(new HillsTerrainGenerator());
+            registerChunkGenerator(new FloraGenerator());
+            registerChunkGenerator(new LiquidsGenerator());
+            registerChunkGenerator(new ForestGenerator());
+        }
+    }
+
     @Override
     protected MapGeneratorUri getUri(MapGenerator item) {
         return item.uri();

@@ -17,6 +17,8 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -81,6 +83,7 @@ public class MenuControlSystem implements EventHandlerSystem {
         switch (event.getKey()) {
             case Keyboard.KEY_F12:
                 DefaultRenderingProcess.getInstance().takeScreenshot();
+                CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera"));
                 break;
         }
     }
