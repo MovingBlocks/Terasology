@@ -270,14 +270,18 @@ subprojects {
         if (!moduleFile.exists()) {
             compileJava.dependsOn createModuleManifest
             createSkeleton.dependsOn createModuleManifest
+			version = "1.0.0"
             
         // Otherwise, retrieve dependencies information from it
         } else {
             def slurper = new JsonSlurper()
             def moduleConfig = slurper.parseText( file('module.txt').text)
 			for (dependency in moduleConfig.dependencies) { 
-				moduleDepends += dependency.id
+				if (dependency.id != 'engine') {
+					moduleDepends += dependency.id
+				}
 			}
+			version = moduleConfig.version
         }
         
         // Jarring needs to copy module.txt and all the assets into the output
