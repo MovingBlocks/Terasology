@@ -25,18 +25,23 @@ public class EngineModule implements Module {
 
     private Reflections reflections;
     private ModuleInfo info;
+    private String id = TerasologyConstants.ENGINE_MODULE;
+    private Version version;
 
-    public EngineModule(Reflections reflections) {
+    public EngineModule(Reflections reflections, ModuleInfo moduleInfo) {
         this.reflections = reflections;
-        this.info = new ModuleInfo();
-        this.info.setId(TerasologyConstants.ENGINE_MODULE);
-        this.info.setDisplayName("Engine");
-        this.info.setDescription("The engine module");
+        this.info = moduleInfo;
+        this.version = Version.create(moduleInfo.getVersion());
     }
 
     @Override
     public String getId() {
-        return info.getId();
+        return id;
+    }
+
+    @Override
+    public Version getVersion() {
+        return version;
     }
 
     @Override
@@ -55,6 +60,11 @@ public class EngineModule implements Module {
     }
 
     @Override
+    public boolean dependsOn(Module module) {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -67,6 +77,11 @@ public class EngineModule implements Module {
 
     @Override
     public int hashCode() {
-        return info.getId().hashCode();
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return id;
     }
 }

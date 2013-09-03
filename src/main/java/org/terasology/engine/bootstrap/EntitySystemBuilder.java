@@ -156,7 +156,7 @@ public class EntitySystemBuilder {
             for (Class<? extends Component> componentType : module.getReflections().getSubTypesOf(Component.class)) {
                 if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                     String componentName = MetadataUtil.getComponentClassName(componentType);
-                    library.register(new SimpleUri(module.getModuleInfo().getId(), componentName), componentType);
+                    library.register(new SimpleUri(module.getId(), componentName), componentType);
                 }
             }
         }
@@ -164,7 +164,7 @@ public class EntitySystemBuilder {
 
     private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
         for (Module module : moduleManager.getActiveCodeModules()) {
-            registerEvents(module.getModuleInfo().getId(), eventSystem, module.getReflections());
+            registerEvents(module.getId(), eventSystem, module.getReflections());
         }
     }
 

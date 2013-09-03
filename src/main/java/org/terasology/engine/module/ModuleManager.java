@@ -16,11 +16,13 @@
 
 package org.terasology.engine.module;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import org.reflections.Reflections;
@@ -49,7 +51,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -67,9 +68,9 @@ public class ModuleManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
 
-    private Set<Module> activeModules = Sets.newLinkedHashSet();
+    private Map<String, Module> activeModules = Maps.newHashMap();
 
-    private Map<String, ExtensionModule> modules = Maps.newHashMap();
+    private Table<String, Version, ExtensionModule> modules = HashBasedTable.create();
     private URLClassLoader activeModuleClassLoader;
     private URLClassLoader allModuleClassLoader;
     private Module engineModule;
@@ -95,8 +96,12 @@ public class ModuleManager {
                     .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
         }
         engineReflections = new Reflections(builder);
-        engineModule = new EngineModule(engineReflections);
-        activeModules.add(engineModule);
+        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/" + ASSETS_SUBDIRECTORY + "/" + "module.txt"))) {
+            engineModule = new EngineModule(engineReflections, new Gson().fromJson(reader, ModuleInfo.class));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load engine module info", e);
+        }
+        activeModules.put(engineModule.getId(), engineModule);
         refresh();
     }
 
@@ -113,20 +118,25 @@ public class ModuleManager {
 
     public void disableAllModules() {
         activeModules.clear();
-        activeModules.add(engineModule);
+        activeModules.put(engineModule.getId(), engineModule);
     }
 
     public void enableModule(Module module) {
-        if (activeModules.add(module) && module instanceof ExtensionModule) {
-            ((ExtensionModule) module).enable();
+        Module oldModule = activeModules.put(module.getId(), module);
+        if (!module.equals(oldModule)) {
+            if (oldModule != null && oldModule instanceof ExtensionModule) {
+                ((ExtensionModule) oldModule).disable();
+            }
+            if (module instanceof ExtensionModule) {
+                ((ExtensionModule) module).enable();
+            }
         }
     }
 
     public void disableModule(Module module) {
-        if (module instanceof ExtensionModule) {
-            if (activeModules.remove(module)) {
-                ((ExtensionModule) module).disable();
-            }
+        Module removedModule = activeModules.remove(module.getId());
+        if (removedModule != null && removedModule instanceof ExtensionModule) {
+            ((ExtensionModule) module).disable();
         }
     }
 
@@ -229,14 +239,8 @@ public class ModuleManager {
             if (modInfoEntry != null) {
                 try {
                     ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
-                    if (!modules.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
-                        ArchiveSource source = new ArchiveSource(moduleInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY);
-                        ExtensionModule module = new ExtensionModule(modPath, moduleInfo, source);
-                        modules.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
-                        logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeModule());
-                    } else {
-                        logger.info("Discovered duplicate module: " + moduleInfo.getDisplayName() + ", skipping");
-                    }
+                    AssetSource source = new ArchiveSource(moduleInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY);
+                    processModuleInfo(moduleInfo, modPath, source);
                 } catch (FileNotFoundException | JsonIOException e) {
                     logger.warn("Failed to load module manifest for module at {}", modPath, e);
                 }
@@ -251,19 +255,29 @@ public class ModuleManager {
         if (Files.isRegularFile(modInfoFile)) {
             try (Reader reader = Files.newBufferedReader(modInfoFile, TerasologyConstants.CHARSET)) {
                 ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
-                if (!modules.containsKey(moduleInfo.getId().toLowerCase(Locale.ENGLISH))) {
-                    Path assetLocation = modPath.resolve(ASSETS_SUBDIRECTORY);
-                    Path overridesLocation = modPath.resolve(OVERRIDES_SUBDIRECTORY);
-                    AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
-                    ExtensionModule module = new ExtensionModule(modPath, moduleInfo, source);
-                    modules.put(moduleInfo.getId().toLowerCase(Locale.ENGLISH), module);
-                    logger.info("Discovered module: {} (hasCode = {})", moduleInfo.getDisplayName(), module.isCodeModule());
-                } else {
-                    logger.info("Discovered duplicate module: {}, skipping", moduleInfo.getDisplayName());
-                }
+                Path assetLocation = modPath.resolve(ASSETS_SUBDIRECTORY);
+                Path overridesLocation = modPath.resolve(OVERRIDES_SUBDIRECTORY);
+                AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
+                processModuleInfo(moduleInfo, modPath, source);
             } catch (FileNotFoundException | JsonIOException e) {
                 logger.warn("Failed to load module manifest for module at {}", modPath, e);
             }
+        }
+    }
+
+    private void processModuleInfo(ModuleInfo moduleInfo, Path modPath, AssetSource source) {
+        String moduleId = UriUtil.normalise(moduleInfo.getId());
+        Version version = Version.create(moduleInfo.getVersion());
+        if (version != null) {
+            if (!modules.contains(moduleId, version)) {
+                ExtensionModule module = new ExtensionModule(this, modPath, moduleInfo, version, source);
+                modules.put(moduleId, version, module);
+                logger.info("Discovered module: {}:{} (hasCode = {})", moduleInfo.getDisplayName(), moduleInfo.getVersion(), module.isCodeModule());
+            } else {
+                logger.info("Discovered duplicate module: {}:{}, skipping", moduleInfo.getDisplayName(), moduleInfo.getVersion());
+            }
+        } else {
+            logger.error("Found module '" + moduleInfo.getId() + "' with invalid version '" + moduleInfo.getVersion() + "', skipping");
         }
     }
 
@@ -281,7 +295,7 @@ public class ModuleManager {
             }
         }
         activeModuleClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
-        for (Module module : activeModules) {
+        for (Module module : activeModules.values()) {
             if (module instanceof ExtensionModule) {
                 ((ExtensionModule) module).setActiveClassLoader(activeModuleClassLoader);
             }
@@ -313,22 +327,32 @@ public class ModuleManager {
         return modules.values();
     }
 
-    public Module getModule(String modName) {
-        String normalisedName = modName.toLowerCase(Locale.ENGLISH);
-        if (TerasologyConstants.ENGINE_MODULE.equals(normalisedName)) {
-            return engineModule;
-        }
-        return modules.get(normalisedName);
+    public Module getActiveModule(String modName) {
+        String normalisedName = UriUtil.normalise(modName);
+        return activeModules.get(normalisedName);
     }
 
     public Iterable<Module> getActiveModules() {
-        return ImmutableSet.copyOf(activeModules);
+        return ImmutableSet.copyOf(activeModules.values());
+    }
+
+    public Module getLatestModuleVersion(String id) {
+        if (TerasologyConstants.ENGINE_MODULE.equals(id)) {
+            return engineModule;
+        }
+        Module result = null;
+        for (Module module : modules.row(UriUtil.normalise(id)).values()) {
+            if (result == null || module.getVersion().compareTo(result.getVersion()) > 0) {
+                result = module;
+            }
+        }
+        return result;
     }
 
     public Iterable<Module> getActiveCodeModules() {
         List<Module> result = Lists.newArrayList();
         result.add(engineModule);
-        for (Module module : activeModules) {
+        for (Module module : activeModules.values()) {
             if (module.isCodeModule()) {
                 result.add(module);
             }
@@ -338,7 +362,7 @@ public class ModuleManager {
 
     private List<ExtensionModule> getActiveExtensionCodeModules() {
         List<ExtensionModule> result = Lists.newArrayListWithCapacity(modules.size() + 1);
-        for (Module module : activeModules) {
+        for (Module module : activeModules.values()) {
             if (module.isCodeModule() && module instanceof ExtensionModule) {
                 result.add((ExtensionModule) module);
             }
@@ -347,7 +371,7 @@ public class ModuleManager {
     }
 
     public boolean isEnabled(Module module) {
-        return activeModules.contains(module);
+        return activeModules.containsKey(module.getId());
     }
 
     public Iterable<Module> getAllDependencies(Module module) {
@@ -358,8 +382,8 @@ public class ModuleManager {
     }
 
     private void addDependenciesRecursive(Module module, Set<Module> dependencies) {
-        for (String dependencyId : module.getModuleInfo().getDependencies()) {
-            Module dependency = getModule(dependencyId);
+        for (DependencyInfo dependencyInfo : module.getModuleInfo().getDependencies()) {
+            Module dependency = getLatestModuleVersion(dependencyInfo.getId());
             if (dependency != null) {
                 dependencies.add(module);
                 addDependenciesRecursive(dependency, dependencies);
@@ -375,8 +399,8 @@ public class ModuleManager {
     }
 
     private void addDependencyNamesRecursive(Module module, Set<String> dependencies) {
-        for (String dependencyId : module.getModuleInfo().getDependencies()) {
-            Module dependency = getModule(dependencyId);
+        for (DependencyInfo dependencyInfo : module.getModuleInfo().getDependencies()) {
+            Module dependency = getLatestModuleVersion(dependencyInfo.getId());
             if (dependency != null) {
                 dependencies.add(module.getId());
                 addDependencyNamesRecursive(dependency, dependencies);

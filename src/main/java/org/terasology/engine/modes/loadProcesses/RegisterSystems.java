@@ -22,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.module.DependencyInfo;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.UriUtil;
 import org.terasology.network.NetworkMode;
 
 import java.util.Locale;
@@ -54,7 +56,7 @@ public class RegisterSystems implements LoadProcess {
         moduleManager = CoreRegistry.get(ModuleManager.class);
 
         for (Module module : moduleManager.getActiveModules()) {
-            if (!registeredMods.contains(module.getModuleInfo().getId().toLowerCase(Locale.ENGLISH))) {
+            if (!registeredMods.contains(module.getId())) {
                 loadMod(module);
             }
         }
@@ -62,17 +64,17 @@ public class RegisterSystems implements LoadProcess {
     }
 
     private void loadMod(Module module) {
-        logger.debug("Loading {}", module.getModuleInfo().getId());
-        for (String dependency : module.getModuleInfo().getDependencies()) {
-            if (!registeredMods.contains(dependency.toLowerCase(Locale.ENGLISH))) {
+        logger.debug("Loading {}", module);
+        for (DependencyInfo dependency : module.getModuleInfo().getDependencies()) {
+            if (!registeredMods.contains(UriUtil.normalise(dependency.getId()))) {
                 logger.debug("Requesting {} due to dependency", dependency);
-                loadMod(moduleManager.getModule(dependency));
+                loadMod(moduleManager.getLatestModuleVersion(dependency.getId()));
             }
         }
         if (module.isCodeModule()) {
-            componentSystemManager.loadSystems(module.getModuleInfo().getId(), module.getReflections(), netMode);
+            componentSystemManager.loadSystems(module.getId(), module.getReflections(), netMode);
         }
-        registeredMods.add(module.getModuleInfo().getId().toLowerCase(Locale.ENGLISH));
+        registeredMods.add(module.getId().toLowerCase(Locale.ENGLISH));
     }
 
     @Override

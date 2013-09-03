@@ -21,6 +21,7 @@ import org.newdawn.slick.Color;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.module.DependencyInfo;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -82,10 +83,10 @@ public class UIDialogModules extends UIDialog {
         });
 
         for (Module module : modules) {
-            if (!module.getModuleInfo().getId().equals(TerasologyConstants.ENGINE_MODULE)) {
+            if (!module.getId().equals(TerasologyConstants.ENGINE_MODULE)) {
                 UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
                 item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
-                if (moduleConfig.hasMod(module.getModuleInfo().getId())) {
+                if (moduleConfig.hasMod(module.getId())) {
                     item.setTextColor(ACTIVE_TEXT_COLOR);
                     item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
                 } else {
@@ -102,13 +103,13 @@ public class UIDialogModules extends UIDialog {
                 detailPanel.setVisible(true);
                 nameLabel.setText(module.getModuleInfo().getDisplayName());
                 descriptionLabel.setText(module.getModuleInfo().getDescription());
-                boolean active = moduleConfig.hasMod(module.getModuleInfo().getId());
+                boolean active = moduleConfig.hasMod(module.getId());
                 if (active) {
                     toggleButton.getLabel().setText(DEACTIVATE_TEXT);
                 } else {
                     toggleButton.getLabel().setText(ACTIVATE_TEXT);
                 }
-                toggleButton.setVisible(!module.getModuleInfo().getId().equals("core"));
+                toggleButton.setVisible(!module.getId().equals("core"));
             }
         });
         modList.addDoubleClickListener(new ClickListener() {
@@ -128,10 +129,10 @@ public class UIDialogModules extends UIDialog {
 
     private void toggleSelectedModuleActivation() {
         Module selectedModule = (Module) modList.getSelection().getValue();
-        if (selectedModule.getModuleInfo().getId().equals("core")) {
+        if (selectedModule.getId().equals("core")) {
             return;
         }
-        if (moduleConfig.hasMod(selectedModule.getModuleInfo().getId())) {
+        if (moduleConfig.hasMod(selectedModule.getId())) {
             deactivateMod(selectedModule);
             toggleButton.getLabel().setText(ACTIVATE_TEXT);
         } else {
@@ -144,7 +145,7 @@ public class UIDialogModules extends UIDialog {
     private void refreshListItemActivation() {
         for (UIListItem item : modList.getItems()) {
             Module module = (Module) item.getValue();
-            if (moduleConfig.hasMod(module.getModuleInfo().getId())) {
+            if (moduleConfig.hasMod(module.getId())) {
                 item.setTextColor(ACTIVE_TEXT_COLOR);
                 item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
             } else {
@@ -155,19 +156,19 @@ public class UIDialogModules extends UIDialog {
     }
 
     private void deactivateMod(Module module) {
-        moduleConfig.removeMod(module.getModuleInfo().getId());
+        moduleConfig.removeMod(module.getId());
         for (String activeModName : Lists.newArrayList(moduleConfig.listMods())) {
-            Module activeModule = moduleManager.getModule(activeModName);
-            if (activeModule != null && activeModule.getModuleInfo().getDependencies().contains(module.getModuleInfo().getId())) {
+            Module activeModule = moduleManager.getLatestModuleVersion(activeModName);
+            if (activeModule != null && activeModule.dependsOn(module)) {
                 deactivateMod(activeModule);
             }
         }
     }
 
     private void activateMod(Module module) {
-        moduleConfig.addMod(module.getModuleInfo().getId());
-        for (String dependencyName : module.getModuleInfo().getDependencies()) {
-            Module dependency = moduleManager.getModule(dependencyName);
+        moduleConfig.addMod(module.getId());
+        for (DependencyInfo dependencyName : module.getModuleInfo().getDependencies()) {
+            Module dependency = moduleManager.getLatestModuleVersion(dependencyName.getId());
             if (dependency != null) {
                 activateMod(dependency);
             }

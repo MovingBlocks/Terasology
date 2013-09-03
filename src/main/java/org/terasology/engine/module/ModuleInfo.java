@@ -16,9 +16,9 @@
 
 package org.terasology.engine.module;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Information on a module
@@ -27,10 +27,11 @@ import java.util.Set;
  */
 public class ModuleInfo {
     private String id = "";
+    private String version = "";
     private String displayName = "";
     private String description = "";
     private boolean serversideOnly;
-    private Set<String> dependencies = Sets.newLinkedHashSet();
+    private List<DependencyInfo> dependencies = Lists.newArrayList();
 
     public String getId() {
         return id;
@@ -38,6 +39,14 @@ public class ModuleInfo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getDisplayName() {
@@ -56,9 +65,9 @@ public class ModuleInfo {
         this.description = description;
     }
 
-    public Set<String> getDependencies() {
+    public List<DependencyInfo> getDependencies() {
         if (dependencies == null) {
-            dependencies = Sets.newLinkedHashSet();
+            dependencies = Lists.newArrayList();
         }
         return dependencies;
     }

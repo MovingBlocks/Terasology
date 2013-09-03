@@ -275,7 +275,9 @@ subprojects {
         } else {
             def slurper = new JsonSlurper()
             def moduleConfig = slurper.parseText( file('module.txt').text)
-            moduleDepends = moduleConfig.dependencies;
+			for (dependency in moduleConfig.dependencies) { 
+				moduleDepends += dependency.id
+			}
         }
         
         // Jarring needs to copy module.txt and all the assets into the output

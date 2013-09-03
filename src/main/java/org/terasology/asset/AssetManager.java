@@ -21,10 +21,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -83,7 +83,7 @@ public class AssetManager {
     }
 
     public List<AssetUri> resolveAll(AssetType type, String name) {
-        return Lists.newArrayList(uriLookup.get(type).row(SimpleUri.normalise(name)).values());
+        return Lists.newArrayList(uriLookup.get(type).row(UriUtil.normalise(name)).values());
     }
 
     public AssetUri resolve(AssetType type, String name) {
@@ -104,7 +104,10 @@ public class AssetManager {
                     Iterator<AssetUri> iterator = possibilities.iterator();
                     while (iterator.hasNext()) {
                         AssetUri possibleUri = iterator.next();
-                        if (!dependencies.contains(possibleUri.getModuleName())) {
+                        if (context.getId().equals(possibleUri.getNormalisedModuleName())) {
+                            return possibleUri;
+                        }
+                        if (!dependencies.contains(possibleUri.getNormalisedModuleName())) {
                             iterator.remove();
                         }
                     }
@@ -255,7 +258,7 @@ public class AssetManager {
                 continue;
             }
 
-            Module module = moduleManager.getModule(uri.getModuleName());
+            Module module = moduleManager.getActiveModule(uri.getNormalisedModuleName());
             InputStream stream = null;
             try {
                 stream = url.openStream();
@@ -295,7 +298,7 @@ public class AssetManager {
             return null;
         }
 
-        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getModule(uri.getModuleName()))) {
+        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getActiveModule(uri.getNormalisedModuleName()))) {
             AssetData data = loadAssetData(uri, logErrors);
 
             if (data != null) {
@@ -370,7 +373,7 @@ public class AssetManager {
                 overrides.remove(override);
                 Asset asset = assetCache.get(override);
                 if (asset != null) {
-                    if (override.getModuleName().equals(TerasologyConstants.ENGINE_MODULE)) {
+                    if (TerasologyConstants.ENGINE_MODULE.equals(override.getNormalisedModuleName())) {
                         AssetData data = loadAssetData(override, true);
                         asset.reload(data);
                     } else {
@@ -381,7 +384,7 @@ public class AssetManager {
             }
         }
         for (Table<String, String, AssetUri> table : uriLookup.values()) {
-            Map<String, AssetUri> columnMap = table.column(SimpleUri.normalise(source.getSourceId()));
+            Map<String, AssetUri> columnMap = table.column(UriUtil.normalise(source.getSourceId()));
             for (AssetUri value : columnMap.values()) {
                 Asset asset = assetCache.remove(value);
                 if (asset != null) {

@@ -15,22 +15,23 @@
  */
 package org.terasology.engine.module;
 
-import org.reflections.Reflections;
+import java.util.Locale;
 
 /**
  * @author Immortius
  */
-public interface Module {
+public final class UriUtil {
 
-    String getId();
+    private UriUtil() {
+    }
 
-    Version getVersion();
-
-    Reflections getReflections();
-
-    boolean isCodeModule();
-
-    ModuleInfo getModuleInfo();
-
-    boolean dependsOn(Module module);
+    /**
+     * Normalises a uri or uri part. The normal form is used for comparison/string matching.
+     * This process includes lower-casing the uri.
+     * @param value A uri or uri part
+     * @return The normal form of the given value.
+     */
+    public static String normalise(String value) {
+        return value.toLowerCase(Locale.ENGLISH);
+    }
 }
