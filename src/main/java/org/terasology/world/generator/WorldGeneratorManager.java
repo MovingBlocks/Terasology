@@ -49,12 +49,12 @@ public class WorldGeneratorManager {
                 logger.error("Null module");
             }
             if (module.getReflections() == null) {
-                logger.error("Module has no reflections: {}", module.getModuleInfo().getId());
+                logger.error("Module has no reflections: {}", module.getId());
             }
             for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                 if (isValidWorldGenerator(generatorClass)) {
-                    SimpleUri uri = new SimpleUri(module.getModuleInfo().getId(), annotation.id());
+                    SimpleUri uri = new SimpleUri(module.getId(), annotation.id());
                     infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
                 } else {
                     logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
@@ -75,14 +75,14 @@ public class WorldGeneratorManager {
      */
     public WorldGenerator createGenerator(SimpleUri uri) throws UnresolvedWorldGeneratorException {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        Module module = moduleManager.getModule(uri.getModuleName());
+        Module module = moduleManager.getActiveModule(uri.getModuleName());
         if (module == null) {
             throw new UnresolvedWorldGeneratorException("Unknown module '" + uri.getModuleName() + "' for world generator '" + uri + "'");
         }
         if (moduleManager.isEnabled(module)) {
             for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
-                SimpleUri generatorUri = new SimpleUri(module.getModuleInfo().getId(), annotation.id());
+                SimpleUri generatorUri = new SimpleUri(module.getId(), annotation.id());
                 if (generatorUri.equals(uri)) {
                     return loadGenerator(generatorClass, generatorUri);
                 }

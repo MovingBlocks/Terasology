@@ -17,6 +17,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.terasology.engine.module.UriUtil;
 
 /**
  * A URI to identify standard objects in Terasology - components, events, etc. These URIs are always in the form: <module-name>:<object-name>
@@ -38,17 +39,17 @@ public class SimpleUri extends AbstractBaseUri {
         Preconditions.checkNotNull(objectName);
         this.moduleName = moduleName;
         this.objectName = objectName;
-        this.normalisedModuleName = normalise(moduleName);
-        this.normalisedObjectName = normalise(objectName);
+        this.normalisedModuleName = UriUtil.normalise(moduleName);
+        this.normalisedObjectName = UriUtil.normalise(objectName);
     }
 
     public SimpleUri(String simpleUri) {
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
             moduleName = split[0];
-            normalisedModuleName = normalise(split[0]);
+            normalisedModuleName = UriUtil.normalise(split[0]);
             objectName = split[1];
-            normalisedObjectName = normalise(split[1]);
+            normalisedObjectName = UriUtil.normalise(split[1]);
         }
     }
 

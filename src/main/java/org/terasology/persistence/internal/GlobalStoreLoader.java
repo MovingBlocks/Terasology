@@ -105,7 +105,7 @@ final class GlobalStoreLoader {
         for (EntityData.Prefab prefabData : globalStore.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
                 if (!prefabData.hasParentName()) {
-                    Module module = moduleManager.getModule(new SimpleUri(prefabData.getName()).getModuleName());
+                    Module module = moduleManager.getActiveModule(new SimpleUri(prefabData.getName()).getNormalisedModuleName());
                     try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                         createPrefab(prefabData);
                     } catch (Exception e) {
@@ -128,7 +128,8 @@ final class GlobalStoreLoader {
             if (prefabData.hasParentName()) {
                 loadPrefab(pendingPrefabs.get(prefabData.getParentName()), pendingPrefabs);
             }
-            try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getModule(new SimpleUri(prefabData.getName()).getModuleName()))) {
+            Module module = moduleManager.getActiveModule(new SimpleUri(prefabData.getName()).getNormalisedModuleName());
+            try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                 result = createPrefab(prefabData);
             } catch (Exception e) {
                 logger.error("Failed to load prefab {}", prefabData.getParentName(), e);

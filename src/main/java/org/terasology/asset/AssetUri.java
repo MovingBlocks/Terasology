@@ -19,6 +19,7 @@ package org.terasology.asset;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.terasology.engine.AbstractBaseUri;
+import org.terasology.engine.module.UriUtil;
 
 /**
  * @author Immortius
@@ -44,8 +45,8 @@ public final class AssetUri extends AbstractBaseUri {
         this.type = type;
         this.moduleName = moduleName;
         this.assetName = assetName;
-        this.normalisedModuleName = normalise(moduleName);
-        this.normalisedAssetName = normalise(assetName);
+        this.normalisedModuleName = UriUtil.normalise(moduleName);
+        this.normalisedAssetName = UriUtil.normalise(assetName);
     }
 
     public AssetUri(AssetType type, String simpleUri) {
@@ -54,8 +55,8 @@ public final class AssetUri extends AbstractBaseUri {
         if (split.length > 1) {
             moduleName = split[0];
             assetName = split[1];
-            normalisedModuleName = normalise(split[0]);
-            normalisedAssetName = normalise(split[1]);
+            normalisedModuleName = UriUtil.normalise(split[0]);
+            normalisedAssetName = UriUtil.normalise(split[1]);
         }
     }
 
@@ -68,8 +69,8 @@ public final class AssetUri extends AbstractBaseUri {
             if (packageSplit.length > 1) {
                 moduleName = packageSplit[0];
                 assetName = packageSplit[1];
-                normalisedModuleName = normalise(packageSplit[0]);
-                normalisedAssetName = normalise(packageSplit[1]);
+                normalisedModuleName = UriUtil.normalise(packageSplit[0]);
+                normalisedAssetName = UriUtil.normalise(packageSplit[1]);
             }
         }
     }

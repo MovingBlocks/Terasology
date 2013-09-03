@@ -1,6 +1,6 @@
 {
     "id" : "${id}",
-    "version" : "",
+    "version" : "1.0.0",
     "author" : "",
     "displayName" : "",
     "description" : "",

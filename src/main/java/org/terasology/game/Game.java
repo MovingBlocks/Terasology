@@ -66,7 +66,7 @@ public class Game {
 
             ModuleConfig moduleConfig = new ModuleConfig();
             for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-                moduleConfig.addMod(module.getModuleInfo().getId());
+                moduleConfig.addMod(module.getId());
             }
 
             GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), moduleConfig);

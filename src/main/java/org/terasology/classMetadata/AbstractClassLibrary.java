@@ -26,6 +26,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.UriUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -106,12 +107,12 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     @Override
     public List<ClassMetadata<? extends T, ?>> getMetadata(String name) {
-        return Lists.newArrayList(uriLookup.row(SimpleUri.normalise(name)).values());
+        return Lists.newArrayList(uriLookup.row(UriUtil.normalise(name)).values());
     }
 
     @Override
     public ClassMetadata<? extends T, ?> resolve(String name, String context) {
-        Module moduleContext = moduleManager.getModule(context);
+        Module moduleContext = moduleManager.getActiveModule(context);
         if (moduleContext != null) {
             return resolve(name, moduleContext);
         }
@@ -149,7 +150,10 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
                     Iterator<ClassMetadata<? extends T, ?>> iterator = possibilities.iterator();
                     while (iterator.hasNext()) {
                         ClassMetadata<? extends T, ?> metadata = iterator.next();
-                        if (!dependencies.contains(metadata.getUri().getModuleName())) {
+                        if (context.getId().equals(metadata.getUri().getNormalisedModuleName())) {
+                            return metadata;
+                        }
+                        if (!dependencies.contains(metadata.getUri().getNormalisedModuleName())) {
                             iterator.remove();
                         }
                     }

@@ -38,7 +38,7 @@ public final class ModuleContext {
     }
 
     public static ContextSpan setContext(String module) {
-        return new ContextSpan(CoreRegistry.get(ModuleManager.class).getModule(module));
+        return new ContextSpan(CoreRegistry.get(ModuleManager.class).getActiveModule(module));
     }
 
     public static final class ContextSpan implements AutoCloseable {

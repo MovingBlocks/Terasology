@@ -131,7 +131,7 @@ public class GameManifest {
             GameManifest result = createGson().fromJson(reader, GameManifest.class);
             if (result.moduleConfiguration.size() == 0) {
                 for (Module module : CoreRegistry.get(ModuleManager.class).getModules()) {
-                    result.moduleConfiguration.addMod(module.getModuleInfo().getId());
+                    result.moduleConfiguration.addMod(module.getId());
                 }
             }
             return result;

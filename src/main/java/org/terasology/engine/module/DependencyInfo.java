@@ -15,22 +15,36 @@
  */
 package org.terasology.engine.module;
 
-import org.reflections.Reflections;
-
 /**
  * @author Immortius
  */
-public interface Module {
+public class DependencyInfo {
 
-    String getId();
+    private String id = "";
+    private String minVersion = "";
+    private String maxVersion = "";
 
-    Version getVersion();
+    public String getId() {
+        return id;
+    }
 
-    Reflections getReflections();
+    public String getMinVersion() {
+        return minVersion;
+    }
 
-    boolean isCodeModule();
+    public String getMaxVersion() {
+        return maxVersion;
+    }
 
-    ModuleInfo getModuleInfo();
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    boolean dependsOn(Module module);
+    public void setMinVersion(String minVersion) {
+        this.minVersion = minVersion;
+    }
+
+    public void setMaxVersion(String maxVersion) {
+        this.maxVersion = maxVersion;
+    }
 }

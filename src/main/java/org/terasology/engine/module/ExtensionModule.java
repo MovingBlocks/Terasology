@@ -34,20 +34,26 @@ import java.nio.file.Path;
  * @author Immortius
  */
 public class ExtensionModule implements Module {
+    private ModuleManager manager;
     private ModuleInfo moduleInfo;
     private Path moduleRoot;
     private AssetSource moduleSource;
     private ClassLoader inactiveClassLoader;
     private ClassLoader activeClassLoader;
     private Reflections reflections;
+    private String id;
+    private Version version;
 
-    public ExtensionModule(Path moduleRoot, ModuleInfo info, AssetSource moduleSource) {
+    public ExtensionModule(ModuleManager manager, Path moduleRoot, ModuleInfo info, Version version, AssetSource moduleSource) {
         if (info == null) {
             throw new IllegalArgumentException("Module info must not be null");
         }
+        this.manager = manager;
         this.moduleInfo = info;
         this.moduleRoot = moduleRoot;
         this.moduleSource = moduleSource;
+        this.id = UriUtil.normalise(info.getId());
+        this.version = version;
     }
 
     void enable() {
@@ -79,7 +85,12 @@ public class ExtensionModule implements Module {
 
     @Override
     public String getId() {
-        return moduleInfo.getId();
+        return id;
+    }
+
+    @Override
+    public Version getVersion() {
+        return version;
     }
 
     @Override
@@ -119,21 +130,39 @@ public class ExtensionModule implements Module {
     }
 
     @Override
+    public boolean dependsOn(Module module) {
+        for (DependencyInfo dependencyInfo : moduleInfo.getDependencies()) {
+            Module dependency = manager.getLatestModuleVersion(dependencyInfo.getId());
+            if (dependency != null) {
+                if (module.equals(dependency)) {
+                    return true;
+                } else if (dependency.dependsOn(module)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj instanceof ExtensionModule) {
             ExtensionModule other = (ExtensionModule) obj;
-            return Objects.equal(other.getModuleInfo().getId(), moduleInfo.getId());
+            return Objects.equal(other.getId(), getId());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return moduleInfo.getId().hashCode();
+        return getId().hashCode();
     }
 
-
+    @Override
+    public String toString() {
+        return id;
+    }
 }

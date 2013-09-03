@@ -1,5 +1,6 @@
 {
     "id" : "minerals",
+    "version" : "1.0.0",
     "displayName" : "Metouto's Mineral Pack",
     "author" : "Metouto",
     "description" : "This module adds a wide range of minerals."

@@ -72,8 +72,8 @@ public class RegisterInputSystem implements LoadProcess {
 
         for (Module module : moduleManager.getActiveModules()) {
             if (module.isCodeModule()) {
-                registerButtonBinds(inputSystem, module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
-                registerAxisBinds(inputSystem, module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+                registerButtonBinds(inputSystem, module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
+                registerAxisBinds(inputSystem, module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
             }
         }
 

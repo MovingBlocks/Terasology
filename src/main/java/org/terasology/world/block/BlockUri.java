@@ -20,6 +20,7 @@ import com.google.common.base.Objects;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.AbstractBaseUri;
+import org.terasology.engine.module.UriUtil;
 
 /**
  * Identifier for both blocks and block families.
@@ -51,14 +52,14 @@ public class BlockUri extends AbstractBaseUri {
     public BlockUri(String moduleName, String familyName) {
         this.moduleName = moduleName;
         this.familyName = familyName;
-        this.normalisedModuleName = normalise(moduleName);
-        this.normalisedFamilyName = normalise(familyName);
+        this.normalisedModuleName = UriUtil.normalise(moduleName);
+        this.normalisedFamilyName = UriUtil.normalise(familyName);
     }
 
     public BlockUri(String moduleName, String familyName, String identifier) {
         this(moduleName, familyName);
         this.blockIdentifier = identifier;
-        this.normalisedBlockIdentifier = normalise(identifier);
+        this.normalisedBlockIdentifier = UriUtil.normalise(identifier);
     }
 
     public BlockUri(String moduleName, String familyName, String shapeModuleName, String shapeName) {
@@ -74,7 +75,7 @@ public class BlockUri extends AbstractBaseUri {
         normalisedFamilyName = familyUri.normalisedFamilyName;
 
         blockIdentifier = identifier;
-        normalisedBlockIdentifier = normalise(blockIdentifier);
+        normalisedBlockIdentifier = UriUtil.normalise(blockIdentifier);
     }
 
     public BlockUri(String uri) {
@@ -101,9 +102,9 @@ public class BlockUri extends AbstractBaseUri {
                 familyName = split[0];
             }
         }
-        normalisedModuleName = normalise(moduleName);
-        normalisedFamilyName = normalise(familyName);
-        normalisedBlockIdentifier = normalise(blockIdentifier);
+        normalisedModuleName = UriUtil.normalise(moduleName);
+        normalisedFamilyName = UriUtil.normalise(familyName);
+        normalisedBlockIdentifier = UriUtil.normalise(blockIdentifier);
     }
 
     public boolean isValid() {

@@ -1,5 +1,6 @@
 {
     "id" : "morelights",
+    "version" : "1.0.0",
     "displayName" : "Esa-Petri's lights",
     "author" : "Esa-Petri",
     "description" : "This module adds lights. suchs as flora,blocks,artificial"

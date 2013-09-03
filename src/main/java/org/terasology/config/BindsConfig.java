@@ -163,7 +163,7 @@ public final class BindsConfig {
         BindsConfig config = new BindsConfig();
         for (Module module : moduleManager.getModules()) {
             if (module.isCodeModule()) {
-                config.addDefaultsFor(module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+                config.addDefaultsFor(module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
         return config;
@@ -176,7 +176,7 @@ public final class BindsConfig {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         for (Module module : moduleManager.getModules()) {
             if (module.isCodeModule()) {
-                updateInputsFor(module.getModuleInfo().getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+                updateInputsFor(module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
