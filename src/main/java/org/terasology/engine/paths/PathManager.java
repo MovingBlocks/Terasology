@@ -138,7 +138,7 @@ public final class PathManager {
         return logPath;
     }
 
-    public List<Path> getModPaths() {
+    public List<Path> getModulePaths() {
         return modPaths;
     }
 

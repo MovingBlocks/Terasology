@@ -37,7 +37,7 @@ import java.util.Set;
 public class RegisterSystems implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterSystems.class);
     private NetworkMode netMode;
-    private Set<String> registeredMods = Sets.newHashSet();
+    private Set<String> registeredModules = Sets.newHashSet();
     private ModuleManager moduleManager;
     private ComponentSystemManager componentSystemManager;
 
@@ -56,25 +56,25 @@ public class RegisterSystems implements LoadProcess {
         moduleManager = CoreRegistry.get(ModuleManager.class);
 
         for (Module module : moduleManager.getActiveModules()) {
-            if (!registeredMods.contains(module.getId())) {
-                loadMod(module);
+            if (!registeredModules.contains(module.getId())) {
+                loadModule(module);
             }
         }
         return true;
     }
 
-    private void loadMod(Module module) {
+    private void loadModule(Module module) {
         logger.debug("Loading {}", module);
         for (DependencyInfo dependency : module.getModuleInfo().getDependencies()) {
-            if (!registeredMods.contains(UriUtil.normalise(dependency.getId()))) {
+            if (!registeredModules.contains(UriUtil.normalise(dependency.getId()))) {
                 logger.debug("Requesting {} due to dependency", dependency);
-                loadMod(moduleManager.getLatestModuleVersion(dependency.getId()));
+                loadModule(moduleManager.getLatestModuleVersion(dependency.getId()));
             }
         }
         if (module.isCodeModule()) {
             componentSystemManager.loadSystems(module.getId(), module.getReflections(), netMode);
         }
-        registeredMods.add(module.getId().toLowerCase(Locale.ENGLISH));
+        registeredModules.add(module.getId().toLowerCase(Locale.ENGLISH));
     }
 
     @Override

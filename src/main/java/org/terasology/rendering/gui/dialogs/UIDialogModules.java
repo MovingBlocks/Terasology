@@ -133,10 +133,10 @@ public class UIDialogModules extends UIDialog {
             return;
         }
         if (moduleConfig.hasMod(selectedModule.getId())) {
-            deactivateMod(selectedModule);
+            deactivateModule(selectedModule);
             toggleButton.getLabel().setText(ACTIVATE_TEXT);
         } else {
-            activateMod(selectedModule);
+            activateModule(selectedModule);
             toggleButton.getLabel().setText(DEACTIVATE_TEXT);
         }
         refreshListItemActivation();
@@ -155,22 +155,22 @@ public class UIDialogModules extends UIDialog {
         }
     }
 
-    private void deactivateMod(Module module) {
+    private void deactivateModule(Module module) {
         moduleConfig.removeMod(module.getId());
         for (String activeModName : Lists.newArrayList(moduleConfig.listMods())) {
             Module activeModule = moduleManager.getLatestModuleVersion(activeModName);
             if (activeModule != null && activeModule.dependsOn(module)) {
-                deactivateMod(activeModule);
+                deactivateModule(activeModule);
             }
         }
     }
 
-    private void activateMod(Module module) {
+    private void activateModule(Module module) {
         moduleConfig.addMod(module.getId());
         for (DependencyInfo dependencyName : module.getModuleInfo().getDependencies()) {
             Module dependency = moduleManager.getLatestModuleVersion(dependencyName.getId());
             if (dependency != null) {
-                activateMod(dependency);
+                activateModule(dependency);
             }
         }
     }

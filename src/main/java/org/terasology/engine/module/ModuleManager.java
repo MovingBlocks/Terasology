@@ -180,12 +180,12 @@ public class ModuleManager {
     public void refresh() {
         modules.clear();
         Gson gson = new Gson();
-        for (Path rootModPath : PathManager.getInstance().getModPaths()) {
+        for (Path rootModulePath : PathManager.getInstance().getModulePaths()) {
 
             // Directories first (they should override zips)
             try {
-                for (Path modPath : Files.newDirectoryStream(rootModPath, FilesUtil.DIRECTORY_FILTER)) {
-                    processModDirectory(modPath, gson);
+                for (Path modulePath : Files.newDirectoryStream(rootModulePath, FilesUtil.DIRECTORY_FILTER)) {
+                    processModDirectory(modulePath, gson);
                 }
             } catch (IOException e) {
                 logger.error("Failed to scan for directory modules", e);
@@ -193,13 +193,13 @@ public class ModuleManager {
 
             // Zip files next
             try {
-                for (Path modPath : Files.newDirectoryStream(rootModPath, new DirectoryStream.Filter<Path>() {
+                for (Path modulePath : Files.newDirectoryStream(rootModulePath, new DirectoryStream.Filter<Path>() {
                     @Override
                     public boolean accept(Path entry) throws IOException {
                         return Files.isRegularFile(entry) && (entry.toString().endsWith(".jar") || entry.toString().endsWith(".zip"));
                     }
                 })) {
-                    processModArchive(modPath, gson);
+                    processModArchive(modulePath, gson);
                 }
             } catch (IOException e) {
                 logger.error("Failed to scan for jar and zip modules", e);
@@ -233,44 +233,44 @@ public class ModuleManager {
         allReflections = null;
     }
 
-    private void processModArchive(Path modPath, Gson gson) {
-        try (ZipFile zipFile = new ZipFile(modPath.toFile())) {
+    private void processModArchive(Path modulePath, Gson gson) {
+        try (ZipFile zipFile = new ZipFile(modulePath.toFile())) {
             ZipEntry modInfoEntry = zipFile.getEntry("module.txt");
             if (modInfoEntry != null) {
                 try {
                     ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
-                    AssetSource source = new ArchiveSource(moduleInfo.getId(), modPath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY);
-                    processModuleInfo(moduleInfo, modPath, source);
+                    AssetSource source = new ArchiveSource(moduleInfo.getId(), modulePath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY);
+                    processModuleInfo(moduleInfo, modulePath, source);
                 } catch (FileNotFoundException | JsonIOException e) {
-                    logger.warn("Failed to load module manifest for module at {}", modPath, e);
+                    logger.warn("Failed to load module manifest for module at {}", modulePath, e);
                 }
             }
         } catch (IOException e) {
-            logger.error("Invalid module file: {}", modPath, e);
+            logger.error("Invalid module file: {}", modulePath, e);
         }
     }
 
-    private void processModDirectory(Path modPath, Gson gson) throws IOException {
-        Path modInfoFile = modPath.resolve("module.txt");
+    private void processModDirectory(Path modulePath, Gson gson) throws IOException {
+        Path modInfoFile = modulePath.resolve("module.txt");
         if (Files.isRegularFile(modInfoFile)) {
             try (Reader reader = Files.newBufferedReader(modInfoFile, TerasologyConstants.CHARSET)) {
                 ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
-                Path assetLocation = modPath.resolve(ASSETS_SUBDIRECTORY);
-                Path overridesLocation = modPath.resolve(OVERRIDES_SUBDIRECTORY);
+                Path assetLocation = modulePath.resolve(ASSETS_SUBDIRECTORY);
+                Path overridesLocation = modulePath.resolve(OVERRIDES_SUBDIRECTORY);
                 AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
-                processModuleInfo(moduleInfo, modPath, source);
+                processModuleInfo(moduleInfo, modulePath, source);
             } catch (FileNotFoundException | JsonIOException e) {
-                logger.warn("Failed to load module manifest for module at {}", modPath, e);
+                logger.warn("Failed to load module manifest for module at {}", modulePath, e);
             }
         }
     }
 
-    private void processModuleInfo(ModuleInfo moduleInfo, Path modPath, AssetSource source) {
+    private void processModuleInfo(ModuleInfo moduleInfo, Path modulePath, AssetSource source) {
         String moduleId = UriUtil.normalise(moduleInfo.getId());
         Version version = Version.create(moduleInfo.getVersion());
         if (version != null) {
             if (!modules.contains(moduleId, version)) {
-                ExtensionModule module = new ExtensionModule(this, modPath, moduleInfo, version, source);
+                ExtensionModule module = new ExtensionModule(this, modulePath, moduleInfo, version, source);
                 modules.put(moduleId, version, module);
                 logger.info("Discovered module: {}:{} (hasCode = {})", moduleInfo.getDisplayName(), moduleInfo.getVersion(), module.isCodeModule());
             } else {
@@ -327,8 +327,8 @@ public class ModuleManager {
         return modules.values();
     }
 
-    public Module getActiveModule(String modName) {
-        String normalisedName = UriUtil.normalise(modName);
+    public Module getActiveModule(String id) {
+        String normalisedName = UriUtil.normalise(id);
         return activeModules.get(normalisedName);
     }
 
