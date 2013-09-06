@@ -23,6 +23,8 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
@@ -71,7 +73,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UIComboBox worldGenerator;
 
     private ModuleConfig moduleConfig;
-    private List<WorldGeneratorInfo> worldGenerators;
     private UIButton modButton;
 
     private boolean createServerGame;
@@ -146,7 +147,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         worldGeneratorLabel = createLabel("Choose World Generator:");
 
         final WorldGeneratorManager worldGeneratorManager = CoreRegistry.get(WorldGeneratorManager.class);
-        worldGenerators = worldGeneratorManager.getWorldGenerators();
+        List<WorldGeneratorInfo> worldGenerators = worldGeneratorManager.getWorldGenerators();
         worldGenerator = new UIComboBox(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT), new Vector2f(COMPONENT_WIDTH, 2 * COMPONENT_HEIGHT));
         SimpleUri defaultMapGenerator = CoreRegistry.get(Config.class).getWorldGeneration().getDefaultGenerator();
         UIListItem item;
@@ -171,7 +172,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
             public void changed(UIDisplayElement element) {
                 WorldGeneratorInfo generator = getSelectedWorldGenerator();
                 if (moduleConfig != null) {
-                    moduleConfig.addMod(generator.getUri().getModuleName());
+                    moduleConfig.addModule(generator.getUri().getModuleName());
                 }
             }
         });
@@ -233,7 +234,13 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 GameManifest gameManifest = new GameManifest();
                 gameManifest.setTitle(config.getWorldGeneration().getWorldTitle());
                 gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
-                gameManifest.getModuleConfiguration().copy(moduleConfig);
+                ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+                for (String id : moduleConfig.listModules()) {
+                    Module module = moduleManager.getLatestModuleVersion(id);
+                    if (module != null) {
+                        gameManifest.addModule(module.getId(), module.getVersion());
+                    }
+                }
 
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(),
                         (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());

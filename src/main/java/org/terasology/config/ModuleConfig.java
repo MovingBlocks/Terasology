@@ -24,35 +24,35 @@ import java.util.List;
  * @author Immortius
  */
 public class ModuleConfig {
-    private List<String> mods = Lists.newArrayList();
+    private List<String> modules = Lists.newArrayList();
 
     public ModuleConfig() {
     }
 
     public void copy(ModuleConfig other) {
-        this.mods.clear();
-        this.mods.addAll(other.mods);
+        this.modules.clear();
+        this.modules.addAll(other.modules);
     }
 
-    public void addMod(String mod) {
-        if (!mods.contains(mod)) {
-            mods.add(mod);
+    public void addModule(String id) {
+        if (!modules.contains(id)) {
+            modules.add(id);
         }
     }
 
-    public Iterable<String> listMods() {
-        return mods;
+    public Iterable<String> listModules() {
+        return modules;
     }
 
-    public boolean removeMod(String mod) {
-        return mods.remove(mod);
+    public boolean removeModule(String id) {
+        return modules.remove(id);
     }
 
     public int size() {
-        return mods.size();
+        return modules.size();
     }
 
-    public boolean hasMod(String modName) {
-        return mods.contains(modName);
+    public boolean hasModule(String modName) {
+        return modules.contains(modName);
     }
 }

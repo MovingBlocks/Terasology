@@ -22,6 +22,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleIdentifier;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 
@@ -46,12 +47,12 @@ public class RegisterMods implements LoadProcess {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         moduleManager.disableAllModules();
 
-        for (String modName : gameManifest.getModuleConfiguration().listMods()) {
-            Module module = moduleManager.getLatestModuleVersion(modName);
+        for (ModuleIdentifier moduleId : gameManifest.getModules()) {
+            Module module = moduleManager.getLatestModuleVersion(moduleId.getId());
             if (module != null) {
                 moduleManager.enableModule(module);
             } else {
-                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + modName));
+                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + moduleId));
                 return true;
             }
         }

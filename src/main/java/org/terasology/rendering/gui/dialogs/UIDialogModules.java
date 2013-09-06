@@ -86,7 +86,7 @@ public class UIDialogModules extends UIDialog {
             if (!module.getId().equals(TerasologyConstants.ENGINE_MODULE)) {
                 UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
                 item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
-                if (moduleConfig.hasMod(module.getId())) {
+                if (moduleConfig.hasModule(module.getId())) {
                     item.setTextColor(ACTIVE_TEXT_COLOR);
                     item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
                 } else {
@@ -103,7 +103,7 @@ public class UIDialogModules extends UIDialog {
                 detailPanel.setVisible(true);
                 nameLabel.setText(module.getModuleInfo().getDisplayName());
                 descriptionLabel.setText(module.getModuleInfo().getDescription());
-                boolean active = moduleConfig.hasMod(module.getId());
+                boolean active = moduleConfig.hasModule(module.getId());
                 if (active) {
                     toggleButton.getLabel().setText(DEACTIVATE_TEXT);
                 } else {
@@ -132,7 +132,7 @@ public class UIDialogModules extends UIDialog {
         if (selectedModule.getId().equals("core")) {
             return;
         }
-        if (moduleConfig.hasMod(selectedModule.getId())) {
+        if (moduleConfig.hasModule(selectedModule.getId())) {
             deactivateModule(selectedModule);
             toggleButton.getLabel().setText(ACTIVATE_TEXT);
         } else {
@@ -145,7 +145,7 @@ public class UIDialogModules extends UIDialog {
     private void refreshListItemActivation() {
         for (UIListItem item : modList.getItems()) {
             Module module = (Module) item.getValue();
-            if (moduleConfig.hasMod(module.getId())) {
+            if (moduleConfig.hasModule(module.getId())) {
                 item.setTextColor(ACTIVE_TEXT_COLOR);
                 item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
             } else {
@@ -156,8 +156,8 @@ public class UIDialogModules extends UIDialog {
     }
 
     private void deactivateModule(Module module) {
-        moduleConfig.removeMod(module.getId());
-        for (String activeModName : Lists.newArrayList(moduleConfig.listMods())) {
+        moduleConfig.removeModule(module.getId());
+        for (String activeModName : Lists.newArrayList(moduleConfig.listModules())) {
             Module activeModule = moduleManager.getLatestModuleVersion(activeModName);
             if (activeModule != null && activeModule.dependsOn(module)) {
                 deactivateModule(activeModule);
@@ -166,7 +166,7 @@ public class UIDialogModules extends UIDialog {
     }
 
     private void activateModule(Module module) {
-        moduleConfig.addMod(module.getId());
+        moduleConfig.addModule(module.getId());
         for (DependencyInfo dependencyName : module.getModuleInfo().getDependencies()) {
             Module dependency = moduleManager.getLatestModuleVersion(dependencyName.getId());
             if (dependency != null) {

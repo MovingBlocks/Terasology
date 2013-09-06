@@ -144,6 +144,7 @@ message SerializationInfo {
 
 message ModuleInfo {
     optional string moduleId = 1;
+    optional string moduleVersion = 2;
 
     extensions 5000 to max;
 }

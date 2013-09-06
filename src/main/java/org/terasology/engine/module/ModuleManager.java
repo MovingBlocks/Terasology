@@ -68,7 +68,7 @@ public class ModuleManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
 
-    private Map<String, Module> activeModules = Maps.newHashMap();
+    private Map<String, Module> activeModules = Maps.newLinkedHashMap();
 
     private Table<String, Version, ExtensionModule> modules = HashBasedTable.create();
     private URLClassLoader activeModuleClassLoader;

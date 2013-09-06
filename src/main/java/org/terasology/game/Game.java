@@ -66,10 +66,13 @@ public class Game {
 
             ModuleConfig moduleConfig = new ModuleConfig();
             for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-                moduleConfig.addMod(module.getId());
+                moduleConfig.addModule(module.getId());
             }
 
-            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs(), moduleConfig);
+            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
+            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
+                gameManifest.addModule(module.getId(), module.getVersion());
+            }
             List<String> registeredBlockFamilies = Lists.newArrayList();
             for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
                 registeredBlockFamilies.add(family.getURI().toString());

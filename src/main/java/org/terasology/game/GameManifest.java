@@ -15,6 +15,7 @@
  */
 package org.terasology.game;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -23,9 +24,12 @@ import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleIdentifier;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.Version;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.utilities.gson.VersionHandler;
 import org.terasology.world.WorldInfo;
 
 import java.io.BufferedReader;
@@ -48,12 +52,12 @@ public class GameManifest {
     private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worlds = Maps.newHashMap();
-    private ModuleConfig moduleConfiguration = new ModuleConfig();
+    private List<ModuleIdentifier> modules = Lists.newArrayList();
 
     public GameManifest() {
     }
 
-    public GameManifest(String title, String seed, long time, ModuleConfig moduleConfiguration) {
+    public GameManifest(String title, String seed, long time) {
         if (title != null) {
             this.title = title;
         }
@@ -61,7 +65,6 @@ public class GameManifest {
             this.seed = seed;
         }
         this.time = time;
-        this.moduleConfiguration.copy(moduleConfiguration);
     }
 
     public String getTitle() {
@@ -104,10 +107,6 @@ public class GameManifest {
         this.blockIdMap = blockIdMap;
     }
 
-    public ModuleConfig getModuleConfiguration() {
-        return moduleConfiguration;
-    }
-
     public WorldInfo getWorldInfo(String name) {
         return worlds.get(name);
     }
@@ -128,13 +127,7 @@ public class GameManifest {
 
     public static GameManifest load(Path filePath) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(filePath, TerasologyConstants.CHARSET)) {
-            GameManifest result = createGson().fromJson(reader, GameManifest.class);
-            if (result.moduleConfiguration.size() == 0) {
-                for (Module module : CoreRegistry.get(ModuleManager.class).getModules()) {
-                    result.moduleConfiguration.addMod(module.getId());
-                }
-            }
-            return result;
+            return createGson().fromJson(reader, GameManifest.class);
         }
     }
 
@@ -142,8 +135,16 @@ public class GameManifest {
         return new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new UriTypeAdapterFactory())
+                .registerTypeAdapter(Version.class, new VersionHandler())
                 .setPrettyPrinting()
                 .create();
     }
 
+    public List<ModuleIdentifier> getModules() {
+        return ImmutableList.copyOf(modules);
+    }
+
+    public void addModule(String id, Version version) {
+        modules.add(new ModuleIdentifier(id, version));
+    }
 }
