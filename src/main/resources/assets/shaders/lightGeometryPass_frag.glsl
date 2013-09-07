@@ -37,9 +37,9 @@ uniform vec4 lightExtendedProperties;
 uniform mat4 invProjMatrix;
 
 #if defined (DYNAMIC_SHADOWS)
-# if defined (CLOUD_SHADOWS)
+#if defined (CLOUD_SHADOWS)
 uniform sampler2D texSceneClouds;
-# endif
+#endif
 
 #define SHADOW_MAP_BIAS 0.01
 
@@ -78,20 +78,20 @@ void main() {
     float shadowTerm = 1.0;
 
     if (!epsilonEqualsOne(depth)) {
-# if defined (DYNAMIC_SHADOWS_PCF)
+#if defined (DYNAMIC_SHADOWS_PCF)
         shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightPosClipSpace.z, shadowMapTexPos, 0.0, SHADOW_MAP_BIAS);
-# else
+#else
         float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
         if (shadowMapDepth + SHADOW_MAP_BIAS < lightPosClipSpace.z) {
             shadowTerm = 0.0;
         }
-# endif
+#endif
 
-# if defined (CLOUD_SHADOWS)
+#if defined (CLOUD_SHADOWS)
         // TODO: Not so nice that this is all hardcoded
         float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 5.0, 0.0, 1.0);
         shadowTerm *= clamp(1.0 - cloudOcclusion + 0.25, 0.0, 1.0);
-#  endif
+#endif
    }
 #endif
 
@@ -101,7 +101,7 @@ void main() {
     vec3 lightDir;
 #if defined (FEATURE_LIGHT_POINT)
     lightDir = lightViewPos.xyz - viewSpacePos;
-#else if defined (FEATURE_LIGHT_DIRECTIONAL)
+#elif defined (FEATURE_LIGHT_DIRECTIONAL)
     lightDir = lightViewPos.xyz;
 #endif
 

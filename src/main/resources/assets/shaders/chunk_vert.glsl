@@ -154,7 +154,7 @@ void main()
 #endif
 
 #if defined (FEATURE_REFRACTIVE_PASS)
-# if defined (ANIMATED_WATER)
+#if defined (ANIMATED_WATER)
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
@@ -164,9 +164,9 @@ void main()
             vertexViewPos.y += normalAndOffset.w + waterOffsetY;
        }
     }
-# else
+#else
     waterNormalViewSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
-# endif
+#endif
 #endif
 
     vertexProjPos = gl_ProjectionMatrix * vertexViewPos;
