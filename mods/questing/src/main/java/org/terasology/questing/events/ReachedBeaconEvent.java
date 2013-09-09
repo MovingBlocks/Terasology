@@ -21,16 +21,22 @@ import org.terasology.entitySystem.event.Event;
 
 public class ReachedBeaconEvent implements Event {
     private EntityRef beacon;
+    private EntityRef instigator;
 
     public ReachedBeaconEvent() {
 
     }
 
-    public ReachedBeaconEvent(EntityRef beaconReached) {
+    public ReachedBeaconEvent(EntityRef instagatorEntity, EntityRef beaconReached) {
         this.beacon = beaconReached;
+        this.instigator = instagatorEntity;
     }
 
     public EntityRef getBeaconEntity() {
         return beacon;
+    }
+
+    public EntityRef getInstigatorEntity() {
+        return instigator;
     }
 }

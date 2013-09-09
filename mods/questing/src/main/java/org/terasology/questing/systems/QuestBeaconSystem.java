@@ -72,7 +72,7 @@ public class QuestBeaconSystem implements ComponentSystem, UpdateSubscriberSyste
                         double distanceToPlayer = beaconPos.lengthSquared(); //Checking the distance between the beacon and the player
 
                         if (distanceToPlayer < 7) {
-                            localPlayer.getCharacterEntity().send(new ReachedBeaconEvent(beacon)); //Send the event
+                            localPlayer.getCharacterEntity().send(new ReachedBeaconEvent(localPlayer.getCharacterEntity(), beacon)); //Send the event
                         }
                     }
                 }
