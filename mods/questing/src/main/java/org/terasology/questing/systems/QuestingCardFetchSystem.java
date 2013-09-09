@@ -102,13 +102,13 @@ public class QuestingCardFetchSystem implements ComponentSystem {
     }
 
     /**
-     * Run this when the quest is done. It blanks everything out so that a new quest can go in it's place.
+     * Run this when the quest is done. It nulls everything out so that a new quest can go in it's place.
      */
     public static void resetQuest() {
-        questName = "";
-        goal = "";
-        friendlyGoal = "";
-        amount = "";
+        questName = null;
+        goal = null;
+        friendlyGoal = null;
+        amount = null;
         currentAmount = 1;
     }
 }
