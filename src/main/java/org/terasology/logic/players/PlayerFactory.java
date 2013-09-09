@@ -104,6 +104,11 @@ public class PlayerFactory {
         inventoryManager.giveItem(player, entityManager.create("core:explodeTool"));
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
+
+        //Give the player some questing goodies
+        inventoryManager.giveItem(player, entityManager.create("questing:journal"));
+        inventoryManager.giveItem(player, entityManager.create("questing:questcard"));
+
         inventoryManager.giveItem(player, chest);
 
         player.send(new SelectedItemChangedEvent(EntityRef.NULL, inventoryManager.getItemInSlot(player, 0)));

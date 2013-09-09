@@ -1,0 +1,15 @@
+{
+    "Item" : {
+            "name" : "Questing Journal",
+            "usage" : "ON_USER",
+            "renderWithIcon" : false
+        },
+    "Inventory": {
+      "itemSlots": [
+        0
+      ]
+    },
+    "QuestJournal" : {
+        "name" : "journal"
+    }
+}
