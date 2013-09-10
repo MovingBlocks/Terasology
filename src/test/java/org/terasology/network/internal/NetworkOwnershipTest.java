@@ -26,6 +26,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityBuilder;
 import org.terasology.entitySystem.EntityRef;
@@ -51,7 +52,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     @BeforeClass
     public static void initialise() {
-        ModuleManager moduleManager = new ModuleManager();
+        ModuleManager moduleManager = new ModuleManagerImpl();
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
 

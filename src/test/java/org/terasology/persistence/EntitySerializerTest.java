@@ -28,6 +28,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.internal.EntityInfoComponent;
@@ -60,7 +61,7 @@ public class EntitySerializerTest {
 
     @BeforeClass
     public static void setupClass() {
-        moduleManager = new ModuleManager();
+        moduleManager = new ModuleManagerImpl();
         AssetManager assetManager = new AssetManager(moduleManager);
         CoreRegistry.put(AssetManager.class, assetManager);
     }

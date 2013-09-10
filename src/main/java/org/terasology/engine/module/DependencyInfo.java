@@ -21,18 +21,21 @@ package org.terasology.engine.module;
 public class DependencyInfo {
 
     private String id = "";
-    private String minVersion = "";
-    private String maxVersion = "";
+    private Version minVersion = new Version(0, 0, 0);
+    private Version maxVersion;
 
     public String getId() {
         return id;
     }
 
-    public String getMinVersion() {
+    public Version getMinVersion() {
         return minVersion;
     }
 
-    public String getMaxVersion() {
+    public Version getMaxVersion() {
+        if (maxVersion == null) {
+            return minVersion.getNextMajorVersion();
+        }
         return maxVersion;
     }
 
@@ -40,11 +43,11 @@ public class DependencyInfo {
         this.id = id;
     }
 
-    public void setMinVersion(String minVersion) {
-        this.minVersion = minVersion;
+    public void setMinVersion(Version value) {
+        this.minVersion = value;
     }
 
-    public void setMaxVersion(String maxVersion) {
-        this.maxVersion = maxVersion;
+    public void setMaxVersion(Version value) {
+        this.maxVersion = value;
     }
 }

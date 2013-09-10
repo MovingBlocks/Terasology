@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.network.NetworkSystem;
 
@@ -39,7 +40,7 @@ public class OwnershipHelperTest {
 
     @BeforeClass
     public static void setupClass() {
-        moduleManager = new ModuleManager();
+        moduleManager = new ModuleManagerImpl();
     }
 
     @Before

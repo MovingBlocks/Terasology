@@ -46,6 +46,7 @@ import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.network.NetworkSystem;
@@ -117,7 +118,7 @@ public abstract class TerasologyTestingEnvironment {
             setup = true;
             bindLwjgl();
 
-            moduleManager = new ModuleManager();
+            moduleManager = new ModuleManagerImpl();
             moduleManager.applyActiveModules();
             CoreRegistry.put(ModuleManager.class, moduleManager);
 
@@ -125,9 +126,9 @@ public abstract class TerasologyTestingEnvironment {
             CoreRegistry.put(AssetManager.class, assetManager);
             AssetType.registerAssetTypes(assetManager);
             assetManager.addAssetSource(new ClasspathSource(TerasologyConstants.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(),
-                    ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+                    TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
             assetManager.addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(),
-                    ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+                    TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
 
             config = new Config();
             CoreRegistry.put(Config.class, config);

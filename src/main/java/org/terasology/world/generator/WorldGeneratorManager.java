@@ -46,7 +46,8 @@ public class WorldGeneratorManager {
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
         for (Module module : moduleManager.getCodeModules()) {
             if (module == null) {
-                logger.error("Null module");
+                logger.error("Null module in code modules?");
+                continue;
             }
             if (module.getReflections() == null) {
                 logger.error("Module has no reflections: {}", module.getId());

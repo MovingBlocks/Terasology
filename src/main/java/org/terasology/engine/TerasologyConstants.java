@@ -30,6 +30,8 @@ public final class TerasologyConstants {
     public static final String MAIN_WORLD = "main";
     public static final Charset CHARSET = Charsets.UTF_8;
     public static final String ENGINE_MODULE = "engine";
+    public static final String ASSETS_SUBDIRECTORY = "assets";
+    public static final String OVERRIDES_SUBDIRECTORY = "overrides";
 
     private TerasologyConstants() {
     }

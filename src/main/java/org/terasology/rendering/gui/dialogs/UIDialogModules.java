@@ -18,12 +18,13 @@ package org.terasology.rendering.gui.dialogs;
 
 import com.google.common.collect.Lists;
 import org.newdawn.slick.Color;
+import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.DependencyInfo;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleSelection;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -49,24 +50,31 @@ public class UIDialogModules extends UIDialog {
     private static final Color ACTIVE_SELECTED_TEXT_COLOR = new Color(255, 255, 0);
     private static final Color INACTIVE_TEXT_COLOR = new Color(180, 180, 180);
     private static final Color INACTIVE_SELECTED_TEXT_COLOR = new Color(255, 255, 255);
+    private static final Color INVALID_TEXT_COLOR = new Color(255, 90, 90);
+    private static final Color INVALID_SELECTED_TEXT_COLOR = new Color(255, 0, 0);
     private static final String ACTIVATE_TEXT = "Activate";
     private static final String DEACTIVATE_TEXT = "Deactivate";
     private static final Color BLACK = new Color(0, 0, 0);
 
-    private ModuleConfig moduleConfig;
-    private ModuleConfig originalModuleConfig;
+    private ModuleSelection selection;
     private UIList modList;
     private UIButton toggleButton;
     private UILabel nameLabel;
     private UILabel descriptionLabel;
+    private UILabel versionLabel;
+    private UILabel errorLabel;
     private UIComposite detailPanel;
     private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
-    public UIDialogModules(ModuleConfig moduleConfig) {
+    public UIDialogModules() {
         super(new Vector2f(640f, 480f));
-        this.moduleConfig = new ModuleConfig();
-        this.originalModuleConfig = moduleConfig;
-        this.moduleConfig.copy(moduleConfig);
+        selection = new ModuleSelection(moduleManager);
+        for (String moduleId : CoreRegistry.get(Config.class).getDefaultModSelection().listModules()) {
+            ModuleSelection newSelection = selection.add(moduleId);
+            if (newSelection.isValid()) {
+                selection = newSelection;
+            }
+        }
         this.setEnableScrolling(false);
         populateModList();
         setTitle("Select Modules...");
@@ -74,24 +82,30 @@ public class UIDialogModules extends UIDialog {
     }
 
     private void populateModList() {
-        List<Module> modules = Lists.newArrayList(moduleManager.getModules());
-        Collections.sort(modules, new Comparator<Module>() {
+        List<String> modules = Lists.newArrayList(moduleManager.getModuleIds());
+        Collections.sort(modules, new Comparator<String>() {
             @Override
-            public int compare(Module o1, Module o2) {
-                return o1.getModuleInfo().getDisplayName().compareTo(o2.getModuleInfo().getDisplayName());
+            public int compare(String o1, String o2) {
+                Module mod1 = moduleManager.getLatestModuleVersion(o1);
+                Module mod2 = moduleManager.getLatestModuleVersion(o2);
+                return mod1.getModuleInfo().getDisplayName().compareTo(mod2.getModuleInfo().getDisplayName());
             }
         });
 
-        for (Module module : modules) {
-            if (!module.getId().equals(TerasologyConstants.ENGINE_MODULE)) {
+        for (String moduleId : modules) {
+            if (!moduleId.equals(TerasologyConstants.ENGINE_MODULE)) {
+                Module module = moduleManager.getLatestModuleVersion(moduleId);
                 UIListItem item = new UIListItem(module.getModuleInfo().getDisplayName(), module);
                 item.setPadding(new Vector4f(2f, 5f, 2f, 5f));
-                if (moduleConfig.hasModule(module.getId())) {
+                if (selection.contains(module.getId())) {
                     item.setTextColor(ACTIVE_TEXT_COLOR);
                     item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
-                } else {
+                } else if (selection.add(module.getId()).isValid()) {
                     item.setTextColor(INACTIVE_TEXT_COLOR);
                     item.setTextSelectionColor(INACTIVE_SELECTED_TEXT_COLOR);
+                } else {
+                    item.setTextColor(INVALID_TEXT_COLOR);
+                    item.setTextSelectionColor(INVALID_SELECTED_TEXT_COLOR);
                 }
                 modList.addItem(item);
             }
@@ -102,14 +116,24 @@ public class UIDialogModules extends UIDialog {
                 Module module = (Module) modList.getSelection().getValue();
                 detailPanel.setVisible(true);
                 nameLabel.setText(module.getModuleInfo().getDisplayName());
-                descriptionLabel.setText(module.getModuleInfo().getDescription());
-                boolean active = moduleConfig.hasModule(module.getId());
-                if (active) {
-                    toggleButton.getLabel().setText(DEACTIVATE_TEXT);
+                versionLabel.setText(module.getVersion().toString());
+                ModuleSelection tryAddModule = selection.add(module);
+                if (!tryAddModule.isValid()) {
+                    errorLabel.setText(tryAddModule.getValidationMessages().get(0));
                 } else {
-                    toggleButton.getLabel().setText(ACTIVATE_TEXT);
+                    errorLabel.setText("");
                 }
-                toggleButton.setVisible(!module.getId().equals("core"));
+                descriptionLabel.setText(module.getModuleInfo().getDescription());
+                boolean active = selection.contains(module.getId());
+                if (tryAddModule.isValid()) {
+                    if (active) {
+                        toggleButton.getLabel().setText(DEACTIVATE_TEXT);
+                    } else {
+                        toggleButton.getLabel().setText(ACTIVATE_TEXT);
+                    }
+                } else {
+                    toggleButton.setVisible(false);
+                }
             }
         });
         modList.addDoubleClickListener(new ClickListener() {
@@ -132,45 +156,32 @@ public class UIDialogModules extends UIDialog {
         if (selectedModule.getId().equals("core")) {
             return;
         }
-        if (moduleConfig.hasModule(selectedModule.getId())) {
-            deactivateModule(selectedModule);
+        if (selection.contains(selectedModule.getId())) {
+            selection = selection.remove(selectedModule.getId());
+            refreshListItemActivation();
             toggleButton.getLabel().setText(ACTIVATE_TEXT);
         } else {
-            activateModule(selectedModule);
-            toggleButton.getLabel().setText(DEACTIVATE_TEXT);
+            ModuleSelection newSelection = selection.add(selectedModule);
+            if (newSelection.isValid()) {
+                selection = newSelection;
+                refreshListItemActivation();
+                toggleButton.getLabel().setText(DEACTIVATE_TEXT);
+            }
         }
-        refreshListItemActivation();
     }
 
     private void refreshListItemActivation() {
         for (UIListItem item : modList.getItems()) {
             Module module = (Module) item.getValue();
-            if (moduleConfig.hasModule(module.getId())) {
+            if (selection.contains(module.getId())) {
                 item.setTextColor(ACTIVE_TEXT_COLOR);
                 item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
-            } else {
+            } else if (selection.add(module.getId()).isValid()) {
                 item.setTextColor(INACTIVE_TEXT_COLOR);
                 item.setTextSelectionColor(INACTIVE_SELECTED_TEXT_COLOR);
-            }
-        }
-    }
-
-    private void deactivateModule(Module module) {
-        moduleConfig.removeModule(module.getId());
-        for (String activeModName : Lists.newArrayList(moduleConfig.listModules())) {
-            Module activeModule = moduleManager.getLatestModuleVersion(activeModName);
-            if (activeModule != null && activeModule.dependsOn(module)) {
-                deactivateModule(activeModule);
-            }
-        }
-    }
-
-    private void activateModule(Module module) {
-        moduleConfig.addModule(module.getId());
-        for (DependencyInfo dependencyName : module.getModuleInfo().getDependencies()) {
-            Module dependency = moduleManager.getLatestModuleVersion(dependencyName.getId());
-            if (dependency != null) {
-                activateModule(dependency);
+            } else {
+                item.setTextColor(INVALID_TEXT_COLOR);
+                item.setTextSelectionColor(INVALID_SELECTED_TEXT_COLOR);
             }
         }
     }
@@ -209,11 +220,30 @@ public class UIDialogModules extends UIDialog {
         nameLabel.setTextShadow(false);
         nameLabel.setPosition(new Vector2f(label.getPosition().x + label.getSize().x + 10f, label.getPosition().y));
         detailPanel.addDisplayElement(nameLabel);
-        label = new UILabel("Description:");
+        label = new UILabel("Version:");
         label.setVisible(true);
         label.setPosition(new Vector2f(0, nameLabel.getPosition().y + nameLabel.getSize().y + 8f));
         label.setColor(BLACK);
         detailPanel.addDisplayElement(label);
+        versionLabel = new UILabel();
+        versionLabel.setColor(BLACK);
+        versionLabel.setTextShadow(false);
+        versionLabel.setPosition(new Vector2f(label.getPosition().x + label.getSize().x + 10f, label.getPosition().y));
+        detailPanel.addDisplayElement(versionLabel);
+
+        errorLabel = new UILabel();
+        errorLabel.setColor(Color.red);
+        errorLabel.setTextShadow(false);
+        errorLabel.setPosition(new Vector2f(0, versionLabel.getPosition().y + versionLabel.getSize().y + 8f));
+        detailPanel.addDisplayElement(errorLabel);
+
+        label = new UILabel("Description:");
+        label.setVisible(true);
+        label.setPosition(new Vector2f(0, errorLabel.getPosition().y + errorLabel.getSize().y + 8f));
+        label.setColor(BLACK);
+        detailPanel.addDisplayElement(label);
+
+
         descriptionLabel = new UILabel();
         descriptionLabel.setColor(BLACK);
         descriptionLabel.setVisible(true);
@@ -245,7 +275,11 @@ public class UIDialogModules extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                originalModuleConfig.copy(moduleConfig);
+                ModuleConfig config = CoreRegistry.get(Config.class).getDefaultModSelection();
+                config.clear();
+                for (Module module : selection.getSelection()) {
+                    config.addModule(module.getId());
+                }
                 close();
             }
         });

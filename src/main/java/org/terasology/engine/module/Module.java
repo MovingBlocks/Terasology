@@ -32,5 +32,4 @@ public interface Module {
 
     ModuleInfo getModuleInfo();
 
-    boolean dependsOn(Module module);
 }

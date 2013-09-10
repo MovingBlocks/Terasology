@@ -60,11 +60,6 @@ public class EngineModule implements Module {
     }
 
     @Override
-    public boolean dependsOn(Module module) {
-        return false;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -82,6 +77,6 @@ public class EngineModule implements Module {
 
     @Override
     public String toString() {
-        return id;
+        return id + ":" + version;
     }
 }

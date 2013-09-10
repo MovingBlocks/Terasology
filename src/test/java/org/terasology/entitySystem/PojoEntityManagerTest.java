@@ -27,6 +27,7 @@ import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.event.EventSystem;
 import org.terasology.entitySystem.internal.PojoEntityManager;
 import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
@@ -66,7 +67,7 @@ public class PojoEntityManagerTest {
 
     @BeforeClass
     public static void setupClass() {
-        moduleManager = new ModuleManager();
+        moduleManager = new ModuleManagerImpl();
         AssetManager assetManager = new AssetManager(moduleManager);
         CoreRegistry.put(AssetManager.class, assetManager);
     }

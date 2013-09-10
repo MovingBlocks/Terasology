@@ -39,6 +39,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.Game;
@@ -446,7 +447,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl());
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
         CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
@@ -457,7 +458,7 @@ public class TerasologyEngine implements GameEngine {
 
         AssetType.registerAssetTypes(assetManager);
         ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
-                getClass().getProtectionDomain().getCodeSource(), ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY);
+                getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
         assetManager.addAssetSource(source);
     }
 

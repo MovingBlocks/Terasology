@@ -28,6 +28,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -83,7 +84,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
-        moduleManager = new ModuleManager();
+        moduleManager = new ModuleManagerImpl();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
@@ -95,7 +96,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         esm = new StorageManagerInternal(moduleManager, entityManager, false);
 
         CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(ModuleManager.class, new ModuleManager());
+        CoreRegistry.put(ModuleManager.class, new ModuleManagerImpl());
         CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager));
     }
 

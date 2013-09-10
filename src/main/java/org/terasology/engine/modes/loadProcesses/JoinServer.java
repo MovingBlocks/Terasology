@@ -19,21 +19,20 @@ package org.terasology.engine.modes.loadProcesses;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ModuleConfig;
+import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleIdentifier;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.Version;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldInfo;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,19 +74,31 @@ public class JoinServer implements LoadProcess {
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
             ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+            moduleManager.disableAllModules();
+
+
             for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
-                Module module = moduleManager.getLatestModuleVersion(moduleInfo.getModuleId());
-                if (module == null) {
-                    StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo.getModuleId() + ":" + moduleInfo.getModuleVersion());
-                    CoreRegistry.get(GameEngine.class).changeState(mainMenu);
-                    return false;
+                if (!moduleInfo.hasModuleId() || !moduleInfo.hasModuleVersion() || Version.create(moduleInfo.getModuleVersion()) == null) {
+                    logger.error("Received incomplete module info");
                 } else {
-                    logger.debug("Activating module: {}:{}", moduleInfo.getModuleId(), moduleInfo.getModuleVersion());
-                    gameManifest.addModule(module.getId(), module.getVersion());
+                    Module module = moduleManager.getModule(moduleInfo.getModuleId(), Version.create(moduleInfo.getModuleVersion()));
+                    if (module == null) {
+                        StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo.getModuleId() + ":" + moduleInfo.getModuleVersion());
+                        CoreRegistry.get(GameEngine.class).changeState(mainMenu);
+                        return false;
+                    } else {
+                        logger.debug("Activating module: {}:{}", moduleInfo.getModuleId(), moduleInfo.getModuleVersion());
+                        gameManifest.addModule(module.getId(), module.getVersion());
+                        moduleManager.enableModule(module);
+                    }
                 }
             }
 
             CoreRegistry.get(Game.class).load(gameManifest);
+            moduleManager.applyActiveModules();
+            AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+            assetManager.clear();
+            assetManager.applyOverrides();
 
             return true;
         } else {

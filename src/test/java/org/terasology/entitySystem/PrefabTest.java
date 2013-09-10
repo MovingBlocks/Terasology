@@ -24,8 +24,10 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -52,7 +54,7 @@ public class PrefabTest {
 
     @Before
     public void setup() throws Exception {
-        ModuleManager moduleManager = new ModuleManager();
+        ModuleManager moduleManager = new ModuleManagerImpl();
         moduleManager.applyActiveModules();
         AssetManager assetManager = new AssetManager(moduleManager);
         CoreRegistry.put(ModuleManager.class, moduleManager);
@@ -60,7 +62,7 @@ public class PrefabTest {
         AssetType.registerAssetTypes(assetManager);
         URL url = getClass().getClassLoader().getResource("testResources");
         url = new URL(url.toString().substring(0, url.toString().length() - "testResources".length() - 1));
-        assetManager.addAssetSource(new ClasspathSource("unittest", url, ModuleManager.ASSETS_SUBDIRECTORY, ModuleManager.OVERRIDES_SUBDIRECTORY));
+        assetManager.addAssetSource(new ClasspathSource("unittest", url, TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());

@@ -55,4 +55,8 @@ public class ModuleConfig {
     public boolean hasModule(String modName) {
         return modules.contains(modName);
     }
+
+    public void clear() {
+        modules.clear();
+    }
 }

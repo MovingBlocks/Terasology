@@ -273,7 +273,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         modButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                UIDialogModules dialog = new UIDialogModules(moduleConfig);
+                UIDialogModules dialog = new UIDialogModules();
                 dialog.open();
             }
         });

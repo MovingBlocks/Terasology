@@ -130,21 +130,6 @@ public class ExtensionModule implements Module {
     }
 
     @Override
-    public boolean dependsOn(Module module) {
-        for (DependencyInfo dependencyInfo : moduleInfo.getDependencies()) {
-            Module dependency = manager.getLatestModuleVersion(dependencyInfo.getId());
-            if (dependency != null) {
-                if (module.equals(dependency)) {
-                    return true;
-                } else if (dependency.dependsOn(module)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -163,6 +148,6 @@ public class ExtensionModule implements Module {
 
     @Override
     public String toString() {
-        return id;
+        return id + ":" + version;
     }
 }

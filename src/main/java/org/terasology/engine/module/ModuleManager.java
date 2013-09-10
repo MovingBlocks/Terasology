@@ -13,132 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.engine.module;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetSource;
-import org.terasology.asset.sources.ArchiveSource;
-import org.terasology.asset.sources.DirectorySource;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.utilities.FilesUtil;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
- * This manager handles the available modules, which ones are active and access to their assets and code
- *
  * @author Immortius
  */
-public class ModuleManager {
+public interface ModuleManager {
+    Reflections getActiveModuleReflections();
 
-    public static final String ASSETS_SUBDIRECTORY = "assets";
-    public static final String OVERRIDES_SUBDIRECTORY = "overrides";
+    void disableAllModules();
 
-    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
+    void enableModule(Module module);
 
-    private Map<String, Module> activeModules = Maps.newLinkedHashMap();
-
-    private Table<String, Version, ExtensionModule> modules = HashBasedTable.create();
-    private URLClassLoader activeModuleClassLoader;
-    private URLClassLoader allModuleClassLoader;
-    private Module engineModule;
-
-    private Reflections allReflections;
-    private Reflections engineReflections;
-    private Reflections activeModuleReflections;
-
-    private ClassLoader[] engineClassLoaders;
-
-    public ModuleManager() {
-        this(ModuleManager.class.getClassLoader());
-    }
-
-    private ModuleManager(ClassLoader... engineClassLoaders) {
-        this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
-
-        ConfigurationBuilder builder = new ConfigurationBuilder()
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
-
-        for (ClassLoader loader : engineClassLoaders) {
-            builder.addClassLoader(loader)
-                    .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
-        }
-        engineReflections = new Reflections(builder);
-        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/" + ASSETS_SUBDIRECTORY + "/" + "module.txt"))) {
-            engineModule = new EngineModule(engineReflections, new Gson().fromJson(reader, ModuleInfo.class));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load engine module info", e);
-        }
-        activeModules.put(engineModule.getId(), engineModule);
-        refresh();
-    }
-
-    private Reflections getEngineReflections() {
-        return engineReflections;
-    }
-
-    public Reflections getActiveModuleReflections() {
-        if (activeModuleReflections != null) {
-            return activeModuleReflections;
-        }
-        return engineReflections;
-    }
-
-    public void disableAllModules() {
-        activeModules.clear();
-        activeModules.put(engineModule.getId(), engineModule);
-    }
-
-    public void enableModule(Module module) {
-        Module oldModule = activeModules.put(module.getId(), module);
-        if (!module.equals(oldModule)) {
-            if (oldModule != null && oldModule instanceof ExtensionModule) {
-                ((ExtensionModule) oldModule).disable();
-            }
-            if (module instanceof ExtensionModule) {
-                ((ExtensionModule) module).enable();
-            }
-        }
-    }
-
-    public void disableModule(Module module) {
-        Module removedModule = activeModules.remove(module.getId());
-        if (removedModule != null && removedModule instanceof ExtensionModule) {
-            ((ExtensionModule) module).disable();
-        }
-    }
+    void disableModule(Module module);
 
     /**
      * Provides the ability to reflect over the engine and all modules, not just active modules.  This should be used sparingly,
@@ -147,264 +39,36 @@ public class ModuleManager {
      *
      * @return Reflections over the engine and all available modules
      */
-    public Reflections loadInactiveReflections() {
-        if (allReflections == null) {
-            List<URL> urls = Lists.newArrayList();
-            for (ExtensionModule module : getExtensionModules()) {
-                if (module.isCodeModule()) {
-                    urls.add(module.getModuleClasspathUrl());
-                }
-            }
-
-            ConfigurationBuilder builder = new ConfigurationBuilder()
-                    .addUrls(urls)
-                    .addClassLoader(allModuleClassLoader);
-            for (ClassLoader engineLoader : engineClassLoaders) {
-                builder.addClassLoader(engineLoader)
-                        .addUrls(ClasspathHelper.forPackage("org.terasology", engineLoader));
-            }
-            allReflections = new Reflections(builder);
-            allReflections.merge(getEngineReflections());
-            for (Module module : getModules()) {
-                if (module.isCodeModule()) {
-                    allReflections.merge(module.getReflections());
-                }
-            }
-        }
-        return allReflections;
-    }
+    Reflections loadInactiveReflections();
 
     /**
      * Rescans for modules.  This should not be done while a game is running, as it drops the module classloader.
      */
-    public void refresh() {
-        modules.clear();
-        Gson gson = new Gson();
-        for (Path rootModulePath : PathManager.getInstance().getModulePaths()) {
+    void refresh();
 
-            // Directories first (they should override zips)
-            try {
-                for (Path modulePath : Files.newDirectoryStream(rootModulePath, FilesUtil.DIRECTORY_FILTER)) {
-                    processModDirectory(modulePath, gson);
-                }
-            } catch (IOException e) {
-                logger.error("Failed to scan for directory modules", e);
-            }
+    void applyActiveModules();
 
-            // Zip files next
-            try {
-                for (Path modulePath : Files.newDirectoryStream(rootModulePath, new DirectoryStream.Filter<Path>() {
-                    @Override
-                    public boolean accept(Path entry) throws IOException {
-                        return Files.isRegularFile(entry) && (entry.toString().endsWith(".jar") || entry.toString().endsWith(".zip"));
-                    }
-                })) {
-                    processModArchive(modulePath, gson);
-                }
-            } catch (IOException e) {
-                logger.error("Failed to scan for jar and zip modules", e);
-            }
-        }
-        List<URL> urls = Lists.newArrayList();
-        for (ExtensionModule module : getExtensionModules()) {
-            if (module.isCodeModule()) {
-                urls.add(module.getModuleClasspathUrl());
-            }
-        }
-        if (allModuleClassLoader != null) {
-            try {
-                allModuleClassLoader.close();
-            } catch (IOException e) {
-                logger.error("Failed to cloase allModuleClassLoader", e);
-            }
-        }
-        allModuleClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
-        for (ExtensionModule module : getExtensionModules()) {
-            module.setInactiveClassLoader(allModuleClassLoader);
-        }
+    List<Module> getModules();
 
-        if (activeModuleClassLoader != null) {
-            try {
-                activeModuleClassLoader.close();
-            } catch (IOException e) {
-                logger.error("Failed to close activeModuleClassLoader", e);
-            }
-        }
-        allReflections = null;
-    }
+    List<String> getModuleIds();
 
-    private void processModArchive(Path modulePath, Gson gson) {
-        try (ZipFile zipFile = new ZipFile(modulePath.toFile())) {
-            ZipEntry modInfoEntry = zipFile.getEntry("module.txt");
-            if (modInfoEntry != null) {
-                try {
-                    ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
-                    AssetSource source = new ArchiveSource(moduleInfo.getId(), modulePath.toFile(), ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY);
-                    processModuleInfo(moduleInfo, modulePath, source);
-                } catch (FileNotFoundException | JsonIOException e) {
-                    logger.warn("Failed to load module manifest for module at {}", modulePath, e);
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Invalid module file: {}", modulePath, e);
-        }
-    }
+    List<Module> getCodeModules();
 
-    private void processModDirectory(Path modulePath, Gson gson) throws IOException {
-        Path modInfoFile = modulePath.resolve("module.txt");
-        if (Files.isRegularFile(modInfoFile)) {
-            try (Reader reader = Files.newBufferedReader(modInfoFile, TerasologyConstants.CHARSET)) {
-                ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
-                Path assetLocation = modulePath.resolve(ASSETS_SUBDIRECTORY);
-                Path overridesLocation = modulePath.resolve(OVERRIDES_SUBDIRECTORY);
-                AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
-                processModuleInfo(moduleInfo, modulePath, source);
-            } catch (FileNotFoundException | JsonIOException e) {
-                logger.warn("Failed to load module manifest for module at {}", modulePath, e);
-            }
-        }
-    }
+    Module getActiveModule(String id);
 
-    private void processModuleInfo(ModuleInfo moduleInfo, Path modulePath, AssetSource source) {
-        String moduleId = UriUtil.normalise(moduleInfo.getId());
-        Version version = Version.create(moduleInfo.getVersion());
-        if (version != null) {
-            if (!modules.contains(moduleId, version)) {
-                ExtensionModule module = new ExtensionModule(this, modulePath, moduleInfo, version, source);
-                modules.put(moduleId, version, module);
-                logger.info("Discovered module: {}:{} (hasCode = {})", moduleInfo.getDisplayName(), moduleInfo.getVersion(), module.isCodeModule());
-            } else {
-                logger.info("Discovered duplicate module: {}:{}, skipping", moduleInfo.getDisplayName(), moduleInfo.getVersion());
-            }
-        } else {
-            logger.error("Found module '" + moduleInfo.getId() + "' with invalid version '" + moduleInfo.getVersion() + "', skipping");
-        }
-    }
+    Iterable<Module> getActiveModules();
 
-    public void applyActiveModules() {
-        List<ExtensionModule> activeCodeMods = getActiveExtensionCodeModules();
-        List<URL> urls = Lists.newArrayList();
-        for (ExtensionModule module : activeCodeMods) {
-            urls.add(module.getModuleClasspathUrl());
-        }
-        if (activeModuleClassLoader != null) {
-            try {
-                activeModuleClassLoader.close();
-            } catch (IOException e) {
-                logger.error("Failed to close activeModuleClassLoader", e);
-            }
-        }
-        activeModuleClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
-        for (Module module : activeModules.values()) {
-            if (module instanceof ExtensionModule) {
-                ((ExtensionModule) module).setActiveClassLoader(activeModuleClassLoader);
-            }
-        }
-        // We don't submit any urls as we don't want to scan (going to merge in from previous scans)
-        activeModuleReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModuleClassLoader));
-        activeModuleReflections.merge(getEngineReflections());
-        for (Module module : activeCodeMods) {
-            activeModuleReflections.merge(module.getReflections());
-        }
-    }
+    Module getLatestModuleVersion(String id);
 
-    public List<Module> getModules() {
-        return ImmutableList.<Module>builder().add(engineModule).addAll(modules.values()).build();
-    }
+    Module getLatestModuleVersion(String id, Version minVersion, Version maxVersion);
 
-    public List<Module> getCodeModules() {
-        List<Module> result = Lists.newArrayList();
-        result.add(engineModule);
-        for (Module module : modules.values()) {
-            if (module.isCodeModule()) {
-                result.add(module);
-            }
-        }
-        return result;
-    }
+    Iterable<Module> getActiveCodeModules();
 
-    private Collection<ExtensionModule> getExtensionModules() {
-        return modules.values();
-    }
+    boolean isEnabled(Module module);
 
-    public Module getActiveModule(String id) {
-        String normalisedName = UriUtil.normalise(id);
-        return activeModules.get(normalisedName);
-    }
+    Iterable<Module> getAllDependencies(Module module);
 
-    public Iterable<Module> getActiveModules() {
-        return ImmutableSet.copyOf(activeModules.values());
-    }
+    Set<String> getDependencyNamesOf(Module context);
 
-    public Module getLatestModuleVersion(String id) {
-        if (TerasologyConstants.ENGINE_MODULE.equals(id)) {
-            return engineModule;
-        }
-        Module result = null;
-        for (Module module : modules.row(UriUtil.normalise(id)).values()) {
-            if (result == null || module.getVersion().compareTo(result.getVersion()) > 0) {
-                result = module;
-            }
-        }
-        return result;
-    }
-
-    public Iterable<Module> getActiveCodeModules() {
-        List<Module> result = Lists.newArrayList();
-        result.add(engineModule);
-        for (Module module : activeModules.values()) {
-            if (module.isCodeModule()) {
-                result.add(module);
-            }
-        }
-        return result;
-    }
-
-    private List<ExtensionModule> getActiveExtensionCodeModules() {
-        List<ExtensionModule> result = Lists.newArrayListWithCapacity(modules.size() + 1);
-        for (Module module : activeModules.values()) {
-            if (module.isCodeModule() && module instanceof ExtensionModule) {
-                result.add((ExtensionModule) module);
-            }
-        }
-        return result;
-    }
-
-    public boolean isEnabled(Module module) {
-        return activeModules.containsKey(module.getId());
-    }
-
-    public Iterable<Module> getAllDependencies(Module module) {
-        Set<Module> dependencies = Sets.newHashSet();
-        addDependenciesRecursive(module, dependencies);
-        dependencies.add(engineModule);
-        return dependencies;
-    }
-
-    private void addDependenciesRecursive(Module module, Set<Module> dependencies) {
-        for (DependencyInfo dependencyInfo : module.getModuleInfo().getDependencies()) {
-            Module dependency = getLatestModuleVersion(dependencyInfo.getId());
-            if (dependency != null) {
-                dependencies.add(module);
-                addDependenciesRecursive(dependency, dependencies);
-            }
-        }
-    }
-
-    public Set<String> getDependencyNamesOf(Module context) {
-        Set<String> dependencies = Sets.newHashSet();
-        addDependencyNamesRecursive(context, dependencies);
-        dependencies.add(engineModule.getId());
-        return dependencies;
-    }
-
-    private void addDependencyNamesRecursive(Module module, Set<String> dependencies) {
-        for (DependencyInfo dependencyInfo : module.getModuleInfo().getDependencies()) {
-            Module dependency = getLatestModuleVersion(dependencyInfo.getId());
-            if (dependency != null) {
-                dependencies.add(module.getId());
-                addDependencyNamesRecursive(dependency, dependencies);
-            }
-        }
-    }
+    Module getModule(String moduleId, Version version);
 }

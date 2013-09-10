@@ -123,7 +123,6 @@ public class StateLoading implements GameState {
 
     private void initClient() {
         loadProcesses.add(new JoinServer(gameManifest));
-        loadProcesses.add(new RegisterMods(gameManifest));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlockFamilyFactories());
         loadProcesses.add(new RegisterBlocks(gameManifest));
