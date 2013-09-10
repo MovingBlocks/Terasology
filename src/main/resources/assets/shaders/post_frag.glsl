@@ -86,20 +86,20 @@ void main() {
     for(int i = 1; i < MOTION_BLUR_SAMPLES; ++i, blurTexCoord += velocity)
     {
       vec4 currentColor = texture2D(texScene, blurTexCoord);
-# ifndef NO_BLUR
+#ifndef NO_BLUR
       vec4 currentColorBlur = texture2D(texBlur, blurTexCoord);
-# endif
+#endif
 
       color += currentColor;
-# ifndef NO_BLUR
+#ifndef NO_BLUR
       colorBlur += currentColorBlur;
-# endif
+#endif
     }
 
     color /= MOTION_BLUR_SAMPLES;
-# ifndef NO_BLUR
+#ifndef NO_BLUR
     colorBlur /= MOTION_BLUR_SAMPLES;
-# endif
+#endif
 #endif
 
 #ifndef NO_BLUR

@@ -16,6 +16,7 @@
 
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
+
 #define WATER_SPEC 1.0
 
 #ifdef FEATURE_REFRACTIVE_PASS
@@ -47,13 +48,13 @@ varying mat3 normalMatrix;
 
 uniform sampler2D textureAtlasNormal;
 
-# if defined (PARALLAX_MAPPING)
+#if defined (PARALLAX_MAPPING)
 uniform vec4 parallaxProperties;
-#  define parallaxBias parallaxProperties.x
-#  define parallaxScale parallaxProperties.y
+#define parallaxBias parallaxProperties.x
+#define parallaxScale parallaxProperties.y
 
 uniform sampler2D textureAtlasHeight;
-# endif
+#endif
 #endif
 
 
@@ -95,7 +96,7 @@ void main() {
     vec3 normalOpaque = normal;
 
 #if defined (NORMAL_MAPPING)
-# if defined (PARALLAX_MAPPING)
+#if defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
     vec3 dp1 = dFdx(vertexProjPos.xyz);
@@ -115,7 +116,7 @@ void main() {
 
     float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
 	texCoord += height * normalize(eyeTangentSpace).xy * TEXTURE_OFFSET;
-# endif
+#endif
 
     normalOpaque = (texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
 
@@ -176,11 +177,11 @@ void main() {
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
 
-# if defined FEATURE_ALPHA_REJECT
+#if defined FEATURE_ALPHA_REJECT
         if (color.a < 0.1) {
             discard;
         }
-# endif
+#endif
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
