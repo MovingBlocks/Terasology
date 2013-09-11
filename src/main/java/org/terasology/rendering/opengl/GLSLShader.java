@@ -287,7 +287,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
             compileShaders(permutation);
             counter++;
         }
-        logger.info("Compiled {} permutations.", counter);
+        logger.info("Compiled {} permutations for {}.", counter, getURI());
     }
 
     private void compileShader(int type, Set<ShaderProgramFeature> features) {
@@ -329,7 +329,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         // Dump all final shader sources to the log directory
         final String strippedTitle = getURI().toString().replace(":", "-");
 
-        Path path = PathManager.getInstance().getLogPath().resolve(debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl");
+        Path path = PathManager.getInstance().getShaderLogPath().resolve(debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl");
         try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
             writer.write(shader.toString());
         } catch (Exception e) {
@@ -396,7 +396,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
             return false;
         }
 
-        logger.info("Shader '{}' successfully compiled.", getURI());
+        //logger.info("Shader '{}' successfully compiled.", getURI());
         return true;
     }
 

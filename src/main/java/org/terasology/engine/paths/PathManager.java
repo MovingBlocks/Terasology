@@ -38,6 +38,7 @@ public final class PathManager {
 
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String LOG_DIR = "logs";
+    private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "mods";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
@@ -47,6 +48,7 @@ public final class PathManager {
     private Path homePath;
     private Path savesPath;
     private Path logPath;
+    private Path shaderLogPath;
     private Path currentWorldPath;
 
     private ImmutableList<Path> modPaths = ImmutableList.of();
@@ -138,6 +140,10 @@ public final class PathManager {
         return logPath;
     }
 
+    public Path getShaderLogPath() {
+        return shaderLogPath;
+    }
+
     public List<Path> getModulePaths() {
         return modPaths;
     }
@@ -156,6 +162,8 @@ public final class PathManager {
         Files.createDirectories(savesPath);
         logPath = homePath.resolve(LOG_DIR);
         Files.createDirectories(logPath);
+        shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
+        Files.createDirectories(shaderLogPath);
         Path homeModPath = homePath.resolve(MOD_DIR);
         Files.createDirectories(homeModPath);
         Path installModPath = installPath.resolve(MOD_DIR);
