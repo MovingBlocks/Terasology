@@ -16,6 +16,8 @@
 
 package org.terasology.network.serialization;
 
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
@@ -40,7 +42,7 @@ public class ClientComponentFieldCheck implements FieldSerializeCheck<Component>
     }
 
     @Override
-    public boolean shouldDeserializeField(ReplicatedFieldMetadata fieldInfo) {
+    public boolean shouldDeserialize(ClassMetadata classMetadata, FieldMetadata fieldMetadata) {
         // Clients should use all replicated fields
         return true;
     }

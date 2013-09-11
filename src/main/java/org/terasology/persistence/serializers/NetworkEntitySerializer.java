@@ -63,10 +63,6 @@ public class NetworkEntitySerializer {
         this.componentSerializeCheck = componentSerializeCheck;
     }
 
-    public ComponentSerializeCheck getComponentSerializeCheck() {
-        return componentSerializeCheck;
-    }
-
     public ComponentLibrary getComponentLibrary() {
         return componentLibrary;
     }
@@ -231,7 +227,7 @@ public class NetworkEntitySerializer {
             for (int fieldIndex = 0; fieldIndex < UnsignedBytes.toInt(entityData.getComponentFieldCounts().byteAt(componentIndex)); ++fieldIndex) {
                 byte fieldId = entityData.getFieldIds().byteAt(fieldPos);
                 ReplicatedFieldMetadata fieldMetadata = metadata.getField(fieldId);
-                if (fieldMetadata != null && fieldCheck.shouldDeserializeField(fieldMetadata)) {
+                if (fieldMetadata != null && fieldCheck.shouldDeserialize(metadata, fieldMetadata)) {
                     logger.trace("Deserializing field {} of component {} as value {}", fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
                     serializer.deserializeOnto(component, fieldMetadata, entityData.getFieldValue(fieldPos));
                 }

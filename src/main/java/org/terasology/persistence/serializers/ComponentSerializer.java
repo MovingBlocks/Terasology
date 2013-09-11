@@ -22,11 +22,14 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
+import org.terasology.persistence.typeSerialization.DeserializeFieldCheck;
 import org.terasology.persistence.typeSerialization.Serializer;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
@@ -174,19 +177,7 @@ public class ComponentSerializer {
     private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
                                                             ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        for (EntityData.NameValue field : componentData.getFieldList()) {
-            ReplicatedFieldMetadata<T, ?> fieldInfo = null;
-            if (field.hasNameIndex()) {
-                fieldInfo = componentMetadata.getField(field.getNameIndex());
-            } else if (field.hasName()) {
-                fieldInfo = componentMetadata.getField(field.getName());
-            }
-            if (fieldInfo == null || !fieldCheck.shouldDeserializeField(fieldInfo)) {
-                continue;
-            }
-
-            serializer.deserializeOnto(targetComponent, fieldInfo, field.getValue());
-        }
+        serializer.deserializeOnto(targetComponent, componentData.getFieldList(), fieldCheck);
         return targetComponent;
     }
 

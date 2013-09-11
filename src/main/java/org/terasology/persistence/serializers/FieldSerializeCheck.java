@@ -16,14 +16,17 @@
 
 package org.terasology.persistence.serializers;
 
+import org.terasology.classMetadata.ClassMetadata;
+import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
+import org.terasology.persistence.typeSerialization.DeserializeFieldCheck;
 
 /**
  * Interface for providing serializers with a method to check whether a given field should be serialized.
  *
  * @author Immortius
  */
-public interface FieldSerializeCheck<T> {
+public interface FieldSerializeCheck<T> extends DeserializeFieldCheck {
 
     /**
      * @param field  The field to check
@@ -39,8 +42,6 @@ public interface FieldSerializeCheck<T> {
      * @return Whether the field should be serialized
      */
     boolean shouldSerializeField(ReplicatedFieldMetadata field, T object, boolean componentInitial);
-
-    boolean shouldDeserializeField(ReplicatedFieldMetadata fieldInfo);
 
     /**
      * Null implementation, returns true for all fields
@@ -68,7 +69,7 @@ public interface FieldSerializeCheck<T> {
         }
 
         @Override
-        public boolean shouldDeserializeField(ReplicatedFieldMetadata fieldInfo) {
+        public boolean shouldDeserialize(ClassMetadata classMetadata, FieldMetadata fieldMetadata) {
             return true;
         }
     }

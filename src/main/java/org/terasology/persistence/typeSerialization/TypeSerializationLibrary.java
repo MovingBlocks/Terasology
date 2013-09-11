@@ -129,7 +129,7 @@ public class TypeSerializationLibrary {
         Serializer serializer = serializerMap.get(type);
         if (serializer == null) {
             Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlerMap = getFieldHandlerMap(type);
-            serializer = new Serializer(fieldHandlerMap);
+            serializer = new Serializer(type, fieldHandlerMap);
             serializerMap.put(type, serializer);
         }
         return serializer;

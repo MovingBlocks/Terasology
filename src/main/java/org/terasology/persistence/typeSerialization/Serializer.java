@@ -15,10 +15,14 @@
  */
 package org.terasology.persistence.typeSerialization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -28,10 +32,14 @@ import java.util.Map;
  */
 public class Serializer {
 
+    private static final Logger logger = LoggerFactory.getLogger(Serializer.class);
+
+    private ClassMetadata<?, ?> classMetadata;
     private Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers;
 
-    public Serializer(Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers) {
+    public Serializer(ClassMetadata<?, ?> classMetadata, Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers) {
         this.fieldHandlers = fieldHandlers;
+        this.classMetadata = classMetadata;
     }
 
     /**
@@ -108,6 +116,38 @@ public class Serializer {
         Object deserializedValue = handler.deserialize(value);
         if (deserializedValue != null) {
             fieldMetadata.setValue(target, deserializedValue);
+        }
+    }
+
+    /**
+     * Deserializes a Collection of name-values onto an object
+     * @param target The object to deserialize onto
+     * @param values The collection of values to apply to the object
+     */
+    public void deserializeOnto(Object target, Collection<EntityData.NameValue> values) {
+        deserializeOnto(target, values, DeserializeFieldCheck.NullCheck.newInstance());
+    }
+
+    /**
+     * Deserializes a Collection of name-values onto an object
+     * @param target The object to deserialize onto
+     * @param values The collection of values to apply to the object
+     * @param check A check to filter which fields to deserialize
+     */
+    public void deserializeOnto(Object target, Collection<EntityData.NameValue> values, DeserializeFieldCheck check) {
+        for (EntityData.NameValue field : values) {
+            FieldMetadata<?, ?> fieldInfo = null;
+            if (field.hasNameIndex()) {
+                fieldInfo = classMetadata.getField(field.getNameIndex());
+            } else if (field.hasName()) {
+                fieldInfo = classMetadata.getField(field.getName());
+            }
+
+            if (fieldInfo != null && check.shouldDeserialize(classMetadata, fieldInfo)) {
+                deserializeOnto(target, fieldInfo, field.getValue());
+            } else if (fieldInfo == null && field.hasName()) {
+                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), classMetadata.getUri());
+            }
         }
     }
 }
