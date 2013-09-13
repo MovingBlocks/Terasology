@@ -16,12 +16,15 @@
 
 package org.terasology.asset;
 
+import org.terasology.engine.API;
+
 import java.net.URL;
 import java.util.List;
 
 /**
  * @author Immortius
  */
+@API
 public interface AssetSource {
 
     /**

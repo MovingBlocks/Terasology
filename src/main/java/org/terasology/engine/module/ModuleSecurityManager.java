@@ -17,45 +17,83 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.AccessControlException;
 import java.security.Permission;
 import java.util.Set;
-import java.util.logging.LoggingPermission;
 
 /**
  * @author Immortius
  */
 public class ModuleSecurityManager extends SecurityManager {
-    private static final Logger logger = LoggerFactory.getLogger(ModuleSecurityManager.class);
 
-    private Set<ClassLoader> modClassLoaders = Sets.newHashSet();
-    private Set<Class> modAvailableClasses = Sets.newHashSet();
+    private static final Permission ADD_TRUSTED_CLASSLOADER = new RuntimePermission("addTrustedClassloader");
+    private static final Permission ADD_ALLOWED_PERMISSION = new RuntimePermission("addAllowedPermission");
+    private static final Permission ADD_API_CLASS = new RuntimePermission("addAPIClass");
 
-    public void setModClassLoader(ClassLoader classLoader) {
-        modClassLoaders.add(classLoader);
+    private Set<ClassLoader> trustedClassLoaders = Sets.newHashSet();
+    private Set<Class> apiClasses = Sets.newHashSet();
+    private Set<String> apiPackages = Sets.newHashSet();
+    private Set<Class<? extends Permission>> allowedPermissions = Sets.newHashSet();
+
+    private ThreadLocal<Boolean> calculatingPermission = new ThreadLocal<>();
+
+
+    public ModuleSecurityManager() {
+        addTrustedClassLoader(getClass().getClassLoader());
     }
 
-    public void addModAvailableClass(Class clazz) {
-        checkModAccess(new RuntimePermission("Install Module Available Class"));
-        modAvailableClasses.add(clazz);
+    public void addTrustedClassLoader(ClassLoader classLoader) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_TRUSTED_CLASSLOADER);
+        }
+        ClassLoader nextClassLoader = classLoader;
+        while (nextClassLoader != null) {
+            trustedClassLoaders.add(nextClassLoader);
+            nextClassLoader = nextClassLoader.getParent();
+        }
+    }
+
+    public void addAllowedPermission(Class<? extends Permission> allowedPermission) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
+        }
+        allowedPermissions.add(allowedPermission);
+    }
+
+    public void addAPIClass(Class clazz) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_API_CLASS);
+        }
+        apiClasses.add(clazz);
     }
 
     public void checkModAccess(Permission perm) {
-        if (perm instanceof LoggingPermission) {
+        if (calculatingPermission.get() != null) {
             return;
         }
-        Class[] classes = getClassContext();
-        for (int i = 0; i < classes.length; ++i) {
-            if (modClassLoaders.contains(classes[i].getClassLoader())) {
-                if (modAvailableClasses.contains(classes[i - 1])) {
+        if (allowedPermissions.contains(perm.getClass())) {
+            return;
+        }
+        calculatingPermission.set(true);
+        try {
+            Class[] classes = getClassContext();
+            for (int i = 0; i < classes.length; ++i) {
+                if (apiClasses.contains(classes[i])) {
                     return;
                 }
-                logger.debug("Module calling into {} requiring {}", classes[i - 1].getName(), perm);
-                throw new AccessControlException("Module attempted protected action " + perm.toString());
+                ClassLoader owningLoader = classes[i].getClassLoader();
+                if (owningLoader != null && owningLoader instanceof ModuleClassLoader) {
+                    if (i - 1 > 0) {
+                        throw new AccessControlException(
+                                String.format("Module class '%s' calling into '%s' requiring permission '%s'", classes[i].getName(), classes[i - 1].getName(), perm));
+                    } else {
+                        throw new AccessControlException(String.format("Module class '%s' requiring permission '%s'", classes[i].getName(), perm));
+                    }
+                }
             }
+        } finally {
+            calculatingPermission.set(null);
         }
     }
 
@@ -67,4 +105,15 @@ public class ModuleSecurityManager extends SecurityManager {
         checkModAccess(perm);
     }
 
+    public boolean checkAccess(Class type) {
+        return true;
+        //return apiClasses.contains(type) || apiPackages.contains(type.getPackage().getName());
+    }
+
+    public void addAPIPackage(String packageName) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
+        }
+        apiPackages.add(packageName);
+    }
 }

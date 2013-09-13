@@ -25,12 +25,14 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleSelection;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.DialogListener;
 import org.terasology.rendering.gui.framework.events.SelectionListener;
 import org.terasology.rendering.gui.layout.ColumnLayout;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -72,10 +74,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UILabel worldGeneratorLabel;
     private UIComboBox worldGenerator;
 
-    private ModuleConfig moduleConfig;
     private UIButton modButton;
 
     private boolean createServerGame;
+    private ModuleSelection selection;
 
     public UIDialogCreateNewWorld(boolean createServer) {
         super(new Vector2f(512f, 380f));
@@ -83,12 +85,18 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
         this.createServerGame = createServer;
 
-        moduleConfig = new ModuleConfig();
-        moduleConfig.copy(CoreRegistry.get(Config.class).getDefaultModSelection());
     }
 
     @Override
     protected void createDialogArea(UIDisplayContainer parent) {
+        selection = new ModuleSelection(CoreRegistry.get(ModuleManager.class));
+        for (String moduleId : CoreRegistry.get(Config.class).getDefaultModSelection().listModules()) {
+            ModuleSelection newSelection = selection.add(moduleId);
+            if (newSelection.isValid()) {
+                selection = newSelection;
+            }
+        }
+
         createWorldTitleInput();
         createSeedInput();
         createWorldGeneratorInput();
@@ -170,9 +178,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
         worldGenerator.addSelectionListener(new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
+                // TODO: Only show valid world generators based on current selection
                 WorldGeneratorInfo generator = getSelectedWorldGenerator();
-                if (moduleConfig != null) {
-                    moduleConfig.addModule(generator.getUri().getModuleName());
+                ModuleSelection newSelection = selection.add(generator.getUri().getModuleName());
+                if (newSelection.isValid()) {
+                    selection = newSelection;
                 }
             }
         });
@@ -188,7 +198,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
         label.setVisible(true);
         return label;
     }
-
 
     private void createOkayButton() {
         okButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
@@ -225,21 +234,20 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     config.getWorldGeneration().setWorldTitle(getWorldName());
                 }
 
-                CoreRegistry.get(Config.class).getDefaultModSelection().copy(moduleConfig);
+                ModuleConfig moduleConfig = CoreRegistry.get(Config.class).getDefaultModSelection();
+                moduleConfig.clear();
+                for (Module module : selection.getSelection()) {
+                    moduleConfig.addModule(module.getId());
+                }
                 CoreRegistry.get(Config.class).save();
 
                 WorldGeneratorInfo worldGeneratorInfo = getSelectedWorldGenerator();
 
-
                 GameManifest gameManifest = new GameManifest();
                 gameManifest.setTitle(config.getWorldGeneration().getWorldTitle());
                 gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
-                ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-                for (String id : moduleConfig.listModules()) {
-                    Module module = moduleManager.getLatestModuleVersion(id);
-                    if (module != null) {
-                        gameManifest.addModule(module.getId(), module.getVersion());
-                    }
+                for (Module module : selection.getSelection()) {
+                    gameManifest.addModule(module.getId(), module.getVersion());
                 }
 
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(),
@@ -273,7 +281,15 @@ public class UIDialogCreateNewWorld extends UIDialog {
         modButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                UIDialogModules dialog = new UIDialogModules();
+                UIDialogModules dialog = new UIDialogModules(selection);
+                dialog.addDialogListener(new DialogListener() {
+                    @Override
+                    public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
+                        if (returnCode == EReturnCode.OK && returnValue instanceof ModuleSelection) {
+                            UIDialogCreateNewWorld.this.selection = (ModuleSelection) returnValue;
+                        }
+                    }
+                });
                 dialog.open();
             }
         });

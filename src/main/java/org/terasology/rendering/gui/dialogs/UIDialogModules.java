@@ -18,8 +18,6 @@ package org.terasology.rendering.gui.dialogs;
 
 import com.google.common.collect.Lists;
 import org.newdawn.slick.Color;
-import org.terasology.config.Config;
-import org.terasology.config.ModuleConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
@@ -66,19 +64,18 @@ public class UIDialogModules extends UIDialog {
     private UIComposite detailPanel;
     private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
-    public UIDialogModules() {
+    public UIDialogModules(ModuleSelection selection) {
         super(new Vector2f(640f, 480f));
-        selection = new ModuleSelection(moduleManager);
-        for (String moduleId : CoreRegistry.get(Config.class).getDefaultModSelection().listModules()) {
-            ModuleSelection newSelection = selection.add(moduleId);
-            if (newSelection.isValid()) {
-                selection = newSelection;
-            }
-        }
+        this.selection = selection;
+
         this.setEnableScrolling(false);
         populateModList();
         setTitle("Select Modules...");
 
+    }
+
+    public ModuleSelection getSelection() {
+        return selection;
     }
 
     private void populateModList() {
@@ -275,12 +272,7 @@ public class UIDialogModules extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                ModuleConfig config = CoreRegistry.get(Config.class).getDefaultModSelection();
-                config.clear();
-                for (Module module : selection.getSelection()) {
-                    config.addModule(module.getId());
-                }
-                close();
+                closeDialog(EReturnCode.OK, selection);
             }
         });
 

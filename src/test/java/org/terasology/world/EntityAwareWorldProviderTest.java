@@ -32,6 +32,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -99,12 +100,12 @@ public class EntityAwareWorldProviderTest {
 
     @BeforeClass
     public static void commonSetup() {
-        moduleManager = new ModuleManagerImpl();
+        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
     }
 
     @Before
     public void setup() {
-        CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl()));
+        CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager())));
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
         CoreRegistry.put(ComponentSystemManager.class, mock(ComponentSystemManager.class));

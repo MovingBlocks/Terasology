@@ -28,6 +28,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -54,7 +55,7 @@ public class PrefabTest {
 
     @Before
     public void setup() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl();
+        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
         moduleManager.applyActiveModules();
         AssetManager assetManager = new AssetManager(moduleManager);
         CoreRegistry.put(ModuleManager.class, moduleManager);

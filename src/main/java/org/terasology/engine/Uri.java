@@ -23,6 +23,7 @@ package org.terasology.engine;
  *
  * @author Immortius
  */
+@API
 public interface Uri extends Comparable<Uri> {
     /**
      * The character(s) use to separate the module name from other parts of the Uri

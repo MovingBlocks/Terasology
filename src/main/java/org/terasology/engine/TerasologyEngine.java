@@ -151,21 +151,11 @@ public class TerasologyEngine implements GameEngine {
         initControls();
         updateInputConfig();
         CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
-        initSecurity();
 
         if (config.getSystem().isMonitoringEnabled()) {
             new AdvancedMonitor().setVisible(true);
         }
         initialised = true;
-    }
-
-    private void initSecurity() {
-        // TODO: More work on security
-        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
-        //System.setSecurityManager(moduleSecurityManager);
-        moduleSecurityManager.addModAvailableClass(GUIManager.class);
-        // TODO: Add in module available classes
-
     }
 
     private void initConfig() {
@@ -447,7 +437,17 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl());
+        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
+        moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIClass(IOException.class);
+        moduleSecurityManager.addAPIClass(LoggerFactory.class);
+        moduleSecurityManager.addAPIClass(Logger.class);
+        for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
+            moduleSecurityManager.addAPIClass(apiClass);
+        }
+        //System.setSecurityManager(moduleSecurityManager);
+
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
         CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());

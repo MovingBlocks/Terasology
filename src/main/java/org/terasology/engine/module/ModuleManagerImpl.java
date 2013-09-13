@@ -66,6 +66,7 @@ import java.util.zip.ZipFile;
 public class ModuleManagerImpl implements ModuleManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
+    private final ModuleSecurityManager moduleSecurityManager;
 
     private Map<String, Module> activeModules = Maps.newLinkedHashMap();
 
@@ -80,12 +81,13 @@ public class ModuleManagerImpl implements ModuleManager {
 
     private ClassLoader[] engineClassLoaders;
 
-    public ModuleManagerImpl() {
-        this(ModuleManagerImpl.class.getClassLoader());
+    public ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager) {
+        this(moduleSecurityManager, ModuleManagerImpl.class.getClassLoader());
     }
 
-    private ModuleManagerImpl(ClassLoader... engineClassLoaders) {
+    private ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager, ClassLoader... engineClassLoaders) {
         this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
+        this.moduleSecurityManager = moduleSecurityManager;
 
         ConfigurationBuilder builder = new ConfigurationBuilder()
                 .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
@@ -223,7 +225,7 @@ public class ModuleManagerImpl implements ModuleManager {
                 logger.error("Failed to cloase allModuleClassLoader", e);
             }
         }
-        allModuleClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
+        allModuleClassLoader = new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
         for (ExtensionModule module : getExtensionModules()) {
             module.setInactiveClassLoader(allModuleClassLoader);
         }
@@ -301,7 +303,7 @@ public class ModuleManagerImpl implements ModuleManager {
                 logger.error("Failed to close activeModuleClassLoader", e);
             }
         }
-        activeModuleClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
+        activeModuleClassLoader = new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
         for (Module module : activeModules.values()) {
             if (module instanceof ExtensionModule) {
                 ((ExtensionModule) module).setActiveClassLoader(activeModuleClassLoader);
@@ -446,6 +448,9 @@ public class ModuleManagerImpl implements ModuleManager {
 
     @Override
     public Module getModule(String moduleId, Version version) {
+        if (UriUtil.normalise(moduleId).equals(TerasologyConstants.ENGINE_MODULE)) {
+            return engineModule;
+        }
         return modules.get(moduleId, version);
     }
 }

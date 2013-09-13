@@ -16,9 +16,12 @@
 
 package org.terasology.audio;
 
+import org.terasology.engine.API;
+
 /**
  *
  */
+@API
 public interface StreamingSound extends Sound<StreamingSoundData> {
 
     /**

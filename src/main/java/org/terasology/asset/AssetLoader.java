@@ -16,6 +16,7 @@
 
 package org.terasology.asset;
 
+import org.terasology.engine.API;
 import org.terasology.engine.module.Module;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.util.List;
  *
  * @author Immortius
  */
+@API
 public interface AssetLoader<T extends AssetData> {
 
     /**

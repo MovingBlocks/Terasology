@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.engine;
 
-package org.terasology.audio;
-
-import org.terasology.engine.API;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Interface for a non-streamed sound - these sounds are loaded entirely into memory.
+ * Types annotated with API are available for modules.
+ *
+ * @author Immortius
  */
-@API
-public interface StaticSound extends Sound<StaticSoundData> {
-
-    /**
-     * Returns sound sample length in seconds
-     *
-     * @return
-     */
-    float getLength();
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface API {
 }

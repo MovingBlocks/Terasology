@@ -16,9 +16,12 @@
 
 package org.terasology.asset;
 
+import org.terasology.engine.API;
+
 /**
  *
  */
+@API
 public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
 
     private final AssetUri uri;

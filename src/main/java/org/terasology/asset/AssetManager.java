@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.API;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -45,6 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 
 // TODO: Split out an interface, possibly two with one for loading and adding assets, the other with disposal and other more management methods
+@API
 public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);

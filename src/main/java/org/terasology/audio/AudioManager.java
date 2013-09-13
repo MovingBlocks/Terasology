@@ -16,6 +16,7 @@
 package org.terasology.audio;
 
 import org.terasology.asset.AssetFactory;
+import org.terasology.engine.API;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -24,6 +25,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Rename this to AudioManager, and AudioManager to AudioManagerAbstract or something
+@API
 public interface AudioManager {
     float MAX_DISTANCE = 100.0f;
     int PRIORITY_LOCKED = Integer.MAX_VALUE;

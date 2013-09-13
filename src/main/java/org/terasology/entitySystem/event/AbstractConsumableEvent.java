@@ -16,11 +16,13 @@
 
 package org.terasology.entitySystem.event;
 
+import org.terasology.engine.API;
 import org.terasology.network.NoReplicate;
 
 /**
  * @author Immortius
  */
+@API
 public abstract class AbstractConsumableEvent implements ConsumableEvent {
     @NoReplicate
     protected boolean consumed;

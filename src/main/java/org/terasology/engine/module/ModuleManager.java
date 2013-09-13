@@ -71,4 +71,5 @@ public interface ModuleManager {
     Set<String> getDependencyNamesOf(Module context);
 
     Module getModule(String moduleId, Version version);
+
 }

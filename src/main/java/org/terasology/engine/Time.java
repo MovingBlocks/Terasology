@@ -24,6 +24,7 @@ package org.terasology.engine;
  *
  * @author Immortius
  */
+@API
 public interface Time {
 
     /**

@@ -26,6 +26,7 @@ import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.ModuleManagerImpl;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -64,7 +65,7 @@ public class PojoPrefabManagerTest {
         entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
-        AssetManager assetManager = new AssetManager(new ModuleManagerImpl());
+        AssetManager assetManager = new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager()));
         CoreRegistry.put(AssetManager.class, assetManager);
     }
 

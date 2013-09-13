@@ -1,3 +1,3 @@
 rootProject.name = 'Terasology'
 include 'mods:funnyBlocks', 'mods:fences', 'mods:core', 'mods:minerals', 'mods:soils', 'mods:test',
-        'mods:morelights', 'mods:blockNetwork', 'mods:signalling'
+        'mods:morelights', 'mods:blockNetwork', 'mods:signalling', 'mods:malicious'

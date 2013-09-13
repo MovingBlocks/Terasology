@@ -1,0 +1,8 @@
+{
+    "id" : "malicious",
+    "version" : "0.1.0",
+    "author" : "Immortius",
+    "displayName" : "Malicious Exploit Security Checks",
+    "description" : "This module contains a number of tests for the sandboxing of modules, to ensure that security is correctly enforced",
+    "dependencies" : []
+}

@@ -47,7 +47,7 @@ public class UIDialog extends UIWindow {
 
     //others
     public static enum EReturnCode {
-        OK, CANCEL, YES, NO, NONE
+        OK, CANCEL, NONE
     }
 
     private float titleWidth = 300f;

@@ -18,13 +18,18 @@ package org.terasology.persistence;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -34,8 +39,11 @@ import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -49,12 +57,14 @@ public class WorldSerializerTest {
 
     @BeforeClass
     public static void setupClass() {
-        moduleManager = new ModuleManagerImpl();
+        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
     }
 
     @Before
     public void setup() {
 
+        AssetManager assetManager = CoreRegistry.put(AssetManager.class, mock(AssetManager.class));
+        when(assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class)).thenReturn(Collections.<Prefab>emptyList());
         EntitySystemBuilder builder = new EntitySystemBuilder();
         entityManager = builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);

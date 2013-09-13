@@ -17,12 +17,14 @@
 package org.terasology.audio;
 
 import org.terasology.asset.AssetData;
+import org.terasology.engine.API;
 
 import java.nio.ByteBuffer;
 
 /**
  * The information used to create Sound assets.
  */
+@API
 public class StaticSoundData implements AssetData {
     private ByteBuffer data;
     private int channels;

@@ -17,6 +17,7 @@
 package org.terasology.asset;
 
 import org.terasology.audio.Sound;
+import org.terasology.engine.API;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * @author Immortius
  */
+@API
 public final class Assets {
 
     // Private constructor to prevent instantiation (static class)

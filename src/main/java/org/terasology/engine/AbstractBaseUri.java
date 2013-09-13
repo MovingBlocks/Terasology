@@ -18,6 +18,7 @@ package org.terasology.engine;
 /**
  * @author Immortius
  */
+@API
 public abstract class AbstractBaseUri implements Uri {
 
     @Override

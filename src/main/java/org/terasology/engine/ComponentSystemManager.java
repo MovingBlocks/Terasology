@@ -142,7 +142,11 @@ public class ComponentSystemManager {
             console.registerCommandProvider(system);
         }
 
-        system.initialise();
+        try {
+            system.initialise();
+        } catch (Throwable e) {
+            logger.error("Failed to initialise system {}", system, e);
+        }
     }
 
     public boolean isActive() {

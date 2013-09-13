@@ -24,6 +24,7 @@ import org.terasology.engine.module.UriUtil;
  *
  * @author synopia
  */
+@API
 public class SimpleUri extends AbstractBaseUri {
     private String moduleName = "";
     private String objectName = "";

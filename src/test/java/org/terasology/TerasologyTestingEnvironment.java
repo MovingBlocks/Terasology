@@ -47,6 +47,7 @@ import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.EngineEntityManager;
 import org.terasology.network.NetworkSystem;
@@ -118,7 +119,7 @@ public abstract class TerasologyTestingEnvironment {
             setup = true;
             bindLwjgl();
 
-            moduleManager = new ModuleManagerImpl();
+            moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
             moduleManager.applyActiveModules();
             CoreRegistry.put(ModuleManager.class, moduleManager);
 
