@@ -26,7 +26,7 @@ import org.terasology.engine.module.Version;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.utilities.gson.VersionHandler;
-import org.terasology.world.WorldInfo;
+import org.terasology.world.internal.WorldInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

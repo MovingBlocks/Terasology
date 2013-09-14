@@ -15,13 +15,10 @@
  */
 package org.terasology.entitySystem.event;
 
-import org.terasology.engine.API;
-
 /**
  * Marker interface for classes that can be sent to entities as events
  *
  * @author Immortius <immortius@gmail.com>
  */
-@API
 public interface Event {
 }

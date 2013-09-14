@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.health;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * This event is sent after an entity is healed

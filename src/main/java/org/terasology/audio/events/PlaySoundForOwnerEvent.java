@@ -17,13 +17,11 @@
 package org.terasology.audio.events;
 
 import org.terasology.audio.Sound;
-import org.terasology.engine.API;
 import org.terasology.network.OwnerEvent;
 
 /**
  * @author Immortius
  */
-@API
 @OwnerEvent
 public class PlaySoundForOwnerEvent extends AbstractPlaySoundEvent {
 

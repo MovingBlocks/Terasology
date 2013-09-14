@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.players.event;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 /**

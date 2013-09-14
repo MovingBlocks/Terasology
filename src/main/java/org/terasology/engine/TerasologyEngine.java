@@ -16,6 +16,7 @@
 
 package org.terasology.engine;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
@@ -437,16 +438,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
-        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
-        moduleSecurityManager.addAPIPackage("java.lang");
-        moduleSecurityManager.addAPIClass(IOException.class);
-        moduleSecurityManager.addAPIClass(LoggerFactory.class);
-        moduleSecurityManager.addAPIClass(Logger.class);
-        for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
-            moduleSecurityManager.addAPIClass(apiClass);
-        }
-        //System.setSecurityManager(moduleSecurityManager);
+        ModuleManager moduleManager = initModuleManager();
 
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
         CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
@@ -460,6 +452,58 @@ public class TerasologyEngine implements GameEngine {
         ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
                 getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
         assetManager.addAssetSource(source);
+    }
+
+    private ModuleManager initModuleManager() {
+        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
+        moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIPackage("java.util");
+        moduleSecurityManager.addAPIPackage("java.util.concurrent");
+        moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
+        moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
+        moduleSecurityManager.addAPIPackage("java.util.regex");
+        moduleSecurityManager.addAPIPackage("com.google.common.annotations");
+        moduleSecurityManager.addAPIPackage("com.google.common.collect");
+        moduleSecurityManager.addAPIPackage("com.google.common.math");
+        moduleSecurityManager.addAPIPackage("com.google.common.primitives");
+        moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
+        moduleSecurityManager.addAPIPackage("gnu.trove");
+        moduleSecurityManager.addAPIPackage("gnu.trove.decorator");
+        moduleSecurityManager.addAPIPackage("gnu.trove.function");
+        moduleSecurityManager.addAPIPackage("gnu.trove.iterator");
+        moduleSecurityManager.addAPIPackage("gnu.trove.iterator.hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.list");
+        moduleSecurityManager.addAPIPackage("gnu.trove.list.array");
+        moduleSecurityManager.addAPIPackage("gnu.trove.list.linked");
+        moduleSecurityManager.addAPIPackage("gnu.trove.map");
+        moduleSecurityManager.addAPIPackage("gnu.trove.map.hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.map.custom_hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.procedure");
+        moduleSecurityManager.addAPIPackage("gnu.trove.procedure.array");
+        moduleSecurityManager.addAPIPackage("gnu.trove.queue");
+        moduleSecurityManager.addAPIPackage("gnu.trove.set");
+        moduleSecurityManager.addAPIPackage("gnu.trove.set.hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.stack");
+        moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
+        moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
+        moduleSecurityManager.addAPIPackage("javax.vecmath");
+
+        moduleSecurityManager.addAPIClass(Joiner.class);
+        moduleSecurityManager.addAPIClass(IOException.class);
+        moduleSecurityManager.addAPIClass(LoggerFactory.class);
+        moduleSecurityManager.addAPIClass(Logger.class);
+        for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
+            if (apiClass.isSynthetic()) {
+                // This is a package-info
+                moduleSecurityManager.addAPIPackage(apiClass.getPackage().getName());
+            } else {
+                moduleSecurityManager.addAPIClass(apiClass);
+            }
+        }
+
+        System.setSecurityManager(moduleSecurityManager);
+        return moduleManager;
     }
 
     private void initTimer() {

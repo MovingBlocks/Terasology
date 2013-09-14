@@ -18,6 +18,7 @@ package org.terasology.rendering.primitives;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.world.block.shapes.BlockMeshPart;
@@ -26,6 +27,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
+@API
 public class Tessellator {
 
     private MeshData meshData = new MeshData();

@@ -16,8 +16,6 @@
 
 package org.terasology.asset;
 
-import org.terasology.engine.API;
-
 /**
  * AssetData is the implementation agnostic data for an asset - typically it isn't dependant on either the source format
  * or the implementation consuming the resource. For instance, for a texture the asset data would not depend on the
@@ -29,6 +27,5 @@ import org.terasology.engine.API;
  * <p/>
  * AssetData is information used to create and reload assets
  */
-@API
 public interface AssetData {
 }

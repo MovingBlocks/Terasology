@@ -19,7 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Lists;
 import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 

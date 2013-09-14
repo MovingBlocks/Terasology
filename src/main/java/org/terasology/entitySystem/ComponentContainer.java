@@ -39,5 +39,4 @@ public interface ComponentContainer {
      * @return
      */
     Iterable<Component> iterateComponents();
-
 }

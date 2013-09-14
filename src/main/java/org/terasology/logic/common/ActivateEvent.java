@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.common;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.logic.location.LocationComponent;
 

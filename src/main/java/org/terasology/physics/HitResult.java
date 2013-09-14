@@ -16,7 +16,7 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;

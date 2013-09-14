@@ -16,7 +16,7 @@
 
 package org.terasology.input;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * Interface for subscribing to bind button events

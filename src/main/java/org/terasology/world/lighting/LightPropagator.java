@@ -25,7 +25,7 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.Collection;

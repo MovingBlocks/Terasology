@@ -22,7 +22,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.input.CameraTargetSystem;
+import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;

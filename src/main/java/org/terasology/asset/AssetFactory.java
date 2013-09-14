@@ -16,12 +16,9 @@
 
 package org.terasology.asset;
 
-import org.terasology.engine.API;
-
 /**
  *
  */
-@API
 public interface AssetFactory<DATA_TYPE extends AssetData, ASSET_TYPE extends Asset<DATA_TYPE>> {
 
     ASSET_TYPE buildAsset(AssetUri uri, DATA_TYPE data);

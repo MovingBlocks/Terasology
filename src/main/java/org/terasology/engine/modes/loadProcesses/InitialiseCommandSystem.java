@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.internal.ConsoleImpl;
 
 /**
  * @author Immortius
@@ -31,7 +32,7 @@ public class InitialiseCommandSystem implements LoadProcess {
 
     @Override
     public boolean step() {
-        CoreRegistry.put(Console.class, new Console());
+        CoreRegistry.put(Console.class, new ConsoleImpl());
         return true;
     }
 

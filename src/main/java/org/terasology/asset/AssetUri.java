@@ -18,14 +18,12 @@ package org.terasology.asset;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.engine.API;
 import org.terasology.engine.AbstractBaseUri;
 import org.terasology.engine.module.UriUtil;
 
 /**
  * @author Immortius
  */
-@API
 public final class AssetUri extends AbstractBaseUri {
     public static final String TYPE_SEPARATOR = ":";
 

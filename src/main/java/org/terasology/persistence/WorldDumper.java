@@ -16,7 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.serializers.WorldSerializer;

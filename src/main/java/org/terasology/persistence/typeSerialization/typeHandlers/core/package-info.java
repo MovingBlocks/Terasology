@@ -17,4 +17,6 @@
 /**
  * This package contains the core type handlers - for Java primitives, collections and MappedContainers.
  */
-package org.terasology.persistence.typeSerialization.typeHandlers.core;
+@API package org.terasology.persistence.typeSerialization.typeHandlers.core;
+
+import org.terasology.engine.API;

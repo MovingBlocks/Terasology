@@ -15,11 +15,11 @@
  */
 package org.terasology.world.chunks.localChunkProvider;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.world.RelevanceRegionComponent;

@@ -16,16 +16,16 @@
 package org.terasology.world.block.typeEntity;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityBuilder;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityBuilder;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockRegistrationListener;
+import org.terasology.world.block.internal.BlockRegistrationListener;
 
 /**
  * @author Immortius

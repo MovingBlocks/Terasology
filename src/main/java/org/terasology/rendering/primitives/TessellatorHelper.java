@@ -15,10 +15,13 @@
  */
 package org.terasology.rendering.primitives;
 
+import org.terasology.engine.API;
+
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
+@API
 public final class TessellatorHelper {
 
     private TessellatorHelper() {

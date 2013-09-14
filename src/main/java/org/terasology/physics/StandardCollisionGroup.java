@@ -22,7 +22,6 @@ import java.util.Locale;
  * @author Immortius
  */
 public enum StandardCollisionGroup implements CollisionGroup {
-    // JAVA7: Use binary literals
     DEFAULT((short) 0b0000001),
     STATIC((short) 0b0000010),
     KINEMATIC((short) 0b0000100),

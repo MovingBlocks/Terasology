@@ -16,9 +16,9 @@
 package org.terasology.logic.inventory;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.EntityBuilder;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityBuilder;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.LocationComponent;

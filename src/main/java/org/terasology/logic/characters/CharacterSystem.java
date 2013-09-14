@@ -16,13 +16,13 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
@@ -40,7 +40,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
-import org.terasology.physics.PhysicsEngine;
+import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.world.WorldProvider;
@@ -54,7 +54,7 @@ import javax.vecmath.Vector3f;
 public class CharacterSystem implements ComponentSystem {
 
     @In
-    private PhysicsEngine physics;
+    private Physics physics;
 
     @In
     private WorldProvider worldProvider;

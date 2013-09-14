@@ -15,15 +15,12 @@
  */
 package org.terasology.entitySystem.event;
 
-import org.terasology.engine.API;
-
 /**
  * A consumable event is an event that can be prevented from continuing through remaining event receivers. This is
  * primarily useful for input event.
  *
  * @author Immortius
  */
-@API
 public interface ConsumableEvent extends Event {
 
     boolean isConsumed();

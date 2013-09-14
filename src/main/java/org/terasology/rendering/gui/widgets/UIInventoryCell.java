@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.widgets;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.characters.CharacterComponent;

@@ -31,7 +31,7 @@ import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.NetData;
-import org.terasology.world.WorldInfo;
+import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
 

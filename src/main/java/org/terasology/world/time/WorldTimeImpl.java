@@ -16,8 +16,8 @@
 package org.terasology.world.time;
 
 import org.terasology.engine.Time;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.world.WorldComponent;

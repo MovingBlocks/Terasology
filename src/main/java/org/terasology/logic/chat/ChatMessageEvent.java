@@ -16,7 +16,7 @@
 
 package org.terasology.logic.chat;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;

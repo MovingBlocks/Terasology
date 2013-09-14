@@ -18,14 +18,14 @@ package org.terasology.logic.debug;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldComponent;
-import org.terasology.world.chunks.BeforeChunkUnload;
-import org.terasology.world.chunks.OnChunkLoaded;
+import org.terasology.world.chunks.event.BeforeChunkUnload;
+import org.terasology.world.chunks.event.OnChunkLoaded;
 
 import java.util.Set;
 

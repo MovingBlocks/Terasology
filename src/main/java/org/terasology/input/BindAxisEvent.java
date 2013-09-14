@@ -35,7 +35,7 @@ public class BindAxisEvent extends AxisEvent {
         return value;
     }
 
-    void prepare(String axisId, float axisValue, float delta) {
+    public void prepare(String axisId, float axisValue, float delta) {
         reset(delta);
         this.id = axisId;
         this.value = axisValue;

@@ -18,7 +18,7 @@ package org.terasology.world.lighting;
 
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
 /**

@@ -15,12 +15,9 @@
  */
 package org.terasology.entitySystem.systems;
 
-import org.terasology.engine.API;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@API
 public interface ComponentSystem {
     void initialise();
 

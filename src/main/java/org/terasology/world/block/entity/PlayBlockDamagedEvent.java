@@ -16,7 +16,7 @@
 
 package org.terasology.world.block.entity;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 

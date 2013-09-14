@@ -25,29 +25,30 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.StorageManagerInternal;
-import org.terasology.physics.PhysicsEngine;
+import org.terasology.physics.Physics;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.EntityAwareWorldProvider;
-import org.terasology.world.WorldBiomeProviderImpl;
-import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldProviderCoreImpl;
-import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.internal.EntityAwareWorldProvider;
+import org.terasology.world.internal.WorldBiomeProviderImpl;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.internal.WorldProviderCoreImpl;
+import org.terasology.world.internal.WorldProviderWrapper;
 
 /**
  * @author Immortius
@@ -107,6 +108,7 @@ public class InitialiseWorld implements LoadProcess {
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
 
         // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing
         worldProvider.getTime().setMilliseconds(worldInfo.getTime());

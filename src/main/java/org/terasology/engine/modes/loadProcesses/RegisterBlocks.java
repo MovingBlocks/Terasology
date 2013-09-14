@@ -21,10 +21,10 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerImpl;
 
 /**
  * @author Immortius

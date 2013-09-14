@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 

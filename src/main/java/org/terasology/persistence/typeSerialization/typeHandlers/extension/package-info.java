@@ -17,4 +17,6 @@
 /**
  * This package contains type handlers for more Terasology-specific types. This includes the various vecmath types as well as blocks, entityrefs and assets.
  */
-package org.terasology.persistence.typeSerialization.typeHandlers.extension;
+@API package org.terasology.persistence.typeSerialization.typeHandlers.extension;
+
+import org.terasology.engine.API;

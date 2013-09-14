@@ -20,6 +20,7 @@ import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.ComponentContainer;
+import org.terasology.entitySystem.prefab.internal.NullPrefab;
 
 import java.util.List;
 

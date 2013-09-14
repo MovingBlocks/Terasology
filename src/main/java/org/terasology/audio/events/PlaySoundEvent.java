@@ -17,14 +17,12 @@
 package org.terasology.audio.events;
 
 import org.terasology.audio.Sound;
-import org.terasology.engine.API;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.BroadcastEvent;
 
 /**
  * @author Immortius
  */
-@API
 @BroadcastEvent(skipInstigator = true)
 public class PlaySoundEvent extends AbstractPlaySoundEvent {
     protected PlaySoundEvent() {

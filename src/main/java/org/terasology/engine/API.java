@@ -26,6 +26,6 @@ import java.lang.annotation.Target;
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(value = {ElementType.TYPE, ElementType.PACKAGE})
 public @interface API {
 }

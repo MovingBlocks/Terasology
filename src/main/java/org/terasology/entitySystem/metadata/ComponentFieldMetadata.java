@@ -19,8 +19,8 @@ import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Owns;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;

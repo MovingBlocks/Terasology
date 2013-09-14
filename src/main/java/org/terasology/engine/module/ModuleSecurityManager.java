@@ -17,6 +17,8 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.AccessControlException;
 import java.security.Permission;
@@ -27,31 +29,19 @@ import java.util.Set;
  */
 public class ModuleSecurityManager extends SecurityManager {
 
-    private static final Permission ADD_TRUSTED_CLASSLOADER = new RuntimePermission("addTrustedClassloader");
+    private static final Logger logger = LoggerFactory.getLogger(ModuleSecurityManager.class);
     private static final Permission ADD_ALLOWED_PERMISSION = new RuntimePermission("addAllowedPermission");
     private static final Permission ADD_API_CLASS = new RuntimePermission("addAPIClass");
 
-    private Set<ClassLoader> trustedClassLoaders = Sets.newHashSet();
     private Set<Class> apiClasses = Sets.newHashSet();
     private Set<String> apiPackages = Sets.newHashSet();
+    private Set<String> loadablePackages = Sets.newHashSet();
     private Set<Class<? extends Permission>> allowedPermissions = Sets.newHashSet();
 
     private ThreadLocal<Boolean> calculatingPermission = new ThreadLocal<>();
 
-
     public ModuleSecurityManager() {
-        addTrustedClassLoader(getClass().getClassLoader());
-    }
-
-    public void addTrustedClassLoader(ClassLoader classLoader) {
-        if (System.getSecurityManager() != null) {
-            System.getSecurityManager().checkPermission(ADD_TRUSTED_CLASSLOADER);
-        }
-        ClassLoader nextClassLoader = classLoader;
-        while (nextClassLoader != null) {
-            trustedClassLoaders.add(nextClassLoader);
-            nextClassLoader = nextClassLoader.getParent();
-        }
+        loadablePackages.add("sun.reflect");
     }
 
     public void addAllowedPermission(Class<? extends Permission> allowedPermission) {
@@ -79,7 +69,7 @@ public class ModuleSecurityManager extends SecurityManager {
         try {
             Class[] classes = getClassContext();
             for (int i = 0; i < classes.length; ++i) {
-                if (apiClasses.contains(classes[i])) {
+                if (apiClasses.contains(classes[i]) || (classes[i].getPackage() != null && apiPackages.contains(classes[i].getPackage().getName()))) {
                     return;
                 }
                 ClassLoader owningLoader = classes[i].getClassLoader();
@@ -106,8 +96,7 @@ public class ModuleSecurityManager extends SecurityManager {
     }
 
     public boolean checkAccess(Class type) {
-        return true;
-        //return apiClasses.contains(type) || apiPackages.contains(type.getPackage().getName());
+        return apiClasses.contains(type) || apiPackages.contains(type.getPackage().getName()) || loadablePackages.contains(type.getPackage().getName());
     }
 
     public void addAPIPackage(String packageName) {

@@ -19,7 +19,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 
 /**
  * Cactus generator.

@@ -19,7 +19,7 @@ package org.terasology.physics.bullet;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.physics.SweepCallback;
+import org.terasology.physics.engine.SweepCallback;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;

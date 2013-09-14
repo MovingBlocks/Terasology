@@ -121,6 +121,7 @@ public class Serializer {
 
     /**
      * Deserializes a Collection of name-values onto an object
+     *
      * @param target The object to deserialize onto
      * @param values The collection of values to apply to the object
      */
@@ -130,9 +131,10 @@ public class Serializer {
 
     /**
      * Deserializes a Collection of name-values onto an object
+     *
      * @param target The object to deserialize onto
      * @param values The collection of values to apply to the object
-     * @param check A check to filter which fields to deserialize
+     * @param check  A check to filter which fields to deserialize
      */
     public void deserializeOnto(Object target, Collection<EntityData.NameValue> values, DeserializeFieldCheck check) {
         for (EntityData.NameValue field : values) {

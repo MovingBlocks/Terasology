@@ -18,7 +18,7 @@ package org.terasology.rendering.logic;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.DistanceComparator;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.cameras.Camera;

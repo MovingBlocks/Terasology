@@ -28,8 +28,8 @@ import org.terasology.world.RegionalChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerImpl;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 
 import static org.junit.Assert.assertEquals;

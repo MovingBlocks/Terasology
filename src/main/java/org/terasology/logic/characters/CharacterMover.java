@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * A CharacterMover is responsible for calculating character movement and generating related events.

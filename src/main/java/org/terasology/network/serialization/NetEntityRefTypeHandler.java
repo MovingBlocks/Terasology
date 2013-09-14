@@ -17,7 +17,7 @@
 package org.terasology.network.serialization;
 
 import com.google.common.collect.Lists;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetEntityRef;

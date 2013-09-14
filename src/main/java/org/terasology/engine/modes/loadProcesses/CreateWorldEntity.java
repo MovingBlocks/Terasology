@@ -18,8 +18,8 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
 

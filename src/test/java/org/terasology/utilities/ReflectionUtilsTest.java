@@ -16,7 +16,7 @@
 package org.terasology.utilities;
 
 import org.junit.Test;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 
 import static org.junit.Assert.assertEquals;

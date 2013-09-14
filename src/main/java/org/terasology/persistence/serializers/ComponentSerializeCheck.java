@@ -17,7 +17,7 @@
 package org.terasology.persistence.serializers;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.internal.EntityInfoComponent;
+import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 
 /**

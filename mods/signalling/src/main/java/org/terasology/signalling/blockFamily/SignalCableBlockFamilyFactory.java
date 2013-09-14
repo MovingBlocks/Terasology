@@ -1,6 +1,6 @@
 package org.terasology.signalling.blockFamily;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;

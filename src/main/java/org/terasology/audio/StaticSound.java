@@ -16,12 +16,9 @@
 
 package org.terasology.audio;
 
-import org.terasology.engine.API;
-
 /**
  * Interface for a non-streamed sound - these sounds are loaded entirely into memory.
  */
-@API
 public interface StaticSound extends Sound<StaticSoundData> {
 
     /**

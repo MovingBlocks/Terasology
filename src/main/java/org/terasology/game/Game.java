@@ -26,8 +26,8 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.persistence.StorageManager;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.management.BlockManager;
 
 import java.io.IOException;
 import java.util.List;

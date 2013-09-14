@@ -20,7 +20,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 
 import java.util.List;
 

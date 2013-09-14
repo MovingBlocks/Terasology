@@ -17,8 +17,8 @@
 package org.terasology.rendering.logic;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Owns;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;

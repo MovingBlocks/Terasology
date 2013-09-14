@@ -15,9 +15,8 @@
  */
 package org.terasology.entitySystem.event;
 
-import org.terasology.engine.API;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.systems.RegisterMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,7 +31,6 @@ import java.lang.annotation.Target;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ReceiveEvent {

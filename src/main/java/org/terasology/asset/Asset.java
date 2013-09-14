@@ -16,8 +16,6 @@
 
 package org.terasology.asset;
 
-import org.terasology.engine.API;
-
 /**
  * Interface common to all assets.
  * <p/>
@@ -33,7 +31,6 @@ import org.terasology.engine.API;
  *
  * @author Immortius
  */
-@API
 public interface Asset<T extends AssetData> {
 
     /**

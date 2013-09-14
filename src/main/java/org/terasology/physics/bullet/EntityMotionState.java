@@ -18,7 +18,7 @@ package org.terasology.physics.bullet;
 
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 
 import javax.vecmath.Matrix4f;

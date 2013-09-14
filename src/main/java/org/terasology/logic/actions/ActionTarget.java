@@ -22,5 +22,5 @@ package org.terasology.logic.actions;
 public enum ActionTarget {
     Instigator,
     Target,
-    Self;
+    Self
 }

@@ -18,7 +18,7 @@ package org.terasology.logic.players;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;

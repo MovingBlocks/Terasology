@@ -16,8 +16,8 @@
 package org.terasology.persistence.typeSerialization.typeHandlers.extension;
 
 import com.google.common.collect.Lists;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 

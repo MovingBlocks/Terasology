@@ -30,7 +30,7 @@ public class BindButtonEvent extends ButtonEvent {
         super(0);
     }
 
-    void prepare(String buttonId, ButtonState newState, float delta) {
+    public void prepare(String buttonId, ButtonState newState, float delta) {
         reset(delta);
         this.id = buttonId;
         this.state = newState;

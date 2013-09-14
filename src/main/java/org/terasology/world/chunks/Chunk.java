@@ -29,7 +29,7 @@ import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArrays;
 import org.terasology.world.chunks.deflate.TeraDeflator;

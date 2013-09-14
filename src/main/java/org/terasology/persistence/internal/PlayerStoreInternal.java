@@ -16,8 +16,8 @@
 package org.terasology.persistence.internal;
 
 import gnu.trove.set.TIntSet;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.protobuf.EntityData;

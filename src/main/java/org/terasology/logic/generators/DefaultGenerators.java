@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.generator.chunkGenerators.ForestGenerator;
 import org.terasology.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.world.generator.chunkGenerators.TreeGeneratorCactus;

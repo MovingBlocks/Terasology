@@ -16,7 +16,7 @@
 
 package org.terasology.world.chunks;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
 
@@ -26,7 +26,7 @@ import org.terasology.world.ChunkView;
 public interface ChunkProvider {
 
     /**
-     * A local view pvoides a
+     * A local view provides a
      *
      * @param centerChunkPos
      * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.

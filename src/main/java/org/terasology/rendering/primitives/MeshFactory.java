@@ -16,12 +16,14 @@
 package org.terasology.rendering.primitives;
 
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 
+@API
 public final class MeshFactory {
 
     private MeshFactory() {

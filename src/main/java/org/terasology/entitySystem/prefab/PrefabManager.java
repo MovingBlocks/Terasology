@@ -25,6 +25,7 @@ import java.util.Collection;
  * @author Immortius <immortius@gmail.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
+// TODO: This is basically unnecessary now, remove and just use Assets?
 public interface PrefabManager {
 
     /**

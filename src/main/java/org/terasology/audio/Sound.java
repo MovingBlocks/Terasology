@@ -17,9 +17,7 @@ package org.terasology.audio;
 
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetData;
-import org.terasology.engine.API;
 
-@API
 public interface Sound<T extends AssetData> extends Asset<T> {
 
     /**

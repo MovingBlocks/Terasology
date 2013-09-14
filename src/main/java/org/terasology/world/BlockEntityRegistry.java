@@ -16,7 +16,7 @@
 package org.terasology.world;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 

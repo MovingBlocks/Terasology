@@ -30,12 +30,12 @@ import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.BindableAxis;
 import org.terasology.input.BindableButton;
-import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.input.binds.ToolbarSlotButton;
+import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayerSystem;
 
 import java.util.Locale;

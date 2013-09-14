@@ -20,11 +20,11 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.ItemComponent;
@@ -32,7 +32,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.PhysicsEngine;
+import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -119,7 +119,7 @@ public class BlockItemSystem implements ComponentSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            PhysicsEngine physics = CoreRegistry.get(PhysicsEngine.class);
+            Physics physics = CoreRegistry.get(Physics.class);
             return physics.scanArea(block.getBounds(blockPos), StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();
         }
         return true;

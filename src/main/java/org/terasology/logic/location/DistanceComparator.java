@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.location;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;

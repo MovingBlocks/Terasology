@@ -17,7 +17,7 @@
 package org.terasology.audio.events;
 
 import org.terasology.audio.Sound;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.NetworkEvent;
 
 /**

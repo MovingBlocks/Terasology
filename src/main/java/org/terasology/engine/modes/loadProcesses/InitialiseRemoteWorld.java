@@ -24,15 +24,16 @@ import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.PhysicsEngine;
+import org.terasology.physics.Physics;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.EntityAwareWorldProvider;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldProviderCoreImpl;
-import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
+import org.terasology.world.internal.EntityAwareWorldProvider;
+import org.terasology.world.internal.WorldProviderCoreImpl;
+import org.terasology.world.internal.WorldProviderWrapper;
 
 /**
  * @author Immortius
@@ -70,6 +71,7 @@ public class InitialiseRemoteWorld implements LoadProcess {
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
 
         CoreRegistry.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
 

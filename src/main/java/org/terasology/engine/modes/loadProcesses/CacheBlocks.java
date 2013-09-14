@@ -18,8 +18,8 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.management.BlockManager;
 
 import java.util.Iterator;
 

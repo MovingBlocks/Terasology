@@ -17,8 +17,8 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import gnu.trove.set.TIntSet;
-import org.terasology.entitySystem.EngineEntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;

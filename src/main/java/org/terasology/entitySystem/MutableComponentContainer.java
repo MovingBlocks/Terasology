@@ -19,6 +19,7 @@ package org.terasology.entitySystem;
  * @author Immortius
  */
 public interface MutableComponentContainer extends ComponentContainer {
+
     /**
      * Adds a component. If this already has a component of the same class it is replaced.
      *

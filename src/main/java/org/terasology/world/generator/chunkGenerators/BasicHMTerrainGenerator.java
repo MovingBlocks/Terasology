@@ -23,7 +23,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;

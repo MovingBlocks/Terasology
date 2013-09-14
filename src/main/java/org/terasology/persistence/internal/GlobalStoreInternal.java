@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence.internal;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.persistence.GlobalStore;
 import org.terasology.protobuf.EntityData;
 

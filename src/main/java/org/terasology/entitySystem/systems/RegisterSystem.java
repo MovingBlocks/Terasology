@@ -16,9 +16,6 @@
 
 package org.terasology.entitySystem.systems;
 
-import org.terasology.engine.API;
-import org.terasology.entitySystem.RegisterMode;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,7 +24,6 @@ import java.lang.annotation.Target;
 /**
  * @author Immortius
  */
-@API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegisterSystem {

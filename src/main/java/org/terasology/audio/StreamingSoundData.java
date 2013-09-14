@@ -17,14 +17,12 @@
 package org.terasology.audio;
 
 import org.terasology.asset.AssetData;
-import org.terasology.engine.API;
 
 import java.nio.ByteBuffer;
 
 /**
  * The information used to create a streaming sound asset
  */
-@API
 public interface StreamingSoundData extends AssetData {
 
     ByteBuffer readNextInto(ByteBuffer dataBuffer);

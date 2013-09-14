@@ -42,4 +42,6 @@
  * This implementation can be found in the "bullet" sub-package.</li>
  * </ul>
  */
-package org.terasology.physics;
+@API package org.terasology.physics;
+
+import org.terasology.engine.API;

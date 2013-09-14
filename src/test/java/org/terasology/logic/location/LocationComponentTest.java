@@ -19,8 +19,8 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
 

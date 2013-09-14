@@ -52,22 +52,22 @@ import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.physics.CharacterCollider;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
-import org.terasology.physics.PhysicsEngine;
-import org.terasology.physics.PhysicsWorldWrapper;
-import org.terasology.physics.RigidBody;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.events.PhysicsSystem;
+import org.terasology.physics.engine.CharacterCollider;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.physics.engine.PhysicsSystem;
+import org.terasology.physics.engine.PhysicsWorldWrapper;
+import org.terasology.physics.engine.RigidBody;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.physics.shapes.CapsuleShapeComponent;
 import org.terasology.physics.shapes.CylinderShapeComponent;
@@ -296,6 +296,7 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
+    //TODO: update if detectGroups changed
     public boolean updateTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);

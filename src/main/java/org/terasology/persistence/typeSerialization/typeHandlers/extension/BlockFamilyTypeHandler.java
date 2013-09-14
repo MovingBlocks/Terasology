@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.management.BlockManager;
 
 import java.util.List;
 

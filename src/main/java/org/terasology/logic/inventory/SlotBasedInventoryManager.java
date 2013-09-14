@@ -16,7 +16,7 @@
 
 package org.terasology.logic.inventory;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * @author Immortius

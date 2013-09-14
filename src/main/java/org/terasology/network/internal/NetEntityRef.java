@@ -18,7 +18,7 @@ package org.terasology.network.internal;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 

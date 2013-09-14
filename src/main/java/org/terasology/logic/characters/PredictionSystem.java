@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * Interface for the system that provides the ability to compensate for lag, by rewinding and replaying state

@@ -49,7 +49,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.EngineEntityManager;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
@@ -82,8 +82,8 @@ import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.block.management.BlockManagerImpl;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.internal.BlockManagerImpl;
 
 import java.nio.file.FileSystem;
 

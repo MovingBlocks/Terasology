@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * @author Immortius

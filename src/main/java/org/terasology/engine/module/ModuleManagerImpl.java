@@ -376,7 +376,7 @@ public class ModuleManagerImpl implements ModuleManager {
         Module latestInBounds = null;
         for (Module module : modules.row(UriUtil.normalise(id)).values()) {
             if (module.getVersion().compareTo(minVersion) >= 0 && module.getVersion().compareTo(maxVersion) < 0
-                    && (latestInBounds == null || latestInBounds.getVersion().compareTo(module.getVersion()) > 0))  {
+                    && (latestInBounds == null || latestInBounds.getVersion().compareTo(module.getVersion()) > 0)) {
                 latestInBounds = module;
             }
         }

@@ -16,7 +16,7 @@
 
 package org.terasology.network;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.chunks.ChunkRegionListener;

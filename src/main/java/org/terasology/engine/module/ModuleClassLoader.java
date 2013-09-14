@@ -36,7 +36,6 @@ public class ModuleClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-
         Class<?> clazz = super.loadClass(name, resolve);
         if (clazz.getClassLoader() != this) {
             if (securityManager.checkAccess(clazz)) {

@@ -15,7 +15,7 @@
  */
 package org.terasology.input.events;
 
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ConsumableEvent;
 import org.terasology.math.Vector3i;
 
@@ -33,13 +33,6 @@ public abstract class InputEvent implements ConsumableEvent {
 
     public InputEvent(float delta) {
         this.delta = delta;
-    }
-
-    public void setTargetInfo(EntityRef newTarget, Vector3i targetBlockPos, Vector3f targetHitPosition, Vector3f targetHitNormal) {
-        this.target = newTarget;
-        this.targetBlockPosition = targetBlockPos;
-        this.hitPosition = targetHitPosition;
-        this.hitNormal = targetHitNormal;
     }
 
     public EntityRef getTarget() {
@@ -72,9 +65,18 @@ public abstract class InputEvent implements ConsumableEvent {
         this.consumed = true;
     }
 
+    public void setTargetInfo(EntityRef newTarget, Vector3i targetBlockPos, Vector3f targetHitPosition, Vector3f targetHitNormal) {
+        this.target = newTarget;
+        this.targetBlockPosition = targetBlockPos;
+        this.hitPosition = targetHitPosition;
+        this.hitNormal = targetHitNormal;
+    }
+
     protected void reset(float newDelta) {
         consumed = false;
         this.delta = newDelta;
         this.target = EntityRef.NULL;
     }
+
+
 }
