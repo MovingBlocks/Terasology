@@ -33,7 +33,7 @@ public class ChatMessageEvent implements MessageEvent {
     private String message;
     private EntityRef from;
 
-    private ChatMessageEvent() {
+    protected ChatMessageEvent() {
     }
 
     public ChatMessageEvent(String message, EntityRef from) {

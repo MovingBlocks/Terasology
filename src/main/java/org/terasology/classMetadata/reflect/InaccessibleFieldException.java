@@ -13,35 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
-
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.ServerEvent;
+package org.terasology.classMetadata.reflect;
 
 /**
- * This event is used to convey commands marked as runOnServer to the server.
- *
  * @author Immortius
  */
-@ServerEvent
-final class CommandEvent implements Event {
-
-    private String command;
-    private String params;
-
-    CommandEvent() {
+public class InaccessibleFieldException extends Exception {
+    public InaccessibleFieldException() {
     }
 
-    CommandEvent(String command, String params) {
-        this.command = command;
-        this.params = params;
+    public InaccessibleFieldException(String message) {
+        super(message);
     }
 
-    public String getCommand() {
-        return command;
+    public InaccessibleFieldException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public String getParams() {
-        return params;
+    public InaccessibleFieldException(Throwable cause) {
+        super(cause);
+    }
+
+    public InaccessibleFieldException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

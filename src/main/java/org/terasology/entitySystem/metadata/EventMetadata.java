@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.event.Event;
@@ -78,7 +79,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     }
 
     @Override
-    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) {
+    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         return new ReplicatedFieldMetadata<>(this, field, copyStrategy, factory, true);
     }
 }

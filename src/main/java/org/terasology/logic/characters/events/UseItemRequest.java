@@ -28,7 +28,7 @@ import org.terasology.network.ServerEvent;
 @ServerEvent(lagCompensate = true)
 public class UseItemRequest extends NetworkEvent {
 
-    private EntityRef item = EntityRef.NULL;
+    EntityRef item = EntityRef.NULL;
 
     protected UseItemRequest() {
     }

@@ -13,35 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
-
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.ServerEvent;
+package org.terasology.classMetadata.reflect;
 
 /**
- * This event is used to convey commands marked as runOnServer to the server.
- *
  * @author Immortius
  */
-@ServerEvent
-final class CommandEvent implements Event {
+public class PrivateComponent {
 
-    private String command;
-    private String params;
+    private PrivateComponent() {
 
-    CommandEvent() {
-    }
-
-    CommandEvent(String command, String params) {
-        this.command = command;
-        this.params = params;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public String getParams() {
-        return params;
     }
 }

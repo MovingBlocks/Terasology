@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
@@ -71,7 +72,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
         }
     }
 
-    protected <U> ComponentFieldMetadata<T, U> createField(Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) {
+    protected <U> ComponentFieldMetadata<T, U> createField(Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         return new ComponentFieldMetadata<>(this, field, copyStrategy, factory, false);
     }
 

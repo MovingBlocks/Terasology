@@ -17,12 +17,12 @@ package org.terasology.classMetadata.reflect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
 
 /**
  * Reflection based implementation of ReflectFactory. Uses standard Java reflection to provide the necessary reflection functionality.
@@ -88,8 +88,8 @@ public class ReflectionReflectFactory implements ReflectFactory {
         @SuppressWarnings("unchecked")
         public ReflectionFieldAccessor(Field field) {
             this.field = field;
-            getter = findGetter();
-            setter = findSetter();
+            getter = ReflectionUtil.findGetter(field);
+            setter = ReflectionUtil.findSetter(field);
             if (getter == null || setter == null) {
                 field.setAccessible(true);
             }
@@ -121,38 +121,5 @@ public class ReflectionReflectFactory implements ReflectFactory {
                 logger.error("Exception during setting of {} from {}", field.getName(), target.getClass(), e);
             }
         }
-
-        private Method findGetter() {
-            Method result = findMethod(field.getDeclaringClass(), "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
-            if (result != null && field.getType().equals(result.getReturnType())) {
-                result.setAccessible(true);
-                return result;
-            }
-            result = findMethod(field.getDeclaringClass(), "is" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
-            if (result != null && field.getType().equals(result.getReturnType())) {
-                result.setAccessible(true);
-                return result;
-            }
-            return null;
-        }
-
-        private Method findSetter() {
-            String setterName = "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1);
-            Method result = findMethod(field.getDeclaringClass(), setterName, field.getType());
-            if (result != null) {
-                result.setAccessible(true);
-            }
-            return result;
-        }
-
-        private Method findMethod(Class<?> targetType, String methodName, Class<?>... parameters) {
-            try {
-                return targetType.getMethod(methodName, parameters);
-            } catch (NoSuchMethodException me) {
-                // We're expecting not to find methods
-                return null;
-            }
-        }
-
     }
 }

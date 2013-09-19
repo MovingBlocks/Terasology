@@ -16,8 +16,11 @@
 
 package org.terasology.utilities;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Locale;
 
 /**
  *
@@ -53,5 +56,37 @@ public final class ReflectionUtil {
             return (Class) ((ParameterizedType) type).getRawType();
         }
         return null;
+    }
+
+    public static Method findGetter(Field field) {
+        Method result = findMethod(field.getDeclaringClass(), "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
+        if (result != null && field.getType().equals(result.getReturnType())) {
+            result.setAccessible(true);
+            return result;
+        }
+        result = findMethod(field.getDeclaringClass(), "is" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
+        if (result != null && field.getType().equals(result.getReturnType())) {
+            result.setAccessible(true);
+            return result;
+        }
+        return null;
+    }
+
+    public static Method findSetter(Field field) {
+        String setterName = "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1);
+        Method result = findMethod(field.getDeclaringClass(), setterName, field.getType());
+        if (result != null) {
+            result.setAccessible(true);
+        }
+        return result;
+    }
+
+    public static Method findMethod(Class<?> targetType, String methodName, Class<?>... parameters) {
+        try {
+            return targetType.getMethod(methodName, parameters);
+        } catch (NoSuchMethodException me) {
+            // We're expecting not to find methods
+            return null;
+        }
     }
 }

@@ -47,11 +47,11 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     // Standard position/rotation
     @Replicate
-    private Vector3f position = new Vector3f();
+    Vector3f position = new Vector3f();
     @Replicate
-    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    Quat4f rotation = new Quat4f(0, 0, 0, 1);
     @Replicate
-    private float scale = 1.0f;
+    float scale = 1.0f;
 
     public LocationComponent() {
     }

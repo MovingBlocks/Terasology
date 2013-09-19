@@ -25,7 +25,6 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.reflections.ReflectionUtils;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
@@ -91,7 +90,7 @@ public class ConsoleImpl implements Console {
     @Override
     public void registerCommandProvider(Object provider) {
         Predicate<? super Method> predicate = Predicates.<Method>and(withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
-        Set<Method> commandMethods = Reflections.getAllMethods(provider.getClass(), predicate);
+        Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         if (!commandMethods.isEmpty()) {
             for (Method method : commandMethods) {
                 CommandInfo command = new CommandInfo(method, provider);

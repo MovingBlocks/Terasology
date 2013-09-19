@@ -13,35 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.benchmark.reflectFactory;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.ServerEvent;
+import org.terasology.entitySystem.Component;
 
 /**
- * This event is used to convey commands marked as runOnServer to the server.
- *
  * @author Immortius
  */
-@ServerEvent
-final class CommandEvent implements Event {
+public class GetterSetterComponent implements Component {
+    private int value;
 
-    private String command;
-    private String params;
-
-    CommandEvent() {
+    public void setValue(int value) {
+        this.value = value;
     }
 
-    CommandEvent(String command, String params) {
-        this.command = command;
-        this.params = params;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public String getParams() {
-        return params;
+    public int getValue() {
+        return value;
     }
 }

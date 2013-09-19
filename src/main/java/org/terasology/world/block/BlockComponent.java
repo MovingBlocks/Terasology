@@ -28,7 +28,7 @@ import javax.vecmath.Tuple3i;
  */
 public final class BlockComponent implements Component {
     @Replicate
-    private Vector3i position = new Vector3i();
+    Vector3i position = new Vector3i();
 
     public BlockComponent() {
     }

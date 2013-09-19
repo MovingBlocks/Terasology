@@ -26,7 +26,7 @@ public interface ReflectFactory {
 
     <T> ObjectConstructor<T> createConstructor(Class<T> type) throws NoSuchMethodException;
 
-    <T> FieldAccessor<T, ?> createFieldAccessor(Class<T> ownerType, Field field);
+    <T> FieldAccessor<T, ?> createFieldAccessor(Class<T> ownerType, Field field) throws InaccessibleFieldException;
 
-    <T, U> FieldAccessor<T, U> createFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType);
+    <T, U> FieldAccessor<T, U> createFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) throws InaccessibleFieldException;
 }

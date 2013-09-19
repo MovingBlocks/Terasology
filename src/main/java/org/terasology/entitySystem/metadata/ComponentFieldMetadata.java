@@ -17,6 +17,7 @@ package org.terasology.entitySystem.metadata;
 
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategy;
+import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
@@ -37,7 +38,8 @@ public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFi
 
     private boolean ownedReference;
 
-    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory, boolean replicatedByDefault) {
+    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory, boolean replicatedByDefault)
+            throws InaccessibleFieldException {
         super(owner, field, copyStrategy, factory, replicatedByDefault);
         ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType())
                 || isCollectionOf(EntityRef.class, field.getGenericType()));

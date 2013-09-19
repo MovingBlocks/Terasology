@@ -35,6 +35,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
+import org.terasology.classMetadata.reflect.ByteCodeReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;

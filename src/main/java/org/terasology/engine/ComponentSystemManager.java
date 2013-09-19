@@ -17,6 +17,7 @@ package org.terasology.engine;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +128,7 @@ public class ComponentSystemManager {
     }
 
     private void initialiseSystem(ComponentSystem system) {
-        for (Field field : Reflections.getAllFields(system.getClass(), Reflections.withAnnotation(In.class))) {
+        for (Field field : ReflectionUtils.getAllFields(system.getClass(), ReflectionUtils.withAnnotation(In.class))) {
             Object value = CoreRegistry.get(field.getType());
             if (value != null) {
                 try {

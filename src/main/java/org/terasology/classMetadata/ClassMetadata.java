@@ -21,9 +21,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.reflections.Reflections;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ObjectConstructor;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
@@ -45,6 +48,8 @@ import java.util.Map;
  * @author Immortius
  */
 public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClassMetadata.class);
 
     private final SimpleUri uri;
     private final Class<T> clazz;
@@ -82,15 +87,21 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param factory             The reflection provider
      */
     private void addFields(CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) {
-        for (Field field : Reflections.getAllFields(clazz, Predicates.alwaysTrue())) {
+        for (Field field : ReflectionUtils.getAllFields(clazz, Predicates.alwaysTrue())) {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
             CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType());
-            FIELD metadata = createField(field, copyStrategy, factory);
-            if (metadata != null) {
-                fields.put(metadata.getName().toLowerCase(Locale.ENGLISH), metadata);
+
+            try {
+                FIELD metadata = createField(field, copyStrategy, factory);
+                if (metadata != null) {
+                    fields.put(metadata.getName().toLowerCase(Locale.ENGLISH), metadata);
+                }
+            } catch (InaccessibleFieldException e) {
+                logger.error("Could not create metadata for field '{}' of type '{}', may be private.'", field, clazz);
             }
+
         }
     }
 
@@ -102,7 +113,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param factory      The reflection provider
      * @return A FieldMetadata describing the field, or null to ignore this field
      */
-    protected abstract <V> FIELD createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory);
+    protected abstract <V> FIELD createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException;
 
     /**
      * @return The class described by this metadata

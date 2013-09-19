@@ -27,7 +27,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import org.reflections.Reflections;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
@@ -106,7 +106,7 @@ public class EventSystemImpl implements EventSystem {
     public void registerEvent(SimpleUri uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
         logger.debug("Registering event {}", eventType.getSimpleName());
-        for (Class parent : Reflections.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
+        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
             }

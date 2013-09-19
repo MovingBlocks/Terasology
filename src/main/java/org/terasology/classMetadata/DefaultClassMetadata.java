@@ -17,6 +17,7 @@ package org.terasology.classMetadata;
 
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
 
@@ -43,7 +44,7 @@ public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?
     }
 
     @Override
-    protected <V> FieldMetadata<T, V> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) {
+    protected <V> FieldMetadata<T, V> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         return new FieldMetadata<>(this, field, copyStrategy, factory);
     }
 }

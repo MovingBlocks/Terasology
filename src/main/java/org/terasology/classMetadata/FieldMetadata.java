@@ -18,6 +18,7 @@ package org.terasology.classMetadata;
 import com.google.common.base.Objects;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.reflect.FieldAccessor;
+import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 
 import java.lang.reflect.Field;
@@ -45,7 +46,7 @@ public class FieldMetadata<T, U> {
      * @param factory      The reflection provider
      */
     @SuppressWarnings("unchecked")
-    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) {
+    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         this.owner = owner;
         this.copyStrategy = copyStrategy;
         this.type = (Class<U>) field.getType();
