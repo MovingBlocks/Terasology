@@ -47,14 +47,14 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandshakeHandler.class);
 
     private Config config = CoreRegistry.get(Config.class);
-    private ServerHandler serverHandler;
+    private ServerConnectionHandler serverConnectionHandler;
     private byte[] serverRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
     private NetData.HandshakeHello serverHello;
 
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
-        serverHandler = ctx.getPipeline().get(ServerHandler.class);
+        serverConnectionHandler = ctx.getPipeline().get(ServerConnectionHandler.class);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         // Identity has been established, inform the server handler and withdraw from the pipeline
         ctx.getPipeline().remove(this);
-        serverHandler.channelAuthenticated(clientCert, ctx);
+        serverConnectionHandler.channelAuthenticated(clientCert, ctx);
     }
 
     private void processNewIdentityRequest(NetData.NewIdentityRequest newIdentityRequest, ChannelHandlerContext ctx) {
@@ -147,7 +147,7 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
 
             // Identity has been established, inform the server handler and withdraw from the pipeline
             ctx.getPipeline().remove(this);
-            serverHandler.channelAuthenticated(clientCertificates.getPublicCert(), ctx);
+            serverConnectionHandler.channelAuthenticated(clientCertificates.getPublicCert(), ctx);
         } catch (BadEncryptedDataException e) {
             logger.error("Received invalid encrypted pre-master secret, ending connection attempt");
             ctx.getChannel().close();

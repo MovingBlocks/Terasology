@@ -18,10 +18,15 @@ message NetMessage {
     repeated UpdateEntityMessage updateEntity = 7;
     repeated EventMessage event = 8;
     optional int64 time = 9;
-    optional ClientConnectMessage clientConnect = 15;
+
+    optional ServerInfoRequest serverInfoRequest = 15;
     optional ServerInfoMessage serverInfo = 16;
     repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
 
+    optional JoinMessage join = 18;
+    optional JoinCompleteMessage joinComplete = 19;
+
+    // Authentication
     optional HandshakeHello handshakeHello = 100;
     optional NewIdentityRequest newIdentityRequest = 101;
     optional ProvisionIdentity provisionIdentity = 102;
@@ -99,10 +104,21 @@ message Vector3iData {
     optional int32 z = 3;
 }
 
-message ClientConnectMessage {
+message ServerInfoRequest {
+
+    extensions 5000 to max;
+}
+
+message JoinMessage {
     optional string name = 1;
     optional string version = 2;
     optional sint32 viewDistanceLevel = 3;
+
+    extensions 5000 to max;
+}
+
+message JoinCompleteMessage {
+    optional int32 clientId = 1;
 
     extensions 5000 to max;
 }
@@ -120,8 +136,7 @@ message ServerInfoMessage {
 
     optional string version = 15;
     optional string gameName = 16;
-    optional int32 clientId = 17;
-    optional int64 time = 18;
+    optional int64 time = 17;
 
     extensions 5000 to max;
 }
@@ -145,6 +160,25 @@ message SerializationInfo {
 message ModuleInfo {
     optional string moduleId = 1;
     optional string moduleVersion = 2;
+
+    extensions 5000 to max;
+}
+
+message RequestModule {
+    optional string moduleId = 1;
+    optional string moduleVersion = 2;
+
+    extensions 5000 to max;
+}
+
+message ModuleData {
+    optional bytes module = 1;
+
+    extensions 5000 to max;
+}
+
+message ModuleSendError {
+    optional string message = 1;
 
     extensions 5000 to max;
 }

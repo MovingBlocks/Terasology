@@ -99,7 +99,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private SetMultimap<Integer, Class<? extends Component>> addedComponents = LinkedHashMultimap.create();
     private SetMultimap<Integer, Class<? extends Component>> removedComponents = LinkedHashMultimap.create();
 
-    private boolean awaitingConnectMessage = true;
     private String name = "Unknown";
     private long lastReceivedTime;
     private ViewDistance viewDistance = ViewDistance.NEAR;
@@ -137,11 +136,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         if (worldProvider != null) {
             worldProvider.registerListener(this);
         }
-    }
-
-    @Override
-    public boolean isAwaitingConnectMessage() {
-        return awaitingConnectMessage;
     }
 
     @Override
@@ -296,15 +290,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     public void connected(EntityManager entityManager, NetworkEntitySerializer newEntitySerializer,
                           EventSerializer newEventSerializer, EntitySystemLibrary newSystemLibrary) {
-        if (awaitingConnectMessage) {
-            awaitingConnectMessage = false;
+        this.entitySerializer = newEntitySerializer;
+        this.eventSerializer = newEventSerializer;
+        this.entitySystemLibrary = newSystemLibrary;
 
-            this.entitySerializer = newEntitySerializer;
-            this.eventSerializer = newEventSerializer;
-            this.entitySystemLibrary = newSystemLibrary;
-
-            createEntity(name, entityManager);
-        }
+        createEntity(name, entityManager);
     }
 
     @Override

@@ -40,6 +40,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
+import org.terasology.network.Server;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
@@ -54,7 +55,6 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.remoteChunkProvider.ChunkReadyListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.util.Collections;
@@ -68,8 +68,8 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Immortius
  */
-public class Server implements ChunkReadyListener {
-    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+public class ServerImpl implements Server {
+    private static final Logger logger = LoggerFactory.getLogger(ServerImpl.class);
 
     private NetworkSystemImpl networkSystem;
     private Channel channel;
@@ -94,7 +94,9 @@ public class Server implements ChunkReadyListener {
 
     private EngineTime time;
 
-    public Server(NetworkSystemImpl system, Channel channel) {
+
+
+    public ServerImpl(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
         metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
@@ -112,17 +114,23 @@ public class Server implements ChunkReadyListener {
 
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
         this.serverInfo = serverInfo;
-        clientEntity = new NetEntityRef(serverInfo.getClientId(), networkSystem);
     }
 
-    public EntityRef getEntity() {
+    void setClientId(int id) {
+        clientEntity = new NetEntityRef(id, networkSystem);
+    }
+
+    @Override
+    public EntityRef getClientEntity() {
         return clientEntity;
     }
 
+    @Override
     public NetData.ServerInfoMessage getInfo() {
         return serverInfo;
     }
 
+    @Override
     public void send(Event event, EntityRef target) {
         NetworkComponent netComp = target.getComponent(NetworkComponent.class);
         if (netComp != null) {
@@ -132,6 +140,7 @@ public class Server implements ChunkReadyListener {
         }
     }
 
+    @Override
     public void update(boolean netTick) {
         processReceivedChunks();
         if (entityManager != null) {
@@ -342,15 +351,18 @@ public class Server implements ChunkReadyListener {
         networkSystem.registerNetworkEntity(newEntity);
     }
 
+    @Override
     public void queueMessage(NetData.NetMessage message) {
         queuedMessages.offer(message);
     }
 
+    @Override
     public void setComponentDirty(int netId, Class<? extends Component> componentType) {
         netDirty.add(netId);
         changedComponents.put(netId, componentType);
     }
 
+    @Override
     public NetMetricSource getMetrics() {
         return metricsSource;
     }

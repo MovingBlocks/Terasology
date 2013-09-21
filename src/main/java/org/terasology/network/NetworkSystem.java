@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
-import org.terasology.network.internal.Server;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.internal.BlockRegistrationListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;

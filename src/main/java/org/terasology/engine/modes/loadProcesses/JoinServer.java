@@ -55,7 +55,7 @@ public class JoinServer implements LoadProcess {
 
     @Override
     public boolean step() {
-        if (networkSystem.getServer() != null && networkSystem.getServer().getInfo() != null) {
+        if (networkSystem.getServer() != null) {
             NetData.ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             gameManifest.setTitle(serverInfo.getGameName());
             for (NetData.WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
@@ -75,7 +75,6 @@ public class JoinServer implements LoadProcess {
 
             ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
             moduleManager.disableAllModules();
-
 
             for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 if (!moduleInfo.hasModuleId() || !moduleInfo.hasModuleVersion() || Version.create(moduleInfo.getModuleVersion()) == null) {

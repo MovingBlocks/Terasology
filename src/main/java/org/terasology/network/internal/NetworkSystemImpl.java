@@ -63,6 +63,7 @@ import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.Server;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -131,7 +132,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private StorageManager storageManager;
 
     // Client only
-    private Server server;
+    private ServerImpl server;
 
     public NetworkSystemImpl(EngineTime time) {
         this.time = time;
@@ -546,7 +547,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     }
                     break;
                 case CLIENT:
-                    if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getEntity())) {
+                    if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getClientEntity())) {
                         server.setComponentDirty(netComp.getNetworkId(), component);
                     }
                     break;
@@ -681,10 +682,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private void processNewClient(NetClient client) {
         logger.info("New client connected: {}", client.getName());
         client.connected(entityManager, entitySerializer, eventSerializer, entitySystemLibrary);
+        client.send(NetData.NetMessage.newBuilder().setJoinComplete(
+                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
         clientList.add(client);
         netClientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
-        sendServerInfo(client);
 
         connectClient(client);
 
@@ -712,7 +714,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         client.getEntity().send(new ConnectedEvent(entityStore));
     }
 
-    private void sendServerInfo(NetClient client) {
+    NetData.ServerInfoMessage getServerInfoMessage() {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
@@ -737,8 +739,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         serializeComponentInfo(serverInfoMessageBuilder);
         serializeEventInfo(serverInfoMessageBuilder);
 
-        serverInfoMessageBuilder.setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId());
-        client.send(NetData.NetMessage.newBuilder().setTime(time.getGameTimeInMs()).setServerInfo(serverInfoMessageBuilder).build());
+        return serverInfoMessageBuilder.build();
     }
 
     private void serializeEventInfo(NetData.ServerInfoMessage.Builder serverInfoMessageBuilder) {
@@ -775,7 +776,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
-    void setServer(Server server) {
+    void setServer(ServerImpl server) {
         this.server = server;
 
     }
@@ -844,4 +845,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
         }
     }
+
+
 }

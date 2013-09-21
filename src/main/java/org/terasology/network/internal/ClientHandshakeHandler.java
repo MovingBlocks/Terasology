@@ -49,7 +49,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientHandshakeHandler.class);
 
     private Config config = CoreRegistry.get(Config.class);
-    private ClientHandler clientHandler;
+    private ClientConnectionHandler clientConnectionHandler;
 
     private byte[] serverRandom;
     private byte[] clientRandom;
@@ -64,7 +64,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
-        clientHandler = ctx.getPipeline().get(ClientHandler.class);
+        clientConnectionHandler = ctx.getPipeline().get(ClientConnectionHandler.class);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         // And we're authenticated.
         ctx.getPipeline().remove(this);
-        clientHandler.channelAuthenticated(ctx);
+        clientConnectionHandler.channelAuthenticated(ctx);
     }
 
     private void processNewIdentity(NetData.ProvisionIdentity provisionIdentity, ChannelHandlerContext ctx) {
@@ -140,7 +140,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
             // And we're authenticated.
             ctx.getPipeline().remove(this);
-            clientHandler.channelAuthenticated(ctx);
+            clientConnectionHandler.channelAuthenticated(ctx);
         } catch (InvalidProtocolBufferException e) {
             logger.error("Received invalid certificate data: cancelling authentication", e);
             ctx.getChannel().close();

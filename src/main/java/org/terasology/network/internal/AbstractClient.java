@@ -49,6 +49,7 @@ public abstract class AbstractClient implements Client {
         // Create player entity
         clientEntity = entityManager.create("engine:client");
 
+        // TODO: Send event for clientInfo creation, don't create here.
         EntityRef clientInfo = entityManager.create("engine:clientInfo");
         DisplayInformationComponent displayInfo = clientInfo.getComponent(DisplayInformationComponent.class);
         displayInfo.name = name;

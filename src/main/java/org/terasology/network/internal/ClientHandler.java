@@ -24,16 +24,11 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateMainMenu;
 
-import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.NetMessage;
-import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
 /**
  * This Netty handler is used on the client side to send and receive messages.
@@ -45,8 +40,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
     private NetworkSystemImpl networkSystem;
-    private Server server;
-    private boolean awaitingServerInfo = true;
+    private ServerImpl server;
 
     public ClientHandler(NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
@@ -63,10 +57,6 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
-        if (message.hasServerInfo()) {
-            ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
-            receivedServerInfo(message.getServerInfo());
-        }
         server.queueMessage(message);
     }
 
@@ -76,22 +66,9 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
         e.getChannel().close();
     }
 
-    private void receivedServerInfo(ServerInfoMessage message) {
-        if (awaitingServerInfo) {
-            logger.info("Received server info");
-            awaitingServerInfo = false;
-            server.setServerInfo(message);
-        }
-    }
 
-    public void channelAuthenticated(ChannelHandlerContext ctx) {
-        this.server = new Server(networkSystem, ctx.getChannel());
+    public void joinComplete(ServerImpl joinedServer) {
+        this.server = joinedServer;
         networkSystem.setServer(server);
-        Config config = CoreRegistry.get(Config.class);
-        ctx.getChannel().write(NetMessage.newBuilder()
-                .setClientConnect(ClientConnectMessage.newBuilder()
-                        .setName(config.getPlayer().getName())
-                        .setViewDistanceLevel(config.getRendering().getViewDistance().getIndex()))
-                .build());
     }
 }

@@ -61,7 +61,6 @@ public final class AssetUri extends AbstractBaseUri {
     }
 
     public AssetUri(String uri) {
-        // TODO: handle incomplete/relative uris?
         String[] typeSplit = uri.split(TYPE_SEPARATOR, 2);
         if (typeSplit.length > 1) {
             type = AssetType.getTypeForId(typeSplit[0]);

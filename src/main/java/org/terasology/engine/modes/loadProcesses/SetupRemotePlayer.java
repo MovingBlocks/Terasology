@@ -36,7 +36,7 @@ public class SetupRemotePlayer implements LoadProcess {
     @Override
     public boolean step() {
         NetworkSystemImpl networkSystem = (NetworkSystemImpl) CoreRegistry.get(NetworkSystem.class);
-        EntityRef client = new NetEntityRef(networkSystem.getServer().getInfo().getClientId(), networkSystem);
+        EntityRef client = networkSystem.getServer().getClientEntity();
         if (client.exists()) {
             CoreRegistry.get(LocalPlayer.class).setClientEntity(client);
             return true;

@@ -13,36 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.network;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.rendering.world.ViewDistance;
-import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.network.NetMetricSource;
+import org.terasology.protobuf.NetData;
+import org.terasology.world.chunks.remoteChunkProvider.ChunkReadyListener;
 
 /**
- * A client is the connection between a player (local or remote) and the game.
- *
  * @author Immortius
  */
-public interface Client extends ChunkRegionListener {
+public interface Server extends ChunkReadyListener {
 
-    String getName();
+    EntityRef getClientEntity();
 
-    String getId();
-
-    void disconnect();
-
-    void update(boolean netTick);
-
-    EntityRef getEntity();
+    NetData.ServerInfoMessage getInfo();
 
     void send(Event event, EntityRef target);
 
-    ViewDistance getViewDistance();
+    void update(boolean netTick);
 
-    boolean isLocal();
+    void queueMessage(NetData.NetMessage message);
 
-    void setViewDistanceMode(ViewDistance viewDistance);
+    void setComponentDirty(int netId, Class<? extends Component> componentType);
+
+    NetMetricSource getMetrics();
+
 }

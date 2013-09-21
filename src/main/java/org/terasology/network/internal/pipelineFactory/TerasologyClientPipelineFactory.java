@@ -24,6 +24,7 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.terasology.network.internal.ClientConnectionHandler;
 import org.terasology.network.internal.ClientHandler;
 import org.terasology.network.internal.ClientHandshakeHandler;
 import org.terasology.network.internal.MetricRecordingHandler;
@@ -57,8 +58,8 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
-
         p.addLast("authenticationHandler", new ClientHandshakeHandler());
+        p.addLast("connectionHandler", new ClientConnectionHandler(networkSystem));
         p.addLast("handler", new ClientHandler(networkSystem));
         return p;
     }

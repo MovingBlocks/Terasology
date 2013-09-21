@@ -23,10 +23,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.rendering.world.ViewDistance;
 
-import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.NetMessage;
 
 /**
@@ -44,6 +41,11 @@ public class ServerHandler extends SimpleChannelUpstreamHandler {
         this.networkSystem = networkSystem;
     }
 
+    public void connectionComplete(NetClient netClient) {
+        this.client = netClient;
+        networkSystem.addClient(client);
+    }
+
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) {
         networkSystem.registerChannel(e.getChannel());
@@ -56,25 +58,10 @@ public class ServerHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
-    public void channelAuthenticated(PublicIdentityCertificate identity, ChannelHandlerContext ctx) {
-        client = new NetClient(ctx.getChannel(), networkSystem, identity);
-    }
-
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
-        if (message.hasClientConnect()) {
-            receivedConnect(message.getClientConnect());
-        }
         client.messageReceived(message);
-    }
-
-    private void receivedConnect(ClientConnectMessage message) {
-        if (client.isAwaitingConnectMessage()) {
-            client.setName(message.getName());
-            client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));
-            networkSystem.addClient(client);
-        }
     }
 
     @Override
