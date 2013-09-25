@@ -41,11 +41,6 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public boolean isAwaitingConnectMessage() {
-        return false;
-    }
-
-    @Override
     public String getName() {
         ClientComponent clientComp = getEntity().getComponent(ClientComponent.class);
         if (clientComp != null) {
