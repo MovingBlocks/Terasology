@@ -144,7 +144,7 @@ public class PrefabSerializer {
                         result.addComponent(newComponent);
                     }
                 }
-            } else {
+            } else if (componentData.hasType()) {
                 logger.error("Prefab contains unknown component '{}'", componentData.getType());
             }
         }

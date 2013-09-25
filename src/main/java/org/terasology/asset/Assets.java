@@ -86,6 +86,10 @@ public final class Assets {
         return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, name);
     }
 
+    public static AssetUri resolveAssetUri(AssetType type, String name) {
+        return CoreRegistry.get(AssetManager.class).resolve(type, name);
+    }
+
     /**
      * @param name
      * @return The resolved Asset URIs.
