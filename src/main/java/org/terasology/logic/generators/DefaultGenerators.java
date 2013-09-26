@@ -72,23 +72,25 @@ public class DefaultGenerators {
         // Cactus
         TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("engine:Cactus")).setGenerationProbability(0.05f);
 
+        // Oak
+        TreeGenerator oakTree = new SeedTreeGenerator().setBlock(blockManager.getBlock("engine:OakSaplingGenerated")).setGenerationProbability(0.08f);
 //
 //        // Add the trees to the generator lists
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
 ////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, pineTree);
 ////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, redTree);
 //
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakTree);
 ////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, pineTree);
 ////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
 //
 ////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, birkTree);
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, oakTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, oakTree);
 ////
 ////        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, redTree);
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
 //
-//        mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, oakTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, oakTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, cactus);
     }
 }

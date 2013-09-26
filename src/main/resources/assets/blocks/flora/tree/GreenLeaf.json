@@ -19,5 +19,5 @@
  * However, more likely it will be used by reference by a Tree
  */
 {
-    "basedOn" : "engine:leaf"
+"basedOn" : "engine:leaf"
 }

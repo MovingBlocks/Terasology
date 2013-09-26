@@ -53,7 +53,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
     @Override
     public void update(float delta) {
         long gameTimeInMs = time.getGameTimeInMs();
-        if (lastCheckTime+CHECK_INTERVAL<gameTimeInMs) {
+        if (lastCheckTime + CHECK_INTERVAL < gameTimeInMs) {
             Iterable<EntityRef> treeRefs = entityManager.getEntitiesWith(LivingTreeComponent.class, BlockComponent.class);
             for (EntityRef treeRef : treeRefs) {
                 LivingTreeComponent tree = treeRef.getComponent(LivingTreeComponent.class);
@@ -78,15 +78,16 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         final FastRandom rnd = new FastRandom();
 
         SimpleAxionElementReplacement trunkTop = new SimpleAxionElementReplacement("t");
-        trunkTop.addReplacement(1f,
+        trunkTop.addReplacement(0.5f,
                 new SimpleAxionElementReplacement.ReplacementGenerator() {
                     @Override
                     public String generateReplacement() {
                         // 137.5 degrees is a golden ratio
-                        int deg = 138+rnd.randomInt(17)-8;
-                        return "W+("+deg+")[&Mb]Wt";
+                        int deg = 138 + rnd.randomInt(17) - 8;
+                        return "W+(" + deg + ")[&Mb]Wt";
                     }
                 });
+        trunkTop.addReplacement(0.5f, "Wt");
 
         SimpleAxionElementReplacement smallBranch = new SimpleAxionElementReplacement("b");
         smallBranch.addReplacement(0.8f, "Bb");
@@ -95,12 +96,14 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         trunk.addReplacement(0.7f, "TN");
 
         replacementMap.put('s', sapling);
+        replacementMap.put('g', sapling);
         replacementMap.put('t', trunkTop);
         replacementMap.put('T', trunk);
         replacementMap.put('b', smallBranch);
 
 
         Block oakSapling = blockManager.getBlock("engine:OakSapling");
+        Block oakSaplingGenerated = blockManager.getBlock("engine:OakSaplingGenerated");
         Block greenLeaf = blockManager.getBlock("engine:GreenLeaf");
         Block oakTrunk = blockManager.getBlock("engine:OakTrunk");
 
@@ -109,6 +112,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
 
         Map<Character, AxionElementGeneration> blockMap = Maps.newHashMap();
         blockMap.put('s', new DefaultAxionElementGeneration(oakSapling, trunkAdvance));
+        blockMap.put('g', new DefaultAxionElementGeneration(oakSaplingGenerated, trunkAdvance));
 
         // Trunk building blocks
         blockMap.put('t', new DefaultAxionElementGeneration(greenLeaf, trunkAdvance));
@@ -121,6 +125,6 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.1f));
         blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
 
-        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), (float) Math.PI/4);
+        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), (float) Math.PI / 4);
     }
 }

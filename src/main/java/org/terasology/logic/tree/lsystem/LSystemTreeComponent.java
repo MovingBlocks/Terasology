@@ -15,4 +15,5 @@ public class LSystemTreeComponent implements Component {
     public float rotationAngle;
 
     public boolean initialized = false;
+    public boolean generated = false;
 }

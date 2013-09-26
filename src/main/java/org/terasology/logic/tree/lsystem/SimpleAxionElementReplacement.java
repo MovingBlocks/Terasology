@@ -11,7 +11,7 @@ public class SimpleAxionElementReplacement implements AxionElementReplacement {
 
     public SimpleAxionElementReplacement(String defaultReplacement) {
         this.defaultReplacement = defaultReplacement;
-        
+
         probabilities.add(1f);
         replacements.add(null);
     }
@@ -21,19 +21,19 @@ public class SimpleAxionElementReplacement implements AxionElementReplacement {
     }
 
     public void addReplacement(float probability, ReplacementGenerator replacement) {
-        if (probabilitySum+probability>1f)
+        if (probabilitySum + probability > 1f)
             throw new IllegalArgumentException("Sum of probabilities exceeds 1");
-        probabilitySum+=probability;
+        probabilitySum += probability;
 
-        probabilities.add(1-probabilitySum);
+        probabilities.add(1 - probabilitySum);
         replacements.add(replacement);
     }
 
     @Override
     public String getReplacement(float random) {
-        for (int i=0, size = probabilities.size(); i<size-1; i++) {
-            if (probabilities.get(i)>random && probabilities.get(i+1)<=random)
-                return replacements.get(i+1).generateReplacement();
+        for (int i = 0, size = probabilities.size(); i < size - 1; i++) {
+            if (probabilities.get(i) > random && probabilities.get(i + 1) <= random)
+                return replacements.get(i + 1).generateReplacement();
         }
         return defaultReplacement;
     }

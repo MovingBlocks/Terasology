@@ -15,6 +15,7 @@ public interface AxionElementGeneration {
 
     public interface AxionElementGenerationCallback {
         public void setBlock(Vector3f position, Block block);
+
         public void advance(float distance);
     }
 }

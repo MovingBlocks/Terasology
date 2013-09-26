@@ -1,6 +1,8 @@
 package org.terasology.logic.tree.lsystem;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.EntityRef;
@@ -22,8 +24,11 @@ import java.util.*;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class AdvancedLSystemTreeDefinition implements TreeDefinition {
+    private static final Logger logger = LoggerFactory.getLogger(AdvancedLSystemTreeDefinition.class);
+
+    private final int GROWTH_SAFE_DISTANCE = 15;
     private final float MAX_ANGLE_OFFSET = (float) Math.PI / 18f;
-    private final int GROWTH_INTERVAL = 1000;
+    private final int GROWTH_INTERVAL = 5 * 60 * 1000;
 
     private Map<Character, AxionElementGeneration> blockMap;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
@@ -46,48 +51,85 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
 
         if (lSystemTree != null) {
             long time = CoreRegistry.get(Time.class).getGameTimeInMs();
-            if (lSystemTree.lastGrowthTime + GROWTH_INTERVAL < time) {
+
+            if (shouldInitializeSapling(lSystemTree)) {
+                logger.debug("Initializing sapling");
+
+                FastRandom rand = new FastRandom(new Random().nextLong());
+
+                lSystemTree.branchAngle = rand.randomFloat() * MAX_ANGLE_OFFSET;
+                lSystemTree.rotationAngle = (float) Math.PI * rand.randomPosFloat();
+                lSystemTree.generation = 1;
+                lSystemTree.initialized = true;
+                // Update time when sapling was placed
+                lSystemTree.lastGrowthTime = time;
+                
+                treeRef.saveComponent(lSystemTree);
+            } else if (shouldProcessTreeGrowth(lSystemTree, time)) {
                 Vector3i treeLocation = treeRef.getComponent(BlockComponent.class).getPosition();
 
                 FastRandom rand = new FastRandom(new Random().nextLong());
 
-                if (!lSystemTree.initialized) {
-                    lSystemTree.branchAngle = rand.randomFloat() * MAX_ANGLE_OFFSET;
-                    lSystemTree.rotationAngle = (float) Math.PI * rand.randomPosFloat();
-                    lSystemTree.generation = 1;
-                    lSystemTree.initialized = true;
-                }
+                if (hasRoomToGrow(worldProvider, treeLocation)) {
+                    logger.debug("Growing tree");
 
-                Map<Vector3i, Block> currentTree = generateTreeFromAxiom(lSystemTree.axion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
+                    Map<Vector3i, Block> currentTree = generateTreeFromAxiom(lSystemTree.axion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
 
-                String nextAxion = generateNextAxion(rand, lSystemTree.axion);
+                    logger.debug("Starting axion generation");
+                    String nextAxion;
+                    if (lSystemTree.generated) {
+                        lSystemTree.generated = false;
+                        int generation = rand.randomIntAbs(maxGenerations);
+                        nextAxion = lSystemTree.axion;
+                        for (int i = 0; i < generation; i++)
+                            nextAxion = generateNextAxion(rand, nextAxion);
+                        lSystemTree.generation = generation;
+                    } else {
+                        nextAxion = generateNextAxion(rand, lSystemTree.axion);
+                    }
+                    logger.debug("Finished axion generation");
 
-                Map<Vector3i, Block> nextTree = generateTreeFromAxiom(nextAxion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
+                    Map<Vector3i, Block> nextTree = generateTreeFromAxiom(nextAxion, lSystemTree.branchAngle, lSystemTree.rotationAngle);
 
-                updateTreeInGame(worldProvider, blockEntityRegistry, treeLocation, currentTree, nextTree);
+                    logger.debug("Starting replacement of blocks");
+                    updateTreeInGame(worldProvider, blockEntityRegistry, treeLocation, currentTree, nextTree);
+                    logger.debug("Finished replacement of blocks");
 
-//                System.out.println("Axion: " + nextAxion);
+                    lSystemTree.axion = nextAxion;
+                    lSystemTree.generation++;
 
-                lSystemTree.axion = nextAxion;
-                lSystemTree.generation++;
+                    logger.debug("Generation: " + lSystemTree.generation + ", tree: " + treeLocation);
 
-//                System.out.println("Generation: " + lSystemTree.generation);
-
-                if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
-                    treeRef.removeComponent(LSystemTreeComponent.class);
-                } else {
-                    lSystemTree.lastGrowthTime = time;
-                    treeRef.saveComponent(lSystemTree);
+                    if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
+                        treeRef.removeComponent(LSystemTreeComponent.class);
+                    } else {
+                        lSystemTree.lastGrowthTime = time + rand.randomIntAbs(GROWTH_INTERVAL / 2);
+                        treeRef.saveComponent(lSystemTree);
+                    }
                 }
             }
         }
+    }
+
+    private boolean shouldInitializeSapling(LSystemTreeComponent lSystemTree) {
+        return !lSystemTree.initialized;
+    }
+
+    private boolean shouldProcessTreeGrowth(LSystemTreeComponent lSystemTree, long time) {
+        logger.debug("Considering processing tree, last growth: " + lSystemTree.lastGrowthTime + ", current time: " + time);
+        return lSystemTree.generated || lSystemTree.lastGrowthTime + GROWTH_INTERVAL < time;
+    }
+
+    private boolean hasRoomToGrow(WorldProvider worldProvider, Vector3i treeLocation) {
+        return worldProvider.isBlockRelevant(treeLocation.x + GROWTH_SAFE_DISTANCE, treeLocation.y, treeLocation.z + GROWTH_SAFE_DISTANCE)
+                && worldProvider.isBlockRelevant(treeLocation.x - GROWTH_SAFE_DISTANCE, treeLocation.y, treeLocation.z - GROWTH_SAFE_DISTANCE);
     }
 
     private boolean checkForDeath(int generation, float random) {
         if (generation < minGenerations)
             return false;
         double deathChance = Math.pow(1f * (maxGenerations - generation) / (maxGenerations - minGenerations), 0.2);
-//        System.out.println("Death chance: " + ((1 - deathChance) * 100) + "%");
+//        logger.debug("Death chance: " + ((1 - deathChance) * 100) + "%");
         return (deathChance < random);
     }
 
@@ -124,7 +166,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
             replaceCount++;
         }
 
-//        System.out.println("Replaced block count: " + replaceCount);
+        logger.debug("Replaced block count: " + replaceCount);
     }
 
     private String generateNextAxion(FastRandom rand, String currentAxion) {
@@ -201,7 +243,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     }
 
     private void setBlock(Map<Vector3i, Block> treeInMemory, Vector3f position, Block block) {
-        Vector3i blockPosition = new Vector3i(position.x+0.5f, position.y+0.5f, position.z+0.5f);
+        Vector3i blockPosition = new Vector3i(position.x + 0.5f, position.y + 0.5f, position.z + 0.5f);
         if (blockPosition.y >= 0) {
             final Block blockAtPosition = treeInMemory.get(blockPosition);
             if (blockAtPosition == block || hasBlockWithHigherPriority(block, blockAtPosition)) {
