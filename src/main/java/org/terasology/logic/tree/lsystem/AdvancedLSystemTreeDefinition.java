@@ -28,7 +28,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
 
     private final int GROWTH_SAFE_DISTANCE = 15;
     private final float MAX_ANGLE_OFFSET = (float) Math.PI / 18f;
-    private final int GROWTH_INTERVAL = 5 * 60 * 1000;
+    private final int GROWTH_INTERVAL = 30 * 1000;
 
     private Map<Character, AxionElementGeneration> blockMap;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
