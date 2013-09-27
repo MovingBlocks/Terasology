@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import com.google.common.collect.Queues;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
@@ -25,8 +24,8 @@ import org.terasology.world.block.BlockManager;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.util.Deque;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Allows the generation of complex trees based on L-Systems.
@@ -35,11 +34,12 @@ import java.util.Map;
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
 
-    public static final int MAX_ANGLE_OFFSET = 5;
+    public final int MAX_ANGLE_OFFSET = 5;
 
     /* SETTINGS */
     private int iterations;
     private double angleInDegree;
+    private Block air;
     private Block leafType;
     private Block barkType;
 
@@ -60,9 +60,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
         angleInDegree = angle;
         this.iterations = iterations;
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        leafType = blockManager.getBlock("engine:GreenLeaf");
-        barkType = blockManager.getBlock("engine:OakTrunk");
+        air = BlockManager.getAir();
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
@@ -74,8 +72,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
         String axiom = initialAxiom;
 
-        Deque<Vector3f> stackPosition = Queues.newArrayDeque();
-        Deque<Matrix4f> stackOrientation = Queues.newArrayDeque();
+        Stack<Vector3f> _stackPosition = new Stack<Vector3f>();
+        Stack<Matrix4f> _stackOrientation = new Stack<Matrix4f>();
 
         for (int i = 0; i < iterations; i++) {
 
@@ -86,11 +84,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
                 double rValue = (rand.randomDouble() + 1.0) / 2.0;
 
-                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue)) {
+                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue))
                     temp += ruleSet.get(c);
-                } else {
+                else
                     temp += c;
-                }
             }
 
             axiom = temp;
@@ -120,15 +117,14 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
-                    if (stackOrientation.size() > 1) {
+                    if (_stackOrientation.size() > 1) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {
                             for (int y = -size; y <= size; y++) {
                                 for (int z = -size; z <= size; z++) {
-                                    if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size) {
+                                    if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
                                         continue;
-                                    }
 
                                     view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
                                     view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
@@ -145,12 +141,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     position.add(dir);
                     break;
                 case '[':
-                    stackOrientation.push(new Matrix4f(rotation));
-                    stackPosition.push(new Vector3f(position));
+                    _stackOrientation.push(new Matrix4f(rotation));
+                    _stackPosition.push(new Vector3f(position));
                     break;
                 case ']':
-                    rotation = stackOrientation.pop();
-                    position = stackPosition.pop();
+                    rotation = _stackOrientation.pop();
+                    position = _stackPosition.pop();
                     break;
                 case '+':
                     tempRotation.setIdentity();
@@ -186,13 +182,13 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         }
     }
 
-    public TreeGenerator setLeafType(Block b) {
+    public TreeGeneratorLSystem setLeafType(Block b) {
         leafType = b;
         return this;
     }
 
 
-    public TreeGenerator setBarkType(Block b) {
+    public TreeGeneratorLSystem setBarkType(Block b) {
         barkType = b;
         return this;
     }

@@ -15,11 +15,9 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 
 /**
  * Cactus generator.
@@ -30,10 +28,6 @@ public class TreeGeneratorCactus extends TreeGenerator {
 
     private Block cactus;
 
-    public TreeGeneratorCactus() {
-        cactus = CoreRegistry.get(BlockManager.class).getBlock("engine:Cactus");
-    }
-
     @Override
     public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
         for (int y = posY; y < posY + 3; y++) {
@@ -41,8 +35,8 @@ public class TreeGeneratorCactus extends TreeGenerator {
         }
     }
 
-    @Override
-    public TreeGenerator setBarkType(Block b) {
+    public TreeGenerator setTrunkType(Block b) {
+        cactus = b;
         return this;
     }
 }
