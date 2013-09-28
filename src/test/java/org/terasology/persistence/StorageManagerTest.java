@@ -51,6 +51,7 @@ import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Vector3f;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.List;
 

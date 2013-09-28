@@ -29,6 +29,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.Version;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
+import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.internal.WorldInfo;
@@ -43,19 +44,21 @@ public class JoinServer implements LoadProcess {
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
     private GameManifest gameManifest;
+    private JoinStatus joinStatus;
 
-    public JoinServer(GameManifest gameManifest) {
+    public JoinServer(GameManifest gameManifest, JoinStatus joinStatus) {
         this.gameManifest = gameManifest;
+        this.joinStatus = joinStatus;
     }
 
     @Override
     public String getMessage() {
-        return "Connecting to server";
+        return joinStatus.getCurrentActivity();
     }
 
     @Override
     public boolean step() {
-        if (networkSystem.getServer() != null) {
+        if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
             NetData.ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             gameManifest.setTitle(serverInfo.getGameName());
             for (NetData.WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
@@ -100,13 +103,19 @@ public class JoinServer implements LoadProcess {
             assetManager.applyOverrides();
 
             return true;
-        } else {
-            return false;
+        } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
+            StateMainMenu mainMenu = new StateMainMenu("Failed to connect to server: " + joinStatus.getErrorMessage());
+            CoreRegistry.get(GameEngine.class).changeState(mainMenu);
         }
+        return false;
     }
 
     @Override
-    public int begin() {
-        return 1;
+    public void begin() {
+    }
+
+    @Override
+    public float getProgress() {
+        return joinStatus.getCurrentActivityProgress();
     }
 }

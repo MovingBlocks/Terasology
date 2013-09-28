@@ -18,7 +18,6 @@ package org.terasology.network;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.NetMetricSource;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.remoteChunkProvider.ChunkReadyListener;
 

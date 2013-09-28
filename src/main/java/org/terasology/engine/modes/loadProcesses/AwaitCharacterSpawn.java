@@ -54,9 +54,13 @@ public class AwaitCharacterSpawn implements LoadProcess {
     }
 
     @Override
-    public int begin() {
+    public void begin() {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        return UNKNOWN_STEPS;
+    }
+
+    @Override
+    public float getProgress() {
+        return 0f;
     }
 
 }

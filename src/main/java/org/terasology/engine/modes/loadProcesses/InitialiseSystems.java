@@ -18,7 +18,6 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -28,7 +27,7 @@ import org.terasology.world.BlockEntityRegistry;
 /**
  * @author Immortius
  */
-public class InitialiseSystems implements LoadProcess {
+public class InitialiseSystems extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Initialising Systems...";
@@ -43,11 +42,6 @@ public class InitialiseSystems implements LoadProcess {
         CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
         CoreRegistry.get(ComponentSystemManager.class).initialise();
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 
 }

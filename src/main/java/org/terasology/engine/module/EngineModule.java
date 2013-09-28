@@ -18,6 +18,9 @@ package org.terasology.engine.module;
 import org.reflections.Reflections;
 import org.terasology.engine.TerasologyConstants;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * @author Immortius
  */
@@ -57,6 +60,21 @@ public class EngineModule implements Module {
     @Override
     public ModuleInfo getModuleInfo() {
         return info;
+    }
+
+    @Override
+    public boolean isDataAvailable() {
+        return false;
+    }
+
+    @Override
+    public InputStream getData() throws IOException {
+        throw new IOException("Cannot get data for the engine module");
+    }
+
+    @Override
+    public long getSize() {
+        return 0;
     }
 
     @Override

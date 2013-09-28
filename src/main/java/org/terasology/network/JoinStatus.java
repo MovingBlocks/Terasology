@@ -13,36 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.engine.modes;
+package org.terasology.network;
 
 /**
  * @author Immortius
  */
-public interface LoadProcess {
+public interface JoinStatus {
 
-    /**
-     * @return A message describing the state of the process
-     */
-    String getMessage();
+    public enum Status {
+        IN_PROGRESS,
+        COMPLETE,
+        FAILED
+    }
 
-    /**
-     * Runs a single step.
-     *
-     * @return Whether the overall process is finished
-     */
-    boolean step();
+    Status getStatus();
 
-    /**
-     * Begins the loading
-     *
-     * @return The total number of expected steps for this LoadProcess, 0 if nothing to do
-     */
-    void begin();
+    String getCurrentActivity();
 
-    /**
-     * @return The progress of the process, between 0f and 1f inclusive
-     */
-    float getProgress();
+    float getCurrentActivityProgress();
 
+    String getErrorMessage();
 }

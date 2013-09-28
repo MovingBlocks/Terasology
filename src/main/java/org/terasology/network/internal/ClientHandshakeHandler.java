@@ -46,10 +46,13 @@ import java.security.SecureRandom;
  * Authentication handler for the client end of the authentication handshake.
  */
 public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
+
     private static final Logger logger = LoggerFactory.getLogger(ClientHandshakeHandler.class);
+    private static final String AUTHENTICATION_FAILURE = "Authentication failure";
 
     private Config config = CoreRegistry.get(Config.class);
     private ClientConnectionHandler clientConnectionHandler;
+    private JoinStatusImpl joinStatus;
 
     private byte[] serverRandom;
     private byte[] clientRandom;
@@ -61,10 +64,15 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     private ClientIdentity identity;
     private PublicIdentityCertificate serverCertificate;
 
+    public ClientHandshakeHandler(JoinStatusImpl joinStatus) {
+        this.joinStatus = joinStatus;
+    }
+
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
         clientConnectionHandler = ctx.getPipeline().get(ClientConnectionHandler.class);
+        joinStatus.setCurrentActivity("Authenticating with server");
     }
 
     @Override
@@ -83,12 +91,14 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         logger.info("Received server verification");
         if (serverHello == null || clientHello == null) {
             logger.error("Received server verification without requesting it: cancelling authentication");
+            joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.getChannel().close();
             return;
         }
 
         if (!serverCertificate.verify(HandshakeCommon.getSignatureData(serverHello, clientHello), handshakeVerification.getSignature().toByteArray())) {
             logger.error("Server failed verification: cancelling authentication");
+            joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.getChannel().close();
             return;
         }
@@ -102,6 +112,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         logger.info("Received identity from server");
         if (!requestedCertificate) {
             logger.error("Received identity without requesting it: cancelling authentication");
+            joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.getChannel().close();
             return;
         }
@@ -115,6 +126,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
                 decryptedCert = cipher.doFinal(provisionIdentity.getEncryptedCertificates().toByteArray());
             } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 logger.error("Unexpected error decrypting received certificate, ending connection attempt", e);
+                joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
                 ctx.getChannel().close();
                 return;
             }
@@ -126,6 +138,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
             if (!publicCert.verifySignedBy(serverCertificate)) {
                 logger.error("Received invalid certificate, not signed by server: cancelling authentication");
+                joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
                 ctx.getChannel().close();
                 return;
             }
@@ -143,8 +156,8 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             clientConnectionHandler.channelAuthenticated(ctx);
         } catch (InvalidProtocolBufferException e) {
             logger.error("Received invalid certificate data: cancelling authentication", e);
+            joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.getChannel().close();
-            return;
         }
     }
 
@@ -158,6 +171,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
             if (!serverCertificate.verifySelfSigned()) {
                 logger.error("Received invalid server certificate: cancelling authentication");
+                joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
                 ctx.getChannel().close();
                 return;
             }
@@ -173,8 +187,8 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         } else {
             logger.error("Received multiple hello messages from server: cancelling authentication");
+            joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.getChannel().close();
-            // TODO: Ensure authentication failed error is displayed to client
         }
 
     }

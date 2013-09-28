@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
 import org.lwjgl.Sys;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ import org.terasology.engine.modes.loadProcesses.StartServer;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
 
@@ -69,8 +71,7 @@ public class StateLoading implements GameState {
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
-    private int currentExpectedSteps;
-    private int completedSteps;
+    private JoinStatus joinStatus;
 
     private GUIManager guiManager;
 
@@ -83,6 +84,8 @@ public class StateLoading implements GameState {
      * @param netMode
      */
     public StateLoading(GameManifest gameManifest, NetworkMode netMode) {
+        Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
+
         this.gameManifest = gameManifest;
         this.guiManager = CoreRegistry.get(GUIManager.class);
         this.netMode = netMode;
@@ -91,12 +94,13 @@ public class StateLoading implements GameState {
     /**
      * Constructor for client of multiplayer game
      *
-     * @param netMode
+     * @param joinStatus
      */
-    public StateLoading(NetworkMode netMode) {
+    public StateLoading(JoinStatus joinStatus) {
         this.gameManifest = new GameManifest();
         this.guiManager = CoreRegistry.get(GUIManager.class);
-        this.netMode = netMode;
+        this.netMode = NetworkMode.CLIENT;
+        this.joinStatus = joinStatus;
     }
 
     @Override
@@ -118,11 +122,11 @@ public class StateLoading implements GameState {
         popStep();
         guiManager.closeAllWindows();
         loadingScreen = (UIScreenLoading) guiManager.openWindow("loading");
-        loadingScreen.updateStatus(current.getMessage(), completedSteps / (currentExpectedSteps * 100f));
+        loadingScreen.updateStatus(current.getMessage(), current.getProgress() * 100f);
     }
 
     private void initClient() {
-        loadProcesses.add(new JoinServer(gameManifest));
+        loadProcesses.add(new JoinServer(gameManifest, joinStatus));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlockFamilyFactories());
         loadProcesses.add(new RegisterBlocks(gameManifest));
@@ -169,13 +173,11 @@ public class StateLoading implements GameState {
 
     private void popStep() {
         current = null;
-        currentExpectedSteps = 0;
-        while (currentExpectedSteps == 0 && !loadProcesses.isEmpty()) {
+        if (!loadProcesses.isEmpty()) {
             current = loadProcesses.remove();
             logger.debug(current.getMessage());
-            currentExpectedSteps = current.begin();
+            current.begin();
         }
-        completedSteps = 0;
     }
 
     @Override
@@ -194,19 +196,13 @@ public class StateLoading implements GameState {
         while (current != null && 1000 * Sys.getTime() / Sys.getTimerResolution() - startTime < 20) {
             if (current.step()) {
                 popStep();
-            } else {
-                completedSteps++;
             }
         }
         if (current == null) {
             CoreRegistry.get(GUIManager.class).closeWindow("loading");
             CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
         } else {
-            if (currentExpectedSteps > 0) {
-                loadingScreen.updateStatus(current.getMessage(), Math.min(100f, 100f * completedSteps / currentExpectedSteps));
-            } else {
-                loadingScreen.updateStatus(current.getMessage(), 0);
-            }
+            loadingScreen.updateStatus(current.getMessage(), 100f * current.getProgress());
             guiManager.update();
         }
     }

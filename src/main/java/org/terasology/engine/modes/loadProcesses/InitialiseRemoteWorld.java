@@ -19,7 +19,6 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
@@ -38,7 +37,7 @@ import org.terasology.world.internal.WorldProviderWrapper;
 /**
  * @author Immortius
  */
-public class InitialiseRemoteWorld implements LoadProcess {
+public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     private GameManifest gameManifest;
 
     public InitialiseRemoteWorld(GameManifest gameManifest) {
@@ -78,8 +77,4 @@ public class InitialiseRemoteWorld implements LoadProcess {
         return true;
     }
 
-    @Override
-    public int begin() {
-        return 1;
-    }
 }

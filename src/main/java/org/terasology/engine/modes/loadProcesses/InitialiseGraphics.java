@@ -19,7 +19,6 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -29,7 +28,7 @@ import javax.vecmath.Vector4f;
 /**
  * @author Immortius
  */
-public class InitialiseGraphics implements LoadProcess {
+public class InitialiseGraphics extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Initialising Graphics";
@@ -46,10 +45,5 @@ public class InitialiseGraphics implements LoadProcess {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
         tessellator.generateMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "gelatinousCube"));
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 }

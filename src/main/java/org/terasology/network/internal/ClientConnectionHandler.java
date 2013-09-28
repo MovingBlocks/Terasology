@@ -15,6 +15,7 @@
  */
 package org.terasology.network.internal;
 
+import com.google.common.collect.Sets;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
@@ -24,7 +25,19 @@ import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.Version;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.network.JoinStatus;
 import org.terasology.protobuf.NetData;
+
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -33,12 +46,22 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
 
+    private final JoinStatusImpl joinStatus;
     private NetworkSystemImpl networkSystem;
     private ServerImpl server;
     private ChannelHandlerContext channelHandlerContext;
+    private ModuleManager moduleManager;
 
-    public ClientConnectionHandler(NetworkSystemImpl networkSystem) {
+    private Set<String> missingModules = Sets.newHashSet();
+    private NetData.ModuleDataHeader receivingModule;
+    private Path tempModuleLocation;
+    private BufferedOutputStream downloadingModule;
+    private long lengthReceived;
+
+    public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
+        this.joinStatus = joinStatus;
+        this.moduleManager = CoreRegistry.get(ModuleManager.class);
     }
 
     @Override
@@ -46,6 +69,10 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
         if (message.hasServerInfo()) {
             receivedServerInfo(message.getServerInfo());
+        } else if (message.hasModuleDataHeader()) {
+            receiveModuleStart(message.getModuleDataHeader());
+        } else if (message.hasModuleData()) {
+            receiveModule(message.getModuleData());
         } else if (message.hasJoinComplete()) {
             completeJoin(message.getJoinComplete());
         } else {
@@ -53,9 +80,97 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    private void receiveModuleStart(NetData.ModuleDataHeader moduleDataHeader) {
+        if (receivingModule != null) {
+            joinStatus.setErrorMessage("Module download error");
+            channelHandlerContext.getChannel().close();
+            return;
+        }
+        String moduleId = moduleDataHeader.getId();
+        if (missingModules.remove(moduleId.toLowerCase(Locale.ENGLISH))) {
+            if (moduleDataHeader.hasError()) {
+                joinStatus.setErrorMessage("Module download error: " + moduleDataHeader.getError());
+                channelHandlerContext.getChannel().close();
+            } else {
+                String sizeString = getSizeString(moduleDataHeader.getSize());
+                joinStatus.setCurrentActivity("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " (" + sizeString + ")");
+                receivingModule = moduleDataHeader;
+                lengthReceived = 0;
+                try {
+                    tempModuleLocation = Files.createTempFile("terasologyDownload", ".tmp");
+                    tempModuleLocation.toFile().deleteOnExit();
+                    downloadingModule = new BufferedOutputStream(Files.newOutputStream(tempModuleLocation, StandardOpenOption.WRITE));
+                } catch (IOException e) {
+                    logger.error("Failed to write received module", e);
+                    joinStatus.setErrorMessage("Module download error");
+                    channelHandlerContext.getChannel().close();
+                }
+            }
+        } else {
+            logger.error("Received unwanted module {}:{} from server", moduleDataHeader.getId(), moduleDataHeader.getVersion());
+            joinStatus.setErrorMessage("Module download error");
+            channelHandlerContext.getChannel().close();
+        }
+    }
+
+    private String getSizeString(long size) {
+        if (size < 1024) {
+            return size + " bytes";
+        } else if (size < 1048576) {
+            return String.format("%.2f KB", (float) size / 1024);
+        } else {
+            return String.format("%.2f MB", (float) size / 1048576);
+        }
+    }
+
+    private void receiveModule(NetData.ModuleData moduleData) {
+        if (receivingModule == null) {
+            joinStatus.setErrorMessage("Module download error");
+            channelHandlerContext.getChannel().close();
+            return;
+        }
+
+        try {
+            downloadingModule.write(moduleData.getModule().toByteArray());
+            lengthReceived += moduleData.getModule().size();
+            joinStatus.setCurrentProgress((float) lengthReceived / receivingModule.getSize());
+            if (lengthReceived == receivingModule.getSize()) {
+                // finished
+                downloadingModule.close();
+                String moduleName = String.format("%s-%s.jar", receivingModule.getId(), receivingModule.getVersion());
+                Path finalPath = PathManager.getInstance().getHomeModPath().normalize().resolve(moduleName);
+                if (finalPath.normalize().startsWith(PathManager.getInstance().getHomeModPath())) {
+                    if (Files.exists(finalPath)) {
+                        logger.error("File already exists at {}", finalPath);
+                        joinStatus.setErrorMessage("Module download error");
+                        channelHandlerContext.getChannel().close();
+                        return;
+                    }
+
+                    Files.copy(tempModuleLocation, finalPath);
+                    receivingModule = null;
+
+                    if (missingModules.isEmpty()) {
+                        moduleManager.refresh();
+                        sendJoin();
+                    }
+                } else {
+                    logger.error("Module rejected");
+                    joinStatus.setErrorMessage("Module download error");
+                    channelHandlerContext.getChannel().close();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Error saving module", e);
+            joinStatus.setErrorMessage("Module download error");
+            channelHandlerContext.getChannel().close();
+        }
+    }
+
     private void completeJoin(NetData.JoinCompleteMessage joinComplete) {
         logger.info("Join complete received");
         server.setClientId(joinComplete.getClientId());
+        joinStatus.setComplete();
 
         channelHandlerContext.getPipeline().remove(this);
         channelHandlerContext.getPipeline().get(ClientHandler.class).joinComplete(server);
@@ -67,15 +182,40 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         this.server = new ServerImpl(networkSystem, channelHandlerContext.getChannel());
         server.setServerInfo(message);
 
+        // Request missing modules
+        for (NetData.ModuleInfo info : message.getModuleList()) {
+            if (null == moduleManager.getModule(info.getModuleId(), Version.create(info.getModuleVersion()))) {
+                missingModules.add(info.getModuleId().toLowerCase(Locale.ENGLISH));
+            }
+        }
+
+        if (missingModules.isEmpty()) {
+            joinStatus.setCurrentActivity("Finalizing join");
+            sendJoin();
+        } else {
+            joinStatus.setCurrentActivity("Requesting missing modules");
+            NetData.NetMessage.Builder builder = NetData.NetMessage.newBuilder();
+            for (String module : missingModules) {
+                builder.addModuleRequest(NetData.ModuleRequest.newBuilder().setModuleId(module));
+            }
+            channelHandlerContext.getChannel().write(builder.build());
+        }
+    }
+
+    private void sendJoin() {
         Config config = CoreRegistry.get(Config.class);
         channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(NetData.JoinMessage.newBuilder().setName(config.getPlayer().getName())
                 .setViewDistanceLevel(config.getRendering().getViewDistance().getIndex())).build());
-
     }
 
     public void channelAuthenticated(ChannelHandlerContext ctx) {
         channelHandlerContext = ctx;
         ctx.getChannel().write(NetData.NetMessage.newBuilder()
                 .setServerInfoRequest(NetData.ServerInfoRequest.newBuilder()).build());
+        joinStatus.setCurrentActivity("Requesting server info");
+    }
+
+    public JoinStatus getJoinStatus() {
+        return joinStatus;
     }
 }

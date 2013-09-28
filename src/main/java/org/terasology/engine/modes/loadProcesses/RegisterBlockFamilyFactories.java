@@ -20,7 +20,6 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.world.block.family.BlockFamilyFactory;
@@ -33,7 +32,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class RegisterBlockFamilyFactories implements LoadProcess {
+public class RegisterBlockFamilyFactories extends SingleStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterBlockFamilyFactories.class);
 
     @Override
@@ -72,16 +71,9 @@ public class RegisterBlockFamilyFactories implements LoadProcess {
                 BlockFamilyFactory newBlockFamilyFactory = (BlockFamilyFactory) blockFamilyFactory.newInstance();
                 registry.setBlockFamilyFactory(id, newBlockFamilyFactory);
                 logger.debug("Loaded blockFamilyFactory {}", id);
-            } catch (InstantiationException e) {
-                logger.error("Failed to load blockFamilyFactory {}", id, e);
-            } catch (IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException e) {
                 logger.error("Failed to load blockFamilyFactory {}", id, e);
             }
         }
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 }

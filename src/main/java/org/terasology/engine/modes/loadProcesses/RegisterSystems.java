@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.module.DependencyInfo;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -34,7 +33,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class RegisterSystems implements LoadProcess {
+public class RegisterSystems extends SingleStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterSystems.class);
     private NetworkMode netMode;
     private Set<String> registeredModules = Sets.newHashSet();
@@ -77,8 +76,4 @@ public class RegisterSystems implements LoadProcess {
         registeredModules.add(module.getId().toLowerCase(Locale.ENGLISH));
     }
 
-    @Override
-    public int begin() {
-        return 1;
-    }
 }

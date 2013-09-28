@@ -19,7 +19,6 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.persistence.StorageManager;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import java.io.IOException;
 /**
  * @author Immortius
  */
-public class LoadEntities implements LoadProcess {
+public class LoadEntities extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadEntities.class);
 
@@ -50,8 +49,5 @@ public class LoadEntities implements LoadProcess {
         return true;
     }
 
-    @Override
-    public int begin() {
-        return 1;
-    }
+
 }

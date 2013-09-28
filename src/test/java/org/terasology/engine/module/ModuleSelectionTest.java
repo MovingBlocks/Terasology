@@ -22,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
@@ -145,6 +147,21 @@ public class ModuleSelectionTest {
             ModuleInfo info = new ModuleInfo();
             info.getDependencies().addAll(dependencies);
             return info;
+        }
+
+        @Override
+        public boolean isDataAvailable() {
+            return false;
+        }
+
+        @Override
+        public InputStream getData() throws IOException {
+            return null;
+        }
+
+        @Override
+        public long getSize() {
+            return 0;
         }
 
         @Override

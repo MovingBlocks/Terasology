@@ -15,15 +15,24 @@
  */
 package org.terasology.network.internal;
 
+import com.google.common.io.ByteStreams;
+import com.google.protobuf.ByteString;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.protobuf.NetData;
 import org.terasology.rendering.world.ViewDistance;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -37,6 +46,8 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
     private ChannelHandlerContext channelHandlerContext;
 
     private PublicIdentityCertificate identity;
+
+    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
     public ServerConnectionHandler(NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
@@ -61,8 +72,48 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
             ctx.getChannel().write(NetData.NetMessage.newBuilder().setServerInfo(serverInfo).setTime(serverInfo.getTime()).build());
         } else if (message.hasJoin()) {
             receivedConnect(message.getJoin());
+        } else if (message.getModuleRequestCount() > 0) {
+            sendModules(message.getModuleRequestList());
         } else {
             logger.error("Received unexpected message");
+        }
+    }
+
+    private void sendModules(List<NetData.ModuleRequest> moduleRequestList) {
+        for (NetData.ModuleRequest request : moduleRequestList) {
+            Module module = moduleManager.getActiveModule(request.getModuleId());
+            NetData.ModuleDataHeader.Builder result = NetData.ModuleDataHeader.newBuilder();
+            result.setId(request.getModuleId());
+            if (module == null) {
+                result.setError("Module not available");
+            } else if (!module.isDataAvailable()) {
+                result.setError("Module not available for download");
+            } else {
+                result.setVersion(module.getVersion().toString());
+                result.setSize(module.getSize());
+            }
+            channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setModuleDataHeader(result).build());
+
+            if (module != null && module.isDataAvailable()) {
+                try {
+                    InputStream input = module.getData();
+
+                    long remainingData = module.getSize();
+                    byte[] data = new byte[1024];
+                    while (remainingData > 0) {
+                        int nextBlock = (int) Math.min(remainingData, 1024);
+                        ByteStreams.read(input, data, 0, nextBlock);
+                        channelHandlerContext.getChannel().write(
+                                NetData.NetMessage.newBuilder().setModuleData(
+                                        NetData.ModuleData.newBuilder().setModule(ByteString.copyFrom(data, 0, nextBlock))
+                                ).build());
+                        remainingData -= nextBlock;
+                    }
+                } catch (IOException e) {
+                    logger.error("Error sending module", e);
+                    channelHandlerContext.getChannel().close();
+                }
+            }
         }
     }
 

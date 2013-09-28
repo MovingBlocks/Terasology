@@ -15,26 +15,26 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.internal.BlockPrefabManager;
+import org.terasology.engine.modes.LoadProcess;
 
 /**
  * @author Immortius
  */
-public class ProcessBlockPrefabs extends SingleStepLoadProcess {
+public abstract class StepBasedLoadProcess implements LoadProcess {
 
-    @Override
-    public String getMessage() {
-        return "Initialising Block Type Entities";
+    private int stepsComplete;
+    private int totalSteps;
+
+    protected void stepDone() {
+        stepsComplete++;
+    }
+
+    protected void setTotalSteps(int amount) {
+        this.totalSteps = Math.min(1, amount);
     }
 
     @Override
-    public boolean step() {
-        BlockManagerImpl blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
-        blockManager.subscribe(new BlockPrefabManager(CoreRegistry.get(EntityManager.class), blockManager));
-        return true;
+    public final float getProgress() {
+        return (float) stepsComplete / totalSteps;
     }
 }

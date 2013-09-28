@@ -19,14 +19,13 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkSystem;
 
 /**
  * @author Immortius
  */
-public class InitialiseEntitySystem implements LoadProcess {
+public class InitialiseEntitySystem extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Initialising Entity System...";
@@ -37,11 +36,6 @@ public class InitialiseEntitySystem implements LoadProcess {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         new EntitySystemBuilder().build(moduleManager, CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 
 }

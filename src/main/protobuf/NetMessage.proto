@@ -24,7 +24,10 @@ message NetMessage {
     repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
 
     optional JoinMessage join = 18;
-    optional JoinCompleteMessage joinComplete = 19;
+    repeated ModuleRequest moduleRequest = 19;
+    optional ModuleDataHeader moduleDataHeader = 20;
+    optional ModuleData moduleData = 21;
+    optional JoinCompleteMessage joinComplete = 22;
 
     // Authentication
     optional HandshakeHello handshakeHello = 100;
@@ -164,9 +167,17 @@ message ModuleInfo {
     extensions 5000 to max;
 }
 
-message RequestModule {
+message ModuleRequest {
     optional string moduleId = 1;
-    optional string moduleVersion = 2;
+
+    extensions 5000 to max;
+}
+
+message ModuleDataHeader {
+    optional string id = 1;
+    optional string version = 2;
+    optional int64 size = 3;
+    optional string error = 15;
 
     extensions 5000 to max;
 }

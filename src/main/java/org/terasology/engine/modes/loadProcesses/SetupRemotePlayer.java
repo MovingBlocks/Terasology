@@ -17,17 +17,15 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.internal.NetworkSystemImpl;
 
 /**
  * @author Immortius
  */
-public class SetupRemotePlayer implements LoadProcess {
+public class SetupRemotePlayer extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Awaiting player data";
@@ -42,10 +40,5 @@ public class SetupRemotePlayer implements LoadProcess {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 }

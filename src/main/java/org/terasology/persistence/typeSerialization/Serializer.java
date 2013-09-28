@@ -63,7 +63,9 @@ public class Serializer {
         Object rawValue = field.getValue(container);
         if (rawValue != null) {
             TypeHandler handler = getHandlerFor(field);
-            return handler.serialize(rawValue);
+            if (handler != null) {
+                return handler.serialize(rawValue);
+            }
         }
         return null;
     }

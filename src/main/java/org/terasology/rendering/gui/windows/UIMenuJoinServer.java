@@ -24,7 +24,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
-import org.terasology.network.NetworkMode;
+import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.dialogs.UIDialogServer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -207,8 +207,9 @@ public class UIMenuJoinServer extends UIWindow {
         if (list.getSelection() != null && list.getSelection().getValue() != null) {
             ServerInfo server = (ServerInfo) list.getSelection().getValue();
             NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-            if (networkSystem.join(server.getAddress(), TerasologyConstants.DEFAULT_PORT)) {
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(NetworkMode.CLIENT));
+            JoinStatus joinStatus = networkSystem.join(server.getAddress(), TerasologyConstants.DEFAULT_PORT);
+            if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(joinStatus));
             } else {
                 getGUIManager().showMessage("Failed to Join", "Could not connect to server (does it exist?)");
             }

@@ -18,7 +18,6 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
@@ -26,7 +25,7 @@ import org.terasology.network.NetworkSystem;
 /**
  * @author Immortius
  */
-public class SetupLocalPlayer implements LoadProcess {
+public class SetupLocalPlayer extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Setting up local player";
@@ -39,8 +38,4 @@ public class SetupLocalPlayer implements LoadProcess {
         return true;
     }
 
-    @Override
-    public int begin() {
-        return 1;
-    }
 }

@@ -23,7 +23,6 @@ import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindAxisEvent;
@@ -43,7 +42,7 @@ import java.util.Locale;
 /**
  * @author Immortius
  */
-public class RegisterInputSystem implements LoadProcess {
+public class RegisterInputSystem extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterInputSystem.class);
 
@@ -79,11 +78,6 @@ public class RegisterInputSystem implements LoadProcess {
 
         registerToolbarShortcuts(inputSystem, bindsConfig);
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 
     private void registerToolbarShortcuts(InputSystem inputSystem, BindsConfig inputConfig) {
@@ -122,9 +116,7 @@ public class RegisterInputSystem implements LoadProcess {
                     BindableAxis bindAxis = inputSystem.registerBindAxis(id, (BindAxisEvent) registerBindClass.newInstance(), positiveButton, negativeButton);
                     bindAxis.setSendEventMode(info.eventMode());
                     logger.debug("Registered axis bind: {}", id);
-                } catch (InstantiationException e) {
-                    logger.error("Failed to register axis bind \"{}\"", id, e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("Failed to register axis bind \"{}\"", id, e);
                 }
             } else {
@@ -149,9 +141,7 @@ public class RegisterInputSystem implements LoadProcess {
                     }
 
                     logger.debug("Registered button bind: {}", id);
-                } catch (InstantiationException e) {
-                    logger.error("Failed to register button bind \"{}\"", e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("Failed to register button bind \"{}\"", e);
                 }
             } else {

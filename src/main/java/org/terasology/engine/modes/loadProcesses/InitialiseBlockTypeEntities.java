@@ -16,7 +16,6 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -25,7 +24,7 @@ import org.terasology.world.block.typeEntity.BlockTypeEntityGenerator;
 /**
  * @author Immortius
  */
-public class InitialiseBlockTypeEntities implements LoadProcess {
+public class InitialiseBlockTypeEntities extends SingleStepLoadProcess {
 
     @Override
     public String getMessage() {
@@ -37,10 +36,5 @@ public class InitialiseBlockTypeEntities implements LoadProcess {
         BlockManagerImpl blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
         blockManager.subscribe(new BlockTypeEntityGenerator(CoreRegistry.get(EntityManager.class), blockManager));
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 }

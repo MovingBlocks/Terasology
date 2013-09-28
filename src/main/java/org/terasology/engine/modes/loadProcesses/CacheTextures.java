@@ -20,14 +20,13 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.modes.LoadProcess;
 
 import java.util.Iterator;
 
 /**
  * @author Immortius
  */
-public class CacheTextures implements LoadProcess {
+public class CacheTextures extends StepBasedLoadProcess {
     private Iterator<AssetUri> uris;
 
     @Override
@@ -36,15 +35,18 @@ public class CacheTextures implements LoadProcess {
     }
 
     @Override
-    public int begin() {
+    public void begin() {
         uris = Assets.list(AssetType.TEXTURE).iterator();
-        return Lists.newArrayList(Assets.list(AssetType.TEXTURE)).size();
+        setTotalSteps(Lists.newArrayList(Assets.list(AssetType.TEXTURE)).size());
     }
 
     @Override
     public boolean step() {
         AssetUri textureURI = uris.next();
         Assets.get(textureURI);
+        stepDone();
         return !uris.hasNext();
     }
+
+
 }

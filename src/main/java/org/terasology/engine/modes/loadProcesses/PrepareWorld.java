@@ -47,10 +47,14 @@ public class PrepareWorld implements LoadProcess {
     }
 
     @Override
-    public int begin() {
+    public void begin() {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         startTime = Sys.getTime() * 1000 / Sys.getTimerResolution();
-        return UNKNOWN_STEPS;
+    }
+
+    @Override
+    public float getProgress() {
+        return 0;
     }
 
 }

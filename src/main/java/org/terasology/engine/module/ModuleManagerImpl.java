@@ -102,7 +102,6 @@ public class ModuleManagerImpl implements ModuleManager {
         } catch (Exception e) {
             throw new RuntimeException("Failed to load engine module info", e);
         }
-        activeModules.put(engineModule.getId(), engineModule);
         refresh();
     }
 
@@ -186,6 +185,8 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public void refresh() {
         modules.clear();
+        activeModules.clear();
+        activeModules.put(engineModule.getId(), engineModule);
         Gson gson = new GsonBuilder().registerTypeAdapter(Version.class, new VersionHandler()).create();
         for (Path rootModulePath : PathManager.getInstance().getModulePaths()) {
 

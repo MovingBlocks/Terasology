@@ -18,7 +18,6 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -26,7 +25,7 @@ import org.terasology.network.exceptions.HostingFailedException;
 /**
  * @author Immortius
  */
-public class StartServer implements LoadProcess {
+public class StartServer extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Starting Server";
@@ -40,10 +39,5 @@ public class StartServer implements LoadProcess {
             CoreRegistry.get(GUIManager.class).showMessage("Failed to Host", e.getMessage() + " - Reverting to single player");
         }
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 }

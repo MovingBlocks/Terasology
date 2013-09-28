@@ -22,7 +22,6 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -53,7 +52,7 @@ import org.terasology.world.internal.WorldProviderWrapper;
 /**
  * @author Immortius
  */
-public class InitialiseWorld implements LoadProcess {
+public class InitialiseWorld extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(InitialiseWorld.class);
 
@@ -115,11 +114,4 @@ public class InitialiseWorld implements LoadProcess {
 
         return true;
     }
-
-    @Override
-    public int begin() {
-        return 1;
-    }
-
-
 }

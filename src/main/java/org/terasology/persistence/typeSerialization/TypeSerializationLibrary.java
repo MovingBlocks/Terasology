@@ -213,6 +213,8 @@ public class TypeSerializationLibrary {
             TypeHandler<?> handler = getHandlerFor(field.getField().getGenericType());
             if (handler != null) {
                 handlerMap.put(field, handler);
+            } else {
+                logger.info("Unsupported field: '{}.{}'", type.getUri(), field.getName());
             }
         }
         return handlerMap;

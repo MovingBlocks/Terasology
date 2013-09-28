@@ -19,7 +19,6 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleIdentifier;
@@ -29,7 +28,7 @@ import org.terasology.game.GameManifest;
 /**
  * @author Immortius
  */
-public class RegisterMods implements LoadProcess {
+public class RegisterMods extends SingleStepLoadProcess {
 
     private GameManifest gameManifest;
 
@@ -63,10 +62,4 @@ public class RegisterMods implements LoadProcess {
         assetManager.applyOverrides();
         return true;
     }
-
-    @Override
-    public int begin() {
-        return 1;
-    }
-
 }

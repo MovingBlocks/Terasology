@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIProgressBar;
@@ -28,6 +30,7 @@ import javax.vecmath.Vector2f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UIScreenLoading extends UIWindow {
+    private static final Logger logger = LoggerFactory.getLogger(UIScreenLoading.class);
 
     final UIImage background;
     final UIProgressBar progressBar;
@@ -53,7 +56,11 @@ public class UIScreenLoading extends UIWindow {
     }
 
     public void updateStatus(String string, float percent) {
-        progressBar.setValue((int) percent);
-        progressBar.setText(string);
+        if (Float.isNaN(percent)) {
+            logger.error("Invalid status: {}", percent);
+        } else {
+            progressBar.setValue((int) percent);
+            progressBar.setText(string);
+        }
     }
 }

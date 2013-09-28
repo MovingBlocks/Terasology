@@ -17,7 +17,6 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -26,7 +25,7 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class CacheBlocks implements LoadProcess {
+public class CacheBlocks extends StepBasedLoadProcess {
 
     private Iterator<BlockFamily> blockFamilyIterator;
 
@@ -41,13 +40,15 @@ public class CacheBlocks implements LoadProcess {
         if (!family.getArchetypeBlock().isInvisible()) {
             family.getArchetypeBlock().getMesh();
         }
+        stepDone();
         return !blockFamilyIterator.hasNext();
     }
 
     @Override
-    public int begin() {
+    public void begin() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         blockFamilyIterator = blockManager.listRegisteredBlockFamilies().iterator();
-        return blockManager.getBlockFamilyCount();
+        setTotalSteps(blockManager.getBlockFamilyCount());
     }
+
 }

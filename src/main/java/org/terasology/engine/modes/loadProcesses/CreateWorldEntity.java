@@ -17,7 +17,6 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.world.WorldRenderer;
@@ -28,7 +27,7 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class CreateWorldEntity implements LoadProcess {
+public class CreateWorldEntity extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Creating World Entity...";
@@ -51,8 +50,4 @@ public class CreateWorldEntity implements LoadProcess {
         return true;
     }
 
-    @Override
-    public int begin() {
-        return 1;
-    }
 }

@@ -17,14 +17,13 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.ConsoleImpl;
 
 /**
  * @author Immortius
  */
-public class InitialiseCommandSystem implements LoadProcess {
+public class InitialiseCommandSystem extends SingleStepLoadProcess {
     @Override
     public String getMessage() {
         return "Initialising Command System...";
@@ -34,10 +33,5 @@ public class InitialiseCommandSystem implements LoadProcess {
     public boolean step() {
         CoreRegistry.put(Console.class, new ConsoleImpl());
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 }

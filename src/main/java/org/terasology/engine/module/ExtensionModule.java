@@ -25,6 +25,9 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
 import org.terasology.engine.CoreRegistry;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -127,6 +130,25 @@ public class ExtensionModule implements Module {
     @Override
     public ModuleInfo getModuleInfo() {
         return moduleInfo;
+    }
+
+    @Override
+    public boolean isDataAvailable() {
+        return Files.isRegularFile(moduleRoot);
+    }
+
+    @Override
+    public InputStream getData() throws IOException {
+        return new BufferedInputStream(Files.newInputStream(moduleRoot));
+    }
+
+    @Override
+    public long getSize() {
+        try {
+            return Files.size(moduleRoot);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override

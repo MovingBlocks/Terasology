@@ -60,6 +60,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
+import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -171,7 +172,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public boolean join(String address, int port) {
+    public JoinStatus join(String address, int port) {
         if (mode == NetworkMode.NONE) {
             factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
             ClientBootstrap bootstrap = new ClientBootstrap(factory);
@@ -184,16 +185,23 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 logger.warn("Failed to connect to server", connectCheck.getCause());
                 connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
                 factory.releaseExternalResources();
-                return false;
+                return new JoinStatusImpl("Failed to connect to server - " + connectCheck.getCause().getMessage());
             } else {
                 allChannels.add(connectCheck.getChannel());
-                logger.info("Connected to server");
                 mode = NetworkMode.CLIENT;
                 nextNetworkTick = time.getRawTimeInMs();
-                return true;
+                logger.info("Connected to server");
+                ClientConnectionHandler connectionHandler = connectCheck.getChannel().getPipeline().get(ClientConnectionHandler.class);
+                if (connectionHandler == null) {
+                    JoinStatusImpl status = new JoinStatusImpl();
+                    status.setComplete();
+                    return status;
+                } else {
+                    return connectionHandler.getJoinStatus();
+                }
             }
         }
-        return false;
+        return new JoinStatusImpl("Network system already active");
     }
 
     @Override

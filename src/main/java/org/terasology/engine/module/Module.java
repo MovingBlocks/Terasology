@@ -17,6 +17,9 @@ package org.terasology.engine.module;
 
 import org.reflections.Reflections;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * @author Immortius
  */
@@ -32,4 +35,9 @@ public interface Module {
 
     ModuleInfo getModuleInfo();
 
+    boolean isDataAvailable();
+
+    InputStream getData() throws IOException;
+
+    long getSize();
 }

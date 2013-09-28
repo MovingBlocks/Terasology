@@ -27,6 +27,7 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepend
 import org.terasology.network.internal.ClientConnectionHandler;
 import org.terasology.network.internal.ClientHandler;
 import org.terasology.network.internal.ClientHandshakeHandler;
+import org.terasology.network.internal.JoinStatusImpl;
 import org.terasology.network.internal.MetricRecordingHandler;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.protobuf.NetData;
@@ -48,6 +49,7 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
+        JoinStatusImpl joinStatus = new JoinStatusImpl();
         ChannelPipeline p = pipeline();
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
 
@@ -58,8 +60,8 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
-        p.addLast("authenticationHandler", new ClientHandshakeHandler());
-        p.addLast("connectionHandler", new ClientConnectionHandler(networkSystem));
+        p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
+        p.addLast("connectionHandler", new ClientConnectionHandler(joinStatus, networkSystem));
         p.addLast("handler", new ClientHandler(networkSystem));
         return p;
     }

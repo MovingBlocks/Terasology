@@ -18,7 +18,6 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.block.BlockManager;
@@ -29,7 +28,7 @@ import org.terasology.world.block.loader.WorldAtlas;
 /**
  * @author Immortius
  */
-public class RegisterBlocks implements LoadProcess {
+public class RegisterBlocks extends SingleStepLoadProcess {
 
     private GameManifest gameManifest;
 
@@ -59,11 +58,6 @@ public class RegisterBlocks implements LoadProcess {
         CoreRegistry.put(BlockManager.class, blockManager);
 
         return true;
-    }
-
-    @Override
-    public int begin() {
-        return 1;
     }
 
 }
