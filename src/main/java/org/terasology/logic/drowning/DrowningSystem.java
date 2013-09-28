@@ -23,12 +23,18 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.OnEnterLiquidEvent;
 import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.rendering.RenderHelper;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -45,6 +51,9 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     @In
     private EntityManager entityManager;
 
+    @In
+    private WorldProvider worldProvider;
+
     @Override
     public void initialise() {
     }
@@ -57,13 +66,33 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(DrowningComponent.class, DrownsComponent.class, LocationComponent.class)) {
             DrowningComponent drowning = entity.getComponent(DrowningComponent.class);
+
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+
+            // Check if the player's head/eyes are actually below the water surface
+            CharacterComponent charComp = entity.getComponent(CharacterComponent.class);
+            if (charComp != null)
+            {
+                Vector3f worldPosition = new Vector3f(loc.getWorldPosition());
+                worldPosition.y += charComp.eyeOffset;
+                worldPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(worldPosition, worldProvider.getTime().getDays());
+
+                if (worldProvider.isBlockRelevant(new Vector3f(worldPosition))) {
+                    Block block = worldProvider.getBlock(new Vector3f(worldPosition));
+
+                    if (!block.isLiquid()) {
+                        resetDrowning(drowning, entity.getComponent(DrownsComponent.class));
+                        continue;
+                    }
+                }
+            }
+
             if (drowning.nextDrownDamageTime < time.getGameTimeInMs()) {
                 DrownsComponent drowns = entity.getComponent(DrownsComponent.class);
 
                 drowning.nextDrownDamageTime = time.getGameTimeInMs() + (long) (drowns.timeBetweenDrownDamage * 1000);
                 entity.saveComponent(drowning);
 
-                LocationComponent loc = entity.getComponent(LocationComponent.class);
                 EntityRef liquidBlock = blockEntityProvider.getBlockEntityAt(loc.getWorldPosition());
                 entity.send(new DoDamageEvent(drowns.drownDamage, EngineDamageTypes.DROWNING.get(), liquidBlock));
             }
@@ -73,8 +102,7 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     @ReceiveEvent
     public void onEnterLiquid(OnEnterLiquidEvent event, EntityRef entity, DrownsComponent drowns) {
         DrowningComponent drowning = new DrowningComponent();
-        drowning.startDrowningTime = time.getGameTimeInMs() + (long) (1000 * drowns.timeBeforeDrownStart);
-        drowning.nextDrownDamageTime = drowning.startDrowningTime;
+        resetDrowning(drowning, drowns);
         entity.addComponent(drowning);
     }
 
@@ -83,4 +111,8 @@ public class DrowningSystem implements UpdateSubscriberSystem {
         entity.removeComponent(DrowningComponent.class);
     }
 
+    private void resetDrowning(DrowningComponent drowningComponent, DrownsComponent drownsComponent) {
+        drowningComponent.startDrowningTime = time.getGameTimeInMs() + (long) (1000 * drownsComponent.timeBeforeDrownStart);
+        drowningComponent.nextDrownDamageTime = drowningComponent.startDrowningTime;
+    }
 }
