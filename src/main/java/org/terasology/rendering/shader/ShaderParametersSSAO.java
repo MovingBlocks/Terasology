@@ -46,15 +46,15 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersSSAO extends ShaderParametersBase {
 
-    public static final int SSAO_KERNEL_ELEMENTS = 16;
+    public static final int SSAO_KERNEL_ELEMENTS = 64;
     public static final int SSAO_NOISE_SIZE = 4;
 
-    private static final FastRandom RAND = new FastRandom(0xD3ADBEEF);
+    private static final FastRandom RAND = new FastRandom(3);
 
     @EditorRange(min = 0.01f, max = 12.0f)
-    private float ssaoStrength = 2.0f;
+    private float ssaoStrength = 1.75f;
     @EditorRange(min = 0.1f, max = 25.0f)
-    private float ssaoRad = 2.0f;
+    private float ssaoRad = 1.5f;
 
     private FloatBuffer ssaoSamples;
 
@@ -72,7 +72,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
                 vec.normalize();
                 vec.scale(RAND.randomPosFloat());
                 float scale = i / (float) SSAO_KERNEL_ELEMENTS;
-                scale = TeraMath.lerpf(0.1f, 1.0f, scale * scale);
+                scale = TeraMath.lerpf(0.25f, 1.0f, scale * scale);
 
                 vec.scale(scale);
 
