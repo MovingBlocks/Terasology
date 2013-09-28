@@ -87,7 +87,7 @@ public final class WorldRenderer {
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
     public static final float BLOCK_LIGHT_POW = 0.96f;
-    public static final float BLOCK_LIGHT_SUN_POW = 0.8f;
+    public static final float BLOCK_LIGHT_SUN_POW = 0.96f;
     public static final float BLOCK_INTENSITY_FACTOR = 1.25f;
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);

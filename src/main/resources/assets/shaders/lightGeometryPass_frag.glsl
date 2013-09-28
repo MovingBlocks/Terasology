@@ -88,7 +88,7 @@ void main() {
 #endif
 
 #if defined (CLOUD_SHADOWS)
-        // TODO: Not so nice that this is all hardcoded
+        // TODO: Add shader parameters for this...
         float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 5.0, 0.0, 1.0);
         shadowTerm *= clamp(1.0 - cloudOcclusion + 0.25, 0.0, 1.0);
 #endif
@@ -117,8 +117,8 @@ void main() {
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     lambTerm *= shadowTerm;
     specTerm *= shadowTerm;
-
-    ambTerm *= clamp(shadowTerm, 0.25, 1.0);
+    // TODO: Add this as a shader parameter...
+    ambTerm *= clamp(shadowTerm, 0.5, 1.0);
 #endif
 
     float specular = lightSpecularIntensity * specTerm;
