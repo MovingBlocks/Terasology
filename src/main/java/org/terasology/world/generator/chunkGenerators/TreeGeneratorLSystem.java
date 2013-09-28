@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
@@ -34,7 +33,7 @@ import java.util.Stack;
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
 
-    public final int MAX_ANGLE_OFFSET = 5;
+    public static final int MAX_ANGLE_OFFSET = 5;
 
     /* SETTINGS */
     private int iterations;
@@ -72,8 +71,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
         String axiom = initialAxiom;
 
-        Stack<Vector3f> _stackPosition = new Stack<Vector3f>();
-        Stack<Matrix4f> _stackOrientation = new Stack<Matrix4f>();
+        Stack<Vector3f> stackPosition = new Stack<Vector3f>();
+        Stack<Matrix4f> stackOrientation = new Stack<Matrix4f>();
 
         for (int i = 0; i < iterations; i++) {
 
@@ -84,10 +83,11 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
                 double rValue = (rand.randomDouble() + 1.0) / 2.0;
 
-                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue))
+                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue)) {
                     temp += ruleSet.get(c);
-                else
+                } else {
                     temp += c;
+                }
             }
 
             axiom = temp;
@@ -117,14 +117,15 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
-                    if (_stackOrientation.size() > 1) {
+                    if (stackOrientation.size() > 1) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {
                             for (int y = -size; y <= size; y++) {
                                 for (int z = -size; z <= size; z++) {
-                                    if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
+                                    if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size) {
                                         continue;
+                                    }
 
                                     view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
                                     view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
@@ -141,12 +142,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     position.add(dir);
                     break;
                 case '[':
-                    _stackOrientation.push(new Matrix4f(rotation));
-                    _stackPosition.push(new Vector3f(position));
+                    stackOrientation.push(new Matrix4f(rotation));
+                    stackPosition.push(new Vector3f(position));
                     break;
                 case ']':
-                    rotation = _stackOrientation.pop();
-                    position = _stackPosition.pop();
+                    rotation = stackOrientation.pop();
+                    position = stackPosition.pop();
                     break;
                 case '+':
                     tempRotation.setIdentity();

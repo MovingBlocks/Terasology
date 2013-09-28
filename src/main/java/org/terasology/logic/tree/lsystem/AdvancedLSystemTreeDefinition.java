@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.logic.tree.lsystem;
 
 import com.google.common.collect.Maps;
@@ -18,7 +33,11 @@ import org.terasology.world.block.BlockManager;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Stack;
+import java.util.LinkedList;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -26,9 +45,9 @@ import java.util.*;
 public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private static final Logger logger = LoggerFactory.getLogger(AdvancedLSystemTreeDefinition.class);
 
-    private final int GROWTH_SAFE_DISTANCE = 15;
-    private final float MAX_ANGLE_OFFSET = (float) Math.PI / 18f;
-    private final int GROWTH_INTERVAL = 30 * 1000;
+    private static final int GROWTH_SAFE_DISTANCE = 15;
+    private static final float MAX_ANGLE_OFFSET = (float) Math.PI / 18f;
+    private static final int GROWTH_INTERVAL = 30 * 1000;
 
     private Map<Character, AxionElementGeneration> blockMap;
     private Map<Character, AxionElementReplacement> axionElementReplacements;
@@ -81,8 +100,9 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
                         lSystemTree.generated = false;
                         int generation = rand.randomIntAbs(maxGenerations);
                         nextAxion = lSystemTree.axion;
-                        for (int i = 0; i < generation; i++)
+                        for (int i = 0; i < generation; i++) {
                             nextAxion = generateNextAxion(rand, nextAxion);
+                        }
                         lSystemTree.generation = generation;
                     } else {
                         nextAxion = generateNextAxion(rand, lSystemTree.axion);
@@ -126,14 +146,16 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     }
 
     private boolean checkForDeath(int generation, float random) {
-        if (generation < minGenerations)
+        if (generation < minGenerations) {
             return false;
+        }
         double deathChance = Math.pow(1f * (maxGenerations - generation) / (maxGenerations - minGenerations), 0.2);
 //        logger.debug("Death chance: " + ((1 - deathChance) * 100) + "%");
         return (deathChance < random);
     }
 
-    private void updateTreeInGame(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i treeLocation, Map<Vector3i, Block> currentTree, Map<Vector3i, Block> nextTree) {
+    private void updateTreeInGame(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i treeLocation,
+                                  Map<Vector3i, Block> currentTree, Map<Vector3i, Block> nextTree) {
         Block air = BlockManager.getAir();
 
         int replaceCount = 0;
@@ -177,8 +199,9 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
                 result.append(axionElementReplacement.getReplacement(rand.randomPosFloat()));
             } else {
                 result.append(axion.key);
-                if (axion.parameter != null)
+                if (axion.parameter != null) {
                     result.append("(").append(axion.parameter).append(")");
+                }
             }
         }
 
@@ -257,7 +280,31 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         return blockAtPosition != null && blockPriorities.indexOf(blockAtPosition) < blockPriorities.indexOf(block);
     }
 
-    private class Callback implements AxionElementGeneration.AxionElementGenerationCallback {
+    private static List<AxionElement> parseAxions(String axionString) {
+        List<AxionElement> result = new LinkedList<>();
+        char[] chars = axionString.toCharArray();
+        for (int i = 0, size = chars.length; i < size; i++) {
+            char c = chars[i];
+            if (c == '(' || c == ')') {
+                throw new IllegalArgumentException("Invalid axion - parameter without key");
+            }
+            if (i + 1 < size && chars[i + 1] == '(') {
+                int closingBracket = axionString.indexOf(')', i + 1);
+                if (closingBracket < 0) {
+                    throw new IllegalArgumentException("Invalid axion - missing closing bracket");
+                }
+                String parameter = axionString.substring(i + 2, closingBracket);
+                i = closingBracket;
+                result.add(new AxionElement(c, parameter));
+            } else {
+                result.add(new AxionElement(c));
+            }
+        }
+
+        return result;
+    }
+
+    private final class Callback implements AxionElementGeneration.AxionElementGenerationCallback {
         private Map<Vector3i, Block> treeInMemory;
         private Vector3f position;
         private Matrix4f rotation;
@@ -269,8 +316,8 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         }
 
         @Override
-        public void setBlock(Vector3f position, Block block) {
-            AdvancedLSystemTreeDefinition.this.setBlock(treeInMemory, position, block);
+        public void setBlock(Vector3f blockPosition, Block block) {
+            AdvancedLSystemTreeDefinition.this.setBlock(treeInMemory, blockPosition, block);
         }
 
         @Override
@@ -281,7 +328,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         }
     }
 
-    private static class AxionElement {
+    private static final class AxionElement {
         private char key;
         private String parameter;
 
@@ -294,27 +341,4 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
             this.key = key;
         }
     }
-
-    private static List<AxionElement> parseAxions(String axionString) {
-        List<AxionElement> result = new LinkedList<>();
-        char[] chars = axionString.toCharArray();
-        for (int i = 0, size = chars.length; i < size; i++) {
-            char c = chars[i];
-            if (c == '(' || c == ')')
-                throw new IllegalArgumentException("Invalid axion - parameter without key");
-            if (i + 1 < size && chars[i + 1] == '(') {
-                int closingBracket = axionString.indexOf(')', i + 1);
-                if (closingBracket < 0)
-                    throw new IllegalArgumentException("Invalid axion - missing closing bracket");
-                String parameter = axionString.substring(i + 2, closingBracket);
-                i = closingBracket;
-                result.add(new AxionElement(c, parameter));
-            } else {
-                result.add(new AxionElement(c));
-            }
-        }
-
-        return result;
-    }
-
 }
