@@ -16,6 +16,7 @@
 package org.terasology.logic.tree.lsystem;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
@@ -33,10 +34,10 @@ import org.terasology.world.block.BlockManager;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Stack;
 import java.util.LinkedList;
 
 /**
@@ -211,8 +212,8 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private Map<Vector3i, Block> generateTreeFromAxiom(String currentAxion, float angleOffset, float treeRotation) {
         Map<Vector3i, Block> treeInMemory = Maps.newHashMap();
 
-        Stack<Vector3f> stackPosition = new Stack<>();
-        Stack<Matrix4f> stackOrientation = new Stack<>();
+        Deque<Vector3f> stackPosition = Queues.newArrayDeque();
+        Deque<Matrix4f> stackOrientation = Queues.newArrayDeque();
 
         Vector3f position = new Vector3f(0, 0, 0);
         Matrix4f rotation = new Matrix4f();
