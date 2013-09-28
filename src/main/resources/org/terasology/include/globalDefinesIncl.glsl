@@ -30,9 +30,9 @@
 #define BLOCK_AMB 1.0
 #define BLOCK_DIFF 2.0
 
-
 #define EPSILON 0.000001
 #define PI 3.14159265359
+#define PI_TIMES_8 25.13274122872
 
 #define A 0.15
 #define B 0.50
