@@ -109,7 +109,7 @@ public class UIProgressBar extends UIDisplayContainer {
     public void setValue(int value) {
         this.value = TeraMath.clamp(value, minValue, maxValue);
 
-        progressLine.updateProgress(value, range);
+        progressLine.updateProgress(this.value, range);
 
         notifyChangedListeners();
     }
@@ -236,7 +236,7 @@ public class UIProgressBar extends UIDisplayContainer {
 
         layout();
     }
-    
+
     /*
        Event listeners
     */

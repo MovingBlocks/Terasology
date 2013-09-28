@@ -35,6 +35,6 @@ public abstract class StepBasedLoadProcess implements LoadProcess {
 
     @Override
     public final float getProgress() {
-        return (float) stepsComplete / totalSteps;
+        return (float) Math.min(totalSteps, stepsComplete) / totalSteps;
     }
 }
