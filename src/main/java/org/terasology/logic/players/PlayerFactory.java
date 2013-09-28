@@ -105,6 +105,7 @@ public class PlayerFactory {
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
         inventoryManager.giveItem(player, chest);
+        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("engine:OakSapling"), 10));
 
         player.send(new SelectedItemChangedEvent(EntityRef.NULL, inventoryManager.getItemInSlot(player, 0)));
 

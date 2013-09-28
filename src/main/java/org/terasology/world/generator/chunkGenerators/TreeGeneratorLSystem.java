@@ -16,11 +16,9 @@
 package org.terasology.world.generator.chunkGenerators;
 
 import com.google.common.collect.Queues;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
@@ -60,9 +58,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
         angleInDegree = angle;
         this.iterations = iterations;
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        leafType = blockManager.getBlock("engine:GreenLeaf");
-        barkType = blockManager.getBlock("engine:OakTrunk");
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
@@ -186,13 +181,13 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         }
     }
 
-    public TreeGenerator setLeafType(Block b) {
+    public TreeGeneratorLSystem setLeafType(Block b) {
         leafType = b;
         return this;
     }
 
 
-    public TreeGenerator setBarkType(Block b) {
+    public TreeGeneratorLSystem setBarkType(Block b) {
         barkType = b;
         return this;
     }

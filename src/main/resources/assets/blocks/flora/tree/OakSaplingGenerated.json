@@ -1,0 +1,6 @@
+{
+    "basedOn": "engine:plant",
+    "entity": {
+        "prefab": "engine:OakTreeGenerated"
+    }
+}
