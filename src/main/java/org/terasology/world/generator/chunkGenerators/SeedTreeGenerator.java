@@ -19,24 +19,16 @@ import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
-/**
- * Cactus generator.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- */
-public class TreeGeneratorCactus extends TreeGenerator {
+public class SeedTreeGenerator extends TreeGenerator {
+    private Block block;
 
-    private Block cactus;
+    public SeedTreeGenerator setBlock(Block saplingBlock) {
+        this.block = saplingBlock;
+        return this;
+    }
 
     @Override
     public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
-        for (int y = posY; y < posY + 3; y++) {
-            view.setBlock(posX, y, posZ, cactus);
-        }
-    }
-
-    public TreeGenerator setTrunkType(Block b) {
-        cactus = b;
-        return this;
+        view.setBlock(posX, posY, posZ, block);
     }
 }
