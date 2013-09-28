@@ -46,10 +46,8 @@ float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
 }
 
 float calcSpecLightNormalized(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
-    const float PI_TIMES_8 = 8.0 * PI;
-
     vec3 halfWay = normalize(eyeVec+lightVec);
-    return clamp(((exp + 8.0) / PI_TIMES_8) * pow(dot(halfWay, normal), exp), 0.0, 1.0);
+    return ((exp + 8.0) / PI_TIMES_8) * pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
 }
 
 vec4 linearToSrgb(vec4 color) {
