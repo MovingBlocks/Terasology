@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator.chunkGenerators;
+package org.terasology.logic.tree.lsystem;
 
-import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
+
 /**
- * Cactus generator.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class TreeGeneratorCactus extends TreeGenerator {
+public interface AxionElementGeneration {
+    void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter);
 
-    private Block cactus;
+    public interface AxionElementGenerationCallback {
+        void setBlock(Vector3f position, Block block);
 
-    @Override
-    public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
-        for (int y = posY; y < posY + 3; y++) {
-            view.setBlock(posX, y, posZ, cactus);
-        }
-    }
-
-    public TreeGenerator setTrunkType(Block b) {
-        cactus = b;
-        return this;
+        void advance(float distance);
     }
 }

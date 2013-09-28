@@ -18,7 +18,6 @@ package org.terasology.world.generator.chunkGenerators;
 
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
-import org.terasology.world.block.Block;
 
 /**
  * Object generators are used to generate objects like trees etc.
@@ -47,6 +46,4 @@ public abstract class TreeGenerator {
         this.generationProbability = genProbability;
         return this;
     }
-
-    public abstract TreeGenerator setBarkType(Block b);
 }

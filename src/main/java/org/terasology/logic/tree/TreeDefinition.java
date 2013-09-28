@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.tree;
 
-#define OCEAN_OCTAVES 16
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
 
-#define LIGHT_SHAFT_SAMPLES 128
-#define MOTION_BLUR_SAMPLES 8
-
-#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
-#define MOONLIGHT_AMBIENT_COLOR 0.5, 0.5, 1.0
-
-#define NIGHT_BRIGHTNESS 0.125
-
-#define WATER_AMB 1.0
-#define WATER_DIFF 2.0
-
-#define BLOCK_AMB 1.0
-#define BLOCK_DIFF 2.0
-
-#define EPSILON 0.000001
-#define PI 3.14159265359
-#define PI_TIMES_8 25.13274122872
-
-#define A 0.15
-#define B 0.50
-#define C 0.10
-#define D 0.20
-#define E 0.02
-#define F 0.30
-#define W 11.2
-
+public interface TreeDefinition {
+    void updateTree(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, EntityRef treeRef);
+}
