@@ -15,16 +15,16 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
+import com.google.common.collect.Queues;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * Allows the generation of complex trees based on L-Systems.
@@ -38,7 +38,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     /* SETTINGS */
     private int iterations;
     private double angleInDegree;
-    private Block air;
     private Block leafType;
     private Block barkType;
 
@@ -59,7 +58,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
         angleInDegree = angle;
         this.iterations = iterations;
-        air = BlockManager.getAir();
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
@@ -71,8 +69,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
         String axiom = initialAxiom;
 
-        Stack<Vector3f> stackPosition = new Stack<Vector3f>();
-        Stack<Matrix4f> stackOrientation = new Stack<Matrix4f>();
+        Deque<Vector3f> stackPosition = Queues.newArrayDeque();
+        Deque<Matrix4f> stackOrientation = Queues.newArrayDeque();
 
         for (int i = 0; i < iterations; i++) {
 
