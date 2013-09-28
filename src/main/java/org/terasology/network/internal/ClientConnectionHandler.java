@@ -170,10 +170,10 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private void completeJoin(NetData.JoinCompleteMessage joinComplete) {
         logger.info("Join complete received");
         server.setClientId(joinComplete.getClientId());
-        joinStatus.setComplete();
 
         channelHandlerContext.getPipeline().remove(this);
         channelHandlerContext.getPipeline().get(ClientHandler.class).joinComplete(server);
+        joinStatus.setComplete();
     }
 
     private void receivedServerInfo(NetData.ServerInfoMessage message) {
