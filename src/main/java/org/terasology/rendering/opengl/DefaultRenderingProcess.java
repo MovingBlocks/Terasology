@@ -775,8 +775,10 @@ public class DefaultRenderingProcess {
     public void endRenderSceneSky() {
         setRenderBufferMask(true, true, true);
 
-        generateSkyBand(0);
-        generateSkyBand(1);
+        if (config.getRendering().isInscattering()) {
+            generateSkyBand(0);
+            generateSkyBand(1);
+        }
 
         bindFbo("sceneOpaque");
     }

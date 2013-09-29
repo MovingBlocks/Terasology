@@ -70,24 +70,24 @@ void main() {
     vec3 worldPosition = reconstructViewPos(depth, gl_TexCoord[0].xy, invViewProjMatrix);
     vec3 lightWorldPosition = worldPosition.xyz + activeCameraToLightSpace;
 
-    vec4 lightProjPos = lightViewProjMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
+    vec4 lightProjVertPos = lightViewProjMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
 
-    vec3 lightPosClipSpace = lightProjPos.xyz / lightProjPos.w;
-    vec2 shadowMapTexPos = lightPosClipSpace.xy * vec2(0.5) + vec2(0.5);
+    lightProjVertPos.xyz /= lightProjVertPos.w;
+    vec2 shadowMapTexPos = lightProjVertPos.xy * vec2(0.5) + vec2(0.5);
 
     float shadowTerm = 1.0;
 
     if (!epsilonEqualsOne(depth)) {
 #if defined (DYNAMIC_SHADOWS_PCF)
-        shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightPosClipSpace.z, shadowMapTexPos, 0.0, SHADOW_MAP_BIAS);
+        shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightProjVertPos.z, shadowMapTexPos, 0.0, SHADOW_MAP_BIAS);
 #else
         float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
-        if (shadowMapDepth + SHADOW_MAP_BIAS < lightPosClipSpace.z) {
+        if (shadowMapDepth + SHADOW_MAP_BIAS < lightProjVertPos.z) {
             shadowTerm = 0.0;
         }
 #endif
 
-#if defined (CLOUD_SHADOWS)
+#if defined (CLOUD_SHADOWS) && !defined (VOLUMETRIC_LIGHTING)
         // TODO: Add shader parameters for this...
         float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 5.0, 0.0, 1.0);
         shadowTerm *= clamp(1.0 - cloudOcclusion + 0.25, 0.0, 1.0);
