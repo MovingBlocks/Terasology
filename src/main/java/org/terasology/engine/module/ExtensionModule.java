@@ -76,7 +76,7 @@ public class ExtensionModule implements Module {
                 }
             } else if (Files.isRegularFile(moduleRoot)) {
                 String extension = com.google.common.io.Files.getFileExtension(moduleRoot.getFileName().toString());
-                if (extension.equals(".jar")) {
+                if (extension.equals("jar")) {
                     return moduleRoot.toUri().toURL();
                 }
             }
