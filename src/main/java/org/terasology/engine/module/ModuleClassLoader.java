@@ -105,7 +105,7 @@ public class ModuleClassLoader extends URLClassLoader {
                 }
             }
             if (cc.getSuperclass() != null) {
-                return isSubtype(cc, parentType);
+                return isSubtype(cc.getSuperclass(), parentType);
             }
         }
         return false;

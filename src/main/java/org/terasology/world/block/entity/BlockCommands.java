@@ -124,14 +124,23 @@ public class BlockCommands implements ComponentSystem {
         return "Sorry, something went wrong!";
     }
 
-    @Command(shortDescription = "Lists all available items")
+    @Command(shortDescription = "Lists all available items (prefabs)")
     public String listItems() {
-        StringBuilder items = new StringBuilder();
+
+        List<String> stringItems = Lists.newArrayList();
+
         for (Prefab prefab : prefabManager.listPrefabs()) {
+            stringItems.add(prefab.getName());
+        }
+
+        Collections.sort(stringItems);
+
+        StringBuilder items = new StringBuilder();
+        for (String item : stringItems) {
             if (!items.toString().isEmpty()) {
-                items.append("\n");
+                items.append(System.lineSeparator());
             }
-            items.append(prefab.getName());
+            items.append(item);
         }
 
         return items.toString();

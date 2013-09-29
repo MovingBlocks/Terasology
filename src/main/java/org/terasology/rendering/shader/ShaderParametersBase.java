@@ -48,7 +48,7 @@ public class ShaderParametersBase implements ShaderParameters {
 
         if (worldRenderer != null) {
             program.setFloat("daylight", worldRenderer.getDaylight(), true);
-            program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f, true);
+            program.setFloat("swimming", worldRenderer.isHeadUnderWater() ? 1.0f : 0.0f, true);
             program.setFloat("tick", worldRenderer.getTick(), true);
             program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getSmoothedPlayerSunlightValue(), true);
 

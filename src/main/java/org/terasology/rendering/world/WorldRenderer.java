@@ -40,6 +40,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
+import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -707,15 +708,15 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
         DefaultRenderingProcess.getInstance().beginRenderSceneTransparent();
         // Make sure the water surface is rendered if the player is swimming
-        boolean headUnderWater = isUnderWater();
-        if (headUnderWater) {
+        boolean isHeadUnderWater = isHeadUnderWater();
+        if (isHeadUnderWater) {
             glDisable(GL11.GL_CULL_FACE);
         }
         while (renderQueueChunksAlphaBlend.size() > 0) {
             renderChunk(renderQueueChunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, camera, ChunkRenderMode.DEFAULT);
         }
         PerformanceMonitor.endActivity();
-        if (headUnderWater) {
+        if (isHeadUnderWater) {
             glEnable(GL11.GL_CULL_FACE);
         }
         PerformanceMonitor.endActivity();
@@ -1031,12 +1032,12 @@ public final class WorldRenderer {
         lightCamera.getViewingDirection().set(negSunDirection);
     }
 
-    public boolean isUnderWater() {
+    public boolean isHeadUnderWater() {
         Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
 
         // Compensate for waves
         if (config.getRendering().isAnimateWater()) {
-            cameraPos.y += 0.5f;
+            cameraPos.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPos, worldProvider.getTime().getDays());
         }
 
         if (worldProvider.isBlockRelevant(new Vector3f(cameraPos))) {
