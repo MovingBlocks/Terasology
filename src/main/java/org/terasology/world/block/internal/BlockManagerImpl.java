@@ -154,7 +154,7 @@ public class BlockManagerImpl extends BlockManager {
 
     public void receiveFamilyRegistration(BlockUri familyUri, Map<String, Integer> registration) {
         BlockFamily family;
-        if (isFreeformFamily(familyUri.getRootFamilyUri())) {
+        if (isFreeformFamily(familyUri)) {
             family = blockLoader.loadWithShape(familyUri);
         } else {
             family = getAvailableBlockFamily(familyUri);
@@ -352,7 +352,7 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public boolean isFreeformFamily(BlockUri familyUri) {
-        return freeformBlockUris.contains(familyUri);
+        return freeformBlockUris.contains(familyUri.getRootFamilyUri());
     }
 
     @Override

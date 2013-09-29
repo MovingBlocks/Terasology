@@ -83,14 +83,14 @@ public class AssetManager {
     }
 
     public List<AssetUri> resolveAll(AssetType type, String name) {
+        AssetUri uri = new AssetUri(type, name);
+        if (uri.isValid()) {
+            return Lists.newArrayList(uri);
+        }
         return Lists.newArrayList(uriLookup.get(type).row(UriUtil.normalise(name)).values());
     }
 
     public AssetUri resolve(AssetType type, String name) {
-        AssetUri uri = new AssetUri(type, name);
-        if (uri.isValid()) {
-            return uri;
-        }
         List<AssetUri> possibilities = resolveAll(type, name);
         switch (possibilities.size()) {
             case 0:
