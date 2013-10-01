@@ -16,6 +16,7 @@
 package org.terasology.world.generator.chunkGenerators;
 
 import com.google.common.collect.Queues;
+import org.terasology.math.LSystemRule;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
@@ -43,8 +44,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
     /* RULES */
     private final String initialAxiom;
-    private final Map<String, String> ruleSet;
-    private final Map<String, Double> probabilities;
+    private final Map<Character, LSystemRule> ruleSet;
 
     /**
      * Init. a new L-System based tree generator.
@@ -55,36 +55,36 @@ public class TreeGeneratorLSystem extends TreeGenerator {
      * @param iterations    The amount of iterations to execute
      * @param angle         The angle
      */
-    public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
+    public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int iterations, int angle) {
         angleInDegree = angle;
         this.iterations = iterations;
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
-        this.probabilities = probabilities;
     }
 
     @Override
     public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
 
-        String axiom = initialAxiom;
+        CharSequence axiom = initialAxiom;
 
         Deque<Vector3f> stackPosition = Queues.newArrayDeque();
         Deque<Matrix4f> stackOrientation = Queues.newArrayDeque();
 
         for (int i = 0; i < iterations; i++) {
 
-            String temp = "";
+            StringBuilder temp = new StringBuilder();
 
             for (int j = 0; j < axiom.length(); j++) {
-                String c = String.valueOf(axiom.charAt(j));
+                char c = axiom.charAt(j);
 
-                double rValue = (rand.randomDouble() + 1.0) / 2.0;
+                float rValue = (rand.randomFloat() + 1.0f) / 2.0f;
 
-                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue)) {
-                    temp += ruleSet.get(c);
+                LSystemRule rule = ruleSet.get(c);
+                if (rule != null && rule.getProbability() > (1.0f - rValue)) {
+                    temp.append(rule.getAxiom());
                 } else {
-                    temp += c;
+                    temp.append(c);
                 }
             }
 
