@@ -15,8 +15,8 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import com.google.common.collect.Queues;
 import org.terasology.math.LSystemRule;
+import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
@@ -24,7 +24,6 @@ import org.terasology.world.block.Block;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.util.Deque;
 import java.util.Map;
 
 /**
@@ -65,32 +64,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
     @Override
     public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
-
-        CharSequence axiom = initialAxiom;
-
-        Deque<Vector3f> stackPosition = Queues.newArrayDeque();
-        Deque<Matrix4f> stackOrientation = Queues.newArrayDeque();
-
-        for (int i = 0; i < iterations; i++) {
-
-            StringBuilder temp = new StringBuilder();
-
-            for (int j = 0; j < axiom.length(); j++) {
-                char c = axiom.charAt(j);
-
-                float rValue = (rand.randomFloat() + 1.0f) / 2.0f;
-
-                LSystemRule rule = ruleSet.get(c);
-                if (rule != null && rule.getProbability() > (1.0f - rValue)) {
-                    temp.append(rule.getAxiom());
-                } else {
-                    temp.append(c);
-                }
-            }
-
-            axiom = temp;
-        }
-
         Vector3f position = new Vector3f(0, 0, 0);
 
         Matrix4f rotation = new Matrix4f();
@@ -98,13 +71,14 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2.0f));
 
         int angleOffset = rand.randomInt() % MAX_ANGLE_OFFSET;
+        recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
+    }
 
-        for (int i = 0; i < axiom.length(); i++) {
-            char c = axiom.charAt(i);
-
-            Matrix4f tempRotation = new Matrix4f();
-            tempRotation.setIdentity();
-
+    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, int angleOffset, CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
+        Matrix4f tempRotation = new Matrix4f();
+        float probabilityMultiplier = calculateProbabilityMultiplier(depth);
+        while (axiomIterator.hasNext()) {
+            char c = axiomIterator.nextChar();
             switch (c) {
                 case 'G':
                 case 'F':
@@ -115,7 +89,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
-                    if (stackOrientation.size() > 1) {
+                    if (depth > 1) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {
@@ -140,13 +114,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     position.add(dir);
                     break;
                 case '[':
-                    stackOrientation.push(new Matrix4f(rotation));
-                    stackPosition.push(new Vector3f(position));
+                    recurse(view, rand, posX, posY, posZ, angleOffset, axiomIterator, new Vector3f(position), new Matrix4f(rotation), depth);
                     break;
                 case ']':
-                    rotation = stackOrientation.pop();
-                    position = stackPosition.pop();
-                    break;
+                    return;
                 case '+':
                     tempRotation.setIdentity();
                     tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(angleInDegree + angleOffset)));
@@ -177,8 +148,22 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), (float) Math.toRadians(angleInDegree)));
                     rotation.mul(tempRotation);
                     break;
+                default:
+                    // If we have already reached the maximum iteration count, don't ever bother to lookup in the map
+                    if (depth == iterations) break;
+                    LSystemRule rule = ruleSet.get(c);
+                    if (rule == null) break;
+                    if (rand.randomFloat() > rule.getProbability() * probabilityMultiplier) break;
+                    recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(rule.getAxiom()), position, rotation, depth + 1);
             }
         }
+    }
+
+    private float calculateProbabilityMultiplier(int depth) {
+        // This function calculates the probability multiplier using a parabollic equation
+        // Equation: probabilityMultiplier = 1 - (depth / iterations) ^ 2
+        float ratio = (float) depth / (float) iterations;
+        return 1f - ratio * ratio;
     }
 
     public TreeGeneratorLSystem setLeafType(Block b) {
