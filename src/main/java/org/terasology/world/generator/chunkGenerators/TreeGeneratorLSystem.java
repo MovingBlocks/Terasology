@@ -33,11 +33,11 @@ import java.util.Map;
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
 
-    public static final int MAX_ANGLE_OFFSET = 5;
+    public static final float MAX_ANGLE_OFFSET = (float) Math.toRadians(5);
 
     /* SETTINGS */
     private int iterations;
-    private double angleInDegree;
+    private float angle;
     private Block leafType;
     private Block barkType;
 
@@ -54,8 +54,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
      * @param iterations    The amount of iterations to execute
      * @param angle         The angle
      */
-    public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int iterations, int angle) {
-        angleInDegree = angle;
+    public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int iterations, float angle) {
+        this.angle = angle;
         this.iterations = iterations;
 
         this.initialAxiom = initialAxiom;
@@ -70,11 +70,11 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         rotation.setIdentity();
         rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2.0f));
 
-        int angleOffset = rand.randomInt() % MAX_ANGLE_OFFSET;
+        float angleOffset = rand.randomFloat() * MAX_ANGLE_OFFSET;
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
     }
 
-    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, int angleOffset, CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
+    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, float angleOffset, CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
         Matrix4f tempRotation = new Matrix4f();
         float probabilityMultiplier = calculateProbabilityMultiplier(depth);
         while (axiomIterator.hasNext()) {
@@ -120,32 +120,32 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     return;
                 case '+':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '-':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '&':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '^':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '*':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), (float) Math.toRadians(angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), angle));
                     rotation.mul(tempRotation);
                     break;
                 case '/':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), (float) Math.toRadians(angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), angle));
                     rotation.mul(tempRotation);
                     break;
                 default:
