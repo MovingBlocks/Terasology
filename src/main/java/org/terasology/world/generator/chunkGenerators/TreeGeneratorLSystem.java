@@ -76,7 +76,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
     private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, float angleOffset, CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
         Matrix4f tempRotation = new Matrix4f();
-        float probabilityMultiplier = calculateProbabilityMultiplier(depth);
+        float probabilityMultiplier = 1f - (float) depth / (float) iterations;
         while (axiomIterator.hasNext()) {
             char c = axiomIterator.nextChar();
             switch (c) {
@@ -159,18 +159,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         }
     }
 
-    private float calculateProbabilityMultiplier(int depth) {
-        // This function calculates the probability multiplier using a parabollic equation
-        // Equation: probabilityMultiplier = 1 - (depth / iterations) ^ 2
-        float ratio = (float) depth / (float) iterations;
-        return 1f - ratio * ratio;
-    }
-
     public TreeGeneratorLSystem setLeafType(Block b) {
         leafType = b;
         return this;
     }
-
 
     public TreeGeneratorLSystem setBarkType(Block b) {
         barkType = b;
