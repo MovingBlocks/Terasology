@@ -46,18 +46,18 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     private float outlineThickness = 0.65f;
 
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float skyInscatteringLength = 0.25f;
+    private float skyInscatteringLength = 1.0f;
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float skyInscatteringStrength = 0.35f;
+    private float skyInscatteringStrength = 0.25f;
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float skyInscatteringThreshold = 0.75f;
+    private float skyInscatteringThreshold = 0.8f;
 
-    @EditorRange(min = 0.001f, max = 1.0f)
-    private float volFogDensityAtViewer = 0.15f;
-    @EditorRange(min = 0.01f, max = 1.0f)
-    private float volFogGlobalDensity = 0.15f;
-    @EditorRange(min = 0.01f, max = 1.0f)
-    private float volFogHeightFalloff = 0.05f;
+    @EditorRange(min = 0.001f, max = 0.1f)
+    private float volFogGlobalDensity = 0.05f;
+    @EditorRange(min = 0.001f, max = 0.1f)
+    private float volFogHeightFalloff = 0.1f;
+    @EditorRange(min = 0.001f, max = 0.1f)
+    private float volFogDensityAtViewer = 0.1f;
 
     @Override
     public void applyParameters(Material program) {
@@ -91,12 +91,20 @@ public class ShaderParametersCombine extends ShaderParametersBase {
                 program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
             }
 
-            Vector3f fogWorldPosition = new Vector3f(0.0f, 32.0f - activeCamera.getPosition().y, 0.0f);
+            Vector3f fogWorldPosition = new Vector3f(0.0f, -activeCamera.getPosition().y, 0.0f);
             program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z, true);
 
+            WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
             // Fog density is set according to the fog density provided by the world
             // TODO: The 50% percent limit shouldn't be hardcoded
-            final float worldFog = Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
+            float worldFog = worldRenderer.getSmoothedPlayerSunlightValue()
+                    * Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
+
+//            boolean headUnderWater = worldRenderer.isHeadUnderWater();
+//            if (headUnderWater) {
+//                worldFog = 1.0f;
+//            }
+
             program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
         }
 

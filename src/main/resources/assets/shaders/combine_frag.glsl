@@ -79,32 +79,26 @@ void main() {
     colorOpaque.rgb = mix(colorOpaque.rgb, vec3(OUTLINE_COLOR), outline);
 #endif
 
-#if defined (INSCATTERING) || defined (VOLUMETRIC_FOG)
-    float fogLuminanceFactor = clamp(0.2126 * lightBufferOpaque.r + 0.7152 * lightBufferOpaque.g + 0.0722 * lightBufferOpaque.b, 0.50, 1.0);;
-#endif
-
 #if defined (INSCATTERING)
-    // Sky inscattering using down-sampled sky band texture
-    vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
+    // No scattering in the sky please - otherwise we end up with an ugly blurry sky
+    if (!epsilonEqualsOne(depthOpaque)) {
+        // Sky inscattering using down-sampled sky band texture
+        vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
 
-    float d = abs(linDepthViewingDistance(depthOpaque));
-    float fogValue = clamp(((skyInscatteringLength - d) / (skyInscatteringLength - skyInscatteringThreshold)) * skyInscatteringStrength, 0.0, 1.0);
-    fogValue *= fogLuminanceFactor;
+        float d = abs(linDepthViewingDistance(depthOpaque));
+        float fogValue = clamp((1.0 - (skyInscatteringLength - d) / clamp(skyInscatteringLength - skyInscatteringThreshold, 0.0, 1.0)) * skyInscatteringStrength, 0.0, 1.0);
 
-    colorOpaque.rgb = mix(colorOpaque.rgb, skyInscatteringColor, fogValue);
-    colorTransparent.rgb = mix(colorTransparent.rgb, skyInscatteringColor, fogValue);
+        colorOpaque.rgb = mix(colorOpaque.rgb, skyInscatteringColor, fogValue);
+        colorTransparent.rgb = mix(colorTransparent.rgb, skyInscatteringColor, fogValue);
+    }
 #endif
 
 #if defined (VOLUMETRIC_FOG)
     // Use lightValueAtPlayerPos to avoid volumetric fog in caves
-    float volumetricFogValue = volFogDensity * sunlightValueAtPlayerPos *
+    float volumetricFogValue = volFogDensity *
         calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
 
-    vec3 volFogColor = fogLuminanceFactor
-#if defined (INSCATTERING)
-        * skyInscatteringColor *
-#endif
-        vec3(VOLUMETRIC_FOG_COLOR);
+    vec3 volFogColor = vec3(VOLUMETRIC_FOG_COLOR);
 
     colorOpaque.rgb = mix(colorOpaque.rgb, volFogColor, volumetricFogValue);
     colorTransparent.rgb = mix(colorTransparent.rgb, volFogColor, volumetricFogValue);
