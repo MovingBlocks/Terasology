@@ -59,15 +59,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     @EditorRange(min = 0.01f, max = 1.0f)
     private float volFogHeightFalloff = 0.05f;
 
-    @EditorRange(min = 0.01f, max = 1.0f)
-    private float volLightingDensity = 0.5f;
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volLightingDecay = 0.005f;
-    @EditorRange(min = -1.0f, max = -0.8f)
-    private float volLightingScattering = -0.9f;
-    @EditorRange(min = 0.0f, max = 10000.0f)
-    private float volLightingPhi = 1000.0f;
-
     @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
@@ -107,48 +98,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             // TODO: The 50% percent limit shouldn't be hardcoded
             final float worldFog = Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
             program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
-        }
-
-        if (CoreRegistry.get(Config.class).getRendering().isVolumetricFog()
-                || CoreRegistry.get(Config.class).getRendering().isVolumetricLighting()) {
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-            if (activeCamera != null) {
-                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-            }
-        }
-
-        if (CoreRegistry.get(Config.class).getRendering().isVolumetricLighting()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
-            program.setInt("texSceneShadowMap", texId++, true);
-
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-            Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();
-            if (lightCamera != null && activeCamera != null) {
-                program.setMatrix4("lightViewMatrix", lightCamera.getViewMatrix(), true);
-                program.setMatrix4("lightProjMatrix", lightCamera.getProjectionMatrix(), true);
-                program.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
-
-                program.setMatrix4("viewMatrix", activeCamera.getViewMatrix(), true);
-
-                Matrix4f invViewMatrix = new Matrix4f();
-                invViewMatrix.invert(activeCamera.getViewMatrix());
-
-                program.setMatrix4("invViewMatrix", invViewMatrix, true);
-
-                Vector3f activeCameraToLightSpace = new Vector3f();
-                activeCameraToLightSpace.sub(activeCamera.getPosition(), lightCamera.getPosition());
-                program.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
-            }
-
-            program.setFloat4("volumetricLightingSettings", volLightingDensity, volLightingDecay, volLightingPhi, volLightingScattering, true);
-
-            if (CoreRegistry.get(Config.class).getRendering().isCloudShadows()) {
-                Texture clouds = Assets.getTexture("engine:perlinNoiseTileable");
-                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                glBindTexture(GL11.GL_TEXTURE_2D, clouds.getId());
-                program.setInt("texSceneClouds", texId++, true);
-            }
         }
 
         DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");

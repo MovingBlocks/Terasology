@@ -41,13 +41,10 @@ uniform float outlineThickness;
 # define OUTLINE_COLOR 0.0, 0.0, 0.0
 #endif
 
-#if defined (VOLUMETRIC_FOG) || defined (VOLUMETRIC_LIGHTING)
-uniform mat4 invViewProjMatrix;
-#endif
-
 #if defined (VOLUMETRIC_FOG)
 #define VOLUMETRIC_FOG_COLOR 1.0, 1.0, 1.0
 
+uniform mat4 invViewProjMatrix;
 uniform vec4 volumetricFogSettings;
 #define volFogDensityAtViewer volumetricFogSettings.x
 #define volFogGlobalDensity volumetricFogSettings.y
@@ -55,28 +52,6 @@ uniform vec4 volumetricFogSettings;
 #define volFogDensity volumetricFogSettings.w
 
 uniform vec3 fogWorldPosition;
-#endif
-
-#if defined (VOLUMETRIC_LIGHTING)
-#define SAMPLES 300.0
-#define STARTING_POINT viewingDistance // defines the amount of samples used / the starting point
-#define STEP_SIZE STARTING_POINT / SAMPLES
-
-uniform vec4 volumetricLightingSettings;
-
-uniform mat4 lightViewMatrix;
-uniform mat4 lightProjMatrix;
-uniform mat4 lightViewProjMatrix;
-
-uniform mat4 viewMatrix;
-uniform mat4 invViewMatrix;
-
-uniform sampler2D texSceneShadowMap;
-uniform vec3 activeCameraToLightSpace;
-
-#if defined (CLOUD_SHADOWS)
-uniform sampler2D texSceneClouds;
-#endif
 #endif
 
 void main() {
@@ -116,54 +91,6 @@ void main() {
         colorOpaque.rgb = mix(colorOpaque.rgb, skyInscatteringColor, fogValue);
         colorTransparent.rgb = mix(colorTransparent.rgb, skyInscatteringColor, fogValue);
     }
-#endif
-
-#if defined (VOLUMETRIC_LIGHTING)
-    vec2 projectedPos = gl_TexCoord[0].xy;
-
-    // Guess a position for fragments that have been projected to the far plane (e.g. the sky)
-    float len = length(worldPosition.xyz);
-    worldPosition.xyz = clamp(len, 0.0,  viewingDistance) * (worldPosition.xyz / len);
-
-    vec3 lightWorldSpaceVertPos = worldPosition.xyz + activeCameraToLightSpace;
-
-//    float L = volumetricLightingL0 * exp(-STARTING_POINT * volumetricLightingTau);
-    float L = 0.0;
-
-    vec4 lightViewSpaceVertPos = lightViewMatrix * vec4(lightWorldSpaceVertPos.x, lightWorldSpaceVertPos.y, lightWorldSpaceVertPos.z, 1.0);
-    vec3 viewDir = normalize(-lightViewSpaceVertPos.xyz);
-    vec4 viewSpacePosition = lightViewSpaceVertPos;
-
-    for (float l = STARTING_POINT - STEP_SIZE; l >= 0; l -= STEP_SIZE) {
-        viewSpacePosition.xyz += vec3(STEP_SIZE, STEP_SIZE, STEP_SIZE) * viewDir.xyz;
-
-        vec4 screenSpacePosition = lightProjMatrix * viewSpacePosition;
-        screenSpacePosition.xyz /= screenSpacePosition.w;
-        screenSpacePosition.xy = screenSpacePosition.xy * vec2(0.5, 0.5) + vec2(0.5, 0.5);
-
-        float sd = texture2D(texSceneShadowMap, screenSpacePosition.xy).x;
-        float v = (sd < screenSpacePosition.z) ? 0.0 : volumetricLightingSettings.x;
-
-#if defined (CLOUD_SHADOWS)
-        // Modulate volumetric lighting with some fictional cloud shadows
-        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 0.5 + timeToTick(time, 0.002)).r * 5.0, 0.0, 1.0);
-#endif
-
-        float d = clamp(length(viewSpacePosition.xyz), 10.0, viewingDistance);
-        float cosTheta = dot(normalize(-viewSpacePosition.xyz), -viewDir);
-        float g = volumetricLightingSettings.w;
-        float phi = volumetricLightingSettings.z;
-
-        float henyeyGreenstein = (1.0 / (4.0 * PI)) * (1.0 - g) * (1.0 - g);
-        henyeyGreenstein /= pow(1.0 + g*g - 2.0 * g * cosTheta, 3.0 / 2.0);
-
-        float intens = henyeyGreenstein * volumetricLightingSettings.y * (v * phi/4.0/PI/d/d) * exp(-d * volumetricLightingSettings.y) * exp(-l * volumetricLightingSettings.y) * STEP_SIZE;
-
-        L += intens;
-    };
-
-    colorOpaque.rgb += vec3(L, L, L);
-    colorTransparent.rgb += vec3(L, L, L);
 #endif
 
 #if defined (VOLUMETRIC_FOG)

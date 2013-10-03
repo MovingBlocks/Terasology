@@ -73,6 +73,12 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setFloat("blurLength", blurLength, true);
         }
 
+        if (CoreRegistry.get(Config.class).getRendering().isVolumetricLighting()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("volumetricLighting");
+            program.setInt("texVolumetricLighting", texId++, true);
+        }
+
         Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1");
 
         if (colorGradingLut != null) {
