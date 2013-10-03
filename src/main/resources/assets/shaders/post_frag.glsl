@@ -108,7 +108,8 @@ void main() {
 #endif
 
 #ifdef VOLUMETRIC_LIGHTING
-    finalColor.rgb = mix(finalColor.rgb, vec3(1.0, 1.0, 1.0), texture2D(texVolumetricLighting, gl_TexCoord[0].xy).r);
+    float fogLuminanceFactor = clamp(0.2126 * finalColor.r + 0.7152 * finalColor.g + 0.0722 * finalColor.b, 0.75, 1.0);
+    finalColor.rgb = mix(finalColor.rgb, vec3(1.0, 1.0, 1.0), texture2D(texVolumetricLighting, gl_TexCoord[0].xy).r * fogLuminanceFactor);
 #endif
 
 #ifdef FILM_GRAIN
