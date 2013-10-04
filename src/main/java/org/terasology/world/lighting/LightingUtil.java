@@ -18,6 +18,7 @@ package org.terasology.world.lighting;
 
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * Utility methods that drive the logic of light propagation
@@ -38,6 +39,30 @@ public final class LightingUtil {
         return toBlock.isTranslucent() || !toBlock.isFullSide(direction);
     }
 
+    public static PropagationComparison compareLightingPropagation(Block newBlock, Block oldBlock, Side side) {
+        if (newBlock.isTranslucent() && oldBlock.isTranslucent()) {
+            return PropagationComparison.IDENTICAL;
+        } else if (newBlock.isTranslucent()) {
+            if (oldBlock.isFullSide(side)) {
+                return PropagationComparison.MORE_PERMISSIVE;
+            }
+        } else if (oldBlock.isTranslucent()) {
+            if (newBlock.isFullSide(side)) {
+                return PropagationComparison.MORE_RESTRICTED;
+            }
+        } else {
+            boolean newBlocked = newBlock.isFullSide(side);
+            boolean oldBlocked = oldBlock.isFullSide(side);
+            if (newBlocked && !oldBlocked) {
+                return PropagationComparison.MORE_RESTRICTED;
+            }
+            if (oldBlocked && !newBlocked) {
+                return PropagationComparison.MORE_PERMISSIVE;
+            }
+        }
+        return PropagationComparison.IDENTICAL;
+    }
+
     /**
      * @param newBlock
      * @param oldBlock
@@ -52,14 +77,12 @@ public final class LightingUtil {
                     return PropagationComparison.MORE_PERMISSIVE;
                 }
             }
-            return PropagationComparison.IDENTICAL;
         } else if (oldBlock.isTranslucent()) {
             for (Side side : Side.values()) {
                 if (newBlock.isFullSide(side)) {
                     return PropagationComparison.MORE_RESTRICTED;
                 }
             }
-            return PropagationComparison.IDENTICAL;
         } else {
             boolean permit = false;
             for (Side side : Side.values()) {
@@ -73,7 +96,36 @@ public final class LightingUtil {
             if (permit) {
                 return PropagationComparison.MORE_PERMISSIVE;
             }
-            return PropagationComparison.IDENTICAL;
         }
+        return PropagationComparison.IDENTICAL;
     }
+
+    /**
+     * @param newBlock
+     * @param oldBlock
+     * @return The propagation of lighting by newBlock compared to oldBlock
+     */
+    public static PropagationComparison compareBlockLighting(Block newBlock, Block oldBlock) {
+        if (newBlock.getLuminance() == Chunk.MAX_LIGHT) {
+            if (oldBlock.getLuminance() != newBlock.getLuminance()) {
+                return PropagationComparison.MORE_PERMISSIVE;
+            } else {
+                return PropagationComparison.IDENTICAL;
+            }
+        } else if (newBlock.getLuminance() > oldBlock.getLuminance()) {
+            if (compareLightingPropagation(newBlock, oldBlock).isRestricting()) {
+                return PropagationComparison.MIXED;
+            }
+            return PropagationComparison.MORE_PERMISSIVE;
+        } else if (newBlock.getLuminance() < oldBlock.getLuminance()) {
+            if (compareLightingPropagation(newBlock, oldBlock).isPermitting()) {
+                return PropagationComparison.MIXED;
+            }
+            return PropagationComparison.MORE_RESTRICTED;
+        } else {
+            return compareLightingPropagation(newBlock, oldBlock);
+        }
+
+    }
+
 }

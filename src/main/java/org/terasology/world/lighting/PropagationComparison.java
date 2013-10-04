@@ -21,16 +21,35 @@ package org.terasology.world.lighting;
  */
 public enum PropagationComparison {
     /**
-     * Lighting is restricted in some way it wasn't before (even if it is more permissive in other ways
+     * Lighting is restricted in some way it wasn't before
      */
-    MORE_RESTRICTED,
+    MORE_RESTRICTED(true, false),
     /**
      * Lighting is identical to before
      */
-    IDENTICAL,
+    IDENTICAL(false, false),
     /**
      * Lighting is strictly more permissive than before
      */
-    MORE_PERMISSIVE
+    MORE_PERMISSIVE(false, true),
+    /**
+     * Lighting is more permissive in some ways, more restrictive in others
+     */
+    MIXED(true, true);
 
+    private boolean restricting;
+    private boolean permitting;
+
+    private PropagationComparison(boolean restricts, boolean permits) {
+        this.restricting = restricts;
+        this.permitting = permits;
+    }
+
+    public boolean isRestricting() {
+        return restricting;
+    }
+
+    public boolean isPermitting() {
+        return permitting;
+    }
 }
