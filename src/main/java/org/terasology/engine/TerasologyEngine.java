@@ -337,6 +337,7 @@ public class TerasologyEngine implements GameEngine {
             Display.setParent(customViewPort);
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             Display.create(config.getRendering().getPixelFormat());
+            Display.setVSyncEnabled(config.getRendering().isVSync());
         } catch (LWJGLException e) {
             logger.error("Can not initialize graphics device.", e);
             System.exit(1);
@@ -647,6 +648,11 @@ public class TerasologyEngine implements GameEngine {
             resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
         }
+    }
+
+    public void setVSync(boolean state) {
+        config.getRendering().setVSync(state);
+        Display.setVSyncEnabled(state);
     }
 
     public boolean isHibernationAllowed() {

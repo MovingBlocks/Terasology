@@ -64,6 +64,7 @@ public class RenderingConfig {
     private int meshLimit = 20;
     private boolean volumetricLighting = false;
     private boolean inscattering = true;
+    private boolean vSync;
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
@@ -371,6 +372,14 @@ public class RenderingConfig {
 
     public void setMeshLimit(int meshLimit) {
         this.meshLimit = meshLimit;
+    }
+
+    public boolean isVSync() {
+        return this.vSync;
+    }
+
+    public void setVSync(boolean vSync) {
+        this.vSync = vSync;
     }
 
     public RenderingDebugConfig getDebug() {
