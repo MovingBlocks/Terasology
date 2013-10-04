@@ -36,7 +36,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public static final float MAX_ANGLE_OFFSET = (float) Math.toRadians(5);
 
     /* SETTINGS */
-    private int iterations;
+    private int maxDepth;
     private float angle;
     private Block leafType;
     private Block barkType;
@@ -50,13 +50,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
      *
      * @param initialAxiom  The initial axiom to use
      * @param ruleSet       The rule set to use
-     * @param probabilities The probability array
-     * @param iterations    The amount of iterations to execute
+     * @param maxDepth      The maximum recursion depth
      * @param angle         The angle
      */
-    public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int iterations, float angle) {
+    public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int maxDepth, float angle) {
         this.angle = angle;
-        this.iterations = iterations;
+        this.maxDepth = maxDepth;
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
@@ -148,15 +147,15 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     rotation.mul(tempRotation);
                     break;
                 default:
-                    // If we have already reached the maximum iteration count, don't ever bother to lookup in the map
-                    if (depth == iterations - 1) break;
+                    // If we have already reached the maximum depth, don't ever bother to lookup in the map
+                    if (depth == maxDepth - 1) break;
                     LSystemRule rule = ruleSet.get(c);
                     if (rule == null) break;
 
                     // Get a random positive float
                     float randVal = rand.randomFloat();
                     if (randVal < 0f) randVal = -randVal;
-                    float weightedFailureProbability = (float) Math.pow(1f - rule.getProbability(), (double) (iterations - depth));
+                    float weightedFailureProbability = (float) Math.pow(1f - rule.getProbability(), (double) (maxDepth - depth));
                     if (randVal < weightedFailureProbability) break;
 
                     recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(rule.getAxiom()), position, rotation, depth + 1);
