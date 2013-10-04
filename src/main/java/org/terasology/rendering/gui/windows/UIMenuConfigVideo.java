@@ -331,7 +331,7 @@ public class UIMenuConfigVideo extends UIWindow {
         volumetricFogButton.addState("Volumetric Fog: On", volumetricFogStateAction);
         volumetricFogButton.addClickListener(clickAction);
         volumetricFogButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        volumetricFogButton.setPosition(new Vector2f(-fovButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
+        volumetricFogButton.setPosition(new Vector2f(-volumetricFogButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
         volumetricFogButton.setVisible(true);
 
         vSyncButton = new UIStateButton(new Vector2f(256f, 32f));
