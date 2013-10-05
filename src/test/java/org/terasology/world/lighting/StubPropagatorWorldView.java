@@ -27,17 +27,17 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class StubLightingWorldView implements LightingWorldView {
+public class StubPropagatorWorldView implements PropagatorWorldView {
     private TObjectByteMap<Vector3i> lightData = new TObjectByteHashMap<>();
     private Map<Vector3i, Block> blockData = Maps.newHashMap();
 
     @Override
-    public byte getLuminanceAt(Vector3i pos) {
+    public byte getValueAt(Vector3i pos) {
         return lightData.get(pos);
     }
 
     @Override
-    public void setLuminanceAt(Vector3i pos, byte value) {
+    public void setValueAt(Vector3i pos, byte value) {
         lightData.put(pos, value);
     }
 

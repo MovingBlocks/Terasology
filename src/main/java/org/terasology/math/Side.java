@@ -255,4 +255,10 @@ public enum Side {
                 return this;
         }
     }
+
+    public Vector3i getAdjacentPos(Vector3i position) {
+        Vector3i result = new Vector3i(position);
+        result.add(vector3iDir);
+        return result;
+    }
 }

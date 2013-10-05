@@ -13,39 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.lighting;
+
+import org.terasology.math.Side;
+import org.terasology.world.block.Block;
 
 /**
  * @author Immortius
  */
-public enum PropagationComparison {
-    /**
-     * Lighting is restricted in some way it wasn't before
-     */
-    MORE_RESTRICTED(true, false),
-    /**
-     * Lighting is identical to before
-     */
-    IDENTICAL(false, false),
-    /**
-     * Lighting is strictly more permissive than before
-     */
-    MORE_PERMISSIVE(false, true);
+public class LightPropagationRules extends CommonLightPropagationRules {
 
-    private boolean restricting;
-    private boolean permitting;
-
-    private PropagationComparison(boolean restricts, boolean permits) {
-        this.restricting = restricts;
-        this.permitting = permits;
+    @Override
+    public byte getBlockValue(Block block) {
+        return block.getLuminance();
     }
 
-    public boolean isRestricting() {
-        return restricting;
+    @Override
+    public byte propagateValue(byte existingValue, Side side) {
+        return (byte) (existingValue - 1);
     }
 
-    public boolean isPermitting() {
-        return permitting;
+    @Override
+    public byte getMaxValue() {
+        return (byte) 15;
     }
+
+
 }

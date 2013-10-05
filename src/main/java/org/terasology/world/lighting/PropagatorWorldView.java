@@ -19,15 +19,33 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
+ * A view providing access to the world for batch propagation
+ *
  * @author Immortius
  */
-public interface LightingWorldView {
+public interface PropagatorWorldView {
 
-    byte getLuminanceAt(Vector3i pos);
+    /**
+     * @param pos
+     * @return The value of interest at pos
+     */
+    byte getValueAt(Vector3i pos);
 
-    void setLuminanceAt(Vector3i pos, byte value);
+    /**
+     * @param pos
+     * @param value A new value at pos.
+     */
+    void setValueAt(Vector3i pos, byte value);
 
+    /**
+     * @param pos
+     * @return The block at pos
+     */
     Block getBlockAt(Vector3i pos);
 
+    /**
+     * @param pos
+     * @return Whether pos is in the bounds of the world view
+     */
     boolean isInBounds(Vector3i pos);
 }
