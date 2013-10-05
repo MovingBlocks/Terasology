@@ -49,7 +49,8 @@ public class DefaultGenerators {
         rules = ImmutableMap.<Character, LSystemRule>builder()
                 .put('A', new LSystemRule("[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", 1.0f))
                 .put('B', new LSystemRule("[&FAF]////[&FAF]////[&FAF]", 0.8f)).build();
-        TreeGenerator birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, 4, (float) Math.toRadians(35)).setLeafType(blockManager.getBlock("engine:DarkLeaf"))
+        TreeGenerator birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, 4, (float) Math.toRadians(35))
+                .setLeafType(blockManager.getBlock("engine:DarkLeaf"))
                 .setBarkType(blockManager.getBlock("engine:BirkTrunk")).setGenerationProbability(0.02f);
 
         // Oak variation tree

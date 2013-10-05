@@ -27,7 +27,8 @@ public class CharSequenceIterator implements Iterator<Character> {
     private int pos;
 
     public CharSequenceIterator(CharSequence sequence) {
-        // Please note that, in order to reduce overhead, this class doesn't copy the sequence, so changes in mutable sequences (like StringBuilders or StringBuffers) will be reflected here
+        // Please note that, in order to reduce overhead, this class doesn't copy the sequence,
+        // so changes in mutable sequences (like StringBuilders or StringBuffers) will be reflected here
         this.sequence = sequence;
     }
 

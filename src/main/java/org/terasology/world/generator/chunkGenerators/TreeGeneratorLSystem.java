@@ -73,7 +73,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
     }
 
-    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, float angleOffset, CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
+    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, float angleOffset,
+                         CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
         Matrix4f tempRotation = new Matrix4f();
         while (axiomIterator.hasNext()) {
             char c = axiomIterator.nextChar();
@@ -148,15 +149,23 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     break;
                 default:
                     // If we have already reached the maximum depth, don't ever bother to lookup in the map
-                    if (depth == maxDepth - 1) break;
+                    if (depth == maxDepth - 1) {
+                        break;
+                    }
                     LSystemRule rule = ruleSet.get(c);
-                    if (rule == null) break;
+                    if (rule == null) {
+                        break;
+                    }
 
                     // Get a random positive float
                     float randVal = rand.randomFloat();
-                    if (randVal < 0f) randVal = -randVal;
+                    if (randVal < 0f) {
+                        randVal = -randVal;
+                    }
                     float weightedFailureProbability = (float) Math.pow(1f - rule.getProbability(), (double) (maxDepth - depth));
-                    if (randVal < weightedFailureProbability) break;
+                    if (randVal < weightedFailureProbability) {
+                        break;
+                    }
 
                     recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(rule.getAxiom()), position, rotation, depth + 1);
             }
