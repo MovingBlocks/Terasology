@@ -15,7 +15,8 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import com.google.common.collect.Queues;
+import org.terasology.math.LSystemRule;
+import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
@@ -23,7 +24,6 @@ import org.terasology.world.block.Block;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.util.Deque;
 import java.util.Map;
 
 /**
@@ -33,78 +33,50 @@ import java.util.Map;
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
 
-    public static final int MAX_ANGLE_OFFSET = 5;
+    public static final float MAX_ANGLE_OFFSET = (float) Math.toRadians(5);
 
     /* SETTINGS */
-    private int iterations;
-    private double angleInDegree;
+    private int maxDepth;
+    private float angle;
     private Block leafType;
     private Block barkType;
 
     /* RULES */
     private final String initialAxiom;
-    private final Map<String, String> ruleSet;
-    private final Map<String, Double> probabilities;
+    private final Map<Character, LSystemRule> ruleSet;
 
     /**
      * Init. a new L-System based tree generator.
      *
      * @param initialAxiom  The initial axiom to use
      * @param ruleSet       The rule set to use
-     * @param probabilities The probability array
-     * @param iterations    The amount of iterations to execute
+     * @param maxDepth      The maximum recursion depth
      * @param angle         The angle
      */
-    public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
-        angleInDegree = angle;
-        this.iterations = iterations;
+    public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int maxDepth, float angle) {
+        this.angle = angle;
+        this.maxDepth = maxDepth;
 
         this.initialAxiom = initialAxiom;
         this.ruleSet = ruleSet;
-        this.probabilities = probabilities;
     }
 
     @Override
     public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
-
-        String axiom = initialAxiom;
-
-        Deque<Vector3f> stackPosition = Queues.newArrayDeque();
-        Deque<Matrix4f> stackOrientation = Queues.newArrayDeque();
-
-        for (int i = 0; i < iterations; i++) {
-
-            String temp = "";
-
-            for (int j = 0; j < axiom.length(); j++) {
-                String c = String.valueOf(axiom.charAt(j));
-
-                double rValue = (rand.randomDouble() + 1.0) / 2.0;
-
-                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue)) {
-                    temp += ruleSet.get(c);
-                } else {
-                    temp += c;
-                }
-            }
-
-            axiom = temp;
-        }
-
-        Vector3f position = new Vector3f(0, 0, 0);
+        Vector3f position = new Vector3f(0f, 0f, 0f);
 
         Matrix4f rotation = new Matrix4f();
         rotation.setIdentity();
-        rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2.0f));
+        rotation.setRotation(new AxisAngle4f(0f, 0f, 1f, (float) Math.PI / 2f));
 
-        int angleOffset = rand.randomInt() % MAX_ANGLE_OFFSET;
+        float angleOffset = rand.randomFloat() * MAX_ANGLE_OFFSET;
+        recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
+    }
 
-        for (int i = 0; i < axiom.length(); i++) {
-            char c = axiom.charAt(i);
-
-            Matrix4f tempRotation = new Matrix4f();
-            tempRotation.setIdentity();
-
+    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, float angleOffset, CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
+        Matrix4f tempRotation = new Matrix4f();
+        while (axiomIterator.hasNext()) {
+            char c = axiomIterator.nextChar();
             switch (c) {
                 case 'G':
                 case 'F':
@@ -115,7 +87,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
-                    if (stackOrientation.size() > 1) {
+                    if (depth > 1) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {
@@ -134,49 +106,59 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                         }
                     }
 
-                    Vector3f dir = new Vector3f(1, 0, 0);
+                    Vector3f dir = new Vector3f(1f, 0f, 0f);
                     rotation.transform(dir);
 
                     position.add(dir);
                     break;
                 case '[':
-                    stackOrientation.push(new Matrix4f(rotation));
-                    stackPosition.push(new Vector3f(position));
+                    recurse(view, rand, posX, posY, posZ, angleOffset, axiomIterator, new Vector3f(position), new Matrix4f(rotation), depth);
                     break;
                 case ']':
-                    rotation = stackOrientation.pop();
-                    position = stackPosition.pop();
-                    break;
+                    return;
                 case '+':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(0f, 0f, 1f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '-':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(0f, 0f, -1f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '&':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(0f, 1f, 0f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '^':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(0f, -1f, 0f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '*':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), (float) Math.toRadians(angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(1f, 0f, 0f, angle));
                     rotation.mul(tempRotation);
                     break;
                 case '/':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), (float) Math.toRadians(angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(-1f, 0f, 0f, angle));
                     rotation.mul(tempRotation);
                     break;
+                default:
+                    // If we have already reached the maximum depth, don't ever bother to lookup in the map
+                    if (depth == maxDepth - 1) break;
+                    LSystemRule rule = ruleSet.get(c);
+                    if (rule == null) break;
+
+                    // Get a random positive float
+                    float randVal = rand.randomFloat();
+                    if (randVal < 0f) randVal = -randVal;
+                    float weightedFailureProbability = (float) Math.pow(1f - rule.getProbability(), (double) (maxDepth - depth));
+                    if (randVal < weightedFailureProbability) break;
+
+                    recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(rule.getAxiom()), position, rotation, depth + 1);
             }
         }
     }
@@ -185,7 +167,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         leafType = b;
         return this;
     }
-
 
     public TreeGeneratorLSystem setBarkType(Block b) {
         barkType = b;
