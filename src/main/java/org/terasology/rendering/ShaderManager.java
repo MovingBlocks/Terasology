@@ -29,7 +29,26 @@ import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.GLSLMaterial;
-import org.terasology.rendering.shader.*;
+import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderParametersBlock;
+import org.terasology.rendering.shader.ShaderParametersChunk;
+import org.terasology.rendering.shader.ShaderParametersCombine;
+import org.terasology.rendering.shader.ShaderParametersDebug;
+import org.terasology.rendering.shader.ShaderParametersDefault;
+import org.terasology.rendering.shader.ShaderParametersGelCube;
+import org.terasology.rendering.shader.ShaderParametersHdr;
+import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
+import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
+import org.terasology.rendering.shader.ShaderParametersLightShaft;
+import org.terasology.rendering.shader.ShaderParametersOcDistortion;
+import org.terasology.rendering.shader.ShaderParametersParticle;
+import org.terasology.rendering.shader.ShaderParametersPost;
+import org.terasology.rendering.shader.ShaderParametersPrePost;
+import org.terasology.rendering.shader.ShaderParametersSSAO;
+import org.terasology.rendering.shader.ShaderParametersShadowMap;
+import org.terasology.rendering.shader.ShaderParametersSky;
+import org.terasology.rendering.shader.ShaderParametersSobel;
+import org.terasology.rendering.shader.ShaderParametersVolumetricLightingRayMarching;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

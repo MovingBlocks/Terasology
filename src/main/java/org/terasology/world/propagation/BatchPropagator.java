@@ -16,7 +16,6 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
-import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;

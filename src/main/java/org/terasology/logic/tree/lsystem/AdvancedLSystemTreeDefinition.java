@@ -284,22 +284,25 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private static List<AxionElement> parseAxions(String axionString) {
         List<AxionElement> result = new LinkedList<>();
         char[] chars = axionString.toCharArray();
-        for (int i = 0, size = chars.length; i < size; i++) {
-            char c = chars[i];
+        int index = 0;
+        int size = chars.length;
+        while (index < size) {
+            char c = chars[index];
             if (c == '(' || c == ')') {
                 throw new IllegalArgumentException("Invalid axion - parameter without key");
             }
-            if (i + 1 < size && chars[i + 1] == '(') {
-                int closingBracket = axionString.indexOf(')', i + 1);
+            if (index + 1 < size && chars[index + 1] == '(') {
+                int closingBracket = axionString.indexOf(')', index + 1);
                 if (closingBracket < 0) {
                     throw new IllegalArgumentException("Invalid axion - missing closing bracket");
                 }
-                String parameter = axionString.substring(i + 2, closingBracket);
-                i = closingBracket;
+                String parameter = axionString.substring(index + 2, closingBracket);
+                index = closingBracket;
                 result.add(new AxionElement(c, parameter));
             } else {
                 result.add(new AxionElement(c));
             }
+            index++;
         }
 
         return result;

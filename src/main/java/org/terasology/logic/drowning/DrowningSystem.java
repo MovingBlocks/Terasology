@@ -71,8 +71,7 @@ public class DrowningSystem implements UpdateSubscriberSystem {
 
             // Check if the player's head/eyes are actually below the water surface
             CharacterComponent charComp = entity.getComponent(CharacterComponent.class);
-            if (charComp != null)
-            {
+            if (charComp != null) {
                 Vector3f worldPosition = new Vector3f(loc.getWorldPosition());
                 worldPosition.y += charComp.eyeOffset;
                 worldPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(worldPosition, worldProvider.getTime().getDays());

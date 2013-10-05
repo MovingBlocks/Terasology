@@ -25,7 +25,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class RenderHelper {
+public final class RenderHelper {
 
     // Parameters which are also defined on shader side
     private static final int OCEAN_OCTAVES = 16;
@@ -48,6 +48,9 @@ public class RenderHelper {
             new Vector2f(0.039766f, -0.396100f)
     };
 
+    private RenderHelper() {
+    }
+
     // Various functions that are also available on the shader side but need to be
     // evaluated on the CPU
     public static float smoothCurve(float x) {
@@ -55,8 +58,8 @@ public class RenderHelper {
     }
 
     public static float triangleWave(float x) {
-        x += 0.5;
-        float fract = x - (float)Math.floor(x);
+        float normX = x + 0.5f;
+        float fract = normX - (float) Math.floor(normX);
         return Math.abs(fract * 2.0f - 1.0f);
     }
 
@@ -72,13 +75,13 @@ public class RenderHelper {
         float height = 0.0f;
 
         GLSLMaterial chunkMaterial = (GLSLMaterial) Assets.getMaterial("engine:chunk");
-        ShaderParametersChunk chunkParameters = (ShaderParametersChunk)chunkMaterial.getShaderParameters();
+        ShaderParametersChunk chunkParameters = (ShaderParametersChunk) chunkMaterial.getShaderParameters();
 
         float size = chunkParameters.waveSize;
         float intens = chunkParameters.waveIntens;
         float timeFactor = chunkParameters.waveSpeed;
 
-        for (int i=0; i<OCEAN_OCTAVES; ++i) {
+        for (int i = 0; i < OCEAN_OCTAVES; ++i) {
             height += (smoothTriangleWave(timeToTick(days,
                     timeFactor) + position.x * OCEAN_WAVE_DIRECTIONS[i].x * size + position.z * OCEAN_WAVE_DIRECTIONS[i].y * size) * 2.0 - 1.0) * intens;
 

@@ -16,7 +16,6 @@
 package org.terasology.world.propagation.light;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.WorldProviderCore;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.propagation.AbstractFullWorldView;

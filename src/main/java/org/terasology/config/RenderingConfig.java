@@ -62,7 +62,7 @@ public class RenderingConfig {
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
     private int meshLimit = 20;
-    private boolean volumetricLighting = false;
+    private boolean volumetricLighting;
     private boolean inscattering = true;
     private boolean vSync;
 
@@ -378,8 +378,8 @@ public class RenderingConfig {
         return this.vSync;
     }
 
-    public void setVSync(boolean vSync) {
-        this.vSync = vSync;
+    public void setVSync(boolean value) {
+        this.vSync = value;
     }
 
     public RenderingDebugConfig getDebug() {

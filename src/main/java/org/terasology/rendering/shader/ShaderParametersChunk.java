@@ -47,6 +47,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     public float waveSpeed = 0.1f;
     @EditorRange(min = 0.0f, max = 2.0f)
     public float waveSpeedFalloff = 0.95f;
+    @EditorRange(min = 0.0f, max = 5.0f)
+    public float waterOffsetY;
 
     @EditorRange(min = 0.0f, max = 2.0f)
     public float waveOverallScale = 1.0f;
@@ -61,9 +63,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     float waterNormalBias = 25.0f;
     @EditorRange(min = 0.0f, max = 1.0f)
     float waterTint = 0.24f;
-
-    @EditorRange(min = 0.0f, max = 5.0f)
-    public float waterOffsetY;
 
     @EditorRange(min = 0.0f, max = 1024.0f)
     float waterSpecExp = 200.0f;
