@@ -62,7 +62,7 @@ public class ScrewdriverSystem implements ComponentSystem {
                     blockForSide = sideDefinedBlockFamily.getBlockForSide(newSide);
                 } while (blockForSide == null);
 
-                if (worldProvider.setBlock(targetLocation, blockForSide, block)) {
+                if (worldProvider.setBlock(targetLocation, blockForSide) != null) {
                     final EntityRef gateEntity = blockEntityRegistry.getBlockEntityAt(targetLocation);
 
                     final SignalProducerComponent signalProducer = gateEntity.getComponent(SignalProducerComponent.class);

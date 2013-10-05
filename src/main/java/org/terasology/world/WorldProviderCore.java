@@ -17,7 +17,6 @@ package org.terasology.world;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.internal.BlockUpdate;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
@@ -54,6 +53,11 @@ public interface WorldProviderCore {
     WorldBiomeProvider getBiomeProvider();
 
     /**
+     * Process any propagation, such as light
+     */
+    void processPropagation();
+
+    /**
      * @param listener
      */
     void registerListener(WorldChangeListener listener);
@@ -84,51 +88,13 @@ public interface WorldProviderCore {
     boolean isBlockRelevant(int x, int y, int z);
 
     /**
-     * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
+     * Places a block of a specific type at a given position
      *
-     * @param updates
-     * @return Whether the updates succeeded
-     */
-    boolean setBlocks(BlockUpdate... updates);
-
-    /**
-     * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
-     *
-     * @param updates
-     * @return Whether the updates succeeded
-     */
-    boolean setBlocks(Iterable<BlockUpdate> updates);
-
-    /**
-     * Places a block of a specific type at a given position and refreshes the
-     * corresponding light values.
-     * <p/>
-     * This method takes the expected value of the previous block in this position - this allows it to check the block
-     * hasn't been changed (potentially by another thread). If it has changed then no change occurs. It is recommended
-     * that this is used to ensure that the block being changed is in an acceptable state for the change.
-     *
-     * @param x       The X-coordinate
-     * @param y       The Y-coordinate
-     * @param z       The Z-coordinate
-     * @param type    The type of the block to set
-     * @param oldType The expected type of the block being replaced.
-     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
-     */
-    boolean setBlock(int x, int y, int z, Block type, Block oldType);
-
-    /**
-     * Places a block of a specific type at a given position and refreshes the
-     * corresponding light values.
-     * <p/>
-     * This method forces the change regardless of the previous value. It should generally be avoided except in situations where
-     * the change must absolutely occur regardless of the type of block being changed.
-     *
-     * @param x    The X-coordinate
-     * @param y    The Y-coordinate
-     * @param z    The Z-coordinate
+     * @param pos  The world position to change
      * @param type The type of the block to set
+     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
      */
-    void setBlockForced(int x, int y, int z, Block type);
+    Block setBlock(Vector3i pos, Block type);
 
     /**
      * @param x

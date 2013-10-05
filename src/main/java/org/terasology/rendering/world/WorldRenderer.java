@@ -970,6 +970,8 @@ public final class WorldRenderer {
         updateTick(delta);
         PerformanceMonitor.endActivity();
 
+        worldProvider.processPropagation();
+
         // Free unused space
         PerformanceMonitor.startActivity("Update Chunk Cache");
         chunkProvider.update();

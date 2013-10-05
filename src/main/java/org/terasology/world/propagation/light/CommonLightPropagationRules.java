@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation.light;
 
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
+import org.terasology.world.propagation.PropagationComparison;
+import org.terasology.world.propagation.PropagationRules;
 
 /**
  * @author Immortius

@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
+import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -61,6 +63,20 @@ public class BatchPropagator {
         }
 
         processReduction();
+        processIncrease();
+        cleanUp();
+    }
+
+    public void propagateFrom(List<? extends Iterable<Vector3i>> fromRegions) {
+        for (Iterable<Vector3i> region : fromRegions) {
+            for (Vector3i pos : region) {
+                byte val = world.getValueAt(pos);
+                if (val > 0) {
+                    queueSpreadValue(pos, val);
+                }
+            }
+        }
+
         processIncrease();
         cleanUp();
     }

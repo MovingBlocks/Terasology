@@ -57,6 +57,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public void processPropagation() {
+        base.processPropagation();
+    }
+
+    @Override
     public void registerListener(WorldChangeListener listener) {
         base.registerListener(listener);
     }
@@ -82,23 +87,8 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public boolean setBlocks(BlockUpdate... updates) {
-        return base.setBlocks(updates);
-    }
-
-    @Override
-    public boolean setBlocks(Iterable<BlockUpdate> updates) {
-        return base.setBlocks(updates);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        return base.setBlock(x, y, z, type, oldType);
-    }
-
-    @Override
-    public void setBlockForced(int x, int y, int z, Block type) {
-        base.setBlockForced(x, y, z, type);
+    public Block setBlock(Vector3i pos, Block type) {
+        return base.setBlock(pos, type);
     }
 
     @Override

@@ -63,6 +63,10 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
+    public void processPropagation() {
+    }
+
+    @Override
     public void registerListener(WorldChangeListener listener) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -88,34 +92,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public boolean setBlocks(BlockUpdate... updates) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean setBlocks(Iterable<BlockUpdate> updates) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        Vector3i pos = new Vector3i(x, y, z);
-        Block old = blocks.get(pos);
+    public Block setBlock(Vector3i pos, Block type) {
+        Block old = blocks.put(pos, type);
         if (old == null) {
-            if (oldType == air) {
-                blocks.put(pos, type);
-                return true;
-            }
-        } else if (old == oldType) {
-            blocks.put(pos, type);
-            return true;
+            return air;
         }
-        return false;
-    }
-
-    @Override
-    public void setBlockForced(int x, int y, int z, Block type) {
-        setBlock(x, y, z, type, getBlock(x, y, z));
+        return old;
     }
 
     @Override

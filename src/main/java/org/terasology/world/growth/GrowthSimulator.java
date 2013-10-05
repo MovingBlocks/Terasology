@@ -23,8 +23,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ThreadActivity;
@@ -46,7 +44,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author Immortius
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+// TODO: Fix this system for world changes (cannot change blocks off the main thread)
+//@RegisterSystem(RegisterMode.AUTHORITY)
 public class GrowthSimulator implements ComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(GrowthSimulator.class);
@@ -141,7 +140,7 @@ public class GrowthSimulator implements ComponentSystem {
                 Block bDown = world.getBlock(blockPos.x, blockPos.y, blockPos.z - 1);
 
                 if (bLeft == grass || bRight == grass || bDown == grass || bUp == grass) {
-                    if (world.setBlock(blockPos, grass, dirt)) {
+                    if (world.setBlock(blockPos, grass) != null) {
 
                         if (bLeft == dirt) {
                             blockQueue.offer(new Vector3i(blockPos.x - 1, blockPos.y, blockPos.z));

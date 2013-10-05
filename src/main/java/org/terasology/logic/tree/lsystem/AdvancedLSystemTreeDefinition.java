@@ -35,10 +35,10 @@ import org.terasology.world.block.BlockManager;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.LinkedList;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -168,24 +168,24 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
             Block newBlock = newTreeBlock.getValue();
             if (oldBlock != null && oldBlock != newBlock) {
                 if (location.equals(origin)) {
-                    blockEntityRegistry.setBlockRetainComponent(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                            newBlock, oldBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
+                    blockEntityRegistry.setBlockRetainComponent(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
+                            newBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
                 } else {
-                    worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                            newBlock, oldBlock);
+                    worldProvider.setBlock(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
+                            newBlock);
                 }
                 replaceCount++;
             } else if (oldBlock == null) {
-                worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                        newBlock, air);
+                worldProvider.setBlock(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
+                        newBlock);
                 replaceCount++;
             }
         }
 
         for (Map.Entry<Vector3i, Block> oldTreeBlock : currentTree.entrySet()) {
             Vector3i location = oldTreeBlock.getKey();
-            worldProvider.setBlock(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z,
-                    air, oldTreeBlock.getValue());
+            worldProvider.setBlock(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
+                    air);
             replaceCount++;
         }
 

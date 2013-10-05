@@ -20,7 +20,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Immortius
@@ -83,8 +81,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
     private Thread mainThread;
-
-    private BlockingQueue<BlockChange> pendingChanges = Queues.newLinkedBlockingQueue();
 
     public EntityAwareWorldProvider(WorldProviderCore base) {
         super(base);
@@ -109,75 +105,30 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
+    public Block setBlock(Vector3i pos, Block type) {
         if (Thread.currentThread().equals(mainThread)) {
-            Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
-            if (super.setBlock(x, y, z, type, oldType)) {
+            Block oldType = super.setBlock(pos, type);
+            if (oldType != null) {
                 updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
-                return true;
-            } else {
-                processOffThreadChanges();
             }
-        } else {
-            if (super.setBlock(x, y, z, type, oldType)) {
-                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type, false));
-                return true;
-            }
+            return oldType;
         }
-        return false;
-    }
-
-    @Override
-    public boolean setBlockForceUpdateEntity(int x, int y, int z, Block type, Block oldType) {
-        if (Thread.currentThread().equals(mainThread)) {
-            Vector3i pos = new Vector3i(x, y, z);
-            EntityRef blockEntity = getBlockEntityAt(pos);
-            if (super.setBlock(x, y, z, type, oldType)) {
-                updateBlockEntity(blockEntity, pos, oldType, type, true, Collections.<Class<? extends Component>>emptySet());
-                return true;
-            } else {
-                processOffThreadChanges();
-            }
-        } else {
-            if (super.setBlock(x, y, z, type, oldType)) {
-                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type, true));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean setBlockForceUpdateEntity(Vector3i position, Block type, Block oldType) {
-        return setBlockForceUpdateEntity(position.x, position.y, position.z, type, oldType);
+        return null;
     }
 
     @Override
     @SafeVarargs
-    public final boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components) {
-        return setBlockRetainComponent(position.x, position.y, position.z, type, oldType, components);
-    }
-
-    @Override
-    @SafeVarargs
-    public final boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components) {
+    public final Block setBlockRetainComponent(Vector3i pos, Block type, Class<? extends Component>... components) {
         if (Thread.currentThread().equals(mainThread)) {
-            Vector3i pos = new Vector3i(x, y, z);
             EntityRef blockEntity = getBlockEntityAt(pos);
-            if (super.setBlock(x, y, z, type, oldType)) {
+            Block oldType = super.setBlock(pos, type);
+            if (oldType != null) {
                 updateBlockEntity(blockEntity, pos, oldType, type, false, Sets.newHashSet(components));
-                return true;
-            } else {
-                processOffThreadChanges();
             }
-        } else {
-            if (super.setBlock(x, y, z, type, oldType)) {
-                pendingChanges.add(new BlockChange(new Vector3i(x, y, z), oldType, type, false, components));
-                return true;
-            }
+            return oldType;
         }
-        return false;
+        return null;
     }
 
     private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type,
@@ -205,6 +156,19 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
         logger.error("Attempted to get block entity off-thread");
         return EntityRef.NULL;
+    }
+
+    @Override
+    public Block setBlockForceUpdateEntity(Vector3i pos, Block type) {
+        if (Thread.currentThread().equals(mainThread)) {
+            EntityRef blockEntity = getBlockEntityAt(pos);
+            Block oldType = super.setBlock(pos, type);
+            if (oldType != null) {
+                updateBlockEntity(blockEntity, pos, oldType, type, true, Collections.<Class<? extends Component>>emptySet());
+            }
+            return oldType;
+        }
+        return null;
     }
 
     @Override
@@ -442,11 +406,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void update(float delta) {
-        // TODO: This should be handled by the event system?
-        PerformanceMonitor.startActivity("BlockChangedEventQueue");
-        processOffThreadChanges();
-        PerformanceMonitor.endActivity();
-
         PerformanceMonitor.startActivity("Temp Blocks Cleanup");
         List<EntityRef> toRemove = Lists.newArrayList(temporaryBlockEntities);
         temporaryBlockEntities.clear();
@@ -454,23 +413,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             cleanUpTemporaryEntity(entity);
         }
         PerformanceMonitor.endActivity();
-    }
-
-    private void processOffThreadChanges() {
-        List<BlockChange> changes = Lists.newArrayListWithExpectedSize(pendingChanges.size());
-        pendingChanges.drainTo(changes);
-        for (BlockChange change : changes) {
-            if (isBlockRelevant(change.position.x, change.position.y, change.position.z)) {
-                Block currentType = getBlock(change.position.x, change.position.y, change.position.z);
-                if (currentType == change.oldType) {
-                    EntityRef blockEntity = getExistingBlockEntityAt(change.position);
-                    if (!blockEntity.exists()) {
-                        blockEntity = createBlockEntity(change.position, change.oldType);
-                        updateBlockEntity(blockEntity, change.position, change.oldType, change.newType, change.forceEntityUpdate, change.retainComponentTypes);
-                    }
-                }
-            }
-        }
     }
 
     private void cleanUpTemporaryEntity(EntityRef entity) {
@@ -532,23 +474,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                     temporaryBlockEntities.add(entity);
                 }
             }
-        }
-    }
-
-    private static class BlockChange {
-        private Vector3i position = new Vector3i();
-        private Block oldType;
-        private Block newType;
-        private boolean forceEntityUpdate;
-        private Set<Class<? extends Component>> retainComponentTypes;
-
-        @SafeVarargs
-        public BlockChange(Vector3i pos, Block oldType, Block newType, boolean forceEntityUpdate, Class<? extends Component>... retainComponentTypes) {
-            this.position.set(pos);
-            this.oldType = oldType;
-            this.newType = newType;
-            this.forceEntityUpdate = forceEntityUpdate;
-            this.retainComponentTypes = Sets.newHashSet(retainComponentTypes);
         }
     }
 }

@@ -13,39 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
- * A view providing access to the world for batch propagation
- *
  * @author Immortius
  */
-public interface PropagatorWorldView {
+public class BlockChange {
+    private Vector3i position;
+    private Block from;
+    private Block to;
 
-    /**
-     * @param pos
-     * @return The value of interest at pos
-     */
-    byte getValueAt(Vector3i pos);
+    public BlockChange(Vector3i position, Block from, Block to) {
+        this.position = position;
+        this.from = from;
+        this.to = to;
+    }
 
-    /**
-     * @param pos
-     * @param value A new value at pos.
-     */
-    void setValueAt(Vector3i pos, byte value);
+    public Vector3i getPosition() {
+        return position;
+    }
 
-    /**
-     * @param pos
-     * @return The block at pos
-     */
-    Block getBlockAt(Vector3i pos);
+    public Block getFrom() {
+        return from;
+    }
 
-    /**
-     * @param pos
-     * @return Whether pos is in the bounds of the world view
-     */
-    boolean isInBounds(Vector3i pos);
+    public Block getTo() {
+        return to;
+    }
+
+    public void setTo(Block block) {
+        this.to = block;
+    }
+
 }

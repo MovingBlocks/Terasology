@@ -88,7 +88,7 @@ public class BlockItemSystem implements ComponentSystem {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                if (!worldProvider.setBlock(placementPos, block, worldProvider.getBlock(placementPos))) {
+                if (worldProvider.setBlock(placementPos, block) == null) {
                     // Something changed the block on another thread, cancel
                     event.consume();
                     return;

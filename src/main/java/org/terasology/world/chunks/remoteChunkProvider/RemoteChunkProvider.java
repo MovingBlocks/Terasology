@@ -119,7 +119,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public ChunkView getSubviewAroundBlock(Vector3i blockPos, int extent) {
-        Region3i region = TeraMath.getChunkRegionAroundBlockPos(blockPos, extent);
+        Region3i region = TeraMath.getChunkRegionAroundWorldPos(blockPos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
     }
 

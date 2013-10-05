@@ -17,11 +17,11 @@
 package org.terasology.world.internal;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -33,14 +33,18 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.lighting.LightPropagator;
-import org.terasology.world.lighting.LightingUtil;
-import org.terasology.world.lighting.PropagationComparison;
+import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.BlockChange;
 import org.terasology.world.liquid.LiquidData;
+import org.terasology.world.propagation.light.LightPropagationRules;
+import org.terasology.world.propagation.light.LightWorldView;
+import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -60,6 +64,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
+    private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private List<BatchPropagator> propagators = Lists.newArrayList();
+
     public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, ChunkProvider chunkProvider) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
@@ -71,6 +78,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
+
+        propagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(chunkProvider)));
+        propagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(chunkProvider)));
     }
 
     public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
@@ -95,6 +105,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public WorldBiomeProvider getBiomeProvider() {
         return biomeProvider;
+    }
+
+    @Override
+    public void processPropagation() {
+        for (BatchPropagator propagator : propagators) {
+            propagator.process(blockChanges.values());
+        }
+        blockChanges.clear();
     }
 
     @Override
@@ -127,84 +145,35 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public boolean setBlocks(BlockUpdate... updates) {
-        // TODO: Implement
-        return false;
-    }
-
-    @Override
-    public boolean setBlocks(Iterable<BlockUpdate> updates) {
-        // TODO: Implement
-        return false;
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        Vector3i blockPos = new Vector3i(x, y, z);
-        ChunkView chunkView;
-
-        if (oldType == type) {
-            return true;
-        }
-
-        if (LightingUtil.compareLightingPropagation(type, oldType) != PropagationComparison.IDENTICAL || type.getLuminance() != oldType.getLuminance()) {
-            chunkView = chunkProvider.getSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1);
-        } else {
-            chunkView = chunkProvider.getSubviewAroundBlock(blockPos, 1);
-        }
-        if (chunkView != null) {
-            chunkView.lock();
-            try {
-                Block current = chunkView.getBlock(x, y, z);
-                if (current != oldType) {
-                    return false;
-                }
-                chunkView.setBlock(x, y, z, type);
-
-                Region3i affected = new LightPropagator(chunkView).update(x, y, z, type, oldType);
-                if (affected.isEmpty()) {
-                    chunkView.setDirtyAround(blockPos);
+    public Block setBlock(Vector3i worldPos, Block type) {
+        Vector3i chunkPos = TeraMath.calcChunkPos(worldPos);
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = TeraMath.calcBlockPos(worldPos);
+            Block oldBlockType = chunk.setBlock(blockPos, type);
+            if (oldBlockType != type) {
+                BlockChange oldChange = blockChanges.get(worldPos);
+                if (oldChange == null) {
+                    blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
                 } else {
-                    chunkView.setDirtyAround(affected);
+                    oldChange.setTo(type);
                 }
-
-                notifyBlockChanged(x, y, z, type, oldType);
-
-                return true;
-            } finally {
-                chunkView.unlock();
+                for (Vector3i pos : TeraMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
+                    Chunk dirtiedChunk = chunkProvider.getChunk(pos);
+                    if (dirtiedChunk != null) {
+                        dirtiedChunk.setDirty(true);
+                    }
+                }
+                notifyBlockChanged(worldPos, type, oldBlockType);
             }
+            return oldBlockType;
         }
-        return false;
+        return null;
     }
 
-    @Override
-    public void setBlockForced(int x, int y, int z, Block type) {
-        Vector3i blockPos = new Vector3i(x, y, z);
-        ChunkView chunkView = chunkProvider.getSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1);
-        if (chunkView != null) {
-            chunkView.lock();
-            try {
-                Block current = chunkView.getBlock(x, y, z);
-                chunkView.setBlock(x, y, z, type);
-
-                Region3i affected = new LightPropagator(chunkView).update(x, y, z, type, current);
-                if (affected.isEmpty()) {
-                    chunkView.setDirtyAround(blockPos);
-                } else {
-                    chunkView.setDirtyAround(affected);
-                }
-
-                notifyBlockChanged(x, y, z, type, current);
-            } finally {
-                chunkView.unlock();
-            }
-        }
-    }
-
-    private void notifyBlockChanged(int x, int y, int z, Block type, Block oldType) {
-        Vector3i pos = new Vector3i(x, y, z);
-        // TODO: Could use a read/write lock
+    private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
+        // TODO: Could use a read/write lock.
+        // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
                 listener.onBlockChanged(pos, type, oldType);

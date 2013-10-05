@@ -13,35 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation.light;
 
-import org.terasology.math.Vector3i;
+import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 
 /**
  * @author Immortius
  */
-public class BlockChange {
-    private Vector3i position;
-    private Block from;
-    private Block to;
+public class LightPropagationRules extends CommonLightPropagationRules {
 
-    public BlockChange(Vector3i position, Block from, Block to) {
-        this.position = position;
-        this.from = from;
-        this.to = to;
+    @Override
+    public byte getBlockValue(Block block) {
+        return block.getLuminance();
     }
 
-    public Vector3i getPosition() {
-        return position;
+    @Override
+    public byte propagateValue(byte existingValue, Side side) {
+        return (byte) (existingValue - 1);
     }
 
-    public Block getFrom() {
-        return from;
+    @Override
+    public byte getMaxValue() {
+        return (byte) 15;
     }
 
-    public Block getTo() {
-        return to;
-    }
 
 }

@@ -241,17 +241,18 @@ public class Chunk {
         return blockManager.getBlock((byte) blockData.get(x, y, z));
     }
 
-    public void setBlock(int x, int y, int z, Block block) {
+    public Block setBlock(int x, int y, int z, Block block) {
         int oldValue = blockData.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
             if (!block.isLiquid()) {
                 setLiquid(x, y, z, new LiquidData());
             }
         }
+        return blockManager.getBlock((short) oldValue);
     }
 
-    public void setBlock(Vector3i pos, Block block) {
-        setBlock(pos.x, pos.y, pos.z, block);
+    public Block setBlock(Vector3i pos, Block block) {
+        return setBlock(pos.x, pos.y, pos.z, block);
     }
 
     public byte getSunlight(Vector3i pos) {

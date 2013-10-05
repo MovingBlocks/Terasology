@@ -13,34 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation.light;
 
-import org.terasology.math.Side;
-import org.terasology.world.block.Block;
+import org.terasology.math.Vector3i;
+import org.terasology.world.WorldProviderCore;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.propagation.AbstractFullWorldView;
 
 /**
  * @author Immortius
  */
-public class SunlightPropagationRules extends CommonLightPropagationRules {
-    private static final byte MAX_VALUE = 15;
+public class LightWorldView extends AbstractFullWorldView {
 
-    @Override
-    public byte getBlockValue(Block block) {
-        return 0;
+    public LightWorldView(ChunkProvider chunkProvider) {
+        super(chunkProvider);
     }
 
     @Override
-    public byte propagateValue(byte existingValue, Side side) {
-        if (existingValue == MAX_VALUE && side == Side.BOTTOM) {
-            return MAX_VALUE;
-        }
-        return (byte) (existingValue - 1);
+    protected byte getValueAt(Chunk chunk, Vector3i pos) {
+        return chunk.getLight(pos);
     }
 
     @Override
-    public byte getMaxValue() {
-        return MAX_VALUE;
+    protected void setValueAt(Chunk chunk, Vector3i pos, byte value) {
+        chunk.setLight(pos, value);
     }
-
-
 }

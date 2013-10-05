@@ -190,7 +190,7 @@ public class EntityAwareWorldProviderTest {
         testBlock.setKeepActive(true);
         BlockFamily blockFamily = new SymmetricFamily(new BlockUri("test:keepActive"), testBlock);
         blockManager.addBlockFamily(blockFamily, true);
-        worldStub.setBlock(0, 0, 0, testBlock, BlockManager.getAir());
+        worldStub.setBlock(Vector3i.zero(), testBlock);
 
         BlockEventChecker checker = new BlockEventChecker();
         entityManager.getEventSystem().registerEventHandler(checker);
@@ -207,8 +207,8 @@ public class EntityAwareWorldProviderTest {
     public void testComponentsAddedAndActivatedWhenBlockChanged() {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
-        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(Vector3i.zero());
         assertTrue(blockEntity.exists());
 
         assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), blockEntity), new EventInfo(OnActivatedComponent.newInstance(), blockEntity)),
@@ -217,11 +217,11 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testComponentsDeactivatedAndRemovedWhenBlockChanged() {
-        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
-        worldProvider.setBlock(0, 0, 0, BlockManager.getAir(), blockWithString);
+        worldProvider.setBlock(Vector3i.zero(), BlockManager.getAir());
         EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         assertTrue(blockEntity.exists());
 
@@ -231,11 +231,11 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testComponentsUpdatedWhenBlockChanged() {
-        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
-        worldProvider.setBlock(0, 0, 0, blockWithDifferentString, blockWithString);
+        worldProvider.setBlock(Vector3i.zero(), blockWithDifferentString);
         EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         assertTrue(blockEntity.exists());
 
@@ -244,9 +244,9 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testPrefabUpdatedWhenBlockChanged() {
-        worldProvider.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
         assertEquals(blockWithString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
-        worldProvider.setBlock(0, 0, 0, blockWithDifferentString, blockWithString);
+        worldProvider.setBlock(Vector3i.zero(), blockWithDifferentString);
         assertEquals(blockWithDifferentString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
     }
 
@@ -262,7 +262,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testEntityCeasesToBeTemporaryIfBlockChangedToKeepActive() {
-        worldProvider.setBlock(0, 0, 0, keepActiveBlock, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), keepActiveBlock);
         worldProvider.update(1.0f);
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
         worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
@@ -271,9 +271,9 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testEntityBecomesTemporaryWhenChangedFromAKeepActiveBlock() {
-        worldProvider.setBlock(0, 0, 0, keepActiveBlock, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), keepActiveBlock);
         EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
-        worldProvider.setBlock(0, 0, 0, BlockManager.getAir(), keepActiveBlock);
+        worldProvider.setBlock(Vector3i.zero(), BlockManager.getAir());
         worldProvider.update(1.0f);
         assertFalse(blockEntity.isActive());
     }
@@ -303,7 +303,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testEntityExtraComponentsRemovedBeforeCleanUpForBlocksWithPrefabs() {
-        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldStub.setBlock(Vector3i.zero(), blockWithString);
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new IntegerComponent(1));
 
@@ -316,7 +316,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testEntityMissingComponentsAddedBeforeCleanUp() {
-        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldStub.setBlock(Vector3i.zero(), blockWithString);
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.removeComponent(StringComponent.class);
 
@@ -329,7 +329,7 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void testChangedComponentsRevertedBeforeCleanUp() {
-        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldStub.setBlock(Vector3i.zero(), blockWithString);
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         StringComponent comp = entity.getComponent(StringComponent.class);
         comp.value = "Moo";
@@ -343,12 +343,12 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void allComponentsNotMarkedAsRetainedRemovedOnBlockChange() {
-        worldStub.setBlock(0, 0, 0, blockWithString, BlockManager.getAir());
+        worldStub.setBlock(Vector3i.zero(), blockWithString);
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new ForceBlockActiveComponent());
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
-        worldProvider.setBlock(0, 0, 0, BlockManager.getAir(), blockWithString);
+        worldProvider.setBlock(Vector3i.zero(), BlockManager.getAir());
 
         assertTrue(entity.hasComponent(RetainedOnBlockChangeComponent.class));
         assertFalse(entity.hasComponent(ForceBlockActiveComponent.class));
@@ -359,7 +359,7 @@ public class EntityAwareWorldProviderTest {
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
-        worldProvider.setBlock(0, 0, 0, blockWithRetainedComponent, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockWithRetainedComponent);
 
         assertEquals(2, entity.getComponent(RetainedOnBlockChangeComponent.class).value);
     }
@@ -391,28 +391,28 @@ public class EntityAwareWorldProviderTest {
 
     @Test
     public void componentsNotAlteredIfBlockInSameFamily() {
-        worldProvider.setBlock(0, 0, 0, blockInFamilyOne, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockInFamilyOne);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         entity.addComponent(new IntegerComponent());
-        worldProvider.setBlock(0, 0, 0, blockInFamilyTwo, blockInFamilyOne);
+        worldProvider.setBlock(Vector3i.zero(), blockInFamilyTwo);
         assertNotNull(entity.getComponent(IntegerComponent.class));
     }
 
     @Test
     public void componentsAlteredIfBlockInSameFamilyWhenForced() {
-        worldProvider.setBlock(0, 0, 0, blockInFamilyOne, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockInFamilyOne);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         entity.addComponent(new IntegerComponent());
-        worldProvider.setBlockForceUpdateEntity(0, 0, 0, blockInFamilyTwo, blockInFamilyOne);
+        worldProvider.setBlockForceUpdateEntity(Vector3i.zero(), blockInFamilyTwo);
         assertNull(entity.getComponent(IntegerComponent.class));
     }
 
     @Test
     public void componentUntouchedIfRetainRequested() {
-        worldProvider.setBlock(0, 0, 0, blockInFamilyOne, BlockManager.getAir());
+        worldProvider.setBlock(Vector3i.zero(), blockInFamilyOne);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         entity.addComponent(new IntegerComponent());
-        worldProvider.setBlockRetainComponent(0, 0, 0, blockWithString, blockInFamilyOne, IntegerComponent.class);
+        worldProvider.setBlockRetainComponent(Vector3i.zero(), blockWithString, IntegerComponent.class);
         assertNotNull(entity.getComponent(IntegerComponent.class));
     }
 

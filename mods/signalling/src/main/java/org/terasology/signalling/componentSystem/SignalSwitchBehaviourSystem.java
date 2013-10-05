@@ -357,10 +357,10 @@ public class SignalSwitchBehaviourSystem implements UpdateSubscriberSystem {
             BlockFamily blockFamily = block.getBlockFamily();
             if (block == lampTurnedOff && consumerStatusComponent.hasSignal) {
                 logger.debug("Lamp turning on");
-                worldProvider.setBlock(blockLocation, lampTurnedOn, block);
+                worldProvider.setBlock(blockLocation, lampTurnedOn);
             } else if (block == lampTurnedOn && !consumerStatusComponent.hasSignal) {
                 logger.debug("Lamp turning off");
-                worldProvider.setBlock(blockLocation, lampTurnedOff, block);
+                worldProvider.setBlock(blockLocation, lampTurnedOff);
             } else if (blockFamily == signalOrGate || blockFamily == signalAndGate
                     || blockFamily == signalXorGate) {
                 logger.debug("Signal changed for gate");

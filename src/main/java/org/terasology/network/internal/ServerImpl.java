@@ -271,7 +271,7 @@ public class ServerImpl implements Server {
             Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
             if (worldProvider.isBlockRelevant(pos)) {
                 Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
-                worldProvider.setBlockForced(pos, newBlock);
+                worldProvider.setBlock(pos, newBlock);
             } else {
                 awaitingChunkReadyUpdates.put(TeraMath.calcChunkPos(pos), blockChange);
             }
@@ -374,7 +374,7 @@ public class ServerImpl implements Server {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             Block newBlock = blockManager.getBlock((byte) message.getNewBlock());
-            worldProvider.setBlockForced(pos, newBlock);
+            worldProvider.setBlock(pos, newBlock);
         }
     }
 }

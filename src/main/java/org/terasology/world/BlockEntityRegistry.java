@@ -42,49 +42,21 @@ public interface BlockEntityRegistry {
      * This method is the same as setBlock, except if the old and new block types are part of the same family the
      * entity will be force updated (usually they are not in this situation).
      *
-     * @param x
-     * @param y
-     * @param z
-     * @param type
-     * @param oldType
-     * @return Whether the block was changed.
-     */
-    boolean setBlockForceUpdateEntity(int x, int y, int z, Block type, Block oldType);
-
-    /**
-     * This method is the same as setBlock, except if the old and new block types are part of the same family the
-     * entity will be force updated (usually they are not in this situation).
-     *
      * @param position
      * @param type
-     * @param oldType
-     * @return Whether the block was changed.
+     * @return The previous block type, or null if the change failed due to the chunk not being available
      */
-    boolean setBlockForceUpdateEntity(Vector3i position, Block type, Block oldType);
+    Block setBlockForceUpdateEntity(Vector3i position, Block type);
 
     /**
      * This method is the same as setBlock, except the specified components are not altered during the update
      *
      * @param position
      * @param type
-     * @param oldType
      * @param components
-     * @return Whether the block was changed
+     * @return The previous block type, or null if the change failed due to the chunk not being available
      */
-    boolean setBlockRetainComponent(Vector3i position, Block type, Block oldType, Class<? extends Component>... components);
-
-    /**
-     * This method is the same as setBlock, except the specified components are not altered during the update
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param type
-     * @param oldType
-     * @param components
-     * @return Whether the block was changed
-     */
-    boolean setBlockRetainComponent(int x, int y, int z, Block type, Block oldType, Class<? extends Component>... components);
+    Block setBlockRetainComponent(Vector3i position, Block type, Class<? extends Component>... components);
 
     /**
      * @param position

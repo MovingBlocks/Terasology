@@ -51,7 +51,9 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+// TODO: Fix this for changes to world
+// TODO: Also just fix it, it is terribly broken
+//@RegisterSystem(RegisterMode.AUTHORITY)
 public class LiquidSimulator implements ComponentSystem {
 
     private static final int NUM_THREADS = 2;
@@ -194,21 +196,20 @@ public class LiquidSimulator implements ComponentSystem {
     }
 
     public void simulate(Vector3i blockPos, ChunkView view) {
-        Block block = view.getBlock(blockPos);
         LiquidData current = view.getLiquid(blockPos);
         LiquidData newState = calcStateFor(blockPos, view);
         if (!newState.equals(current)) {
             try {
                 if (view.isValidView() && world.setLiquid(blockPos, newState, current)) {
                     if (newState.getDepth() > 0) {
-                        world.setBlock(blockPos, ((newState.getType() == LiquidType.WATER) ? water : lava), block);
+                        world.setBlock(blockPos, ((newState.getType() == LiquidType.WATER) ? water : lava));
                         Vector3i belowBlockPos = new Vector3i(blockPos.x, blockPos.y - 1, blockPos.z);
                         Block belowType = world.getBlock(belowBlockPos);
                         if (grass.equals(belowType) || snow.equals(belowType)) {
-                            world.setBlock(belowBlockPos, dirt, belowType);
+                            world.setBlock(belowBlockPos, dirt);
                         }
                     } else {
-                        world.setBlock(blockPos, air, block);
+                        world.setBlock(blockPos, air);
                     }
                 }
             } finally {

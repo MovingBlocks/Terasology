@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.lighting;
+package org.terasology.world.propagation;
 
 /**
  * @author Immortius

@@ -32,6 +32,11 @@ import org.terasology.world.liquid.LiquidData;
  */
 public interface ChunkView {
 
+    /***
+     * @return The region of the world which this view is over
+     */
+    Region3i getWorldRegion();
+
     /**
      * @return A Region3i denoting the chunks covered by this view
      */
@@ -233,4 +238,5 @@ public interface ChunkView {
      * @return The equivalent world-space coordinate for the given view coord.
      */
     Vector3i toWorldPos(Vector3i localPos);
+
 }

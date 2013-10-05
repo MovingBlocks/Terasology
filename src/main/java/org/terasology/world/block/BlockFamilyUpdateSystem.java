@@ -69,7 +69,7 @@ public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
             Block neighborBlock = worldProvider.getBlock(neighborLocation);
             Block neighborBlockAfterUpdate = neighborBlock.getBlockFamily().getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
             if (neighborBlock != neighborBlockAfterUpdate) {
-                worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate, neighborBlock);
+                worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
             }
         }
     }

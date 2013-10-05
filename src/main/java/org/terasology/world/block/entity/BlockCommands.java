@@ -34,6 +34,7 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -112,8 +113,7 @@ public class BlockCommands implements ComponentSystem {
         }
 
         if (world != null) {
-            Block oldBlock = world.getBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z);
-            world.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, blockFamily.getArchetypeBlock(), oldBlock);
+            world.setBlock(new Vector3i((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z), blockFamily.getArchetypeBlock());
 
             StringBuilder builder = new StringBuilder();
             builder.append(blockFamily.getArchetypeBlock());

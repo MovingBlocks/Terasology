@@ -136,9 +136,9 @@ public class DoorSystem implements ComponentSystem {
         }
 
         Block newBottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
-        worldProvider.setBlock(bottomBlockPos, newBottomBlock, bottomBlock);
+        worldProvider.setBlock(bottomBlockPos, newBottomBlock);
         Block newTopBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
-        worldProvider.setBlock(topBlockPos, newTopBlock, topBlock);
+        worldProvider.setBlock(topBlockPos, newTopBlock);
 
         EntityRef newDoor = entityManager.copy(entity);
         newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
@@ -193,10 +193,10 @@ public class DoorSystem implements ComponentSystem {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
         Block oldBottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), oldSide, Side.TOP);
-        worldProvider.setBlock(regionComp.region.min(), bottomBlock, oldBottomBlock);
+        worldProvider.setBlock(regionComp.region.min(), bottomBlock);
         Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
         Block oldTopBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), oldSide, Side.TOP);
-        worldProvider.setBlock(regionComp.region.max(), topBlock, oldTopBlock);
+        worldProvider.setBlock(regionComp.region.max(), topBlock);
         Sound sound = (door.isOpen) ? door.closeSound : door.openSound;
         if (sound != null) {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
@@ -235,10 +235,9 @@ public class DoorSystem implements ComponentSystem {
 
     @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class})
     public void onOutOfHealth(NoHealthEvent event, EntityRef entity) {
-        DoorComponent door = entity.getComponent(DoorComponent.class);
         BlockRegionComponent blockRegionComponent = entity.getComponent(BlockRegionComponent.class);
         for (Vector3i blockPos : blockRegionComponent.region) {
-            worldProvider.setBlock(blockPos, BlockManager.getAir(), worldProvider.getBlock(blockPos));
+            worldProvider.setBlock(blockPos, BlockManager.getAir());
         }
         EntityInfoComponent entityInfo = entity.getComponent(EntityInfoComponent.class);
         if (entityInfo != null) {

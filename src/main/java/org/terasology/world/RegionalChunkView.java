@@ -53,6 +53,11 @@ public class RegionalChunkView implements ChunkView {
     }
 
     @Override
+    public Region3i getWorldRegion() {
+        return blockRegion;
+    }
+
+    @Override
     public Region3i getChunkRegion() {
         return chunkRegion;
     }
@@ -199,7 +204,7 @@ public class RegionalChunkView implements ChunkView {
 
     @Override
     public void setDirtyAround(Vector3i blockPos) {
-        for (Vector3i pos : TeraMath.getChunkRegionAroundBlockPos(blockPos, 1)) {
+        for (Vector3i pos : TeraMath.getChunkRegionAroundWorldPos(blockPos, 1)) {
             chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
     }

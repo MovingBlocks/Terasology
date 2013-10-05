@@ -13,50 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation;
 
-import com.google.common.collect.Maps;
-import gnu.trove.map.TObjectByteMap;
-import gnu.trove.map.hash.TObjectByteHashMap;
 import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.propagation.PropagatorWorldView;
-
-import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class StubPropagatorWorldView implements PropagatorWorldView {
-    private TObjectByteMap<Vector3i> lightData = new TObjectByteHashMap<>();
-    private Map<Vector3i, Block> blockData = Maps.newHashMap();
+public abstract class AbstractChunkView implements PropagatorWorldView {
+
+    private ChunkView chunkView;
+
+    public AbstractChunkView(ChunkView chunkView) {
+        this.chunkView = chunkView;
+    }
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        return lightData.get(pos);
+        return getValueAt(chunkView, pos);
     }
+
+    protected abstract byte getValueAt(ChunkView view, Vector3i pos);
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        lightData.put(pos, value);
+        setValueAt(chunkView, pos, value);
     }
+
+    protected abstract void setValueAt(ChunkView view, Vector3i pos, byte value);
 
     @Override
     public Block getBlockAt(Vector3i pos) {
-        Block result =blockData.get(pos);
-        if (result == null) {
-            return BlockManager.getAir();
-        }
-        return result;
+        return chunkView.getBlock(pos);
     }
 
     @Override
     public boolean isInBounds(Vector3i pos) {
-        return true;
-    }
-
-    public void setBlockAt(Vector3i pos, Block block) {
-        blockData.put(pos, block);
+        return chunkView.getWorldRegion().encompasses(pos);
     }
 }

@@ -39,34 +39,6 @@ public interface WorldProvider extends WorldProviderCore {
     boolean isBlockRelevant(Vector3f pos);
 
     /**
-     * Places a block of a specific type at a given position and refreshes the
-     * corresponding light values.
-     * <p/>
-     * This method takes the expected value of the previous block in this position - this allows it to check the block
-     * hasn't been changed (potentially by another thread). If it has changed then no change occurs. It is recommended
-     * that this is used to ensure that the block being changed is in an acceptable state for the change.
-     *
-     * @param pos     Block position
-     * @param type    The type of the block to set
-     * @param oldType The expected type of the block being replaced.
-     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
-     */
-    boolean setBlock(Vector3i pos, Block type, Block oldType);
-
-    /**
-     * Places a block of a specific type at a given position and refreshes the
-     * corresponding light values.
-     * <p/>
-     * This method forces the change regardless of the previous value. It should generally be avoided except in situations where
-     * the change must absolutely be forced.
-     *
-     * @param pos  Block position
-     * @param type The type of the block to set
-     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
-     */
-    void setBlockForced(Vector3i pos, Block type);
-
-    /**
      * @param pos
      * @param state    The new value of the liquid state
      * @param oldState The expected previous value of the liquid state

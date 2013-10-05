@@ -18,7 +18,7 @@ package org.terasology.world.lighting;
 
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.propagation.PropagationComparison;
 
 /**
  * Utility methods that drive the logic of light propagation

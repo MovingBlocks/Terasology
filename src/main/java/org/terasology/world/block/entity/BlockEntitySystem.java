@@ -34,6 +34,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
+import org.terasology.math.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -89,7 +90,7 @@ public class BlockEntitySystem implements ComponentSystem {
         // TODO: Better handling of "support required" blocks
         Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
         if (upperBlock.isSupportRequired()) {
-            worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getAir(), upperBlock);
+            worldProvider.setBlock(new Vector3i(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z), BlockManager.getAir());
         }
 
         // TODO: Configurable via block definition
@@ -118,7 +119,7 @@ public class BlockEntitySystem implements ComponentSystem {
             }
         }
 
-        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir(), oldBlock);
+        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir());
     }
 
     @ReceiveEvent

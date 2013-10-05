@@ -335,6 +335,10 @@ public final class TeraMath {
         return calcBlockPosZ(blockZ, Chunk.INNER_CHUNK_POS_FILTER_Z);
     }
 
+    public static Vector3i calcBlockPos(Vector3i worldPos) {
+        return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, Chunk.INNER_CHUNK_POS_FILTER);
+    }
+
     public static Vector3i calcBlockPos(int x, int y, int z) {
         return calcBlockPos(x, y, z, Chunk.INNER_CHUNK_POS_FILTER);
     }
@@ -343,7 +347,7 @@ public final class TeraMath {
         return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y), calcBlockPosZ(z, chunkFilterSize.z));
     }
 
-    public static Region3i getChunkRegionAroundBlockPos(Vector3i pos, int extent) {
+    public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
         Vector3i minPos = new Vector3i(-extent, 0, -extent);
         minPos.add(pos);
         Vector3i maxPos = new Vector3i(extent, 0, extent);

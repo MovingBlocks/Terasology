@@ -47,13 +47,8 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
-    public boolean setBlock(Vector3i pos, Block type, Block oldType) {
-        return core.setBlock(pos.x, pos.y, pos.z, type, oldType);
-    }
-
-    @Override
-    public void setBlockForced(Vector3i pos, Block type) {
-        core.setBlockForced(pos.x, pos.y, pos.z, type);
+    public Block setBlock(Vector3i pos, Block type) {
+        return core.setBlock(pos, type);
     }
 
     @Override
@@ -105,6 +100,11 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     @Override
     public byte getTotalLight(Vector3i pos) {
         return core.getTotalLight(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public void processPropagation() {
+        core.processPropagation();
     }
 
     @Override
