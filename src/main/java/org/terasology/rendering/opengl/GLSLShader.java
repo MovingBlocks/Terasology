@@ -244,6 +244,12 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         if (config.getRendering().isCloudShadows()) {
             builder.append("#define CLOUD_SHADOWS \n");
         }
+        if (config.getRendering().isVolumetricLighting()) {
+            builder.append("#define VOLUMETRIC_LIGHTING \n");
+        }
+        if (config.getRendering().isInscattering()) {
+            builder.append("#define INSCATTERING \n");
+        }
 
         for (RenderingDebugConfig.DebugRenderingStage stage : RenderingDebugConfig.DebugRenderingStage.values()) {
             builder.append("#define ").append(stage.getDefineName()).append(" int(").append(stage.getIndex()).append(") \n");

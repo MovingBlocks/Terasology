@@ -17,12 +17,11 @@
 uniform sampler2D texScene;
 uniform sampler2D texDepth;
 
-// TODO: Move me some place else
-#define COLOR_GRADING
-
-#ifdef COLOR_GRADING
-uniform sampler3D texColorGradingLut;
+#ifdef VOLUMETRIC_LIGHTING
+uniform sampler2D texVolumetricLighting;
 #endif
+
+uniform sampler3D texColorGradingLut;
 
 #if !defined (NO_BLUR)
 uniform sampler2D texBlur;
@@ -108,6 +107,10 @@ void main() {
     vec4 finalColor = color;
 #endif
 
+#ifdef VOLUMETRIC_LIGHTING
+    finalColor.rgb = mix(finalColor.rgb, vec3(1.0, 1.0, 1.0), texture2D(texVolumetricLighting, gl_TexCoord[0].xy).r);
+#endif
+
 #ifdef FILM_GRAIN
     vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
     finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0f, 1.0f);
@@ -115,13 +118,11 @@ void main() {
 
     // In the case the color is > 1.0 or < 0.0 despite tonemapping
     finalColor.rgb = clamp(finalColor.rgb, 0.0, 1.0);
-
-#ifdef COLOR_GRADING
     vec3 lutScale = vec3(15.0 / 16.0);
-    vec3 lutOffset = vec3(1.0 / 32.0);
 
+    // Color grading
+    vec3 lutOffset = vec3(1.0 / 32.0);
     finalColor.rgb = texture3D(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
-#endif
 
     gl_FragData[0].rgba = finalColor;
 }

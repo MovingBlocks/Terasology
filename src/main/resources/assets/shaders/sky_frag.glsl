@@ -74,5 +74,4 @@ void main () {
     skyColor.rgb += vec3((1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight);
 
     gl_FragData[0].rgba = skyColor.rgba;
-    gl_FragDepth = 1.0;
 }

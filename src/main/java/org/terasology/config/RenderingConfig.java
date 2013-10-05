@@ -62,6 +62,9 @@ public class RenderingConfig {
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
     private int meshLimit = 20;
+    private boolean volumetricLighting = false;
+    private boolean inscattering = true;
+    private boolean vSync;
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
@@ -204,7 +207,7 @@ public class RenderingConfig {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur && !oculusVrSupport;
+        return motionBlur && !isOculusVrSupport();
     }
 
     public void setMotionBlur(boolean motionBlur) {
@@ -316,7 +319,7 @@ public class RenderingConfig {
     }
 
     public boolean isVolumetricFog() {
-        return volumetricFog;
+        return this.volumetricFog;
     }
 
     public void setVolumetricFog(boolean volumetricFog) {
@@ -329,6 +332,22 @@ public class RenderingConfig {
 
     public void setCloudShadows(boolean cloudShadows) {
         this.cloudShadows = cloudShadows;
+    }
+
+    public boolean isVolumetricLighting() {
+        return this.volumetricLighting;
+    }
+
+    public void setVolumetricLighting(boolean volumetricLighting) {
+        this.volumetricLighting = volumetricLighting;
+    }
+
+    public boolean isInscattering() {
+        return this.inscattering;
+    }
+
+    public void setInscattering(boolean inscattering) {
+        this.inscattering = inscattering;
     }
 
     public boolean isRenderNearest() {
@@ -353,6 +372,14 @@ public class RenderingConfig {
 
     public void setMeshLimit(int meshLimit) {
         this.meshLimit = meshLimit;
+    }
+
+    public boolean isVSync() {
+        return this.vSync;
+    }
+
+    public void setVSync(boolean vSync) {
+        this.vSync = vSync;
     }
 
     public RenderingDebugConfig getDebug() {

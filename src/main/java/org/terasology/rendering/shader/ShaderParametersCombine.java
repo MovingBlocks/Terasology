@@ -15,18 +15,24 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Combine shader program.
@@ -40,18 +46,18 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     private float outlineThickness = 0.65f;
 
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float skyInscatteringLength = 0.25f;
+    private float skyInscatteringLength = 1.0f;
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float skyInscatteringStrength = 0.35f;
+    private float skyInscatteringStrength = 0.25f;
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float skyInscatteringThreshold = 0.75f;
+    private float skyInscatteringThreshold = 0.8f;
 
-    @EditorRange(min = 0.001f, max = 1.0f)
-    private float volFogDensityAtViewer = 0.15f;
-    @EditorRange(min = 0.01f, max = 1.0f)
-    private float volFogGlobalDensity = 0.15f;
-    @EditorRange(min = 0.01f, max = 1.0f)
-    private float volFogHeightFalloff = 0.05f;
+    @EditorRange(min = 0.001f, max = 0.1f)
+    private float volFogGlobalDensity = 0.05f;
+    @EditorRange(min = 0.001f, max = 0.1f)
+    private float volFogHeightFalloff = 0.1f;
+    @EditorRange(min = 0.001f, max = 0.1f)
+    private float volFogDensityAtViewer = 0.1f;
 
     @Override
     public void applyParameters(Material program) {
@@ -83,18 +89,23 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
             if (activeCamera != null) {
                 program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-
-                Vector3f fogWorldPosition = new Vector3f(activeCamera.getPosition().x, 32.0f, activeCamera.getPosition().y);
-                fogWorldPosition.sub(activeCamera.getPosition());
-                program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z, true);
-
-                // Fog density is set according to the fog density provided by the world
-                // TODO: The 50% percent limit shouldn't be hardcoded
-                final float worldFog = Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
-                program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
             }
 
+            Vector3f fogWorldPosition = new Vector3f(0.0f, -activeCamera.getPosition().y, 0.0f);
+            program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z, true);
 
+            WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+            // Fog density is set according to the fog density provided by the world
+            // TODO: The 50% percent limit shouldn't be hardcoded
+            float worldFog = worldRenderer.getSmoothedPlayerSunlightValue()
+                    * Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
+
+//            boolean headUnderWater = worldRenderer.isHeadUnderWater();
+//            if (headUnderWater) {
+//                worldFog = 1.0f;
+//            }
+
+            program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
         }
 
         DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
@@ -120,14 +131,16 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setFloat("outlineThickness", outlineThickness, true);
         }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
-        program.setInt("texSceneSkyBand", texId++, true);
+        if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
+            program.setInt("texSceneSkyBand", texId++, true);
 
-        Vector4f skyInscatteringSettingsFrag = new Vector4f();
-        skyInscatteringSettingsFrag.y = skyInscatteringStrength;
-        skyInscatteringSettingsFrag.z = skyInscatteringLength;
-        skyInscatteringSettingsFrag.w = skyInscatteringThreshold;
-        program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag, true);
+            Vector4f skyInscatteringSettingsFrag = new Vector4f();
+            skyInscatteringSettingsFrag.y = skyInscatteringStrength;
+            skyInscatteringSettingsFrag.z = skyInscatteringLength;
+            skyInscatteringSettingsFrag.w = skyInscatteringThreshold;
+            program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag, true);
+        }
     }
 }

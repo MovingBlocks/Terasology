@@ -309,6 +309,7 @@ public class DefaultRenderingProcess {
         createFBO("ssaoBlurred", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
 
         createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT);
+        createFBO("volumetricLighting", rtWidth2, rtHeight2, FBOType.DEFAULT);
 
         createFBO("sceneHighPass", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
         createFBO("sceneBloom0", rtWidth2, rtHeight2, FBOType.DEFAULT);
@@ -775,8 +776,10 @@ public class DefaultRenderingProcess {
     public void endRenderSceneSky() {
         setRenderBufferMask(true, true, true);
 
-        generateSkyBand(0);
-        generateSkyBand(1);
+        if (config.getRendering().isInscattering()) {
+            generateSkyBand(0);
+            generateSkyBand(1);
+        }
 
         bindFbo("sceneOpaque");
     }
@@ -801,6 +804,10 @@ public class DefaultRenderingProcess {
 
         if (config.getRendering().isLightShafts()) {
             generateLightShafts();
+        }
+
+        if (config.getRendering().isVolumetricLighting()) {
+            generateVolumetricLightingRayMarching();
         }
 
         generatePrePost();
@@ -1102,20 +1109,15 @@ public class DefaultRenderingProcess {
         }
 
         shader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
-
-
         ssao.bind();
 
         glViewport(0, 0, ssao.width, ssao.height);
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         bindFboTexture("ssao");
 
         renderFullscreenQuad();
 
         ssao.unbind();
-
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
@@ -1129,6 +1131,25 @@ public class DefaultRenderingProcess {
         renderFullscreenQuad();
 
         unbindFbo("scenePrePost");
+    }
+
+    private void generateVolumetricLightingRayMarching() {
+        Assets.getMaterial("engine:volLightingRayMarching").enable();
+
+        FBO volLighting = getFBO("volumetricLighting");
+
+        if (volLighting == null) {
+            return;
+        }
+
+        glViewport(0, 0, volLighting.width, volLighting.height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        volLighting.bind();
+
+        renderFullscreenQuad();
+
+        volLighting.unbind();
+        glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
 
     private void generateHighPass() {

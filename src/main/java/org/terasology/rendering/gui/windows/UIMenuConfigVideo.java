@@ -55,6 +55,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton outlineButton;
     private final UIStateButton shadowButton;
     private final UIStateButton volumetricFogButton;
+    private final UIStateButton vSyncButton;
     private final UIButton backToConfigMenuButton;
 
     private final Config config = CoreRegistry.get(Config.class);
@@ -330,8 +331,29 @@ public class UIMenuConfigVideo extends UIWindow {
         volumetricFogButton.addState("Volumetric Fog: On", volumetricFogStateAction);
         volumetricFogButton.addClickListener(clickAction);
         volumetricFogButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        volumetricFogButton.setPosition(new Vector2f(-fovButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
+        volumetricFogButton.setPosition(new Vector2f(-volumetricFogButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
         volumetricFogButton.setVisible(true);
+
+        vSyncButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction vSyncStateAction = new StateButtonAction() {
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton) element;
+                TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+
+                if (button.getState() == 0) {
+                    te.setVSync(false);
+                } else {
+                    te.setVSync(true);
+                }
+            }
+        };
+        vSyncButton.addState("VSync: Off", vSyncStateAction);
+        vSyncButton.addState("VSync: On", vSyncStateAction);
+        vSyncButton.addClickListener(clickAction);
+        vSyncButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        vSyncButton.setPosition(new Vector2f(vSyncButton.getSize().x / 2f, 300f + 5 * 40f));
+        vSyncButton.setVisible(true);
 
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
@@ -362,6 +384,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(outlineButton);
         addDisplayElement(shadowButton);
         addDisplayElement(volumetricFogButton);
+        addDisplayElement(vSyncButton);
 
         setup();
     }
@@ -423,6 +446,12 @@ public class UIMenuConfigVideo extends UIWindow {
             volumetricFogButton.setState(1);
         } else {
             volumetricFogButton.setState(0);
+        }
+
+        if (config.getRendering().isVSync()) {
+            vSyncButton.setState(1);
+        } else {
+            vSyncButton.setState(0);
         }
     }
 }

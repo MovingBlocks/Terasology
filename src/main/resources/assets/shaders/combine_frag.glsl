@@ -20,12 +20,14 @@ uniform sampler2D texSceneOpaqueNormals;
 uniform sampler2D texSceneOpaqueLightBuffer;
 uniform sampler2D texSceneTransparent;
 
+#ifdef INSCATTERING
 uniform vec4 skyInscatteringSettingsFrag;
 #define skyInscatteringStrength skyInscatteringSettingsFrag.y
 #define skyInscatteringLength skyInscatteringSettingsFrag.z
 #define skyInscatteringThreshold skyInscatteringSettingsFrag.w
 
 uniform sampler2D texSceneSkyBand;
+#endif
 
 #ifdef SSAO
 uniform sampler2D texSsao;
@@ -40,12 +42,9 @@ uniform float outlineThickness;
 #endif
 
 #if defined (VOLUMETRIC_FOG)
-uniform mat4 invViewProjMatrix;
-#endif
-
-#if defined (VOLUMETRIC_FOG)
 #define VOLUMETRIC_FOG_COLOR 1.0, 1.0, 1.0
 
+uniform mat4 invViewProjMatrix;
 uniform vec4 volumetricFogSettings;
 #define volFogDensityAtViewer volumetricFogSettings.x
 #define volFogGlobalDensity volumetricFogSettings.y
@@ -80,24 +79,27 @@ void main() {
     colorOpaque.rgb = mix(colorOpaque.rgb, vec3(OUTLINE_COLOR), outline);
 #endif
 
-    // Sky inscattering using down-sampled sky band texture
-    vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
-
-    float d = abs(linDepthViewingDistance(depthOpaque));
-    float fogValue = clamp(((skyInscatteringLength - d) / (skyInscatteringLength - skyInscatteringThreshold)) * skyInscatteringStrength, 0.0, 1.0);
-
+#if defined (INSCATTERING)
     // No scattering in the sky please - otherwise we end up with an ugly blurry sky
     if (!epsilonEqualsOne(depthOpaque)) {
+        // Sky inscattering using down-sampled sky band texture
+        vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
+
+        float d = abs(linDepthViewingDistance(depthOpaque));
+        float fogValue = clamp((1.0 - (skyInscatteringLength - d) / clamp(skyInscatteringLength - skyInscatteringThreshold, 0.0, 1.0)) * skyInscatteringStrength, 0.0, 1.0);
+
         colorOpaque.rgb = mix(colorOpaque.rgb, skyInscatteringColor, fogValue);
         colorTransparent.rgb = mix(colorTransparent.rgb, skyInscatteringColor, fogValue);
     }
+#endif
 
 #if defined (VOLUMETRIC_FOG)
     // Use lightValueAtPlayerPos to avoid volumetric fog in caves
-    float volumetricFogValue = volFogDensity *sunlightValueAtPlayerPos *
+    float volumetricFogValue = volFogDensity *
         calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
 
-    vec3 volFogColor = skyInscatteringColor * vec3(VOLUMETRIC_FOG_COLOR);
+    vec3 volFogColor = vec3(VOLUMETRIC_FOG_COLOR);
+
     colorOpaque.rgb = mix(colorOpaque.rgb, volFogColor, volumetricFogValue);
     colorTransparent.rgb = mix(colorTransparent.rgb, volFogColor, volumetricFogValue);
 #endif

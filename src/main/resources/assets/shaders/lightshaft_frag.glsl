@@ -33,11 +33,6 @@ void main() {
 
         float sceneDepth = texture2D(texDepth, texCoord).r * 2.0 - 1.0;
 
-        // Only blur the sky
-//        if (!epsilonEqualsOne(sceneDepth)) {
-//            discard;
-//        }
-
         vec2 deltaTexCoord = vec2(texCoord - lightScreenPos.xy);
 
         deltaTexCoord *= (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density;
