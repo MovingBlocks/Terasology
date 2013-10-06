@@ -262,8 +262,17 @@ public final class TeraMath {
      * @return The Y-coordinate of the chunk
      */
     public static int calcChunkPosY(int y) {
-        // If we ever have multiple vertical chunks, change this
-        return 0;
+        return calcChunkPosY(y, Chunk.POWER_Y);
+    }
+
+    /**
+    * Returns the chunk position of a given coordinate.
+    *
+    * @param y The Y-coordinate of the block
+    * @return The Y-coordinate of the chunk
+    */
+    public static int calcChunkPosY(int y, int chunkPowerY) {
+        return (y >> chunkPowerY);
     }
 
     /**
@@ -299,7 +308,7 @@ public final class TeraMath {
     }
 
     public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
-        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y), calcChunkPosZ(z, chunkPower.z));
+        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
     }
 
     /**
@@ -636,5 +645,37 @@ public final class TeraMath {
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }
 
-
+    /**
+     * Produces a region containing the region touching the side of the given region, both in and outside the region.
+     * @param region
+     * @param side
+     * @return
+     */
+    public static Region3i getEdgeRegion(Region3i region, Side side) {
+        Vector3i sideDir = side.getVector3i();
+        Vector3i min = region.min();
+        Vector3i max = region.max();
+        Vector3i edgeMin = new Vector3i(min);
+        Vector3i edgeMax = new Vector3i(max);
+        if (sideDir.x < 0) {
+            edgeMin.x = min.x;
+            edgeMax.x = min.x;
+        } else if (sideDir.x > 0) {
+            edgeMin.x = max.x;
+            edgeMax.x = max.x;
+        } else if (sideDir.y < 0) {
+            edgeMin.y = min.y;
+            edgeMax.y = min.y;
+        } else if (sideDir.y > 0) {
+            edgeMin.y = max.y;
+            edgeMax.y = max.y;
+        } else if (sideDir.z < 0) {
+            edgeMin.z = min.z;
+            edgeMax.z = min.z;
+        } else if (sideDir.z > 0) {
+            edgeMin.z = max.z;
+            edgeMax.z = max.z;
+        }
+        return Region3i.createFromMinMax(edgeMin, edgeMax);
+    }
 }

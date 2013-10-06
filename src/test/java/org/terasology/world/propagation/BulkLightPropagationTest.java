@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,6 +23,7 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -32,11 +33,15 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.propagation.BatchPropagator;
-import org.terasology.world.propagation.BlockChange;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.propagation.light.LightPropagationRules;
+import org.terasology.world.propagation.light.SunlightChunkView;
+import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightWorldView;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
@@ -338,5 +343,30 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
                 assertEquals(expectedLuminance, worldView.getValueAt(pos));
             }
         }
+    }
+
+    @Test
+    public void betweenChunks() {
+        Chunk main = new Chunk(new Vector3i(0,0,0));
+        main.setChunkState(Chunk.State.COMPLETE);
+        for (Vector3i pos : Chunk.CHUNK_REGION) {
+            main.setSunlight(pos, (byte) 15);
+        }
+        Chunk adjacent = new Chunk(new Vector3i(1,0,0));
+        adjacent.setChunkState(Chunk.State.COMPLETE);
+        for (Vector3i pos : TeraMath.getEdgeRegion(Chunk.CHUNK_REGION, Side.TOP)) {
+            adjacent.setBlock(pos, solid);
+        }
+
+        ChunkProvider provider = mock(ChunkProvider.class);
+        when(provider.getChunk(Vector3i.zero())).thenReturn(main);
+        when(provider.getChunk(new Vector3i(1,0,0))).thenReturn(adjacent);
+
+        BatchPropagator prop = new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(provider));
+        prop.propagateBetween(main, adjacent, Side.RIGHT);
+        prop.process();
+
+        assertEquals(14, adjacent.getSunlight(0,32,32));
+        assertEquals(13, adjacent.getSunlight(1,32,32));
     }
 }

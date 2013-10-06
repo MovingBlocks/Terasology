@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.AABB;
+import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
@@ -61,25 +62,26 @@ public class Chunk {
     public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
+    public static final int POWER_Y = TeraMath.sizeOfPower(SIZE_Y);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
     public static final byte MAX_LIQUID_DEPTH = 0x07;
 
-    public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);
+    public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, POWER_Y, POWER_Z);
     public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
     public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
+    public static final Region3i CHUNK_REGION = Region3i.createFromMinAndSize(Vector3i.zero(), CHUNK_SIZE);
 
     private static final Logger logger = LoggerFactory.getLogger(Chunk.class);
 
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
+
     public static enum State {
         ADJACENCY_GENERATION_PENDING(EntityData.ChunkState.ADJACENCY_GENERATION_PENDING),
         INTERNAL_LIGHT_GENERATION_PENDING(EntityData.ChunkState.INTERNAL_LIGHT_GENERATION_PENDING),
-        LIGHT_PROPAGATION_PENDING(EntityData.ChunkState.LIGHT_PROPAGATION_PENDING),
-        FULL_LIGHT_CONNECTIVITY_PENDING(EntityData.ChunkState.FULL_LIGHT_CONNECTIVITY_PENDING),
         COMPLETE(EntityData.ChunkState.COMPLETE);
 
         private static final Map<EntityData.ChunkState, State> LOOKUP;
@@ -91,14 +93,12 @@ public class Chunk {
             for (State s : State.values()) {
                 LOOKUP.put(s.protobufState, s);
             }
+            LOOKUP.put(EntityData.ChunkState.FULL_LIGHT_CONNECTIVITY_PENDING, INTERNAL_LIGHT_GENERATION_PENDING);
+            LOOKUP.put(EntityData.ChunkState.LIGHT_PROPAGATION_PENDING, INTERNAL_LIGHT_GENERATION_PENDING);
         }
 
         private State(EntityData.ChunkState protobufState) {
             this.protobufState = Preconditions.checkNotNull(protobufState);
-        }
-
-        public final EntityData.ChunkState getProtobufState() {
-            return protobufState;
         }
 
         public static State lookup(EntityData.ChunkState state) {
@@ -125,6 +125,7 @@ public class Chunk {
     private boolean dirty;
     private boolean animated;
     private AABB aabb;
+    private Region3i region;
 
     // Rendering
     private ChunkMesh[] activeMesh;
@@ -151,6 +152,7 @@ public class Chunk {
         chunkPos.x = x;
         chunkPos.y = y;
         chunkPos.z = z;
+        region = Region3i.createFromMinAndSize(new Vector3i(x * SIZE_X, y * SIZE_Y, z * SIZE_Z), CHUNK_SIZE);
         ChunkMonitor.fireChunkCreated(this);
     }
 
@@ -167,6 +169,7 @@ public class Chunk {
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
+        region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * SIZE_X, chunkPos.y * SIZE_Y, chunkPos.z * SIZE_Z), CHUNK_SIZE);
         initialGenerationComplete = loaded;
         ChunkMonitor.fireChunkCreated(this);
     }
@@ -500,6 +503,10 @@ public class Chunk {
         return disposed;
     }
 
+    public Region3i getRegion() {
+        return region;
+    }
+
     public int getChunkSizeX() {
         return SIZE_X;
     }
@@ -562,7 +569,7 @@ public class Chunk {
                 sunlightData = t.decode(message.getSunlightData());
             } else {
                 sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
+                if (state == State.COMPLETE) {
                     state = State.INTERNAL_LIGHT_GENERATION_PENDING;
                 }
             }
@@ -571,7 +578,7 @@ public class Chunk {
                 lightData = t.decode(message.getLightData());
             } else {
                 lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
+                if (state == State.COMPLETE) {
                     state = State.INTERNAL_LIGHT_GENERATION_PENDING;
                 }
             }

@@ -25,9 +25,11 @@ import org.terasology.world.block.Block;
  */
 public interface PropagatorWorldView {
 
+    byte UNAVAILABLE = -1;
+
     /**
      * @param pos
-     * @return The value of interest at pos
+     * @return The value of interest at pos, or UNAVAILABLE if out of bounds
      */
     byte getValueAt(Vector3i pos);
 
@@ -39,13 +41,8 @@ public interface PropagatorWorldView {
 
     /**
      * @param pos
-     * @return The block at pos
+     * @return The block at pos, or null if out of bounds
      */
     Block getBlockAt(Vector3i pos);
 
-    /**
-     * @param pos
-     * @return Whether pos is in the bounds of the world view
-     */
-    boolean isInBounds(Vector3i pos);
 }

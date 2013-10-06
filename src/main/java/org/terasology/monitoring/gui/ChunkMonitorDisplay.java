@@ -16,6 +16,8 @@
 package org.terasology.monitoring.gui;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -57,8 +59,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ChunkMonitorDisplay extends JPanel {
 
     public static final Color COLOR_COMPLETE = new Color(0, 38, 28);
-    public static final Color COLOR_FULL_LIGHT_CONNECTIVITY_PENDING = new Color(69, 191, 85);
-    public static final Color COLOR_LIGHT_PROPAGATION_PENDING = new Color(22, 127, 57);
     public static final Color COLOR_INTERNAL_LIGHT_GENERATION_PENDING = new Color(4, 76, 41);
     public static final Color COLOR_ADJACENCY_GENERATION_PENDING = new Color(150, 237, 137);
 
@@ -72,8 +72,8 @@ public class ChunkMonitorDisplay extends JPanel {
     private static final Logger logger = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
 
     private final EventBus eventbus = new EventBus("ChunkMonitorDisplay");
-    private final List<ChunkMonitorEntry> chunks = new LinkedList<ChunkMonitorEntry>();
-    private final Map<Vector3i, ChunkMonitorEntry> map = new HashMap<Vector3i, ChunkMonitorEntry>();
+    private final List<ChunkMonitorEntry> chunks = Lists.newArrayList();
+    private final Map<Vector3i, ChunkMonitorEntry> map = Maps.newHashMap();
     private final ImageBuffer image = new ImageBuffer();
 
     private int refreshInterval;
@@ -679,10 +679,6 @@ public class ChunkMonitorDisplay extends JPanel {
             switch (chunk.getChunkState()) {
                 case ADJACENCY_GENERATION_PENDING:
                     return COLOR_ADJACENCY_GENERATION_PENDING;
-                case FULL_LIGHT_CONNECTIVITY_PENDING:
-                    return COLOR_FULL_LIGHT_CONNECTIVITY_PENDING;
-                case LIGHT_PROPAGATION_PENDING:
-                    return COLOR_LIGHT_PROPAGATION_PENDING;
                 case INTERNAL_LIGHT_GENERATION_PENDING:
                     return COLOR_INTERNAL_LIGHT_GENERATION_PENDING;
                 case COMPLETE:

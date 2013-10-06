@@ -15,13 +15,18 @@
  */
 package org.terasology.world.propagation;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.terasology.math.Region3i;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.Chunk;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,9 +44,31 @@ public class BatchPropagator {
     private Set<Vector3i>[] reduceQueues;
     private Set<Vector3i>[] increaseQueues;
 
+    private Map<Side, Vector3i> chunkEdgeDeltas = Maps.newEnumMap(Side.class);
+
     public BatchPropagator(PropagationRules rules, PropagatorWorldView world) {
         this.world = world;
         this.rules = rules;
+
+        for (Side side : Side.values()) {
+            Vector3i delta = new Vector3i(side.getVector3i());
+            if (delta.x < 0) {
+                delta.x += Chunk.SIZE_X;
+            } else if (delta.x > 0) {
+                delta.x -= Chunk.SIZE_X;
+            }
+            if (delta.y < 0) {
+                delta.y += Chunk.SIZE_Y;
+            } else if (delta.y > 0) {
+                delta.y -= Chunk.SIZE_Y;
+            }
+            if (delta.z < 0) {
+                delta.z += Chunk.SIZE_Z;
+            } else if (delta.z > 0) {
+                delta.z -= Chunk.SIZE_Z;
+            }
+            chunkEdgeDeltas.put(side, delta);
+        }
 
         increaseQueues = new Set[rules.getMaxValue()];
         reduceQueues = new Set[rules.getMaxValue()];
@@ -66,20 +93,6 @@ public class BatchPropagator {
         cleanUp();
     }
 
-    public void propagateFrom(List<? extends Iterable<Vector3i>> fromRegions) {
-        for (Iterable<Vector3i> region : fromRegions) {
-            for (Vector3i pos : region) {
-                byte val = world.getValueAt(pos);
-                if (val > 0) {
-                    queueSpreadValue(pos, val);
-                }
-            }
-        }
-
-        processIncrease();
-        cleanUp();
-    }
-
     private void reviewChange(BlockChange blockChange) {
         byte newValue = rules.getBlockValue(blockChange.getTo());
         byte existingValue = world.getValueAt(blockChange.getPosition());
@@ -97,19 +110,18 @@ public class BatchPropagator {
             if (comparison.isRestricting() && existingValue > 0) {
                 reduce(blockChange.getPosition(), existingValue);
                 Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
-                if (world.isInBounds(adjPos)) {
-                    byte adjValue = world.getValueAt(adjPos);
-                    if (adjValue == rules.propagateValue(existingValue, side)) {
-                        reduce(adjPos, adjValue);
-                    }
+                byte adjValue = world.getValueAt(adjPos);
+                if (adjValue == rules.propagateValue(existingValue, side)) {
+                    reduce(adjPos, adjValue);
                 }
             } else if (comparison.isPermitting()) {
                 if (existingValue > 0) {
                     queueSpreadValue(blockChange.getPosition(), existingValue);
                 }
                 Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
-                if (world.isInBounds(adjPos)) {
-                    queueSpreadValue(adjPos, world.getValueAt(adjPos));
+                byte adjValue = world.getValueAt(adjPos);
+                if (adjValue != PropagatorWorldView.UNAVAILABLE) {
+                    queueSpreadValue(adjPos, adjValue);
                 }
             }
         }
@@ -143,7 +155,7 @@ public class BatchPropagator {
         for (Side side : Side.values()) {
             byte expectedValue = rules.propagateValue(oldValue, side);
             Vector3i adjPos = side.getAdjacentPos(pos);
-            if (world.isInBounds(adjPos) && rules.canSpreadOutOf(block, side)) {
+            if (rules.canSpreadOutOf(block, side)) {
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == expectedValue) {
                     Block adjBlock = world.getBlockAt(adjPos);
@@ -178,9 +190,9 @@ public class BatchPropagator {
         for (Side side : Side.values()) {
             byte spreadValue = rules.propagateValue(value, side);
             Vector3i adjPos = side.getAdjacentPos(pos);
-            if (world.isInBounds(adjPos) && rules.canSpreadOutOf(block, side)) {
+            if (rules.canSpreadOutOf(block, side)) {
                 byte adjValue = world.getValueAt(adjPos);
-                if (adjValue < spreadValue) {
+                if (adjValue < spreadValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
                     Block adjBlock = world.getBlockAt(adjPos);
                     if (rules.canSpreadInto(adjBlock, side.reverse())) {
                         increase(adjPos, spreadValue);
@@ -213,4 +225,28 @@ public class BatchPropagator {
         }
     }
 
+    public void propagateBetween(Chunk chunk, Chunk adjChunk, Side side) {
+        Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), Chunk.CHUNK_SIZE), side);
+        Vector3i adjPos = new Vector3i();
+        for (Vector3i pos : edgeRegion) {
+            adjPos.set(pos);
+            adjPos.add(chunkEdgeDeltas.get(side));
+
+            Block block = chunk.getBlock(pos);
+            byte value = rules.getValue(chunk, pos);
+            Block adjBlock = adjChunk.getBlock(adjPos);
+            byte adjValue = rules.getValue(adjChunk, adjPos);
+
+            byte expectedAdjValue = rules.propagateValue(value, side);
+            if (rules.canSpreadOutOf(block, side) && rules.canSpreadInto(adjBlock, side.reverse()) && adjValue < expectedAdjValue) {
+                rules.setValue(adjChunk, adjPos, expectedAdjValue);
+                queueSpreadValue(adjChunk.getBlockWorldPos(adjPos), expectedAdjValue);
+            }
+            byte expectedValue = rules.propagateValue(adjValue, side.reverse());
+            if (rules.canSpreadInto(block, side) && rules.canSpreadOutOf(adjBlock, side.reverse()) && value < expectedValue) {
+                rules.setValue(chunk, pos, expectedValue);
+                queueSpreadValue(chunk.getBlockWorldPos(pos), expectedValue);
+            }
+        }
+    }
 }

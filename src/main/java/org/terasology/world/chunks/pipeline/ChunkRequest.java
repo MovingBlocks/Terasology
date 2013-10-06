@@ -116,12 +116,6 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
             case INTERNAL_LIGHT_GENERATION_PENDING:
                 checkReadyToDoInternalLighting(chunk);
                 break;
-            case LIGHT_PROPAGATION_PENDING:
-                checkReadyToPropagateLighting(chunk);
-                break;
-            case FULL_LIGHT_CONNECTIVITY_PENDING:
-                checkComplete(chunk);
-                break;
             default:
                 break;
         }
@@ -138,7 +132,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
 
     private void checkReadyForSecondPass(Chunk chunk) {
         Vector3i pos = chunk.getPos();
-        if (chunk != null && chunk.getChunkState() == Chunk.State.ADJACENCY_GENERATION_PENDING) {
+        if (chunk.getChunkState() == Chunk.State.ADJACENCY_GENERATION_PENDING) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                 if (!adjPos.equals(pos)) {
                     Chunk adjChunk = provider.getChunkForProcessing(adjPos);
@@ -154,7 +148,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
 
     private void checkReadyToDoInternalLighting(Chunk chunk) {
         Vector3i pos = chunk.getPos();
-        if (chunk != null && chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
+        if (chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
             if (CoreRegistry.get(NetworkSystem.class).getMode().isAuthority()) {
                 for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                     if (!adjPos.equals(pos)) {
@@ -167,41 +161,6 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
             }
             logger.debug("Queueing for internal light generation {}", pos);
             pipeline.doTask(new InternalLightingChunkTask(pipeline, pos, provider));
-        }
-    }
-
-    private void checkReadyToPropagateLighting(Chunk chunk) {
-        Vector3i pos = chunk.getPos();
-        if (chunk != null && chunk.getChunkState() == Chunk.State.LIGHT_PROPAGATION_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunkForProcessing(adjPos);
-                    if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.LIGHT_PROPAGATION_PENDING) < 0) {
-                        return;
-                    }
-                }
-            }
-            logger.debug("Queueing for light propagation pass {}", pos);
-
-            pipeline.doTask(new PropagateLightingChunkTask(pipeline, pos, provider));
-        }
-    }
-
-    private void checkComplete(Chunk chunk) {
-        Vector3i pos = chunk.getPos();
-        if (chunk != null && chunk.getChunkState() == Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunkForProcessing(adjPos);
-                    if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) < 0) {
-                        return;
-                    }
-                }
-            }
-            logger.debug("Now complete {}", pos);
-            chunk.deflate();
-            chunk.setChunkState(Chunk.State.COMPLETE);
-            provider.onChunkIsReady(pos);
         }
     }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.lighting;
+package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
@@ -49,11 +49,6 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
             return BlockManager.getAir();
         }
         return result;
-    }
-
-    @Override
-    public boolean isInBounds(Vector3i pos) {
-        return true;
     }
 
     public void setBlockAt(Vector3i pos, Block block) {

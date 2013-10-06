@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
@@ -60,6 +61,11 @@ import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.light.LightPropagationRules;
+import org.terasology.world.propagation.light.LightWorldView;
+import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightWorldView;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -104,6 +110,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private boolean forceCleanup;
 
+    private List<BatchPropagator> loadEdgePropagators = Lists.newArrayList();
+
     public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
@@ -113,6 +121,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
+
+        loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
+        loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
     }
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
@@ -151,7 +162,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             Chunk chunk = nearCache.get(chunkPos);
-            if (chunk == null || chunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) == -1) {
+            if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
                 return null;
             }
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
@@ -241,10 +252,12 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private void makeChunksAvailable() {
-        List<ReadyChunkInfo> readyChunkPositions = Lists.newArrayListWithExpectedSize(readyChunks.size());
-        readyChunks.drainTo(readyChunkPositions);
-        for (ReadyChunkInfo info : readyChunkPositions) {
-            makeChunkAvailable(info);
+        ReadyChunkInfo readyChunkInfo = readyChunks.poll();
+        if (readyChunkInfo != null) {
+            makeChunkAvailable(readyChunkInfo);
+            for (BatchPropagator propagator : loadEdgePropagators) {
+                propagator.process();
+            }
         }
     }
 
@@ -281,6 +294,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 }
                 if (!keep) {
                     // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
+                    // Note: Above won't matter if all changes are on the main thread
                     Chunk chunk = nearCache.get(pos);
                     if (chunk.isLocked()) {
                         continue;
@@ -312,9 +326,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     } finally {
                         chunk.unlock();
                     }
-
                 }
-
             }
         }
         PerformanceMonitor.endActivity();
@@ -385,6 +397,16 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 }
             });
             PerformanceMonitor.endActivity();
+
+            for (Side side : Side.horizontalSides()) {
+                Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
+                Chunk adjChunk = getChunk(adjChunkPos);
+                if (adjChunk != null) {
+                    for (BatchPropagator propagator : loadEdgePropagators) {
+                        propagator.propagateBetween(chunk, adjChunk, side);
+                    }
+                }
+            }
 
             if (!loaded) {
                 worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));

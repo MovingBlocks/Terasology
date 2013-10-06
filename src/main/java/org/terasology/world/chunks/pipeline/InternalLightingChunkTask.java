@@ -50,8 +50,9 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
                 return;
             }
             InternalLightProcessor.generateInternalLighting(chunk);
-            chunk.setChunkState(Chunk.State.LIGHT_PROPAGATION_PENDING);
-            getPipeline().requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
+            chunk.deflate();
+            chunk.setChunkState(Chunk.State.COMPLETE);
+            getProvider().onChunkIsReady(chunk.getPos());
         } finally {
             chunk.unlock();
         }

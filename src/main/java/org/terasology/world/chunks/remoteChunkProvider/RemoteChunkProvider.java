@@ -25,6 +25,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
@@ -37,6 +38,11 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
+import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.light.LightPropagationRules;
+import org.terasology.world.propagation.light.LightWorldView;
+import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightWorldView;
 
 import java.util.Comparator;
 import java.util.List;
@@ -54,9 +60,12 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     private ChunkReadyListener listener;
 
     private ChunkGenerationPipeline pipeline;
+    private List<BatchPropagator> loadEdgePropagators = Lists.newArrayList();
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(this, null, new ChunkTaskRelevanceComparator());
+        loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
+        loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
@@ -75,10 +84,23 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void update() {
-        if (!readyChunks.isEmpty() && listener != null) {
-            List<Vector3i> ready = Lists.newArrayListWithExpectedSize(readyChunks.size());
-            readyChunks.drainTo(ready);
-            for (Vector3i pos : ready) {
+        if (listener != null) {
+            Vector3i pos = readyChunks.poll();
+            if (pos != null) {
+                Chunk chunk = chunkCache.get(pos);
+                chunk.markReady();
+                for (Side side : Side.horizontalSides()) {
+                    Vector3i adjChunkPos = side.getAdjacentPos(pos);
+                    Chunk adjChunk = getChunk(adjChunkPos);
+                    if (adjChunk != null) {
+                        for (BatchPropagator propagator : loadEdgePropagators) {
+                            propagator.propagateBetween(chunk, adjChunk, side);
+                        }
+                    }
+                }
+                for (BatchPropagator propagator : loadEdgePropagators) {
+                    propagator.process();
+                }
                 listener.onChunkReady(pos);
             }
         }
@@ -136,7 +158,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null || chunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) == -1) {
+            if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
                 return null;
             }
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);

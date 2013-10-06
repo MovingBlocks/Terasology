@@ -32,7 +32,10 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        return getValueAt(chunkView, pos);
+        if (isInBounds(pos)) {
+            return getValueAt(chunkView, pos);
+        }
+        return UNAVAILABLE;
     }
 
     protected abstract byte getValueAt(ChunkView view, Vector3i pos);
@@ -46,10 +49,12 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
 
     @Override
     public Block getBlockAt(Vector3i pos) {
-        return chunkView.getBlock(pos);
+        if (isInBounds(pos)) {
+            return chunkView.getBlock(pos);
+        }
+        return null;
     }
 
-    @Override
     public boolean isInBounds(Vector3i pos) {
         return chunkView.getWorldRegion().encompasses(pos);
     }

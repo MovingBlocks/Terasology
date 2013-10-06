@@ -30,10 +30,16 @@ public class SunlightWorldView extends AbstractFullWorldView {
     }
 
     @Override
-    protected byte getValueAt(Chunk chunk, Vector3i pos) {
-        if (pos.y >= Chunk.SIZE_Y) {
+    public byte getValueAt(Vector3i pos) {
+        byte result = super.getValueAt(pos);
+        if (result == UNAVAILABLE && pos.y == Chunk.SIZE_Y) {
             return SunlightPropagationRules.MAX_VALUE;
         }
+        return result;
+    }
+
+    @Override
+    protected byte getValueAt(Chunk chunk, Vector3i pos) {
         return chunk.getSunlight(pos);
     }
 
@@ -42,8 +48,4 @@ public class SunlightWorldView extends AbstractFullWorldView {
         chunk.setSunlight(pos, value);
     }
 
-    @Override
-    public boolean isInBounds(Vector3i pos) {
-        return pos.y == Chunk.SIZE_Y || super.isInBounds(pos);
-    }
 }

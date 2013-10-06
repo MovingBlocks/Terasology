@@ -35,12 +35,17 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     }
 
     private Chunk getChunk(Vector3i pos) {
+
         return chunkProvider.getChunk(TeraMath.calcChunkPos(pos));
     }
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        return getValueAt(getChunk(pos), TeraMath.calcBlockPos(pos.x, pos.y, pos.z));
+        Chunk chunk = getChunk(pos);
+        if (chunk != null) {
+            return getValueAt(chunk, TeraMath.calcBlockPos(pos.x, pos.y, pos.z));
+        }
+        return UNAVAILABLE;
     }
 
     /**
@@ -76,11 +81,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
         if (chunk != null) {
             return chunk.getBlock(TeraMath.calcBlockPos(pos));
         }
-        return BlockManager.getAir();
+        return null;
     }
 
-    @Override
-    public boolean isInBounds(Vector3i pos) {
-        return chunkProvider.isChunkReady(TeraMath.calcChunkPos(pos));
-    }
 }

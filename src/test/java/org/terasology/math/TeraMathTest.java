@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.math;
 
-package org.terasology.world.chunks;
+import org.junit.Test;
 
-import org.terasology.math.Vector3i;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius
  */
-public final class ChunkConstants {
-    public static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 0, 1);
-    /**
-     * How many chunks around a chunk must be relevant to guarantee it is fully generated.
-     */
-    public static final int FULL_GENERATION_DISTANCE = 2;
+public class TeraMathTest {
 
-    public static final int REMOTE_GENERATION_DISTANCE = 2;
-
-    private ChunkConstants() {
+    @Test
+    public void getEdgeRegion() {
+        Region3i region = Region3i.createFromMinAndSize(new Vector3i(16,0,16), new Vector3i(16,128,16));
+        assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), TeraMath.getEdgeRegion(region, Side.LEFT));
     }
 }
