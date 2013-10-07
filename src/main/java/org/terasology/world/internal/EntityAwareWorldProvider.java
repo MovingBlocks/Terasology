@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -80,11 +81,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
-    private Thread mainThread;
-
     public EntityAwareWorldProvider(WorldProviderCore base) {
         super(base);
-        mainThread = Thread.currentThread();
         entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
         CoreRegistry.get(ComponentSystemManager.class).register(getTime());
     }
@@ -106,7 +104,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public Block setBlock(Vector3i pos, Block type) {
-        if (Thread.currentThread().equals(mainThread)) {
+        if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
             Block oldType = super.setBlock(pos, type);
             if (oldType != null) {
@@ -120,7 +118,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @Override
     @SafeVarargs
     public final Block setBlockRetainComponent(Vector3i pos, Block type, Class<? extends Component>... components) {
-        if (Thread.currentThread().equals(mainThread)) {
+        if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
             Block oldType = super.setBlock(pos, type);
             if (oldType != null) {
@@ -150,7 +148,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getExistingBlockEntityAt(Vector3i blockPosition) {
-        if (Thread.currentThread() == mainThread) {
+        if (GameThread.isCurrentThread()) {
             EntityRef result = blockEntityLookup.get(blockPosition);
             return (result == null) ? EntityRef.NULL : result;
         }
@@ -160,7 +158,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public Block setBlockForceUpdateEntity(Vector3i pos, Block type) {
-        if (Thread.currentThread().equals(mainThread)) {
+        if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
             Block oldType = super.setBlock(pos, type);
             if (oldType != null) {
@@ -179,7 +177,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getBlockEntityAt(Vector3i blockPosition) {
-        if (Thread.currentThread() == mainThread) {
+        if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
             if (!blockEntity.exists() && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
                 Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
@@ -320,7 +318,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getExistingEntityAt(Vector3i blockPosition) {
-        if (Thread.currentThread() == mainThread) {
+        if (GameThread.isCurrentThread()) {
             EntityRef result = blockRegionLookup.get(blockPosition);
             if (result == null) {
                 return getExistingBlockEntityAt(blockPosition);
@@ -333,7 +331,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getEntityAt(Vector3i blockPosition) {
-        if (Thread.currentThread() == mainThread) {
+        if (GameThread.isCurrentThread()) {
             EntityRef entity = getExistingEntityAt(blockPosition);
             if (!entity.exists()) {
                 return getBlockEntityAt(blockPosition);
@@ -346,7 +344,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public boolean hasPermanentBlockEntity(Vector3i blockPos) {
-        if (Thread.currentThread() == mainThread) {
+        if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = blockEntityLookup.get(blockPos);
             return blockEntity != null && !temporaryBlockEntities.contains(blockEntity);
         }

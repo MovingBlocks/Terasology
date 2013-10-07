@@ -22,6 +22,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -115,6 +116,7 @@ public class StateIngame implements GameState {
         // TODO: Shutdown background threads
         eventSystem.process();
         componentSystemManager.shutdown();
+        GameThread.processWaitingProcesses();
         guiManager.closeAllWindows();
 
         if (worldRenderer != null) {
@@ -132,6 +134,7 @@ public class StateIngame implements GameState {
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);
+        GameThread.clearWaitingProcesses();
 
     }
 

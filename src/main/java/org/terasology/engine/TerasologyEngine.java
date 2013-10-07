@@ -440,6 +440,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+        GameThread.setGameThread();
         ModuleManager moduleManager = initModuleManager();
 
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
@@ -578,6 +579,8 @@ public class TerasologyEngine implements GameEngine {
                 currentState.update(delta);
                 PerformanceMonitor.endActivity();
             }
+
+            GameThread.processWaitingProcesses();
 
             PerformanceMonitor.startActivity("Render");
             currentState.render();
