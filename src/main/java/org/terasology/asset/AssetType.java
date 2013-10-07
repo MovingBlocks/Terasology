@@ -48,9 +48,9 @@ public enum AssetType {
     PREFAB("prefab", "prefabs", "prefab", new PrefabLoader()),
     SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
-    SHAPE("shape", "shapes", "json", new JsonBlockShapeLoader()),
+    SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader()),
     MESH("mesh", "mesh", "obj", new ObjMeshLoader()),
-    TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "json"}, new PNGTextureLoader()),
+    TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader()),
     SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
         @Override
         public AssetUri getUri(String sourceId, String item) {
@@ -65,7 +65,7 @@ public enum AssetType {
         }
     },
     MATERIAL("material", "materials", "mat", new MaterialLoader()),
-    BLOCK_DEFINITION("blockdef", "blocks", "json", null),
+    BLOCK_DEFINITION("blockdef", "blocks", "block", null),
     BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader()),
     SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader()),
     ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader()),

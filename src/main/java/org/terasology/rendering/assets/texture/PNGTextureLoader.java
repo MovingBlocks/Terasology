@@ -82,7 +82,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             }
 
             for (URL url : urls) {
-                if (url.toString().endsWith(".json")) {
+                if (url.toString().endsWith(".texinfo")) {
                     try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
                         TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
                         if (metadata.filterMode != null) {
