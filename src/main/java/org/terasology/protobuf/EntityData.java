@@ -104,13 +104,13 @@ public final class EntityData {
      */
     INTERNAL_LIGHT_GENERATION_PENDING(1, 1),
     /**
-     * <code>LIGHT_PROPAGATION_PENDING = 2;</code>
+     * <code>DEPRECATED_1 = 2;</code>
      */
-    LIGHT_PROPAGATION_PENDING(2, 2),
+    DEPRECATED_1(2, 2),
     /**
-     * <code>FULL_LIGHT_CONNECTIVITY_PENDING = 3;</code>
+     * <code>DEPRECATED_2 = 3;</code>
      */
-    FULL_LIGHT_CONNECTIVITY_PENDING(3, 3),
+    DEPRECATED_2(3, 3),
     /**
      * <code>COMPLETE = 4;</code>
      */
@@ -126,13 +126,13 @@ public final class EntityData {
      */
     public static final int INTERNAL_LIGHT_GENERATION_PENDING_VALUE = 1;
     /**
-     * <code>LIGHT_PROPAGATION_PENDING = 2;</code>
+     * <code>DEPRECATED_1 = 2;</code>
      */
-    public static final int LIGHT_PROPAGATION_PENDING_VALUE = 2;
+    public static final int DEPRECATED_1_VALUE = 2;
     /**
-     * <code>FULL_LIGHT_CONNECTIVITY_PENDING = 3;</code>
+     * <code>DEPRECATED_2 = 3;</code>
      */
-    public static final int FULL_LIGHT_CONNECTIVITY_PENDING_VALUE = 3;
+    public static final int DEPRECATED_2_VALUE = 3;
     /**
      * <code>COMPLETE = 4;</code>
      */
@@ -145,8 +145,8 @@ public final class EntityData {
       switch (value) {
         case 0: return ADJACENCY_GENERATION_PENDING;
         case 1: return INTERNAL_LIGHT_GENERATION_PENDING;
-        case 2: return LIGHT_PROPAGATION_PENDING;
-        case 3: return FULL_LIGHT_CONNECTIVITY_PENDING;
+        case 2: return DEPRECATED_1;
+        case 3: return DEPRECATED_2;
         case 4: return COMPLETE;
         default: return null;
       }
@@ -11956,33 +11956,33 @@ public final class EntityData {
      */
     org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getBlockDataOrBuilder();
 
-    // optional .TeraArray sunlight_data = 7;
+    // optional .TeraArray deprecated_data_1 = 7;
     /**
-     * <code>optional .TeraArray sunlight_data = 7;</code>
+     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
      */
-    boolean hasSunlightData();
+    boolean hasDeprecatedData1();
     /**
-     * <code>optional .TeraArray sunlight_data = 7;</code>
+     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArray getSunlightData();
+    org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData1();
     /**
-     * <code>optional .TeraArray sunlight_data = 7;</code>
+     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getSunlightDataOrBuilder();
+    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData1OrBuilder();
 
-    // optional .TeraArray light_data = 8;
+    // optional .TeraArray deprecated_data_2 = 8;
     /**
-     * <code>optional .TeraArray light_data = 8;</code>
+     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
      */
-    boolean hasLightData();
+    boolean hasDeprecatedData2();
     /**
-     * <code>optional .TeraArray light_data = 8;</code>
+     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArray getLightData();
+    org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData2();
     /**
-     * <code>optional .TeraArray light_data = 8;</code>
+     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLightDataOrBuilder();
+    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData2OrBuilder();
 
     // optional .TeraArray liquid_data = 9;
     /**
@@ -12104,12 +12104,12 @@ public final class EntityData {
             case 58: {
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = null;
               if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                subBuilder = sunlightData_.toBuilder();
+                subBuilder = deprecatedData1_.toBuilder();
               }
-              sunlightData_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
+              deprecatedData1_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(sunlightData_);
-                sunlightData_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(deprecatedData1_);
+                deprecatedData1_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000040;
               break;
@@ -12117,12 +12117,12 @@ public final class EntityData {
             case 66: {
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = null;
               if (((bitField0_ & 0x00000080) == 0x00000080)) {
-                subBuilder = lightData_.toBuilder();
+                subBuilder = deprecatedData2_.toBuilder();
               }
-              lightData_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
+              deprecatedData2_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(lightData_);
-                lightData_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(deprecatedData2_);
+                deprecatedData2_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000080;
               break;
@@ -12288,48 +12288,48 @@ public final class EntityData {
       return blockData_;
     }
 
-    // optional .TeraArray sunlight_data = 7;
-    public static final int SUNLIGHT_DATA_FIELD_NUMBER = 7;
-    private org.terasology.protobuf.ChunksProtobuf.TeraArray sunlightData_;
+    // optional .TeraArray deprecated_data_1 = 7;
+    public static final int DEPRECATED_DATA_1_FIELD_NUMBER = 7;
+    private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData1_;
     /**
-     * <code>optional .TeraArray sunlight_data = 7;</code>
+     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
      */
-    public boolean hasSunlightData() {
+    public boolean hasDeprecatedData1() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional .TeraArray sunlight_data = 7;</code>
+     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArray getSunlightData() {
-      return sunlightData_;
+    public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData1() {
+      return deprecatedData1_;
     }
     /**
-     * <code>optional .TeraArray sunlight_data = 7;</code>
+     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getSunlightDataOrBuilder() {
-      return sunlightData_;
+    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData1OrBuilder() {
+      return deprecatedData1_;
     }
 
-    // optional .TeraArray light_data = 8;
-    public static final int LIGHT_DATA_FIELD_NUMBER = 8;
-    private org.terasology.protobuf.ChunksProtobuf.TeraArray lightData_;
+    // optional .TeraArray deprecated_data_2 = 8;
+    public static final int DEPRECATED_DATA_2_FIELD_NUMBER = 8;
+    private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData2_;
     /**
-     * <code>optional .TeraArray light_data = 8;</code>
+     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
      */
-    public boolean hasLightData() {
+    public boolean hasDeprecatedData2() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional .TeraArray light_data = 8;</code>
+     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArray getLightData() {
-      return lightData_;
+    public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData2() {
+      return deprecatedData2_;
     }
     /**
-     * <code>optional .TeraArray light_data = 8;</code>
+     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLightDataOrBuilder() {
-      return lightData_;
+    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData2OrBuilder() {
+      return deprecatedData2_;
     }
 
     // optional .TeraArray liquid_data = 9;
@@ -12361,8 +12361,8 @@ public final class EntityData {
       z_ = 0;
       state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
       blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      sunlightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      lightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       liquidData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
@@ -12382,14 +12382,14 @@ public final class EntityData {
           return false;
         }
       }
-      if (hasSunlightData()) {
-        if (!getSunlightData().isInitialized()) {
+      if (hasDeprecatedData1()) {
+        if (!getDeprecatedData1().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
       }
-      if (hasLightData()) {
-        if (!getLightData().isInitialized()) {
+      if (hasDeprecatedData2()) {
+        if (!getDeprecatedData2().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -12433,10 +12433,10 @@ public final class EntityData {
         output.writeMessage(6, blockData_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(7, sunlightData_);
+        output.writeMessage(7, deprecatedData1_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeMessage(8, lightData_);
+        output.writeMessage(8, deprecatedData2_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeMessage(9, liquidData_);
@@ -12477,11 +12477,11 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, sunlightData_);
+          .computeMessageSize(7, deprecatedData1_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, lightData_);
+          .computeMessageSize(8, deprecatedData2_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
@@ -12598,8 +12598,8 @@ public final class EntityData {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getStoreFieldBuilder();
           getBlockDataFieldBuilder();
-          getSunlightDataFieldBuilder();
-          getLightDataFieldBuilder();
+          getDeprecatedData1FieldBuilder();
+          getDeprecatedData2FieldBuilder();
           getLiquidDataFieldBuilder();
         }
       }
@@ -12629,16 +12629,16 @@ public final class EntityData {
           blockDataBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
-        if (sunlightDataBuilder_ == null) {
-          sunlightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+        if (deprecatedData1Builder_ == null) {
+          deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
         } else {
-          sunlightDataBuilder_.clear();
+          deprecatedData1Builder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
-        if (lightDataBuilder_ == null) {
-          lightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+        if (deprecatedData2Builder_ == null) {
+          deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
         } else {
-          lightDataBuilder_.clear();
+          deprecatedData2Builder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000080);
         if (liquidDataBuilder_ == null) {
@@ -12710,18 +12710,18 @@ public final class EntityData {
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        if (sunlightDataBuilder_ == null) {
-          result.sunlightData_ = sunlightData_;
+        if (deprecatedData1Builder_ == null) {
+          result.deprecatedData1_ = deprecatedData1_;
         } else {
-          result.sunlightData_ = sunlightDataBuilder_.build();
+          result.deprecatedData1_ = deprecatedData1Builder_.build();
         }
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        if (lightDataBuilder_ == null) {
-          result.lightData_ = lightData_;
+        if (deprecatedData2Builder_ == null) {
+          result.deprecatedData2_ = deprecatedData2_;
         } else {
-          result.lightData_ = lightDataBuilder_.build();
+          result.deprecatedData2_ = deprecatedData2Builder_.build();
         }
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
@@ -12765,11 +12765,11 @@ public final class EntityData {
         if (other.hasBlockData()) {
           mergeBlockData(other.getBlockData());
         }
-        if (other.hasSunlightData()) {
-          mergeSunlightData(other.getSunlightData());
+        if (other.hasDeprecatedData1()) {
+          mergeDeprecatedData1(other.getDeprecatedData1());
         }
-        if (other.hasLightData()) {
-          mergeLightData(other.getLightData());
+        if (other.hasDeprecatedData2()) {
+          mergeDeprecatedData2(other.getDeprecatedData2());
         }
         if (other.hasLiquidData()) {
           mergeLiquidData(other.getLiquidData());
@@ -12792,14 +12792,14 @@ public final class EntityData {
             return false;
           }
         }
-        if (hasSunlightData()) {
-          if (!getSunlightData().isInitialized()) {
+        if (hasDeprecatedData1()) {
+          if (!getDeprecatedData1().isInitialized()) {
             
             return false;
           }
         }
-        if (hasLightData()) {
-          if (!getLightData().isInitialized()) {
+        if (hasDeprecatedData2()) {
+          if (!getDeprecatedData2().isInitialized()) {
             
             return false;
           }
@@ -13205,238 +13205,238 @@ public final class EntityData {
         return blockDataBuilder_;
       }
 
-      // optional .TeraArray sunlight_data = 7;
-      private org.terasology.protobuf.ChunksProtobuf.TeraArray sunlightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      // optional .TeraArray deprecated_data_1 = 7;
+      private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> sunlightDataBuilder_;
+          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> deprecatedData1Builder_;
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public boolean hasSunlightData() {
+      public boolean hasDeprecatedData1() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray getSunlightData() {
-        if (sunlightDataBuilder_ == null) {
-          return sunlightData_;
+      public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData1() {
+        if (deprecatedData1Builder_ == null) {
+          return deprecatedData1_;
         } else {
-          return sunlightDataBuilder_.getMessage();
+          return deprecatedData1Builder_.getMessage();
         }
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public Builder setSunlightData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (sunlightDataBuilder_ == null) {
+      public Builder setDeprecatedData1(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+        if (deprecatedData1Builder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          sunlightData_ = value;
+          deprecatedData1_ = value;
           onChanged();
         } else {
-          sunlightDataBuilder_.setMessage(value);
+          deprecatedData1Builder_.setMessage(value);
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public Builder setSunlightData(
+      public Builder setDeprecatedData1(
           org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder builderForValue) {
-        if (sunlightDataBuilder_ == null) {
-          sunlightData_ = builderForValue.build();
+        if (deprecatedData1Builder_ == null) {
+          deprecatedData1_ = builderForValue.build();
           onChanged();
         } else {
-          sunlightDataBuilder_.setMessage(builderForValue.build());
+          deprecatedData1Builder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public Builder mergeSunlightData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (sunlightDataBuilder_ == null) {
+      public Builder mergeDeprecatedData1(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+        if (deprecatedData1Builder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
-              sunlightData_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
-            sunlightData_ =
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(sunlightData_).mergeFrom(value).buildPartial();
+              deprecatedData1_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
+            deprecatedData1_ =
+              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(deprecatedData1_).mergeFrom(value).buildPartial();
           } else {
-            sunlightData_ = value;
+            deprecatedData1_ = value;
           }
           onChanged();
         } else {
-          sunlightDataBuilder_.mergeFrom(value);
+          deprecatedData1Builder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public Builder clearSunlightData() {
-        if (sunlightDataBuilder_ == null) {
-          sunlightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      public Builder clearDeprecatedData1() {
+        if (deprecatedData1Builder_ == null) {
+          deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
           onChanged();
         } else {
-          sunlightDataBuilder_.clear();
+          deprecatedData1Builder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getSunlightDataBuilder() {
+      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getDeprecatedData1Builder() {
         bitField0_ |= 0x00000040;
         onChanged();
-        return getSunlightDataFieldBuilder().getBuilder();
+        return getDeprecatedData1FieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getSunlightDataOrBuilder() {
-        if (sunlightDataBuilder_ != null) {
-          return sunlightDataBuilder_.getMessageOrBuilder();
+      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData1OrBuilder() {
+        if (deprecatedData1Builder_ != null) {
+          return deprecatedData1Builder_.getMessageOrBuilder();
         } else {
-          return sunlightData_;
+          return deprecatedData1_;
         }
       }
       /**
-       * <code>optional .TeraArray sunlight_data = 7;</code>
+       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> 
-          getSunlightDataFieldBuilder() {
-        if (sunlightDataBuilder_ == null) {
-          sunlightDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          getDeprecatedData1FieldBuilder() {
+        if (deprecatedData1Builder_ == null) {
+          deprecatedData1Builder_ = new com.google.protobuf.SingleFieldBuilder<
               org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder>(
-                  sunlightData_,
+                  deprecatedData1_,
                   getParentForChildren(),
                   isClean());
-          sunlightData_ = null;
+          deprecatedData1_ = null;
         }
-        return sunlightDataBuilder_;
+        return deprecatedData1Builder_;
       }
 
-      // optional .TeraArray light_data = 8;
-      private org.terasology.protobuf.ChunksProtobuf.TeraArray lightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      // optional .TeraArray deprecated_data_2 = 8;
+      private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> lightDataBuilder_;
+          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> deprecatedData2Builder_;
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public boolean hasLightData() {
+      public boolean hasDeprecatedData2() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray getLightData() {
-        if (lightDataBuilder_ == null) {
-          return lightData_;
+      public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData2() {
+        if (deprecatedData2Builder_ == null) {
+          return deprecatedData2_;
         } else {
-          return lightDataBuilder_.getMessage();
+          return deprecatedData2Builder_.getMessage();
         }
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public Builder setLightData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (lightDataBuilder_ == null) {
+      public Builder setDeprecatedData2(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+        if (deprecatedData2Builder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          lightData_ = value;
+          deprecatedData2_ = value;
           onChanged();
         } else {
-          lightDataBuilder_.setMessage(value);
+          deprecatedData2Builder_.setMessage(value);
         }
         bitField0_ |= 0x00000080;
         return this;
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public Builder setLightData(
+      public Builder setDeprecatedData2(
           org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder builderForValue) {
-        if (lightDataBuilder_ == null) {
-          lightData_ = builderForValue.build();
+        if (deprecatedData2Builder_ == null) {
+          deprecatedData2_ = builderForValue.build();
           onChanged();
         } else {
-          lightDataBuilder_.setMessage(builderForValue.build());
+          deprecatedData2Builder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000080;
         return this;
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public Builder mergeLightData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (lightDataBuilder_ == null) {
+      public Builder mergeDeprecatedData2(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+        if (deprecatedData2Builder_ == null) {
           if (((bitField0_ & 0x00000080) == 0x00000080) &&
-              lightData_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
-            lightData_ =
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(lightData_).mergeFrom(value).buildPartial();
+              deprecatedData2_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
+            deprecatedData2_ =
+              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(deprecatedData2_).mergeFrom(value).buildPartial();
           } else {
-            lightData_ = value;
+            deprecatedData2_ = value;
           }
           onChanged();
         } else {
-          lightDataBuilder_.mergeFrom(value);
+          deprecatedData2Builder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000080;
         return this;
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public Builder clearLightData() {
-        if (lightDataBuilder_ == null) {
-          lightData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      public Builder clearDeprecatedData2() {
+        if (deprecatedData2Builder_ == null) {
+          deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
           onChanged();
         } else {
-          lightDataBuilder_.clear();
+          deprecatedData2Builder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getLightDataBuilder() {
+      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getDeprecatedData2Builder() {
         bitField0_ |= 0x00000080;
         onChanged();
-        return getLightDataFieldBuilder().getBuilder();
+        return getDeprecatedData2FieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLightDataOrBuilder() {
-        if (lightDataBuilder_ != null) {
-          return lightDataBuilder_.getMessageOrBuilder();
+      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData2OrBuilder() {
+        if (deprecatedData2Builder_ != null) {
+          return deprecatedData2Builder_.getMessageOrBuilder();
         } else {
-          return lightData_;
+          return deprecatedData2_;
         }
       }
       /**
-       * <code>optional .TeraArray light_data = 8;</code>
+       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> 
-          getLightDataFieldBuilder() {
-        if (lightDataBuilder_ == null) {
-          lightDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          getDeprecatedData2FieldBuilder() {
+        if (deprecatedData2Builder_ == null) {
+          deprecatedData2Builder_ = new com.google.protobuf.SingleFieldBuilder<
               org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder>(
-                  lightData_,
+                  deprecatedData2_,
                   getParentForChildren(),
                   isClean());
-          lightData_ = null;
+          deprecatedData2_ = null;
         }
-        return lightDataBuilder_;
+        return deprecatedData2Builder_;
       }
 
       // optional .TeraArray liquid_data = 9;
@@ -16717,29 +16717,29 @@ public final class EntityData {
       "\200\200\002\"\220\001\n\013PlayerStore\022\033\n\005store\030\001 \001(\0132\014.Ent" +
       "ityStore\022\025\n\rcharacterPosX\030\017 \001(\002\022\025\n\rchara" +
       "cterPosY\030\020 \001(\002\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n" +
-      "\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\365\001\n\nChunk" +
+      "\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\200\002\n\nChunk" +
       "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\t\n\001x\030" +
       "\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001z\030\004 \001(\021\022\032\n\005state\030\005 \001" +
       "(\0162\013.ChunkState\022\036\n\nblock_data\030\006 \001(\0132\n.Te" +
-      "raArray\022!\n\rsunlight_data\030\007 \001(\0132\n.TeraArr" +
-      "ay\022\036\n\nlight_data\030\010 \001(\0132\n.TeraArray\022\037\n\013li" +
-      "quid_data\030\t \001(\0132\n.TeraArray*\t\010\210\'\020\200\200\200\200\002\"\204",
-      "\001\n\023EntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.S" +
-      "toreType\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016store" +
-      "IntegerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002" +
-      "\020\001*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030" +
-      "\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022" +
-      "\027\n\017component_class\030\003 \003(\t\022\026\n\016next_entity_" +
-      "id\030\020 \001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n" +
-      "\013prefab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030" +
-      "\023 \003(\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4" +
-      "\n\tStoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016Chun",
-      "kStoreType\020\002*\247\001\n\nChunkState\022 \n\034ADJACENCY" +
-      "_GENERATION_PENDING\020\000\022%\n!INTERNAL_LIGHT_" +
-      "GENERATION_PENDING\020\001\022\035\n\031LIGHT_PROPAGATIO" +
-      "N_PENDING\020\002\022#\n\037FULL_LIGHT_CONNECTIVITY_P" +
-      "ENDING\020\003\022\014\n\010COMPLETE\020\004B\'\n\027org.terasology" +
-      ".protobufB\nEntityDataH\001"
+      "raArray\022%\n\021deprecated_data_1\030\007 \001(\0132\n.Ter" +
+      "aArray\022%\n\021deprecated_data_2\030\010 \001(\0132\n.Tera" +
+      "Array\022\037\n\013liquid_data\030\t \001(\0132\n.TeraArray*\t",
+      "\010\210\'\020\200\200\200\200\002\"\204\001\n\023EntityStoreMetadata\022\030\n\004typ" +
+      "e\030\001 \001(\0162\n.StoreType\022\025\n\rstoreStringId\030\002 \001" +
+      "(\t\022\032\n\016storeIntegerId\030\003 \003(\005B\002\020\001\022\025\n\trefere" +
+      "nce\030\004 \003(\005B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore" +
+      "\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(" +
+      "\0132\007.Prefab\022\027\n\017component_class\030\003 \003(\t\022\026\n\016n" +
+      "ext_entity_id\030\020 \001(\005\022\033\n\017freed_entity_id\030\021" +
+      " \003(\005B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t\022/\n\021storeRe" +
+      "ferenceSet\030\023 \003(\0132\024.EntityStoreMetadata*\t" +
+      "\010\210\'\020\200\200\200\200\002*4\n\tStoreType\022\023\n\017PlayerStoreTyp",
+      "e\020\001\022\022\n\016ChunkStoreType\020\002*\207\001\n\nChunkState\022 " +
+      "\n\034ADJACENCY_GENERATION_PENDING\020\000\022%\n!INTE" +
+      "RNAL_LIGHT_GENERATION_PENDING\020\001\022\020\n\014DEPRE" +
+      "CATED_1\020\002\022\020\n\014DEPRECATED_2\020\003\022\014\n\010COMPLETE\020" +
+      "\004B\'\n\027org.terasology.protobufB\nEntityData" +
+      "H\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -16805,7 +16805,7 @@ public final class EntityData {
           internal_static_ChunkStore_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ChunkStore_descriptor,
-              new java.lang.String[] { "Store", "X", "Y", "Z", "State", "BlockData", "SunlightData", "LightData", "LiquidData", });
+              new java.lang.String[] { "Store", "X", "Y", "Z", "State", "BlockData", "DeprecatedData1", "DeprecatedData2", "LiquidData", });
           internal_static_EntityStoreMetadata_descriptor =
             getDescriptor().getMessageTypes().get(10);
           internal_static_EntityStoreMetadata_fieldAccessorTable = new

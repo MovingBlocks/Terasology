@@ -68,10 +68,7 @@ public class ChunkMonitorEntry {
         Preconditions.checkNotNull(value, "The parameter 'value' must not be null");
         Preconditions.checkArgument(pos.equals(value.getPos()), "Expected chunk for position {} but got position {} instead", pos, value.getPos());
         purge();
-        chunks.add(new WeakReference<Chunk>(value));
-        if (chunks.size() > 1) {
-            logger.warn("Multiple chunks for position {} are registered ({})", pos, chunks.size());
-        }
+        chunks.add(new WeakReference<>(value));
     }
 
     public void addEvent(ChunkMonitorEvent.BasicChunkEvent event) {

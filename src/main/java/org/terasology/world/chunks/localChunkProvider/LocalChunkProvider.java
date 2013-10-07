@@ -61,6 +61,7 @@ import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.lighting.InternalLightProcessor;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.LightWorldView;
@@ -528,11 +529,15 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         public void enact() {
                             ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                             Chunk chunk = chunkStore.getChunk();
+
                             if (nearCache.putIfAbsent(getPosition(), chunkStore.getChunk()) != null) {
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }
                             preparingChunks.remove(getPosition());
-                            if (chunk.getChunkState() == Chunk.State.COMPLETE) {
+                            if (chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
+                                InternalLightProcessor.generateInternalLighting(chunk);
+                                chunk.deflate();
+                                chunk.setChunkState(Chunk.State.COMPLETE);
                                 readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
                             } else {
                                 pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));

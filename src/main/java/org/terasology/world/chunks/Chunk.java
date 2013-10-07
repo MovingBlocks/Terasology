@@ -93,8 +93,6 @@ public class Chunk {
             for (State s : State.values()) {
                 LOOKUP.put(s.protobufState, s);
             }
-            LOOKUP.put(EntityData.ChunkState.FULL_LIGHT_CONNECTIVITY_PENDING, INTERNAL_LIGHT_GENERATION_PENDING);
-            LOOKUP.put(EntityData.ChunkState.LIGHT_PROPAGATION_PENDING, INTERNAL_LIGHT_GENERATION_PENDING);
         }
 
         private State(EntityData.ChunkState protobufState) {
@@ -104,7 +102,7 @@ public class Chunk {
         public static State lookup(EntityData.ChunkState state) {
             State result = LOOKUP.get(Preconditions.checkNotNull(state, "The parameter 'state' must not be null"));
             if (result == null) {
-                throw new IllegalStateException("Unable to lookup the supplied state: " + state);
+                return INTERNAL_LIGHT_GENERATION_PENDING;
             }
             return result;
         }
@@ -471,7 +469,12 @@ public class Chunk {
     }
 
     public void prepareForReactivation() {
-        disposed = false;
+        if (disposed) {
+            disposed = false;
+            Chunks c = Chunks.getInstance();
+            sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+            lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+        }
     }
 
     public void dispose() {
@@ -483,6 +486,8 @@ public class Chunk {
             }
             activeMesh = null;
         }
+        lightData = null;
+        sunlightData = null;
         ChunkMonitor.fireChunkDisposed(this);
     }
 
@@ -539,9 +544,7 @@ public class Chunk {
                     .setState(chunk.chunkState.protobufState)
                     .setBlockData(t.encode(chunk.blockData));
             if (!coreOnly) {
-                b.setSunlightData(t.encode(chunk.sunlightData))
-                        .setLightData(t.encode(chunk.lightData))
-                        .setLiquidData(t.encode(chunk.extraData));
+                b.setLiquidData(t.encode(chunk.extraData));
             }
             return b;
         }
@@ -564,31 +567,20 @@ public class Chunk {
             final TeraArray blockData = t.decode(message.getBlockData());
 
             Chunks c = Chunks.getInstance();
-            TeraArray sunlightData;
-            if (message.hasSunlightData()) {
-                sunlightData = t.decode(message.getSunlightData());
-            } else {
-                sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-                if (state == State.COMPLETE) {
-                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
-                }
-            }
-            TeraArray lightData;
-            if (message.hasLightData()) {
-                lightData = t.decode(message.getLightData());
-            } else {
-                lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
-                if (state == State.COMPLETE) {
-                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
-                }
-            }
+            TeraArray sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+            TeraArray lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
             TeraArray extraData;
             if (message.hasLiquidData()) {
                 extraData = t.decode(message.getLiquidData());
             } else {
                 extraData = c.getExtraDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
             }
-            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData, state == State.COMPLETE);
+
+            boolean previouslyComplete = state == State.COMPLETE;
+            if (previouslyComplete) {
+                state = State.INTERNAL_LIGHT_GENERATION_PENDING;
+            }
+            return new Chunk(pos, state, blockData, sunlightData, lightData, extraData, previouslyComplete);
         }
     }
 }
