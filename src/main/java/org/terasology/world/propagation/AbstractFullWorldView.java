@@ -41,6 +41,9 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public byte getValueAt(Vector3i pos) {
+        if (pos.y < 0 || pos.y >= Chunk.SIZE_Y) {
+            return UNAVAILABLE;
+        }
         Chunk chunk = getChunk(pos);
         if (chunk != null) {
             return getValueAt(chunk, TeraMath.calcBlockPos(pos.x, pos.y, pos.z));
@@ -77,6 +80,9 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public Block getBlockAt(Vector3i pos) {
+        if (pos.y < 0 || pos.y >= Chunk.SIZE_Y) {
+            return null;
+        }
         Chunk chunk = chunkProvider.getChunk(TeraMath.calcChunkPos(pos));
         if (chunk != null) {
             return chunk.getBlock(TeraMath.calcBlockPos(pos));

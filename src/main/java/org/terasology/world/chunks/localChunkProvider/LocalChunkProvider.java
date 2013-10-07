@@ -61,7 +61,7 @@ import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.lighting.InternalLightProcessor;
+import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.LightWorldView;

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.propagation.light;
+package org.terasology.world.propagation;
 
-import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
@@ -23,36 +22,34 @@ import org.terasology.world.chunks.Chunk;
 /**
  * @author Immortius
  */
-public class SunlightPropagationRules extends CommonLightPropagationRules {
-    public static final byte MAX_VALUE = 15;
+public class SingleChunkView implements PropagatorWorldView {
 
-    @Override
-    public byte getBlockValue(Block block) {
-        return 0;
+    private final PropagationRules rules;
+    private final Chunk chunk;
+
+    public SingleChunkView(PropagationRules rules, Chunk chunk) {
+        this.rules = rules;
+        this.chunk = chunk;
     }
 
     @Override
-    public byte propagateValue(byte existingValue, Side side, Block from) {
-        if (existingValue == MAX_VALUE && side == Side.BOTTOM && !from.isLiquid()) {
-            return MAX_VALUE;
+    public byte getValueAt(Vector3i pos) {
+        if (Chunk.CHUNK_REGION.encompasses(pos)) {
+            return rules.getValue(chunk, pos);
         }
-        return (byte) (existingValue - 1);
+        return UNAVAILABLE;
     }
 
     @Override
-    public byte getMaxValue() {
-        return MAX_VALUE;
+    public void setValueAt(Vector3i pos, byte value) {
+        rules.setValue(chunk, pos, value);
     }
 
     @Override
-    public byte getValue(Chunk chunk, Vector3i pos) {
-        return chunk.getSunlight(pos);
+    public Block getBlockAt(Vector3i pos) {
+        if (Chunk.CHUNK_REGION.encompasses(pos)) {
+            return chunk.getBlock(pos);
+        }
+        return null;
     }
-
-    @Override
-    public void setValue(Chunk chunk, Vector3i pos, byte value) {
-        chunk.setSunlight(pos, value);
-    }
-
-
 }

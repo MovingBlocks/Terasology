@@ -39,6 +39,8 @@ import org.terasology.world.propagation.light.SunlightChunkView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightWorldView;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -346,7 +348,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void betweenChunks() {
+    public void betweenChunks() throws Exception {
+        Thread.sleep(10000);
         Chunk main = new Chunk(new Vector3i(0,0,0));
         main.setChunkState(Chunk.State.COMPLETE);
         for (Vector3i pos : Chunk.CHUNK_REGION) {

@@ -31,7 +31,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte propagateValue(byte existingValue, Side side) {
+    public byte propagateValue(byte existingValue, Side side, Block from) {
         return (byte) (existingValue - 1);
     }
 

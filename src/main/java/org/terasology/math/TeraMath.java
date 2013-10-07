@@ -272,7 +272,7 @@ public final class TeraMath {
     * @return The Y-coordinate of the chunk
     */
     public static int calcChunkPosY(int y, int chunkPowerY) {
-        return (y >> chunkPowerY);
+        return 0;//(y >> chunkPowerY);
     }
 
     /**

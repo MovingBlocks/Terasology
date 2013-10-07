@@ -44,9 +44,10 @@ public interface PropagationRules {
     /**
      * @param existingValue
      * @param side
+     * @param from the block the value is leaving
      * @return The value propagate in the given direction from an existing value
      */
-    byte propagateValue(byte existingValue, Side side);
+    byte propagateValue(byte existingValue, Side side, Block from);
 
     /**
      * @return The maximum value

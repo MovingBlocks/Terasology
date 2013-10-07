@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.world.lighting;
+package org.terasology.world.propagation.light;
 
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.PropagationRules;
+import org.terasology.world.propagation.SingleChunkView;
+import org.terasology.world.propagation.light.LightPropagationRules;
+import org.terasology.world.propagation.light.SunlightPropagationRules;
 
 /**
  * For doing an initial lighting sweep during chunk generation - bound to the chunk and assumed blank slate
@@ -27,6 +33,9 @@ import org.terasology.world.chunks.Chunk;
  * @author Immortius
  */
 public final class InternalLightProcessor {
+
+    private static final PropagationRules LIGHT_RULES = new LightPropagationRules();
+    private static final PropagationRules SUNLIGHT_RULES = new SunlightPropagationRules();
 
     private InternalLightProcessor() {
     }
@@ -36,6 +45,8 @@ public final class InternalLightProcessor {
 
         short[] tops = new short[Chunk.SIZE_X * Chunk.SIZE_Z];
 
+        byte sunlightMax = SUNLIGHT_RULES.getMaxValue();
+
         // Tunnel light down
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -43,18 +54,17 @@ public final class InternalLightProcessor {
                 int y = top;
                 for (; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);
-                    if (LightingUtil.doesSunlightRetainsFullStrengthIn(block) && LightingUtil.canSpreadLightOutOf(lastBlock, Side.BOTTOM)
-                            && LightingUtil.canSpreadLightInto(block, Side.TOP)) {
-                        chunk.setSunlight(x, y, z, Chunk.MAX_LIGHT);
+                    if (SUNLIGHT_RULES.propagateValue(sunlightMax, Side.BOTTOM, lastBlock) == sunlightMax
+                            && SUNLIGHT_RULES.canSpreadOutOf(lastBlock, Side.BOTTOM) && SUNLIGHT_RULES.canSpreadInto(block, Side.TOP)) {
+                        chunk.setSunlight(x, y, z, sunlightMax);
                         lastBlock = block;
-                    } else {
-                        break;
                     }
                 }
                 tops[x + Chunk.SIZE_X * z] = (short) y;
             }
         }
 
+        BatchPropagator lightPropagator = new BatchPropagator(LIGHT_RULES, new SingleChunkView(LIGHT_RULES, chunk));
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 if (tops[x + Chunk.SIZE_X * z] < top) {
@@ -71,49 +81,28 @@ public final class InternalLightProcessor {
                     }
                     if (block.getLuminance() > 0) {
                         chunk.setLight(x, y, z, block.getLuminance());
-                        spreadLightInternal(chunk, x, y, z, block);
+                        lightPropagator.propagateFrom(new Vector3i(x, y, z), block);
                     }
                 }
             }
         }
-    }
-
-    private static void spreadLightInternal(Chunk chunk, int x, int y, int z, Block block) {
-        byte lightValue = chunk.getLight(x, y, z);
-        if (lightValue <= 1) {
-            return;
-        }
-
-        // TODO: use custom bounds checked iterator for this
-        for (Side adjDir : Side.values()) {
-            int adjX = x + adjDir.getVector3i().x;
-            int adjY = y + adjDir.getVector3i().y;
-            int adjZ = z + adjDir.getVector3i().z;
-            if (chunk.isInBounds(adjX, adjY, adjZ)) {
-                byte adjLightValue = chunk.getLight(adjX, adjY, adjZ);
-                Block adjBlock = chunk.getBlock(adjX, adjY, adjZ);
-                if (adjLightValue < lightValue - 1 && LightingUtil.canSpreadLightOutOf(block, adjDir) && LightingUtil.canSpreadLightInto(adjBlock, adjDir.reverse())) {
-                    chunk.setLight(adjX, adjY, adjZ, (byte) (lightValue - 1));
-                    spreadLightInternal(chunk, adjX, adjY, adjZ, adjBlock);
-                }
-            }
-        }
+        lightPropagator.process();
     }
 
     private static void spreadSunlightInternal(Chunk chunk, int x, int y, int z, Block block) {
         byte lightValue = chunk.getSunlight(x, y, z);
 
-        if (y > 0 && LightingUtil.canSpreadLightOutOf(block, Side.BOTTOM)) {
+        if (y > 0 && SUNLIGHT_RULES.canSpreadOutOf(block, Side.BOTTOM)) {
             Block adjBlock = chunk.getBlock(x, y - 1, z);
-            if (chunk.getSunlight(x, y - 1, z) < lightValue - 1 && LightingUtil.canSpreadLightInto(adjBlock, Side.TOP)) {
+            if (chunk.getSunlight(x, y - 1, z) < lightValue - 1 && SUNLIGHT_RULES.canSpreadInto(adjBlock, Side.TOP)) {
                 chunk.setSunlight(x, y - 1, z, (byte) (lightValue - 1));
                 spreadSunlightInternal(chunk, x, y - 1, z, adjBlock);
             }
         }
 
-        if (y < Chunk.SIZE_Y && lightValue < Chunk.MAX_LIGHT && LightingUtil.canSpreadLightOutOf(block, Side.TOP)) {
+        if (y < Chunk.SIZE_Y && lightValue < Chunk.MAX_LIGHT && SUNLIGHT_RULES.canSpreadOutOf(block, Side.TOP)) {
             Block adjBlock = chunk.getBlock(x, y + 1, z);
-            if (chunk.getSunlight(x, y + 1, z) < lightValue - 1 && LightingUtil.canSpreadLightInto(adjBlock, Side.BOTTOM)) {
+            if (chunk.getSunlight(x, y + 1, z) < lightValue - 1 && SUNLIGHT_RULES.canSpreadInto(adjBlock, Side.BOTTOM)) {
                 chunk.setSunlight(x, y + 1, z, (byte) (lightValue - 1));
                 spreadSunlightInternal(chunk, x, y + 1, z, adjBlock);
             }
@@ -127,10 +116,10 @@ public final class InternalLightProcessor {
             int adjX = x + adjDir.getVector3i().x;
             int adjZ = z + adjDir.getVector3i().z;
 
-            if (chunk.isInBounds(adjX, y, adjZ) && LightingUtil.canSpreadLightOutOf(block, adjDir)) {
+            if (chunk.isInBounds(adjX, y, adjZ) && SUNLIGHT_RULES.canSpreadOutOf(block, adjDir)) {
                 byte adjLightValue = chunk.getSunlight(adjX, y, adjZ);
                 Block adjBlock = chunk.getBlock(adjX, y, adjZ);
-                if (adjLightValue < lightValue - 1 && LightingUtil.canSpreadLightInto(adjBlock, adjDir.reverse())) {
+                if (adjLightValue < lightValue - 1 && SUNLIGHT_RULES.canSpreadInto(adjBlock, adjDir.reverse())) {
                     chunk.setSunlight(adjX, y, adjZ, (byte) (lightValue - 1));
                     spreadSunlightInternal(chunk, adjX, y, adjZ, adjBlock);
                 }

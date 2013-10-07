@@ -32,7 +32,7 @@ import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.lighting.InternalLightProcessor;
+import org.terasology.world.propagation.light.InternalLightProcessor;
 
 import static org.junit.Assert.assertEquals;
 
