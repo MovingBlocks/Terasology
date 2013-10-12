@@ -19,8 +19,8 @@
 
 uniform sampler2D texSceneOpaqueDepth;
 
-#define SAMPLES 300.0
-#define STARTING_POINT 128.0 // defines the amount of samples used / the starting point
+#define SAMPLES 64.0
+#define STARTING_POINT 64.0
 #define STEP_SIZE STARTING_POINT / SAMPLES
 
 uniform vec2 texelSize;
@@ -45,13 +45,22 @@ void main() {
     // TODO: As costly as in the deferred light geometry pass - frustum ray method would be great here
     vec3 worldPosition = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invViewProjMatrix);
 
+#if defined (INTERLEAVED_SAMPLING)
+    const float samplingPixelArea = 8; // ^2
+    float stepSize = STEP_SIZE * 64.0;
+    float startingPoint =
+        STARTING_POINT - (mod(gl_TexCoord[0].x / texelSize.x, samplingPixelArea) * (samplingPixelArea - 1) + mod(gl_TexCoord[0].y / texelSize.y, samplingPixelArea)) * STEP_SIZE;
+#else
+    float stepSize = STEP_SIZE;
+    float startingPoint = STARTING_POINT;
+#endif
+
     vec2 projectedPos = gl_TexCoord[0].xy;
 
-    // Guess a position for fragments that have been projected to the far plane (e.g. the sky)
-    float len = length(worldPosition.xyz);
-    worldPosition.xyz = clamp(len, 0.0,  STARTING_POINT) * (worldPosition.xyz / len);
-
     vec3 lightWorldSpaceVertPos = worldPosition.xyz + activeCameraToLightSpace;
+
+    // Clamp points that have been project to the far plan so the effect is also available on the skysphere
+   lightWorldSpaceVertPos.xyz = normalize(lightWorldSpaceVertPos) * 128.0;
 
 //    float L = volumetricLightingL0 * exp(-STARTING_POINT * volumetricLightingTau);
     float L = 0.0;
@@ -59,16 +68,6 @@ void main() {
     vec4 lightViewSpaceVertPos = lightViewMatrix * vec4(lightWorldSpaceVertPos.x, lightWorldSpaceVertPos.y, lightWorldSpaceVertPos.z, 1.0);
     vec3 viewDir = normalize(-lightViewSpaceVertPos.xyz);
     vec4 viewSpacePosition = lightViewSpaceVertPos;
-
-#if defined (INTERLEAVED_SAMPLING)
-    const float samplingPixelArea = 8; // ^2
-    const float stepSize = STEP_SIZE * 64.0;
-    float startingPoint =
-        STARTING_POINT - (mod(gl_TexCoord[0].x / texelSize.x, samplingPixelArea) * (samplingPixelArea - 1) + mod(gl_TexCoord[0].y / texelSize.y, samplingPixelArea)) * STEP_SIZE;
-#else
-    const float stepSize = STEP_SIZE;
-    const float startingPoint = STARTING_POINT;
-#endif
 
     for (float l = startingPoint - stepSize; l >= 0; l -= stepSize) {
         viewSpacePosition.xyz += stepSize * viewDir.xyz;
@@ -82,7 +81,7 @@ void main() {
 
 #if defined (CLOUD_SHADOWS)
         // Modulate volumetric lighting with some fictional cloud shadows
-        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 4.0 + timeToTick(time, 0.002)).r * 5.0, 0.0, 1.0);
+        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 4.0 + timeToTick(time, 0.01)).r * 5.0, 0.0, 1.0);
 #endif
 
         float d = clamp(length(viewSpacePosition.xyz), 0.1, startingPoint);

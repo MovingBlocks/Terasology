@@ -206,3 +206,40 @@ bool epsilonEquals(float val, float expectedResult) {
 bool epsilonEqualsOne(float val) {
     return epsilonEquals(val, 1.0);
 }
+
+vec3 cubizePoint(vec3 pos) {
+    vec3 f = abs(pos);
+    vec3 result = pos;
+
+    if (f.y >= f.x && f.y >= f.z) {
+        if (pos.y > 0) {
+            result.y = 1.0;
+        }
+        else {
+            // bottom face
+            result.y = -1.0;
+        }
+    }
+    else if (f.x >= f.y && f.x >= f.z) {
+        if (pos.x > 0) {
+            // right face
+            result.x = 1.0;
+        }
+        else {
+            // left face
+            result.x = -1.0;
+        }
+    }
+    else {
+        if (pos.z > 0) {
+            // front face
+            result.z = 1.0;
+        }
+        else {
+            // back face
+            result.z = -1.0;
+        }
+    }
+
+    return result;
+}
