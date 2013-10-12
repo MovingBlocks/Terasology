@@ -15,10 +15,12 @@
  */
 package org.terasology.rendering.nui;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.lwjgl.opengl.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -26,30 +28,46 @@ import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 
-import java.util.Arrays;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glScissor;
 
 /**
  * @author Immortius
  */
 public class LwjglCanvas implements Canvas {
 
+    private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
+
     private CanvasState state;
 
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
 
+    private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
+
     public void preRender() {
         state = new CanvasState(Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
+        glScissor(0, 0, Display.getWidth(), Display.getHeight());
+        glEnable(GL_SCISSOR_TEST);
     }
 
     public void postRender() {
+        glDisable(GL_SCISSOR_TEST);
+        if (!subregionStack.isEmpty()) {
+            logger.error("Subregions are not being correctly ended");
+            while (!subregionStack.isEmpty()) {
+                subregionStack.pop().close();
+            }
+        }
         Iterator<Map.Entry<TextCacheKey, Map<Material, Mesh>>> textIterator = cachedText.entrySet().iterator();
         while (textIterator.hasNext()) {
             Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
@@ -64,8 +82,8 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public SubRegion subRegion(Rect2i region) {
-        return new LwjglSubRegion(region);
+    public SubRegion subRegion(Rect2i region, boolean crop) {
+        return new LwjglSubRegion(region, crop);
     }
 
     @Override
@@ -94,16 +112,6 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void setTextAlignment(HorizontalAlignment value) {
-        state.horizontalTextAlignment = value;
-    }
-
-    @Override
-    public void setTextAlignment(VerticalAlignment value) {
-        state.verticalTextAlignment = value;
-    }
-
-    @Override
     public void drawText(Font font, String text) {
         drawTextShadowed(font, text, null);
     }
@@ -115,20 +123,7 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawTextShadowed(Font font, String text, Color shadowColor) {
-        TextCacheKey key = new TextCacheKey(text, font, state.textColor, shadowColor);
-        usedText.add(key);
-        Map<Material, Mesh> fontMesh = cachedText.get(key);
-        if (fontMesh == null) {
-            List<String> lines = Arrays.asList(text.split("\\r?\\n"));
-            fontMesh = font.createStringMesh(lines, state.textColor, shadowColor);
-            cachedText.put(key, fontMesh);
-        }
-
-        for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
-            entry.getKey().bindTextures();
-            entry.getKey().setFloat2("offset", state.offset.x, state.offset.y);
-            entry.getValue().render();
-        }
+        drawTextShadowed(font, text, Integer.MAX_VALUE, shadowColor);
     }
 
     @Override
@@ -144,7 +139,7 @@ public class LwjglCanvas implements Canvas {
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
-            entry.getKey().setFloat2("offset", state.offset.x, state.offset.y);
+            entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX(), state.getAbsoluteOffsetY());
             entry.getValue().render();
         }
     }
@@ -152,10 +147,8 @@ public class LwjglCanvas implements Canvas {
     private static class CanvasState {
         public Rect2i region;
         public Rect2i cropRegion;
+        public boolean cropped;
         public Color textColor = Color.WHITE;
-
-        public HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.LEFT;
-        public VerticalAlignment verticalTextAlignment = VerticalAlignment.TOP;
 
         public Vector2i offset = new Vector2i();
 
@@ -166,26 +159,59 @@ public class LwjglCanvas implements Canvas {
         public CanvasState(Rect2i region, Rect2i cropRegion) {
             this.region = region;
             this.cropRegion = cropRegion;
+            this.cropped = true;
+        }
+
+        public int getAbsoluteOffsetX() {
+            return offset.x + region.minX();
+        }
+
+        public int getAbsoluteOffsetY() {
+            return offset.y + region.minY();
         }
     }
 
     private class LwjglSubRegion implements SubRegion {
 
         private CanvasState previousState;
+        private boolean disposed;
 
-        public LwjglSubRegion(Rect2i region) {
-            int left = region.minX() + state.region.minX();
-            int right = left + region.width();
-            int top = region.minY() + state.region.minY();
-            int bottom = top + region.height();
+        public LwjglSubRegion(Rect2i region, boolean crop) {
             previousState = state;
-            //state = new CanvasState();
-            //glOrtho(0, Display.getWidth(), Display.getHeight(), 0, -32, 32);
+            subregionStack.push(this);
+
+            int left = region.minX() + state.region.minX();
+            int right = region.maxX() + state.region.minX();
+            int top = region.minY() + state.region.minY();
+            int bottom = region.maxY() + state.region.minY();
+            Rect2i subRegion = Rect2i.createFromMinAndMax(left, top, right, bottom);
+            if (crop) {
+                int cropLeft = Math.max(left, state.cropRegion.minX());
+                int cropRight = Math.min(right, state.cropRegion.maxX());
+                int cropTop = Math.max(top, state.cropRegion.minY());
+                int cropBottom = Math.min(bottom, state.cropRegion.maxY());
+                state = new CanvasState(subRegion, Rect2i.createFromMinAndMax(cropLeft, cropTop, cropRight, cropBottom));
+                glScissor(cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop);
+            } else {
+                state = new CanvasState(subRegion);
+            }
         }
 
         @Override
         public void close() {
-            state = previousState;
+            if (!disposed) {
+                disposed = true;
+                LwjglSubRegion region = subregionStack.pop();
+                while (!region.equals(this)) {
+                    logger.error("UI Subregions being closed in an incorrect order");
+                    region.close();
+                    region = subregionStack.pop();
+                }
+                if (state.cropped) {
+                    glScissor(previousState.region.minX(), previousState.region.minY(), previousState.region.width(), previousState.region.height());
+                }
+                state = previousState;
+            }
         }
     }
 
