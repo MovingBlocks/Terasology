@@ -16,6 +16,8 @@
 
 package org.terasology.asset;
 
+import java.util.Objects;
+
 /**
  *
  */
@@ -34,4 +36,19 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
         return uri;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof  AbstractAsset) {
+            return Objects.equals(uri, ((AbstractAsset) obj).uri);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return uri.hashCode();
+    }
 }

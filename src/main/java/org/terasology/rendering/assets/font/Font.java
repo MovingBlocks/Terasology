@@ -16,17 +16,34 @@
 
 package org.terasology.rendering.assets.font;
 
-import org.newdawn.slick.Color;
 import org.terasology.asset.Asset;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.nui.Color;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 public interface Font extends Asset<FontData> {
 
-    void drawString(int x, int y, String text, Color color);
+    void drawString(int x, int y, String text, org.newdawn.slick.Color color);
+
+    /**
+     * Produces a map of texture to mesh to render the given text.
+     *
+     * @param lines
+     * @return A map of texture to mesh, where each texture is a font page and each mesh is the characters of that mesh page.
+     */
+    Map<Material, Mesh> createTextMesh(List<String> lines, Color color);
+
+    Map<Material, Mesh> createStringMesh(List<String> lines, Color color, Color shadowColor);
 
     int getWidth(String text);
+
+    int getWidth(Character c);
 
     int getHeight(String text);
 }

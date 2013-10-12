@@ -56,7 +56,7 @@ public final class SavedGamesPathFinder {
                 Ole32.INSTANCE.CoTaskMemFree(outPath.getValue());
                 return path;
             }
-        } catch (UnsatisfiedLinkError e) {
+        } catch (UnsatisfiedLinkError|NoClassDefFoundError e) {
             return findWindowsPathFallback(folderId);
         }
         return null;
@@ -77,7 +77,7 @@ public final class SavedGamesPathFinder {
                 }
                 return new String(outPath, 0, end);
             }
-        } catch (UnsatisfiedLinkError e) {
+        } catch (UnsatisfiedLinkError|NoClassDefFoundError e) {
             System.out.println("SHGetFolderPath not available");
         }
         return null;

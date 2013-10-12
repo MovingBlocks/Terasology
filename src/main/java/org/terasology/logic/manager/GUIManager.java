@@ -48,6 +48,7 @@ import org.terasology.rendering.gui.windows.UIMenuJoinServer;
 import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
+import org.terasology.rendering.gui.windows.UINUITest;
 import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
@@ -100,6 +101,7 @@ public class GUIManager implements ComponentSystem {
         registeredWindows.put("inventory", UIScreenInventory.class);
         registeredWindows.put("chat", UIScreenConsole.class);
         registeredWindows.put("hud", UIScreenHUD.class);
+        registeredWindows.put("nuitest", UINUITest.class);
     }
 
     /**
@@ -352,9 +354,9 @@ public class GUIManager implements ComponentSystem {
         UIWindow messageWindow = new UIMessageBox(title, text);
         messageWindow.open();
     }
-    
-    
-    
+
+
+
     /*
        The following methods are responsible for receiving and processing mouse and keyboard inputs.
     */
@@ -403,7 +405,7 @@ public class GUIManager implements ComponentSystem {
     public void shutdown() {
 
     }
-    
+
     /*
       The following events will capture the mouse and keyboard inputs. They have the highest priority so the GUI will always come first.
       If a window is "modal" it will consume all input events so no other than the GUI will handle these events.

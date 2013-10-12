@@ -17,8 +17,14 @@
 package org.terasology.rendering.assets.font;
 
 import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
+import org.terasology.persistence.ModuleContext;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.io.BufferedReader;
@@ -114,7 +120,13 @@ public class FontLoader implements AssetLoader<FontData> {
             if (texture == null) {
                 throw new IOException("Failed to load font - unable to resolve font page '" + textureName + "'");
             }
-            builder.addPage(pageId, texture);
+
+            MaterialData materialData = new MaterialData(Assets.getShader("engine:font"));
+            materialData.setParam("texture", texture);
+            AssetUri matName = new AssetUri(AssetType.MATERIAL, moduleName, textureName + "_font");
+            Material pageMat = Assets.generateAsset(matName, materialData, Material.class);
+
+            builder.addPage(pageId, texture, pageMat);
         } else {
             throw new IOException("Failed to load font - invalid page line '" + pageInfo + "'");
         }

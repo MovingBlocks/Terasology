@@ -336,6 +336,11 @@ public class AssetManager {
 //        }
     }
 
+    public void dispose(Asset asset) {
+        asset.dispose();
+        assetCache.remove(asset.getURI());
+    }
+
     public <U extends AssetData> Asset<U> generateAsset(AssetUri uri, U data) {
         AssetFactory assetFactory = factories.get(uri.getAssetType());
         if (assetFactory == null) {

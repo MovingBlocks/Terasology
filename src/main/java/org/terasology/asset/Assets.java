@@ -285,4 +285,7 @@ public final class Assets {
         return null;
     }
 
+    public static void dispose(Asset asset) {
+        CoreRegistry.get(AssetManager.class).dispose(asset);
+    }
 }

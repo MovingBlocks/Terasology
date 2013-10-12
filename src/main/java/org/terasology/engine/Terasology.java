@@ -15,10 +15,10 @@
  */
 package org.terasology.engine;
 
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 
+import javax.swing.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -55,7 +55,8 @@ public final class Terasology {
             engine.run(new StateMainMenu());
             engine.dispose();
         } catch (Throwable t) {
-            LoggerFactory.getLogger(Terasology.class).error("Uncaught Exception", t);
+            t.printStackTrace();
+            JOptionPane.showMessageDialog(null, t.getMessage(), "Fatal Error", JOptionPane.ERROR_MESSAGE);
         }
         System.exit(0);
     }

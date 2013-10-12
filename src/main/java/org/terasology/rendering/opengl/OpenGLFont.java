@@ -15,16 +15,26 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontCharacter;
 import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.Color;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -50,7 +60,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     // This function shouldn't be here, should be in a Canvas style class most likely.
-    public void drawString(int x, int y, String text, Color color) {
+    public void drawString(int x, int y, String text, org.newdawn.slick.Color color) {
         if (isDisposed()) {
             return;
         }
@@ -95,6 +105,50 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         }
     }
 
+    @Override
+    public Map<Material, Mesh> createTextMesh(List<String> lines, Color color) {
+        return createStringMesh(lines, color, null);
+    }
+
+    @Override
+    public Map<Material, Mesh> createStringMesh(List<String> lines, Color color, Color shadowColor) {
+        Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
+
+        if (shadowColor != null) {
+            addLinesToMesh(lines, 1, 1, shadowColor, meshBuilders);
+        }
+        addLinesToMesh(lines, 0, 0, color, meshBuilders);
+
+
+        Map<Material, Mesh> result = Maps.newLinkedHashMap();
+        for (Map.Entry<Material, MeshBuilder> entry : meshBuilders.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().getMesh());
+        }
+        return result;
+    }
+
+    private void addLinesToMesh(List<String> lines, int offsetX, int offsetY, Color color, Map<Material, MeshBuilder> meshBuilders) {
+        int x = offsetX;
+        int y = offsetY;
+        for (String line : lines) {
+            for (char c : line.toCharArray()) {
+                FontCharacter character = data.getCharacter(c);
+                if (character != null && character.getPage() != null) {
+                    MeshBuilder builder = meshBuilders.get(character.getPageMat());
+                    if (builder == null) {
+                        builder = new MeshBuilder();
+                        meshBuilders.put(character.getPageMat(), builder);
+                    }
+                    builder.addCharacter(character, x, y, color);
+
+                    x += character.getxAdvance();
+                }
+            }
+            x = offsetX;
+            y += data.getLineHeight();
+        }
+    }
+
     public int getWidth(String text) {
         int largestWidth = 0;
         int currentWidth = 0;
@@ -110,6 +164,15 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
             }
         }
         return Math.max(largestWidth, currentWidth);
+    }
+
+    @Override
+    public int getWidth(Character c) {
+        FontCharacter character = data.getCharacter(c);
+        if (character != null) {
+            return character.getxAdvance();
+        }
+        return 0;
     }
 
     public int getHeight(String text) {
@@ -135,5 +198,65 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     @Override
     public boolean isDisposed() {
         return data == null;
+    }
+
+    private static class MeshBuilder {
+        private MeshData meshData = new MeshData();
+        private int vertCount;
+
+        public void addCharacter(FontCharacter character, int x, int y, Color color) {
+            float top = y + character.getyOffset();
+            float bottom = top + character.getHeight();
+            float left = x + character.getxOffset();
+            float right = left + character.getWidth();
+            float texTop = character.getY();
+            float texBottom = texTop + character.getTexHeight();
+            float texLeft = character.getX();
+            float texRight = texLeft + character.getTexWidth();
+
+            meshData.getVertices().add(left);
+            meshData.getVertices().add(top);
+            meshData.getVertices().add(0);
+            meshData.getTexCoord0().add(texLeft);
+            meshData.getTexCoord0().add(texTop);
+
+            meshData.getVertices().add(right);
+            meshData.getVertices().add(top);
+            meshData.getVertices().add(0);
+            meshData.getTexCoord0().add(texRight);
+            meshData.getTexCoord0().add(texTop);
+
+            meshData.getVertices().add(right);
+            meshData.getVertices().add(bottom);
+            meshData.getVertices().add(0);
+            meshData.getTexCoord0().add(texRight);
+            meshData.getTexCoord0().add(texBottom);
+
+            meshData.getVertices().add(left);
+            meshData.getVertices().add(bottom);
+            meshData.getVertices().add(0);
+            meshData.getTexCoord0().add(texLeft);
+            meshData.getTexCoord0().add(texBottom);
+
+            for (int i = 0; i < 4; ++i) {
+                meshData.getColors().add(color.rf());
+                meshData.getColors().add(color.gf());
+                meshData.getColors().add(color.bf());
+                meshData.getColors().add(color.af());
+            }
+
+            meshData.getIndices().add(vertCount);
+            meshData.getIndices().add(vertCount + 1);
+            meshData.getIndices().add(vertCount + 2);
+            meshData.getIndices().add(vertCount);
+            meshData.getIndices().add(vertCount + 2);
+            meshData.getIndices().add(vertCount + 3);
+
+            vertCount += 4;
+        }
+
+        public Mesh getMesh() {
+            return Assets.generateAsset(AssetType.MESH, meshData, Mesh.class);
+        }
     }
 }

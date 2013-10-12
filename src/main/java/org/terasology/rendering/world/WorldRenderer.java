@@ -236,11 +236,11 @@ public final class WorldRenderer {
                 // adjust proximity chunk list
                 int vd2 = viewingDistance / 2;
 
-                Rect2i oldView = new Rect2i(chunkPosX - vd2, chunkPosZ - vd2, viewingDistance, viewingDistance);
-                Rect2i newView = new Rect2i(newChunkPosX - vd2, newChunkPosZ - vd2, viewingDistance, viewingDistance);
+                Rect2i oldView = Rect2i.createFromMinAndSize(chunkPosX - vd2, chunkPosZ - vd2, viewingDistance, viewingDistance);
+                Rect2i newView = Rect2i.createFromMinAndSize(newChunkPosX - vd2, newChunkPosZ - vd2, viewingDistance, viewingDistance);
 
                 // remove
-                List<Rect2i> removeRects = Rect2i.subtractEqualsSized(oldView, newView);
+                List<Rect2i> removeRects = Rect2i.difference(oldView, newView);
                 for (Rect2i r : removeRects) {
                     for (int x = r.minX(); x < r.maxX(); ++x) {
                         for (int y = r.minY(); y < r.maxY(); ++y) {
@@ -254,7 +254,7 @@ public final class WorldRenderer {
                 }
 
                 // add
-                List<Rect2i> addRects = Rect2i.subtractEqualsSized(newView, oldView);
+                List<Rect2i> addRects = Rect2i.difference(newView, oldView);
                 for (Rect2i r : addRects) {
                     for (int x = r.minX(); x < r.maxX(); ++x) {
                         for (int y = r.minY(); y < r.maxY(); ++y) {

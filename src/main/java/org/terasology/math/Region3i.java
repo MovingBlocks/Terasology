@@ -33,7 +33,7 @@ public class Region3i implements Iterable<Vector3i> {
     /**
      * Constructs an empty Region with size (0,0,0).
      */
-    public Region3i() {
+    private Region3i() {
     }
 
     private Region3i(Vector3i min, Vector3i size) {

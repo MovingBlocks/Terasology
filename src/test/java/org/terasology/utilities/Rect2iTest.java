@@ -22,27 +22,18 @@ import org.terasology.math.Rect2i;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class Rect2iTest {
 
-    private Rect2i findAnyRectWithArea(List<Rect2i> rects, int area) {
-        for (Rect2i r : rects) {
-            if (r.area() == area) {
-                return r;
-            }
-        }
-
-        return null;
-    }
-
     @Test
     public void testSubtraction0() {
-        Rect2i a = new Rect2i(1, 2, 3, 3);
-        Rect2i b = new Rect2i(0, 4, 3, 3);
+        Rect2i a = Rect2i.createFromMinAndSize(1, 2, 3, 3);
+        Rect2i b = Rect2i.createFromMinAndSize(0, 4, 3, 3);
 
-        List<Rect2i> sub = Rect2i.subtractEqualsSized(a, b);
+        List<Rect2i> sub = Rect2i.difference(a, b);
 
-        assertEquals(3, sub.size());
+        assertEquals(2, sub.size());
 
         int area = 0;
         for (Rect2i r : sub) {
@@ -51,58 +42,19 @@ public class Rect2iTest {
 
         assertEquals(7, area);
 
-        Rect2i r0 = findAnyRectWithArea(sub, 4);
-        assertEquals(1, r0.posX);
-        assertEquals(2, r0.posY);
-
-        Rect2i r1 = findAnyRectWithArea(sub, 2);
-        assertEquals(3, r1.posX);
-        assertEquals(2, r1.posY);
-
-        Rect2i r2 = findAnyRectWithArea(sub, 1);
-        assertEquals(3, r2.posX);
-        assertEquals(4, r2.posY);
+        assertTrue(sub.contains(Rect2i.createFromMinAndSize(1, 2, 3, 2)));
+        assertTrue(sub.contains(Rect2i.createFromMinAndSize(3, 4, 1, 1)));
     }
 
     @Test
     public void testSubtraction1() {
-        Rect2i a = new Rect2i(1, 2, 3, 3);
-        Rect2i b = new Rect2i(3, 2, 3, 3);
+        Rect2i a = Rect2i.createFromMinAndSize(1, 2, 3, 3);
+        Rect2i b = Rect2i.createFromMinAndSize(3, 2, 3, 3);
 
-        List<Rect2i> sub = Rect2i.subtractEqualsSized(a, b);
-
-        assertEquals(1, sub.size());
-
-        int area = 0;
-        for (Rect2i r : sub) {
-            area += r.area();
-        }
-
-        assertEquals(6, area);
-
-        Rect2i r0 = findAnyRectWithArea(sub, 6);
-        assertEquals(1, r0.posX);
-        assertEquals(2, r0.posY);
-    }
-
-    @Test
-    public void testSubtraction2() {
-        Rect2i a = new Rect2i(3, 2, 3, 3);
-        Rect2i b = new Rect2i(1, 2, 3, 3);
-
-        List<Rect2i> sub = Rect2i.subtractEqualsSized(a, b);
+        List<Rect2i> sub = Rect2i.difference(a, b);
 
         assertEquals(1, sub.size());
-
-        int area = 0;
-        for (Rect2i r : sub) {
-            area += r.area();
-        }
-
-        assertEquals(6, area);
-
-        Rect2i r0 = findAnyRectWithArea(sub, 6);
-        assertEquals(4, r0.posX);
-        assertEquals(2, r0.posY);
+        assertEquals(Rect2i.createFromMinAndSize(1, 2, 2, 3), sub.get(0));
     }
+
 }

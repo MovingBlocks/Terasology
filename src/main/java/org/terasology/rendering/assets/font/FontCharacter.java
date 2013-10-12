@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets.font;
 
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
@@ -30,8 +31,9 @@ public class FontCharacter {
     private int yOffset;
     private int xAdvance;
     private Texture page;
+    private Material pageMat;
 
-    public FontCharacter(float x, float y, int width, int height, int xOffset, int yOffset, int xAdvance, Texture page) {
+    public FontCharacter(float x, float y, int width, int height, int xOffset, int yOffset, int xAdvance, Texture page, Material pageMat) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -40,6 +42,7 @@ public class FontCharacter {
         this.yOffset = yOffset;
         this.xAdvance = xAdvance;
         this.page = page;
+        this.pageMat = pageMat;
     }
 
     public float getX() {
@@ -80,5 +83,9 @@ public class FontCharacter {
 
     public Texture getPage() {
         return page;
+    }
+
+    public Material getPageMat() {
+        return pageMat;
     }
 }

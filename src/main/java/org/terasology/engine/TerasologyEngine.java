@@ -136,28 +136,33 @@ public class TerasologyEngine implements GameEngine {
         }
         initLogger();
 
-        logger.info("Initializing Terasology...");
-        logger.info(TerasologyVersion.getInstance().toString());
-        logger.info("Home path: {}", PathManager.getInstance().getHomePath());
-        logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
-        logger.info("Java version: {}", System.getProperty("java.version"));
+        try {
+            logger.info("Initializing Terasology...");
+            logger.info(TerasologyVersion.getInstance().toString());
+            logger.info("Home path: {}", PathManager.getInstance().getHomePath());
+            logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
+            logger.info("Java version: {}", System.getProperty("java.version"));
 
-        initConfig();
+            initConfig();
 
-        initNativeLibs();
-        initTimer(); // Dependent on LWJGL
-        initManagers();
-        initDisplay();
-        initOpenGL();
-        initOpenAL();
-        initControls();
-        updateInputConfig();
-        CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
+            initNativeLibs();
+            initTimer(); // Dependent on LWJGL
+            initManagers();
+            initDisplay();
+            initOpenGL();
+            initOpenAL();
+            initControls();
+            updateInputConfig();
+            CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
 
-        if (config.getSystem().isMonitoringEnabled()) {
-            new AdvancedMonitor().setVisible(true);
+            if (config.getSystem().isMonitoringEnabled()) {
+                new AdvancedMonitor().setVisible(true);
+            }
+            initialised = true;
+        } catch (Throwable t) {
+            logger.error("Failed to initialise Terasology", t);
+            throw new RuntimeException("Failed to initialise Terasology", t);
         }
-        initialised = true;
     }
 
     private void initConfig() {
@@ -212,17 +217,22 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void run(GameState initialState) {
-        CoreRegistry.putPermanently(GameEngine.class, this);
-        if (!initialised) {
-            init();
+        try {
+            CoreRegistry.putPermanently(GameEngine.class, this);
+            if (!initialised) {
+                init();
+            }
+            changeState(initialState);
+            running = true;
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+
+            mainLoop();
+
+            cleanup();
+        } catch (Throwable t) {
+            logger.error("Uncaught exception", t);
+            throw new RuntimeException("Uncaught exception", t);
         }
-        changeState(initialState);
-        running = true;
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-
-        mainLoop();
-
-        cleanup();
     }
 
     @Override
@@ -232,13 +242,18 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void dispose() {
-        if (!running) {
-            disposed = true;
-            initialised = false;
-            Mouse.destroy();
-            Keyboard.destroy();
-            Display.destroy();
-            audioManager.dispose();
+        try {
+            if (!running) {
+                disposed = true;
+                initialised = false;
+                Mouse.destroy();
+                Keyboard.destroy();
+                Display.destroy();
+                audioManager.dispose();
+            }
+        } catch (Throwable t) {
+            logger.error("Uncaught exception", t);
+            throw new RuntimeException("Uncaught exception", t);
         }
     }
 

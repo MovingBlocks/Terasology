@@ -18,6 +18,14 @@ package org.terasology.rendering.assets.font;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.engine.Terasology;
+import org.terasology.engine.TerasologyConstants;
+import org.terasology.persistence.ModuleContext;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.Map;
@@ -29,6 +37,7 @@ public class FontDataBuilder {
 
     private int lineHeight;
     private TIntObjectMap<Texture> pages = new TIntObjectHashMap<>();
+    private TIntObjectMap<Material> pageMats = new TIntObjectHashMap<>();
     private Map<Integer, FontCharacter> characters = Maps.newHashMap();
 
     private int currentCharacterId;
@@ -52,8 +61,9 @@ public class FontDataBuilder {
         this.lineHeight = lineHeight;
     }
 
-    public void addPage(int pageId, Texture texture) {
+    public void addPage(int pageId, Texture texture, Material material) {
         pages.put(pageId, texture);
+        pageMats.put(pageId, material);
     }
 
     public FontDataBuilder startCharacter(int characterId) {
@@ -107,7 +117,7 @@ public class FontDataBuilder {
     public FontDataBuilder endCharacter() {
         Texture page = pages.get(characterPage);
         FontCharacter character = new FontCharacter(((float) characterX / page.getWidth()), ((float) characterY / page.getHeight()),
-                characterWidth, characterHeight, characterXOffset, characterYOffset, characterXAdvance, page);
+                characterWidth, characterHeight, characterXOffset, characterYOffset, characterXAdvance, page, pageMats.get(characterPage));
         characters.put(currentCharacterId, character);
         return this;
     }
