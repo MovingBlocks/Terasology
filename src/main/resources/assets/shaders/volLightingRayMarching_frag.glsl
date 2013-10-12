@@ -19,7 +19,7 @@
 
 uniform sampler2D texSceneOpaqueDepth;
 
-#define SAMPLES 64.0
+#define SAMPLES 128.0
 #define STARTING_POINT 64.0
 #define STEP_SIZE STARTING_POINT / SAMPLES
 
@@ -59,8 +59,6 @@ void main() {
 
     vec3 lightWorldSpaceVertPos = worldPosition.xyz + activeCameraToLightSpace;
 
-    // Clamp points that have been project to the far plan so the effect is also available on the skysphere
-   lightWorldSpaceVertPos.xyz = normalize(lightWorldSpaceVertPos) * 128.0;
 
 //    float L = volumetricLightingL0 * exp(-STARTING_POINT * volumetricLightingTau);
     float L = 0.0;
@@ -68,6 +66,10 @@ void main() {
     vec4 lightViewSpaceVertPos = lightViewMatrix * vec4(lightWorldSpaceVertPos.x, lightWorldSpaceVertPos.y, lightWorldSpaceVertPos.z, 1.0);
     vec3 viewDir = normalize(-lightViewSpaceVertPos.xyz);
     vec4 viewSpacePosition = lightViewSpaceVertPos;
+
+    // Clamp points that have been project to the far plan so the effect is also available on the skysphere
+    float distance = length(viewSpacePosition.xyz);
+    viewSpacePosition.xyz = (viewSpacePosition.xyz / distance) * clamp(distance, 0.0, STARTING_POINT * 1.5);
 
     for (float l = startingPoint - stepSize; l >= 0; l -= stepSize) {
         viewSpacePosition.xyz += stepSize * viewDir.xyz;
@@ -81,7 +83,7 @@ void main() {
 
 #if defined (CLOUD_SHADOWS)
         // Modulate volumetric lighting with some fictional cloud shadows
-        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 4.0 + timeToTick(time, 0.01)).r * 5.0, 0.0, 1.0);
+        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 4.0 + timeToTick(time, 0.0025)).r * 5.0, 0.0, 1.0);
 #endif
 
         float d = clamp(length(viewSpacePosition.xyz), 0.1, startingPoint);
