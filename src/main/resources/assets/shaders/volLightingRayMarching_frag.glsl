@@ -69,7 +69,7 @@ void main() {
 
     // Clamp points that have been project to the far plan so the effect is also available on the skysphere
     float distance = length(viewSpacePosition.xyz);
-    viewSpacePosition.xyz = (viewSpacePosition.xyz / distance) * clamp(distance, 0.0, STARTING_POINT * 1.5);
+    viewSpacePosition.xyz = (viewSpacePosition.xyz / distance) * clamp(distance, 0.0, 128.0);
 
     for (float l = startingPoint - stepSize; l >= 0; l -= stepSize) {
         viewSpacePosition.xyz += stepSize * viewDir.xyz;
@@ -79,11 +79,15 @@ void main() {
         screenSpacePosition.xy = screenSpacePosition.xy * vec2(0.5, 0.5) + vec2(0.5, 0.5);
 
         float sd = texture2D(texSceneShadowMap, screenSpacePosition.xy).x;
-        float v = (sd < screenSpacePosition.z) ? 0.0 : volumetricLightingSettings.x;
+        float v = 1.0;
+
+        if (!epsilonEqualsOne(depthOpaque)) {
+          v = (sd + 0.01 < screenSpacePosition.z) ? 0.0 : volumetricLightingSettings.x;
+        }
 
 #if defined (CLOUD_SHADOWS)
         // Modulate volumetric lighting with some fictional cloud shadows
-        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 4.0 + timeToTick(time, 0.0025)).r * 5.0, 0.0, 1.0);
+        v *= clamp(1.0 - texture2D(texSceneClouds, screenSpacePosition.xy * 4.0 + timeToTick(time, 0.005)).r * 5.0, 0.0, 1.0);
 #endif
 
         float d = clamp(length(viewSpacePosition.xyz), 0.1, startingPoint);

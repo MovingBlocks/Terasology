@@ -79,9 +79,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
             Camera activeCamera = worldRenderer.getActiveCamera();
 
             if (activeCamera != null) {
-                float worldFog = worldRenderer.getSmoothedPlayerSunlightValue()
-                        * Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
-
+                float worldFog = Math.max(worldRenderer.getSmoothedPlayerSunlightValue(), 0.2f) * CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition());
                 program.setFloat4("volumetricLightingSettings", worldFog, 0.0f, 0.0f, 0.0f);
             }
         }
