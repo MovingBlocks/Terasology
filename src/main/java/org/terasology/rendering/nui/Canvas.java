@@ -18,6 +18,9 @@ package org.terasology.rendering.nui;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.Texture;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Canvas provides primitive drawing operations for use by the UI.
@@ -119,5 +122,12 @@ public interface Canvas {
      */
     void drawTextShadowed(Font font, String text, int maxWidth, Color shadowColor);
 
+    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode);
+
+    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, Vector2f subTopLeft, Vector2f subBottomRight);
+
+    void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border);
+
+    void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border, Vector2f subTopLeft, Vector2f subBottomRight);
 
 }

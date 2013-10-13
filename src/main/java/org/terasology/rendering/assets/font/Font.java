@@ -37,9 +37,7 @@ public interface Font extends Asset<FontData> {
      * @param lines
      * @return A map of texture to mesh, where each texture is a font page and each mesh is the characters of that mesh page.
      */
-    Map<Material, Mesh> createTextMesh(List<String> lines, Color color);
-
-    Map<Material, Mesh> createStringMesh(List<String> lines, Color color, Color shadowColor);
+    Map<Material, Mesh> createTextMesh(List<String> lines);
 
     int getWidth(String text);
 

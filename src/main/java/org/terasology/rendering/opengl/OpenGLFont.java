@@ -22,7 +22,6 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.math.Vector2i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontCharacter;
@@ -31,7 +30,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.Color;
 
 import java.util.List;
 import java.util.Map;
@@ -106,18 +104,9 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public Map<Material, Mesh> createTextMesh(List<String> lines, Color color) {
-        return createStringMesh(lines, color, null);
-    }
-
-    @Override
-    public Map<Material, Mesh> createStringMesh(List<String> lines, Color color, Color shadowColor) {
+    public Map<Material, Mesh> createTextMesh(List<String> lines) {
         Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
-
-        if (shadowColor != null) {
-            addLinesToMesh(lines, 1, 1, shadowColor, meshBuilders);
-        }
-        addLinesToMesh(lines, 0, 0, color, meshBuilders);
+        addLinesToMesh(lines, meshBuilders);
 
 
         Map<Material, Mesh> result = Maps.newLinkedHashMap();
@@ -127,10 +116,10 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         return result;
     }
 
-    private void addLinesToMesh(List<String> lines, int offsetX, int offsetY, Color color, Map<Material, MeshBuilder> meshBuilders) {
-        int x = offsetX;
-        int y = offsetY;
+    private void addLinesToMesh(List<String> lines, Map<Material, MeshBuilder> meshBuilders) {
+        int y = 0;
         for (String line : lines) {
+            int x = 0;
             for (char c : line.toCharArray()) {
                 FontCharacter character = data.getCharacter(c);
                 if (character != null && character.getPage() != null) {
@@ -139,12 +128,11 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
                         builder = new MeshBuilder();
                         meshBuilders.put(character.getPageMat(), builder);
                     }
-                    builder.addCharacter(character, x, y, color);
+                    builder.addCharacter(character, x, y);
 
                     x += character.getxAdvance();
                 }
             }
-            x = offsetX;
             y += data.getLineHeight();
         }
     }
@@ -204,7 +192,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         private MeshData meshData = new MeshData();
         private int vertCount;
 
-        public void addCharacter(FontCharacter character, int x, int y, Color color) {
+        public void addCharacter(FontCharacter character, int x, int y) {
             float top = y + character.getyOffset();
             float bottom = top + character.getHeight();
             float left = x + character.getxOffset();
@@ -237,13 +225,6 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
             meshData.getVertices().add(0);
             meshData.getTexCoord0().add(texLeft);
             meshData.getTexCoord0().add(texBottom);
-
-            for (int i = 0; i < 4; ++i) {
-                meshData.getColors().add(color.rf());
-                meshData.getColors().add(color.gf());
-                meshData.getColors().add(color.bf());
-                meshData.getColors().add(color.af());
-            }
 
             meshData.getIndices().add(vertCount);
             meshData.getIndices().add(vertCount + 1);

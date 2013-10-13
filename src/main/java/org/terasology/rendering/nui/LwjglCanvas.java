@@ -27,7 +27,9 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.texture.Texture;
 
+import javax.vecmath.Vector2f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -128,20 +130,47 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawTextShadowed(Font font, String text, int maxWidth, Color shadowColor) {
-        TextCacheKey key = new TextCacheKey(text, font, state.textColor, shadowColor, maxWidth);
+        TextCacheKey key = new TextCacheKey(text, font, maxWidth);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
         if (fontMesh == null) {
             List<String> lines = LineBuilder.getLines(font, text, maxWidth);
-            fontMesh = font.createStringMesh(lines, state.textColor, shadowColor);
+            fontMesh = font.createTextMesh(lines);
             cachedText.put(key, fontMesh);
         }
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
+            if (shadowColor != null) {
+                entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX() + 1, state.getAbsoluteOffsetY() + 1);
+                entry.getKey().setFloat4("color", shadowColor.toVector4f());
+                entry.getValue().render();
+            }
+
             entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX(), state.getAbsoluteOffsetY());
+            entry.getKey().setFloat4("color", state.textColor.toVector4f());
             entry.getValue().render();
         }
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, Vector2f subTopLeft, Vector2f subBottomRight) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border, Vector2f subTopLeft, Vector2f subBottomRight) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private static class CanvasState {
@@ -218,22 +247,16 @@ public class LwjglCanvas implements Canvas {
     private static class TextCacheKey {
         private String text;
         private Font font;
-        private Color color;
-        private Color shadowColor;
         private int width = -1;
 
-        public TextCacheKey(String text, Font font, Color color, Color shadowColor) {
+        public TextCacheKey(String text, Font font) {
             this.text = text;
             this.font = font;
-            this.color = color;
-            this.shadowColor = shadowColor;
         }
 
-        public TextCacheKey(String text, Font font, Color color, Color shadowColor, int maxWidth) {
+        public TextCacheKey(String text, Font font, int maxWidth) {
             this.text = text;
             this.font = font;
-            this.color = color;
-            this.shadowColor = shadowColor;
             this.width = maxWidth;
         }
 
@@ -245,7 +268,6 @@ public class LwjglCanvas implements Canvas {
             if (obj instanceof TextCacheKey) {
                 TextCacheKey other = (TextCacheKey) obj;
                 return Objects.equals(text, other.text) && Objects.equals(font, other.font)
-                        && Objects.equals(color, other.color) && Objects.equals(shadowColor, other.shadowColor)
                         && Objects.equals(width, other.width);
             }
             return false;
@@ -253,7 +275,7 @@ public class LwjglCanvas implements Canvas {
 
         @Override
         public int hashCode() {
-            return Objects.hash(text, font, color, shadowColor, width);
+            return Objects.hash(text, font, width);
         }
     }
 }

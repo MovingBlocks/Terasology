@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Moving Blocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.nui;
 
-uniform vec2 offset;
-uniform vec4 color;
+/**
+ * @author Immortius
+ */
+public enum ScaleMode {
+    /**
+     * Stretches to fill the given space
+     */
+    STRETCH,
+    /**
+     * Scales to fill the given space. Parts of the image will be cut off if it is a different shape to the space.
+     */
+    SCALE_FILL,
+    /**
+     * Scales to fit in the given space. There will be gaps if the image is a different shape to the space.
+     */
+    SCALE_FIT,
 
-void main()
-{
-    vec4 pos = gl_Vertex;
-    pos.xy += offset;
-	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * pos;
-    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-    gl_FrontColor = color;
+    /**
+     * Repeats the image to fill the given space
+     */
+    REPEAT
 }
