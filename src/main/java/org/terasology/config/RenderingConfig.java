@@ -64,6 +64,7 @@ public class RenderingConfig {
     private int meshLimit = 20;
     private boolean volumetricLighting;
     private boolean inscattering = true;
+    private boolean localReflections;
     private boolean vSync;
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
@@ -191,7 +192,7 @@ public class RenderingConfig {
     }
 
     public boolean isReflectiveWater() {
-        return reflectiveWater;
+        return reflectiveWater && !localReflections;
     }
 
     public void setReflectiveWater(boolean reflectiveWater) {
@@ -340,6 +341,14 @@ public class RenderingConfig {
 
     public void setVolumetricLighting(boolean volumetricLighting) {
         this.volumetricLighting = volumetricLighting;
+    }
+
+    public boolean isLocalReflections() {
+        return this.localReflections;
+    }
+
+    public void setLocalReflections(boolean localReflections) {
+        this.localReflections = localReflections;
     }
 
     public boolean isInscattering() {

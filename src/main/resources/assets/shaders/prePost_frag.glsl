@@ -17,6 +17,10 @@
 // TODO: define could be removed
 #define CHROMATIC_ABERRATION
 
+#ifdef VOLUMETRIC_LIGHTING
+uniform sampler2D texVolumetricLighting;
+#endif
+
 #ifdef BLOOM
 uniform float bloomFactor;
 
@@ -48,6 +52,10 @@ void main() {
     float b = texture2D(texScene, gl_TexCoord[0].xy - aberrationOffset).b;
 
     vec4 color = vec4(r, ga.x, b, ga.y);
+#endif
+
+#ifdef VOLUMETRIC_LIGHTING
+    color.rgb *= clamp(texture2D(texVolumetricLighting, gl_TexCoord[0].xy).rgb + 0.1, 0.0, 1.0);
 #endif
 
 #ifdef LIGHT_SHAFTS

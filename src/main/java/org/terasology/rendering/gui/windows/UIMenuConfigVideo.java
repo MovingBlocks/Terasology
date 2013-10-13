@@ -132,10 +132,10 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setLightShafts(true);
+                        config.getRendering().setCloudShadows(true);
 
                         config.getRendering().setSsao(false);
                         config.getRendering().setAnimateWater(false);
-                        config.getRendering().setCloudShadows(false);
                         break;
                     case 3:
                         config.getRendering().setFlickeringLight(true);

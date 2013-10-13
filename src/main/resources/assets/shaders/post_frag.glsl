@@ -17,10 +17,6 @@
 uniform sampler2D texScene;
 uniform sampler2D texDepth;
 
-#ifdef VOLUMETRIC_LIGHTING
-uniform sampler2D texVolumetricLighting;
-#endif
-
 uniform sampler3D texColorGradingLut;
 
 #if !defined (NO_BLUR)
@@ -69,16 +65,14 @@ void main() {
 #if defined (MOTION_BLUR)
     vec4 screenSpaceNorm = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth, 1.0);
     vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
-#endif
 
-#ifdef MOTION_BLUR
     vec4 worldSpacePos = invViewProjMatrix * screenSpacePos;
     vec4 normWorldSpacePos = worldSpacePos / worldSpacePos.w;
     vec4 prevScreenSpacePos = prevViewProjMatrix * normWorldSpacePos;
     prevScreenSpacePos /= prevScreenSpacePos.w;
 
-    vec2 velocity = (screenSpacePos.xy - prevScreenSpacePos.xy) / 16.0;
-    velocity = clamp(velocity, vec2(-0.025), vec2(0.025));
+    vec2 velocity = (screenSpacePos.xy - prevScreenSpacePos.xy) / 128.0;
+    velocity = clamp(velocity, vec2(-0.01), vec2(0.01));
 
     vec2 blurTexCoord = gl_TexCoord[0].xy;
     blurTexCoord += velocity;
@@ -105,10 +99,6 @@ void main() {
     vec4 finalColor = mix(color, colorBlur, blur);
 #else
     vec4 finalColor = color;
-#endif
-
-#ifdef VOLUMETRIC_LIGHTING
-    finalColor.rgb = mix(finalColor.rgb, vec3(1.0, 1.0, 1.0), texture2D(texVolumetricLighting, gl_TexCoord[0].xy).r);
 #endif
 
 #ifdef FILM_GRAIN

@@ -292,7 +292,7 @@ public class DefaultRenderingProcess {
         createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
         createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
 
-        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR);
+        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, false, true);
         attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
 
         createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true);

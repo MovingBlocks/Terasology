@@ -67,6 +67,13 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         program.setFloat2("aberrationOffset", aberrationOffsetX, aberrationOffsetY, true);
 
+
+        if (CoreRegistry.get(Config.class).getRendering().isVolumetricLighting()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("volumetricLighting");
+            program.setInt("texVolumetricLighting", texId++, true);
+        }
+
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");
