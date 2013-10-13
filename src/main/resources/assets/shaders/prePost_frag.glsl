@@ -19,6 +19,8 @@
 
 #ifdef VOLUMETRIC_LIGHTING
 uniform sampler2D texVolumetricLighting;
+
+uniform vec4 volumetricLightingSettings;
 #endif
 
 #ifdef BLOOM
@@ -55,7 +57,8 @@ void main() {
 #endif
 
 #ifdef VOLUMETRIC_LIGHTING
-    color.rgb *= clamp(texture2D(texVolumetricLighting, gl_TexCoord[0].xy).rgb + 0.1, 0.0, 1.0);
+    float volLightIntensity = clamp(volumetricLightingSettings.x * texture2D(texVolumetricLighting, gl_TexCoord[0].xy).r, 0.0, 0.75);
+    color.rgb = mix(color.rgb, clamp(daylight, 0.25, 1.0) * vec3(1.0, 1.0, 1.0), volLightIntensity);
 #endif
 
 #ifdef LIGHT_SHAFTS
