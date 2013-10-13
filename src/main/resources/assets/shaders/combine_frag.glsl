@@ -76,7 +76,8 @@ void main() {
 #if defined (LOCAL_REFLECTIONS)
     vec3 worldPositionViewSpace = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invProjMatrix);
 
-    vec3 reflectionNormal = normalize(texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0);
+    vec4 transparentNormalColorValue = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy).xyzw;
+    vec3 reflectionNormal = transparentNormalColorValue.xyz * 2.0 - 1.0;
     vec3 viewingDirection = normalize(worldPositionViewSpace.xyz);
 
     vec3 reflectionDirection = reflect(viewingDirection.xyz, reflectionNormal.xyz);
@@ -85,6 +86,10 @@ void main() {
 #define SAMPLES_LOCAL_REFLECTION 64
 #define RAY_MARCHING_DISTANCE 128.0
 #define SAMPLE_STEP_SIZE (RAY_MARCHING_DISTANCE / SAMPLES_LOCAL_REFLECTION)
+#define ANGLE_THRESHOLD 0.5
+#define ANGLE_FADE_INTERVAL 0.1
+#define EDGE_THRESHOLD 0.95
+#define EDGE_FADE_INTERVAL 0.05
 
     vec3 viewSpaceRayPosition = worldPositionViewSpace;
     for (int i=0; i<SAMPLES_LOCAL_REFLECTION; ++i) {
@@ -102,16 +107,27 @@ void main() {
         float newSampledDepth = texture2D(texSceneOpaqueDepth, screenSpaceRayPosition.xy * 0.5 + 0.5).r * 2.0 - 1.0;
 
         if (newSampledDepth < screenSpaceRayPosition.z) {
-            // TODO: This could be nicer (and also be an option) - fades the reflection if the reflection vector is too steep
-            float reflectionFadeFactor = clamp(1.0 - abs(reflectionDirection.y), 0.0, 1.0);
+            float reflectionFadeFactor = transparentNormalColorValue.a;
 
-            // TODO: Better to sample the frame buffer of the prev. frame
+            // TODO: Make this an option
+            // Fades the reflection if the reflection vector is too steep
+            if (reflectionDirection.y > ANGLE_THRESHOLD) {
+                reflectionFadeFactor *= clamp(1.0 - (reflectionDirection.y - ANGLE_THRESHOLD) / ANGLE_FADE_INTERVAL, 0.0, 1.0);
+            }
+
+            // Fade out at the edges
+            // TODO: Make this an option
+            float rayLength = length(screenSpaceRayPosition.xy);
+            if (rayLength > EDGE_THRESHOLD) {
+                reflectionFadeFactor *= clamp(1.0 - (rayLength - EDGE_THRESHOLD) / EDGE_FADE_INTERVAL, 0.0, 1.0);
+            }
+
+            // TODO: Find a better way to do this... Using the previous frame buffer caused too much lag though
             vec4 tempColTransparent = texture2D(texSceneTransparent, screenSpaceRayPosition.xy * 0.5 + 0.5).rgba;
             vec3 tempColOpaque = texture2D(texSceneOpaque, screenSpaceRayPosition.xy * 0.5 + 0.5).rgb;
 
             float fade = clamp(1.0 - tempColTransparent.a, 0.0, 1.0);
             vec3 reflectionColor = mix(tempColTransparent.rgb, tempColOpaque.rgb, fade);
-
             colorTransparent.rgb = mix(colorTransparent.rgb, reflectionColor, reflectionFadeFactor);
             break;
         }

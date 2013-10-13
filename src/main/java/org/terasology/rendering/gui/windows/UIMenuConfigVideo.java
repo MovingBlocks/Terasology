@@ -47,14 +47,13 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton graphicsQualityButton;
     private final UIStateButton viewingDistanceButton;
     private final UISlider fovButton;
-    private final UIStateButton animateGrassButton;
     private final UIStateButton reflectiveWaterButton;
     private final UIStateButton blurIntensityButton;
     private final UIStateButton bobbingButton;
     private final UIStateButton fullscreenButton;
     private final UIStateButton outlineButton;
     private final UIStateButton shadowButton;
-    private final UIStateButton volumetricFogButton;
+    private final UIStateButton environmentEffectsButton;
     private final UIStateButton vSyncButton;
     private final UIButton backToConfigMenuButton;
 
@@ -108,7 +107,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
                         config.getRendering().setLightShafts(false);
-                        config.getRendering().setAnimateWater(false);
                         config.getRendering().setCloudShadows(false);
                         break;
                     case 1:
@@ -121,7 +119,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setSsao(false);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setLightShafts(false);
-                        config.getRendering().setAnimateWater(false);
                         config.getRendering().setCloudShadows(false);
                         break;
                     case 2:
@@ -135,7 +132,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setCloudShadows(true);
 
                         config.getRendering().setSsao(false);
-                        config.getRendering().setAnimateWater(false);
                         break;
                     case 3:
                         config.getRendering().setFlickeringLight(true);
@@ -146,7 +142,6 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
                         config.getRendering().setLightShafts(true);
-                        config.getRendering().setAnimateWater(true);
                         config.getRendering().setCloudShadows(true);
                         break;
                 }
@@ -206,31 +201,33 @@ public class UIMenuConfigVideo extends UIWindow {
         bobbingButton.setPosition(new Vector2f(-bobbingButton.getSize().x / 2f - 10f, 300f + 3 * 40f));
         bobbingButton.setVisible(true);
 
-        animateGrassButton = new UIStateButton(new Vector2f(256f, 32f));
-        StateButtonAction animateGrassStateAction = new StateButtonAction() {
-            @Override
-            public void action(UIDisplayElement element) {
-                UIStateButton button = (UIStateButton) element;
-                config.getRendering().setAnimateGrass(button.getState() != 0);
-            }
-        };
-        animateGrassButton.addState("Animate Grass: Off", animateGrassStateAction);
-        animateGrassButton.addState("Animate Grass: On", animateGrassStateAction);
-        animateGrassButton.addClickListener(clickAction);
-        animateGrassButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        animateGrassButton.setPosition(new Vector2f(animateGrassButton.getSize().x / 2f, 300f));
-        animateGrassButton.setVisible(true);
 
         reflectiveWaterButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction reflectiveWaterStateAction = new StateButtonAction() {
             @Override
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton) element;
-                config.getRendering().setReflectiveWater(button.getState() != 0);
+                switch (button.getState()) {
+                    case 0:
+                        config.getRendering().setReflectiveWater(false);
+                        config.getRendering().setLocalReflections(false);
+                        break;
+                    case 1:
+                        config.getRendering().setReflectiveWater(false);
+                        config.getRendering().setLocalReflections(true);
+
+                        break;
+                    case 2:
+                        config.getRendering().setReflectiveWater(true);
+                        config.getRendering().setLocalReflections(true);
+                        break;
+                }
             }
         };
-        reflectiveWaterButton.addState("Water World Reflection: Off", reflectiveWaterStateAction);
-        reflectiveWaterButton.addState("Water World Reflection: On", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Reflections: Sky Only", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Reflections: Local Reflections (SSR)", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Reflections: Global Reflections", reflectiveWaterStateAction);
+
         reflectiveWaterButton.addClickListener(clickAction);
         reflectiveWaterButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         reflectiveWaterButton.setPosition(new Vector2f(reflectiveWaterButton.getSize().x / 2f, 300f + 40f));
@@ -319,20 +316,50 @@ public class UIMenuConfigVideo extends UIWindow {
         shadowButton.setPosition(new Vector2f(-shadowButton.getSize().x / 2f - 10f, 300f + 4 * 40f));
         shadowButton.setVisible(true);
 
-        volumetricFogButton = new UIStateButton(new Vector2f(256f, 32f));
-        StateButtonAction volumetricFogStateAction = new StateButtonAction() {
+        environmentEffectsButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction environmentEffectsStateAction = new StateButtonAction() {
             @Override
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton) element;
-                config.getRendering().setVolumetricFog(button.getState() != 0);
+                switch (button.getState()) {
+                    case 0:
+                        config.getRendering().setVolumetricLighting(false);
+                        config.getRendering().setVolumetricFog(false);
+                        config.getRendering().setAnimateGrass(false);
+                        config.getRendering().setAnimateWater(false);
+                        break;
+                    case 1:
+                        config.getRendering().setVolumetricLighting(false);
+                        config.getRendering().setAnimateWater(false);
+
+                        config.getRendering().setVolumetricFog(true);
+                        config.getRendering().setAnimateGrass(true);
+                        break;
+                    case 2:
+                        config.getRendering().setVolumetricLighting(false);
+
+                        config.getRendering().setAnimateWater(true);
+                        config.getRendering().setVolumetricFog(true);
+                        config.getRendering().setAnimateGrass(true);
+                        break;
+                    case 3:
+                        config.getRendering().setVolumetricLighting(true);
+                        config.getRendering().setAnimateWater(true);
+                        config.getRendering().setVolumetricFog(true);
+                        config.getRendering().setAnimateGrass(true);
+                        break;
+                }
             }
         };
-        volumetricFogButton.addState("Volumetric Fog: Off", volumetricFogStateAction);
-        volumetricFogButton.addState("Volumetric Fog: On", volumetricFogStateAction);
-        volumetricFogButton.addClickListener(clickAction);
-        volumetricFogButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        volumetricFogButton.setPosition(new Vector2f(-volumetricFogButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
-        volumetricFogButton.setVisible(true);
+
+        environmentEffectsButton.addState("Environment Effects: Off", environmentEffectsStateAction);
+        environmentEffectsButton.addState("Environment Effects: Low", environmentEffectsStateAction);
+        environmentEffectsButton.addState("Environment Effects: Medium", environmentEffectsStateAction);
+        environmentEffectsButton.addState("Environment Effects: High", environmentEffectsStateAction);
+        environmentEffectsButton.addClickListener(clickAction);
+        environmentEffectsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        environmentEffectsButton.setPosition(new Vector2f(environmentEffectsButton.getSize().x / 2f, 300f));
+        environmentEffectsButton.setVisible(true);
 
         vSyncButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction vSyncStateAction = new StateButtonAction() {
@@ -348,11 +375,12 @@ public class UIMenuConfigVideo extends UIWindow {
                 }
             }
         };
+
         vSyncButton.addState("VSync: Off", vSyncStateAction);
         vSyncButton.addState("VSync: On", vSyncStateAction);
         vSyncButton.addClickListener(clickAction);
         vSyncButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        vSyncButton.setPosition(new Vector2f(vSyncButton.getSize().x / 2f, 300f + 5 * 40f));
+        vSyncButton.setPosition(new Vector2f(-vSyncButton.getSize().x / 2f - 10f, 300f + 5 * 40f));
         vSyncButton.setVisible(true);
 
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
@@ -375,7 +403,6 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(graphicsQualityButton);
         addDisplayElement(fovButton);
         addDisplayElement(viewingDistanceButton);
-        addDisplayElement(animateGrassButton);
         addDisplayElement(reflectiveWaterButton);
         addDisplayElement(blurIntensityButton);
         addDisplayElement(bobbingButton);
@@ -383,7 +410,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(fullscreenButton);
         addDisplayElement(outlineButton);
         addDisplayElement(shadowButton);
-        addDisplayElement(volumetricFogButton);
+        addDisplayElement(environmentEffectsButton);
         addDisplayElement(vSyncButton);
 
         setup();
@@ -404,14 +431,10 @@ public class UIMenuConfigVideo extends UIWindow {
             graphicsQualityButton.setState(0);
         }
 
-        if (config.getRendering().isAnimateGrass()) {
-            animateGrassButton.setState(1);
-        } else {
-            animateGrassButton.setState(0);
-        }
-
-        if (config.getRendering().isReflectiveWater()) {
+        if (config.getRendering().isLocalReflections()) {
             reflectiveWaterButton.setState(1);
+        } else if (config.getRendering().isReflectiveWater() && config.getRendering().isLocalReflections()) {
+            reflectiveWaterButton.setState(2);
         } else {
             reflectiveWaterButton.setState(0);
         }
@@ -442,10 +465,14 @@ public class UIMenuConfigVideo extends UIWindow {
             shadowButton.setState(0);
         }
 
-        if (config.getRendering().isVolumetricFog()) {
-            volumetricFogButton.setState(1);
+        if (config.getRendering().isVolumetricLighting()) {
+            environmentEffectsButton.setState(3);
+        } else if (config.getRendering().isAnimateWater()) {
+            environmentEffectsButton.setState(2);
+        } else if (config.getRendering().isVolumetricFog()) {
+            environmentEffectsButton.setState(1);
         } else {
-            volumetricFogButton.setState(0);
+            environmentEffectsButton.setState(0);
         }
 
         if (config.getRendering().isVSync()) {
