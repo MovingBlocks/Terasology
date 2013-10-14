@@ -43,11 +43,21 @@ public class UINUITest extends UIWindow {
     public void render() {
         canvas.preRender();
 
-        canvas.drawTexture(Assets.getTexture("engine:containerWindow"), Rect2i.createFromMinAndSize(0, 0, 400, 400), ScaleMode.STRETCH);
-
-        canvas.drawText(font, "Some Text");
+        canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(12, 12, 104, 104), ScaleMode.STRETCH);
         canvas.setOffset(15, 100);
-        canvas.drawTextShadowed(font, "Shadowed Text", Color.BLACK);
+        canvas.drawTextShadowed(font, "Stretched", Color.BLACK);
+
+        canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(140, 12, 104, 104), ScaleMode.SCALE_FIT);
+        canvas.setOffset(143, 75);
+        canvas.drawTextShadowed(font, "Scaled Fit", Color.BLACK);
+
+        canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(268, 12, 104, 104), ScaleMode.SCALE_FILL);
+        canvas.setOffset(270, 100);
+        canvas.drawTextShadowed(font, "Scaled Fill", Color.BLACK);
+
         try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndMax(0, 300, 100, 500), true)) {
             canvas.drawText(font, "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 300);
         }

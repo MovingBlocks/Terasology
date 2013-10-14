@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -76,6 +77,7 @@ public class LwjglCanvas implements Canvas {
     }
 
     public void postRender() {
+        Util.checkGLError();
         glDisable(GL_SCISSOR_TEST);
         if (!subregionStack.isEmpty()) {
             logger.error("Subregions are not being correctly ended");
@@ -168,11 +170,27 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode) {
-        uiMat.setFloat2("scale", toArea.width(), toArea.height());
-        uiMat.setFloat2("offset", toArea.minX(), toArea.minY());
+        Util.checkGLError();
+        Vector2f scale = mode.scaleForRegion(toArea, texture.getWidth(), texture.getHeight());
+        uiMat.setFloat2("scale", scale);
+        uiMat.setFloat2("offset",
+                state.region.minX() + toArea.minX() + 0.5f * (toArea.width() - scale.x),
+                state.region.minY() + toArea.minY() + 0.5f * (toArea.height() - scale.y));
         uiMat.setTexture("texture", texture);
         uiMat.bindTextures();
-        simpleMesh.render();
+        if (mode == ScaleMode.SCALE_FILL) {
+            Rect2i cropRegion = Rect2i.createFromMinAndSize(toArea.minX() + state.region.minX(), toArea.minY() + state.region.minY(), toArea.width(), toArea.height());
+            if (!cropRegion.equals(state.cropRegion)) {
+                crop(cropRegion);
+                simpleMesh.render();
+                crop(state.cropRegion);
+            } else {
+                simpleMesh.render();
+            }
+        } else {
+            simpleMesh.render();
+        }
+        Util.checkGLError();
     }
 
     @Override
@@ -188,6 +206,14 @@ public class LwjglCanvas implements Canvas {
     @Override
     public void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border, Vector2f subTopLeft, Vector2f subBottomRight) {
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private void crop(Rect2i region) {
+        crop(region.minX(), region.minY(), region.width(), region.height());
+    }
+
+    private void crop(int x, int y, int w, int h) {
+        glScissor(x, Display.getHeight() - y - h, w, h);
     }
 
     private static class CanvasState {
@@ -231,13 +257,16 @@ public class LwjglCanvas implements Canvas {
             int bottom = region.maxY() + state.region.minY();
             Rect2i subRegion = Rect2i.createFromMinAndMax(left, top, right, bottom);
             if (crop) {
-                int cropLeft = Math.max(left, state.cropRegion.minX());
-                int cropRight = Math.min(right, state.cropRegion.maxX());
-                int cropTop = Math.max(top, state.cropRegion.minY());
-                int cropBottom = Math.min(bottom, state.cropRegion.maxY());
-                state = new CanvasState(subRegion, Rect2i.createFromMinAndMax(cropLeft, cropTop, cropRight, cropBottom));
-                glScissor(cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop);
-                croppingRegion = true;
+                Rect2i cropRegion = subRegion.intersect(state.cropRegion);
+                if (cropRegion.isEmpty()) {
+                    // TODO: disable drawing
+                } else if (!cropRegion.equals(state.cropRegion)) {
+                    state = new CanvasState(subRegion, cropRegion);
+                    crop(cropRegion);
+                    croppingRegion = true;
+                } else {
+                    state = new CanvasState(subRegion);
+                }
             } else {
                 state = new CanvasState(subRegion);
             }
@@ -246,6 +275,7 @@ public class LwjglCanvas implements Canvas {
         @Override
         public void close() {
             if (!disposed) {
+                Util.checkGLError();
                 disposed = true;
                 LwjglSubRegion region = subregionStack.pop();
                 while (!region.equals(this)) {

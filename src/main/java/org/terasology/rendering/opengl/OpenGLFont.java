@@ -107,7 +107,6 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
         addLinesToMesh(lines, meshBuilders);
 
-
         Map<Material, Mesh> result = Maps.newLinkedHashMap();
         for (Map.Entry<Material, MeshBuilder> entry : meshBuilders.entrySet()) {
             result.put(entry.getKey(), entry.getValue().build());

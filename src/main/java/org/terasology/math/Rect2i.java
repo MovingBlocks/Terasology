@@ -129,7 +129,7 @@ public class Rect2i {
         if (maxX < minX || maxY < minY) {
             return EMPTY;
         }
-        return createFromMinAndMax(minX, maxX, minY, maxY);
+        return createFromMinAndMax(minX, minY, maxX, maxY);
     }
 
     /**

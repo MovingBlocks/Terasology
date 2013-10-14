@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
+
+import javax.vecmath.Vector2f;
+
 /**
  * @author Immortius
  */
@@ -22,18 +27,50 @@ public enum ScaleMode {
     /**
      * Stretches to fill the given space
      */
-    STRETCH,
+    STRETCH {
+        @Override
+        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
+            return new Vector2f(region.width(), region.height());
+        }
+    },
+
     /**
      * Scales to fill the given space. Parts of the image will be cut off if it is a different shape to the space.
      */
-    SCALE_FILL,
+    SCALE_FILL {
+        @Override
+        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
+            Vector2f scale = new Vector2f();
+            float aspect = ((float) actualWidth) / actualHeight;
+            if (aspect > 0) {
+                scale.x = (float) Math.ceil(region.height() * aspect);
+                scale.y = region.height();
+            } else {
+                scale.x = region.width();
+                scale.y = (float) Math.ceil(region.width() / aspect);
+            }
+            return scale;
+        }
+    },
+
     /**
      * Scales to fit in the given space. There will be gaps if the image is a different shape to the space.
      */
-    SCALE_FIT,
+    SCALE_FIT {
+        @Override
+        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
+            Vector2f scale = new Vector2f();
+            float aspect = ((float) actualWidth) / actualHeight;
+            if (aspect > 0) {
+                scale.x = region.width();
+                scale.y = (float) Math.ceil(region.width() / aspect);
+            } else {
+                scale.x = (float) Math.ceil(region.height() * aspect);
+                scale.y = region.height();
+            }
+            return scale;
+        }
+    };
 
-    /**
-     * Repeats the image to fill the given space
-     */
-    REPEAT
+    public abstract Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight);
 }
