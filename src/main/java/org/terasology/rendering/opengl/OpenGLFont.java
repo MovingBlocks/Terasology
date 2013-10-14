@@ -18,9 +18,7 @@ package org.terasology.rendering.opengl;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
@@ -28,9 +26,10 @@ import org.terasology.rendering.assets.font.FontCharacter;
 import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.texture.Texture;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.Map;
 
@@ -111,7 +110,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
 
         Map<Material, Mesh> result = Maps.newLinkedHashMap();
         for (Map.Entry<Material, MeshBuilder> entry : meshBuilders.entrySet()) {
-            result.put(entry.getKey(), entry.getValue().getMesh());
+            result.put(entry.getKey(), entry.getValue().build());
         }
         return result;
     }
@@ -128,7 +127,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
                         builder = new MeshBuilder();
                         meshBuilders.put(character.getPageMat(), builder);
                     }
-                    builder.addCharacter(character, x, y);
+                    addCharacter(builder, character, x, y);
 
                     x += character.getxAdvance();
                 }
@@ -188,56 +187,25 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         return data == null;
     }
 
-    private static class MeshBuilder {
-        private MeshData meshData = new MeshData();
-        private int vertCount;
+    public void addCharacter(MeshBuilder builder, FontCharacter character, int x, int y) {
+        float top = y + character.getyOffset();
+        float bottom = top + character.getHeight();
+        float left = x + character.getxOffset();
+        float right = left + character.getWidth();
+        float texTop = character.getY();
+        float texBottom = texTop + character.getTexHeight();
+        float texLeft = character.getX();
+        float texRight = texLeft + character.getTexWidth();
 
-        public void addCharacter(FontCharacter character, int x, int y) {
-            float top = y + character.getyOffset();
-            float bottom = top + character.getHeight();
-            float left = x + character.getxOffset();
-            float right = left + character.getWidth();
-            float texTop = character.getY();
-            float texBottom = texTop + character.getTexHeight();
-            float texLeft = character.getX();
-            float texRight = texLeft + character.getTexWidth();
-
-            meshData.getVertices().add(left);
-            meshData.getVertices().add(top);
-            meshData.getVertices().add(0);
-            meshData.getTexCoord0().add(texLeft);
-            meshData.getTexCoord0().add(texTop);
-
-            meshData.getVertices().add(right);
-            meshData.getVertices().add(top);
-            meshData.getVertices().add(0);
-            meshData.getTexCoord0().add(texRight);
-            meshData.getTexCoord0().add(texTop);
-
-            meshData.getVertices().add(right);
-            meshData.getVertices().add(bottom);
-            meshData.getVertices().add(0);
-            meshData.getTexCoord0().add(texRight);
-            meshData.getTexCoord0().add(texBottom);
-
-            meshData.getVertices().add(left);
-            meshData.getVertices().add(bottom);
-            meshData.getVertices().add(0);
-            meshData.getTexCoord0().add(texLeft);
-            meshData.getTexCoord0().add(texBottom);
-
-            meshData.getIndices().add(vertCount);
-            meshData.getIndices().add(vertCount + 1);
-            meshData.getIndices().add(vertCount + 2);
-            meshData.getIndices().add(vertCount);
-            meshData.getIndices().add(vertCount + 2);
-            meshData.getIndices().add(vertCount + 3);
-
-            vertCount += 4;
-        }
-
-        public Mesh getMesh() {
-            return Assets.generateAsset(AssetType.MESH, meshData, Mesh.class);
-        }
+        Vector3f v1 = new Vector3f(left, top, 0);
+        Vector3f v2 = new Vector3f(right, top, 0);
+        Vector3f v3 = new Vector3f(right, bottom, 0);
+        Vector3f v4 = new Vector3f(left, bottom, 0);
+        builder.addPoly(v1, v2, v3, v4);
+        builder.addTexCoord(texLeft, texTop);
+        builder.addTexCoord(texRight, texTop);
+        builder.addTexCoord(texRight, texBottom);
+        builder.addTexCoord(texLeft, texBottom);
     }
+
 }

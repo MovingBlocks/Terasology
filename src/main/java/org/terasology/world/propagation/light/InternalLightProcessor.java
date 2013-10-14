@@ -24,8 +24,6 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.PropagationRules;
 import org.terasology.world.propagation.SingleChunkView;
-import org.terasology.world.propagation.light.LightPropagationRules;
-import org.terasology.world.propagation.light.SunlightPropagationRules;
 
 /**
  * For doing an initial lighting sweep during chunk generation - bound to the chunk and assumed blank slate
@@ -58,6 +56,8 @@ public final class InternalLightProcessor {
                             && SUNLIGHT_RULES.canSpreadOutOf(lastBlock, Side.BOTTOM) && SUNLIGHT_RULES.canSpreadInto(block, Side.TOP)) {
                         chunk.setSunlight(x, y, z, sunlightMax);
                         lastBlock = block;
+                    } else {
+                        break;
                     }
                 }
                 tops[x + Chunk.SIZE_X * z] = (short) y;
@@ -79,18 +79,22 @@ public final class InternalLightProcessor {
                             || (z < Chunk.SIZE_Z - 1 && tops[x + Chunk.SIZE_X * (z + 1)] >= y))) {
                         spreadSunlightInternal(chunk, x, y, z, block);
                     }
-                    if (block.getLuminance() > 0) {
-                        chunk.setLight(x, y, z, block.getLuminance());
+                    if (block.getLuminance() > 1) {
                         lightPropagator.propagateFrom(new Vector3i(x, y, z), block);
                     }
                 }
             }
         }
+
         lightPropagator.process();
     }
 
     private static void spreadSunlightInternal(Chunk chunk, int x, int y, int z, Block block) {
         byte lightValue = chunk.getSunlight(x, y, z);
+
+        if (lightValue <= 1) {
+            return;
+        }
 
         if (y > 0 && SUNLIGHT_RULES.canSpreadOutOf(block, Side.BOTTOM)) {
             Block adjBlock = chunk.getBlock(x, y - 1, z);
@@ -106,10 +110,6 @@ public final class InternalLightProcessor {
                 chunk.setSunlight(x, y + 1, z, (byte) (lightValue - 1));
                 spreadSunlightInternal(chunk, x, y + 1, z, adjBlock);
             }
-        }
-
-        if (lightValue <= 1) {
-            return;
         }
 
         for (Side adjDir : Side.horizontalSides()) {

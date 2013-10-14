@@ -27,9 +27,11 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +57,17 @@ public class LwjglCanvas implements Canvas {
     private Set<TextCacheKey> usedText = Sets.newHashSet();
 
     private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
+
+    private Mesh simpleMesh;
+    private Material uiMat = Assets.getMaterial("engine:uiTexture");
+
+    public LwjglCanvas() {
+        simpleMesh = new MeshBuilder().addPoly(new Vector3f(0, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 1, 0), new Vector3f(0, 1, 0))
+                .addTexCoord(0, 0)
+                .addTexCoord(1, 0)
+                .addTexCoord(1, 1)
+                .addTexCoord(0, 1).build();
+    }
 
     public void preRender() {
         state = new CanvasState(Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
@@ -155,7 +168,11 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        uiMat.setFloat2("scale", toArea.width(), toArea.height());
+        uiMat.setFloat2("offset", toArea.minX(), toArea.minY());
+        uiMat.setTexture("texture", texture);
+        uiMat.bindTextures();
+        simpleMesh.render();
     }
 
     @Override
@@ -176,7 +193,6 @@ public class LwjglCanvas implements Canvas {
     private static class CanvasState {
         public Rect2i region;
         public Rect2i cropRegion;
-        public boolean cropped;
         public Color textColor = Color.WHITE;
 
         public Vector2i offset = new Vector2i();
@@ -188,7 +204,6 @@ public class LwjglCanvas implements Canvas {
         public CanvasState(Rect2i region, Rect2i cropRegion) {
             this.region = region;
             this.cropRegion = cropRegion;
-            this.cropped = true;
         }
 
         public int getAbsoluteOffsetX() {
@@ -202,6 +217,7 @@ public class LwjglCanvas implements Canvas {
 
     private class LwjglSubRegion implements SubRegion {
 
+        public boolean croppingRegion;
         private CanvasState previousState;
         private boolean disposed;
 
@@ -221,6 +237,7 @@ public class LwjglCanvas implements Canvas {
                 int cropBottom = Math.min(bottom, state.cropRegion.maxY());
                 state = new CanvasState(subRegion, Rect2i.createFromMinAndMax(cropLeft, cropTop, cropRight, cropBottom));
                 glScissor(cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop);
+                croppingRegion = true;
             } else {
                 state = new CanvasState(subRegion);
             }
@@ -236,7 +253,7 @@ public class LwjglCanvas implements Canvas {
                     region.close();
                     region = subregionStack.pop();
                 }
-                if (state.cropped) {
+                if (croppingRegion) {
                     glScissor(previousState.region.minX(), previousState.region.minY(), previousState.region.width(), previousState.region.height());
                 }
                 state = previousState;
@@ -247,12 +264,7 @@ public class LwjglCanvas implements Canvas {
     private static class TextCacheKey {
         private String text;
         private Font font;
-        private int width = -1;
-
-        public TextCacheKey(String text, Font font) {
-            this.text = text;
-            this.font = font;
-        }
+        private int width;
 
         public TextCacheKey(String text, Font font, int maxWidth) {
             this.text = text;

@@ -21,6 +21,7 @@ import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LwjglCanvas;
+import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
 
 /**
@@ -41,6 +42,8 @@ public class UINUITest extends UIWindow {
     @Override
     public void render() {
         canvas.preRender();
+
+        canvas.drawTexture(Assets.getTexture("engine:containerWindow"), Rect2i.createFromMinAndSize(0, 0, 400, 400), ScaleMode.STRETCH);
 
         canvas.drawText(font, "Some Text");
         canvas.setOffset(15, 100);

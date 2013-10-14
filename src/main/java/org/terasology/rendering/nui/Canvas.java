@@ -24,6 +24,7 @@ import javax.vecmath.Vector2f;
 
 /**
  * Canvas provides primitive drawing operations for use by the UI.
+ *
  * @author Immortius
  */
 public interface Canvas {
