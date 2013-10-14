@@ -1258,9 +1258,9 @@ public class DefaultRenderingProcess {
         shader.enable();
 
         for (int i = 4; i >= 0; i--) {
-            int sizePrev = (int) java.lang.Math.pow(2, i + 1);
+            int sizePrev = TeraMath.pow(2, i + 1);
 
-            int size = (int) java.lang.Math.pow(2, i);
+            int size = TeraMath.pow(2, i);
             shader.setFloat("size", size, true);
 
             bindFbo("scene" + size);

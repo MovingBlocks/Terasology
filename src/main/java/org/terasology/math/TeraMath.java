@@ -153,6 +153,133 @@ public final class TeraMath {
     }
 
     /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static int pow(int base, int exp) {
+        if (exp <= 0) {
+            // x^0 and 1/(1^x) for any x are the only cases where an integer could represent a non-zero value
+            // 0^0 is an indetermination, but Integers provides no means to represent it
+            if (exp == 0) {
+                return 1;
+            }
+            return 0;
+        }
+        int temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp <= 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static long pow(long base, int exp) {
+        if (exp <= 0) {
+            if (exp == 0 || base == 1) {
+                return 1L;
+            }
+            return 0L;
+        }
+        long temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp == 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static float pow(float base, int exp) {
+        if (exp <= 0) {
+            if (exp == 0) {
+                // 0^0 is an indetermination (NaN)
+                if (base == 0.0f) {
+                    return Float.NaN;
+                }
+                return 1.0f;
+            }
+            base = 1.0f / base;
+            exp = -exp;
+        }
+        float temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp == 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static double pow(double base, int exp) {
+        if (exp <= 0) {
+            if (exp == 0) {
+                if (base == 0.0) {
+                    return Double.NaN;
+                }
+                return 1.0;
+            }
+            base = 1.0 / base;
+            exp = -exp;
+        }
+        double temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp == 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
      * Bilinear interpolation.
      */
     public static double biLerp(double x, double y, double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2) {

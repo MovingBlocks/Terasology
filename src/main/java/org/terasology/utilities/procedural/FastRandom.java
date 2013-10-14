@@ -169,7 +169,7 @@ public class FastRandom {
             u1 = randomDouble();
             u2 = randomDouble();
 
-            q = java.lang.Math.pow(u1, 2) + java.lang.Math.pow(u2, 2);
+            q = TeraMath.pow(u1, 2) + TeraMath.pow(u2, 2);
         }
 
         double p = java.lang.Math.sqrt((-2d * (java.lang.Math.log(q))) / q);
