@@ -37,6 +37,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -273,12 +274,12 @@ public class MeshRenderer implements RenderSystem {
                             lastMesh = (OpenGLMesh) meshComp.mesh;
                             lastMesh.preRender();
                         }
-                        Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
-                        TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                        MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
                         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-                        TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                        MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                         material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);

@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Matrix4f;
@@ -95,8 +96,8 @@ public abstract class Camera {
             return;
         }
 
-        viewFrustum.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrix), TeraMath.matrixToFloatBuffer(projectionMatrix));
-        viewFrustumReflected.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrixReflected), TeraMath.matrixToFloatBuffer(projectionMatrix));
+        viewFrustum.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrix), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
+        viewFrustumReflected.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixReflected), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
     }
 
     public abstract boolean isBobbingAllowed();
