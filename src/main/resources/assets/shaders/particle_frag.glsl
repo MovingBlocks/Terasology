@@ -39,4 +39,7 @@ void main() {
 
     gl_FragData[0].a = color.a * colorOffset.a;
     gl_FragData[0].rgb = color.rgb * colorOffset.rgb * gl_FragData[0].a;
+
+    // No normals available
+    gl_FragData[1].rgba = vec4(0.0, 0.0, 0.0, 0.0);
 }

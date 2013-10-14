@@ -285,6 +285,10 @@ void main() {
 
 #if defined (FEATURE_REFRACTIVE_PASS) || defined (FEATURE_USE_FORWARD_LIGHTING)
     gl_FragData[0].rgba = color.rgba;
+#if defined (FEATURE_REFRACTIVE_PASS)
+    // Encode "reflection" intensity into normal alpha
+    gl_FragData[1].a = 1.0;
+#endif
 #else
     gl_FragData[0].rgb = color.rgb;
     // Encode occlusion value into the alpha channel

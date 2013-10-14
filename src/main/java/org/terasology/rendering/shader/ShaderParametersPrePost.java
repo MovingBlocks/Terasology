@@ -23,8 +23,10 @@ import org.terasology.editor.EditorRange;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
 
@@ -66,6 +68,21 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         }
 
         program.setFloat2("aberrationOffset", aberrationOffsetX, aberrationOffsetY, true);
+
+
+        if (CoreRegistry.get(Config.class).getRendering().isVolumetricLighting()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            DefaultRenderingProcess.getInstance().bindFboTexture("volumetricLighting");
+            program.setInt("texVolumetricLighting", texId++, true);
+
+            WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+            Camera activeCamera = worldRenderer.getActiveCamera();
+
+            if (activeCamera != null) {
+                float worldFog = Math.max(worldRenderer.getSmoothedPlayerSunlightValue(), 0.2f) * CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition());
+                program.setFloat4("volumetricLightingSettings", worldFog, 0.0f, 0.0f, 0.0f);
+            }
+        }
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

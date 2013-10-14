@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
     @EditorRange(min = 0.0f, max = 2.0f)
-    public float waveIntens = 1.5f;
+    public float waveIntens = 2.0f;
     @EditorRange(min = 0.0f, max = 2.0f)
     public float waveIntensFalloff = 0.85f;
     @EditorRange(min = 0.0f, max = 2.0f)
@@ -60,7 +60,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     @EditorRange(min = 0.0f, max = 10.0f)
     float waterFresnelPow = 2.5f;
     @EditorRange(min = 1.0f, max = 100.0f)
-    float waterNormalBias = 25.0f;
+    float waterNormalBias = 10.0f;
     @EditorRange(min = 0.0f, max = 1.0f)
     float waterTint = 0.24f;
 

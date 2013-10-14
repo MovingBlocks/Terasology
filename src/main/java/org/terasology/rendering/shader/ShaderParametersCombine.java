@@ -110,6 +110,18 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneTransparent", texId++, true);
         }
 
+        if (CoreRegistry.get(Config.class).getRendering().isLocalReflections()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            sceneTransparent.bindNormalsTexture();
+            program.setInt("texSceneTransparentNormals", texId++, true);
+
+            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            if (activeCamera != null) {
+                program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+                program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+            }
+        }
+
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("ssaoBlurred");

@@ -247,6 +247,9 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         if (config.getRendering().isVolumetricLighting()) {
             builder.append("#define VOLUMETRIC_LIGHTING \n");
         }
+        if (config.getRendering().isLocalReflections()) {
+            builder.append("#define LOCAL_REFLECTIONS \n");
+        }
         if (config.getRendering().isInscattering()) {
             builder.append("#define INSCATTERING \n");
         }

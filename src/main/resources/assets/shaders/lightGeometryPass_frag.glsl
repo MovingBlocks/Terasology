@@ -112,13 +112,21 @@ void main() {
 
     float ambTerm = lightAmbientIntensity;
     float lambTerm = calcLambLight(normal, lightDirNorm);
+
+    // Apply "back light"
+    // TODO: Make intensity a shader parameter
+    const float backLightIntens = 0.5;
+    lambTerm += calcLambLight(normal, -lightDirNorm) * backLightIntens;
+
     float specTerm  = calcSpecLightNormalized(normal, lightDirNorm, eyeVec, lightSpecularPower);
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
+    shadowTerm = clamp(shadowTerm, 0.25, 1.0);
+
     lambTerm *= shadowTerm;
     specTerm *= shadowTerm;
     // TODO: Add this as a shader parameter...
-    ambTerm *= clamp(shadowTerm, 0.5, 1.0);
+    ambTerm *= shadowTerm;
 #endif
 
     float specular = lightSpecularIntensity * specTerm;
