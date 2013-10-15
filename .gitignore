@@ -1,6 +1,7 @@
 # Ignore general
 /.*
 !.gitignore
+!.gitattributes
 *~
 ._*
 *.bak

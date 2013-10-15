@@ -22,6 +22,7 @@ import org.lwjgl.BufferUtils;
 import org.terasology.math.Direction;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
@@ -266,7 +267,7 @@ public final class ChunkTessellator {
             }
         }
 
-        double resultAmbientOcclusion = (Math.pow(0.40, occCounter) + Math.pow(0.80, occCounterBillboard)) / 2.0;
+        double resultAmbientOcclusion = (TeraMath.pow(0.40, occCounter) + TeraMath.pow(0.80, occCounterBillboard)) / 2.0;
 
         if (counterLight == 0) {
             output[0] = 0;

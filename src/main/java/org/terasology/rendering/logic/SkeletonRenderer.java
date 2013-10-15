@@ -37,6 +37,7 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
@@ -207,12 +208,12 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
             float worldScale = location.getWorldScale();
             matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);
 
-            Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
-            TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+            MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-            TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+            MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
@@ -277,12 +278,12 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
                 float worldScale = location.getWorldScale();
                 matrixCameraSpace.set(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, worldScale);
 
-                Matrix4f modelViewMatrix = TeraMath.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
-                TeraMath.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
                 material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-                TeraMath.matrixToFloatBuffer(TeraMath.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
                 material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                 SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);

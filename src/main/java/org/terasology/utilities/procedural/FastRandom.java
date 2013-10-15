@@ -27,6 +27,12 @@ import java.util.List;
  */
 public class FastRandom {
 
+    private static final char[] VALID_CHARS = new char[] {
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    };
+
     private long seed = System.currentTimeMillis();
 
     /**
@@ -51,7 +57,8 @@ public class FastRandom {
      *
      * @return Random value
      */
-    long randomLong() {
+    public long randomLong() {
+        seed++;
         seed ^= (seed << 21);
         seed ^= (seed >>> 35);
         seed ^= (seed << 4);
@@ -144,14 +151,11 @@ public class FastRandom {
      * @return Random character string
      */
     public String randomCharacterString(int length) {
-        StringBuilder s = new StringBuilder();
-
-        for (int i = 0; i < length / 2; i++) {
-            s.append((char) ('a' + TeraMath.fastAbs(randomDouble()) * 26d));
-            s.append((char) ('A' + TeraMath.fastAbs(randomDouble()) * 26d));
+        char[] randomChars = new char[length];
+        for (int i = 0; i < length; i++) {
+            randomChars[i] = VALID_CHARS[VALID_CHARS.length * TeraMath.fastAbs(randomDouble())];
         }
-
-        return s.toString();
+        return new String(randomChars);
     }
 
     /**
@@ -169,7 +173,7 @@ public class FastRandom {
             u1 = randomDouble();
             u2 = randomDouble();
 
-            q = java.lang.Math.pow(u1, 2) + java.lang.Math.pow(u2, 2);
+            q = TeraMath.pow(u1, 2) + TeraMath.pow(u2, 2);
         }
 
         double p = java.lang.Math.sqrt((-2d * (java.lang.Math.log(q))) / q);
