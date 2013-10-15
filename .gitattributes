@@ -10,6 +10,8 @@
 *.py           text diff=python
 *.properties   text
 *.sh           text eol=lf
+*.shape        text
+*.texinfo      text
 *.txt          text
 *.xml          text diff=html 
 
