@@ -131,4 +131,7 @@ public interface Canvas {
 
     void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border, Vector2f subTopLeft, Vector2f subBottomRight);
 
+    void drawText(Font font, String text, int maxWidth, HorizontalAlignment alignment);
+
+    void drawTextShadowed(Font font, String text, int maxWidth, HorizontalAlignment alignment, Color shadowColor);
 }

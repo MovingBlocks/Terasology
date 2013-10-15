@@ -19,7 +19,24 @@ package org.terasology.rendering.nui;
  * @author Immortius
  */
 public enum HorizontalAlignment {
-    LEFT,
-    RIGHT,
-    CENTER
+    LEFT {
+        @Override
+        public int getOffset(int w, int maxWidth) {
+            return 0;
+        }
+    },
+    RIGHT {
+        @Override
+        public int getOffset(int w, int maxWidth) {
+            return maxWidth - w;
+        }
+    },
+    CENTER {
+        @Override
+        public int getOffset(int w, int maxWidth) {
+            return (maxWidth - w) / 2;
+        }
+    };
+
+    public abstract int getOffset(int w, int maxWidth);
 }

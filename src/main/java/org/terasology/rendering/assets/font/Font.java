@@ -20,6 +20,7 @@ import org.terasology.asset.Asset;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlignment;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public interface Font extends Asset<FontData> {
      * @param lines
      * @return A map of texture to mesh, where each texture is a font page and each mesh is the characters of that mesh page.
      */
-    Map<Material, Mesh> createTextMesh(List<String> lines);
+    Map<Material, Mesh> createTextMesh(List<String> lines, int width, HorizontalAlignment alignment);
 
     int getWidth(String text);
 

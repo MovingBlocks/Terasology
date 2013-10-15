@@ -139,18 +139,28 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
+    public void drawText(Font font, String text, int maxWidth, HorizontalAlignment alignment) {
+        drawTextShadowed(font, text, maxWidth, alignment, null);
+    }
+
+    @Override
     public void drawTextShadowed(Font font, String text, Color shadowColor) {
         drawTextShadowed(font, text, Integer.MAX_VALUE, shadowColor);
     }
 
     @Override
     public void drawTextShadowed(Font font, String text, int maxWidth, Color shadowColor) {
-        TextCacheKey key = new TextCacheKey(text, font, maxWidth);
+        drawTextShadowed(font, text, maxWidth, HorizontalAlignment.LEFT, shadowColor);
+    }
+
+    @Override
+    public void drawTextShadowed(Font font, String text, int maxWidth, HorizontalAlignment alignment, Color shadowColor) {
+        TextCacheKey key = new TextCacheKey(text, font, maxWidth, alignment);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
+        List<String> lines = LineBuilder.getLines(font, text, maxWidth);
         if (fontMesh == null) {
-            List<String> lines = LineBuilder.getLines(font, text, maxWidth);
-            fontMesh = font.createTextMesh(lines);
+            fontMesh = font.createTextMesh(lines, maxWidth, alignment);
             cachedText.put(key, fontMesh);
         }
 
@@ -166,6 +176,8 @@ public class LwjglCanvas implements Canvas {
             entry.getKey().setFloat4("color", state.textColor.toVector4f());
             entry.getValue().render();
         }
+
+        state.offset.y += lines.size() * font.getHeight("M");
     }
 
     @Override
@@ -295,11 +307,13 @@ public class LwjglCanvas implements Canvas {
         private String text;
         private Font font;
         private int width;
+        private HorizontalAlignment alignment;
 
-        public TextCacheKey(String text, Font font, int maxWidth) {
+        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlignment alignment) {
             this.text = text;
             this.font = font;
             this.width = maxWidth;
+            this.alignment = alignment;
         }
 
         @Override
@@ -310,14 +324,14 @@ public class LwjglCanvas implements Canvas {
             if (obj instanceof TextCacheKey) {
                 TextCacheKey other = (TextCacheKey) obj;
                 return Objects.equals(text, other.text) && Objects.equals(font, other.font)
-                        && Objects.equals(width, other.width);
+                        && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(text, font, width);
+            return Objects.hash(text, font, width, alignment);
         }
     }
 }

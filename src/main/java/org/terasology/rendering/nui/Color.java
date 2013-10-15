@@ -45,6 +45,7 @@ public class Color {
     public static final Color BLUE = new Color(0x0000FFFF);
     public static final Color GREEN = new Color(0x00FF00FF);
     public static final Color RED = new Color(0xFF0000FF);
+    public static final Color GREY = new Color(0x888888FF);
 
     private static final int MAX = 255;
     private static final int RED_OFFSET = 24;
