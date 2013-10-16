@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
@@ -578,7 +579,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(value));
+            GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
         } else {
             TIntIntIterator it = shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -586,7 +587,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(value));
+                GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
             }
 
             restoreStateAfterUniformsSet();
@@ -634,7 +635,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4(id, false, TeraMath.matrixToFloatBuffer(value));
+            GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
         } else {
             TIntIntIterator it = shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -642,7 +643,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4(id, false, TeraMath.matrixToFloatBuffer(value));
+                GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
             }
 
             restoreStateAfterUniformsSet();
