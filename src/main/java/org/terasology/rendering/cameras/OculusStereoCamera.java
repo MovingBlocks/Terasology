@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -65,10 +66,10 @@ public class OculusStereoCamera extends Camera {
     public void updateFrustum() {
         super.updateFrustum();
 
-        viewFrustumLeftEye.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrixLeftEye), TeraMath.matrixToFloatBuffer(projectionMatrixLeftEye));
-        viewFrustumRightEye.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrixRightEye), TeraMath.matrixToFloatBuffer(projectionMatrixRightEye));
-        viewFrustumReflectedLeftEye.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrixReflectedLeftEye), TeraMath.matrixToFloatBuffer(projectionMatrixLeftEye));
-        viewFrustumReflectedRightEye.updateFrustum(TeraMath.matrixToFloatBuffer(viewMatrixReflectedRightEye), TeraMath.matrixToFloatBuffer(projectionMatrixRightEye));
+        viewFrustumLeftEye.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixLeftEye), MatrixUtils.matrixToFloatBuffer(projectionMatrixLeftEye));
+        viewFrustumRightEye.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixRightEye), MatrixUtils.matrixToFloatBuffer(projectionMatrixRightEye));
+        viewFrustumReflectedLeftEye.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixReflectedLeftEye), MatrixUtils.matrixToFloatBuffer(projectionMatrixLeftEye));
+        viewFrustumReflectedRightEye.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixReflectedRightEye), MatrixUtils.matrixToFloatBuffer(projectionMatrixRightEye));
     }
 
     @Override
@@ -169,20 +170,20 @@ public class OculusStereoCamera extends Camera {
     @Deprecated
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(TeraMath.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Deprecated
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToFloatBuffer(getViewMatrix()));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
     }
 
     @Deprecated
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToFloatBuffer(normViewMatrix));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
     }
 
     public void update(float deltaT) {
@@ -203,7 +204,7 @@ public class OculusStereoCamera extends Camera {
             return;
         }
 
-        projectionMatrix = TeraMath.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), zNear, zFar);
+        projectionMatrix = MatrixUtils.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), zNear, zFar);
 
         projTranslationLeftEye.setIdentity();
         projTranslationLeftEye.setTranslation(new Vector3f(OculusVrHelper.getProjectionCenterOffset(), 0.0f, 0.0f));
@@ -214,8 +215,8 @@ public class OculusStereoCamera extends Camera {
         projectionMatrixLeftEye.mul(projTranslationLeftEye, projectionMatrix);
         projectionMatrixRightEye.mul(projTranslationRightEye, projectionMatrix);
 
-        viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
-        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
         reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
         reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
@@ -240,8 +241,8 @@ public class OculusStereoCamera extends Camera {
         viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
         viewMatrixReflectedRightEye.mul(viewMatrixReflected, viewTranslationRightEye);
 
-        viewProjectionMatrixLeftEye = TeraMath.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
-        viewProjectionMatrixRightEye = TeraMath.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
+        viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
+        viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
         inverseViewProjectionMatrixLeftEye.invert(viewProjectionMatrixLeftEye);
         inverseViewProjectionMatrixRightEye.invert(viewProjectionMatrixRightEye);

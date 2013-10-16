@@ -16,6 +16,7 @@
 package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -51,18 +52,18 @@ public class OrthographicCamera extends Camera {
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(TeraMath.matrixToFloatBuffer(projectionMatrix));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(projectionMatrix));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToFloatBuffer(viewMatrix));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(viewMatrix));
     }
 
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(TeraMath.matrixToFloatBuffer(normViewMatrix));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
     }
 
     public void update(float deltaT) {
@@ -83,11 +84,11 @@ public class OrthographicCamera extends Camera {
             return;
         }
 
-        projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
-        viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
-        normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        projectionMatrix = MatrixUtils.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
+        viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-        viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks

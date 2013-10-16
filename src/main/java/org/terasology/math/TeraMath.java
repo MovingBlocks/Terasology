@@ -16,13 +16,9 @@
 
 package org.terasology.math;
 
-import org.lwjgl.BufferUtils;
 import org.terasology.world.chunks.Chunk;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.nio.FloatBuffer;
 
 /**
  * Collection of math functions.
@@ -154,6 +150,133 @@ public final class TeraMath {
             return min;
         }
         return value;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static int pow(int base, int exp) {
+        if (exp <= 0) {
+            // x^0 and 1/(1^x) for any x are the only cases where an integer could represent a non-zero value
+            // 0^0 is an indetermination, but Integers provides no means to represent it
+            if (exp == 0) {
+                return 1;
+            }
+            return 0;
+        }
+        int temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp <= 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static long pow(long base, int exp) {
+        if (exp <= 0) {
+            if (exp == 0 || base == 1) {
+                return 1L;
+            }
+            return 0L;
+        }
+        long temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp == 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static float pow(float base, int exp) {
+        if (exp <= 0) {
+            if (exp == 0) {
+                // 0^0 is an indetermination (NaN)
+                if (base == 0.0f) {
+                    return Float.NaN;
+                }
+                return 1.0f;
+            }
+            base = 1.0f / base;
+            exp = -exp;
+        }
+        float temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp == 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
+    }
+
+    /**
+     * Fast power function
+     *
+     * @param base
+     * @param exp
+     * @return
+     */
+    public static double pow(double base, int exp) {
+        if (exp <= 0) {
+            if (exp == 0) {
+                if (base == 0.0) {
+                    return Double.NaN;
+                }
+                return 1.0;
+            }
+            base = 1.0 / base;
+            exp = -exp;
+        }
+        double temp = base;
+        exp--;
+        while (true) {
+            if ((exp & 1) != 0) {
+                base *= temp;
+            }
+            exp >>= 1;
+            if (exp == 0) {
+                break;
+            }
+            temp *= temp;
+        }
+        return base;
     }
 
     /**
@@ -417,222 +540,6 @@ public final class TeraMath {
     public static int ceilToInt(float val) {
         int i = (int) val;
         return (val >= 0 && val != i) ? i + 1 : i;
-    }
-
-    // TODO: Move to a matrix util class
-
-    /**
-     * Copies the given matrix into a newly allocated FloatBuffer.
-     * The order of the elements is column major (as used by OpenGL).
-     *
-     * @param m the matrix to copy
-     * @return A new FloatBuffer containing the matrix in column-major form.
-     */
-    public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        matrixToFloatBuffer(m, buffer);
-        return buffer;
-    }
-
-    /**
-     * Copies the given matrix into a newly allocated FloatBuffer.
-     * The order of the elements is column major (as used by OpenGL).
-     *
-     * @param m the matrix to copy
-     * @return A new FloatBuffer containing the matrix in column-major form.
-     */
-    public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
-        matrixToFloatBuffer(m, buffer);
-        return buffer;
-    }
-
-    /**
-     * Copies the given matrix into an existing FloatBuffer.
-     * The order of the elements is column major (as used by OpenGL).
-     *
-     * @param m  the matrix to copy
-     * @param fb the float buffer to copy the matrix into
-     * @return The provided float buffer.
-     */
-    public static FloatBuffer matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
-        fb.put(m.m00);
-        fb.put(m.m10);
-        fb.put(m.m20);
-        fb.put(m.m01);
-        fb.put(m.m11);
-        fb.put(m.m21);
-        fb.put(m.m02);
-        fb.put(m.m12);
-        fb.put(m.m22);
-
-        fb.flip();
-        return fb;
-    }
-
-    /**
-     * Copies the given matrix into an existing FloatBuffer.
-     * The order of the elements is column major (as used by OpenGL).
-     *
-     * @param m  the matrix to copy
-     * @param fb the float buffer to copy the matrix into
-     * @return The provided float buffer.
-     */
-    public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
-        fb.put(m.m00);
-        fb.put(m.m10);
-        fb.put(m.m20);
-        fb.put(m.m30);
-        fb.put(m.m01);
-        fb.put(m.m11);
-        fb.put(m.m21);
-        fb.put(m.m31);
-        fb.put(m.m02);
-        fb.put(m.m12);
-        fb.put(m.m22);
-        fb.put(m.m32);
-        fb.put(m.m03);
-        fb.put(m.m13);
-        fb.put(m.m23);
-        fb.put(m.m33);
-
-        fb.flip();
-        return fb;
-    }
-
-    public static Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
-        return createViewMatrix(new Vector3f(eyeX, eyeY, eyeZ), new Vector3f(centerX, centerY, centerZ), new Vector3f(upX, upY, upZ));
-    }
-
-    public static Matrix4f createViewMatrix(Vector3f eye, Vector3f center, Vector3f up) {
-        Matrix4f m = new Matrix4f();
-
-        Vector3f f = new Vector3f();
-        f.sub(center, eye);
-
-        f.normalize();
-        up.normalize();
-
-        Vector3f s = new Vector3f();
-        s.cross(f, up);
-        s.normalize();
-
-        Vector3f u = new Vector3f();
-        u.cross(s, f);
-        u.normalize();
-
-        m.m00 = s.x;
-        m.m10 = s.y;
-        m.m20 = s.z;
-        m.m30 = 0;
-        m.m01 = u.x;
-        m.m11 = u.y;
-        m.m21 = u.z;
-        m.m31 = 0;
-        m.m02 = -f.x;
-        m.m12 = -f.y;
-        m.m22 = -f.z;
-        m.m32 = 0;
-        m.m03 = 0;
-        m.m13 = 0;
-        m.m23 = 0;
-        m.m33 = 1;
-
-        m.m30 = -eye.x;
-        m.m31 = -eye.y;
-        m.m32 = -eye.z;
-
-        m.transpose();
-
-        return m;
-    }
-
-    public static Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
-        Matrix4f m = new Matrix4f();
-
-        float lateral = right - left;
-        float vertical = top - bottom;
-        float forward = far - near;
-        float tx = -(right + left) / (right - left);
-        float ty = -(top + bottom) / (top - bottom);
-        float tz = -(far + near) / (far - near);
-
-        m.m00 = 2.0f / lateral;
-        m.m10 = 0.0f;
-        m.m20 = 0.0f;
-        m.m30 = tx;
-        m.m01 = 0.0f;
-        m.m11 = 2.0f / vertical;
-        m.m21 = 0.0f;
-        m.m31 = ty;
-        m.m02 = 0.0f;
-        m.m12 = 0.0f;
-        m.m22 = -2.0f / forward;
-        m.m32 = tz;
-        m.m03 = 0.0f;
-        m.m13 = 0.0f;
-        m.m23 = 0.0f;
-        m.m33 = 1.0f;
-
-        m.transpose();
-
-        return m;
-    }
-
-    public static Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
-        Matrix4f m = new Matrix4f();
-
-        float f = 1.0f / (float) Math.tan(fovY * 0.5f);
-
-        m.m00 = f / aspectRatio;
-        m.m10 = 0;
-        m.m20 = 0;
-        m.m30 = 0;
-        m.m01 = 0;
-        m.m11 = f;
-        m.m21 = 0;
-        m.m31 = 0;
-        m.m02 = 0;
-        m.m12 = 0;
-        m.m22 = (zFar + zNear) / (zNear - zFar);
-        m.m32 = (2 * zFar * zNear) / (zNear - zFar);
-        m.m03 = 0;
-        m.m13 = 0;
-        m.m23 = -1;
-        m.m33 = 0;
-
-        m.transpose();
-
-        return m;
-    }
-
-    public static Matrix4f calcViewProjectionMatrix(Matrix4f vm, Matrix4f p) {
-        Matrix4f result = new Matrix4f();
-        result.mul(p, vm);
-        return result;
-    }
-
-    public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
-        Matrix4f result = new Matrix4f();
-        result.mul(m, vm);
-        return result;
-    }
-
-    public static Matrix3f calcNormalMatrix(Matrix4f mv) {
-        Matrix3f result = new Matrix3f();
-        result.m00 = mv.m00;
-        result.m10 = mv.m10;
-        result.m20 = mv.m20;
-        result.m01 = mv.m01;
-        result.m11 = mv.m11;
-        result.m21 = mv.m21;
-        result.m02 = mv.m02;
-        result.m12 = mv.m12;
-        result.m22 = mv.m22;
-
-        result.invert();
-        result.transpose();
-        return result;
     }
 
     // TODO: This doesn't belong in this class, move it.

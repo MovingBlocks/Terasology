@@ -16,6 +16,7 @@
 package org.terasology.world.generator.chunkGenerators;
 
 import org.terasology.math.LSystemRule;
+import org.terasology.math.TeraMath;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
@@ -162,7 +163,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     if (randVal < 0f) {
                         randVal = -randVal;
                     }
-                    float weightedFailureProbability = (float) Math.pow(1f - rule.getProbability(), (double) (maxDepth - depth));
+                    float weightedFailureProbability = TeraMath.pow(1f - rule.getProbability(), maxDepth - depth);
                     if (randVal < weightedFailureProbability) {
                         break;
                     }
