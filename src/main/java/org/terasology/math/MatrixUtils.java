@@ -30,6 +30,9 @@ import java.nio.FloatBuffer;
  */
 public final class MatrixUtils {
 
+    private MatrixUtils() {
+    }
+
     /**
      * Copies the given matrix into a newly allocated FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).

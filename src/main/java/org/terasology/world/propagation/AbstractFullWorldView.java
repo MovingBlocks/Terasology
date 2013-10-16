@@ -18,12 +18,12 @@ package org.terasology.world.propagation;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * A base world view implementation sitting on ChunkProvider.
+ *
  * @author Immortius
  */
 public abstract class AbstractFullWorldView implements PropagatorWorldView {
@@ -53,8 +53,9 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     /**
      * Obtains the relevant value from the given chunk
+     *
      * @param chunk
-     * @param pos The internal position of the chunk to get the value from
+     * @param pos   The internal position of the chunk to get the value from
      * @return The relevant value for this view
      */
     protected abstract byte getValueAt(Chunk chunk, Vector3i pos);
@@ -72,8 +73,9 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     /**
      * Sets the relevant value for the given chunk
+     *
      * @param chunk
-     * @param pos The internal position of the chunk to set the value of
+     * @param pos   The internal position of the chunk to set the value of
      * @param value The new value
      */
     protected abstract void setValueAt(Chunk chunk, Vector3i pos, byte value);

@@ -18,7 +18,6 @@ package org.terasology.rendering.cameras;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.TeraMath;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;

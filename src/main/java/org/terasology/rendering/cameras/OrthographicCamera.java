@@ -17,7 +17,6 @@ package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.TeraMath;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;

@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.math.Rect2i;
-import org.terasology.math.Vector2i;
 
 import javax.vecmath.Vector2f;
 

@@ -17,7 +17,6 @@ package org.terasology.math;
 
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +24,7 @@ import java.util.Objects;
  * 2D Rectangle
  */
 // TODO: Review and bring into line with Region3i's api
-public class Rect2i {
+public final class Rect2i {
     public static final Rect2i EMPTY = new Rect2i();
 
     // position
@@ -184,6 +183,7 @@ public class Rect2i {
 
     /**
      * Returns the difference between a and b - that is all parts of a that are not contained by b.
+     *
      * @param a
      * @param b
      * @return A collection of rectangles that compose the difference of a - b. May be empty if a is completely encompassed by b.

@@ -163,7 +163,7 @@ public final class TeraMath {
         if (exp <= 0) {
             // x^0 and 1/(1^x) for any x are the only cases where an integer could represent a non-zero value
             // 0^0 is an indetermination, but Integers provides no means to represent it
-            if (exp == 0) {
+            if (exp == 0 || base == 1) {
                 return 1;
             }
             return 0;
@@ -395,7 +395,8 @@ public final class TeraMath {
     * @return The Y-coordinate of the chunk
     */
     public static int calcChunkPosY(int y, int chunkPowerY) {
-        return 0;//(y >> chunkPowerY);
+        return 0;
+        //return (y >> chunkPowerY);
     }
 
     /**

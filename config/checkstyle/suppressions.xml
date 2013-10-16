@@ -6,4 +6,5 @@
 <suppressions>
     <suppress checks="." files="org[\\/]terasology[\\/]protobuf[\\/].*"/>
     <suppress checks="MethodNameCheck" files="org[\\/]terasology[\\/]engine[\\/]paths[\\/]windows.*"/>
+	<suppress checks="ParameterAssignment" files="org[\\/]terasology[\\/]math[\\/]TeraMath"/>
 </suppressions>

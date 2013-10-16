@@ -24,7 +24,7 @@ import java.util.Iterator;
  *
  * @author Immortius
  */
-public class Region3i implements Iterable<Vector3i> {
+public final class Region3i implements Iterable<Vector3i> {
     public static final Region3i EMPTY = new Region3i();
 
     private final Vector3i min = new Vector3i();

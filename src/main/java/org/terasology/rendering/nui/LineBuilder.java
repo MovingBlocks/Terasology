@@ -31,7 +31,7 @@ public class LineBuilder {
     private final int maxWidth;
     private List<String> lines = Lists.newArrayList();
 
-    private int currentLineLength = 0;
+    private int currentLineLength;
     private StringBuilder lineBuilder = new StringBuilder();
 
     public LineBuilder(Font font, int maxWidth) {
@@ -48,7 +48,8 @@ public class LineBuilder {
 
     public void addText(String text) {
         List<String> paragraphs = Arrays.asList(text.split("\\r?\\n"));
-        for (String remainder : paragraphs) {
+        for (String paragraph : paragraphs) {
+            String remainder = paragraph;
             while (!remainder.isEmpty()) {
                 String[] split = remainder.split(" ", 2);
                 String word = split[0];

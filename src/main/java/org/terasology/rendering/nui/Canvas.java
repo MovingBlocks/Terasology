@@ -20,8 +20,6 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.Texture;
 
-import javax.vecmath.Vector2f;
-
 /**
  * Canvas provides primitive drawing operations for use by the UI.
  *

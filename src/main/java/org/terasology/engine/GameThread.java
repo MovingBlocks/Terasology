@@ -37,6 +37,9 @@ public final class GameThread {
     private static Thread gameThread;
     private static BlockingDeque<Runnable> pendingRunnables = Queues.newLinkedBlockingDeque();
 
+    private GameThread() {
+    }
+
     /**
      * @return Whether the currentThread is the gameThread.
      */

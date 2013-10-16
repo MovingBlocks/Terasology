@@ -24,9 +24,6 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlignment;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.SubRegion;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius

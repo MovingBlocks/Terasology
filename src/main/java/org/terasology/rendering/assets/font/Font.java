@@ -19,7 +19,6 @@ package org.terasology.rendering.assets.font;
 import org.terasology.asset.Asset;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlignment;
 
 import java.util.List;

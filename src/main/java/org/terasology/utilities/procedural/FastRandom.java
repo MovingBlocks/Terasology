@@ -153,7 +153,7 @@ public class FastRandom {
     public String randomCharacterString(int length) {
         char[] randomChars = new char[length];
         for (int i = 0; i < length; i++) {
-            randomChars[i] = VALID_CHARS[VALID_CHARS.length * TeraMath.fastAbs(randomDouble())];
+            randomChars[i] = VALID_CHARS[randomInt(VALID_CHARS.length)];
         }
         return new String(randomChars);
     }
