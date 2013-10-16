@@ -173,6 +173,10 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         return height;
     }
 
+    public int getLineHeight() {
+        return data.getLineHeight();
+    }
+
     @Override
     public void reload(FontData newData) {
         this.data = newData;

@@ -45,4 +45,6 @@ public interface Font extends Asset<FontData> {
     int getWidth(Character c);
 
     int getHeight(String text);
+
+    int getLineHeight();
 }

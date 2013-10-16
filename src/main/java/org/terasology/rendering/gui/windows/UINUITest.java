@@ -19,11 +19,14 @@ import org.terasology.asset.Assets;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlignment;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
+
+import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
@@ -65,6 +68,10 @@ public class UINUITest extends UIWindow {
         canvas.drawText(font, "Some More Text");
         canvas.drawText(font, "A little to the right", canvas.size().x, HorizontalAlignment.RIGHT);
         canvas.drawText(font, "Smack in the middle", canvas.size().x, HorizontalAlignment.CENTER);
+
+        canvas.drawTexture(Assets.getTexture("engine:icons"), Rect2i.createFromMinAndSize(0, 256, 64, 64), ScaleMode.STRETCH, 52, 0, 9, 9);
+        canvas.drawTextureBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 128, 512, 128), new Border(6, 6, 6, 6), false);
+        canvas.drawTextureBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 256, 512, 128), new Border(6, 6, 6, 6), true);
 
         canvas.postRender();
 

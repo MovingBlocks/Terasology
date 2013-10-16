@@ -60,9 +60,10 @@ public class LwjglCanvas implements Canvas {
     private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
 
     private Mesh simpleMesh;
-    private Material uiMat = Assets.getMaterial("engine:uiTexture");
+    private Material textureMat = Assets.getMaterial("engine:uiTexture");
 
     public LwjglCanvas() {
+        // TODO: Make an asset for this.
         simpleMesh = new MeshBuilder().addPoly(new Vector3f(0, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 1, 0), new Vector3f(0, 1, 0))
                 .addTexCoord(0, 0)
                 .addTexCoord(1, 0)
@@ -177,19 +178,33 @@ public class LwjglCanvas implements Canvas {
             entry.getValue().render();
         }
 
-        state.offset.y += lines.size() * font.getHeight("M");
+        state.offset.y += lines.size() * font.getLineHeight();
     }
 
     @Override
     public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode) {
+        drawTexture(texture, toArea, mode, 0f, 0f, 1f, 1f);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, int ux, int uy, int uw, int uh) {
+        drawTexture(texture, toArea, mode,
+                (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
+                (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, float ux, float uy, float uw, float uh) {
         Util.checkGLError();
         Vector2f scale = mode.scaleForRegion(toArea, texture.getWidth(), texture.getHeight());
-        uiMat.setFloat2("scale", scale);
-        uiMat.setFloat2("offset",
+        textureMat.setFloat2("scale", scale);
+        textureMat.setFloat2("offset",
                 state.region.minX() + toArea.minX() + 0.5f * (toArea.width() - scale.x),
                 state.region.minY() + toArea.minY() + 0.5f * (toArea.height() - scale.y));
-        uiMat.setTexture("texture", texture);
-        uiMat.bindTextures();
+        textureMat.setFloat2("texOffset", ux, uy);
+        textureMat.setFloat2("texSize", uw, uh);
+        textureMat.setTexture("texture", texture);
+        textureMat.bindTextures();
         if (mode == ScaleMode.SCALE_FILL) {
             Rect2i cropRegion = Rect2i.createFromMinAndSize(toArea.minX() + state.region.minX(), toArea.minY() + state.region.minY(), toArea.width(), toArea.height());
             if (!cropRegion.equals(state.cropRegion)) {
@@ -206,18 +221,70 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, Vector2f subTopLeft, Vector2f subBottomRight) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile) {
+        drawTextureBordered(texture, toArea, border, tile, 0f, 0f, 1f, 1f);
     }
 
     @Override
-    public void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, int ux, int uy, int uw, int uh) {
+        drawTextureBordered(texture, toArea, border, tile,
+                (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
+                (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
-    public void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border, Vector2f subTopLeft, Vector2f subBottomRight) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, float ux, float uy, float uw, float uh) {
+        float top = (float) border.getTop() / texture.getHeight();
+        float left = (float) border.getLeft() / texture.getWidth();
+        float bottom = (float) border.getBottom() / texture.getHeight();
+        float right = (float) border.getRight() / texture.getWidth();
+        int centerHoriz = toArea.width() - border.getLeft() - border.getRight();
+        int centerVert = toArea.height() - border.getTop() - border.getBottom();
+
+        if (border.getTop() != 0) {
+            // TOP-LEFT CORNER
+            if (border.getLeft() != 0) {
+                drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX(), toArea.minY(), border.getLeft(), border.getTop()), ScaleMode.STRETCH,
+                        ux, uy, left, top);
+            }
+            // TOP BORDER
+            drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY(), centerHoriz, border.getTop()), ScaleMode.STRETCH,
+                    ux + left, uy, uw - left - right, top);
+            // TOP-RIGHT CORNER
+            if (border.getRight() != 0) {
+                Rect2i area = Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.minY(), border.getRight(), border.getTop());
+                drawTexture(texture, area, ScaleMode.STRETCH, ux + uw - right, uy, right, top);
+            }
+        }
+        // LEFT BORDER
+        if (border.getLeft() != 0) {
+            Rect2i area = Rect2i.createFromMinAndSize(toArea.minX(), toArea.minY() + border.getTop(), border.getLeft(), centerVert);
+            drawTexture(texture, area, ScaleMode.STRETCH, ux, uy + top, left, uh - top - bottom);
+        }
+        // CENTER
+        drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
+                ux + left, uy + top, uw - left - right, uh - top - bottom);
+
+        // RIGHT BORDER
+        if (border.getRight() != 0) {
+            Rect2i area = Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.minY() + border.getTop(), border.getRight(), centerVert);
+            drawTexture(texture, area, ScaleMode.STRETCH, ux + uw - right, uy + top, right, uh - top - bottom);
+        }
+        if (border.getBottom() != 0) {
+            // BOTTOM-LEFT CORNER
+            if (border.getLeft() != 0) {
+                drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX(), toArea.maxY() - border.getBottom(), border.getLeft(), border.getBottom()), ScaleMode.STRETCH,
+                        ux, uy + uw - bottom, left, bottom);
+            }
+            // BOTTOM BORDER
+            drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.maxY() - border.getBottom(), centerHoriz, border.getBottom()),
+                    ScaleMode.STRETCH, ux + left, uy + uw - bottom, uw - left - right, bottom);
+            // BOTTOM-RIGHT CORNER
+            if (border.getRight() != 0) {
+                drawTexture(texture, Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.maxY() - border.getBottom(), border.getRight(), border.getBottom()),
+                        ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
+            }
+        }
     }
 
     private void crop(Rect2i region) {

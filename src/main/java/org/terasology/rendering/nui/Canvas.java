@@ -125,11 +125,15 @@ public interface Canvas {
 
     void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode);
 
-    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, Vector2f subTopLeft, Vector2f subBottomRight);
+    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, int ux, int uy, int uw, int uh);
 
-    void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border);
+    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, float ux, float uy, float uw, float uh);
 
-    void drawTextureBordered(Texture texture, Rect2i toArea, ScaleMode mode, Border border, Vector2f subTopLeft, Vector2f subBottomRight);
+    void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile);
+
+    void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, int ux, int uy, int uw, int uh);
+
+    void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, float ux, float uy, float uw, float uh);
 
     void drawText(Font font, String text, int maxWidth, HorizontalAlignment alignment);
 
