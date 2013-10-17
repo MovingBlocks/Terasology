@@ -1,6 +1,0 @@
-{
-    "displayName": "Signal Limited Emitter",
-    "entity" : {
-        "prefab" : "signalling:SignalSwitch"
-    }
-}

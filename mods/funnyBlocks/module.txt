@@ -1,8 +1,0 @@
-{
-	"id" : "funnyBlocks",
-	"version" : "1.0.0",
-	"displayName" : "Funny Blocks",
-	"author" : "A'nW",
-	"description" :
-	"A module adding funny/random goofy blocks just because they are awesome!"
-}

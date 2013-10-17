@@ -1,8 +1,0 @@
-{
-    "shader" : "engine:genericMeshMaterial",
-    "params" : {
-        "diffuse" : "testmod:pony",
-        "colorOffset" : [1.0, 1.0, 1.0],
-        "textured" : true
-    }
-}

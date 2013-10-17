@@ -1,6 +1,0 @@
-{
-    "displayName": "Signal Lamp",
-    "entity" : {
-        "prefab" : "signalling:SignalLampOff"
-    }
-}

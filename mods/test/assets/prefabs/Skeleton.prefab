@@ -1,9 +1,0 @@
-{
-    "location" : {},
-    "skeletalmesh" : {
-        "mesh" : "testmod:character",
-        "material" : "testmod:guardskin",
-        "animation" : "testmod:characterwave",
-        "loop" : true
-    }
-}

@@ -1,8 +1,0 @@
-{
-    "attachmentAllowed" : false,
-    "rotation" : "horizontal",
-    "climbable" : true,
-    "penetrable" : true,
-    "shape" : "engine:verticalOffsetPlane",
-    "tile" : "engine:redclover"
-}
