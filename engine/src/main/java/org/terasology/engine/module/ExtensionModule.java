@@ -70,7 +70,7 @@ public class ExtensionModule implements Module {
     URL getModuleClasspathUrl() {
         try {
             if (Files.isDirectory(moduleRoot)) {
-                Path classesDir = moduleRoot.resolve("classes");
+                Path classesDir = moduleRoot.resolve("build/classes");
                 if (Files.isDirectory(classesDir)) {
                     return classesDir.toUri().toURL();
                 }

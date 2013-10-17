@@ -39,7 +39,7 @@ public final class PathManager {
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
-    private static final String MOD_DIR = "mods";
+    private static final String MOD_DIR = "modules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
 
@@ -61,8 +61,10 @@ public final class PathManager {
             URL urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
 
             Path codeLocation = Paths.get(urlToSource.toURI());
+            System.out.println("codeLocation: " + codeLocation);
             if (Files.isRegularFile(codeLocation)) {
-                installPath = codeLocation.getParent();
+                installPath = codeLocation.getParent().getParent();
+                System.out.println("Running from a file (jar). Setting installPath to: " + installPath);
             }
         } catch (URISyntaxException e) {
             // Can't use logger, because logger not set up when PathManager is used.
@@ -71,6 +73,7 @@ public final class PathManager {
         // If terasology.jar's location could not be resolved (maybe running from an IDE) then fallback on working path
         if (installPath == null) {
             installPath = Paths.get("").toAbsolutePath();
+            System.out.println("installPath was null, running from IDE. Setting it to: " + installPath);
         }
         homePath = installPath;
     }
