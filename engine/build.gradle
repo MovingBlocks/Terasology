@@ -1,0 +1,256 @@
+/*
+ * This is a Gradle build file:
+ * - Gradle Homepage: http://gradle.org/
+ * - Gradle Documentation: http://gradle.org/documentation
+ * - View tasks for this project: $ gradlew tasks
+ */
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'checkstyle'
+
+import groovy.json.JsonSlurper
+import org.apache.tools.ant.filters.FixCrLfFilter
+
+import java.text.SimpleDateFormat;
+
+def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+// Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
+ext {
+    //mainClassNameEditor = 'org.terasology.editor.TeraEd' // Actually need a new facade for this, maybe?
+
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
+
+    templatesDir = new File(rootDir, 'templates')
+
+    // Stuff for our automatic version file setup
+    startDateTimeString = dateTimeFormat.format(new Date())
+    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
+    //println "versionInfoFileDir is $versionInfoFileDir"
+    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
+    versionFileName = 'VERSION'
+    versionBase = new File(templatesDir, "version.txt").text.trim()
+    displayVersion = versionBase
+}
+
+// TODO: Make a top-level commons.gradle and put repositories and global variables etc in there then include: it?
+
+// Declare remote repositories we're interested in - library files will be fetched from here
+repositories {
+    // Main Maven repo
+    mavenCentral()
+    // MovingBlocks Artifactory instance for libs not readily available elsewhere
+    maven {
+        url "http://www.movingblocks.net:8081/artifactory/repo"
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Java Section                                                                                                      //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Engine for now has two source sets
+sourceSets {
+
+    // Main is almost everything - the true engine
+    main {
+        java {
+            output.classesDir 'build/classes'
+        }
+        // This makes the resources (assets, 3d wizardry includes, etc) also go to build/classes
+        output.resourcesDir 'build/classes'
+    }
+
+    // Dev contains some utilities. Not really sure this needs to be included with the build? But hey. Dump it in
+    dev {
+        java {
+            output.classesDir 'build/classes'
+        }
+    }
+}
+
+// Customizations for the main compilation configuration
+configurations {
+
+    // Exclude a couple JWJGL modules that aren't needed during compilation (OS specific stuff in these two perhaps)
+    compile {
+        exclude module: 'lwjgl-platform'
+        exclude module: 'jinput-platform'
+    }
+
+    // Beyond the standard compile "configuration" we declare one called "devCompile" specific to the "dev" source set
+    devCompile.extendsFrom compile
+}
+
+// Primary dependencies definition
+dependencies {
+
+    // Main library files fetched online
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
+    compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
+    compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+    compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LWJGL_VERSION
+    compile group: 'io.netty', name: 'netty', version: '3.6.5.Final'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
+    compile group: 'java3d', name: 'vecmath', version: '1.3.1'
+    //compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
+    compile group: 'org.newdawn.slick', name: 'slick', version: '237'
+    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
+    compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
+
+    // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
+    compile fileTree(dir: 'libs', include: '*.jar')
+
+    // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
+
+    // These dependencies are only needed for running tests
+    testCompile group: 'junit', name: 'junit', version: '4.10'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
+    testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3'
+
+    // This kinda-sorta triggers a circular dependency, but PC --> Engine is compile and this is test ...
+    testCompile project(':facades:PC')
+
+    // In addition to all the above the dev source set also needs to depend on what gets compiled in main
+    devCompile sourceSets.main.output
+}
+
+// Instructions for packaging a jar file for the engine
+jar {
+    // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
+    duplicatesStrategy = 'exclude'
+
+    manifest {
+        def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
+        attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID + ", " + displayVersion)
+    }
+}
+
+task distEngine (type: Sync) {
+    description = "Prepares the engine.jar for distribution"
+    into ("$distsDir/engine")
+    from jar
+}
+
+task distLibs (type: Sync) {
+    description = "Prepares the engine libs for distribution (useful for other builds)"
+    into ("$distsDir/libs")
+    from configurations.runtime
+}
+
+task sourceJar(type: Jar) {
+    description = "Create a JAR with all sources (main: java, resources)"
+    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
+    classifier = 'sources'
+    from sourceSets.main.output
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    description = "Create a JAR with the JavaDoc for the java sources"
+    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// Extra details provided for unit tests
+test {
+    dependsOn rootProject.extractNatives
+
+    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
+    ignoreFailures = true
+
+    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
+    testLogging.showStandardStreams = true
+
+    // Arguments to include while running tests
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Version file stuff                                                                                                //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// First read the internal version out of the engine's module.txt
+def moduleFile = file('src/main/resources/assets/module.txt')
+
+if (!moduleFile.exists()) {
+    println "Y U NO EXIST MODULE.TXT!"
+} else {
+    println "Scanning for version in module.txt for engine"
+    def slurper = new JsonSlurper()
+    def moduleConfig = slurper.parseText(moduleFile.text)
+
+    // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+    version = moduleConfig.version
+
+    // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+    group = 'org.terasology.engine'
+
+    // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
+    if (env.BUILD_NUMBER != null) {
+        version += '-SNAPSHOT+' + env.BUILD_NUMBER
+    }
+}
+
+// This version info file actually goes inside the built jar and can be used at runtime
+task createVersionInfoFile {
+    inputs.property('dateTime', startDateTimeString)
+    onlyIf { env.BUILD_URL != null }
+    doLast {
+        versionInfoFileDir.mkdirs()
+        ant.propertyfile (file: versionInfoFile) {
+            ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
+            ant.entry(key:'buildId',value:env.BUILD_ID)
+            ant.entry(key:'buildTag',value:env.BUILD_TAG)
+            ant.entry(key:'buildUrl',value:env.BUILD_URL)
+            ant.entry(key:'jobName',value:env.JOB_NAME)
+            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
+            ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
+            ant.entry(key:'dateTime',value:startDateTimeString)
+            ant.entry(key:'displayVersion',value:displayVersion)
+            ant.entry(key:'engineVersion',value:version)    // TODO: This new entry might have to be hooked into code / logging
+        }
+    }
+}
+
+jar.dependsOn createVersionInfoFile
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// General IDE customization                                                                                         //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// For IntelliJ add a bunch of excluded directories. Or not so much a bunch in the engine version of this
+idea {
+    module {
+        // Add development "dev" dir
+        sourceDirs += sourceSets.dev.allJava.srcDirs
+
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+    }
+}
+
+checkstyle {
+    ignoreFailures = true
+    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+    configProperties.samedir = checkstyle.configFile.parentFile
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSetFiles = files("config/pmd/pmd.xml")
+}

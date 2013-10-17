@@ -1,23 +1,26 @@
 # Ignore general
 /.*
 !.gitignore
-!.gitattributes
 *~
 ._*
 *.bak
 
-# Ignore gradle
+# Ignore Gradle
 /.gradle/
-/build/
-/mods/*/build
+build/
 
-# Ignore IntelliJ
+# Ignore IntelliJ IDEA
 /out/
-*.iml
-*.ipr
-*.iws
+/*.iml
+/**/*.iml
+/*.ipr
+/*.iws
 
 # Ignore Eclipse
+/.checkstyle
+/.classpath
+/.project
+/.settings/
 /bin/
 
 # Ignore Linux
@@ -48,7 +51,19 @@ entityDump.txt
 # Ignore natives (extracted to project root during setup)
 /natives/
 
-# Mod outputs
-/mods/*/classes/
-/mods/*/testClasses/
-/mods/*/.*
+# Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
+extensions
+/facades/*
+!/facades/PC
+!/facades/subprojects.gradle
+/modules/*
+!/modules/Core
+!/modules/subprojects.gradle
+
+libs
+
+# Ignore weird stuff that might be obsolete
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes

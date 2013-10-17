@@ -1,0 +1,298 @@
+// This extra build file is mainly for structural setup of the project using Git to import other repos from GitHub
+
+// Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
+
+ext {
+    // TODO: Huh, why can't this be resolved from the main build.gradle anymore? It used to be accessible
+    templatesDir = 'templates'
+}
+
+// The special build script section here ties dependencies to running the Gradle script itself
+buildscript {
+
+    // This needs to be in here as well for some reason - can't just inherit?
+    repositories {
+        mavenCentral()
+    }
+
+    // Dependencies at build script level
+    dependencies {
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+    }
+}
+
+// Dynamic task definition for cloning an existing module (with the module name embedded in the task name as <ID>)
+// Sample command: gradlew fetchModulePortals
+tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
+    if (taskName.startsWith("fetchModule")) {
+
+        // Here's the actual task definition for each dynamically created task of name taskName
+        task (taskName, type: GitClone) {
+            // TODO: This task description does not get listed under the "Rules" section on "gradlew tasks" :-(
+            description = 'Fetches source for a given module to the local project, cloned from GitHub'
+
+            // Repo name is the dynamic part of the task name
+            def repo = (taskName - 'fetchModule')
+            def parentDir = 'modules'
+
+            // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
+            def githubHome = 'Terasology'
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            def destination = file("$parentDir/$repo")
+
+            // Don't clone this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "fetchModule requested for $repo from Github under $githubHome - exists already? " + !enabled
+
+            // Do the actual clone if we don't have the directory already
+            if (enabled) {
+                uri = "git@github.com:$githubHome/" + repo + ".git"
+                println "Fetching $repo from $uri"
+                destinationPath = destination
+                bare = false
+            }
+
+            // Copy in (replace if existing for some reason) a build.gradle from template, plus module.txt if missing
+            doLast {
+                File targetBuildGradle = new File(destination, 'build.gradle')
+                targetBuildGradle.delete()
+                targetBuildGradle << new File(templatesDir, 'modules.gradle').text
+
+                File moduleManifest = new File (destination, 'module.txt')
+                if (!moduleManifest.exists()) {
+                    def moduleText = new File(templatesDir, 'module.txt').text
+                    moduleManifest << moduleText.replaceAll('MODULENAME', repo)
+                    println "WARNING: Module $repo did not have a module.txt! One was created, please review and submit to GitHub"
+                }
+            }
+        }
+    }
+}
+
+// Dynamic task definition for creating a new module (from scratch, rather than cloning from GitHub)
+// Sample command: gradlew createModuleMyStuff
+tasks.addRule("Pattern: createModule<ID>") { String taskName ->
+    if (taskName.startsWith("createModule")) {
+
+        // Here's the actual task definition for each dynamically created task of name taskName
+        task (taskName, type: GitInit) {
+            description = 'Creates template source for a given module to the local project and preps a local Git repo'
+
+            // Repo name is the dynamic part of the task name
+            def repo = (taskName - 'createModule')
+            def parentDir = 'modules'
+
+            // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
+            def githubHome = 'Terasology'
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            def destination = file("$parentDir/$repo")
+
+            // Don't create this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "createModule requested for $repo linked to $githubHome on GitHub - exists already? " + !enabled
+
+            // Do the actual creation if we don't have the directory already
+            if (enabled) {
+
+                println "Creating $repo locally"
+                destination.mkdir()
+                destinationPath = destination
+
+                // TODO: Add in the local mapping to a remote ref definition. Needs support in the Gradle-Git plugin
+                //uri = "git@github.com:$githubAccount/" + repo + ".git"
+                bare = false
+
+                // Copy in some template stuff for the new module
+                doLast {
+                    new File(destination, 'build.gradle') << new File(templatesDir, 'modules.gradle').text
+                    def moduleManifest = new File (destination, 'module.txt')
+                    def moduleText = new File(templatesDir, 'module.txt').text
+                    moduleManifest << moduleText.replaceAll('MODULENAME', repo)
+                    new File(destination, '.gitignore') << new File(templatesDir, '.gitignore').text
+                }
+            }
+        }
+    }
+}
+
+// Dynamic task definition for cloning an existing facade (with the facade name embedded in the task name as <ID>)
+// Sample command: gradlew fetchFacadeAndroid
+tasks.addRule("Pattern: fetchFacade<ID>") { String taskName ->
+    if (taskName.startsWith("fetchFacade")) {
+
+        // Here's the actual task definition for each dynamically created task of name taskName
+        task (taskName, type: GitClone) {
+            description = 'Fetches source for a given facade to the local project, cloned from GitHub'
+
+            // Repo name is the dynamic part of the task name. Facade repos are prefixed with "Facade" so we do "math"
+            def repo = (taskName - 'fetch')
+            def localName = (repo - 'Facade')
+            def parentDir = 'facades'
+
+            println "Repo is $repo - localName is $localName"
+
+            // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
+            def githubHome = 'Terasology'
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            def destination = file("$parentDir/$localName")
+
+            // Don't clone this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "fetchFacade requested for $localName from Github under $githubHome - exists already? " + !enabled
+
+            // Do the actual clone if we don't have the directory already
+            if (enabled) {
+                uri = "git@github.com:$githubHome/" + repo + ".git"
+                println "Fetching $repo from $uri"
+                destinationPath = destination
+                bare = false
+            }
+        }
+    }
+}
+
+// Dynamic task definition for creating a new facade (with the facade name embedded in the task name as <ID>)
+// Sample command: gradlew createFacadeConsoleX
+tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
+    if (taskName.startsWith("createFacade")) {
+
+        // Here's the actual task definition for each dynamically created task of name taskName
+        task (taskName, type: GitInit) {
+            description = 'Creates template source for a given facade to the local project and preps a local Git repo'
+
+            // Repo name is the dynamic part of the task name. Facade repos are prefixed with "Facade" so we do "math"
+            def repo = (taskName - 'create')
+            def localName = (repo - 'Facade')
+            def parentDir = 'facades'
+
+            println "Repo is $repo - localName is $localName"
+
+            // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
+            def githubHome = 'Terasology'
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            def destination = file("$parentDir/$localName")
+
+            // Don't create this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "createFacade requested for $localName linked to Github under $githubHome - exists already? " + !enabled
+
+            // Do the actual creation if we don't have the directory already TODO: Doesn't enable the GitHub mapping yet
+            if (enabled) {
+                //uri = "git@github.com:$githubHome/" + repo + ".git"
+                println "Creating $repo locally" // pointed at $uri"
+                destination.mkdir()
+                destinationPath = destination
+                bare = false
+
+                // Copy in some template stuff for the new facade. TODO: This doesn't do a whole lot yet...
+                doLast {
+                    new File(destination, 'build.gradle') << new File(templatesDir, 'facades.gradle').text
+                    def moduleManifest = new File (destination, 'module.txt')
+                    def moduleText = new File(templatesDir, 'module.txt').text
+                    moduleManifest << moduleText.replaceAll('MODULENAME', repo)
+                    new File(destination, '.gitignore') << '*.iml'
+                    println "*** New facade created but this template is pretty raw! Please review well before using"
+                }
+            }
+        }
+    }
+}
+
+// Dynamic task for fetching project-related libs. Probably rarely needed and half-hardcoded for specific libs anyway
+// Sample command: gradlew fetchLibJitter
+tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
+    if (taskName.startsWith("fetchLib")) {
+
+        // Task for fetching our various library projects like TeraBullet
+        task (taskName, type: GitClone) {
+            description = 'Fetches source for a given Terasology-related library to the local project, pulled from GitHub'
+
+            // Repo name is the dynamic part of the task name
+            def repo = (taskName - 'fetchLib')
+            def parentDir = 'libs'
+
+            // Default to MovingBlocks but set some stuff for known libs
+            def githubHome = 'MovingBlocks'
+
+            switch (repo) {
+                case 'TeraBullet' :
+                    // TeraBullet currently uses the "develop" branch
+                    branch = 'develop'
+                    break;
+
+            // Hmm, what to do with casing issues. Camel case gradlew fetchLibJitter is so pretty! But .. jitter
+                case 'Jitter' :
+                case 'jitter' :
+                    // Jitter is hosted in the "openleap" org and everything is in lower case, whoops
+                    githubHome = 'openleap'
+                    repo = 'jitter'
+                    break;
+            }
+
+            // Allow user to override the GitHub account to pull from. Supply with -PgithubAccount="TargetAccountName"
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            // Prep destination - this creates the "libs" dir if it doesn't exists and places a subprojects.gradle there
+            checkSubprojectDir(parentDir)
+
+            def destination = file("$parentDir/$repo")
+
+            // Don't clone this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "fetchLib requested for $repo from Github under $githubHome - exists already? " + !enabled
+
+            // Do the actual clone if we don't have the directory already
+            if (enabled) {
+                uri = "git@github.com:$githubHome/" + repo + ".git"
+                println "Fetching $repo from $uri"
+                destinationPath = destination
+                bare = false
+            }
+        }
+    }
+}
+
+// Check for a sub project type dir (/modules, /libs, etc), and create it along with a subprojects.gradle if no exist
+// NOTE: With the PC Facade and Core module back in main repo those two dirs exist and have the file. Maybe more later
+def checkSubprojectDir(String dir) {
+    def typeDir = new File(dir)
+    if (!typeDir.exists()) {
+        println "typeDir " + typeDir + " didn't exist yet, creating it and generating a subprojects.gradle file for it"
+        typeDir.mkdir()
+        def subProjectGradleFile = new File(typeDir, 'subprojects.gradle')
+        subProjectGradleFile.createNewFile()
+
+        // TODO: Change this to be a template file instead? Although two other instances will be kept (facades, modules)
+        // Fill in the new file, including its parent dir so each is unique
+        subProjectGradleFile.text = """
+// This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
+// The first time this type of sub is added this file is created, but the sub-sub isn't available until next run
+new File('${dir}').eachDir { possibleSubprojectDir ->
+    println "subprojects.gradle running for " + possibleSubprojectDir
+    def subprojectName = '${dir}:' + possibleSubprojectDir.name
+    println "subprojectName is " + subprojectName
+    include subprojectName
+    def subprojectPath = ':' + subprojectName
+    def subproject = project(subprojectPath)
+    subproject.projectDir = possibleSubprojectDir
+}
+"""
+
+    }
+}

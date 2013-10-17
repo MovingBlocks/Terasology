@@ -1,0 +1,211 @@
+import groovy.json.JsonSlurper
+
+// Simple build file for modules - this template will be copied into new module directories as they are created
+
+apply plugin: 'java'
+apply plugin: 'project-report'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+ext {
+
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
+}
+
+// Same repository configuration as root project
+repositories {
+    mavenCentral()
+    maven {
+        url "http://www.movingblocks.net:8081/artifactory/repo"
+    }
+}
+
+def moduleDepends = [];
+def moduleFile = file('module.txt')
+
+// Really the module file should always exist if the module was correctly created or cloned using Gradle
+if (!moduleFile.exists()) {
+    println "Y U NO EXIST MODULE.TXT!"
+    throw new GradleException("Failed to find module.txt for " + project.name)
+// Otherwise, retrieve dependencies information from it
+} else {
+    //println "Scanning for dependencies in module.txt for " + project.name
+    def slurper = new JsonSlurper()
+    def moduleConfig = slurper.parseText(moduleFile.text)
+    for (dependency in moduleConfig.dependencies) {
+        if (dependency.id != 'engine') {
+            moduleDepends += dependency.id
+        }
+    }
+
+    // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+    version = moduleConfig.version
+
+    // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+    group = 'org.terasology.modules'
+
+    // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
+    if (env.BUILD_NUMBER != null) {
+        version += '-SNAPSHOT+' + env.BUILD_NUMBER
+    }
+}
+
+// Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.10'
+
+    println "Dependencies for " + project.name + " will be engine and potentially more on any following lines:"
+    moduleDepends.each {
+        println " + module dependency " + it
+    }
+
+    // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
+    if (project.name != project(':').name) {
+        //println "We're in a local multi-project workspace so will look for dependencies there first, then Artifactory"
+
+        // In multi-project mode we should always have an engine project to depend on. Also satisfies external libs
+        compile project(':engine')
+
+        // If the module has dependencies on other modules we look in a few different spots to find them
+        for (dependency in moduleDepends) {
+
+            File wouldBeSrcPath = new File(rootDir, 'modules/' + dependency)
+
+            // TODO: module jars with version info (maybe supplied by user) won't match. Artifactory fetches get renamed
+            File wouldBeModuleJar = new File(rootDir, 'modules/' + dependency + '.jar')
+
+            println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
+            println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
+
+            // First see if we have an actual source module project in the Gradle project tree (user addModule'ed it)
+            if (wouldBeSrcPath.exists()) {
+                //TODO: This is fragile, of course, and will hit problems with corrupt module directories (empty dir)
+
+                println "Found dependency source module locally, setting a direct project dependency: " + dependency
+                compile project(':modules:' + dependency)
+
+            } else if (wouldBeModuleJar.exists()) {
+
+                // Alternatively might find the dependency in the modules dir as a binary (manually placed or fetched)
+                println "Found dependency binary locally in /modules, it will be included via file dependency"
+
+                compile files(wouldBeModuleJar)
+
+                // Knowing that the jar is in /modules we know it'll be available at runtime
+                // If the user later adds a source version it'll override this binary naturally
+
+            } else {
+                println "*** Unsatisfied local dependency for module " + project.name + ": " + dependency
+                // The '+' is satisfied by any version
+                compile(group: 'org.terasology.modules', name: dependency, version: '+')
+
+                // NOTE: Referencing resolvedArtifacts actually resolves the involved artifacts at this time (early)
+                configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+                    def id = artifact.moduleVersion.id
+                    if (id.group == 'org.terasology.modules') {
+                        println "Remotely resolved $id.group - $id.name at version $id.version"
+
+                        // This copies the jar from the Gradle cache to the game's module dir for runtime usage
+                        wouldBeModuleJar.createNewFile()
+                        wouldBeModuleJar << artifact.file.bytes
+                        // After this has run the next execution will match the local binary case instead
+
+                        // TODO: Make the project clean task delete such transient module jars? They'll re-resolve
+                    }
+                }
+            }
+        }
+    } else {
+        println "We're in a single-project workspace (probably Jenkins) so will look elsewhere for everything"
+
+        // In Jenkins we can expect to have a sort of "project harness" dumped into a libs dir (engine, engine libs ..)
+        compile fileTree(dir: 'libs', include: '*.jar')
+
+        // To get Terasology module dependencies we simply declare them against Artifactory and wait - no runtime need
+        moduleDepends.each {
+            println "*** Attempting to fetch dependency module from Artifactory: " + project.name + ": " + it
+            // The '+' is satisfied by any version
+            compile(group: 'org.terasology.modules', name: it, version: '+')
+        }
+    }
+}
+
+// Generate the module directory structure if missing
+task createSkeleton() {
+    mkdir('assets')
+    mkdir('assets/animations')
+    mkdir('assets/blocks')
+    mkdir('assets/blockTiles')
+    mkdir('assets/fonts')
+    mkdir('assets/materials')
+    mkdir('assets/mesh')
+    mkdir('assets/music')
+    mkdir('assets/prefabs')
+    mkdir('assets/shaders')
+    mkdir('assets/shapes')
+    mkdir('assets/skeletalMesh')
+    mkdir('assets/sounds')
+    mkdir('assets/textures')
+    mkdir('src/main/java')
+    mkdir('src/test/java')
+}
+
+// This task syncs everything in the assets dir into the output dir, used when jarring the module
+task syncAssets(type: Sync) {
+    from 'assets'
+    into 'build/classes/assets'
+}
+
+// Change the output dir of each module
+sourceSets {
+    main {
+        java {
+            output.classesDir 'build/classes'
+        }
+    }
+}
+
+// Instructions for packaging a jar file - is a manifest even needed for modules?
+jar {
+    // Make sure the assets directory is included
+    dependsOn syncAssets
+
+    // Jarring needs to copy module.txt and all the assets into the output
+    doFirst {
+        copy {
+            from 'module.txt'
+            into 'build/classes'
+        }
+    }
+}
+
+// Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D
+idea {
+    module {
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+    }
+}
+
+// For Eclipse just make sure the classpath is right
+eclipse {
+    classpath {
+        defaultOutputDir = file('build/classes')
+    }
+}
+
+checkstyle {
+    ignoreFailures = true
+    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+    configProperties.samedir = checkstyle.configFile.parentFile
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+}

@@ -1,8 +1,9 @@
 {
-    "id" : "${id}",
-    "version" : "1.0.0",
+    "id" : "MODULENAME",
+    "version" : "0.1.0",
     "author" : "",
-    "displayName" : "${id}",
+    "displayName" : "",
     "description" : "",
-    "dependencies" : []
+    "dependencies" : [],
+    "isServersideOnly" : false
 }

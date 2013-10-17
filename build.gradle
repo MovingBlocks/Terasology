@@ -5,81 +5,64 @@
  * - View tasks for this project: $ gradlew tasks
  */
 
-apply plugin: 'java'
-apply plugin: 'project-report'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+// Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
+apply from: 'utility.gradle'
+apply from: 'ide.gradle'
 
 /*
- * Update Gradle Wrapper:
+ * To Update Gradle Wrapper:
  * 1. Uncomment 'wrapper' task
  * 2. Change 'gradleVersion'
- * 3. Run 'gradlew wrapper'
+ * 3. Run "gradlew wrapper" TWICE (first upgrades the prop file, second the jar if needed)
  * 4. Comment 'wrapper' task
  */
-// task wrapper(type: Wrapper) {
-//     gradleVersion = '1.6'
-// }
+//task wrapper(type: Wrapper) {
+//    gradleVersion = '1.8'
+//}
 
-import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter;
-import java.text.SimpleDateFormat;
 
-def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
+// Test for right version of Java in use for running this script
+assert org.gradle.api.JavaVersion.current().isJava7Compatible()
 
-def LWJGL_VERSION = '2.9.0'
-def JINPUT_VERSION = '2.0.5'
-
-// Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
+// Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
-    // Project paths
-    dirApplet = 'applet'
+    // Version levels for LWJGL
+    LWJGL_VERSION = '2.9.0'
+    JINPUT_VERSION = '2.0.5'
+
     dirNatives = 'natives'
-    dirSaves = 'saves'
+    templatesDir = 'templates'
+
+    // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
-    subDirModules = 'mods'
-    destDirApplet = 'distributions/applet'
-    destDirApplication = 'distributions/application'
-    destDirMainOutput = 'mainOutput'
-    destDirModules = "distributions/$subDirModules"
-    mainClassName = 'org.terasology.engine.Terasology'
-	mainClassNameEditor = 'org.terasology.editor.TeraEd'
-    jarFileName = 'Terasology.jar'
-    templatesDir = file('templates')
-    
-    // Read environment variables, including variables passed by jenkins continuous integration server
-    env = System.getenv() 
-    
-    // Settings for automatic version file
-    startDateTimeString = dateTimeFormat.format(new Date())
-    versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
-    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
-    versionFileName = 'VERSION'
-    versionBase = rootProject.file("templates/version.txt").text.trim()
-    displayVersion = versionBase
 }
 
 // Declare remote repositories we're interested in - library files will be fetched from here
 repositories {
+    // Main Maven repo
     mavenCentral()
+    // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         url "http://www.movingblocks.net:8081/artifactory/repo"
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Natives
-//
-// Handling of pulling in and extracting native libraries for lwjgl
+// Natives - Handles pulling in and extracting native libraries for LWJGL                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Define a custom configuration for Natives
+// Define a custom configuration named "natives"
 configurations {
     natives
 }
 
+// For the "natives" configuration make it depend on the native files from LWJGL
 dependencies {
     natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
 }
@@ -119,541 +102,132 @@ task extractNatives {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Java
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-sourceCompatibility = 1.7
-
-// Add additional "source set" beyond the default (src/main/ + src/test/), in this case src/dev/ (utility)
-sourceSets {
-    dev
-}
-
-// Customizations for the main compilation configuration
-configurations {
-    // Exclude a couple of LWJGL modules that aren't needed during compilation
-    compile {
-        exclude module: 'lwjgl-platform'
-        exclude module: 'jinput-platform'
-    }
-    // Setup compilation for the dev source set
-    devCompile.extendsFrom compile
-}
-
-// Primary dependenices definition
-dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
-    compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
-    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
-    compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-    compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LWJGL_VERSION
-    compile group: 'io.netty', name: 'netty', version: '3.6.5.Final'
-    compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
-    compile group: 'java3d', name: 'vecmath', version: '1.3.1'
-    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
-    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
-    compile group: 'org.newdawn.slick', name: 'slick', version: '237'
-	compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
-	compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
-    
-    // Also grab any libraries in the libs folder (not preferred)
-    compile fileTree(dir: 'libs', include: '*.jar')
-    
-    // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
-    
-    // These dependencies are only needed for running tests
-    testCompile group: 'junit', name: 'junit', version: '4.10'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-    testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3' 
-    
-    // The dev source set also needs these dependencines
-    devCompile sourceSets.main.output
-}
-
-// Instructions for packaging a jar file of the main project
-jar {
-    archiveName = jarFileName
-    manifest {
-        def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
-        attributes("Main-Class": mainClassName, "Class-Path" : manifestClasspath, "Implementation-Title": project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID + ", " + displayVersion)
-    }
-}
-
-task sourceJar(type: Jar) {
-    description = "Create a JAR with all sources (main: java, resources)"
-    manifest.attributes("Implementation-Title": project.name)
-    classifier = 'sources'
-    from sourceSets.main.output
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    description = "Create a JAR with the JavaDoc for the java sources"
-    manifest.attributes("Implementation-Title": project.name)
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-// Configuration for running unit tess
-test {
-    dependsOn extractNatives 
-
-    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
-    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
-    // Arguments to include while running tests
-    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Modules
-//
-// Configuration around the creation and inclusion of modules
+// Section for project modules (equally set up as modules in IntelliJ)                                               //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Move this to the generated subproject gradle files? Or use project.childProjects even here?
+// TODO: This pretty much has been made obsolete by changes elsewhere. Do a last check (especially of libs) then remove
 subprojects {
-    // Ignore the actual "mods" directory as it itself is not a module
-    if (name != 'mods') {
-        // Each module gets set up as Java and prepped for being turned into an Eclipse or IntelliJ project
+    // MODULES - most "exposed" project component type, users will supply these so need to be careful
+    if (project.getParent().name == "modules" ) {
+        // TODO: Verify a user-provided build.gradle cannot override the one we create
+        // Maybe Jenkins module builds should delete if exists then re-copy in from main project ?
+        println "Iterating over subprojects - Found a module: $project.name"
+    } else if (project.getParent().name == "facades" ) {
+        // FACADES - front-ends to the engine, fully under our control
+        println "Iterating over subprojects - Found a facade: " + project.name
+    } else if (project.getParent().name == "libs" ) {
+        println "Iterating over subprojects - Found a lib: " + project.name
+
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'idea'
-        
-        // Change the output dir of each module to classes, as this is where Terasology will look when loading modules
-        sourceSets {
-            main {
-                java {
-                    output.classesDir 'classes'
-                }
-            }
-        }
-        
-        // Generate the module directory structure if missing
-        task createSkeleton() {
-            mkdir('assets')
-            mkdir('assets/animations')
-            mkdir('assets/blocks')
-            mkdir('assets/blockTiles')
-            mkdir('assets/fonts')
-            mkdir('assets/materials')
-            mkdir('assets/mesh')
-            mkdir('assets/music')
-            mkdir('assets/prefabs')
-            mkdir('assets/shaders')
-            mkdir('assets/shapes')
-            mkdir('assets/skeletalMesh')
-            mkdir('assets/sounds')
-            mkdir('assets/textures')
-            mkdir('src/main/java')
-            mkdir('src/test/java')
-        }
-        // This task syncs everything in the assets dir into the output dir, used when jarring the module
-        task syncAssets(type: Sync) {
-            from 'assets'
-            into 'classes/assets'
-        }
-        
-        // This task creates a barebones module.txt if it is missing, from a template
-        task createModuleManifest(type: Copy) {
-            from templatesDir
-            into projectDir
-            include 'module.txt'
-            expand(id: project.name)
-        }
-        
-        def moduleDepends = [];
-        def moduleFile = file('module.txt')
-        // If moduleFile is missing, create it
-        if (!moduleFile.exists()) {
-            compileJava.dependsOn createModuleManifest
-            createSkeleton.dependsOn createModuleManifest
-			version = "1.0.0"
-            
-        // Otherwise, retrieve dependencies information from it
-        } else {
-            def slurper = new JsonSlurper()
-            def moduleConfig = slurper.parseText( file('module.txt').text)
-			for (dependency in moduleConfig.dependencies) { 
-				if (dependency.id != 'engine') {
-					moduleDepends += dependency.id
-				}
-			}
-			version = moduleConfig.version
-        }
-        
-        // Jarring needs to copy module.txt and all the assets into the output
-        jar.doFirst {
-            copy {
-                from 'module.txt'
-                into 'classes'
-            }
-        }
-        jar.dependsOn syncAssets
-        
-        // Setup for IntelliJ projects
-        idea {
-            module {
-                // Output into classes and testClasses rather than the default
-                inheritOutputDirs = false
-                outputDir = file('classes')
-                testOutputDir = file('testClasses')
-                iml {
-                    generateTo = file('.idea')
-                }
-            }
-        }
-        // Setup for Eclipse projects
-        eclipse {
-            classpath {
-                // Output into classes rather than the default
-                defaultOutputDir = file('classes')
-            }
-        }
-        // Same repository configuration as root project
-        repositories {
-            mavenCentral()
-            maven {
-                url "http://www.movingblocks.net:8081/artifactory/repo"
-            }
-        }
-        // Set dependencies. Note that the dependency information from module.txt is used
-        dependencies {
-            compile project(':')
-            testCompile group: 'junit', name: 'junit', version: '4.10'
-            for (dependency in moduleDepends) {
-                compile project(':mods:' + dependency)
-            }
-        }
-    }
-}
-
-task moduleClasses {
-    description = "Compile all modules"
-    subprojects.each { project -> 
-        if (project.name != 'mods') {
-            moduleClasses.dependsOn project.tasks['classes']
-        }
-    }    
-}
-
-task moduleAssemble {
-    description = "Assembles all modules"
-    subprojects.each { project -> 
-        if (project.name != 'mods') {
-            moduleAssemble.dependsOn project.tasks['assemble']
-        }
-    }    
-}
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Checkstyle
-//
-// This is used to check the style of the source for compliance with our code style guidelines
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-checkstyle.ignoreFailures = true
-checkstyle.configProperties.samedir = checkstyle.configFile.parentFile
-/* Optional check plugins
-apply plugin: 'codenarc'
-apply plugin: 'findbugs'
-apply plugin: 'pmd'
-
-// ignoreFailures: Whether or not this task will ignore failures and continue running the build.
-codenarc.ignoreFailures = true
-findbugs.ignoreFailures = true
-pmd.ignoreFailures = true
-*/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Miscellaneous
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-task assembleMainOutput(type:Sync) {
-    description = "Helper task for when the game is being run from the command line"
-    from sourceSets.main.output
-    into "$buildDir/$destDirMainOutput"
-}
-
-task run(type:JavaExec) {
-    description = "Run 'Terasology' to play the game"
-
-    dependsOn extractNatives
-    dependsOn assembleMainOutput
-    dependsOn moduleClasses
-    main = mainClassName
-    classpath "$buildDir/$destDirMainOutput"
-    classpath configurations.runtime
-}
-
-task runTeraEd(type:JavaExec) {
-    description = "Run 'TeraEd' to customize shader settings while the game is running"
-
-    dependsOn extractNatives
-    dependsOn assembleMainOutput
-    dependsOn moduleClasses
-    main = mainClassNameEditor
-    classpath "$buildDir/$destDirMainOutput"
-    classpath configurations.runtime
-}
-
-task deleteSaves(type: Delete) {
-    description = "Delete all saved games"
-    delete file(dirSaves).listFiles().findAll { it.directory }
-}
-
-task deleteSaveFiles(type: Delete) {
-    description = "Delete all files in '$dirSaves'"
-    delete file(dirSaves).listFiles().findAll { !it.directory }
-}
-
-task zipSavesFolder(type: Zip) {
-    description = "Creates a Saves ZIP file from '$dirSaves'"
-    appendix = "SavedGames"
-    classifier = startDateTimeString
-    into (dirSaves) {
-        from dirSaves
-    }
-}
-
-task runProtobufWindows(type:Exec) {
-    description = "Run 'Protobuf Compiler' (Windows)"
-    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Version file
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-task createVersionInfoFile {
-    dependsOn processResources
-    inputs.property('dateTime', startDateTimeString)
-    onlyIf { env.BUILD_URL != null }
-    doLast {
-        versionInfoFileDir.mkdirs()
-        ant.propertyfile (file: versionInfoFile) {
-            ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
-            ant.entry(key:'buildId',value:env.BUILD_ID)
-            ant.entry(key:'buildTag',value:env.BUILD_TAG)
-            ant.entry(key:'buildUrl',value:env.BUILD_URL)
-            ant.entry(key:'jobName',value:env.JOB_NAME)
-            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
-            ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
-            ant.entry(key:'dateTime',value:startDateTimeString)
-            ant.entry(key:'displayVersion',value:displayVersion)
-        }
-    }
-}
-
-jar.dependsOn createVersionInfoFile
-
-task createVersionFile(type: Copy) {
-    inputs.property('dateTime', startDateTimeString)
-    onlyIf { env.BUILD_URL != null }
-    from 'src/template'
-    into "$buildDir"
-    include versionFileName
-    expand(buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString, displayVersion: displayVersion)
-    filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Distributions
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-task distModules {
-    description = "Prepares the modules for distribution"
-    dependsOn moduleAssemble
-    subprojects.each { project -> 
-        if (project.name != 'mods') {
-            project.task('dist', type: Copy) {
-                from (project.libsDir)
-                into "$buildDir/$destDirModules"
-            }
-            distModules.dependsOn project.tasks['dist']
-        }
-    }
-}
-
-task distApplication(type:Sync) {
-    description = "Creates an Application folder"
-    dependsOn extractNatives
-    dependsOn distModules
-    into("$buildDir/$destDirApplication")
-    from ('Heightmap.txt') {}
-    from ('README.markdown') {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-        rename('README.markdown', 'README')
-    }
-    from ('LICENSE') {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-    }
-    from ('NOTICE') {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-    }
-    from jar
-    from('launchScripts') {
-        exclude('Launcher.xml')
-    }
-    into(subDirLibs) {
-        from configurations.runtime
-    }
-    into(dirNatives) {
-        from dirNatives
-    }
-    into(subDirModules) {
-        from "$buildDir/$destDirModules"
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Applet
+// Helper tasks                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-configurations {
-    applet
+// Helper that returns a list of all local Terasology module projects
+def terasologyModules() {
+    subprojects.findAll {it.parent.name == 'modules'}
 }
 
-dependencies {
-    applet group: 'org.lwjgl.lwjgl', name: 'lwjgl_util_applet', version: LWJGL_VERSION
-}
-
-task syncIntoApplet(type:Sync) {
-    into("$buildDir/$destDirApplet")
-    from ('README.markdown') {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-        rename('README.markdown', 'README')
-    }
-    from ('LICENSE') {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-    }
-    from ('NOTICE') {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
-    }
-    from jar
-    from configurations.applet
-    into(subDirLibs) {
-        from configurations.runtime
-        from configurations.natives
-    }
-    into(subDirModules) {
-        from "$buildDir/$destDirModules"
+// Helper that replaces the build.gradle under every module with a fresh copy of modules.gradle
+// NOTE: This also replaces the version under the Core module that *is* in fact under Git control ...
+task refreshModuleGradle << {
+    File replacementGradle = new File(templatesDir, 'modules.gradle')
+    terasologyModules().each {
+        File targetFile = new File(rootDir, "modules/" + it.name + "/build.gradle")
+        targetFile.delete()
+        targetFile << replacementGradle.text
     }
 }
 
-task createIndexHtml(type:Copy) {
-    mustRunAfter syncIntoApplet
-    def jars = []
-    configurations.runtime.each {
-        jars += 'lib/' + it.getName()
-    }
-    def modules = []
-    subprojects.each { project -> 
-        if (project.name != 'mods') {
-            modules += project.name + '.jar'
-        }
-    }
-    from(dirApplet)
-    into("$buildDir/$destDirApplet")
-    include 'index.html'
-    expand(lwjglVersion: LWJGL_VERSION, jinputVersion : JINPUT_VERSION, jars : jars.join(", "), modules : modules.join(", "))
-}
+// Helpers that do magic things after having dependencies attached below
+task moduleClasses
+task moduleJars
 
-task distApplet {
-    description = "Creates an Applet folder"
-    dependsOn distModules
-    dependsOn syncIntoApplet
-    dependsOn createIndexHtml    
-}
+// This magically makes everything work - without this the desired module projects returned have no tasks :-(
+gradle.projectsEvaluated {
+    // Note how "classes" may indirectly trigger "jar" for module dependencies of modules (module compile dependency)
+    moduleClasses.dependsOn(terasologyModules().classes)
 
-// At the end of the applet distribution sign the jar files so they can get expanded rights in a browser
-distApplet.doLast {
-    file("$buildDir/$destDirApplet").listFiles().each {
-        if (it.getName().endsWith(".jar"))
-            ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
-    }
-    file("$buildDir/$destDirApplet/$subDirLibs").listFiles().each {
-        if (it.getName().endsWith(".jar"))
-            ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
-    }
-    file("$buildDir/$destDirApplet/$subDirMods").listFiles().each {
-        if (it.getName().endsWith(".jar"))
-            ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
-    }
-}
-
-task distModulesZip(type:Zip) {
-    description = "Creates a modules ZIP file from '$buildDir/$destDirModules'"
-    dependsOn distModules
-    appendix 'Mods'
-    from "$buildDir/$destDirModules"
-}
-
-task distApplicationZip(type:Zip) {
-    description = "Creates an Application ZIP file from '$buildDir/$destDirApplication'"
-    dependsOn distApplication
-    dependsOn createVersionInfoFile
-    dependsOn createVersionFile
-    //appendix 'Application'
-    from "$buildDir/$destDirApplication"
-    from "$buildDir/$versionFileName"
-}
-
-task distAppletZip(type:Zip) {
-    description = "Creates an Applet ZIP file from '$buildDir/$destDirApplet'"
-    dependsOn distApplet
-    dependsOn createVersionInfoFile
-    dependsOn createVersionFile
-    appendix 'Applet'
-    from "$buildDir/$destDirApplet"
-    from "$buildDir/$versionFileName"
+    // This makes it work for a full jar task
+    moduleJars.dependsOn(terasologyModules().jar)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IDE project setup
+// General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Make sure the IDE prep includes extraction of natives
 ideaModule.dependsOn extractNatives
-eclipseClasspath.dependsOn extractNatives
+// TODO: This next piece broke when the root build had its java plugin removed
+//eclipseClasspath.dependsOn extractNatives
 
-idea { 
-    project {
-        jdkName = '1.7'
-        ipr {
-            withXml {
-                // Setup copyright statement injection
-                def node = it.asNode()
-                def copyrightManager = node.find {it.@name == 'CopyrightManager'}
-                copyrightManager.@default = "TerasologyEngine"
-                def copyright = copyrightManager.appendNode("copyright")
-                copyright.appendNode("option", [name : "notice", value : 'Copyright 2013 MovingBlocks\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n     http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.']) 
-                copyright.appendNode("option", [name : "keyword", value : "Copyright"])
-                copyright.appendNode("option", [name : "allowReplaceKeywod", value : ""])
-                copyright.appendNode("option", [name : "myName", value : "TerasologyEngine"])
-                copyright.appendNode("option", [name : "myLocal", value : "true"])
-                def langOptions = copyrightManager.appendNode("LanguageOptions", [name : "__TEMPLATE__"])
-                langOptions.appendNode("option", [name : "addBlankAfter", value : "false"])
-                
-                // Setup knowledge of certain annotations being entry points (so don't mark annotated items as unused)
-                def entryPointsManager = node.appendNode('component', [name : "EntryPointsManager"])
-                def entryPoints = entryPointsManager.appendNode('entry_points', [version : '2.0'])
-                def entryPointsList = entryPointsManager.appendNode('list', [size : '3'])
-                entryPointsList.appendNode('item', [index : '0', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.event.ReceiveEvent'])
-                entryPointsList.appendNode('item', [index : '1', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.In'])
-                entryPointsList.appendNode('item', [index : '2', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.RegisterSystem'])
-                entryPointsList.appendNode('item', [index : '3', class : 'java.lang.String', itemvalue : 'org.terasology.logic.console.Command'])
-            }
-        }
-    }
-    // Add benchmarking "dev" directory
-    module.sourceDirs += sourceSets.dev.allJava.srcDirs
-    
-    // Exclude these directories from the project view
+// For IntelliJ add a bunch of excluded directories
+idea {
+
+    // Exclude Eclipse dirs
     module.excludeDirs += file('bin')
-    module.excludeDirs += file('gradle')
-    module.excludeDirs += file('logs') 
+    module.excludeDirs += file('.settings')
+
+    // Exclude special dirs
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
+    module.excludeDirs += file('gradle')
+
+    // Exclude output dirs
+    module.excludeDirs += file('logs')
     module.excludeDirs += file('saves')
     module.excludeDirs += file('screenshots')
+
+    project {
+        // Set JDK
+        jdkName = '1.7'
+
+        ipr {
+            withXml { xmlProvider ->
+                // Apply a bunch of tweaks to IntelliJ config - all defined in ide.gradle
+                // Part reason for separate file was in case a module needs to define something it cannot do so in a project block
+                def iprNode = xmlProvider.asNode()
+                ideaActivateCheckstyle(iprNode)
+                ideaActivateCopyright(iprNode)
+                ideaActivateAnnotations(iprNode)
+                ideaActivateGit(iprNode)
+                ideaExcludeLogbackGroovy(iprNode)
+                ideaActivateGradle(iprNode)
+            }
+
+            // Sets sourceCompatibility within IntelliJ (without this root build having the Java plugin applied)
+            whenMerged {project ->
+                project.jdk.languageLevel = 'JDK_1_7'
+            }
+        }
+    }
+
+    // Tweaks to the .iws
+    workspace.iws.withXml { xmlProvider ->
+        def iwsNode = xmlProvider.asNode()
+        ideaMakeAutomatically(iwsNode)
+        ideaRunConfig(iwsNode)
+    }
 }
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checkstyle stuff                                                                                                  //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// TODO: Should probably put this in a separate Gradle file and import everywhere. Maybe a Java version too with sourceCompatibility?
+checkstyle {
+    ignoreFailures = true
+    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+    configProperties.samedir = checkstyle.configFile.parentFile
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+}

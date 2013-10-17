@@ -1,0 +1,207 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+import org.apache.tools.ant.filters.FixCrLfFilter
+import java.text.SimpleDateFormat;
+
+def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+ext {
+    mainClassName = 'org.terasology.engine.Terasology'
+    subDirLibs = 'libs'
+    templatesDir = new File(rootDir, 'templates')
+
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
+
+    startDateTimeString = dateTimeFormat.format(new Date())
+    versionFileName = 'VERSION'
+    versionBase = new File(templatesDir, "version.txt").text.trim()
+    displayVersion = versionBase
+}
+
+// Same repository configuration as root project
+repositories {
+    mavenCentral()
+    maven {
+        url "http://www.movingblocks.net:8081/artifactory/repo"
+    }
+}
+
+dependencies {
+    compile project(':engine')
+    testCompile group: 'junit', name: 'junit', version: '4.10'
+}
+
+// Change the output dir
+sourceSets {
+    main {
+        java {
+            output.classesDir 'build/classes'
+        }
+    }
+}
+
+// Instructions for packaging a jar file for the PC facade
+jar {
+    manifest {
+        //TODO: Maybe later add the engine's version number into here?
+        def manifestClasspath = "$subDirLibs/" + configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
+        attributes("Main-Class": mainClassName, "Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
+    }
+}
+
+// Task to run the game, PC-style
+task runPC(type:JavaExec) {
+    description = "Run 'Terasology' to play the game"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    main = mainClassName
+    workingDir = rootDir
+    args '-homedir'
+
+    // Classpath: PC itself, engine classes, engine dependencies, natives. Not modules since the engine finds those
+    classpath sourceSets.main.output.classesDir
+    classpath project(':engine').sourceSets.main.output.classesDir
+    classpath project(':engine').configurations.runtime
+    classpath rootProject.configurations.natives
+}
+
+// Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
+task createVersionFile(type: Copy) {
+    inputs.property('dateTime', startDateTimeString)
+    onlyIf { env.BUILD_URL != null }
+    from templatesDir
+    into "$buildDir"
+    include versionFileName
+    expand(buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString, displayVersion: displayVersion)
+    filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+}
+
+// Main application dist target. Does NOT include any modules.
+task distApp (type: Sync) {
+    description = "Creates an application package for distribution"
+
+    dependsOn createVersionFile
+    dependsOn rootProject.extractNatives
+    dependsOn jar
+
+    into ("$distsDir/app")
+    from ("$rootDir/Heightmap.txt") {}
+    from ("$rootDir/README.markdown") {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+        rename('README.markdown', 'README')
+    }
+    from ("$rootDir/LICENSE") {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
+    from ("$rootDir/NOTICE") {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
+    from ("build/libs/PC.jar") {
+        rename 'PC.*', 'Terasology.jar'
+    }
+    from('launchScripts') {
+        exclude('*.xml')
+        exclude('TeraEd.exe')
+    }
+    from("$buildDir/$versionFileName") {}
+
+    into(subDirLibs) {
+        from configurations.runtime
+        from project(':engine').jar
+    }
+    into(dirNatives) {
+        from "$rootDir/$dirNatives"
+    }
+
+    // TODO: Need to sort out versioned vs. non-versioned engine jar in dist + PC jar manifest. This is a hack :P
+    // Can't get a hold of a valid version var for engine, nor find a working rename combo in the "from" above :(
+    doLast {
+        File appLibDir = new File("$distsDir/app/libs")
+        appLibDir.listFiles().each {
+            if (it.name.startsWith("engine")) {
+                it.renameTo(new File(appLibDir, "engine.jar"))
+            }
+        }
+    }
+}
+
+// Distribute modules - with the option to provide a list of additional modules to include as dependencies
+// Note how in a local developer workspace this might grab more than Core, but in Jenkins always only Core
+// Example command including additional modules: gradlew -PextraModules="Signalling,BlockNetwork"
+task distModules (type: Sync) {
+    description = "Prepares modules for distribution"
+    //dependsOn distApp
+    dependsOn rootProject.moduleJars
+
+    // So this is probably a hack, but it works ;-) It does not work if it is in distApp, default "into" quirk ?
+    into("$distsDir/app/modules")
+    rootProject.terasologyModules().each {
+        from "$rootDir/modules/${it.name}/build/libs"
+        include "*.jar"
+    }
+
+    // If the execution was supplied with an extraModules property then include those modules as well
+    if (project.hasProperty('extraModules')) {
+        extraModules.split(',').each { String dependency ->
+            println "Extra module: " + dependency
+
+            // See if the supplied extra already exists in the local workspace, in that case don't add it again
+            if (findProject(':modules:' + dependency) != null) {
+                println "Found supplied extra $dependency already present in local workspace, ignoring"
+            } else {
+                dependencies {
+                    compile group: 'org.terasology.modules', name: dependency, version: '+'
+                }
+            }
+        }
+
+        // Note: This causes early resolution of artifacts! Can mess with order of execution/classpath and cause issues
+        // Example: gradlew distApp copyModules -PextraModules="Signalling" fails due to to lacking engine on classpath
+        // But the error goes away if either distApp is removed or this following statement isn't reached
+        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+            def id = artifact.moduleVersion.id
+            if (id.group == 'org.terasology.modules') {
+                println "Remotely resolved $id.group - $id.name at version $id.version"
+                from artifact.file
+                into("$distsDir/app/modules")
+            }
+        }
+    }
+}
+
+task distAppZip (type: Zip) {
+    from "$distsDir/app"
+    baseName = "Terasology"
+}
+
+// Prep an IntelliJ module for the facade
+idea {
+    module {
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+    }
+}
+
+checkstyle {
+    ignoreFailures = true
+    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+    configProperties.samedir = checkstyle.configFile.parentFile
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+}

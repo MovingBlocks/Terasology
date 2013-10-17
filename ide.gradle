@@ -1,0 +1,192 @@
+// Stuff specific to IDEA IntelliJ setup - meant to be included by more central Gradle files
+
+ext {
+
+    // Activate Checkstyle config
+    ideaActivateCheckstyle = { Node iprNode ->
+        def checkstyle = iprNode.component.find { it.@name == 'CheckStyle-IDEA' }
+        if (checkstyle) {
+            //TODO: check and update/change existing configuration if necessary - or just delete any existing and replace?
+        } else {
+            // Create new CheckStyle component
+            checkstyle = iprNode.appendNode('component', [name: 'CheckStyle-IDEA'])
+            // use NodeBuilder to create the config block in the xml structure
+            def builder = new NodeBuilder()
+            def option = builder.option(name: 'configuration') {
+                map {
+                    entry(key: 'active-configuration',
+                            value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
+                    entry(key: 'check-nonjava-files', value: false)
+                    entry(key: 'check-test-classes', value: false)
+                    entry(key: 'location-0',
+                            value: 'CLASSPATH:/sun_checks.xml:The default CheckStyle rules')
+                    entry(key: 'location-1',
+                            value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
+                    entry(key: 'property-1.samedir', value: '')
+                    entry(key: 'suppress-errors', value: false)
+                    entry(key: 'thirdparty-classpath', value: '')
+                }
+            }
+            // Add result from NodeBuilder
+            checkstyle.append option
+        }
+    }
+
+    // Activate copyright conventions
+    ideaActivateCopyright = { Node iprNode ->
+        // Setup copyright statement injection
+        def copyrightManager = iprNode.find { it.@name == 'CopyrightManager' }
+        copyrightManager.@default = "TerasologyEngine"
+        def copyright = copyrightManager.appendNode("copyright")
+        copyright.appendNode("option", [name : "notice", value : 'Copyright 2013 MovingBlocks\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.'])
+        copyright.appendNode("option", [name : "keyword", value : "Copyright"])
+        copyright.appendNode("option", [name : "allowReplaceKeyword", value : ""])
+        copyright.appendNode("option", [name : "myName", value : "TerasologyEngine"])
+        copyright.appendNode("option", [name : "myLocal", value : "true"])
+        def langOptions = copyrightManager.appendNode("LanguageOptions", [name : "__TEMPLATE__"])
+        langOptions.appendNode("option", [name : "addBlankAfter", value : "false"])
+    }
+
+    // Activate special cases for annotations
+    ideaActivateAnnotations = { Node iprNode ->
+        // Setup knowledge of certain annotations being entry points (so don't mark annotated items as unused)
+        def entryPointsManager = iprNode.appendNode('component', [name : "EntryPointsManager"])
+        def entryPoints = entryPointsManager.appendNode('entry_points', [version : '2.0'])
+        def entryPointsList = entryPointsManager.appendNode('list', [size : '3'])
+        entryPointsList.appendNode('item', [index : '0', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.event.ReceiveEvent'])
+        entryPointsList.appendNode('item', [index : '1', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.In'])
+        entryPointsList.appendNode('item', [index : '2', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.RegisterSystem'])
+        entryPointsList.appendNode('item', [index : '3', class : 'java.lang.String', itemvalue : 'org.terasology.logic.console.Command'])
+    }
+
+    // Activate Git for the root + appropriate sub projects (may add more later)
+    ideaActivateGit = { Node iprNode ->
+
+        // Set root project to use Git
+        def vcsMappings = iprNode.component.find { it.@name == 'VcsDirectoryMappings' }
+        vcsMappings.mapping.@vcs = 'Git'
+
+        // Set Terasology "modules" to use Git (also: huh, this works and both prints and does stuff - handy!)
+        //println "Each module child project (for Git auto-enable): " +
+        rootProject.project(':modules').childProjects.each { child ->
+            if (child.value.path == ':modules:Core') {
+                println "Skipping IntelliJ Git setup for 'Core' module (internal)"
+            } else {
+                println "Preparing IntelliJ Git setup for module $child.value.name"
+                vcsMappings.appendNode('mapping', [
+                        'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                        'vcs' : 'Git'
+                ])
+            }
+        }
+
+        // Set Terasology "facades" to use Git (except the bundled "PC" facade - that's covered by the root project)
+        rootProject.project(':facades').childProjects.each { child ->
+
+            if (child.value.path == ':facades:PC') {
+                println "Skipping IntelliJ Git setup for 'PC' facade (internal)"
+            } else {
+                println "Preparing IntelliJ Git setup for facade $child.value.name"
+                vcsMappings.appendNode('mapping', [
+                        'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                        'vcs' : 'Git'
+                ])
+            }
+        }
+
+        // Set Terasology related libraries to use Git
+        rootProject.project(':libs').childProjects.each { child ->
+
+            println "Preparing IntelliJ Git setup for lib $child.value.name"
+            vcsMappings.appendNode('mapping', [
+                    'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                    'vcs' : 'Git'
+            ])
+        }
+    }
+
+    // Exclude the directory where the logback Groovy file hangs out from execution (but not subdirs)
+    ideaExcludeLogbackGroovy = { Node iprNode ->
+        def compilerConf = iprNode.find { it.@name == 'CompilerConfiguration' }
+        //println "Compiler conf: " + compilerConf
+
+        def compilerExclude = compilerConf.excludeFromCompile
+
+        // Add the exclude if missing - could get trickier later if we need more than one exclude? Then the node might exist already
+        if (compilerExclude == []) {
+            compilerExclude = compilerConf.appendNode('excludeFromCompile')
+            compilerExclude.appendNode('directory', [
+                    'url' : 'file://$PROJECT_DIR$/engine/src/main/resources',
+                    'includeSubdirectories' : 'false'
+            ])
+        }
+    }
+
+    // Activate 'Gradle' plugin - TODO: Doesn't actually work with the Gradle wrapper in a non-default location :-(
+    ideaActivateGradle = { Node iprNode ->
+        def gradleSettings = iprNode.component.find { it.@name == 'GradleSettings' }
+        if (gradleSettings == null) {
+            gradleSettings = iprNode.appendNode('component', [name: 'GradleSettings'])
+            gradleSettings.appendNode('option', [name: 'linkedProjectPath', value: '$PROJECT_DIR$/build.gradle'])
+        }
+    }
+
+    // Enable "make project automatically"
+    ideaMakeAutomatically = { Node iwsNode ->
+        def compilerWsConf = iwsNode.find { it.@name == 'CompilerWorkspaceConfiguration' }
+
+        // Slowly realizing the XML stuff is smart enough to not insert dupes even without an if, but .. scary!
+        if (compilerWsConf == null) {
+            compilerWsConf = iwsNode.appendNode('component', [name: 'CompilerWorkspaceConfiguration'])
+            compilerWsConf.appendNode("option", [name : "MAKE_PROJECT_ON_SAVE", value : "true"])
+        }
+    }
+
+    // Generate a run configuration for the primary PC facade way of running the game
+    ideaRunConfig = { Node iwsNode ->
+
+        // Adds our run config
+        def runManager = iwsNode.find { it.@name == 'RunManager' }
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="TerasologyPC" type="Application" factoryName="Application">
+              <extension name="coverage" enabled="false" merge="false" runner="idea">
+                <pattern>
+                  <option name="PATTERN" value="org.terasology.engine.*"/>
+                  <option name="ENABLED" value="true"/>
+                </pattern>
+              </extension>
+              <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="PROGRAM_PARAMETERS" value="-homedir"/>
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
+              <option name="ALTERNATIVE_JRE_PATH" value=""/>
+              <option name="ENABLE_SWING_INSPECTOR" value="false"/>
+              <option name="ENV_VARIABLES"/>
+              <option name="PASS_PARENT_ENVS" value="true"/>
+              <module name="PC"/>
+              <envs/>
+              <RunnerSettings RunnerId="Debug">
+                <option name="DEBUG_PORT" value=""/>
+                <option name="TRANSPORT" value="0"/>
+                <option name="LOCAL" value="true"/>
+              </RunnerSettings>
+              <RunnerSettings RunnerId="Run"/>
+              <ConfigurationWrapper RunnerId="Debug"/>
+              <ConfigurationWrapper RunnerId="Run"/>
+              <method/>
+            </configuration>
+        '''))
+
+        // This part puts the added run config into the actual "Run" drop-down
+        runManager.append(new XmlParser().parseText('''
+        <list size="1">
+        <item index="0" class="java.lang.String" itemvalue="Application.TerasologyPC"/>
+        </list>
+        '''))
+
+        // Makes the added run config the selected item
+        def runManagerTag = iwsNode.component.find { it.@name == 'RunManager' }
+        runManagerTag.@selected = 'Application.TerasologyPC'
+    }
+}

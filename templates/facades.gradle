@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+// Same repository configuration as root project
+repositories {
+    mavenCentral()
+    maven {
+        url "http://www.movingblocks.net:8081/artifactory/repo"
+    }
+}
+
+dependencies {
+    compile project(':engine')
+}
+
+checkstyle {
+    ignoreFailures = true
+    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+    configProperties.samedir = checkstyle.configFile.parentFile
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+}
