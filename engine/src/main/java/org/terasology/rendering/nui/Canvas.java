@@ -18,6 +18,7 @@ package org.terasology.rendering.nui;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
@@ -77,6 +78,14 @@ public interface Canvas {
      * @return The current offset for drawing operations in pixels.
      */
     Vector2i getOffset();
+
+    /**
+     * Sets the alpha for drawing all elements.
+     * This accumulates across sub regions, so the canvas is set to alpha 0.5f and then a sub region is begun and the canvas is set to alpha 0.5f,
+     * elements will be drawn with an effective alpha of 0.25f
+     * @param value The value for alpha between 0 and 1.
+     */
+    void setAlpha(float value);
 
     /**
      * Set the primary color of drawn text
@@ -251,4 +260,15 @@ public interface Canvas {
      */
     void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, float ux, float uy, float uw, float uh);
 
+
+    /**
+     * Draws a material to a given area.
+     *
+     * Other than cropping and positioning the material relative to the current region of the canvas, it is up to the material as to how it behaves.
+     * The "alpha" parameter of the material, if any, will be set to the current alpha of the canvas.
+     *
+     * @param material
+     * @param toArea
+     */
+    void drawMaterial(Material material, Rect2i toArea);
 }

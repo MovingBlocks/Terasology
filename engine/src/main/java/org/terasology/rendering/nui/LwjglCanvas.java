@@ -32,6 +32,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +43,11 @@ import java.util.Set;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glScissor;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * @author Immortius
@@ -58,7 +63,7 @@ public class LwjglCanvas implements Canvas {
 
     private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
 
-    private Mesh simpleMesh = Assets.getMesh("engine:UIBillboard");
+    private Mesh billboard = Assets.getMesh("engine:UIBillboard");
     private Material textureMat = Assets.getMaterial("engine:UITexture");
 
     public LwjglCanvas() {
@@ -118,6 +123,11 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
+    public void setAlpha(float value) {
+        state.alpha = value;
+    }
+
+    @Override
     public void setTextColor(Color color) {
         state.textColor = color;
     }
@@ -165,12 +175,16 @@ public class LwjglCanvas implements Canvas {
             entry.getKey().bindTextures();
             if (shadowColor.a() != 0) {
                 entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX() + 1, state.getAbsoluteOffsetY() + 1);
-                entry.getKey().setFloat4("color", shadowColor.toVector4f());
+                Vector4f shadowValues = shadowColor.toVector4f();
+                shadowValues.w *= state.getAlpha();
+                entry.getKey().setFloat4("color", shadowValues);
                 entry.getValue().render();
             }
 
             entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX(), state.getAbsoluteOffsetY());
-            entry.getKey().setFloat4("color", state.textColor.toVector4f());
+            Vector4f colorValues = state.textColor.toVector4f();
+            colorValues.w *= state.getAlpha();
+            entry.getKey().setFloat4("color", colorValues);
             entry.getValue().render();
         }
 
@@ -220,18 +234,19 @@ public class LwjglCanvas implements Canvas {
             textureMat.setFloat2("texOffset", ux, uy);
             textureMat.setFloat2("texSize", uw, uh);
             textureMat.setTexture("texture", texture);
+            textureMat.setFloat4("color", 1.0f, 1.0f, 1.0f, state.getAlpha());
             textureMat.bindTextures();
             if (mode == ScaleMode.SCALE_FILL) {
                 Rect2i cropRegion = relativeToAbsolute(toArea).intersect(state.cropRegion);
                 if (!cropRegion.equals(state.cropRegion)) {
                     crop(cropRegion);
-                    simpleMesh.render();
+                    billboard.render();
                     crop(state.cropRegion);
                 } else {
-                    simpleMesh.render();
+                    billboard.render();
                 }
             } else {
-                simpleMesh.render();
+                billboard.render();
             }
         }
     }
@@ -353,6 +368,17 @@ public class LwjglCanvas implements Canvas {
         }
     }
 
+    @Override
+    public void drawMaterial(Material material, Rect2i toArea) {
+        material.setFloat("alpha", state.getAlpha());
+        material.bindTextures();
+        glPushMatrix();
+        glTranslatef(state.getAbsoluteOffsetX() + toArea.minX(), state.getAbsoluteOffsetY() + toArea.minY(), 0f);
+        glScalef(toArea.width(), toArea.height(), 1);
+        billboard.render();
+        glPopMatrix();
+    }
+
     private Rect2i relativeToAbsolute(Rect2i region) {
         return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
     }
@@ -374,6 +400,8 @@ public class LwjglCanvas implements Canvas {
         public Color textColor = Color.WHITE;
 
         public Vector2i offset = new Vector2i();
+        private float alpha = 1.0f;
+        private float baseAlpha = 1.0f;
 
         public CanvasState(Rect2i drawRegion) {
             this(drawRegion, drawRegion);
@@ -391,6 +419,11 @@ public class LwjglCanvas implements Canvas {
         public int getAbsoluteOffsetY() {
             return offset.y + drawRegion.minY();
         }
+
+        public float getAlpha() {
+            return alpha * baseAlpha;
+        }
+
     }
 
     /**
@@ -425,6 +458,7 @@ public class LwjglCanvas implements Canvas {
             } else {
                 state = new CanvasState(subRegion);
             }
+            state.baseAlpha = previousState.getAlpha();
         }
 
         @Override

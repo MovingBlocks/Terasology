@@ -55,7 +55,6 @@ public final class Terasology {
             engine.run(new StateMainMenu());
             engine.dispose();
         } catch (Throwable t) {
-            t.printStackTrace();
             JOptionPane.showMessageDialog(null, t.getMessage(), "Fatal Error", JOptionPane.ERROR_MESSAGE);
         }
         System.exit(0);
