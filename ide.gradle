@@ -4,32 +4,29 @@ ext {
 
     // Activate Checkstyle config
     ideaActivateCheckstyle = { Node iprNode ->
-        def checkstyle = iprNode.component.find { it.@name == 'CheckStyle-IDEA' }
-        if (checkstyle) {
-            //TODO: check and update/change existing configuration if necessary - or just delete any existing and replace?
-        } else {
-            // Create new CheckStyle component
-            checkstyle = iprNode.appendNode('component', [name: 'CheckStyle-IDEA'])
-            // use NodeBuilder to create the config block in the xml structure
-            def builder = new NodeBuilder()
-            def option = builder.option(name: 'configuration') {
-                map {
-                    entry(key: 'active-configuration',
-                            value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
-                    entry(key: 'check-nonjava-files', value: false)
-                    entry(key: 'check-test-classes', value: false)
-                    entry(key: 'location-0',
-                            value: 'CLASSPATH:/sun_checks.xml:The default CheckStyle rules')
-                    entry(key: 'location-1',
-                            value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
-                    entry(key: 'property-1.samedir', value: '')
-                    entry(key: 'suppress-errors', value: false)
-                    entry(key: 'thirdparty-classpath', value: '')
-                }
+        // Even if the component already exists this'll just overwrite it - shouldn't duplicate
+        def checkstyle = iprNode.appendNode('component', [name: 'CheckStyle-IDEA'])
+
+        // use NodeBuilder to create the config block in the xml structure
+        def builder = new NodeBuilder()
+        def option = builder.option(name: 'configuration') {
+            map {
+                entry(key: 'active-configuration',
+                        value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
+                entry(key: 'check-nonjava-files', value: false)
+                entry(key: 'check-test-classes', value: true)
+                entry(key: 'location-0',
+                        value: 'CLASSPATH:/sun_checks.xml:The default CheckStyle rules')
+                entry(key: 'location-1',
+                        value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
+                entry(key: 'property-1.samedir', value: 'config/checkstyle')
+                entry(key: 'suppress-errors', value: false)
+                entry(key: 'thirdparty-classpath', value: '')
             }
-            // Add result from NodeBuilder
-            checkstyle.append option
         }
+
+        // Add result from NodeBuilder
+        checkstyle.append option
     }
 
     // Activate copyright conventions
