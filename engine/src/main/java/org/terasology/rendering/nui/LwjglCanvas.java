@@ -24,15 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.math.Rect2i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -59,16 +58,10 @@ public class LwjglCanvas implements Canvas {
 
     private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
 
-    private Mesh simpleMesh;
-    private Material textureMat = Assets.getMaterial("engine:uiTexture");
+    private Mesh simpleMesh = Assets.getMesh("engine:UIBillboard");
+    private Material textureMat = Assets.getMaterial("engine:UITexture");
 
     public LwjglCanvas() {
-        // TODO: Make an asset for this.
-        simpleMesh = new MeshBuilder().addPoly(new Vector3f(0, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 1, 0), new Vector3f(0, 1, 0))
-                .addTexCoord(0, 0)
-                .addTexCoord(1, 0)
-                .addTexCoord(1, 1)
-                .addTexCoord(0, 1).build();
     }
 
     public void preRender() {
@@ -81,7 +74,7 @@ public class LwjglCanvas implements Canvas {
         Util.checkGLError();
         glDisable(GL_SCISSOR_TEST);
         if (!subregionStack.isEmpty()) {
-            logger.error("Subregions are not being correctly ended");
+            logger.error("UI Subregions are not being correctly ended");
             while (!subregionStack.isEmpty()) {
                 subregionStack.pop().close();
             }
@@ -106,7 +99,7 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public Vector2i size() {
-        return new Vector2i(state.region.width(), state.region.height());
+        return new Vector2i(state.drawRegion.width(), state.drawRegion.height());
     }
 
     @Override
@@ -131,17 +124,17 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawText(Font font, String text) {
-        drawTextShadowed(font, text, null);
+        drawTextShadowed(font, text, Color.TRANSPARENT);
     }
 
     @Override
-    public void drawText(Font font, String text, int maxWidth) {
-        drawTextShadowed(font, text, maxWidth, null);
+    public void drawText(Font font, String text, int drawWidth) {
+        drawTextShadowed(font, text, drawWidth, Color.TRANSPARENT);
     }
 
     @Override
-    public void drawText(Font font, String text, int maxWidth, HorizontalAlignment alignment) {
-        drawTextShadowed(font, text, maxWidth, alignment, null);
+    public void drawText(Font font, String text, int drawWidth, HorizontalAlignment alignment) {
+        drawTextShadowed(font, text, drawWidth, alignment, Color.TRANSPARENT);
     }
 
     @Override
@@ -150,24 +143,27 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void drawTextShadowed(Font font, String text, int maxWidth, Color shadowColor) {
-        drawTextShadowed(font, text, maxWidth, HorizontalAlignment.LEFT, shadowColor);
+    public void drawTextShadowed(Font font, String text, int drawWidth, Color shadowColor) {
+        drawTextShadowed(font, text, drawWidth, HorizontalAlignment.LEFT, shadowColor);
     }
 
     @Override
-    public void drawTextShadowed(Font font, String text, int maxWidth, HorizontalAlignment alignment, Color shadowColor) {
-        TextCacheKey key = new TextCacheKey(text, font, maxWidth, alignment);
+    public void drawTextShadowed(Font font, String text, int drawWidth, HorizontalAlignment alignment, Color shadowColor) {
+        TextCacheKey key = new TextCacheKey(text, font, drawWidth, alignment);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = LineBuilder.getLines(font, text, maxWidth);
+        List<String> lines = LineBuilder.getLines(font, text, drawWidth);
+        if (!state.cropRegion.overlaps(Rect2i.createFromMinAndSize(state.getAbsoluteOffsetX(), state.getAbsoluteOffsetY(), drawWidth, lines.size() * font.getLineHeight()))) {
+            return;
+        }
         if (fontMesh == null) {
-            fontMesh = font.createTextMesh(lines, maxWidth, alignment);
+            fontMesh = font.createTextMesh(lines, drawWidth, alignment);
             cachedText.put(key, fontMesh);
         }
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
-            if (shadowColor != null) {
+            if (shadowColor.a() != 0) {
                 entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX() + 1, state.getAbsoluteOffsetY() + 1);
                 entry.getKey().setFloat4("color", shadowColor.toVector4f());
                 entry.getValue().render();
@@ -179,6 +175,21 @@ public class LwjglCanvas implements Canvas {
         }
 
         state.offset.y += lines.size() * font.getLineHeight();
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea) {
+        drawTexture(texture, toArea, ScaleMode.STRETCH);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea, int ux, int uy, int uw, int uh) {
+        drawTexture(texture, toArea, ScaleMode.STRETCH, ux, uy, uw, uh);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i toArea, float ux, float uy, float uw, float uh) {
+        drawTexture(texture, toArea, ScaleMode.STRETCH, uw, uy, uw, uh);
     }
 
     @Override
@@ -195,27 +206,61 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, float ux, float uy, float uw, float uh) {
-        Util.checkGLError();
-        Vector2f scale = mode.scaleForRegion(toArea, texture.getWidth(), texture.getHeight());
-        textureMat.setFloat2("scale", scale);
-        textureMat.setFloat2("offset",
-                state.region.minX() + toArea.minX() + 0.5f * (toArea.width() - scale.x),
-                state.region.minY() + toArea.minY() + 0.5f * (toArea.height() - scale.y));
-        textureMat.setFloat2("texOffset", ux, uy);
-        textureMat.setFloat2("texSize", uw, uh);
-        textureMat.setTexture("texture", texture);
-        textureMat.bindTextures();
-        if (mode == ScaleMode.SCALE_FILL) {
-            Rect2i cropRegion = Rect2i.createFromMinAndSize(toArea.minX() + state.region.minX(), toArea.minY() + state.region.minY(), toArea.width(), toArea.height());
-            if (!cropRegion.equals(state.cropRegion)) {
-                crop(cropRegion);
-                simpleMesh.render();
-                crop(state.cropRegion);
+        if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
+            return;
+        }
+        if (mode == ScaleMode.TILED) {
+            drawTextureTiled(texture, toArea, ux, uy, uw, uh);
+        } else {
+            Vector2f scale = mode.scaleForRegion(toArea, texture.getWidth(), texture.getHeight());
+            textureMat.setFloat2("scale", scale);
+            textureMat.setFloat2("offset",
+                    state.drawRegion.minX() + toArea.minX() + 0.5f * (toArea.width() - scale.x),
+                    state.drawRegion.minY() + toArea.minY() + 0.5f * (toArea.height() - scale.y));
+            textureMat.setFloat2("texOffset", ux, uy);
+            textureMat.setFloat2("texSize", uw, uh);
+            textureMat.setTexture("texture", texture);
+            textureMat.bindTextures();
+            if (mode == ScaleMode.SCALE_FILL) {
+                Rect2i cropRegion = relativeToAbsolute(toArea).intersect(state.cropRegion);
+                if (!cropRegion.equals(state.cropRegion)) {
+                    crop(cropRegion);
+                    simpleMesh.render();
+                    crop(state.cropRegion);
+                } else {
+                    simpleMesh.render();
+                }
             } else {
                 simpleMesh.render();
             }
-        } else {
-            simpleMesh.render();
+        }
+    }
+
+    private void drawTextureTiled(Texture texture, Rect2i toArea, float ux, float uy, float uw, float uh) {
+        if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
+            return;
+        }
+        Util.checkGLError();
+        int tileW = (int) (uw * texture.getWidth());
+        int tileH = (int) (uh * texture.getHeight());
+        if (tileW != 0 && tileH != 0) {
+            int horizTiles = TeraMath.fastAbs((toArea.width() - 1) / tileW) + 1;
+            int vertTiles = TeraMath.fastAbs((toArea.height() - 1) / tileH) + 1;
+
+            int offsetX = toArea.width() - horizTiles * tileW;
+            int offsetY = toArea.height() - vertTiles * tileH;
+
+            Rect2i drawRegion = relativeToAbsolute(toArea).intersect(state.cropRegion);
+            if (!drawRegion.equals(state.cropRegion)) {
+                crop(drawRegion);
+                for (int tileY = 0; tileY < vertTiles; tileY++) {
+                    for (int tileX = 0; tileX < horizTiles; tileX++) {
+                        Rect2i tileArea = Rect2i.createFromMinAndSize(toArea.minX() + offsetX + tileW * tileX, toArea.minY() + offsetY + tileH * tileY, tileW, tileH);
+                        drawTexture(texture, tileArea, ScaleMode.STRETCH, ux, uy, uw, uh);
+                    }
+                }
+                crop(state.cropRegion);
+            }
         }
         Util.checkGLError();
     }
@@ -248,8 +293,12 @@ public class LwjglCanvas implements Canvas {
                         ux, uy, left, top);
             }
             // TOP BORDER
-            drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY(), centerHoriz, border.getTop()), ScaleMode.STRETCH,
-                    ux + left, uy, uw - left - right, top);
+            Rect2i topArea = Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY(), centerHoriz, border.getTop());
+            if (tile) {
+                drawTextureTiled(texture, topArea, ux + left, uy, uw - left - right, top);
+            } else {
+                drawTexture(texture, topArea, ScaleMode.STRETCH, ux + left, uy, uw - left - right, top);
+            }
             // TOP-RIGHT CORNER
             if (border.getRight() != 0) {
                 Rect2i area = Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.minY(), border.getRight(), border.getTop());
@@ -259,16 +308,29 @@ public class LwjglCanvas implements Canvas {
         // LEFT BORDER
         if (border.getLeft() != 0) {
             Rect2i area = Rect2i.createFromMinAndSize(toArea.minX(), toArea.minY() + border.getTop(), border.getLeft(), centerVert);
-            drawTexture(texture, area, ScaleMode.STRETCH, ux, uy + top, left, uh - top - bottom);
+            if (tile) {
+                drawTextureTiled(texture, area, ux, uy + top, left, uh - top - bottom);
+            } else {
+                drawTexture(texture, area, ScaleMode.STRETCH, ux, uy + top, left, uh - top - bottom);
+            }
         }
         // CENTER
-        drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
-                ux + left, uy + top, uw - left - right, uh - top - bottom);
+        if (tile) {
+            drawTextureTiled(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY() + border.getTop(), centerHoriz, centerVert),
+                    ux + left, uy + top, uw - left - right, uh - top - bottom);
+        } else {
+            drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
+                    ux + left, uy + top, uw - left - right, uh - top - bottom);
+        }
 
         // RIGHT BORDER
         if (border.getRight() != 0) {
             Rect2i area = Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.minY() + border.getTop(), border.getRight(), centerVert);
-            drawTexture(texture, area, ScaleMode.STRETCH, ux + uw - right, uy + top, right, uh - top - bottom);
+            if (tile) {
+                drawTextureTiled(texture, area, ux + uw - right, uy + top, right, uh - top - bottom);
+            } else {
+                drawTexture(texture, area, ScaleMode.STRETCH, ux + uw - right, uy + top, right, uh - top - bottom);
+            }
         }
         if (border.getBottom() != 0) {
             // BOTTOM-LEFT CORNER
@@ -277,14 +339,22 @@ public class LwjglCanvas implements Canvas {
                         ux, uy + uw - bottom, left, bottom);
             }
             // BOTTOM BORDER
-            drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.maxY() - border.getBottom(), centerHoriz, border.getBottom()),
-                    ScaleMode.STRETCH, ux + left, uy + uw - bottom, uw - left - right, bottom);
+            Rect2i bottomArea = Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.maxY() - border.getBottom(), centerHoriz, border.getBottom());
+            if (tile) {
+                drawTextureTiled(texture, bottomArea, ux + left, uy + uw - bottom, uw - left - right, bottom);
+            } else {
+                drawTexture(texture, bottomArea, ScaleMode.STRETCH, ux + left, uy + uw - bottom, uw - left - right, bottom);
+            }
             // BOTTOM-RIGHT CORNER
             if (border.getRight() != 0) {
                 drawTexture(texture, Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.maxY() - border.getBottom(), border.getRight(), border.getBottom()),
                         ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
             }
         }
+    }
+
+    private Rect2i relativeToAbsolute(Rect2i region) {
+        return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
     }
 
     private void crop(Rect2i region) {
@@ -295,31 +365,37 @@ public class LwjglCanvas implements Canvas {
         glScissor(x, Display.getHeight() - y - h, w, h);
     }
 
+    /**
+     * The state of the canvas
+     */
     private static class CanvasState {
-        public Rect2i region;
+        public Rect2i drawRegion;
         public Rect2i cropRegion;
         public Color textColor = Color.WHITE;
 
         public Vector2i offset = new Vector2i();
 
-        public CanvasState(Rect2i region) {
-            this(region, region);
+        public CanvasState(Rect2i drawRegion) {
+            this(drawRegion, drawRegion);
         }
 
-        public CanvasState(Rect2i region, Rect2i cropRegion) {
-            this.region = region;
+        public CanvasState(Rect2i drawRegion, Rect2i cropRegion) {
+            this.drawRegion = drawRegion;
             this.cropRegion = cropRegion;
         }
 
         public int getAbsoluteOffsetX() {
-            return offset.x + region.minX();
+            return offset.x + drawRegion.minX();
         }
 
         public int getAbsoluteOffsetY() {
-            return offset.y + region.minY();
+            return offset.y + drawRegion.minY();
         }
     }
 
+    /**
+     * A SubRegion implementation for this canvas.
+     */
     private class LwjglSubRegion implements SubRegion {
 
         public boolean croppingRegion;
@@ -330,15 +406,15 @@ public class LwjglCanvas implements Canvas {
             previousState = state;
             subregionStack.push(this);
 
-            int left = region.minX() + state.region.minX();
-            int right = region.maxX() + state.region.minX();
-            int top = region.minY() + state.region.minY();
-            int bottom = region.maxY() + state.region.minY();
+            int left = region.minX() + state.drawRegion.minX();
+            int right = region.maxX() + state.drawRegion.minX();
+            int top = region.minY() + state.drawRegion.minY();
+            int bottom = region.maxY() + state.drawRegion.minY();
             Rect2i subRegion = Rect2i.createFromMinAndMax(left, top, right, bottom);
             if (crop) {
                 Rect2i cropRegion = subRegion.intersect(state.cropRegion);
                 if (cropRegion.isEmpty()) {
-                    // TODO: disable drawing
+                    state = new CanvasState(subRegion, cropRegion);
                 } else if (!cropRegion.equals(state.cropRegion)) {
                     state = new CanvasState(subRegion, cropRegion);
                     crop(cropRegion);
@@ -358,18 +434,21 @@ public class LwjglCanvas implements Canvas {
                 disposed = true;
                 LwjglSubRegion region = subregionStack.pop();
                 while (!region.equals(this)) {
-                    logger.error("UI Subregions being closed in an incorrect order");
+                    logger.error("UI SubRegions being closed in an incorrect order");
                     region.close();
                     region = subregionStack.pop();
                 }
                 if (croppingRegion) {
-                    glScissor(previousState.region.minX(), previousState.region.minY(), previousState.region.width(), previousState.region.height());
+                    glScissor(previousState.drawRegion.minX(), previousState.drawRegion.minY(), previousState.drawRegion.width(), previousState.drawRegion.height());
                 }
                 state = previousState;
             }
         }
     }
 
+    /**
+     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
+     */
     private static class TextCacheKey {
         private String text;
         private Font font;

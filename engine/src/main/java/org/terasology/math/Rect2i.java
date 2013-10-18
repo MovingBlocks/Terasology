@@ -140,17 +140,15 @@ public final class Rect2i {
     }
 
     public boolean encompasses(int x, int y) {
-        return (x >= posX) && (y >= posY) && (x < posX + w) && (y <= posY + h);
+        return !isEmpty() && (x >= posX) && (y >= posY) && (x < posX + w) && (y <= posY + h);
     }
 
     public boolean encompasses(Rect2i other) {
-        return other.posX >= posX && other.posY >= other.posY
-                && other.posX + other.w <= posX + w && other.posY + w <= posY + w;
+        return !isEmpty() && other.posX >= posX && other.posY >= posY && other.posX + other.w <= posX + w && other.posY + w <= posY + w;
     }
 
     public boolean overlaps(Rect2i other) {
-        return other.posX < posX + w && other.posX + other.w - 1 > posX
-                && other.posY < posY + h && other.posY + other.h - 1 > posY;
+        return !(isEmpty() || other.isEmpty()) && other.posX < posX + w && other.posX + other.w - 1 > posX && other.posY < posY + h && other.posY + other.h - 1 > posY;
     }
 
     @Override

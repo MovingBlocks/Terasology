@@ -66,9 +66,9 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
         if (data.getVertices() == null) {
             throw new IOException("No vertices define");
         }
-        if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
-            throw new IOException("The number of normals does not match the number of vertices.");
-        }
+        //if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
+        //    throw new IOException("The number of normals does not match the number of vertices.");
+        //}
         if (data.getTexCoord0() == null || data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
             throw new IOException("The number of tex coords does not match the number of vertices.");
         }

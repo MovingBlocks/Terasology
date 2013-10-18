@@ -53,7 +53,7 @@ public enum ScaleMode {
     },
 
     /**
-     * Scales to fit in the given space. There will be gaps if the image is a different shape to the space.
+     * Scales to fit in the given space. There will be gaps if the image is a different shape (aspect) to the space.
      */
     SCALE_FIT {
         @Override
@@ -68,6 +68,16 @@ public enum ScaleMode {
                 scale.y = region.height();
             }
             return scale;
+        }
+    },
+
+    /**
+     * Tiles the texture to fill the given space.
+     */
+    TILED {
+        @Override
+        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
+            return new Vector2f(1, 1);
         }
     };
 

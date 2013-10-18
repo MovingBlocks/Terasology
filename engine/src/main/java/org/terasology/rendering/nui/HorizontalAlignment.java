@@ -19,24 +19,39 @@ package org.terasology.rendering.nui;
  * @author Immortius
  */
 public enum HorizontalAlignment {
+    /**
+     * Starts on the left edge of the area
+     */
     LEFT {
         @Override
-        public int getOffset(int w, int maxWidth) {
+        public int getOffset(int elementWidth, int availableWidth) {
             return 0;
         }
     },
+    /**
+     * Ends on the right edge of the area
+     */
     RIGHT {
         @Override
-        public int getOffset(int w, int maxWidth) {
-            return maxWidth - w;
+        public int getOffset(int elementWidth, int availableWidth) {
+            return availableWidth - elementWidth;
         }
     },
+    /**
+     * Centered in the middle of the area, with equal space on each side.
+     */
     CENTER {
         @Override
-        public int getOffset(int w, int maxWidth) {
-            return (maxWidth - w) / 2;
+        public int getOffset(int elementWidth, int availableWidth) {
+            return (availableWidth - elementWidth) / 2;
         }
     };
 
-    public abstract int getOffset(int w, int maxWidth);
+    /**
+     * Given the elementWidth and availableWidth, the offset of the element so that it will be correctly aligned
+     * @param elementWidth The width of the element being drawn
+     * @param availableWidth The width of the available space for the element
+     * @return The horizontal offset that is needed to align the element
+     */
+    public abstract int getOffset(int elementWidth, int availableWidth);
 }

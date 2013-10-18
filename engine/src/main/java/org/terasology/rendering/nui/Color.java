@@ -26,7 +26,7 @@ import java.util.Objects;
  * Color is a representation of a RGBA color. Color components can be set and accessed via floats ranging from 0-1, or ints ranging from 0-255.
  * Color is immutable and thread safe.
  * <p/>
- * There are a plethora of Color classes, but none that are quite suitable:
+ * There are a plethora of Color classes, but none that are quite suitable IMO:
  * <ul>
  * <li>vecmaths - doesn't access with r/g/b/a, separation by representation is awkward, feature bland.</li>
  * <li>Slick2D - ideally will lose dependency on slick utils. Also ties to lwjgl</li>
@@ -46,6 +46,7 @@ public class Color {
     public static final Color GREEN = new Color(0x00FF00FF);
     public static final Color RED = new Color(0xFF0000FF);
     public static final Color GREY = new Color(0x888888FF);
+    public static final Color TRANSPARENT = new Color(0x00000000);
 
     private static final int MAX = 255;
     private static final int RED_OFFSET = 24;
