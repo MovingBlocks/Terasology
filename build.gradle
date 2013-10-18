@@ -158,6 +158,12 @@ gradle.projectsEvaluated {
     moduleJars.dependsOn(terasologyModules().jar)
 }
 
+// This is a TEMPORARY tweak to make "changing" dependencies always ('0') check for newer snapshots available
+// TODO: Remove this when versioning and promotion works fully, then we shouldn't care about snapshots normally anyway
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

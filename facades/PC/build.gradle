@@ -136,6 +136,12 @@ task distApp (type: Sync) {
     }
 }
 
+// This is a TEMPORARY tweak to make "changing" dependencies always ('0') check for newer snapshots available
+// TODO: Remove this when versioning and promotion works fully, then we shouldn't care about snapshots normally anyway
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 // Distribute modules - with the option to provide a list of additional modules to include as dependencies
 // Note how in a local developer workspace this might grab more than Core, but in Jenkins always only Core
 // Example command including additional modules: gradlew -PextraModules="Signalling,BlockNetwork"
@@ -161,7 +167,8 @@ task distModules (type: Sync) {
                 println "Found supplied extra $dependency already present in local workspace, ignoring"
             } else {
                 dependencies {
-                    compile group: 'org.terasology.modules', name: dependency, version: '+'
+                    // TODO: When version handling and promotion is in then we can probably remove "changing"
+                    compile group: 'org.terasology.modules', name: dependency, version: '+', changing: true
                 }
             }
         }

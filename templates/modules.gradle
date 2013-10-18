@@ -99,8 +99,9 @@ dependencies {
 
             } else {
                 println "*** Unsatisfied local dependency for module " + project.name + ": " + dependency
-                // The '+' is satisfied by any version
-                compile(group: 'org.terasology.modules', name: dependency, version: '+')
+                // The '+' is satisfied by any version. "changing" triggers better checking for updated snapshots
+                // TODO: When version handling and promotion is in then we can probably ignore snapshots in normal cases
+                compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
 
                 // NOTE: Referencing resolvedArtifacts actually resolves the involved artifacts at this time (early)
                 configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
