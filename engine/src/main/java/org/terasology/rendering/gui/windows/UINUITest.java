@@ -15,7 +15,11 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
+import org.lwjgl.util.vector.Quaternion;
 import org.terasology.asset.Assets;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.Time;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.widgets.UIWindow;
@@ -24,6 +28,9 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlignment;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.ScaleMode;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -46,20 +53,20 @@ public class UINUITest extends UIWindow {
 
         canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(12, 12, 104, 104), ScaleMode.STRETCH);
-        canvas.setOffset(15, 100);
+        canvas.setTextCursor(15, 100);
         canvas.drawTextShadowed(font, "Stretched", Color.BLACK);
 
         canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(140, 12, 104, 104), ScaleMode.SCALE_FIT);
-        canvas.setOffset(143, 75);
+        canvas.setTextCursor(143, 75);
         canvas.drawTextShadowed(font, "Scaled Fit", Color.BLACK);
 
         canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 0, 128, 128), ScaleMode.STRETCH);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(268, 12, 104, 104), ScaleMode.SCALE_FILL);
-        canvas.setOffset(270, 100);
+        canvas.setTextCursor(270, 100);
         canvas.drawTextShadowed(font, "Scaled Fill", Color.BLACK);
 
-        canvas.setOffset(0, 150);
+        canvas.setTextCursor(0, 150);
         canvas.setTextColor(Color.GREY);
         canvas.drawText(font, "Some Text");
         canvas.drawText(font, "Some More Text");
@@ -71,6 +78,12 @@ public class UINUITest extends UIWindow {
         canvas.drawTextureBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 256, 512, 128), new Border(6, 6, 6, 6), true);
 
         canvas.drawMaterial(Assets.getMaterial("engine:testMaterial"), Rect2i.createFromMinAndSize(0, 128, 256, 256));
+        canvas.drawTexture(Assets.getTexture("engine:icons"), Rect2i.createFromMinAndSize(0, 128, 256, 256), ScaleMode.STRETCH, 52, 0, 9, 9);
+
+        Quat4f rot = new Quat4f(0, 0, 0, 1);
+        QuaternionUtil.setEuler(rot, CoreRegistry.get(Time.class).getGameTime(), 0, 0);
+        canvas.drawMesh(Assets.getMesh("engine:testmonkey"), Assets.getTexture("engine:mhead"),
+                Rect2i.createFromMinAndSize(0, 128, 256, 256), rot, new Vector3f(0, 0, 0), 1.5f);
 
         canvas.postRender();
 

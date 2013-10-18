@@ -15,11 +15,16 @@
  */
 package org.terasology.rendering.nui;
 
+import org.lwjgl.util.vector.Quaternion;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 /**
  * Canvas provides primitive drawing operations for use by the UI.
@@ -60,24 +65,24 @@ public interface Canvas {
     Vector2i size();
 
     /**
-     * Sets the offset (top-left corner) for drawing operations, such as drawText.
+     * Sets the position (top-left corner) for drawText.
      *
-     * @param offset The offset in pixels
+     * @param pos The offset in pixels
      */
-    void setOffset(Vector2i offset);
+    void setTextCursor(Vector2i pos);
 
     /**
-     * Sets the offset (top-left corner) for drawing operations, such as drawText.
+     * Sets the position (top-left corner) for drawText.
      *
      * @param x The horizontal offset in pixels
      * @param y The vertical offset in pixels
      */
-    void setOffset(int x, int y);
+    void setTextCursor(int x, int y);
 
     /**
      * @return The current offset for drawing operations in pixels.
      */
-    Vector2i getOffset();
+    Vector2i getTextCursor();
 
     /**
      * Sets the alpha for drawing all elements.
@@ -271,4 +276,17 @@ public interface Canvas {
      * @param toArea
      */
     void drawMaterial(Material material, Rect2i toArea);
+
+    /**
+     * Draws a mesh centered on the given screen position.
+     * @param mesh The mesh to draw
+     * @param material The material to draw the mesh with
+     * @param region The screen area to draw the mesh
+     * @param rotation The rotation of the mesh
+     * @param offset Offset, in object space, for the mesh
+     * @param scale A relative scale for drawing the mesh
+     */
+    void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
+
+    void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
 }

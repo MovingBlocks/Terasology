@@ -256,6 +256,11 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
+    public boolean supportsFeature(ShaderProgramFeature feature) {
+        return shader.getAvailableFeatures().contains(feature);
+    }
+
+    @Override
     public void setFloat(String desc, float f) {
         setFloat(desc, f, false);
     }

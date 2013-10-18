@@ -15,24 +15,34 @@
  */
 package org.terasology.rendering.nui;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
+import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.math.AABB;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.nio.FloatBuffer;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -41,8 +51,11 @@ import java.util.Objects;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
+import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glLoadMatrix;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glScalef;
@@ -55,6 +68,9 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class LwjglCanvas implements Canvas {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
+    private static final int MAX_TEXT_WIDTH = 16777216;
+    private static final Quat4f IDENTITY_ROT = new Quat4f(0, 0, 0, 1);
+    private static final Vector3f ZERO_VECTOR = new Vector3f();
 
     private CanvasState state;
 
@@ -65,6 +81,7 @@ public class LwjglCanvas implements Canvas {
 
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
     private Material textureMat = Assets.getMaterial("engine:UITexture");
+    private Material meshMat = Assets.getMaterial("engine:UILitMesh");
 
     public LwjglCanvas() {
     }
@@ -108,18 +125,18 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void setOffset(Vector2i offset) {
-        state.offset.set(offset);
+    public void setTextCursor(Vector2i pos) {
+        state.textCursorPos.set(pos);
     }
 
     @Override
-    public void setOffset(int x, int y) {
-        state.offset.set(x, y);
+    public void setTextCursor(int x, int y) {
+        state.textCursorPos.set(x, y);
     }
 
     @Override
-    public Vector2i getOffset() {
-        return new Vector2i(state.offset);
+    public Vector2i getTextCursor() {
+        return new Vector2i(state.textCursorPos);
     }
 
     @Override
@@ -149,7 +166,7 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawTextShadowed(Font font, String text, Color shadowColor) {
-        drawTextShadowed(font, text, Integer.MAX_VALUE, shadowColor);
+        drawTextShadowed(font, text, MAX_TEXT_WIDTH, shadowColor);
     }
 
     @Override
@@ -188,7 +205,7 @@ public class LwjglCanvas implements Canvas {
             entry.getValue().render();
         }
 
-        state.offset.y += lines.size() * font.getLineHeight();
+        state.textCursorPos.y += lines.size() * font.getLineHeight();
     }
 
     @Override
@@ -370,13 +387,90 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void drawMaterial(Material material, Rect2i toArea) {
+        if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
+            return;
+        }
         material.setFloat("alpha", state.getAlpha());
         material.bindTextures();
         glPushMatrix();
-        glTranslatef(state.getAbsoluteOffsetX() + toArea.minX(), state.getAbsoluteOffsetY() + toArea.minY(), 0f);
+        glTranslatef(state.drawRegion.minX() + toArea.minX(), state.drawRegion.minY() + toArea.minY(), 0f);
         glScalef(toArea.width(), toArea.height(), 1);
         billboard.render();
         glPopMatrix();
+    }
+
+    @Override
+    public void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+        if (material == null) {
+            logger.warn("Attempted to draw with nonexistent material");
+            return;
+        }
+        if (mesh == null) {
+            logger.warn("Attempted to draw nonexistent mesh");
+            return;
+        }
+
+        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
+            return;
+        }
+
+        AABB meshAABB = mesh.getAABB();
+        Vector3f meshExtents = meshAABB.getExtents();
+        float fitScale = 0.45f * Math.min(region.width(), region.height()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
+        Vector3f centerOffset = meshAABB.getCenter();
+        centerOffset.scale(-1.0f);
+
+        // Roll 180 degrees because the Y-Axis is reversed
+        Quat4f fixRotation = new Quat4f();
+        QuaternionUtil.setEuler(fixRotation, 0, 0, TeraMath.PI);
+
+        Matrix4f centerTransform = new Matrix4f(IDENTITY_ROT, centerOffset, 1.0f);
+        Matrix4f userTransform = new Matrix4f(rotation, offset, scale);
+        Matrix4f fixRotationTransform = new Matrix4f(fixRotation, ZERO_VECTOR, fitScale);
+        Matrix4f translateTransform = new Matrix4f(IDENTITY_ROT, new Vector3f(state.drawRegion.minX() + region.minX() + region.width() / 2, state.drawRegion.minY() + region.minY() + region.height() / 2, 0), 1);
+
+        userTransform.mul(centerTransform);
+        fixRotationTransform.mul(userTransform);
+        translateTransform.mul(fixRotationTransform);
+
+        Transform transform = new Transform(translateTransform);
+        float[] data = new float[16];
+        transform.getOpenGLMatrix(data);
+        FloatBuffer model = BufferUtils.createFloatBuffer(16);
+        model.put(data);
+        model.rewind();
+
+        Rect2i cropRegion = relativeToAbsolute(region).intersect(state.cropRegion);
+
+        crop(cropRegion);
+        glEnable(GL11.GL_DEPTH_TEST);
+        glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        glMatrixMode(GL11.GL_MODELVIEW);
+        glPushMatrix();
+        glLoadMatrix(model);
+
+        boolean matrixStackSupported = material.supportsFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        if (matrixStackSupported) {
+            material.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        }
+        material.setFloat("alpha", state.getAlpha());
+        material.bindTextures();
+        mesh.render();
+        if (matrixStackSupported) {
+            material.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        }
+
+        glPopMatrix();
+
+        glDisable(GL11.GL_DEPTH_TEST);
+
+        crop(state.cropRegion);
+    }
+
+    @Override
+    public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+        meshMat.setTexture("texture", texture);
+        drawMesh(mesh, meshMat, region, rotation, offset, scale);
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
@@ -399,7 +493,7 @@ public class LwjglCanvas implements Canvas {
         public Rect2i cropRegion;
         public Color textColor = Color.WHITE;
 
-        public Vector2i offset = new Vector2i();
+        public Vector2i textCursorPos = new Vector2i();
         private float alpha = 1.0f;
         private float baseAlpha = 1.0f;
 
@@ -413,11 +507,11 @@ public class LwjglCanvas implements Canvas {
         }
 
         public int getAbsoluteOffsetX() {
-            return offset.x + drawRegion.minX();
+            return textCursorPos.x + drawRegion.minX();
         }
 
         public int getAbsoluteOffsetY() {
-            return offset.y + drawRegion.minY();
+            return textCursorPos.y + drawRegion.minY();
         }
 
         public float getAlpha() {

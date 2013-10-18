@@ -231,6 +231,8 @@ public interface Material extends Asset<MaterialData> {
      */
     void setCamera(Camera camera);
 
+    boolean supportsFeature(ShaderProgramFeature feature);
+
     /**
      * Activates a feature of this material, if available
      *
