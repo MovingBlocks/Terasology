@@ -15,11 +15,12 @@
  */
 
 varying vec3 normal;
+uniform float alpha;
 
 void main()
 {
     normal = normalize(gl_NormalMatrix * gl_Normal);
     gl_Position = ftransform();
     gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = gl_Color;
+    gl_FrontColor = vec4(gl_Color.rgb, gl_Color.a * alpha);
 }

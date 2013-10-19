@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.linearmath.TransformUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -50,6 +51,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_MATRIX_MODE;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW_MATRIX;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -90,6 +94,7 @@ public class LwjglCanvas implements Canvas {
         state = new CanvasState(Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
         glScissor(0, 0, Display.getWidth(), Display.getHeight());
         glEnable(GL_SCISSOR_TEST);
+        glEnable(GL_CULL_FACE);
     }
 
     public void postRender() {
@@ -427,7 +432,9 @@ public class LwjglCanvas implements Canvas {
         Matrix4f centerTransform = new Matrix4f(IDENTITY_ROT, centerOffset, 1.0f);
         Matrix4f userTransform = new Matrix4f(rotation, offset, scale);
         Matrix4f fixRotationTransform = new Matrix4f(fixRotation, ZERO_VECTOR, fitScale);
-        Matrix4f translateTransform = new Matrix4f(IDENTITY_ROT, new Vector3f(state.drawRegion.minX() + region.minX() + region.width() / 2, state.drawRegion.minY() + region.minY() + region.height() / 2, 0), 1);
+        Matrix4f translateTransform = new Matrix4f(IDENTITY_ROT,
+                new Vector3f(state.drawRegion.minX() + region.minX() + region.width() / 2,
+                        state.drawRegion.minY() + region.minY() + region.height() / 2, 0), 1);
 
         userTransform.mul(centerTransform);
         fixRotationTransform.mul(userTransform);
@@ -471,6 +478,28 @@ public class LwjglCanvas implements Canvas {
     public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
         meshMat.setTexture("texture", texture);
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
+    }
+
+    @Override
+    public void transform(Matrix4f transform) {
+        /*glMatrixMode(GL11.GL_MODELVIEW);
+        FloatBuffer original = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL_MODELVIEW_MATRIX, original);
+        original.rewind();
+        float[] vals = new float[16];
+        for (int i = 0; i < 16; ++i) {
+            vals[i] = original.get();
+        }
+
+        Matrix4f model = new Matrix4f(vals);
+        transform.mul(model);
+        original.clear();
+
+
+        new Transform(transform).getOpenGLMatrix(vals);
+        original.put(vals);
+        original.rewind();
+        glLoadMatrix(original);*/
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {

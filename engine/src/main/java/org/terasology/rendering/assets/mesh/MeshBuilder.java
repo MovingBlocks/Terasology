@@ -39,7 +39,7 @@ public class MeshBuilder {
 
     public MeshBuilder addPoly(Vector3f v1, Vector3f v2, Vector3f v3, Vector3f ... vn) {
         for (int i = 0; i < vn.length + 1; i++) {
-            addIndices(vertexCount, vertexCount + i + 1, vertexCount + i + 2);
+            addIndices(vertexCount, vertexCount + i + 2, vertexCount + i + 1);
         }
         addVertex(v1);
         addVertex(v2);
