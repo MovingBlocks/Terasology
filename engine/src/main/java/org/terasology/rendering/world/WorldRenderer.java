@@ -242,8 +242,8 @@ public final class WorldRenderer {
                 // remove
                 List<Rect2i> removeRects = Rect2i.difference(oldView, newView);
                 for (Rect2i r : removeRects) {
-                    for (int x = r.minX(); x < r.maxX(); ++x) {
-                        for (int y = r.minY(); y < r.maxY(); ++y) {
+                    for (int x = r.minX(); x <= r.maxX(); ++x) {
+                        for (int y = r.minY(); y <= r.maxY(); ++y) {
                             Chunk c = chunkProvider.getChunk(x, 0, y);
                             if (c != null) {
                                 chunksInProximity.remove(c);
@@ -256,8 +256,8 @@ public final class WorldRenderer {
                 // add
                 List<Rect2i> addRects = Rect2i.difference(newView, oldView);
                 for (Rect2i r : addRects) {
-                    for (int x = r.minX(); x < r.maxX(); ++x) {
-                        for (int y = r.minY(); y < r.maxY(); ++y) {
+                    for (int x = r.minX(); x <= r.maxX(); ++x) {
+                        for (int y = r.minY(); y <= r.maxY(); ++y) {
                             Chunk c = chunkProvider.getChunk(x, 0, y);
                             if (c != null && c.getChunkState() == Chunk.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
                                 chunksInProximity.add(c);
