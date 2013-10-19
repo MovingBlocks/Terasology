@@ -160,11 +160,27 @@ public final class TeraMath {
      * @return
      */
     public static int pow(int base, int exp) {
-        if (exp <= 0) {
-            // x^0 and 1/(1^x) for any x are the only cases where an integer could represent a non-zero value
-            // 0^0 is an indetermination, but Integers provides no means to represent it
-            if (exp == 0 || base == 1) {
+        switch (exp) {
+            case 0:
+                if (base == 0) { // Special case for 0^0
+                    return 0;
+                }
                 return 1;
+            case 1:
+                return base;
+            case 2:
+                return base * base;
+            case 3:
+                return base * base * base;
+        }
+        if (exp < 0) {
+            if (base == 1) {
+                return 1;
+            } else if (base == -1) {
+                if (exp % 2 == 0) {
+                    return 1;
+                }
+                return -1;
             }
             return 0;
         }
@@ -191,9 +207,27 @@ public final class TeraMath {
      * @return
      */
     public static long pow(long base, int exp) {
-        if (exp <= 0) {
-            if (exp == 0 || base == 1) {
+        switch (exp) {
+            case 0:
+                if (base == 0L) { // Special case for 0^0
+                    return 0L;
+                }
                 return 1L;
+            case 1:
+                return base;
+            case 2:
+                return base * base;
+            case 3:
+                return base * base * base;
+        }
+        if (exp < 0) {
+            if (base == 1L) {
+                return 1L;
+            } else if (base == -1L) {
+                if (exp % 2 == 0) {
+                    return 1L;
+                }
+                return -1L;
             }
             return 0L;
         }
