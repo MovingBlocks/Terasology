@@ -134,14 +134,15 @@ def terasologyModules() {
     subprojects.findAll {it.parent.name == 'modules'}
 }
 
-// Helper that replaces the build.gradle under every module with a fresh copy of modules.gradle
-// NOTE: This also replaces the version under the Core module that *is* in fact under Git control ...
+// Helper that replaces the build.gradle under every module with a fresh copy from the Core module
 task refreshModuleGradle << {
-    File replacementGradle = new File(templatesDir, 'modules.gradle')
+    File replacementGradle = new File(rootDir, 'modules/Core/build.gradle')
     terasologyModules().each {
-        File targetFile = new File(rootDir, "modules/" + it.name + "/build.gradle")
-        targetFile.delete()
-        targetFile << replacementGradle.text
+        if (it.name != 'Core') {
+            File targetFile = new File(rootDir, "modules/" + it.name + "/build.gradle")
+            targetFile.delete()
+            targetFile << replacementGradle.text
+        }
     }
 }
 
