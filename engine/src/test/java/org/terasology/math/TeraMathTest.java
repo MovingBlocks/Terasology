@@ -17,16 +17,92 @@ package org.terasology.math;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 
 /**
  * @author Immortius
  */
 public class TeraMathTest {
 
+    private static final double MAX_DOUBLE_ERROR = 0.00001;
+
     @Test
     public void getEdgeRegion() {
         Region3i region = Region3i.createFromMinAndSize(new Vector3i(16,0,16), new Vector3i(16,128,16));
-        assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), TeraMath.getEdgeRegion(region, Side.LEFT));
+        Assert.assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), TeraMath.getEdgeRegion(region, Side.LEFT));
+    }
+
+    // This function mimicks a power function using ints only
+    private long longPow(int base, int exp) {
+        // MAX_DOUBLE_ERROR fixes small rounding errors
+        double result = Math.pow(base, exp);
+        if (!TeraMath.isFinite(result)) {
+            throw new ArithmeticException(Double.toString(result));
+        }
+        if (result < 0) {
+            return (long) (result - MAX_DOUBLE_ERROR);
+        }
+        return (long) (result + MAX_DOUBLE_ERROR);
+    }
+
+    @Test
+    public void powDouble() {
+        for (int exp = -5; exp <= 5; exp++) {
+            for (double base = -10.0; base <= 10.0; base += 0.2f) {
+                assertEqualsRatio(base + "^" + exp, Math.pow(base, exp), TeraMath.pow(base, exp), MAX_DOUBLE_ERROR);
+            }
+        }
+    }
+
+    @Test
+    public void powInt() {
+        // Only from -2 because most negative exponents return a 0
+        for (int exp = -2; exp <= 8; exp++) {
+            for (int base = -8; base <= 8; base++) {
+                long javaMathResult = 9001;
+                boolean exception = false;
+                try {
+                    javaMathResult = longPow(base, exp);
+                } catch (ArithmeticException e) {
+                    exception = true;
+                }
+
+                try {
+                    int result = TeraMath.pow(base, exp);
+                    Assert.assertFalse("(int)" + base + "^" + exp + " did not throw an exception as expected", exception);
+                    Assert.assertEquals(base + "^" + exp, javaMathResult, (long) result);
+                } catch (ArithmeticException e) {
+                    Assert.assertTrue("(int)" + base + "^" + exp + " threw an unexpected exception", exception);
+                }
+
+                try {
+                    long result = TeraMath.pow((long) base, exp);
+                    Assert.assertFalse("(long)" + base + "^" + exp + " did not throw an exception as expected", exception);
+                    Assert.assertEquals(base + "^" + exp, javaMathResult, result);
+                } catch (ArithmeticException e) {
+                    Assert.assertTrue("(long)" + base + "^" + exp + " threw an unexpected exception", exception);
+                }
+            }
+        }
+    }
+
+    // JUnit's assertEquals(expected, value, delta) uses delta as the maximum difference from expected and value
+    // This approach is not acceptable for large doubles whose precision decreases as numbers grows
+    // Therefore this function uses delta as the maximum deviation of the actual from the expected value
+    private void assertEqualsRatio(String msg, double expected, double actual, double error) {
+        // If not finite, ignore error. Its value must be exact
+        if (!TeraMath.isFinite(expected) && expected != actual) {
+            Assert.fail(msg);
+            return;
+        }
+
+        double ratio = expected / actual;
+        if (ratio < 0.0) {
+            ratio = 1.0 / ratio;
+        }
+        ratio = TeraMath.fastAbs(ratio - 1.0);
+        if (ratio >= error) {
+            Assert.fail(msg);
+        }
     }
 }
