@@ -18,6 +18,7 @@ package org.terasology.rendering.nui;
 import java.util.Objects;
 
 /**
+ * The size of a border, supporting independent widths on each side.
  * @author Immortius
  */
 public class Border {

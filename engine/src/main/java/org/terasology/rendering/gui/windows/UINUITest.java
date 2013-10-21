@@ -53,9 +53,6 @@ public class UINUITest extends UIWindow {
         canvas.preRender();
 
         //canvas.setAlpha(0.5f);
-        Quat4f fullRot = new Quat4f(0,0,0,1);
-        QuaternionUtil.setEuler(fullRot, CoreRegistry.get(Time.class).getGameTime(), 0, 0);
-        canvas.transform(new Matrix4f(fullRot, new Vector3f(), 1.0f));
 
         canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(12, 12, 104, 104), ScaleMode.STRETCH);

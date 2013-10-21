@@ -291,5 +291,5 @@ public interface Canvas {
 
     void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
 
-    void transform(Matrix4f transform);
+    void addInteractionRegion(Rect2i region, InteractionListener listener);
 }

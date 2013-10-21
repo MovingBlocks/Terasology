@@ -17,7 +17,6 @@ package org.terasology.rendering.nui;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.linearmath.TransformUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -52,8 +51,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_MATRIX_MODE;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW_MATRIX;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -86,6 +83,11 @@ public class LwjglCanvas implements Canvas {
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
     private Material textureMat = Assets.getMaterial("engine:UITexture");
     private Material meshMat = Assets.getMaterial("engine:UILitMesh");
+
+    private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
+    private Deque<InteractionRegion> interactionRegions = Queues.newArrayDeque();
+    private InteractionRegion mouseOverRegion;
 
     public LwjglCanvas() {
     }
@@ -443,9 +445,9 @@ public class LwjglCanvas implements Canvas {
         Transform transform = new Transform(translateTransform);
         float[] data = new float[16];
         transform.getOpenGLMatrix(data);
-        FloatBuffer model = BufferUtils.createFloatBuffer(16);
-        model.put(data);
-        model.rewind();
+
+        matrixBuffer.put(data);
+        matrixBuffer.rewind();
 
         Rect2i cropRegion = relativeToAbsolute(region).intersect(state.cropRegion);
 
@@ -454,7 +456,8 @@ public class LwjglCanvas implements Canvas {
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL11.GL_MODELVIEW);
         glPushMatrix();
-        glLoadMatrix(model);
+        glLoadMatrix(matrixBuffer);
+        matrixBuffer.rewind();
 
         boolean matrixStackSupported = material.supportsFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
         if (matrixStackSupported) {
@@ -481,25 +484,8 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void transform(Matrix4f transform) {
-        /*glMatrixMode(GL11.GL_MODELVIEW);
-        FloatBuffer original = BufferUtils.createFloatBuffer(16);
-        GL11.glGetFloat(GL_MODELVIEW_MATRIX, original);
-        original.rewind();
-        float[] vals = new float[16];
-        for (int i = 0; i < 16; ++i) {
-            vals[i] = original.get();
-        }
-
-        Matrix4f model = new Matrix4f(vals);
-        transform.mul(model);
-        original.clear();
-
-
-        new Transform(transform).getOpenGLMatrix(vals);
-        original.put(vals);
-        original.rewind();
-        glLoadMatrix(original);*/
+    public void addInteractionRegion(Rect2i region, InteractionListener listener) {
+        interactionRegions.addLast(new InteractionRegion(region, listener));
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
@@ -636,5 +622,16 @@ public class LwjglCanvas implements Canvas {
         public int hashCode() {
             return Objects.hash(text, font, width, alignment);
         }
+    }
+
+    private static class InteractionRegion {
+        public InteractionListener listener;
+        public Rect2i region;
+
+        public InteractionRegion(Rect2i region, InteractionListener listener) {
+            this.listener = listener;
+            this.region = region;
+        }
+
     }
 }
