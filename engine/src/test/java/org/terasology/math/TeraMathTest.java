@@ -22,17 +22,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * @author Immortius
- */
 public class TeraMathTest {
 
     private static final double MAX_DOUBLE_ERROR = 0.00001;
 
     @Test
     public void getEdgeRegion() {
-        Region3i region = Region3i.createFromMinAndSize(new Vector3i(16,0,16), new Vector3i(16,128,16));
-        Assert.assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), TeraMath.getEdgeRegion(region, Side.LEFT));
+        Region3i region = Region3i.createFromMinAndSize(new Vector3i(16, 0, 16), new Vector3i(16, 128, 16));
+        assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), TeraMath.getEdgeRegion(region, Side.LEFT));
     }
 
     // This function mimicks a power function using ints only
@@ -72,18 +69,18 @@ public class TeraMathTest {
 
                 try {
                     int result = TeraMath.pow(base, exp);
-                    Assert.assertFalse("(int)" + base + "^" + exp + " did not throw an exception as expected", exception);
-                    Assert.assertEquals(base + "^" + exp, javaMathResult, (long) result);
+                    assertFalse("(int)" + base + "^" + exp + " did not throw an exception as expected", exception);
+                    assertEquals(base + "^" + exp, javaMathResult, (long) result);
                 } catch (ArithmeticException e) {
-                    Assert.assertTrue("(int)" + base + "^" + exp + " threw an unexpected exception", exception);
+                    assertTrue("(int)" + base + "^" + exp + " threw an unexpected exception", exception);
                 }
 
                 try {
                     long result = TeraMath.pow((long) base, exp);
-                    Assert.assertFalse("(long)" + base + "^" + exp + " did not throw an exception as expected", exception);
-                    Assert.assertEquals(base + "^" + exp, javaMathResult, result);
+                    assertFalse("(long)" + base + "^" + exp + " did not throw an exception as expected", exception);
+                    assertEquals(base + "^" + exp, javaMathResult, result);
                 } catch (ArithmeticException e) {
-                    Assert.assertTrue("(long)" + base + "^" + exp + " threw an unexpected exception", exception);
+                    assertTrue("(long)" + base + "^" + exp + " threw an unexpected exception", exception);
                 }
             }
         }
@@ -95,7 +92,7 @@ public class TeraMathTest {
     private void assertEqualsRatio(String msg, double expected, double actual, double error) {
         // If not finite, ignore error. Its value must be exact
         if (!TeraMath.isFinite(expected) && expected != actual) {
-            Assert.fail(msg);
+            fail(msg);
             return;
         }
 
@@ -105,7 +102,7 @@ public class TeraMathTest {
         }
         ratio = TeraMath.fastAbs(ratio - 1.0);
         if (ratio >= error) {
-            Assert.fail(msg);
+            fail(msg);
         }
     }
 }

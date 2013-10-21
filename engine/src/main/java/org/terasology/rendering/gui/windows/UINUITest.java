@@ -16,7 +16,6 @@
 package org.terasology.rendering.gui.windows;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.lwjgl.util.vector.Quaternion;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
@@ -29,7 +28,6 @@ import org.terasology.rendering.nui.HorizontalAlignment;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.ScaleMode;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 

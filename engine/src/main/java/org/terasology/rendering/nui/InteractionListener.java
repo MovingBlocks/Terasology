@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.math.Vector2i;
 
 /**

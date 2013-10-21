@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui;
 
-import org.lwjgl.util.vector.Quaternion;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
@@ -23,7 +22,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
@@ -89,6 +87,7 @@ public interface Canvas {
      * Sets the alpha for drawing all elements.
      * This accumulates across sub regions, so the canvas is set to alpha 0.5f and then a sub region is begun and the canvas is set to alpha 0.5f,
      * elements will be drawn with an effective alpha of 0.25f
+     *
      * @param value The value for alpha between 0 and 1.
      */
     void setAlpha(float value);
@@ -269,7 +268,7 @@ public interface Canvas {
 
     /**
      * Draws a material to a given area.
-     *
+     * <p/>
      * Other than cropping and positioning the material relative to the current region of the canvas, it is up to the material as to how it behaves.
      * The "alpha" parameter of the material, if any, will be set to the current alpha of the canvas.
      *
@@ -280,12 +279,13 @@ public interface Canvas {
 
     /**
      * Draws a mesh centered on the given screen position.
-     * @param mesh The mesh to draw
+     *
+     * @param mesh     The mesh to draw
      * @param material The material to draw the mesh with
-     * @param region The screen area to draw the mesh
+     * @param region   The screen area to draw the mesh
      * @param rotation The rotation of the mesh
-     * @param offset Offset, in object space, for the mesh
-     * @param scale A relative scale for drawing the mesh
+     * @param offset   Offset, in object space, for the mesh
+     * @param scale    A relative scale for drawing the mesh
      */
     void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
 
