@@ -75,7 +75,7 @@ public class MultiTerrainGenerator implements FirstPassGenerator {
     public void setWorldSeed(String seed) {
         if (seed != null) {
             // base
-            pGen1 = new EPNoise(seed.hashCode() + 1, 1, false);
+            pGen1 = new EPNoise(seed.hashCode() + 1, EPNoise.NoiseType.SINE);
             // _pGen1 =new VornoiNoise(seed.hashCode() + 1, false, 1, 1);
             // _pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
             // _pGen1 = new DiamondSquareNoise(seed.hashCode() + 1, 3, 3);
@@ -83,25 +83,25 @@ public class MultiTerrainGenerator implements FirstPassGenerator {
 
             // ocean
             // _pGen2 = new WhiteNoise(seed.hashCode() + 2, 1);
-            pGen2 = new EPNoise(seed.hashCode() + 2, 6, false);
+            pGen2 = new EPNoise(seed.hashCode() + 2, EPNoise.NoiseType.LOGARYTHM);
             pGen2.setOctaves(10);
 
             // river
             // _pGen3 = new WhiteNoise(seed.hashCode() + 3, 1);
-            pGen3 = new EPNoise(seed.hashCode() + 3, 2, false);
+            pGen3 = new EPNoise(seed.hashCode() + 3, EPNoise.NoiseType.SINE);
             pGen3.setOctaves(8);
 
             // mountain //6 ok
             // _pGen4 = new WhiteNoise(seed.hashCode() + 4, 1);
-            pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
+            pGen4 = new EPNoise(seed.hashCode() + 4);
 
 
             // hill
             // _pGen5 = new WhiteNoise(seed.hashCode() + 5, 1);
-            pGen5 = new EPNoise(seed.hashCode() + 5, 2, false);
+            pGen5 = new EPNoise(seed.hashCode() + 5, EPNoise.NoiseType.SINE);
 
             // cave
-            pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
+            pGen8 = new EPNoise(seed.hashCode() + 7);
         }
     }
 

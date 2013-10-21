@@ -27,10 +27,11 @@ public class EPNoise implements Noise {
 
     private static final double LACUNARITY = 2.1379201;
     private static final double H = 0.836281;
+    private static final double TAN_BYTE = Math.atan(256);
 
     private double[] spectralWeights;
 
-    private final int[] noisePermutations;
+    private final int[] noisePermutations = new int[512];
     private boolean recomputeSpectralWeights = true;
     private int octaves = 9;
     private boolean on;
@@ -40,30 +41,37 @@ public class EPNoise implements Noise {
      * Init. a new generator with a given seed value.
      *
      * @param seed   The seed value
+     */
+    public EPNoise(int seed) {
+        this(seed, NoiseType.RANDOM);
+    }
+
+    /**
+     * Init. a new generator with a given seed value.
+     *
+     * @param seed   The seed value
      * @param type   Type of generator
-     *               -2: only zeroes, causes layer to disappear
-     *               -1:no swapping
-     *               0: default perlin
-     *               1: sin swapping, smoother
-     *               2: cos swapping, also smooth
-     *               3: tan
-     *               4: sinh, lot of low values
-     *               5: tanh
-     *               6: logarythmic, high elevation and flat top
-     *               7: acos, lot of mid values
+     */
+    public EPNoise(int seed, NoiseType type) {
+        this(seed, type, false);
+    }
+
+    /**
+     * Init. a new generator with a given seed value.
+     *
+     * @param seed   The seed value
+     * @param type   Type of generator
      * @param random allow extra randomization whit mostly odd results
      */
-    public EPNoise(int seed, int type, boolean random) {
+    public EPNoise(int seed, NoiseType type, boolean random) {
         FastRandom rand = new FastRandom(seed);
         on = true;
-
-        noisePermutations = new int[512];
         int[] noiseTable = new int[256];
 
         // Init. the noise table
         for (int i = 0; i < 256; i++) {
             if (random) {
-                noiseTable[i] = (int) (rand.randomDouble() % 256);
+                noiseTable[i] = rand.randomIntAbs(256);
             } else {
                 noiseTable[i] = i;
             }
@@ -73,79 +81,61 @@ public class EPNoise implements Noise {
         for (int i = 0; i < 256; i++) {
             int j = 0;
             switch (type) {
-                case 1:
-                    j = (int) TeraMath
-                            .fastFloor(Math.sin(rand.randomDouble()) * 255);
-                    j = (j < 0) ? -j : j;
+                case RANDOM:
+                    j = rand.randomIntAbs(256);
                     break;
-                case 2:
-                    j = (int) TeraMath
-                            .fastFloor(Math.cos(rand.randomDouble()) * 255);
-                    j = (j < 0) ? -j : j;
+
+                case SINE:
+                    j = TeraMath.fastAbs((int) (Math.sin(rand.randomDouble() * Math.PI) * 255.0));
                     break;
-                case 3:
-                    j = (int) (TeraMath
-                            .fastFloor(Math.tan(rand.randomDouble() % 6) * 100) % 256);
-                    j = (j < 0) ? -j : j;
+
+                case TANGENT:
+                    // TAN_BYTE makes Math.tan return a value in range (-256, 256)
+                    j = TeraMath.fastAbs((int) Math.tan(rand.randomDouble() * TAN_BYTE));
                     break;
-                case 4:
-                    j = (int) (TeraMath
-                            .fastFloor((Math.sinh(rand.randomDouble() % 3) / Math
-                                    .sinh(3)) * 256));
-                    j = (j < 0) ? -j : j;
+
+                case HYPERBOLIC_SINE:
+                    // 6.238328 is aprox. asinh(256), so sinh will return a value in range (-256, 256)
+                    j = TeraMath.fastAbs((int) Math.sinh(rand.randomDouble() * 6.238328));
                     break;
-                case 5:
+
+                case HYPERBOLIC_TANGENT:
+                    // TODO: Remove magic
                     j = (int) TeraMath
                             .fastFloor((Math.tanh(rand.randomDouble() % 3) / Math
                                     .tanh(3)) * 256);
                     j = (j < 0) ? -j : j;
                     break;
-                case 6:
+
+                case LOGARYTHM:
+                    // TODO: Remove magic
                     j = (int) (TeraMath
                             .fastFloor((Math.log(rand.randomDouble() % 4) / 4) * 256)) % 256;
                     j = (j < 0) ? -j : j;
                     break;
-                case 7:
-                    j = (int) (TeraMath
-                            .fastFloor((Math.acos(rand.randomDouble() % 5) / 4) * 256)) % 256;
-                    j = (j < 0) ? -j : j;
+
+                case ARCSINE:
+                    j = TeraMath.fastAbs((int) (Math.acos(rand.randomDouble()) * 256.0 / Math.PI));
                     break;
 
-            /*
-             * case 8: // not working yet j=(int) TeraMath
-             * .fastFloor((Math.asin(rand.randomDouble()%3)/Math.asin(3))*256);
-             * j = (j < 0) ? -j : j; break;
-             */
-            /*
-             * case 10: // creates j = rand.randomInt(); j = (j < 0) ? -j : j; j
-             * = (int) Math.atan((double) j) % 256; break;
-             */
-
-                case -2:// fill array whit zeros, for debug purposes
+                case ZEROES: // Fill array with zeros, for debug purposes
                     on = false;
                     break;
-                case -1:// oddly this works, and generates something watchable
+
+                case NONE: // Oddly this works, and generates something watchable
                     break;
-                case 0:
-                default: // orginal
-                    j = rand.randomInt() % 256;
-                    j = (j < 0) ? -j : j;
-                    break;
+
+                default:
+                    throw new IllegalArgumentException("Invalid swapping type");
             }
 
-            /*if (verbose && type != -1) {
-                System.out.print("noise generator type:" + type + "\n");
-                System.out.print("value:" + j + "\n");
-            }*/
-
-            if (j > 255 || j < 0) {
-                System.out
-                        .print("Error in noise generator type:" + type + "\n");
-                System.out.print("values out of range 255:" + j + "\n");
+            if (j < 0) {
+                j = 0;
+            } else if (j > 255) {
                 j = 255;
             }
 
-            if (type != -1) {
+            if (type != NoiseType.NONE) {
                 int swap = noiseTable[i];
                 noiseTable[i] = noiseTable[j];
                 noiseTable[j] = swap;
@@ -265,5 +255,18 @@ public class EPNoise implements Noise {
 
     public int getOctaves() {
         return octaves;
+    }
+
+    public enum NoiseType {
+        RANDOM, // Default
+        SINE, // Smoother
+        TANGENT,
+        HYPERBOLIC_SINE, // Lots of low values
+        HYPERBOLIC_TANGENT,
+        LOGARYTHM, // High elevation and flat top
+        ARCSINE, // Lot of mid values
+        // Types below are for debugging purposes only
+        ZEROES, // Only zeroes, causes layer to disappear
+        NONE
     }
 }
