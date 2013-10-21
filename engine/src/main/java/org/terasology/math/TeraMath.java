@@ -153,6 +153,26 @@ public final class TeraMath {
     }
 
     /**
+     * Checks if given float is finite
+     *
+     * @param value
+     * @return
+     */
+    public static boolean isFinite(float value) {
+        return value != Float.NaN && value != Float.NEGATIVE_INFINITY && value != Float.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Checks if given double is finite
+     *
+     * @param value
+     * @return
+     */
+    public static boolean isFinite(double value) {
+        return value != Double.NaN && value != Double.NEGATIVE_INFINITY && value != Double.POSITIVE_INFINITY;
+    }
+
+    /**
      * Fast power function
      *
      * @param base
@@ -160,11 +180,28 @@ public final class TeraMath {
      * @return
      */
     public static int pow(int base, int exp) {
-        if (exp <= 0) {
-            // x^0 and 1/(1^x) for any x are the only cases where an integer could represent a non-zero value
-            // 0^0 is an indetermination, but Integers provides no means to represent it
-            if (exp == 0 || base == 1) {
+        switch (exp) {
+            case 0:
                 return 1;
+            case 1:
+                return base;
+            case 2:
+                return base * base;
+            case 3:
+                return base * base * base;
+        }
+        if (exp < 0) {
+            if (base == 0) {
+                throw new ArithmeticException("0^" + exp + " causes division by zero");
+            }
+            if (base == 1) {
+                return 1;
+            }
+            if (base == -1) {
+                if (exp % 2 == 0) {
+                    return 1;
+                }
+                return -1;
             }
             return 0;
         }
@@ -191,9 +228,28 @@ public final class TeraMath {
      * @return
      */
     public static long pow(long base, int exp) {
-        if (exp <= 0) {
-            if (exp == 0 || base == 1) {
+        switch (exp) {
+            case 0:
                 return 1L;
+            case 1:
+                return base;
+            case 2:
+                return base * base;
+            case 3:
+                return base * base * base;
+        }
+        if (exp < 0) {
+            if (base == 0L) {
+                throw new ArithmeticException("0^" + exp + " causes division by zero");
+            }
+            if (base == 1L) {
+                return 1L;
+            }
+            if (base == -1L) {
+                if (exp % 2 == 0) {
+                    return 1L;
+                }
+                return -1L;
             }
             return 0L;
         }
@@ -222,10 +278,8 @@ public final class TeraMath {
     public static float pow(float base, int exp) {
         if (exp <= 0) {
             if (exp == 0) {
-                // 0^0 is an indetermination (NaN)
-                if (base == 0.0f) {
-                    return Float.NaN;
-                }
+                // 0^0 is an indetermination, and should therefore return NaN, but Java Math.pow does return 1.0,
+                // so this function will also return 1.0
                 return 1.0f;
             }
             base = 1.0f / base;
@@ -256,9 +310,6 @@ public final class TeraMath {
     public static double pow(double base, int exp) {
         if (exp <= 0) {
             if (exp == 0) {
-                if (base == 0.0) {
-                    return Double.NaN;
-                }
                 return 1.0;
             }
             base = 1.0 / base;
