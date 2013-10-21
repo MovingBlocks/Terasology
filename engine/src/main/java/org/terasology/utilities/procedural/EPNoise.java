@@ -65,7 +65,7 @@ public class EPNoise implements Noise {
      */
     public EPNoise(int seed, NoiseType type, boolean random) {
         FastRandom rand = new FastRandom(seed);
-        on = true;
+        on = type.isUsingFBM();
         int[] noiseTable = new int[256];
 
         // Init. the noise table
@@ -79,56 +79,7 @@ public class EPNoise implements Noise {
 
         // Shuffle the array
         for (int i = 0; i < 256; i++) {
-            int j = 0;
-            switch (type) {
-                case RANDOM:
-                    j = rand.randomIntAbs(256);
-                    break;
-
-                case SINE:
-                    j = TeraMath.fastAbs((int) (Math.sin(rand.randomDouble() * Math.PI) * 255.0));
-                    break;
-
-                case TANGENT:
-                    // TAN_BYTE makes Math.tan return a value in range (-256, 256)
-                    j = TeraMath.fastAbs((int) Math.tan(rand.randomDouble() * TAN_BYTE));
-                    break;
-
-                case HYPERBOLIC_SINE:
-                    // 6.238328 is aprox. asinh(256), so sinh will return a value in range (-256, 256)
-                    j = TeraMath.fastAbs((int) Math.sinh(rand.randomDouble() * 6.238328));
-                    break;
-
-                case HYPERBOLIC_TANGENT:
-                    // TODO: Remove magic
-                    j = (int) TeraMath
-                            .fastFloor((Math.tanh(rand.randomDouble() % 3) / Math
-                                    .tanh(3)) * 256);
-                    j = (j < 0) ? -j : j;
-                    break;
-
-                case LOGARYTHM:
-                    // TODO: Remove magic
-                    j = (int) (TeraMath
-                            .fastFloor((Math.log(rand.randomDouble() % 4) / 4) * 256)) % 256;
-                    j = (j < 0) ? -j : j;
-                    break;
-
-                case ARCSINE:
-                    j = TeraMath.fastAbs((int) (Math.acos(rand.randomDouble()) * 256.0 / Math.PI));
-                    break;
-
-                case ZEROES: // Fill array with zeros, for debug purposes
-                    on = false;
-                    break;
-
-                case NONE: // Oddly this works, and generates something watchable
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Invalid swapping type");
-            }
-
+            int j = type.generate(rand);
             if (j < 0) {
                 j = 0;
             } else if (j > 255) {
@@ -258,15 +209,95 @@ public class EPNoise implements Noise {
     }
 
     public enum NoiseType {
-        RANDOM, // Default
-        SINE, // Smoother
-        TANGENT,
-        HYPERBOLIC_SINE, // Lots of low values
-        HYPERBOLIC_TANGENT,
-        LOGARYTHM, // High elevation and flat top
-        ARCSINE, // Lot of mid values
+        // Default
+        RANDOM(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                return rand.randomIntAbs(256);
+            }
+        },
+
+        // Smoother
+        SINE(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                return TeraMath.fastAbs((int) (Math.sin(rand.randomDouble() * Math.PI) * 255.0));
+            }
+        },
+
+        TANGENT(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                // TAN_BYTE makes Math.tan return a value in range (-256, 256)
+                return TeraMath.fastAbs((int) Math.tan(rand.randomDouble() * TAN_BYTE));
+            }
+        },
+
+        // Lots of low values
+        HYPERBOLIC_SINE(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                // 6.238328 is aprox. asinh(256), so sinh will return a value in range (-256, 256)
+                return TeraMath.fastAbs((int) Math.sinh(rand.randomDouble() * 6.238328));
+            }
+        },
+
+        HYPERBOLIC_TANGENT(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                // TODO: Remove magic
+                int result = (int) TeraMath
+                        .fastFloor((Math.tanh(rand.randomDouble() % 3) / Math
+                                .tanh(3)) * 256);
+                return (result < 0) ? -result : result;
+            }
+        },
+
+        // High elevation and flat top
+        LOGARYTHM(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                // TODO: Remove magic
+                int result = (int) (TeraMath
+                        .fastFloor((Math.log(rand.randomDouble() % 4) / 4) * 256)) % 256;
+                return (result < 0) ? -result : result;
+            }
+        },
+
+        // Lot of mid values
+        ARCSINE(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                return TeraMath.fastAbs((int) (Math.acos(rand.randomDouble()) * 256.0 / Math.PI));
+            }
+        },
+
         // Types below are for debugging purposes only
-        ZEROES, // Only zeroes, causes layer to disappear
-        NONE
+
+        // Only zeroes, causes layer to disappear
+        ZEROES(false) {
+            @Override
+            public int generate(FastRandom rand) {
+                return 0;
+            }
+        },
+        NONE(true) {
+            @Override
+            public int generate(FastRandom rand) {
+                return 0;
+            }
+        };
+
+        private boolean usingFBM;
+
+        private NoiseType(boolean usingFBM) {
+            this.usingFBM = usingFBM;
+        }
+
+        public abstract int generate(FastRandom rand);
+
+        public boolean isUsingFBM() {
+            return usingFBM;
+        }
     }
 }
