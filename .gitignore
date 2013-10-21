@@ -9,10 +9,12 @@
 /.gradle/
 build/
 
-# Ignore IntelliJ IDEA
+# Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
 /out/
+modules/Core/Core.iml
+facades/PC/PC.iml
+engine/engine.iml
 /*.iml
-/**/*.iml
 /*.ipr
 /*.iws
 

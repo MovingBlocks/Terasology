@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-// Simple build file for modules - this template will be copied into new module directories as they are created
+// Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
 apply plugin: 'java'
 apply plugin: 'project-report'

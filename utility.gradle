@@ -61,7 +61,7 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
             doLast {
                 File targetBuildGradle = new File(destination, 'build.gradle')
                 targetBuildGradle.delete()
-                targetBuildGradle << new File(templatesDir, 'modules.gradle').text
+                targetBuildGradle << new File(rootDir, 'modules/Core/build.gradle').text
 
                 File moduleManifest = new File (destination, 'module.txt')
                 if (!moduleManifest.exists()) {
@@ -112,7 +112,7 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
 
                 // Copy in some template stuff for the new module
                 doLast {
-                    new File(destination, 'build.gradle') << new File(templatesDir, 'modules.gradle').text
+                    new File(destination, 'build.gradle') << new File(rootDir, 'modules/Core/build.gradle').text
                     def moduleManifest = new File (destination, 'module.txt')
                     def moduleText = new File(templatesDir, 'module.txt').text
                     moduleManifest << moduleText.replaceAll('MODULENAME', repo)
