@@ -19,12 +19,16 @@ uniform vec4 color;
 uniform vec2 scale;
 uniform vec2 texOffset;
 uniform vec2 texSize;
+uniform vec4 croppingBoundaries;
+
+varying vec2 relPos;
 
 void main()
 {
     vec4 pos = gl_Vertex;
     pos.xy *= scale;
     pos.xy += offset;
+    relPos = pos.xy;
 	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * pos;
     gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
     gl_TexCoord[0].xy = texOffset + gl_TexCoord[0].xy * (texSize) ;

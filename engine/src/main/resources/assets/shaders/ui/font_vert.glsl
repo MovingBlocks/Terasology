@@ -17,10 +17,13 @@
 uniform vec2 offset;
 uniform vec4 color;
 
+varying vec2 relPos;
+
 void main()
 {
     vec4 pos = gl_Vertex;
     pos.xy += offset;
+    relPos = pos.xy;
 	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * pos;
     gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
     gl_FrontColor = color;

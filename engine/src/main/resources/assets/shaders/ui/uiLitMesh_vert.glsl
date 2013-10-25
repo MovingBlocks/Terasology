@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-varying vec3 normal;
+
 uniform float alpha;
+uniform mat4 posMatrix;
+
+varying vec3 normal;
+varying vec2 relPos;
 
 void main()
 {
+    vec3 pos = (posMatrix * gl_Vertex).xyz;
+    relPos = pos.xy;
+
     normal = normalize(gl_NormalMatrix * gl_Normal);
     gl_Position = ftransform();
     gl_TexCoord[0] = gl_MultiTexCoord0;

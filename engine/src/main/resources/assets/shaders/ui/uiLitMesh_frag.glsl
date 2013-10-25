@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
+uniform vec4 croppingBoundaries;
 uniform sampler2D texture;
 varying vec3 normal;
+varying vec2 relPos;
 
 void main(){
+    if (relPos.x < croppingBoundaries.x || relPos.x > croppingBoundaries.y || relPos.y < croppingBoundaries.z || relPos.y > croppingBoundaries.w) {
+        discard;
+    }
+
     vec4 color = texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
 
     float light = 0.6 * max(0.0, dot(normal, vec3(0.57735,-0.57735,0.57735))) +

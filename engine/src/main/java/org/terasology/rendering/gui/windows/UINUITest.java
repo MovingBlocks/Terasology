@@ -23,6 +23,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.input.InputSystem;
 import org.terasology.math.Rect2i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.Texture;
@@ -33,9 +34,21 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlignment;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.SubRegion;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glFrustum;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.Util.checkGLError;
 
 /**
  * @author Immortius
@@ -69,6 +82,7 @@ public class UINUITest extends UIWindow {
 
     @Override
     public void render() {
+        checkGLError();
         canvas.preRender();
 
         canvas.drawTextureBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y),
@@ -77,10 +91,13 @@ public class UINUITest extends UIWindow {
         canvas.drawTexture(getTexture(c1), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
         canvas.addInteractionRegion(Rect2i.createFromMinAndSize(0, 0, 128, 128), c1);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(12, 12, 104, 104), ScaleMode.STRETCH);
-        canvas.setTextCursor(15, 100);
-        canvas.drawTextShadowed(font, "Stretched", Color.BLACK);
 
-        canvas.drawTexture(getTexture(c2), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
+        try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(12, 12, 104, 104), true)) {
+            canvas.setTextCursor(3, 88);
+            canvas.drawTextShadowed(font, "Stretched with a lot more text than there should be", 160, Color.BLACK);
+        }
+
+        /*canvas.drawTexture(getTexture(c2), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
         canvas.addInteractionRegion(Rect2i.createFromMinAndSize(128, 0, 128, 128), c2);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(140, 12, 104, 104), ScaleMode.SCALE_FIT);
         canvas.setTextCursor(143, 75);
@@ -90,7 +107,7 @@ public class UINUITest extends UIWindow {
         canvas.addInteractionRegion(Rect2i.createFromMinAndSize(256, 0, 128, 128), c3);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(268, 12, 104, 104), ScaleMode.SCALE_FILL);
         canvas.setTextCursor(270, 100);
-        canvas.drawTextShadowed(font, "Scaled Fill", Color.BLACK);
+        canvas.drawTextShadowed(font, "Scaled Fill", Color.BLACK);   */
 
         canvas.setTextCursor(0, 150);
         canvas.setTextColor(Color.GREY);
@@ -112,6 +129,8 @@ public class UINUITest extends UIWindow {
                 Rect2i.createFromMinAndSize(0, 128, 256, 256), rot, new Vector3f(0, 0, 0), 1.5f);
 
         canvas.postRender();
+
+        checkGLError();
 
     }
 

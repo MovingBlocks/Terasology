@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
+uniform vec4 croppingBoundaries;
 uniform sampler2D texture;
 
-void main(){
-    vec4 diffColor = texture2D(texture, gl_TexCoord[0].xy);
+varying vec2 relPos;
 
+void main(){
+    if (relPos.x < croppingBoundaries.x || relPos.x > croppingBoundaries.y || relPos.y < croppingBoundaries.z || relPos.y > croppingBoundaries.w) {
+        discard;
+    }
+
+    vec4 diffColor = texture2D(texture, gl_TexCoord[0].xy);
     gl_FragData[0].rgba = diffColor * gl_Color;
 }
