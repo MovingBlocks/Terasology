@@ -87,16 +87,74 @@ public class LwjglCanvas implements Canvas {
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     private Deque<InteractionRegion> interactionRegions = Queues.newArrayDeque();
-    private InteractionRegion mouseOverRegion;
+    private Set<InteractionRegion> mouseOverRegions = Sets.newLinkedHashSet();
+    private InteractionRegion clickedRegion;
+    private int dragMouseButton;
 
     public LwjglCanvas() {
     }
 
     public void preRender() {
+        interactionRegions.clear();
         state = new CanvasState(Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
         glScissor(0, 0, Display.getWidth(), Display.getHeight());
         glEnable(GL_SCISSOR_TEST);
         glEnable(GL_CULL_FACE);
+    }
+
+    public void processMouseOver(Vector2i position) {
+        Set<InteractionRegion> newMouseOverRegions = Sets.newLinkedHashSet();
+        Iterator<InteractionRegion> iter = interactionRegions.descendingIterator();
+        while (iter.hasNext()) {
+            InteractionRegion next = iter.next();
+            if (next.region.contains(position)) {
+                Vector2i relPos = new Vector2i(position).sub(next.region.min());
+                next.listener.onMouseOver(relPos, newMouseOverRegions.isEmpty());
+                newMouseOverRegions.add(next);
+            }
+        }
+
+        for (InteractionRegion region : mouseOverRegions) {
+            if (!newMouseOverRegions.contains(region) && interactionRegions.contains(region)) {
+                region.listener.onMouseLeave();
+            }
+        }
+
+        if (clickedRegion != null && !interactionRegions.contains(clickedRegion)) {
+            clickedRegion = null;
+        }
+
+        mouseOverRegions = newMouseOverRegions;
+    }
+
+    public void processMouseClick(int button, Vector2i pos) {
+        for (InteractionRegion next : mouseOverRegions) {
+            if (next.region.contains(pos)) {
+                Vector2i relPos = new Vector2i(pos).sub(next.region.min());
+                if (next.listener.onMouseClick(button, relPos)) {
+                    clickedRegion = next;
+                    break;
+                }
+            }
+        }
+    }
+
+    public void processMouseRelease(int button, Vector2i pos) {
+        if (clickedRegion != null) {
+            clickedRegion.listener.onMouseRelease(button, pos);
+            clickedRegion = null;
+        }
+    }
+
+    public void processMouseWheeled(int amount, Vector2i pos) {
+        for (InteractionRegion next : mouseOverRegions) {
+            if (next.region.contains(pos)) {
+                Vector2i relPos = new Vector2i(pos).sub(next.region.min());
+                if (next.listener.onMouseWheeled(amount, relPos)) {
+                    break;
+                }
+            }
+        }
     }
 
     public void postRender() {
@@ -485,7 +543,10 @@ public class LwjglCanvas implements Canvas {
 
     @Override
     public void addInteractionRegion(Rect2i region, InteractionListener listener) {
-        interactionRegions.addLast(new InteractionRegion(region, listener));
+        Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));
+        if (!finalRegion.isEmpty()) {
+            interactionRegions.addLast(new InteractionRegion(finalRegion, listener));
+        }
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
@@ -633,5 +694,18 @@ public class LwjglCanvas implements Canvas {
             this.region = region;
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof InteractionRegion) {
+                InteractionRegion other = (InteractionRegion) obj;
+                return Objects.equals(other.listener, listener);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return listener.hashCode();
+        }
     }
 }

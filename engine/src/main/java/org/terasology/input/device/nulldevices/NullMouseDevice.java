@@ -13,46 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.input.device.nulldevices;
 
+import com.google.common.collect.Queues;
+import org.terasology.input.device.InputAction;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Vector2i;
+
+import java.util.Queue;
 
 /**
  * @author Immortius
  */
-public class BaseInteractionListener implements InteractionListener {
-
-    private boolean mouseOver;
-
+public class NullMouseDevice implements MouseDevice {
     @Override
-    public void onMouseOver(Vector2i pos, boolean topMostElement) {
-        this.mouseOver = topMostElement;
+    public Vector2i getPosition() {
+        return new Vector2i();
     }
 
     @Override
-    public void onMouseLeave() {
-        this.mouseOver = false;
+    public Vector2i getDelta() {
+        return new Vector2i();
     }
 
     @Override
-    public boolean onMouseClick(int button, Vector2i pos) {
+    public boolean isButtonDown(int button) {
         return false;
     }
 
     @Override
-    public void onMouseDrag(int button, Vector2i pos) {
-    }
-
-    @Override
-    public void onMouseRelease(int button, Vector2i pos) {
-    }
-
-    @Override
-    public boolean onMouseWheeled(int amount, Vector2i pos) {
-        return false;
-    }
-
-    public boolean isMouseOver() {
-        return mouseOver;
+    public Queue<InputAction> getInputQueue() {
+        return Queues.newArrayDeque();
     }
 }

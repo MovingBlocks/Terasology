@@ -50,9 +50,9 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 public class StateMainMenu implements GameState {
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
-    private InputSystem inputSystem;
     private ComponentSystemManager componentSystemManager;
     private GUIManager guiManager;
+    private InputSystem inputSystem;
 
     private String messageOnLoad = "";
 
@@ -80,8 +80,8 @@ public class StateMainMenu implements GameState {
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 
-        inputSystem = new InputSystem();
-        CoreRegistry.put(InputSystem.class, inputSystem);
+        eventSystem.registerEventHandler(guiManager);
+        inputSystem = CoreRegistry.get(InputSystem.class);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());

@@ -35,7 +35,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
-import org.terasology.classMetadata.reflect.ByteCodeReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
@@ -79,12 +78,12 @@ import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
-import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
+import org.terasology.world.block.loader.WorldAtlas;
 
 import java.nio.file.FileSystem;
 

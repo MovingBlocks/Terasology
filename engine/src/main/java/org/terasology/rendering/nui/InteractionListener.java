@@ -22,9 +22,45 @@ import org.terasology.math.Vector2i;
  */
 public interface InteractionListener {
 
-    void setMouseOver(Vector2i pos, boolean mouseOver);
+    /**
+     * Called every frame the mouse is over the interaction region
+     * @param pos The relative position of the mouse
+     * @param topMostElement Whether this element is the top-most element the mouse is over
+     */
+    void onMouseOver(Vector2i pos, boolean topMostElement);
 
+    /**
+     * Called if the mouse ceases to be over the interaction region
+     */
+    void onMouseLeave();
+
+    /**
+     * Called when the mouse is clicked over an interaction region associated with this listener
+     * @param button The mouse button that was clicked
+     * @param pos The relative position of the mouse
+     * @return Whether the mouse input should be consumed, and thus not propagated to other interaction regions
+     */
     boolean onMouseClick(int button, Vector2i pos);
 
-    boolean onMouseRelease(int button, Vector2i pos);
+    /**
+     * Called when the mouse is moved after clicking on the interaction region
+     * @param button The mouse button that is held down
+     * @param pos The relative position of the mouse
+     */
+    void onMouseDrag(int button, Vector2i pos);
+
+    /**
+     * Called when the mouse is released after clicking on the interaction region
+     * @param button The mouse button that was clicked
+     * @param pos The relative position of the mouse
+     */
+    void onMouseRelease(int button, Vector2i pos);
+
+    /**
+     * Called when the mouse is wheeled over an interaction region
+     * @param amount The amount the mouse wheel is moved
+     * @param pos The relative position of the mouse
+     * @return Whether the mouse input should be consumed, and thus not propagated to other intertaction regions
+     */
+    boolean onMouseWheeled(int amount, Vector2i pos);
 }

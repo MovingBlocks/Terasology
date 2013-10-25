@@ -79,39 +79,52 @@ public class Vector2i {
         values[1] = y;
     }
 
-    public final void add(Vector2i t1, Vector2i t2) {
+    public final Vector2i add(Vector2i t1, Vector2i t2) {
         x = t1.x + t2.x;
         y = t1.y + t2.y;
+        return this;
     }
 
-    public final void add(Vector2i other) {
+    public final Vector2i add(Vector2i other) {
         x += other.x;
         y += other.y;
+        return this;
     }
 
-    public final void negate(Vector2i other) {
+    public Vector2i sub(Vector2i other) {
+        x -= other.x;
+        y -= other.y;
+        return this;
+    }
+
+    public final Vector2i negate(Vector2i other) {
         x = -other.x;
         y = -other.y;
+        return this;
     }
 
-    public final void negate() {
+    public final Vector2i negate() {
         x = -x;
         y = -y;
+        return this;
     }
 
-    public final void mult(int amount) {
+    public final Vector2i mult(int amount) {
         x *= amount;
         y *= amount;
+        return this;
     }
 
-    public final void mult(int multX, int multY) {
+    public final Vector2i mult(int multX, int multY) {
         this.x *= multX;
         this.y *= multY;
+        return this;
     }
 
-    public final void mult(Vector2i other) {
+    public final Vector2i mult(Vector2i other) {
         this.x *= other.x;
         this.y *= other.y;
+        return this;
     }
 
     @Override
@@ -156,4 +169,5 @@ public class Vector2i {
     public Vector2d toVector2d() {
         return new Vector2d(x, y);
     }
+
 }

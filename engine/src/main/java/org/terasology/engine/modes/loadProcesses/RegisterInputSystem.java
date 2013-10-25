@@ -64,9 +64,8 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 
-        InputSystem inputSystem = new InputSystem();
         BindsConfig bindsConfig = CoreRegistry.get(Config.class).getInput().getBinds();
-        CoreRegistry.put(InputSystem.class, inputSystem);
+        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         for (Module module : moduleManager.getActiveModules()) {

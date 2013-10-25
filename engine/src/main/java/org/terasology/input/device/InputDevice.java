@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.tree.lsystem;
+package org.terasology.input.device;
 
-
-import org.terasology.entitySystem.Component;
-import org.terasology.world.block.ForceBlockActive;
+import java.util.Queue;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Immortius
  */
-@ForceBlockActive
-public class LSystemTreeComponent implements Component {
-    public String axion;
-    public int generation;
-    public long lastGrowthTime;
-    public float branchAngle;
-    public float rotationAngle;
+public interface InputDevice {
 
-    public boolean initialized;
-    public boolean generated;
+    /**
+     * @return A queue of all input actions that have occurred over the last update for this device
+     */
+    Queue<InputAction> getInputQueue();
 }

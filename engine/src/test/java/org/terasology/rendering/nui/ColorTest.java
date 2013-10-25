@@ -31,7 +31,7 @@ public class ColorTest {
 
     @Test
     public void getSetRed() {
-        Color color = new Color(1,10,60,255);
+        Color color = new Color(1, 10, 60, 255);
         assertEquals(1, color.r());
         color = color.alterRed(72);
         assertEquals(72, color.r());
@@ -39,7 +39,7 @@ public class ColorTest {
 
     @Test
     public void getSetGreen() {
-        Color color = new Color(1,10,60,255);
+        Color color = new Color(1, 10, 60, 255);
         assertEquals(10, color.g());
         color = color.alterGreen(72);
         assertEquals(72, color.g());
@@ -47,7 +47,7 @@ public class ColorTest {
 
     @Test
     public void getSetBlue() {
-        Color color = new Color(1,10,60,255);
+        Color color = new Color(1, 10, 60, 255);
         assertEquals(60, color.b());
         color = color.alterBlue(72);
         assertEquals(72, color.b());
@@ -55,7 +55,7 @@ public class ColorTest {
 
     @Test
     public void getSetAlpha() {
-        Color color = new Color(1,10,60,255);
+        Color color = new Color(1, 10, 60, 255);
         assertEquals(255, color.a());
         color = color.alterAlpha(72);
         assertEquals(72, color.a());

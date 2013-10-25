@@ -18,13 +18,12 @@ package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
-import org.terasology.world.internal.BlockUpdate;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
+import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 

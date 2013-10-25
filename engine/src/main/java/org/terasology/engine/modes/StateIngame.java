@@ -84,6 +84,7 @@ public class StateIngame implements GameState {
         entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
+        eventSystem.registerEventHandler(guiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
 
         guiManager.openWindow(MenuControlSystem.HUD);

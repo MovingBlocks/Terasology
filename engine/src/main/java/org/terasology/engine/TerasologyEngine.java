@@ -46,6 +46,8 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
+import org.terasology.input.InputSystem;
+import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
@@ -448,6 +450,8 @@ public class TerasologyEngine implements GameEngine {
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
             Mouse.setGrabbed(false);
+            InputSystem inputSystem = CoreRegistry.putPermanently(InputSystem.class, new InputSystem());
+            inputSystem.setMouseDevice(new LwjglMouseDevice());
         } catch (LWJGLException e) {
             logger.error("Could not initialize controls.", e);
             System.exit(1);

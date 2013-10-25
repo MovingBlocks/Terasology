@@ -139,11 +139,11 @@ public class BindableButtonImpl implements BindableButton {
      * Updates this bind with the new state of a bound button. This should be done whenever a bound button changes
      * state, so that the overall state of the bind can be tracked.
      *
+     *
      * @param pressed            Is the changing
      * @param delta              The length of the current frame
      * @param target             The current camera target
      * @param initialKeyConsumed Has the changing button's event already been consumed
-     * @param guiOnly            Is the gui consuming input
      * @return Whether the button's event has been consumed
      */
     public boolean updateBindState(boolean pressed,
@@ -153,8 +153,7 @@ public class BindableButtonImpl implements BindableButton {
                                    Vector3i targetBlockPos,
                                    Vector3f hitPosition,
                                    Vector3f hitNormal,
-                                   boolean initialKeyConsumed,
-                                   boolean guiOnly) {
+                                   boolean initialKeyConsumed) {
         boolean keyConsumed = initialKeyConsumed;
         if (pressed) {
             activeInputs++;

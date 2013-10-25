@@ -18,7 +18,7 @@ package org.terasology.classMetadata.reflect;
 /**
  * @author Immortius
  */
-public class PrivateComponent {
+public final class PrivateComponent {
 
     private PrivateComponent() {
 

@@ -16,12 +16,18 @@
 package org.terasology.rendering.gui.windows;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
+import org.terasology.input.InputSystem;
 import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlignment;
@@ -38,6 +44,14 @@ public class UINUITest extends UIWindow {
 
     private LwjglCanvas canvas;
     private Font font = Assets.getFont("engine:default");
+    private InputSystem input = CoreRegistry.get(InputSystem.class);
+
+    private Texture inactive = Assets.getTexture("engine:testWindowBorder");
+    private Texture active = Assets.getTexture("engine:testWindowBorderOver");
+
+    private BaseInteractionListener c1 = new BaseInteractionListener();
+    private BaseInteractionListener c2 = new BaseInteractionListener();
+    private BaseInteractionListener c3 = new BaseInteractionListener();
 
     public UINUITest() {
         setId("nuitest");
@@ -47,22 +61,33 @@ public class UINUITest extends UIWindow {
     }
 
     @Override
+    public void update() {
+        super.update();
+
+        canvas.processMouseOver(new Vector2i(Mouse.getX(), Display.getHeight() - Mouse.getY()));
+    }
+
+    @Override
     public void render() {
         canvas.preRender();
 
-        //canvas.setAlpha(0.5f);
+        canvas.drawTextureBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y),
+                new Border(6, 6, 6, 6), true);
 
-        canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.drawTexture(getTexture(c1), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.addInteractionRegion(Rect2i.createFromMinAndSize(0, 0, 128, 128), c1);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(12, 12, 104, 104), ScaleMode.STRETCH);
         canvas.setTextCursor(15, 100);
         canvas.drawTextShadowed(font, "Stretched", Color.BLACK);
 
-        canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.drawTexture(getTexture(c2), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.addInteractionRegion(Rect2i.createFromMinAndSize(128, 0, 128, 128), c2);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(140, 12, 104, 104), ScaleMode.SCALE_FIT);
         canvas.setTextCursor(143, 75);
         canvas.drawTextShadowed(font, "Scaled Fit", Color.BLACK);
 
-        canvas.drawTexture(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.drawTexture(getTexture(c3), Rect2i.createFromMinAndSize(256, 0, 128, 128), ScaleMode.STRETCH);
+        canvas.addInteractionRegion(Rect2i.createFromMinAndSize(256, 0, 128, 128), c3);
         canvas.drawTexture(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(268, 12, 104, 104), ScaleMode.SCALE_FILL);
         canvas.setTextCursor(270, 100);
         canvas.drawTextShadowed(font, "Scaled Fill", Color.BLACK);
@@ -88,5 +113,12 @@ public class UINUITest extends UIWindow {
 
         canvas.postRender();
 
+    }
+
+    private Texture getTexture(BaseInteractionListener listener) {
+        if (listener.isMouseOver()) {
+            return active;
+        }
+        return inactive;
     }
 }

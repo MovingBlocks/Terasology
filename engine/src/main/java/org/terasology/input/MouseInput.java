@@ -59,8 +59,7 @@ public enum MouseInput {
 
     public static MouseInput parse(String id) {
         try {
-            MouseInput input = valueOf(id);
-            return input;
+            return valueOf(id);
         } catch (IllegalArgumentException e) {
             return MOUSE_NONE;
         }

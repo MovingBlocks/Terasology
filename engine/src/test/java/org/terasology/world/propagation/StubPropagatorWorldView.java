@@ -21,7 +21,6 @@ import gnu.trove.map.hash.TObjectByteHashMap;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.propagation.PropagatorWorldView;
 
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
 
     @Override
     public Block getBlockAt(Vector3i pos) {
-        Block result =blockData.get(pos);
+        Block result = blockData.get(pos);
         if (result == null) {
             return BlockManager.getAir();
         }

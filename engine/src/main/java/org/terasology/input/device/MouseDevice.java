@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.tree.lsystem;
+package org.terasology.input.device;
 
-
-import org.terasology.entitySystem.Component;
-import org.terasology.world.block.ForceBlockActive;
+import org.terasology.math.Vector2i;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Immortius
  */
-@ForceBlockActive
-public class LSystemTreeComponent implements Component {
-    public String axion;
-    public int generation;
-    public long lastGrowthTime;
-    public float branchAngle;
-    public float rotationAngle;
+public interface MouseDevice extends InputDevice {
 
-    public boolean initialized;
-    public boolean generated;
+    /**
+     * @return The current position of the mouse in screen space
+     */
+    Vector2i getPosition();
+
+    /**
+     * @return The change in mouse position over the last update
+     */
+    Vector2i getDelta();
+
+    /**
+     * @param button
+     * @return The current state of the given button
+     */
+    boolean isButtonDown(int button);
 }

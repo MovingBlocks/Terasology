@@ -20,7 +20,17 @@ package org.terasology.input;
  * @author Immortius
  */
 public enum ButtonState {
-    DOWN,
-    UP,
-    REPEAT
+    DOWN(true),
+    UP(false),
+    REPEAT(true);
+
+    private boolean down;
+
+    private ButtonState(boolean down) {
+        this.down = down;
+    }
+
+    public boolean isDown() {
+        return down;
+    }
 }

@@ -35,11 +35,8 @@ import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.propagation.light.LightPropagationRules;
-import org.terasology.world.propagation.light.SunlightChunkView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightWorldView;
-
-import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -350,12 +347,12 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     @Test
     public void betweenChunks() throws Exception {
         Thread.sleep(10000);
-        Chunk main = new Chunk(new Vector3i(0,0,0));
+        Chunk main = new Chunk(new Vector3i(0, 0, 0));
         main.setChunkState(Chunk.State.COMPLETE);
         for (Vector3i pos : Chunk.CHUNK_REGION) {
             main.setSunlight(pos, (byte) 15);
         }
-        Chunk adjacent = new Chunk(new Vector3i(1,0,0));
+        Chunk adjacent = new Chunk(new Vector3i(1, 0, 0));
         adjacent.setChunkState(Chunk.State.COMPLETE);
         for (Vector3i pos : TeraMath.getEdgeRegion(Chunk.CHUNK_REGION, Side.TOP)) {
             adjacent.setBlock(pos, solid);
@@ -363,13 +360,13 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
         ChunkProvider provider = mock(ChunkProvider.class);
         when(provider.getChunk(Vector3i.zero())).thenReturn(main);
-        when(provider.getChunk(new Vector3i(1,0,0))).thenReturn(adjacent);
+        when(provider.getChunk(new Vector3i(1, 0, 0))).thenReturn(adjacent);
 
         BatchPropagator prop = new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(provider));
         prop.propagateBetween(main, adjacent, Side.RIGHT);
         prop.process();
 
-        assertEquals(14, adjacent.getSunlight(0,32,32));
-        assertEquals(13, adjacent.getSunlight(1,32,32));
+        assertEquals(14, adjacent.getSunlight(0, 32, 32));
+        assertEquals(13, adjacent.getSunlight(1, 32, 32));
     }
 }

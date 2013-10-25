@@ -18,15 +18,16 @@ package org.terasology.input;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.input.device.InputAction;
+import org.terasology.input.device.MouseDevice;
+import org.terasology.input.device.nulldevices.NullMouseDevice;
 import org.terasology.input.events.InputEvent;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
@@ -45,8 +46,8 @@ import org.terasology.input.events.RightMouseDownButtonEvent;
 import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.Vector2i;
 
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,8 @@ public class InputSystem implements ComponentSystem {
     @In
     private GameEngine engine;
 
+    private MouseDevice mouse = new NullMouseDevice();
+
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();
 
@@ -79,18 +82,24 @@ public class InputSystem implements ComponentSystem {
 
     private LocalPlayer localPlayer;
     private CameraTargetSystem targetSystem;
-    private GUIManager guiManager;
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         targetSystem = CoreRegistry.get(CameraTargetSystem.class);
-        guiManager = CoreRegistry.get(GUIManager.class);
-
-        CoreRegistry.get(EventSystem.class).registerEventHandler(guiManager);
     }
 
     @Override
     public void shutdown() {
+        localPlayer = null;
+        targetSystem = null;
+    }
+
+    public void setMouseDevice(MouseDevice mouseDevice) {
+        this.mouse = mouseDevice;
+    }
+
+    public MouseDevice getMouseDevice() {
+        return mouse;
     }
 
     public BindableButton registerBindButton(String bindId, String displayName) {
@@ -176,62 +185,11 @@ public class InputSystem implements ComponentSystem {
         if (!engine.hasFocus()) {
             return;
         }
-        //process mouse clicks
-        while (Mouse.next()) {
-            //left/right/middle mouse click
-            if (Mouse.getEventButton() != -1) {
-                int button = Mouse.getEventButton();
-                boolean buttonDown = Mouse.getEventButtonState();
-                boolean consumed = sendMouseEvent(button, buttonDown, delta);
 
-                BindableButtonImpl bind = mouseButtonBinds.get(button);
-                if (bind != null) {
-                    bind.updateBindState(
-                            buttonDown,
-                            delta,
-                            getInputEntities(),
-                            targetSystem.getTarget(),
-                            targetSystem.getTargetBlockPosition(),
-                            targetSystem.getHitPosition(),
-                            targetSystem.getHitNormal(),
-                            consumed,
-                            guiManager.isConsumingInput());
-                }
-            } else if (Mouse.getEventDWheel() != 0) {
-                //mouse wheel
-                int wheelMoved = Mouse.getEventDWheel();
-                boolean consumed = sendMouseWheelEvent(wheelMoved / 120, delta);
-
-                BindableButtonImpl bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
-                if (bind != null) {
-                    bind.updateBindState(
-                            true,
-                            delta,
-                            getInputEntities(),
-                            targetSystem.getTarget(),
-                            targetSystem.getTargetBlockPosition(),
-                            targetSystem.getHitPosition(),
-                            targetSystem.getHitNormal(),
-                            consumed,
-                            guiManager.isConsumingInput());
-                    bind.updateBindState(
-                            false,
-                            delta,
-                            getInputEntities(),
-                            targetSystem.getTarget(),
-                            targetSystem.getTargetBlockPosition(),
-                            targetSystem.getHitPosition(),
-                            targetSystem.getHitNormal(),
-                            consumed,
-                            guiManager.isConsumingInput());
-                }
-            }
-        }
-
+        Vector2i deltaMouse = mouse.getDelta();
         //process mouse movement x axis
-        int deltaX = Mouse.getDX();
-        if (deltaX != 0) {
-            MouseAxisEvent event = new MouseXAxisEvent(deltaX * config.getInput().getMouseSensitivity(), delta);
+        if (deltaMouse.x != 0) {
+            MouseAxisEvent event = new MouseXAxisEvent(deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
@@ -242,9 +200,8 @@ public class InputSystem implements ComponentSystem {
         }
 
         //process mouse movement y axis
-        int deltaY = Mouse.getDY();
-        if (deltaY != 0) {
-            MouseAxisEvent event = new MouseYAxisEvent(deltaY * config.getInput().getMouseSensitivity(), delta);
+        if (deltaMouse.y != 0) {
+            MouseAxisEvent event = new MouseYAxisEvent(deltaMouse.y * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
@@ -253,16 +210,75 @@ public class InputSystem implements ComponentSystem {
                 }
             }
         }
+
+        //process mouse clicks
+        for (InputAction action : mouse.getInputQueue()) {
+            switch (action.getInput().getType()) {
+                case MOUSE_BUTTON:
+                    int id = action.getInput().getId();
+                    if (id != -1) {
+                        boolean consumed = sendMouseEvent(id, action.getState().isDown(), delta);
+
+                        BindableButtonImpl bind = mouseButtonBinds.get(id);
+                        if (bind != null) {
+                            bind.updateBindState(
+                                    action.getState().isDown(),
+                                    delta,
+                                    getInputEntities(),
+                                    targetSystem.getTarget(),
+                                    targetSystem.getTargetBlockPosition(),
+                                    targetSystem.getHitPosition(),
+                                    targetSystem.getHitNormal(),
+                                    consumed
+                            );
+                        }
+                    }
+                    break;
+                case MOUSE_WHEEL:
+                    int dir = action.getInput().getId();
+                    if (dir != 0 && action.getTurns() != 0) {
+                        boolean consumed = sendMouseWheelEvent(dir * action.getTurns(), delta);
+
+                        BindableButtonImpl bind = (dir == 1) ? mouseWheelUpBind : mouseWheelDownBind;
+                        if (bind != null) {
+                            for (int i = 0; i < action.getTurns(); ++i) {
+                                bind.updateBindState(
+                                        true,
+                                        delta,
+                                        getInputEntities(),
+                                        targetSystem.getTarget(),
+                                        targetSystem.getTargetBlockPosition(),
+                                        targetSystem.getHitPosition(),
+                                        targetSystem.getHitNormal(),
+                                        consumed
+                                );
+                                bind.updateBindState(
+                                        false,
+                                        delta,
+                                        getInputEntities(),
+                                        targetSystem.getTarget(),
+                                        targetSystem.getTargetBlockPosition(),
+                                        targetSystem.getHitPosition(),
+                                        targetSystem.getHitNormal(),
+                                        consumed
+                                );
+                            }
+                        }
+                    }
+                    break;
+                case KEY:
+                    break;
+            }
+        }
     }
 
     private void setupTarget(InputEvent event) {
-        if (targetSystem.isTargetAvailable() && !guiManager.isConsumingInput()) {
+        if (targetSystem.isTargetAvailable()) {
             event.setTargetInfo(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 
     private void processKeyboardInput(float delta) {
-        boolean guiConsumingInput = guiManager.isConsumingInput();
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
@@ -279,8 +295,8 @@ public class InputSystem implements ComponentSystem {
                         targetSystem.getTargetBlockPosition(),
                         targetSystem.getHitPosition(),
                         targetSystem.getHitNormal(),
-                        consumed,
-                        guiConsumingInput);
+                        consumed
+                );
             }
         }
     }

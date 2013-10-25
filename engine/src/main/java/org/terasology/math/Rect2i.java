@@ -135,11 +135,11 @@ public final class Rect2i {
      * @param pos
      * @return Whether this Rect2i includes pos
      */
-    public boolean encompasses(Vector2i pos) {
-        return encompasses(pos.x, pos.y);
+    public boolean contains(Vector2i pos) {
+        return contains(pos.x, pos.y);
     }
 
-    public boolean encompasses(int x, int y) {
+    public boolean contains(int x, int y) {
         return !isEmpty() && (x >= posX) && (y >= posY) && (x < posX + w) && (y <= posY + h);
     }
 
