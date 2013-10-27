@@ -204,7 +204,7 @@ idea {
                 ideaActivateCopyright(iprNode)
                 ideaActivateAnnotations(iprNode)
                 ideaActivateGit(iprNode)
-                ideaExcludeLogbackGroovy(iprNode)
+                //ideaExcludeLogbackGroovy(iprNode)
                 ideaActivateGradle(iprNode)
             }
 
