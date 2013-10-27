@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 
 /**
@@ -35,16 +36,16 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public boolean onMouseClick(int button, Vector2i pos) {
+    public boolean onMouseClick(MouseInput button, Vector2i pos) {
         return false;
     }
 
     @Override
-    public void onMouseDrag(int button, Vector2i pos) {
+    public void onMouseDrag(MouseInput button, Vector2i pos) {
     }
 
     @Override
-    public void onMouseRelease(int button, Vector2i pos) {
+    public void onMouseRelease(MouseInput button, Vector2i pos) {
     }
 
     @Override

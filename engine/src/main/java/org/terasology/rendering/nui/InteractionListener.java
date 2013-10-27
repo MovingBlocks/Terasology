@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 
 /**
@@ -40,21 +41,21 @@ public interface InteractionListener {
      * @param pos The relative position of the mouse
      * @return Whether the mouse input should be consumed, and thus not propagated to other interaction regions
      */
-    boolean onMouseClick(int button, Vector2i pos);
+    boolean onMouseClick(MouseInput button, Vector2i pos);
 
     /**
      * Called when the mouse is moved after clicking on the interaction region
      * @param button The mouse button that is held down
      * @param pos The relative position of the mouse
      */
-    void onMouseDrag(int button, Vector2i pos);
+    void onMouseDrag(MouseInput button, Vector2i pos);
 
     /**
      * Called when the mouse is released after clicking on the interaction region
      * @param button The mouse button that was clicked
      * @param pos The relative position of the mouse
      */
-    void onMouseRelease(int button, Vector2i pos);
+    void onMouseRelease(MouseInput button, Vector2i pos);
 
     /**
      * Called when the mouse is wheeled over an interaction region

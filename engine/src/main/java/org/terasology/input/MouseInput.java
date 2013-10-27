@@ -16,15 +16,17 @@
 
 package org.terasology.input;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 /**
  * @author Immortius
  */
 public enum MouseInput {
     MOUSE_NONE(InputType.MOUSE_BUTTON, -1, ""),
-    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "M_Left"),
-    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "M_Right"),
-    MOUSE_1(InputType.MOUSE_BUTTON, 0, "M_1"),
-    MOUSE_2(InputType.MOUSE_BUTTON, 1, "M_2"),
+    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "M_Left", "M_1"),
+    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "M_Right", "M_2"),
     MOUSE_3(InputType.MOUSE_BUTTON, 2, "M_3"),
     MOUSE_4(InputType.MOUSE_BUTTON, 3, "M_4"),
     MOUSE_5(InputType.MOUSE_BUTTON, 4, "M_5"),
@@ -34,11 +36,13 @@ public enum MouseInput {
     private InputType type;
     private int id;
     private String shortString;
+    private List<String> alternateStrings;
 
-    private MouseInput(InputType type, int id, String shortString) {
+    private MouseInput(InputType type, int id, String shortString, String ... alternateStrings) {
         this.type = type;
         this.id = id;
         this.shortString = shortString;
+        this.alternateStrings = Lists.newArrayList(alternateStrings);
     }
 
     public InputType getType() {
@@ -58,11 +62,12 @@ public enum MouseInput {
     }
 
     public static MouseInput parse(String id) {
-        try {
-            return valueOf(id);
-        } catch (IllegalArgumentException e) {
-            return MOUSE_NONE;
+        for (MouseInput input : values()) {
+            if (input.shortString.equals(id) || input.alternateStrings.contains(id)) {
+                return input;
+            }
         }
+        return MOUSE_NONE;
     }
 
     public static MouseInput getInputFor(InputType type, int id) {

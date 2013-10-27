@@ -53,6 +53,17 @@ public class Border {
         return bottom;
     }
 
+    public boolean isEmpty() {
+        return left == 0 && right == 0 && top == 0 && bottom == 0;
+    }
+
+    public void set(Border other) {
+        this.left = other.left;
+        this.right = other.right;
+        this.top = other.top;
+        this.bottom = other.bottom;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {

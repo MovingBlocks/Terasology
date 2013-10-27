@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -26,6 +25,7 @@ import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.input.MouseInput;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Rect2i;
@@ -37,7 +37,6 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -57,14 +56,12 @@ import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glFrustum;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glLoadMatrix;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.Util.checkGLError;
@@ -126,7 +123,6 @@ public class LwjglCanvas implements Canvas {
     }
 
 
-
     public void processMouseOver(Vector2i position) {
         Set<InteractionRegion> newMouseOverRegions = Sets.newLinkedHashSet();
         Iterator<InteractionRegion> iter = interactionRegions.descendingIterator();
@@ -152,7 +148,7 @@ public class LwjglCanvas implements Canvas {
         mouseOverRegions = newMouseOverRegions;
     }
 
-    public void processMouseClick(int button, Vector2i pos) {
+    public void processMouseClick(MouseInput button, Vector2i pos) {
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos).sub(next.region.min());
@@ -164,7 +160,7 @@ public class LwjglCanvas implements Canvas {
         }
     }
 
-    public void processMouseRelease(int button, Vector2i pos) {
+    public void processMouseRelease(MouseInput button, Vector2i pos) {
         if (clickedRegion != null) {
             clickedRegion.listener.onMouseRelease(button, pos);
             clickedRegion = null;
@@ -220,21 +216,6 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void setTextCursor(Vector2i pos) {
-        state.textCursorPos.set(pos);
-    }
-
-    @Override
-    public void setTextCursor(int x, int y) {
-        state.textCursorPos.set(x, y);
-    }
-
-    @Override
-    public Vector2i getTextCursor() {
-        return new Vector2i(state.textCursorPos);
-    }
-
-    @Override
     public void setAlpha(float value) {
         state.alpha = value;
     }
@@ -245,48 +226,110 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void drawText(Font font, String text) {
-        drawTextShadowed(font, text, Color.TRANSPARENT);
+    public void drawText(String text, UIStyle style) {
+        drawText(text, Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()), style);
     }
 
     @Override
-    public void drawText(Font font, String text, int drawWidth) {
-        drawTextShadowed(font, text, drawWidth, Color.TRANSPARENT);
+    public void drawText(String text, Rect2i region, UIStyle style) {
+        drawBackground(region, style);
+        setTextColor(style.getTextColor());
+        if (style.isTextShadowed()) {
+            drawTextShadowed(text, style.getFont(), region, style.getTextAlignmentH(), style.getTextShadowColor());
+        } else {
+            drawText(text, style.getFont(), region, style.getTextAlignmentH());
+        }
     }
 
     @Override
-    public void drawText(Font font, String text, int drawWidth, HorizontalAlignment alignment) {
-        drawTextShadowed(font, text, drawWidth, alignment, Color.TRANSPARENT);
+    public void drawTexture(Texture texture, UIStyle style) {
+        drawTexture(texture, Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()), style);
     }
 
     @Override
-    public void drawTextShadowed(Font font, String text, Color shadowColor) {
-        drawTextShadowed(font, text, MAX_TEXT_WIDTH, shadowColor);
+    public void drawTexture(Texture texture, Rect2i region, UIStyle style) {
+        if (style.getBorder().isEmpty()) {
+            drawTexture(texture, region, style.getDrawMode());
+        } else {
+            drawTextureBordered(texture, region, style.getBorder(), style.getDrawMode() == ScaleMode.TILED);
+        }
     }
 
     @Override
-    public void drawTextShadowed(Font font, String text, int drawWidth, Color shadowColor) {
-        drawTextShadowed(font, text, drawWidth, HorizontalAlignment.LEFT, shadowColor);
+    public void drawTexture(Texture texture, float ux, float uy, float uw, float uh, UIStyle style) {
+        Rect2i region = Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height());
+        drawTexture(texture, region, ux, uy, uw, uh, style);
     }
 
     @Override
-    public void drawTextShadowed(Font font, String text, int drawWidth, HorizontalAlignment alignment, Color shadowColor) {
-        TextCacheKey key = new TextCacheKey(text, font, drawWidth, alignment);
+    public void drawTexture(Texture texture, Rect2i region, float ux, float uy, float uw, float uh, UIStyle style) {
+        if (style.getBorder().isEmpty()) {
+            drawTexture(texture, region, style.getDrawMode(), ux, uy, uw, uh);
+        } else {
+            drawTextureBordered(texture, region, style.getBorder(), style.getDrawMode() == ScaleMode.TILED, ux, uy, uw, uh);
+        }
+    }
+
+    @Override
+    public void drawBackground(UIStyle style) {
+        drawBackground(Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()), style);
+    }
+
+    @Override
+    public void drawBackground(Rect2i region, UIStyle style) {
+        if (style.getBackground() != null) {
+            if (style.getBorder().isEmpty()) {
+                drawTexture(style.getBackground(), region, style.getDrawMode());
+            } else {
+                drawTextureBordered(style.getBackground(), region, style.getBorder(), style.getDrawMode() == ScaleMode.TILED);
+            }
+        }
+    }
+
+    @Override
+    public void drawText(String text, Font font) {
+        drawTextShadowed(text, font, Color.TRANSPARENT);
+    }
+
+    @Override
+    public void drawText(String text, Font font, Rect2i region) {
+        drawTextShadowed(text, font, region, Color.TRANSPARENT);
+    }
+
+    @Override
+    public void drawText(String text, Font font, Rect2i region, HorizontalAlignment alignment) {
+        drawTextShadowed(text, font, region, alignment, Color.TRANSPARENT);
+    }
+
+    @Override
+    public void drawTextShadowed(String text, Font font, Color shadowColor) {
+        drawTextShadowed(text, font, state.drawRegion, shadowColor);
+    }
+
+    @Override
+    public void drawTextShadowed(String text, Font font, Rect2i region, Color shadowColor) {
+        drawTextShadowed(text, font, region, HorizontalAlignment.LEFT, shadowColor);
+    }
+
+    @Override
+    public void drawTextShadowed(String text, Font font, Rect2i region, HorizontalAlignment hAlign, VerticalAlignment vAlign, Color shadowColor) {
+        TextCacheKey key = new TextCacheKey(text, font, region.width(), hAlign);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = LineBuilder.getLines(font, text, drawWidth);
-        if (!state.cropRegion.overlaps(Rect2i.createFromMinAndSize(state.getAbsoluteOffsetX(), state.getAbsoluteOffsetY(), drawWidth, lines.size() * font.getLineHeight()))) {
+        List<String> lines = LineBuilder.getLines(font, text, region.width());
+        Rect2i absoluteRegion = relativeToAbsolute(region);
+        if (!state.cropRegion.overlaps(absoluteRegion)) {
             return;
         }
         if (fontMesh == null) {
-            fontMesh = font.createTextMesh(lines, drawWidth, alignment);
+            fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
             cachedText.put(key, fontMesh);
         }
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
             if (shadowColor.a() != 0) {
-                entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX() + 1, state.getAbsoluteOffsetY() + 1);
+                entry.getKey().setFloat2("offset", absoluteRegion.minX() + 1, absoluteRegion.minY() + 1);
                 Vector4f shadowValues = shadowColor.toVector4f();
                 shadowValues.w *= state.getAlpha();
                 entry.getKey().setFloat4("color", shadowValues);
@@ -294,7 +337,7 @@ public class LwjglCanvas implements Canvas {
                 entry.getValue().render();
             }
 
-            entry.getKey().setFloat2("offset", state.getAbsoluteOffsetX(), state.getAbsoluteOffsetY());
+            entry.getKey().setFloat2("offset", absoluteRegion.minX(), absoluteRegion.minY());
             Vector4f colorValues = state.textColor.toVector4f();
             colorValues.w *= state.getAlpha();
             entry.getKey().setFloat4("color", colorValues);
@@ -303,8 +346,6 @@ public class LwjglCanvas implements Canvas {
             }
             entry.getValue().render();
         }
-
-        state.textCursorPos.y += lines.size() * font.getLineHeight();
     }
 
     @Override
@@ -568,6 +609,11 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
+    public void addInteractionRegion(InteractionListener listener) {
+        addInteractionRegion(Rect2i.createFromMinAndMax(0, 0, size().x, size().y), listener);
+    }
+
+    @Override
     public void addInteractionRegion(Rect2i region, InteractionListener listener) {
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));
         if (!finalRegion.isEmpty()) {
@@ -587,7 +633,6 @@ public class LwjglCanvas implements Canvas {
         public Rect2i cropRegion;
         public Color textColor = Color.WHITE;
 
-        public Vector2i textCursorPos = new Vector2i();
         private float alpha = 1.0f;
         private float baseAlpha = 1.0f;
 
@@ -598,14 +643,6 @@ public class LwjglCanvas implements Canvas {
         public CanvasState(Rect2i drawRegion, Rect2i cropRegion) {
             this.drawRegion = drawRegion;
             this.cropRegion = cropRegion;
-        }
-
-        public int getAbsoluteOffsetX() {
-            return textCursorPos.x + drawRegion.minX();
-        }
-
-        public int getAbsoluteOffsetY() {
-            return textCursorPos.y + drawRegion.minY();
         }
 
         public float getAlpha() {

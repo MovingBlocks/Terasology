@@ -64,26 +64,6 @@ public interface Canvas {
     Vector2i size();
 
     /**
-     * Sets the position (top-left corner) for drawText.
-     *
-     * @param pos The offset in pixels
-     */
-    void setTextCursor(Vector2i pos);
-
-    /**
-     * Sets the position (top-left corner) for drawText.
-     *
-     * @param x The horizontal offset in pixels
-     * @param y The vertical offset in pixels
-     */
-    void setTextCursor(int x, int y);
-
-    /**
-     * @return The current offset for drawing operations in pixels.
-     */
-    Vector2i getTextCursor();
-
-    /**
      * Sets the alpha for drawing all elements.
      * This accumulates across sub regions, so the canvas is set to alpha 0.5f and then a sub region is begun and the canvas is set to alpha 0.5f,
      * elements will be drawn with an effective alpha of 0.25f
@@ -100,65 +80,105 @@ public interface Canvas {
     void setTextColor(Color color);
 
     /**
-     * Draws text. Text may include new lines. This text will always be left-aligned.
+     * Draws text, with the provided UIStyle.
      *
-     * @param font The font to use to draw text
-     * @param text The text to draw
+     * @param text
+     * @param style
      */
-    void drawText(Font font, String text);
+    void drawText(String text, UIStyle style);
 
     /**
-     * Draws text. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
-     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     * Draws text, with the provided UIStyle.
      *
-     * @param font      The font to use to draw text
-     * @param text      The text to draw
-     * @param drawWidth The maximum width in which to draw the text. The text will be wrapped to multiple lines if it exceeds this width
+     * @param text
+     * @param region
+     * @param style
      */
-    void drawText(Font font, String text, int drawWidth);
+    void drawText(String text, Rect2i region, UIStyle style);
+
+    void drawTexture(Texture texture, UIStyle style);
+
+    void drawTexture(Texture texture, Rect2i region, UIStyle style);
+
+    void drawTexture(Texture texture, float ux, float uy, float uw, float uh, UIStyle style);
+
+    void drawTexture(Texture texture, Rect2i region, float ux, float uy, float uw, float uh, UIStyle style);
+
+    /**
+     * Draws the image of the style, filling the entire canvas.
+     *
+     * @param style
+     */
+    void drawBackground(UIStyle style);
+
+    /**
+     * Draws the image of the style, filling the given region.
+     *
+     * @param region
+     * @param style
+     */
+    void drawBackground(Rect2i region, UIStyle style);
+
+    /**
+     * Draws text. Text may include new lines. This text will always be left-aligned.
+     *
+     * @param text The text to draw
+     * @param font The font to use to draw text
+     */
+    void drawText(String text, Font font);
+
+    /**
+     * Draws text. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding the width of the region.
+     * If an individual word is longer than the width of the region, it will be split mid-word.
+     *
+     * @param text   The text to draw
+     * @param font   The font to use to draw text
+     * @param region The region in which to draw the text
+     */
+    void drawText(String text, Font font, Rect2i region);
 
     /**
      * Draws text, aligned within the drawWidth.  Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
      * If an individual word is longer than the drawWidth, it will be split mid-word.
      *
-     * @param font      The font to use to draw text
      * @param text      The text to draw
-     * @param drawWidth The maximum width of the text. The text will be wrapped to multiple lines if it exceeds this width
+     * @param font      The font to use to draw text
+     * @param region    The region within which to of the text. The text will be wrapped to multiple lines if it exceeds this width
      * @param alignment The alignment or justification of the text
      */
-    void drawText(Font font, String text, int drawWidth, HorizontalAlignment alignment);
+    void drawText(String text, Font font, Rect2i region, HorizontalAlignment alignment);
 
     /**
      * Draws text with a shadow. Text may include new lines. This text will always be left-aligned.
      *
-     * @param font        The font to use to draw text
      * @param text        The text to draw
+     * @param font        The font to use to draw text
      * @param shadowColor The color to draw the shadow
      */
-    void drawTextShadowed(Font font, String text, Color shadowColor);
+    void drawTextShadowed(String text, Font font, Color shadowColor);
 
     /**
      * Draws text with a shadow. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
      * If an individual word is longer than the drawWidth, it will be split mid-word.
      *
-     * @param font        The font to use to draw text
      * @param text        The text to draw
-     * @param drawWidth   The maximum width in which to draw the text. The text will be wrapped to multiple lines if it exceeds this width
+     * @param font        The font to use to draw text
+     * @param region      The region within which to draw this text. The text will be wrapped to new lines if it exceeds this width.
      * @param shadowColor The color to draw the shadow
      */
-    void drawTextShadowed(Font font, String text, int drawWidth, Color shadowColor);
+    void drawTextShadowed(String text, Font font, Rect2i region, Color shadowColor);
 
     /**
      * Draws text with a shadow. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
      * If an individual word is longer than the drawWidth, it will be split mid-word.
      *
-     * @param font        The font to use to draw text
      * @param text        The text to draw
-     * @param drawWidth   The maximum width in which to draw the text. The text will be wrapped to multiple lines if it exceeds this width
+     * @param font        The font to use to draw text
+     * @param region      The region within which to draw this text. The text will be wrapped to new lines if it exceeds this width.
      * @param alignment   The alignment or justification of the text
      * @param shadowColor The color to draw the shadow
      */
-    void drawTextShadowed(Font font, String text, int drawWidth, HorizontalAlignment alignment, Color shadowColor);
+    void drawTextShadowed(String text, Font font, Rect2i region, HorizontalAlignment alignment, Color shadowColor);
 
     /**
      * Draws a texture to the given area. This is the same as drawing the texture with ScaleMode.STRETCH.
@@ -290,6 +310,8 @@ public interface Canvas {
     void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
 
     void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
+
+    void addInteractionRegion(InteractionListener listener);
 
     void addInteractionRegion(Rect2i region, InteractionListener listener);
 
