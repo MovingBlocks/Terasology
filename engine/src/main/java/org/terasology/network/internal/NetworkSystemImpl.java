@@ -733,7 +733,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-            if (!module.getModuleInfo().isServersideOnly()) {
+            if (!module.getModuleInfo().isServerSideOnly()) {
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(module.getId()).setModuleVersion(module.getVersion().toString()).build());
             }
         }

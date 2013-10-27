@@ -30,7 +30,7 @@ public class ModuleInfo {
     private String version = "";
     private String displayName = "";
     private String description = "";
-    private boolean serversideOnly;
+    private boolean serverSideOnly;
     private List<DependencyInfo> dependencies = Lists.newArrayList();
 
     public String getId() {
@@ -75,11 +75,11 @@ public class ModuleInfo {
     /**
      * @return Whether this module is only required server-side
      */
-    public boolean isServersideOnly() {
-        return serversideOnly;
+    public boolean isServerSideOnly() {
+        return serverSideOnly;
     }
 
-    public void setServersideOnly(boolean serversideOnly) {
-        this.serversideOnly = serversideOnly;
+    public void setServerSideOnly(boolean serverSideOnly) {
+        this.serverSideOnly = serverSideOnly;
     }
 }

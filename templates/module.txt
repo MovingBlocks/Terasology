@@ -5,5 +5,5 @@
     "displayName" : "",
     "description" : "",
     "dependencies" : [],
-    "isServersideOnly" : false
+    "isServerSideOnly" : false
 }
