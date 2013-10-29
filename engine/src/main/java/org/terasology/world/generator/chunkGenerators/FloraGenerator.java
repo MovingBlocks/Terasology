@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -100,7 +101,7 @@ public class FloraGenerator implements FirstPassGenerator {
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      */
-    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, FastRandom random) {
+    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, Random random) {
         Block targetBlock = c.getBlock(x, y, z);
         if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 
@@ -126,7 +127,7 @@ public class FloraGenerator implements FirstPassGenerator {
                     break;
             }
 
-            if (random.nextDouble() < grassProb) {
+            if (random.nextFloat() < grassProb) {
                 /*
                  * Generate tall grass.
                  */

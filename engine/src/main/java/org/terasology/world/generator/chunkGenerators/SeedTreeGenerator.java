@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
@@ -28,7 +28,7 @@ public class SeedTreeGenerator extends TreeGenerator {
     }
 
     @Override
-    public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
+    public void generate(ChunkView view, Random rand, int posX, int posY, int posZ) {
         view.setBlock(posX, posY, posZ, block);
     }
 }

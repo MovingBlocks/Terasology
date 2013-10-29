@@ -212,7 +212,7 @@ public class EPNoise implements Noise {
         // Default
         RANDOM(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 return rand.nextInt(256);
             }
         },
@@ -220,14 +220,14 @@ public class EPNoise implements Noise {
         // Smoother
         SINE(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 return (int) (Math.sin(rand.nextDouble() * Math.PI) * 256.0);
             }
         },
 
         TANGENT(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 // TAN_BYTE makes Math.tan return a value in range [0, 256)
                 return(int) Math.tan(rand.nextDouble() * TAN_BYTE);
             }
@@ -236,7 +236,7 @@ public class EPNoise implements Noise {
         // Lots of low values
         HYPERBOLIC_SINE(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 // 6.238328 is aprox. asinh(256), so sinh will return a value in range [0, 256)
                 return (int) Math.sinh(rand.nextDouble() * 6.238328);
             }
@@ -244,7 +244,7 @@ public class EPNoise implements Noise {
 
         HYPERBOLIC_TANGENT(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 // TODO: Remove magic
                 int result = (int) TeraMath
                         .fastFloor((Math.tanh(rand.nextDouble() % 3) / Math
@@ -256,7 +256,7 @@ public class EPNoise implements Noise {
         // High elevation and flat top
         LOGARYTHM(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 // TODO: Remove magic
                 int result = (int) (TeraMath
                         .fastFloor((Math.log(rand.nextDouble() % 4) / 4) * 256)) % 256;
@@ -267,7 +267,7 @@ public class EPNoise implements Noise {
         // Lot of mid values
         ARCSINE(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 return (int) (Math.acos(rand.nextDouble()) * 256.0 / Math.PI);
             }
         },
@@ -277,14 +277,14 @@ public class EPNoise implements Noise {
         // Only zeroes, causes layer to disappear
         ZEROES(false) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 return 0;
             }
         },
 
         NONE(true) {
             @Override
-            public int generate(FastRandom rand) {
+            public int generate(Random rand) {
                 return 0;
             }
         };
@@ -295,7 +295,7 @@ public class EPNoise implements Noise {
             this.usingFBM = usingFBM;
         }
 
-        public abstract int generate(FastRandom rand);
+        public abstract int generate(Random rand);
 
         public boolean isUsingFBM() {
             return usingFBM;

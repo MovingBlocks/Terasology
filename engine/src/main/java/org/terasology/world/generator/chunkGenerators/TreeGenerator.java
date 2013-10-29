@@ -19,7 +19,7 @@ package org.terasology.world.generator.chunkGenerators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -50,12 +50,12 @@ public abstract class TreeGenerator {
      * Generates a tree at the given position.
      *
      * @param view Chunk view
-     * @param rand The random generator
+     * @param rand The random number generator
      * @param posX Position on the x-axis
      * @param posY Position on the y-axis
      * @param posZ Position on the z-axis
      */
-    public abstract void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ);
+    public abstract void generate(ChunkView view, Random rand, int posX, int posY, int posZ);
 
     public double getGenerationProbability() {
         return generationProbability;
