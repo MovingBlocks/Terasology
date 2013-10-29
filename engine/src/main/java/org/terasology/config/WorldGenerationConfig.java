@@ -17,6 +17,7 @@
 package org.terasology.config;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.world.WorldBiomeProvider.Biome;
 
 /**
  * @author Immortius
@@ -78,6 +79,42 @@ public class WorldGenerationConfig {
 
     public void setDesertGrassDensity(float desertGrassDensity) {
         this.desertGrassDensity = desertGrassDensity;
+    }
+
+    public float getGrassDensity(Biome biome) {
+        switch (biome) {
+            case PLAINS:
+                return getPlainsGrassDensity();
+            case MOUNTAINS:
+                return getMountainGrassDensity();
+            case FOREST:
+                return getForestGrassDensity();
+            case SNOW:
+                return getSnowGrassDensity();
+            case DESERT:
+                return getDesertGrassDensity();
+        }
+        return 1.0f;
+    }
+
+    public void setGrassDensity(Biome biome, float density) {
+        switch (biome) {
+            case PLAINS:
+                setPlainsGrassDensity(density);
+                break;
+            case MOUNTAINS:
+                setMountainGrassDensity(density);
+                break;
+            case FOREST:
+                setForestGrassDensity(density);
+                break;
+            case SNOW:
+                setSnowGrassDensity(density);
+                break;
+            case DESERT:
+                setDesertGrassDensity(density);
+                break;
+        }
     }
 
     public String getDefaultSeed() {

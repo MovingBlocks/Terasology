@@ -105,29 +105,9 @@ public class FloraGenerator implements FirstPassGenerator {
         Block targetBlock = c.getBlock(x, y, z);
         if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 
-            double grassProb = 1.0;
-
             WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-            switch (biome) {
-                case PLAINS:
-                    grassProb = config.getPlainsGrassDensity();
-                    break;
-                case MOUNTAINS:
-                    grassProb = config.getMountainGrassDensity();
-                    break;
-                case FOREST:
-                    grassProb = config.getForestGrassDensity();
-                    break;
-                case SNOW:
-                    grassProb = config.getSnowGrassDensity();
-                    break;
-                case DESERT:
-                    grassProb = config.getDesertGrassDensity();
-                    break;
-            }
-
-            if (random.nextFloat() < grassProb) {
+            if (random.nextFloat() < config.getGrassDensity(biome)) {
                 /*
                  * Generate tall grass.
                  */
