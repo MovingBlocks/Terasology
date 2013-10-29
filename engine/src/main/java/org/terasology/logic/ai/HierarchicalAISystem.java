@@ -33,6 +33,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
@@ -48,7 +49,7 @@ public class HierarchicalAISystem implements ComponentSystem,
 
     private WorldProvider worldProvider;
     private EntityManager entityManager;
-    private FastRandom random = new FastRandom();
+    private Random random = new FastRandom();
     private Time time;
     private boolean idling;
 
@@ -146,8 +147,7 @@ public class HierarchicalAISystem implements ComponentSystem,
 
             //update
             if (tempTime - ai.lastChangeOfDangerAt > dangerChangeTime) {
-                dangerChangeTime = (long) (TeraMath.fastAbs(ai.dangerUpdateTime
-                        * random.randomDouble() * ai.hectic));
+                dangerChangeTime = (long) (ai.dangerUpdateTime * random.nextDouble() * ai.hectic);
                 if (ai.hunter) {
                     if (distanceToPlayer > ai.playerdistance
                             && distanceToPlayer < ai.playerSense) {
@@ -155,12 +155,10 @@ public class HierarchicalAISystem implements ComponentSystem,
                         Vector3f tempTarget = localPlayer.getPosition();
                         if (ai.forgiving != 0) {
                             ai.movementTarget.set(new Vector3f(
-                                    (tempTarget.x + random.randomFloat()
-                                            * ai.forgiving),
-                                    (tempTarget.y + random.randomFloat()
-                                            * ai.forgiving),
-                                    (tempTarget.z + random.randomFloat()
-                                            * ai.forgiving)));
+                                    tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
+                                    tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
+                                    tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
+                                    ));
                         } else {
                             ai.movementTarget.set(tempTarget);
                         }
@@ -177,12 +175,10 @@ public class HierarchicalAISystem implements ComponentSystem,
                         Vector3f tempTarget = localPlayer.getPosition();
                         if (ai.forgiving != 0) {
                             ai.movementTarget.set(new Vector3f(
-                                    (tempTarget.x * -1 + random.randomFloat()
-                                            * ai.forgiving),
-                                    (tempTarget.y * -1 + random.randomFloat()
-                                            * ai.forgiving),
-                                    (tempTarget.z * -1 + random.randomFloat()
-                                            * ai.forgiving)));
+                                    -tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
+                                    -tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
+                                    -tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
+                                    ));
                         } else {
                             ai.movementTarget
                                     .set(new Vector3f(tempTarget.x * -1,
@@ -212,9 +208,7 @@ public class HierarchicalAISystem implements ComponentSystem,
             if (idling) {
                 // time to stop idling
                 if (tempTime - ai.lastChangeOfidlingtAt > idleChangeTime) {
-                    idleChangeTime = (long) (TeraMath
-                            .fastAbs(ai.idlingUpdateTime
-                                    * random.randomDouble() * ai.hectic));
+                    idleChangeTime = (long) (ai.idlingUpdateTime * random.nextDouble() * ai.hectic);
                     idling = false;
                     // mark idling state changed
                     ai.lastChangeOfidlingtAt = CoreRegistry.get(Time.class)
@@ -230,8 +224,7 @@ public class HierarchicalAISystem implements ComponentSystem,
             // check if it is time to idle again
             if (tempTime - ai.lastChangeOfMovementAt > moveChangeTime) {
                 // update time
-                moveChangeTime = (long) (TeraMath.fastAbs(ai.moveUpdateTime
-                        * random.randomDouble() * ai.hectic));
+                moveChangeTime = (long) (ai.moveUpdateTime * random.nextDouble() * ai.hectic);
                 idling = true;
                 entity.saveComponent(location);
 
@@ -246,22 +239,22 @@ public class HierarchicalAISystem implements ComponentSystem,
             // Random walk
             // check if time to change direction
             if (tempTime - ai.lastChangeOfDirectionAt > directionChangeTime) {
-                directionChangeTime = (long) (TeraMath
-                        .fastAbs(ai.moveUpdateTime * random.randomDouble()
-                                * ai.straightLined));
+                directionChangeTime = (long) (ai.moveUpdateTime * random.nextDouble() * ai.straightLined);
                 // if ai flies
                 if (ai.flying) {
                     float targetY = 0;
                     do {
-                        targetY = worldPos.y + random.randomFloat() * 100;
+                        targetY = worldPos.y + random.nextFloat(-100.0f, 100.0f);
                     } while (targetY > ai.maxAltitude);
-                    ai.movementTarget.set(worldPos.x + random.randomFloat()
-                            * 500, targetY, worldPos.z + random.randomFloat()
-                            * 500);
+                    ai.movementTarget.set(
+                            worldPos.x + random.nextFloat(-500.0f, 500.0f),
+                            targetY,
+                            worldPos.z + random.nextFloat(-500.0f, 500.0f));
                 } else {
-                    ai.movementTarget.set(worldPos.x + random.randomFloat()
-                            * 500, worldPos.y,
-                            worldPos.z + random.randomFloat() * 500);
+                    ai.movementTarget.set(
+                            worldPos.x + random.nextFloat(-500.0f, 500.0f),
+                            worldPos.y,
+                            worldPos.z + random.nextFloat(-500.0f, 500.0f));
                 }
                 ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                 entity.saveComponent(ai);

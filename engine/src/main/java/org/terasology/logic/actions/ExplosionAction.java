@@ -29,6 +29,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -50,7 +51,7 @@ public class ExplosionAction implements ComponentSystem {
     @In
     private EntityManager entityManager;
 
-    private FastRandom random = new FastRandom();
+    private Random random = new FastRandom();
 
     @Override
     public void initialise() {
@@ -88,9 +89,7 @@ public class ExplosionAction implements ComponentSystem {
 
         Vector3i blockPos = new Vector3i();
         for (int i = 0; i < 64; i++) {
-            // TODO: Add a randomVector3f method to FastRandom?
-            Vector3f direction = new Vector3f(random.randomFloat(), random.randomFloat(), random.randomFloat());
-            direction.normalize();
+            Vector3f direction = random.nextVector3f(1.0f);
             Vector3f impulse = new Vector3f(direction);
             impulse.scale(150);
 

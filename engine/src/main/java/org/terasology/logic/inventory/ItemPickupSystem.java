@@ -38,6 +38,7 @@ import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
@@ -50,7 +51,7 @@ public class ItemPickupSystem implements ComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
-    private FastRandom rand = new FastRandom();
+    private Random rand = new FastRandom();
 
     @Override
     public void initialise() {
@@ -85,7 +86,7 @@ public class ItemPickupSystem implements ComponentSystem {
         if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
             LightComponent lightComponent = builder.addComponent(new LightComponent());
 
-            Vector3f randColor = new Vector3f(rand.randomPosFloat(), rand.randomPosFloat(), rand.randomPosFloat());
+            Vector3f randColor = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
             lightComponent.lightColorDiffuse.set(randColor);
             lightComponent.lightColorAmbient.set(randColor);
         }

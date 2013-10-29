@@ -51,8 +51,7 @@ public class PerlinNoise implements Noise {
 
         // Shuffle the array
         for (int i = 0; i < 256; i++) {
-            int j = rand.randomInt() % 256;
-            j = (j < 0) ? -j : j;
+            int j = rand.nextInt(256);
 
             int swap = noiseTable[i];
             noiseTable[i] = noiseTable[j];

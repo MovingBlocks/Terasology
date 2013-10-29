@@ -29,6 +29,7 @@ import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.AxisAngle4f;
@@ -42,7 +43,7 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
 
     private WorldProvider worldProvider;
     private EntityManager entityManager;
-    private FastRandom random = new FastRandom();
+    private Random random = new FastRandom();
     private Time time;
 
     @Override
@@ -84,7 +85,7 @@ public class SimpleAISystem implements UpdateSubscriberSystem {
                 } else {
                     // Random walk
                     if (CoreRegistry.get(Time.class).getGameTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
-                        ai.movementTarget.set(worldPos.x + random.randomFloat() * 500, worldPos.y, worldPos.z + random.randomFloat() * 500);
+                        ai.movementTarget.set(worldPos.x + random.nextFloat(-500.0f, 500.0f), worldPos.y, worldPos.z + random.nextFloat(-500.0f, 500.0f));
                         ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                         ai.followingPlayer = false;
                         entity.saveComponent(ai);

@@ -104,34 +104,33 @@ public class FloraGenerator implements FirstPassGenerator {
         Block targetBlock = c.getBlock(x, y, z);
         if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 
-            double grassRand = (random.randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
 
             WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
             switch (biome) {
                 case PLAINS:
-                    grassProb = 1.0 - config.getPlainsGrassDensity();
+                    grassProb = config.getPlainsGrassDensity();
                     break;
                 case MOUNTAINS:
-                    grassProb = 1.0 - config.getMountainGrassDensity();
+                    grassProb = config.getMountainGrassDensity();
                     break;
                 case FOREST:
-                    grassProb = 1.0 - config.getForestGrassDensity();
+                    grassProb = config.getForestGrassDensity();
                     break;
                 case SNOW:
-                    grassProb = 1.0 - config.getSnowGrassDensity();
+                    grassProb = config.getSnowGrassDensity();
                     break;
                 case DESERT:
-                    grassProb = 1.0 - config.getDesertGrassDensity();
+                    grassProb = config.getDesertGrassDensity();
                     break;
             }
 
-            if (grassRand > grassProb) {
+            if (random.nextDouble() < grassProb) {
                 /*
                  * Generate tall grass.
                  */
-                double rand = random.standNormalDistrDouble();
+                double rand = random.nextStandNormalDistrDouble();
 
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, tallGrass1);
@@ -141,14 +140,11 @@ public class FloraGenerator implements FirstPassGenerator {
                     c.setBlock(x, y + 1, z, tallGrass3);
                 }
 
-                double flowerRand = random.randomDouble();
-
                 /*
                  * Generate flowers.
                  */
-                if (random.standNormalDistrDouble() < -2) {
-                    int index = random.randomIntAbs(flowers.size());
-                    c.setBlock(x, y + 1, z, flowers.get(index));
+                if (random.nextStandNormalDistrDouble() < -2) {
+                    c.setBlock(x, y + 1, z, random.nextItem(flowers));
                 }
             }
         }

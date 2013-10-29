@@ -30,6 +30,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.Physics;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -57,7 +58,7 @@ public class TunnelAction implements ComponentSystem {
     @In
     private EntityManager entityManager;
 
-    private FastRandom random = new FastRandom();
+    private Random random = new FastRandom();
 
     @Override
     public void initialise() {
@@ -85,8 +86,7 @@ public class TunnelAction implements ComponentSystem {
             }
 
             for (int i = 0; i < 64; i++) {
-                Vector3f direction = random.randomVector3f();
-                direction.normalize();
+                Vector3f direction = random.nextVector3f(1.0f);
                 Vector3f impulse = new Vector3f(direction);
                 impulse.scale(200);
 
@@ -108,7 +108,7 @@ public class TunnelAction implements ComponentSystem {
                             builder.build();
                             particleEffects++;
                         }
-                        if (random.randomInt(4) == 0) {
+                        if (random.nextInt(4) == 0) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                             blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get(), EntityRef.NULL));
                         }

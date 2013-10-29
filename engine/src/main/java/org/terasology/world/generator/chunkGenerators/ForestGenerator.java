@@ -68,8 +68,8 @@ public class ForestGenerator implements SecondPassGenerator {
                     worldPos.add(x, y, z);
                     WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(worldPos.x, worldPos.z);
 
-                    int randX = x + random.randomInt(3);
-                    int randZ = z + random.randomInt(3);
+                    int randX = x + random.nextInt(-3, 3);
+                    int randZ = z + random.nextInt(-3, 3);
 
                     Block posBlock = view.getBlock(randX, y, randZ);
                     if (posBlock == null) {
@@ -78,19 +78,10 @@ public class ForestGenerator implements SecondPassGenerator {
                     }
 
                     if (posBlock.equals(sandBlock) || posBlock.equals(grassBlock) || posBlock.equals(snowBlock)) {
-                        double rand = Math.abs(random.randomDouble());
+                        TreeGenerator treeGen = random.nextItem(treeGenerators.get(biome));
 
-                        int randomGeneratorId;
-                        int size = treeGenerators.get(biome).size();
-
-                        if (size > 0) {
-                            randomGeneratorId = Math.abs(random.randomInt()) % size;
-
-                            TreeGenerator treeGen = treeGenerators.get(biome).get(randomGeneratorId);
-
-                            if (rand < treeGen.getGenerationProbability()) {
-                                generateTree(view, treeGen, randX, y, randZ, random);
-                            }
+                        if (treeGen != null && random.nextDouble() < treeGen.getGenerationProbability()) {
+                            generateTree(view, treeGen, randX, y, randZ, random);
                         }
                     }
                 }

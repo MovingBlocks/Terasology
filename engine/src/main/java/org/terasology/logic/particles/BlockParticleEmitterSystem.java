@@ -37,6 +37,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.logic.NearestSortingList;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -99,7 +100,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     @In
     private Config config;
 
-    private FastRandom random = new FastRandom();
+    private Random random = new FastRandom();
     private NearestSortingList sorter = new NearestSortingList();
     private int displayList;
 
@@ -160,14 +161,13 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     private void spawnParticle(BlockParticleEffectComponent particleEffect) {
 
         Particle p = new Particle();
-        p.lifeRemaining = random.randomPosFloat() * (particleEffect.maxLifespan - particleEffect.minLifespan) + particleEffect.minLifespan;
-        p.velocity.set(particleEffect.initialVelocityRange.x * random.randomFloat(),
-                particleEffect.initialVelocityRange.y * random.randomFloat(),
-                particleEffect.initialVelocityRange.z * random.randomFloat());
-        p.size = random.randomPosFloat() * (particleEffect.maxSize - particleEffect.minSize) + particleEffect.minSize;
-        p.position.set(particleEffect.spawnRange.x * random.randomFloat(),
-                particleEffect.spawnRange.y * random.randomFloat(),
-                particleEffect.spawnRange.z * random.randomFloat());
+        p.lifeRemaining = random.nextFloat() * (particleEffect.maxLifespan - particleEffect.minLifespan) + particleEffect.minLifespan;
+        p.velocity = random.nextVector3f();
+        p.size = random.nextFloat() * (particleEffect.maxSize - particleEffect.minSize) + particleEffect.minSize;
+        p.position.set(
+                random.nextFloat(-particleEffect.spawnRange.x, particleEffect.spawnRange.x),
+                random.nextFloat(-particleEffect.spawnRange.y, particleEffect.spawnRange.y),
+                random.nextFloat(-particleEffect.spawnRange.z, particleEffect.spawnRange.z));
         p.color = particleEffect.color;
 
         if (particleEffect.blockType != null) {
@@ -187,8 +187,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 p.texSize.y *= particleEffect.randBlockTexDisplacementScale.y;
 
                 p.texOffset.set(
-                        p.texOffset.x + random.randomPosFloat() * (tileSize - particleTexSize.x),
-                        p.texOffset.y + random.randomPosFloat() * (tileSize - particleTexSize.y));
+                        p.texOffset.x + random.nextFloat() * (tileSize - particleTexSize.x),
+                        p.texOffset.y + random.nextFloat() * (tileSize - particleTexSize.y));
             }
         }
 

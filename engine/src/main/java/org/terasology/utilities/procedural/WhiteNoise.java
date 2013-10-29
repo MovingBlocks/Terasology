@@ -29,7 +29,7 @@ public class WhiteNoise implements Noise {
 
     private boolean recomputeSpectralWeights = true;
     private int octaves = 9;
-    private FastRandom rand;
+    private Random rand;
     private double amplitude;
 
     /**
@@ -57,7 +57,7 @@ public class WhiteNoise implements Noise {
      * @return The noise value
      */
     public double noise(double x, double y, double z) {
-        return (rand.randomDouble() % 256) * amplitude;
+        return (rand.nextDouble(-1.0f, 1.0f) % 256) * amplitude;
     }
 
     /**

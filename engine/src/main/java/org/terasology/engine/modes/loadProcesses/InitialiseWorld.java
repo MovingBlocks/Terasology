@@ -74,7 +74,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
-            worldInfo.setSeed(random.randomCharacterString(16));
+            worldInfo.setSeed(random.nextString(16));
         }
 
         logger.info("World seed: \"{}\"", worldInfo.getSeed());

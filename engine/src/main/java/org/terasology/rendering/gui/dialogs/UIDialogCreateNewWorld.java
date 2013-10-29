@@ -225,7 +225,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     config.getWorldGeneration().setDefaultSeed(inputSeed.getText());
                 } else {
                     FastRandom random = new FastRandom();
-                    config.getWorldGeneration().setDefaultSeed(random.randomCharacterString(32));
+                    config.getWorldGeneration().setDefaultSeed(random.nextString(32));
                 }
 
                 if (inputWorldTitle.getText().length() > 0) {

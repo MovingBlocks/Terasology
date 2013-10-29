@@ -38,7 +38,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -75,10 +74,10 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
             if (shouldInitializeSapling(lSystemTree)) {
                 logger.debug("Initializing sapling");
 
-                FastRandom rand = new FastRandom(new Random().nextLong());
+                FastRandom rand = new FastRandom();
 
-                lSystemTree.branchAngle = rand.randomFloat() * MAX_ANGLE_OFFSET;
-                lSystemTree.rotationAngle = (float) Math.PI * rand.randomPosFloat();
+                lSystemTree.branchAngle = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
+                lSystemTree.rotationAngle = (float) Math.PI * rand.nextFloat();
                 lSystemTree.generation = 1;
                 lSystemTree.initialized = true;
                 // Update time when sapling was placed
@@ -88,7 +87,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
             } else if (shouldProcessTreeGrowth(lSystemTree, time)) {
                 Vector3i treeLocation = treeRef.getComponent(BlockComponent.class).getPosition();
 
-                FastRandom rand = new FastRandom(new Random().nextLong());
+                FastRandom rand = new FastRandom();
 
                 if (hasRoomToGrow(worldProvider, treeLocation)) {
                     logger.debug("Growing tree");
@@ -99,7 +98,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
                     String nextAxion;
                     if (lSystemTree.generated) {
                         lSystemTree.generated = false;
-                        int generation = rand.randomIntAbs(maxGenerations);
+                        int generation = rand.nextInt(maxGenerations);
                         nextAxion = lSystemTree.axion;
                         for (int i = 0; i < generation; i++) {
                             nextAxion = generateNextAxion(rand, nextAxion);
@@ -121,10 +120,10 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
 
                     logger.debug("Generation: " + lSystemTree.generation + ", tree: " + treeLocation);
 
-                    if (checkForDeath(lSystemTree.generation, rand.randomPosFloat())) {
+                    if (checkForDeath(lSystemTree.generation, rand.nextFloat())) {
                         treeRef.removeComponent(LSystemTreeComponent.class);
                     } else {
-                        lSystemTree.lastGrowthTime = time + rand.randomIntAbs(GROWTH_INTERVAL / 2);
+                        lSystemTree.lastGrowthTime = time + rand.nextInt(GROWTH_INTERVAL / 2);
                         treeRef.saveComponent(lSystemTree);
                     }
                 }
@@ -197,7 +196,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         for (AxionElement axion : parseAxions(currentAxion)) {
             final AxionElementReplacement axionElementReplacement = axionElementReplacements.get(axion.key);
             if (axionElementReplacement != null) {
-                result.append(axionElementReplacement.getReplacement(rand.randomPosFloat()));
+                result.append(axionElementReplacement.getReplacement(rand.nextFloat()));
             } else {
                 result.append(axion.key);
                 if (axion.parameter != null) {

@@ -70,7 +70,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         rotation.setIdentity();
         rotation.setRotation(new AxisAngle4f(0f, 0f, 1f, (float) Math.PI / 2f));
 
-        float angleOffset = rand.randomFloat() * MAX_ANGLE_OFFSET;
+        float angleOffset = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
     }
 
@@ -158,13 +158,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                         break;
                     }
 
-                    // Get a random positive float
-                    float randVal = rand.randomFloat();
-                    if (randVal < 0f) {
-                        randVal = -randVal;
-                    }
                     float weightedFailureProbability = TeraMath.pow(1f - rule.getProbability(), maxDepth - depth);
-                    if (randVal < weightedFailureProbability) {
+                    if (rand.nextFloat() < weightedFailureProbability) {
                         break;
                     }
 
