@@ -16,8 +16,14 @@
 
 package org.terasology.world.generator.chunkGenerators;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * Object generators are used to generate objects like trees etc.
@@ -25,12 +31,25 @@ import org.terasology.world.ChunkView;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class TreeGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(TreeGenerator.class);
 
     private float generationProbability = 1.0f;
 
+    private Block grassBlock;
+    private Block snowBlock;
+    private Block sandBlock;
+
+    public TreeGenerator() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        grassBlock = blockManager.getBlock("engine:Grass");
+        snowBlock = blockManager.getBlock("engine:Snow");
+        sandBlock = blockManager.getBlock("engine:Sand");
+    }
+    
     /**
      * Generates a tree at the given position.
      *
+     * @param view Chunk view
      * @param rand The random generator
      * @param posX Position on the x-axis
      * @param posY Position on the y-axis
@@ -45,5 +64,33 @@ public abstract class TreeGenerator {
     public TreeGenerator setGenerationProbability(float genProbability) {
         this.generationProbability = genProbability;
         return this;
+    }
+
+    /**
+     * Checks if a tree can grow at the given position
+     *
+     * @param view Chunk view
+     * @param posX Position on the x-axis
+     * @param posY Position on the y-axis
+     * @param posZ Position on the z-axis
+     */
+    public boolean canGenerateAt(ChunkView view, int x, int y, int z) {
+        Block posBlock = view.getBlock(x, y - 1, z);
+        if (posBlock == null) {
+            logger.error("WorldView.getBlock({}, {}, {}) return null, skipping forest generation (watchdog for issue #534)", x, y, z);
+            return false;
+        }
+
+        if (!posBlock.equals(sandBlock) && !posBlock.equals(grassBlock) && !posBlock.equals(snowBlock)) {
+            return false;
+        }
+
+        for (int checkY = y; checkY < Chunk.SIZE_Y; ++checkY) {
+            if (!view.getBlock(x, checkY, z).isTranslucent()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

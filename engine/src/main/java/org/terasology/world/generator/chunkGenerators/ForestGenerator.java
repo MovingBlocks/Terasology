@@ -18,15 +18,10 @@ package org.terasology.world.generator.chunkGenerators;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.SecondPassGenerator;
 
@@ -36,22 +31,10 @@ import java.util.Map;
  * @author Immortius
  */
 public class ForestGenerator implements SecondPassGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(ForestGenerator.class);
     private String seed;
     private WorldBiomeProvider biomeProvider;
 
     private ListMultimap<WorldBiomeProvider.Biome, TreeGenerator> treeGenerators = ArrayListMultimap.create();
-
-    private Block grassBlock;
-    private Block snowBlock;
-    private Block sandBlock;
-
-    public ForestGenerator() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        grassBlock = blockManager.getBlock("engine:Grass");
-        snowBlock = blockManager.getBlock("engine:Snow");
-        sandBlock = blockManager.getBlock("engine:Sand");
-    }
 
     public void addTreeGenerator(WorldBiomeProvider.Biome type, TreeGenerator gen) {
         treeGenerators.put(type, gen);
@@ -71,39 +54,14 @@ public class ForestGenerator implements SecondPassGenerator {
                     int randX = x + random.nextInt(-3, 3);
                     int randZ = z + random.nextInt(-3, 3);
 
-                    Block posBlock = view.getBlock(randX, y, randZ);
-                    if (posBlock == null) {
-                        logger.error("WorldView.getBlock({}, {}, {}) return null, skipping forest generation (watchdog for issue #534)", randX, y, randZ);
-                        return;
-                    }
+                    TreeGenerator treeGen = random.nextItem(treeGenerators.get(biome));
 
-                    if (posBlock.equals(sandBlock) || posBlock.equals(grassBlock) || posBlock.equals(snowBlock)) {
-                        TreeGenerator treeGen = random.nextItem(treeGenerators.get(biome));
-
-                        if (treeGen != null && random.nextDouble() < treeGen.getGenerationProbability()) {
-                            generateTree(view, treeGen, randX, y, randZ, random);
-                        }
+                    if (treeGen != null && treeGen.canGenerateAt(view, randX, y, randZ) && random.nextFloat() < treeGen.getGenerationProbability()) {
+                        treeGen.generate(view, random, randX, y, randZ);
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Generates a tree on the given chunk.
-     *
-     * @param treeGen The tree generator
-     * @param x       Position on the x-axis
-     * @param y       Position on the y-axis
-     * @param z       Position on the z-axis
-     */
-    private void generateTree(ChunkView view, TreeGenerator treeGen, int x, int y, int z, FastRandom random) {
-        for (int checkY = y + 1; checkY < Chunk.SIZE_Y; ++checkY) {
-            if (!view.getBlock(x, checkY, z).isTranslucent()) {
-                return;
-            }
-        }
-        treeGen.generate(view, random, x, y + 1, z);
     }
 
     @Override
