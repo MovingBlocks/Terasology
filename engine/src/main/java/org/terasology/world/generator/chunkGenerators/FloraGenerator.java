@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -100,38 +101,17 @@ public class FloraGenerator implements FirstPassGenerator {
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      */
-    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, FastRandom random) {
+    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, Random random) {
         Block targetBlock = c.getBlock(x, y, z);
         if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 
-            double grassRand = (random.randomDouble() + 1.0) / 2.0;
-            double grassProb = 1.0;
-
             WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-            switch (biome) {
-                case PLAINS:
-                    grassProb = 1.0 - config.getPlainsGrassDensity();
-                    break;
-                case MOUNTAINS:
-                    grassProb = 1.0 - config.getMountainGrassDensity();
-                    break;
-                case FOREST:
-                    grassProb = 1.0 - config.getForestGrassDensity();
-                    break;
-                case SNOW:
-                    grassProb = 1.0 - config.getSnowGrassDensity();
-                    break;
-                case DESERT:
-                    grassProb = 1.0 - config.getDesertGrassDensity();
-                    break;
-            }
-
-            if (grassRand > grassProb) {
+            if (random.nextFloat() < config.getGrassDensity(biome)) {
                 /*
                  * Generate tall grass.
                  */
-                double rand = random.standNormalDistrDouble();
+                double rand = random.nextStandNormalDistrDouble();
 
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, tallGrass1);
@@ -141,14 +121,11 @@ public class FloraGenerator implements FirstPassGenerator {
                     c.setBlock(x, y + 1, z, tallGrass3);
                 }
 
-                double flowerRand = random.randomDouble();
-
                 /*
                  * Generate flowers.
                  */
-                if (random.standNormalDistrDouble() < -2) {
-                    int index = random.randomIntAbs(flowers.size());
-                    c.setBlock(x, y + 1, z, flowers.get(index));
+                if (random.nextStandNormalDistrDouble() < -2) {
+                    c.setBlock(x, y + 1, z, random.nextItem(flowers));
                 }
             }
         }

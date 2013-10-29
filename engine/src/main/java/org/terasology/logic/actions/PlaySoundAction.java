@@ -25,6 +25,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 
 import javax.vecmath.Vector3f;
 
@@ -34,7 +35,7 @@ import javax.vecmath.Vector3f;
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction implements ComponentSystem {
 
-    private FastRandom random = new FastRandom();
+    private Random random = new FastRandom();
 
     @In
     private AudioManager audioManager;
@@ -49,8 +50,8 @@ public class PlaySoundAction implements ComponentSystem {
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
-        if (playSound.sounds.size() > 0) {
-            Sound sound = playSound.sounds.get(random.randomIntAbs(playSound.sounds.size()));
+        Sound sound = random.nextItem(playSound.sounds);
+        if (sound != null) {
             Vector3f pos = null;
             switch (playSound.relativeTo) {
                 case Instigator:

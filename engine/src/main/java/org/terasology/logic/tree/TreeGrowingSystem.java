@@ -104,7 +104,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
                     @Override
                     public String generateReplacement() {
                         // 137.5 degrees is a golden ratio
-                        int deg = 138 + rnd.randomInt(17) - 8;
+                        int deg = rnd.nextInt(130, 147);
                         return "W+(" + deg + ")[&Mb]Wt";
                     }
                 });

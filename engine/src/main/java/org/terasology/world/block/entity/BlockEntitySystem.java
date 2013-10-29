@@ -37,6 +37,7 @@ import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -67,7 +68,7 @@ public class BlockEntitySystem implements ComponentSystem {
 
     private BlockItemFactory blockItemFactory;
     private PickupBuilder pickupBuilder;
-    private FastRandom random;
+    private Random random;
 
     @Override
     public void initialise() {
@@ -103,19 +104,19 @@ public class BlockEntitySystem implements ComponentSystem {
             chanceOfBlockDrop = 1 - blockDamageComponent.blockAnnihilationChance;
         }
 
-        if ((random.randomFloat() + 1) / 2 < chanceOfBlockDrop) {
+        if (random.nextFloat() < chanceOfBlockDrop) {
             EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
             entity.send(new OnBlockToItem(item));
 
             if ((oldBlock.isDirectPickup())) {
                 if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                     EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
-                    pickup.send(new ImpulseEvent(random.randomVector3f(30)));
+                    pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
                 }
             } else {
                 /* PHYSICS */
                 EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
-                pickup.send(new ImpulseEvent(random.randomVector3f(30)));
+                pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
             }
         }
 

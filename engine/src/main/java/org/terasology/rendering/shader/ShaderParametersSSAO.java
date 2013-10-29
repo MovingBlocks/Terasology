@@ -32,6 +32,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 
 import javax.vecmath.Vector3f;
 import java.nio.ByteBuffer;
@@ -49,7 +50,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public static final int SSAO_KERNEL_ELEMENTS = 64;
     public static final int SSAO_NOISE_SIZE = 4;
 
-    private static final FastRandom RAND = new FastRandom(3);
+    private final Random random = new FastRandom();
 
     @EditorRange(min = 0.01f, max = 12.0f)
     private float ssaoStrength = 1.75f;
@@ -65,12 +66,12 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
             for (int i = 0; i < SSAO_KERNEL_ELEMENTS; ++i) {
                 Vector3f vec = new Vector3f();
-                vec.x = RAND.randomFloat();
-                vec.y = RAND.randomFloat();
-                vec.z = RAND.randomPosFloat();
+                vec.x = random.nextFloat(-1.0f, 1.0f);
+                vec.y = random.nextFloat(-1.0f, 1.0f);
+                vec.z = random.nextFloat();
 
                 vec.normalize();
-                vec.scale(RAND.randomPosFloat());
+                vec.scale(random.nextFloat(0.0f, 1.0f));
                 float scale = i / (float) SSAO_KERNEL_ELEMENTS;
                 scale = TeraMath.lerpf(0.25f, 1.0f, scale * scale);
 
@@ -126,7 +127,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
 
             for (int i = 0; i < SSAO_NOISE_SIZE * SSAO_NOISE_SIZE; ++i) {
-                Vector3f noiseVector = new Vector3f(RAND.randomFloat(), RAND.randomFloat(), 0.0f);
+                Vector3f noiseVector = new Vector3f(random.nextFloat(-1.0f, 1.0f), random.nextFloat(-1.0f, 1.0f), 0.0f);
                 noiseVector.normalize();
 
                 noiseValues.put((byte) ((noiseVector.x * 0.5 + 0.5) * 255.0f));

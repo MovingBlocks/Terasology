@@ -18,7 +18,7 @@ package org.terasology.world.generator.chunkGenerators;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.collection.CharSequenceIterator;
-import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.procedural.Random;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
@@ -63,18 +63,18 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     }
 
     @Override
-    public void generate(ChunkView view, FastRandom rand, int posX, int posY, int posZ) {
+    public void generate(ChunkView view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
         Matrix4f rotation = new Matrix4f();
         rotation.setIdentity();
         rotation.setRotation(new AxisAngle4f(0f, 0f, 1f, (float) Math.PI / 2f));
 
-        float angleOffset = rand.randomFloat() * MAX_ANGLE_OFFSET;
+        float angleOffset = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
     }
 
-    private void recurse(ChunkView view, FastRandom rand, int posX, int posY, int posZ, float angleOffset,
+    private void recurse(ChunkView view, Random rand, int posX, int posY, int posZ, float angleOffset,
                          CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
         Matrix4f tempRotation = new Matrix4f();
         while (axiomIterator.hasNext()) {
@@ -158,13 +158,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                         break;
                     }
 
-                    // Get a random positive float
-                    float randVal = rand.randomFloat();
-                    if (randVal < 0f) {
-                        randVal = -randVal;
-                    }
                     float weightedFailureProbability = TeraMath.pow(1f - rule.getProbability(), maxDepth - depth);
-                    if (randVal < weightedFailureProbability) {
+                    if (rand.nextFloat() < weightedFailureProbability) {
                         break;
                     }
 
