@@ -24,8 +24,8 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 import javax.vecmath.Vector3f;
 

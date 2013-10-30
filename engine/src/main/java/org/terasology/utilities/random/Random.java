@@ -1,25 +1,25 @@
 /*
-* Copyright 2013 MovingBlocks
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2013 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-package org.terasology.utilities.procedural;
+package org.terasology.utilities.random;
 
 import org.terasology.math.TeraMath;
 
-import java.util.List;
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * Interface for random number generators.
@@ -29,10 +29,10 @@ import javax.vecmath.Vector3f;
 public abstract class Random {
 
     // This is the list of characters nextString can return
-    private static final char[] ALPHANUMERIC_CHARS = new char[] {
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    private static final char[] ALPHANUMERIC_CHARS = new char[]{
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
 
     /**
@@ -153,7 +153,7 @@ public abstract class Random {
      * @return The vector
      */
     public Vector3f nextVector3f() {
-        return nextVector3f(-1.0f, 1.0f);
+        return nextVector3f(new Vector3f());
     }
 
     /**
@@ -168,42 +168,52 @@ public abstract class Random {
     }
 
     /**
+     * Randomises a provided Vector3f so its components range from -1.0 (inclusive) to 1.0 (inclusive)
+     *
+     * @param output
+     * @return
+     */
+    public Vector3f nextVector3f(Vector3f output) {
+        return nextVector3f(-1.0f, 1.0f, output);
+    }
+
+    /**
+     * Randomises a provided Vector3f so its components range from min (inclusive) to max
+     *
+     * @param min
+     * @param max
+     * @param output
+     * @return
+     */
+    public Vector3f nextVector3f(float min, float max, Vector3f output) {
+        output.set(nextFloat(min, max), nextFloat(min, max), nextFloat(min, max));
+        return output;
+    }
+
+    /**
      * Returns a Vector3f with a given size whose components can range from -size (inclusive) to +size (inclusive)
      *
      * @param size
      * @return The vector
      */
     public Vector3f nextVector3f(float size) {
-        Vector3f vector = nextVector3f();
         // Create a vector whose length is not zero
-        while (vector.x == 0.0f && vector.y == 0.0f && vector.z == 0.0f) {
-            vector = nextVector3f();
-        }
-        vector.normalize();
-        // There is no need to scale vectors whose size is 1
-        if (size != 1.0f) {
-            vector.scale(size);
-        }
+        Vector3f vector = new Vector3f();
+        do {
+            nextVector3f(vector);
+        } while (vector.x == 0.0f && vector.y == 0.0f && vector.z == 0.0f);
+        float length = vector.length();
+        vector.scale(size / length);
         return vector;
     }
 
     /**
-     * Returns a unit vector (length = 1) Vector3f whose components range from 0 (inclusive) to 1 (exclusive)
+     * Returns a unit vector (length = 1) Vector3f whose components range from -1 (inclusive) to 1 (inclusive)
      *
      * @return The vector
      */
-    public Vector3f nextUnitVector3f(float min, float max, float length) {
-        float x, y, z;
-        // Create a vector whose length is not zero
-        do {
-            x = nextFloat();
-            y = nextFloat();
-            z = nextFloat();
-        } while (x == 0.0f && y == 0.0f && z == 0.0f);
-    
-        Vector3f vector = new Vector3f(x, y, z);
-        vector.normalize();
-        return vector;
+    public Vector3f nextUnitVector3f() {
+        return nextVector3f(1.0f);
     }
 
     /**

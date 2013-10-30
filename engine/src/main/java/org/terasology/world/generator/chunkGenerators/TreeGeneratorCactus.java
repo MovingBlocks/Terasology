@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generator.chunkGenerators;
 
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 

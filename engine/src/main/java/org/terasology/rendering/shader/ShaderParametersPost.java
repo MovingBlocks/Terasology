@@ -28,8 +28,8 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -43,12 +43,12 @@ public class ShaderParametersPost extends ShaderParametersBase {
     private Random rand = new FastRandom();
 
     @EditorRange(min = 0.0f, max = 1.0f)
-    float filmGrainIntensity = 0.025f;
+    private float filmGrainIntensity = 0.025f;
 
     @EditorRange(min = 0.0f, max = 1.0f)
-    float blurStart;
+    private float blurStart;
     @EditorRange(min = 0.0f, max = 1.0f)
-    float blurLength = 0.15f;
+    private float blurLength = 0.15f;
 
     @Override
     public void applyParameters(Material program) {

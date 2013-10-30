@@ -30,7 +30,7 @@ import org.terasology.logic.tree.lsystem.AxionElementReplacement;
 import org.terasology.logic.tree.lsystem.DefaultAxionElementGeneration;
 import org.terasology.logic.tree.lsystem.SimpleAxionElementReplacement;
 import org.terasology.logic.tree.lsystem.SurroundAxionElementGeneration;
-import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

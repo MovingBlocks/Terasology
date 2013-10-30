@@ -25,7 +25,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.tree.LivingTreeComponent;
 import org.terasology.logic.tree.TreeDefinition;
 import org.terasology.math.Vector3i;
-import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

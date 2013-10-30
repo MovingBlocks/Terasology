@@ -15,6 +15,9 @@
  */
 package org.terasology.utilities.procedural;
 
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
+
 /**
  * Some white noise
  *

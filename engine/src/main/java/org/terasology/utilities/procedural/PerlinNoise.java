@@ -16,6 +16,7 @@
 package org.terasology.utilities.procedural;
 
 import org.terasology.math.TeraMath;
+import org.terasology.utilities.random.FastRandom;
 
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.

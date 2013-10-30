@@ -43,7 +43,7 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
-import org.terasology.utilities.procedural.FastRandom;
+import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.WorldGeneratorInfo;
 import org.terasology.world.generator.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;

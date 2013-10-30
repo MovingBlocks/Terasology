@@ -23,7 +23,6 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.input.InputSystem;
 import org.terasology.math.Rect2i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.Texture;
@@ -39,15 +38,6 @@ import org.terasology.rendering.nui.SubRegion;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glFrustum;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.Util.checkGLError;
 
 /**

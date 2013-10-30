@@ -31,9 +31,8 @@ import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.TeraMath;
-import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;

@@ -37,8 +37,8 @@ import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 

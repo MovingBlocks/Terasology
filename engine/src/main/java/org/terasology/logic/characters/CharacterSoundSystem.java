@@ -37,8 +37,8 @@ import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
-import org.terasology.utilities.procedural.FastRandom;
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 import javax.vecmath.Vector3f;
 

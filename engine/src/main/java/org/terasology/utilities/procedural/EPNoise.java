@@ -16,6 +16,8 @@
 package org.terasology.utilities.procedural;
 
 import org.terasology.math.TeraMath;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 /**
  * Edited Perlin noise generator based on the reference implementation by Ken Perlin.
@@ -229,7 +231,7 @@ public class EPNoise implements Noise {
             @Override
             public int generate(Random rand) {
                 // TAN_BYTE makes Math.tan return a value in range [0, 256)
-                return(int) Math.tan(rand.nextDouble() * TAN_BYTE);
+                return (int) Math.tan(rand.nextDouble() * TAN_BYTE);
             }
         },
 

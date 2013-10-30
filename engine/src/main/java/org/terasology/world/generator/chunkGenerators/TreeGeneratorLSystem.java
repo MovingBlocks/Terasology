@@ -18,7 +18,7 @@ package org.terasology.world.generator.chunkGenerators;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.collection.CharSequenceIterator;
-import org.terasology.utilities.procedural.Random;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
