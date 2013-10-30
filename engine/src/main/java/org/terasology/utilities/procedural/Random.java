@@ -174,16 +174,16 @@ public abstract class Random {
      * @return The vector
      */
     public Vector3f nextVector3f(float size) {
-        Vector3f vector = nextVector3f();
+        Vector3f vector;
+        float calculatedSize;
+
         // Create a vector whose length is not zero
-        while (vector.x == 0.0f && vector.y == 0.0f && vector.z == 0.0f) {
+        do {
             vector = nextVector3f();
-        }
-        vector.normalize();
-        // There is no need to scale vectors whose size is 1
-        if (size != 1.0f) {
-            vector.scale(size);
-        }
+            calculatedSize = vector.length();
+        } while (calculatedSize == 0.0f);
+
+        vector.scale(size / calculatedSize);
         return vector;
     }
 
