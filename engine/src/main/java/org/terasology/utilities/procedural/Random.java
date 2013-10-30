@@ -188,25 +188,6 @@ public abstract class Random {
     }
 
     /**
-     * Returns a unit vector (length = 1) Vector3f whose components range from 0 (inclusive) to 1 (exclusive)
-     *
-     * @return The vector
-     */
-    public Vector3f nextUnitVector3f(float min, float max, float length) {
-        float x, y, z;
-        // Create a vector whose length is not zero
-        do {
-            x = nextFloat();
-            y = nextFloat();
-            z = nextFloat();
-        } while (x == 0.0f && y == 0.0f && z == 0.0f);
-    
-        Vector3f vector = new Vector3f(x, y, z);
-        vector.normalize();
-        return vector;
-    }
-
-    /**
      * Calculates a standardized normal distributed value (using the polar method).
      *
      * @return The value
