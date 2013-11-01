@@ -51,7 +51,7 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
 
             // Do the actual clone if we don't have the directory already
             if (enabled) {
-                uri = "git@github.com:$githubHome/" + repo + ".git"
+                uri = "https://github.com/$githubHome/" + repo + ".git"
                 println "Fetching $repo from $uri"
                 destinationPath = destination
                 bare = false
@@ -107,7 +107,7 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
                 destinationPath = destination
 
                 // TODO: Add in the local mapping to a remote ref definition. Needs support in the Gradle-Git plugin
-                //uri = "git@github.com:$githubAccount/" + repo + ".git"
+                //uri = "https://github.com/$githubAccount/" + repo + ".git"
                 bare = false
 
                 // Copy in some template stuff for the new module
@@ -153,7 +153,7 @@ tasks.addRule("Pattern: fetchFacade<ID>") { String taskName ->
 
             // Do the actual clone if we don't have the directory already
             if (enabled) {
-                uri = "git@github.com:$githubHome/" + repo + ".git"
+                uri = "https://github.com/$githubHome/" + repo + ".git"
                 println "Fetching $repo from $uri"
                 destinationPath = destination
                 bare = false
@@ -192,7 +192,7 @@ tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
 
             // Do the actual creation if we don't have the directory already TODO: Doesn't enable the GitHub mapping yet
             if (enabled) {
-                //uri = "git@github.com:$githubHome/" + repo + ".git"
+                //uri = "https://github.com/$githubHome/" + repo + ".git"
                 println "Creating $repo locally" // pointed at $uri"
                 destination.mkdir()
                 destinationPath = destination
@@ -259,7 +259,7 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
 
             // Do the actual clone if we don't have the directory already
             if (enabled) {
-                uri = "git@github.com:$githubHome/" + repo + ".git"
+                uri = "https://github.com/$githubHome/" + repo + ".git"
                 println "Fetching $repo from $uri"
                 destinationPath = destination
                 bare = false
