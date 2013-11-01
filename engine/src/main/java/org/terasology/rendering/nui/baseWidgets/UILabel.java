@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.baseWidgets;
 
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIStyle;
+import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
@@ -57,7 +57,7 @@ public class UILabel implements UIWidget {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawText(text, style);
+        canvas.drawText(text);
     }
 
     @Override

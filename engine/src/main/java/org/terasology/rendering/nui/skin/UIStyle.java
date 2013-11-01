@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.rendering.nui.skin;
 
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.Border;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.VerticalAlign;
 
 /**
  * @author Immortius
  */
 public class UIStyle {
     private Texture background;
-    private Border border = new Border(0, 0, 0, 0);
-    private ScaleMode drawMode = ScaleMode.STRETCH;
+    private Border backgroundBorder = new Border(0, 0, 0, 0);
+    private ScaleMode backgroundScaleMode = ScaleMode.STRETCH;
+
+    private Border margin = new Border(0, 0, 0, 0);
 
     private Font font = Assets.getFont("engine:default");
     private Color textColor = Color.WHITE;
     private Color textShadowColor = Color.BLACK;
-    private HorizontalAlignment textAlignmentH = HorizontalAlignment.CENTER;
-    private VerticalAlignment textAlignmentV = VerticalAlignment.MIDDLE;
+    private HorizontalAlign textAlignmentH = HorizontalAlign.CENTER;
+    private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
     private boolean textShadowed;
 
     public UIStyle() {
@@ -39,8 +46,10 @@ public class UIStyle {
 
     public UIStyle(UIStyle other) {
         this.background = other.background;
-        this.border.set(other.border);
-        this.drawMode = other.drawMode;
+        this.backgroundBorder = other.backgroundBorder;
+        this.backgroundScaleMode = other.backgroundScaleMode;
+
+        this.margin = other.margin;
 
         this.font = other.font;
         this.textColor = other.textColor;
@@ -57,20 +66,28 @@ public class UIStyle {
         this.background = background;
     }
 
-    public Border getBorder() {
-        return border;
+    public Border getBackgroundBorder() {
+        return backgroundBorder;
     }
 
-    public void setBorder(Border border) {
-        this.border = border;
+    public void setBackgroundBorder(Border backgroundBorder) {
+        this.backgroundBorder = backgroundBorder;
     }
 
-    public ScaleMode getDrawMode() {
-        return drawMode;
+    public ScaleMode getBackgroundScaleMode() {
+        return backgroundScaleMode;
     }
 
-    public void setDrawMode(ScaleMode drawMode) {
-        this.drawMode = drawMode;
+    public void setBackgroundScaleMode(ScaleMode value) {
+        this.backgroundScaleMode = value;
+    }
+
+    public Border getMargin() {
+        return margin;
+    }
+
+    public void setMargin(Border margin) {
+        this.margin = margin;
     }
 
     public Font getFont() {
@@ -97,19 +114,19 @@ public class UIStyle {
         this.textShadowColor = textShadowColor;
     }
 
-    public HorizontalAlignment getTextAlignmentH() {
+    public HorizontalAlign getTextAlignmentH() {
         return textAlignmentH;
     }
 
-    public void setTextAlignmentH(HorizontalAlignment textAlignmentH) {
+    public void setTextAlignmentH(HorizontalAlign textAlignmentH) {
         this.textAlignmentH = textAlignmentH;
     }
 
-    public VerticalAlignment getTextAlignmentV() {
+    public VerticalAlign getTextAlignmentV() {
         return textAlignmentV;
     }
 
-    public void setTextAlignmentV(VerticalAlignment textAlignmentV) {
+    public void setTextAlignmentV(VerticalAlign textAlignmentV) {
         this.textAlignmentV = textAlignmentV;
     }
 

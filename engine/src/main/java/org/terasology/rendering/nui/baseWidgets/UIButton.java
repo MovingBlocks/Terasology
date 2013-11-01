@@ -19,18 +19,16 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIStyle;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
  */
 public class UIButton implements UIWidget {
-    private String text = "";
+    public static final String HOVER_MODE = "hover";
+    public static final String DOWN_MODE = "down";
 
-    private UIStyle style = new UIStyle();
-    private UIStyle mouseOverStyle = new UIStyle();
-    private UIStyle activeStyle = new UIStyle();
+    private String text = "";
 
     private boolean down;
 
@@ -59,22 +57,19 @@ public class UIButton implements UIWidget {
     public UIButton() {
     }
 
-    public UIButton(String text, UIStyle style, UIStyle mouseOverStyle, UIStyle activeStyle) {
+    public UIButton(String text) {
         this.text = text;
-        this.style = style;
-        this.mouseOverStyle = mouseOverStyle;
-        this.activeStyle = activeStyle;
     }
 
     @Override
     public void draw(Canvas canvas) {
         if (down) {
-            canvas.drawText(text, activeStyle);
+            canvas.setMode(DOWN_MODE);
         } else if (listener.isMouseOver()) {
-            canvas.drawText(text, mouseOverStyle);
-        } else {
-            canvas.drawText(text, style);
+            canvas.setMode(HOVER_MODE);
         }
+        canvas.drawBackground();
+        canvas.drawText(text);
         canvas.addInteractionRegion(listener);
     }
 
@@ -93,29 +88,5 @@ public class UIButton implements UIWidget {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public UIStyle getStyle() {
-        return style;
-    }
-
-    public void setStyle(UIStyle style) {
-        this.style = style;
-    }
-
-    public UIStyle getMouseOverStyle() {
-        return mouseOverStyle;
-    }
-
-    public void setMouseOverStyle(UIStyle mouseOverStyle) {
-        this.mouseOverStyle = mouseOverStyle;
-    }
-
-    public UIStyle getActiveStyle() {
-        return activeStyle;
-    }
-
-    public void setActiveStyle(UIStyle activeStyle) {
-        this.activeStyle = activeStyle;
     }
 }

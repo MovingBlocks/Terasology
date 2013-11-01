@@ -36,6 +36,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UIStyle;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -72,7 +74,6 @@ import static org.lwjgl.opengl.Util.checkGLError;
 public class LwjglCanvas implements Canvas {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
-    private static final int MAX_TEXT_WIDTH = 16777216;
     private static final Quat4f IDENTITY_ROT = new Quat4f(0, 0, 0, 1);
 
     private CanvasState state;
@@ -100,7 +101,7 @@ public class LwjglCanvas implements Canvas {
 
     public void preRender() {
         interactionRegions.clear();
-        state = new CanvasState(Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
+        state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
         glEnable(GL_CULL_FACE);
 
         checkGLError();
@@ -122,6 +123,32 @@ public class LwjglCanvas implements Canvas {
         matrixBuffer.rewind();
     }
 
+    public void postRender() {
+        Util.checkGLError();
+        if (!subregionStack.isEmpty()) {
+            logger.error("UI Subregions are not being correctly ended");
+            while (!subregionStack.isEmpty()) {
+                subregionStack.pop().close();
+            }
+        }
+        Iterator<Map.Entry<TextCacheKey, Map<Material, Mesh>>> textIterator = cachedText.entrySet().iterator();
+        while (textIterator.hasNext()) {
+            Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
+            if (!usedText.contains(entry.getKey())) {
+                for (Mesh mesh : entry.getValue().values()) {
+                    Assets.dispose(mesh);
+                }
+                textIterator.remove();
+            }
+        }
+        usedText.clear();
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        checkGLError();
+    }
 
     public void processMouseOver(Vector2i position) {
         Set<InteractionRegion> newMouseOverRegions = Sets.newLinkedHashSet();
@@ -178,33 +205,6 @@ public class LwjglCanvas implements Canvas {
         }
     }
 
-    public void postRender() {
-        Util.checkGLError();
-        if (!subregionStack.isEmpty()) {
-            logger.error("UI Subregions are not being correctly ended");
-            while (!subregionStack.isEmpty()) {
-                subregionStack.pop().close();
-            }
-        }
-        Iterator<Map.Entry<TextCacheKey, Map<Material, Mesh>>> textIterator = cachedText.entrySet().iterator();
-        while (textIterator.hasNext()) {
-            Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
-            if (!usedText.contains(entry.getKey())) {
-                for (Mesh mesh : entry.getValue().values()) {
-                    Assets.dispose(mesh);
-                }
-                textIterator.remove();
-            }
-        }
-        usedText.clear();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        checkGLError();
-    }
-
     @Override
     public SubRegion subRegion(Rect2i region, boolean crop) {
         return new LwjglSubRegion(region, crop);
@@ -221,104 +221,137 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void setTextColor(Color color) {
-        state.textColor = color;
+    public void setSkin(UISkin skin) {
+        state.skin = skin;
     }
 
     @Override
-    public void drawText(String text, UIStyle style) {
-        drawText(text, Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()), style);
+    public void setWidget(Class<? extends UIWidget> widgetClass) {
+        state.widget = widgetClass;
+        state.mode = "";
     }
 
     @Override
-    public void drawText(String text, Rect2i region, UIStyle style) {
-        drawBackground(region, style);
-        setTextColor(style.getTextColor());
+    public void setFamily(String familyName) {
+        state.family = familyName;
+    }
+
+    @Override
+    public void setMode(String mode) {
+        state.mode = mode;
+    }
+
+    @Override
+    public UIStyle getCurrentStyle() {
+        return state.getCurrentStyle();
+    }
+
+    @Override
+    public void drawText(String text) {
+        drawText(text, state.getRelativeRegion());
+    }
+
+    @Override
+    public void drawText(String text, Rect2i region) {
+        Rect2i drawRegion = applyStyleToRegion(region);
+        UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
-            drawTextShadowed(text, style.getFont(), region, style.getTextAlignmentH(), style.getTextShadowColor());
+            drawTextShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getTextAlignmentH(), style.getTextAlignmentV());
         } else {
-            drawText(text, style.getFont(), region, style.getTextAlignmentH());
+            drawText(text, style.getFont(), style.getTextColor(), drawRegion, style.getTextAlignmentH(), style.getTextAlignmentV());
         }
     }
 
     @Override
-    public void drawTexture(Texture texture, UIStyle style) {
-        drawTexture(texture, Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()), style);
+    public void drawTexture(Texture texture) {
+        drawTexture(texture, state.getRelativeRegion());
     }
 
     @Override
-    public void drawTexture(Texture texture, Rect2i region, UIStyle style) {
-        if (style.getBorder().isEmpty()) {
-            drawTexture(texture, region, style.getDrawMode());
-        } else {
-            drawTextureBordered(texture, region, style.getBorder(), style.getDrawMode() == ScaleMode.TILED);
+    public void drawTexture(Texture texture, int ux, int uy, int uw, int uh) {
+        drawTexture(texture, state.getRelativeRegion(), ux, uy, uw, uh);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, float ux, float uy, float uw, float uh) {
+        drawTexture(texture, state.getRelativeRegion(), ux, uy, uw, uh);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i region) {
+        drawTexture(texture, applyStyleToRegion(region), ScaleMode.STRETCH);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i region, float ux, float uy, float uw, float uh) {
+        drawTexture(texture, applyStyleToRegion(region), ScaleMode.STRETCH, uw, uy, uw, uh);
+    }
+
+    @Override
+    public void drawTexture(Texture texture, Rect2i region, int ux, int uy, int uw, int uh) {
+        drawTexture(texture, applyStyleToRegion(region), ScaleMode.STRETCH, ux, uy, uw, uh);
+    }
+
+    private Rect2i applyStyleToRegion(Rect2i region) {
+        UIStyle style = getCurrentStyle();
+        if (!style.getMargin().isEmpty()) {
+            return Rect2i.createFromMinAndMax(region.minX() + style.getMargin().getLeft(), region.minY() + style.getMargin().getTop(),
+                    region.maxX() - style.getMargin().getRight(), region.maxY() - style.getMargin().getBottom());
         }
+        return region;
     }
 
     @Override
-    public void drawTexture(Texture texture, float ux, float uy, float uw, float uh, UIStyle style) {
-        Rect2i region = Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height());
-        drawTexture(texture, region, ux, uy, uw, uh, style);
+    public void drawBackground() {
+        drawBackground(Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()));
     }
 
     @Override
-    public void drawTexture(Texture texture, Rect2i region, float ux, float uy, float uw, float uh, UIStyle style) {
-        if (style.getBorder().isEmpty()) {
-            drawTexture(texture, region, style.getDrawMode(), ux, uy, uw, uh);
-        } else {
-            drawTextureBordered(texture, region, style.getBorder(), style.getDrawMode() == ScaleMode.TILED, ux, uy, uw, uh);
-        }
-    }
-
-    @Override
-    public void drawBackground(UIStyle style) {
-        drawBackground(Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()), style);
-    }
-
-    @Override
-    public void drawBackground(Rect2i region, UIStyle style) {
+    public void drawBackground(Rect2i region) {
+        UIStyle style = getCurrentStyle();
         if (style.getBackground() != null) {
-            if (style.getBorder().isEmpty()) {
-                drawTexture(style.getBackground(), region, style.getDrawMode());
+            if (style.getBackgroundBorder().isEmpty()) {
+                drawTexture(style.getBackground(), region, style.getBackgroundScaleMode());
             } else {
-                drawTextureBordered(style.getBackground(), region, style.getBorder(), style.getDrawMode() == ScaleMode.TILED);
+                drawTextureBordered(style.getBackground(), region, style.getBackgroundBorder(), style.getBackgroundScaleMode() == ScaleMode.TILED);
             }
         }
     }
 
     @Override
-    public void drawText(String text, Font font) {
-        drawTextShadowed(text, font, Color.TRANSPARENT);
+    public void drawText(String text, Font font, Color color) {
+        drawTextShadowed(text, font, color, Color.TRANSPARENT);
     }
 
     @Override
-    public void drawText(String text, Font font, Rect2i region) {
-        drawTextShadowed(text, font, region, Color.TRANSPARENT);
+    public void drawText(String text, Font font, Color color, Rect2i region) {
+        drawTextShadowed(text, font, color, Color.TRANSPARENT, region);
     }
 
     @Override
-    public void drawText(String text, Font font, Rect2i region, HorizontalAlignment alignment) {
-        drawTextShadowed(text, font, region, alignment, Color.TRANSPARENT);
+    public void drawText(String text, Font font, Color color, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign) {
+        drawTextShadowed(text, font, color, Color.TRANSPARENT, region, hAlign, vAlign);
     }
 
     @Override
-    public void drawTextShadowed(String text, Font font, Color shadowColor) {
-        drawTextShadowed(text, font, state.drawRegion, shadowColor);
+    public void drawTextShadowed(String text, Font font, Color color, Color shadowColor) {
+        drawTextShadowed(text, font, color, shadowColor, state.drawRegion);
     }
 
     @Override
-    public void drawTextShadowed(String text, Font font, Rect2i region, Color shadowColor) {
-        drawTextShadowed(text, font, region, HorizontalAlignment.LEFT, shadowColor);
+    public void drawTextShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region) {
+        drawTextShadowed(text, font, color, shadowColor, region, HorizontalAlign.LEFT, VerticalAlign.TOP);
     }
 
     @Override
-    public void drawTextShadowed(String text, Font font, Rect2i region, HorizontalAlignment hAlign, VerticalAlignment vAlign, Color shadowColor) {
+    public void drawTextShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign) {
         TextCacheKey key = new TextCacheKey(text, font, region.width(), hAlign);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
         List<String> lines = LineBuilder.getLines(font, text, region.width());
         Rect2i absoluteRegion = relativeToAbsolute(region);
-        if (!state.cropRegion.overlaps(absoluteRegion)) {
+        Rect2i croppingRegion = absoluteRegion.intersect(state.cropRegion);
+        if (croppingRegion.isEmpty()) {
             return;
         }
         if (fontMesh == null) {
@@ -326,75 +359,61 @@ public class LwjglCanvas implements Canvas {
             cachedText.put(key, fontMesh);
         }
 
+        Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
+        offset.y += vAlign.getOffset(region.height(), lines.size() * font.getLineHeight());
+
+
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
+            entry.getKey().setFloat4("croppingBoundaries", croppingRegion.minX(), croppingRegion.maxX() + 1, croppingRegion.minY(), croppingRegion.maxY() + 1);
             if (shadowColor.a() != 0) {
-                entry.getKey().setFloat2("offset", absoluteRegion.minX() + 1, absoluteRegion.minY() + 1);
+                entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
                 Vector4f shadowValues = shadowColor.toVector4f();
                 shadowValues.w *= state.getAlpha();
                 entry.getKey().setFloat4("color", shadowValues);
-                entry.getKey().setFloat4("croppingBoundaries", state.cropRegion.minX(), state.cropRegion.maxX() + 1, state.cropRegion.minY(), state.cropRegion.maxY() + 1);
                 entry.getValue().render();
             }
 
-            entry.getKey().setFloat2("offset", absoluteRegion.minX(), absoluteRegion.minY());
-            Vector4f colorValues = state.textColor.toVector4f();
+            entry.getKey().setFloat2("offset", offset.x, offset.y);
+            Vector4f colorValues = color.toVector4f();
             colorValues.w *= state.getAlpha();
             entry.getKey().setFloat4("color", colorValues);
-            if (shadowColor.a() == 0) {
-                entry.getKey().setFloat4("croppingBoundaries", state.cropRegion.minX(), state.cropRegion.maxX() + 1, state.cropRegion.minY(), state.cropRegion.maxY() + 1);
-            }
             entry.getValue().render();
         }
     }
 
     @Override
-    public void drawTexture(Texture texture, Rect2i toArea) {
-        drawTexture(texture, toArea, ScaleMode.STRETCH);
+    public void drawTexture(Texture texture, Rect2i region, ScaleMode mode) {
+        drawTexture(texture, region, mode, 0f, 0f, 1f, 1f);
     }
 
     @Override
-    public void drawTexture(Texture texture, Rect2i toArea, int ux, int uy, int uw, int uh) {
-        drawTexture(texture, toArea, ScaleMode.STRETCH, ux, uy, uw, uh);
-    }
-
-    @Override
-    public void drawTexture(Texture texture, Rect2i toArea, float ux, float uy, float uw, float uh) {
-        drawTexture(texture, toArea, ScaleMode.STRETCH, uw, uy, uw, uh);
-    }
-
-    @Override
-    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode) {
-        drawTexture(texture, toArea, mode, 0f, 0f, 1f, 1f);
-    }
-
-    @Override
-    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, int ux, int uy, int uw, int uh) {
-        drawTexture(texture, toArea, mode,
+    public void drawTexture(Texture texture, Rect2i region, ScaleMode mode, int ux, int uy, int uw, int uh) {
+        drawTexture(texture, region, mode,
                 (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
                 (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
-    public void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, float ux, float uy, float uw, float uh) {
-        if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
+    public void drawTexture(Texture texture, Rect2i region, ScaleMode mode, float ux, float uy, float uw, float uh) {
+        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
             return;
         }
         if (mode == ScaleMode.TILED) {
-            drawTextureTiled(texture, toArea, ux, uy, uw, uh);
+            drawTextureTiled(texture, region, ux, uy, uw, uh);
         } else {
-            Vector2f scale = mode.scaleForRegion(toArea, texture.getWidth(), texture.getHeight());
+            Vector2f scale = mode.scaleForRegion(region, texture.getWidth(), texture.getHeight());
             textureMat.setFloat2("scale", scale);
             textureMat.setFloat2("offset",
-                    state.drawRegion.minX() + toArea.minX() + 0.5f * (toArea.width() - scale.x),
-                    state.drawRegion.minY() + toArea.minY() + 0.5f * (toArea.height() - scale.y));
+                    state.drawRegion.minX() + region.minX() + 0.5f * (region.width() - scale.x),
+                    state.drawRegion.minY() + region.minY() + 0.5f * (region.height() - scale.y));
             textureMat.setFloat2("texOffset", ux, uy);
             textureMat.setFloat2("texSize", uw, uh);
             textureMat.setTexture("texture", texture);
             textureMat.setFloat4("color", 1.0f, 1.0f, 1.0f, state.getAlpha());
             textureMat.bindTextures();
             if (mode == ScaleMode.SCALE_FILL) {
-                Rect2i cropRegion = relativeToAbsolute(toArea).intersect(state.cropRegion);
+                Rect2i cropRegion = relativeToAbsolute(region).intersect(state.cropRegion);
                 if (!cropRegion.equals(state.cropRegion)) {
                     crop(cropRegion);
                     billboard.render();
@@ -442,34 +461,34 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile) {
-        drawTextureBordered(texture, toArea, border, tile, 0f, 0f, 1f, 1f);
+    public void drawTextureBordered(Texture texture, Rect2i region, Border border, boolean tile) {
+        drawTextureBordered(texture, region, border, tile, 0f, 0f, 1f, 1f);
     }
 
     @Override
-    public void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, int ux, int uy, int uw, int uh) {
-        drawTextureBordered(texture, toArea, border, tile,
+    public void drawTextureBordered(Texture texture, Rect2i region, Border border, boolean tile, int ux, int uy, int uw, int uh) {
+        drawTextureBordered(texture, region, border, tile,
                 (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
                 (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
-    public void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, float ux, float uy, float uw, float uh) {
+    public void drawTextureBordered(Texture texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh) {
         float top = (float) border.getTop() / texture.getHeight();
         float left = (float) border.getLeft() / texture.getWidth();
         float bottom = (float) border.getBottom() / texture.getHeight();
         float right = (float) border.getRight() / texture.getWidth();
-        int centerHoriz = toArea.width() - border.getLeft() - border.getRight();
-        int centerVert = toArea.height() - border.getTop() - border.getBottom();
+        int centerHoriz = region.width() - border.getLeft() - border.getRight();
+        int centerVert = region.height() - border.getTop() - border.getBottom();
 
         if (border.getTop() != 0) {
             // TOP-LEFT CORNER
             if (border.getLeft() != 0) {
-                drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX(), toArea.minY(), border.getLeft(), border.getTop()), ScaleMode.STRETCH,
+                drawTexture(texture, Rect2i.createFromMinAndSize(region.minX(), region.minY(), border.getLeft(), border.getTop()), ScaleMode.STRETCH,
                         ux, uy, left, top);
             }
             // TOP BORDER
-            Rect2i topArea = Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY(), centerHoriz, border.getTop());
+            Rect2i topArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY(), centerHoriz, border.getTop());
             if (tile) {
                 drawTextureTiled(texture, topArea, ux + left, uy, uw - left - right, top);
             } else {
@@ -477,13 +496,13 @@ public class LwjglCanvas implements Canvas {
             }
             // TOP-RIGHT CORNER
             if (border.getRight() != 0) {
-                Rect2i area = Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.minY(), border.getRight(), border.getTop());
+                Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.minY(), border.getRight(), border.getTop());
                 drawTexture(texture, area, ScaleMode.STRETCH, ux + uw - right, uy, right, top);
             }
         }
         // LEFT BORDER
         if (border.getLeft() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(toArea.minX(), toArea.minY() + border.getTop(), border.getLeft(), centerVert);
+            Rect2i area = Rect2i.createFromMinAndSize(region.minX(), region.minY() + border.getTop(), border.getLeft(), centerVert);
             if (tile) {
                 drawTextureTiled(texture, area, ux, uy + top, left, uh - top - bottom);
             } else {
@@ -492,16 +511,16 @@ public class LwjglCanvas implements Canvas {
         }
         // CENTER
         if (tile) {
-            drawTextureTiled(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY() + border.getTop(), centerHoriz, centerVert),
+            drawTextureTiled(texture, Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY() + border.getTop(), centerHoriz, centerVert),
                     ux + left, uy + top, uw - left - right, uh - top - bottom);
         } else {
-            drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
+            drawTexture(texture, Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
                     ux + left, uy + top, uw - left - right, uh - top - bottom);
         }
 
         // RIGHT BORDER
         if (border.getRight() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.minY() + border.getTop(), border.getRight(), centerVert);
+            Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.minY() + border.getTop(), border.getRight(), centerVert);
             if (tile) {
                 drawTextureTiled(texture, area, ux + uw - right, uy + top, right, uh - top - bottom);
             } else {
@@ -511,11 +530,11 @@ public class LwjglCanvas implements Canvas {
         if (border.getBottom() != 0) {
             // BOTTOM-LEFT CORNER
             if (border.getLeft() != 0) {
-                drawTexture(texture, Rect2i.createFromMinAndSize(toArea.minX(), toArea.maxY() - border.getBottom(), border.getLeft(), border.getBottom()), ScaleMode.STRETCH,
+                drawTexture(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom(), border.getLeft(), border.getBottom()), ScaleMode.STRETCH,
                         ux, uy + uw - bottom, left, bottom);
             }
             // BOTTOM BORDER
-            Rect2i bottomArea = Rect2i.createFromMinAndSize(toArea.minX() + border.getLeft(), toArea.maxY() - border.getBottom(), centerHoriz, border.getBottom());
+            Rect2i bottomArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.maxY() - border.getBottom(), centerHoriz, border.getBottom());
             if (tile) {
                 drawTextureTiled(texture, bottomArea, ux + left, uy + uw - bottom, uw - left - right, bottom);
             } else {
@@ -523,22 +542,22 @@ public class LwjglCanvas implements Canvas {
             }
             // BOTTOM-RIGHT CORNER
             if (border.getRight() != 0) {
-                drawTexture(texture, Rect2i.createFromMinAndSize(toArea.maxX() - border.getRight(), toArea.maxY() - border.getBottom(), border.getRight(), border.getBottom()),
+                drawTexture(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.maxY() - border.getBottom(), border.getRight(), border.getBottom()),
                         ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
             }
         }
     }
 
     @Override
-    public void drawMaterial(Material material, Rect2i toArea) {
-        if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
+    public void drawMaterial(Material material, Rect2i region) {
+        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
             return;
         }
         material.setFloat("alpha", state.getAlpha());
         material.bindTextures();
         glPushMatrix();
-        glTranslatef(state.drawRegion.minX() + toArea.minX(), state.drawRegion.minY() + toArea.minY(), 0f);
-        glScalef(toArea.width(), toArea.height(), 1);
+        glTranslatef(state.drawRegion.minX() + region.minX(), state.drawRegion.minY() + region.minY(), 0f);
+        glScalef(region.width(), region.height(), 1);
         billboard.render();
         glPopMatrix();
     }
@@ -629,18 +648,29 @@ public class LwjglCanvas implements Canvas {
      * The state of the canvas
      */
     private static class CanvasState {
+        public UISkin skin;
+        public String family = "";
+        public Class<? extends UIWidget> widget;
+        public String mode = "";
+
         public Rect2i drawRegion;
         public Rect2i cropRegion;
-        public Color textColor = Color.WHITE;
 
         private float alpha = 1.0f;
         private float baseAlpha = 1.0f;
 
-        public CanvasState(Rect2i drawRegion) {
-            this(drawRegion, drawRegion);
+        public CanvasState(CanvasState previous, Rect2i drawRegion) {
+            this(previous, drawRegion, drawRegion);
         }
 
-        public CanvasState(Rect2i drawRegion, Rect2i cropRegion) {
+        public CanvasState(CanvasState previous, Rect2i drawRegion, Rect2i cropRegion) {
+            if (previous != null) {
+                this.skin = previous.skin;
+                this.family = previous.family;
+                this.widget = previous.widget;
+                this.mode = previous.mode;
+                baseAlpha = previous.getAlpha();
+            }
             this.drawRegion = drawRegion;
             this.cropRegion = cropRegion;
         }
@@ -649,6 +679,13 @@ public class LwjglCanvas implements Canvas {
             return alpha * baseAlpha;
         }
 
+        public UIStyle getCurrentStyle() {
+            return skin.getStyleFor(family, widget, mode);
+        }
+
+        public Rect2i getRelativeRegion() {
+            return Rect2i.createFromMinAndMax(0, 0, drawRegion.width(), drawRegion.height());
+        }
     }
 
     /**
@@ -672,18 +709,17 @@ public class LwjglCanvas implements Canvas {
             if (crop) {
                 Rect2i cropRegion = subRegion.intersect(state.cropRegion);
                 if (cropRegion.isEmpty()) {
-                    state = new CanvasState(subRegion, cropRegion);
+                    state = new CanvasState(state, subRegion, cropRegion);
                 } else if (!cropRegion.equals(state.cropRegion)) {
-                    state = new CanvasState(subRegion, cropRegion);
+                    state = new CanvasState(state, subRegion, cropRegion);
                     crop(cropRegion);
                     croppingRegion = true;
                 } else {
-                    state = new CanvasState(subRegion);
+                    state = new CanvasState(state, subRegion);
                 }
             } else {
-                state = new CanvasState(subRegion);
+                state = new CanvasState(state, subRegion);
             }
-            state.baseAlpha = previousState.getAlpha();
         }
 
         @Override
@@ -712,9 +748,9 @@ public class LwjglCanvas implements Canvas {
         private String text;
         private Font font;
         private int width;
-        private HorizontalAlignment alignment;
+        private HorizontalAlign alignment;
 
-        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlignment alignment) {
+        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment) {
             this.text = text;
             this.font = font;
             this.width = maxWidth;

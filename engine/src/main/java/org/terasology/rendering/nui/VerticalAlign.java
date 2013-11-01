@@ -18,8 +18,26 @@ package org.terasology.rendering.nui;
 /**
  * @author Immortius
  */
-public enum VerticalAlignment {
-    TOP,
-    MIDDLE,
-    BOTTOM
+public enum VerticalAlign {
+    TOP {
+        @Override
+        public int getOffset(int availableHeight, int elementHeight) {
+            return 0;
+        }
+    },
+    MIDDLE {
+        @Override
+        public int getOffset(int availableHeight, int elementHeight) {
+            return (availableHeight - elementHeight) / 2;
+        }
+    },
+
+    BOTTOM {
+        @Override
+        public int getOffset(int availableHeight, int elementHeight) {
+            return availableHeight - elementHeight;
+        }
+    };
+
+    public abstract int getOffset(int availableHeight, int elementHeight);
 }

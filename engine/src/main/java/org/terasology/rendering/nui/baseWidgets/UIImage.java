@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.baseWidgets;
 
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIStyle;
+import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.UIWidget;
 
 import javax.vecmath.Vector2f;
@@ -46,10 +46,9 @@ public class UIImage implements UIWidget {
 
     @Override
     public void draw(Canvas canvas) {
+        canvas.drawBackground();
         if (texture != null) {
-            canvas.drawTexture(texture, subregionOffset.x, subregionOffset.y, subregionSize.x, subregionSize.y, style);
-        } else {
-            canvas.drawBackground(style);
+            canvas.drawTexture(texture, subregionOffset.x, subregionOffset.y, subregionSize.x, subregionSize.y);
         }
     }
 

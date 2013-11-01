@@ -17,19 +17,26 @@ package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.input.InputSystem;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.HorizontalAlignment;
+import org.terasology.rendering.nui.Border;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIStyle;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UISkinBuilder;
+import org.terasology.rendering.nui.skin.UISkinData;
+import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 
 import static org.lwjgl.opengl.Util.checkGLError;
@@ -43,13 +50,7 @@ public class UINUITest extends UIWindow {
     private Font font = Assets.getFont("engine:default");
     private InputSystem input = CoreRegistry.get(InputSystem.class);
 
-    private Texture inactive = Assets.getTexture("engine:testWindowBorder");
-    private Texture active = Assets.getTexture("engine:testWindowBorderOver");
-
-    private UIStyle baseStyle;
-    private UIStyle buttonStyle;
-    private UIStyle buttonHoverStyle;
-    private UIStyle buttonActiveStyle;
+    private UISkin skin;
 
     private UIButton button;
 
@@ -59,16 +60,33 @@ public class UINUITest extends UIWindow {
         setModal(true);
         maximize();
         canvas = new LwjglCanvas();
-        baseStyle = new UIStyle();
-        buttonStyle = new UIStyle();
-        buttonStyle.setBackground(Assets.getTexture("engine", "button"));
-        buttonStyle.setTextAlignmentH(HorizontalAlignment.CENTER);
-        buttonHoverStyle = new UIStyle(buttonStyle);
-        buttonHoverStyle.setBackground(Assets.getTexture("engine", "buttonOver"));
-        buttonActiveStyle = new UIStyle();
-        buttonActiveStyle.setBackground(Assets.getTexture("engine", "buttonDown"));
+        CoreRegistry.get(AssetManager.class).setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
+            @Override
+            public UISkin buildAsset(AssetUri uri, UISkinData data) {
+                return new UISkin(uri, data);
+            }
+        });
 
-        button = new UIButton("Click Me", buttonStyle, buttonHoverStyle, buttonActiveStyle);
+        UISkinData skinData = new UISkinBuilder()
+                .setWidgetClass(UIButton.class)
+                .setBackground(Assets.getTexture("engine", "button"))
+                .setTextHorizontalAlignment(HorizontalAlign.CENTER)
+                .setTextVerticalAlignment(VerticalAlign.MIDDLE)
+                .setBackgroundBorder(new Border(1, 1, 1, 1))
+                .setMargin(new Border(4, 4, 4, 4))
+                .setTextShadowed(true)
+
+                .setWidgetMode("hover")
+                .setBackground(Assets.getTexture("engine", "buttonOver"))
+
+                .setWidgetMode("down")
+                .setBackground(Assets.getTexture("engine", "buttonDown"))
+                .setTextColor(Color.YELLOW)
+                .build();
+
+        skin = Assets.generateAsset(new AssetUri(AssetType.UI_SKIN, "engine:defaultSkin"), skinData, UISkin.class);
+
+        button = new UIButton("Click Me please and lots of other text to demonstrate margin");
     }
 
     @Override
@@ -82,9 +100,10 @@ public class UINUITest extends UIWindow {
     public void render() {
         checkGLError();
         canvas.preRender();
-
+        canvas.setSkin(skin);
 
         try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(0, 0, 120, 80), true)) {
+            canvas.setWidget(button.getClass());
             button.draw(canvas);
         }
 
@@ -127,10 +146,4 @@ public class UINUITest extends UIWindow {
 
     }
 
-    private Texture getTexture(BaseInteractionListener listener) {
-        if (listener.isMouseOver()) {
-            return active;
-        }
-        return inactive;
-    }
 }
