@@ -69,7 +69,8 @@ public enum AssetType {
     BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader()),
     SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader()),
     ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader()),
-    FONT("font", "fonts", "fnt", new FontLoader());
+    FONT("font", "fonts", "fnt", new FontLoader()),
+    UI_SKIN("skin", "skins", "skin", null);
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;

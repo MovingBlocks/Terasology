@@ -28,7 +28,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.HorizontalAlignment;
+import org.terasology.rendering.nui.HorizontalAlign;
 
 import javax.vecmath.Vector3f;
 import java.util.List;
@@ -104,7 +104,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public Map<Material, Mesh> createTextMesh(List<String> lines, int width, HorizontalAlignment alignment) {
+    public Map<Material, Mesh> createTextMesh(List<String> lines, int width, HorizontalAlign alignment) {
         Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
         addLinesToMesh(lines, meshBuilders, width, alignment);
 
@@ -115,7 +115,7 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         return result;
     }
 
-    private void addLinesToMesh(List<String> lines, Map<Material, MeshBuilder> meshBuilders, int maxWidth, HorizontalAlignment alignment) {
+    private void addLinesToMesh(List<String> lines, Map<Material, MeshBuilder> meshBuilders, int maxWidth, HorizontalAlign alignment) {
         int y = 0;
         for (String line : lines) {
             int w = getWidth(line);

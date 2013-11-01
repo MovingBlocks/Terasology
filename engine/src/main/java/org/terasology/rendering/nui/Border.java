@@ -19,6 +19,8 @@ import java.util.Objects;
 
 /**
  * The size of a border, supporting independent widths on each side.
+ *
+ * Immutable
  * @author Immortius
  */
 public class Border {
@@ -51,6 +53,10 @@ public class Border {
 
     public int getBottom() {
         return bottom;
+    }
+
+    public boolean isEmpty() {
+        return left == 0 && right == 0 && top == 0 && bottom == 0;
     }
 
     @Override

@@ -18,7 +18,7 @@ package org.terasology.rendering.nui;
 /**
  * @author Immortius
  */
-public enum HorizontalAlignment {
+public enum HorizontalAlign {
     /**
      * Starts on the left edge of the area
      */

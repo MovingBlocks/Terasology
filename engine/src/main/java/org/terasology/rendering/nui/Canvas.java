@@ -21,6 +21,8 @@ import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UIStyle;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -64,26 +66,6 @@ public interface Canvas {
     Vector2i size();
 
     /**
-     * Sets the position (top-left corner) for drawText.
-     *
-     * @param pos The offset in pixels
-     */
-    void setTextCursor(Vector2i pos);
-
-    /**
-     * Sets the position (top-left corner) for drawText.
-     *
-     * @param x The horizontal offset in pixels
-     * @param y The vertical offset in pixels
-     */
-    void setTextCursor(int x, int y);
-
-    /**
-     * @return The current offset for drawing operations in pixels.
-     */
-    Vector2i getTextCursor();
-
-    /**
      * Sets the alpha for drawing all elements.
      * This accumulates across sub regions, so the canvas is set to alpha 0.5f and then a sub region is begun and the canvas is set to alpha 0.5f,
      * elements will be drawn with an effective alpha of 0.25f
@@ -93,155 +75,244 @@ public interface Canvas {
     void setAlpha(float value);
 
     /**
-     * Set the primary color of drawn text
-     *
-     * @param color The color to draw text in
+     * Sets the skin to use for drawing operations
+     * @param skin
      */
-    void setTextColor(Color color);
+    void setSkin(UISkin skin);
 
     /**
-     * Draws text. Text may include new lines. This text will always be left-aligned.
-     *
-     * @param font The font to use to draw text
-     * @param text The text to draw
+     * Sets the class of widget being drawn, used to determine what style to use from the skin.
+     * Wipes the current mode selection
+     * @param widgetClass
      */
-    void drawText(Font font, String text);
+    void setWidget(Class<? extends UIWidget> widgetClass);
 
     /**
-     * Draws text. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
-     * If an individual word is longer than the drawWidth, it will be split mid-word.
-     *
-     * @param font      The font to use to draw text
-     * @param text      The text to draw
-     * @param drawWidth The maximum width in which to draw the text. The text will be wrapped to multiple lines if it exceeds this width
+     * Sets the family subset of the current skin to use for drawing operations
+     * @param familyName
      */
-    void drawText(Font font, String text, int drawWidth);
+    void setFamily(String familyName);
 
     /**
-     * Draws text, aligned within the drawWidth.  Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
-     * If an individual word is longer than the drawWidth, it will be split mid-word.
-     *
-     * @param font      The font to use to draw text
-     * @param text      The text to draw
-     * @param drawWidth The maximum width of the text. The text will be wrapped to multiple lines if it exceeds this width
-     * @param alignment The alignment or justification of the text
+     * Sets the mode of the current skin/widget/family selection to use for drawing operations
+     * @param mode
      */
-    void drawText(Font font, String text, int drawWidth, HorizontalAlignment alignment);
+    void setMode(String mode);
 
     /**
-     * Draws text with a shadow. Text may include new lines. This text will always be left-aligned.
-     *
-     * @param font        The font to use to draw text
-     * @param text        The text to draw
-     * @param shadowColor The color to draw the shadow
+     * @return The current style, as determined by the skin/widget/family/mode combination currently set.
      */
-    void drawTextShadowed(Font font, String text, Color shadowColor);
+    UIStyle getCurrentStyle();
 
     /**
-     * Draws text with a shadow. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
-     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     * Draws test, using the current style.
      *
-     * @param font        The font to use to draw text
-     * @param text        The text to draw
-     * @param drawWidth   The maximum width in which to draw the text. The text will be wrapped to multiple lines if it exceeds this width
-     * @param shadowColor The color to draw the shadow
+     * @param text
      */
-    void drawTextShadowed(Font font, String text, int drawWidth, Color shadowColor);
+    void drawText(String text);
 
     /**
-     * Draws text with a shadow. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
-     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     * Draws text to the given region, using the current style
      *
-     * @param font        The font to use to draw text
-     * @param text        The text to draw
-     * @param drawWidth   The maximum width in which to draw the text. The text will be wrapped to multiple lines if it exceeds this width
-     * @param alignment   The alignment or justification of the text
-     * @param shadowColor The color to draw the shadow
+     * @param text
+     * @param region
      */
-    void drawTextShadowed(Font font, String text, int drawWidth, HorizontalAlignment alignment, Color shadowColor);
+    void drawText(String text, Rect2i region);
 
     /**
-     * Draws a texture to the given area. This is the same as drawing the texture with ScaleMode.STRETCH.
+     * Draws a texture filling the canvas using the current style.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
      */
-    void drawTexture(Texture texture, Rect2i toArea);
+    void drawTexture(Texture texture);
 
     /**
-     * Draws a sub-region of a texture to the given area. This is the same as drawing the texture with ScaleMode.STRETCH.
+     * Draws a texture to the given region using the current style.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
+     */
+    void drawTexture(Texture texture, Rect2i region);
+
+    /**
+     * Draws a sub-region of a texture to fill the canvas using the current style
+     *
+     * @param texture The texture to draw
      * @param ux      The leftmost pixel of the sub-region of the texture to draw
      * @param uy      The topmost pixel of the sub-region of the texture to draw
      * @param uw      The width of the sub-region of the texture to draw, in pixels
      * @param uh      The height of the sub-region of the texture to draw, in pixels
      */
-    void drawTexture(Texture texture, Rect2i toArea, int ux, int uy, int uw, int uh);
+    void drawTexture(Texture texture, int ux, int uy, int uw, int uh);
 
     /**
-     * Draws a sub-region of a texture to the given area. This is the same as drawing the texture with ScaleMode.STRETCH.
+     * Draws a sub-region of a texture to fill the canvas using the current style
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
      * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
      * @param uy      The topmost pixel of the sub-region of the texture to draw, between 0 and 1
      * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
      * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
      */
-    void drawTexture(Texture texture, Rect2i toArea, float ux, float uy, float uw, float uh);
+    void drawTexture(Texture texture, float ux, float uy, float uw, float uh);
 
     /**
-     * Draws a texture to the given area. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
+     * Draws a sub-region of a texture to the given area using the current style
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
+     * @param ux      The leftmost pixel of the sub-region of the texture to draw
+     * @param uy      The topmost pixel of the sub-region of the texture to draw
+     * @param uw      The width of the sub-region of the texture to draw, in pixels
+     * @param uh      The height of the sub-region of the texture to draw, in pixels
+     */
+    void drawTexture(Texture texture, Rect2i region, int ux, int uy, int uw, int uh);
+
+    /**
+     * Draws a sub-region of a texture to the given area using the current style
+     *
+     * @param texture The texture to draw
+     * @param region  The area to draw the texture in, in pixels
+     * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
+     * @param uy      The topmost pixel of the sub-region of the texture to draw, between 0 and 1
+     * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
+     * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
+     */
+    void drawTexture(Texture texture, Rect2i region, float ux, float uy, float uw, float uh);
+
+    /**
+     * Draws the background of the current style, filling the entire canvas.
+     */
+    void drawBackground();
+
+    /**
+     * Draws the background of the current style, filling the given region.
+     *
+     * @param region
+     */
+    void drawBackground(Rect2i region);
+
+    /**
+     * Draws text without using the current style. Text may include new lines. This text will always be left-aligned.
+     *
+     * @param text  The text to draw
+     * @param font  The font to use to draw text
+     * @param color The color of to draw the text
+     */
+    void drawText(String text, Font font, Color color);
+
+    /**
+     * Draws text without using the current style. Text may include new lines.
+     * Additionally new lines will be added to prevent any given line exceeding the width of the region.
+     * If an individual word is longer than the width of the region, it will be split mid-word.
+     *
+     * @param text   The text to draw
+     * @param font   The font to use to draw text
+     * @param color  The color of to draw the text
+     * @param region The region in which to draw the text
+     */
+    void drawText(String text, Font font, Color color, Rect2i region);
+
+    /**
+     * Draws text without using the current style, aligned within the drawWidth.  Text may include new lines.
+     * Additionally new lines will be added to prevent any given line exceeding drawWidth.
+     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     *
+     * @param text   The text to draw
+     * @param font   The font to use to draw text
+     * @param color  The color of to draw the text
+     * @param region The region within which to of the text. The text will be wrapped to multiple lines if it exceeds this width
+     * @param hAlign The horizontal alignment or justification of the text
+     * @param vAlign The vertical alignment of the text
+     */
+    void drawText(String text, Font font, Color color, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign);
+
+    /**
+     * Draws shadowed text without using the current style. Text may include new lines. This text will always be left-aligned.
+     *
+     * @param text        The text to draw
+     * @param font        The font to use to draw text
+     * @param color       The color of to draw the text
+     * @param shadowColor The color to draw the shadow
+     */
+    void drawTextShadowed(String text, Font font, Color color, Color shadowColor);
+
+    /**
+     * raws shadowed text without using the current style. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
+     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     *
+     * @param text        The text to draw
+     * @param font        The font to use to draw text
+     * @param color       The color of to draw the text
+     * @param shadowColor The color to draw the shadow
+     * @param region      The region within which to draw this text. The text will be wrapped to new lines if it exceeds this width.
+     */
+    void drawTextShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region);
+
+    /**
+     * raws shadowed text without using the current style. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
+     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     *
+     * @param text        The text to draw
+     * @param font        The font to use to draw text
+     * @param color       The color of to draw the text
+     * @param shadowColor The color to draw the shadow
+     * @param region      The region within which to draw this text. The text will be wrapped to new lines if it exceeds this width.
+     * @param hAlign      The horizontal alignment or justification of the text
+     * @param vAlign      The vertical alignment of the text
+     */
+    void drawTextShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign);
+
+    /**
+     * Draws a texture to the given area without using the current style. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
+     *
+     * @param texture The texture to draw
+     * @param region  The area to draw the texture in, in pixels
      * @param mode    The method for adapting this texture to the region
      */
-    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode);
+    void drawTexture(Texture texture, Rect2i region, ScaleMode mode);
 
     /**
      * Draws a sub-region of a texture to the given area. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
      * @param mode    The method for adapting this texture to the region
      * @param ux      The leftmost pixel of the sub-region of the texture to draw
      * @param uy      The topmost pixel of the sub-region of the texture to draw
      * @param uw      The width of the sub-region of the texture to draw, in pixels
      * @param uh      The height of the sub-region of the texture to draw, in pixels
      */
-    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, int ux, int uy, int uw, int uh);
+    void drawTexture(Texture texture, Rect2i region, ScaleMode mode, int ux, int uy, int uw, int uh);
 
     /**
      * Draws a sub-region of a texture to the given area. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
      * @param mode    The method for adapting this texture to the region
      * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
      * @param uy      The topmost pixel of the sub-region of the texture to draw, between 0 and 1
      * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
      * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
      */
-    void drawTexture(Texture texture, Rect2i toArea, ScaleMode mode, float ux, float uy, float uw, float uh);
+    void drawTexture(Texture texture, Rect2i region, ScaleMode mode, float ux, float uy, float uw, float uh);
 
     /**
      * Draws a texture with a border - allows the drawing of a texture to a wider area without distorting the edge of the texture.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
      * @param border  The size of the border.
      * @param tile    Whether to tile the center and edges, or just stretch them
      */
-    void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile);
+    void drawTextureBordered(Texture texture, Rect2i region, Border border, boolean tile);
 
     /**
      * Draws a sub-region of a texture with a border - allows the drawing of a texture to a wider area without distorting the edge of the texture.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
      * @param border  The size of the border.
      * @param tile    Whether to tile the center and edges, or just stretch them
      * @param ux      The leftmost pixel of the sub-region of the texture to draw
@@ -249,13 +320,13 @@ public interface Canvas {
      * @param uw      The width of the sub-region of the texture to draw, in pixels
      * @param uh      The height of the sub-region of the texture to draw, in pixels
      */
-    void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, int ux, int uy, int uw, int uh);
+    void drawTextureBordered(Texture texture, Rect2i region, Border border, boolean tile, int ux, int uy, int uw, int uh);
 
     /**
      * Draws a sub-region of a texture with a border - allows the drawing of a texture to a wider area without distorting the edge of the texture.
      *
      * @param texture The texture to draw
-     * @param toArea  The area to draw the texture in, in pixels
+     * @param region  The area to draw the texture in, in pixels
      * @param border  The size of the border.
      * @param tile    Whether to tile the center and edges, or just stretch them
      * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
@@ -263,7 +334,7 @@ public interface Canvas {
      * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
      * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
      */
-    void drawTextureBordered(Texture texture, Rect2i toArea, Border border, boolean tile, float ux, float uy, float uw, float uh);
+    void drawTextureBordered(Texture texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh);
 
 
     /**
@@ -273,9 +344,9 @@ public interface Canvas {
      * The "alpha" parameter of the material, if any, will be set to the current alpha of the canvas.
      *
      * @param material
-     * @param toArea
+     * @param region
      */
-    void drawMaterial(Material material, Rect2i toArea);
+    void drawMaterial(Material material, Rect2i region);
 
     /**
      * Draws a mesh centered on the given screen position.
@@ -290,6 +361,8 @@ public interface Canvas {
     void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
 
     void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
+
+    void addInteractionRegion(InteractionListener listener);
 
     void addInteractionRegion(Rect2i region, InteractionListener listener);
 
