@@ -19,6 +19,7 @@ package org.terasology.input;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Immortius
@@ -41,8 +42,11 @@ public enum MouseInput {
     private MouseInput(InputType type, int id, String shortString, String ... alternateStrings) {
         this.type = type;
         this.id = id;
-        this.shortString = shortString;
-        this.alternateStrings = Lists.newArrayList(alternateStrings);
+        this.shortString = shortString.toLowerCase(Locale.ENGLISH);
+        this.alternateStrings = Lists.newArrayListWithCapacity(alternateStrings.length);
+        for (String alternate : alternateStrings) {
+            this.alternateStrings.add(alternate.toLowerCase(Locale.ENGLISH));
+        }
     }
 
     public InputType getType() {
@@ -63,7 +67,7 @@ public enum MouseInput {
 
     public static MouseInput parse(String id) {
         for (MouseInput input : values()) {
-            if (input.shortString.equals(id) || input.alternateStrings.contains(id)) {
+            if (input.shortString.equals(id.toLowerCase(Locale.ENGLISH)) || input.alternateStrings.contains(id.toLowerCase(Locale.ENGLISH))) {
                 return input;
             }
         }
