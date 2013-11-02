@@ -200,6 +200,15 @@ eclipse {
     }
 }
 
+// Extra details provided for unit tests
+test {
+    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
+    ignoreFailures = true
+
+    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
+    testLogging.showStandardStreams = true
+}
+
 checkstyle {
     ignoreFailures = true
     configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
