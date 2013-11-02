@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,13 +30,13 @@ import java.util.Set;
  */
 public enum MouseInput {
     MOUSE_NONE(InputType.MOUSE_BUTTON, -1, ""),
-    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "M_Left", "M_1"),
-    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "M_Right", "M_2"),
-    MOUSE_3(InputType.MOUSE_BUTTON, 2, "M_3"),
-    MOUSE_4(InputType.MOUSE_BUTTON, 3, "M_4"),
-    MOUSE_5(InputType.MOUSE_BUTTON, 4, "M_5"),
-    MOUSE_WHEEL_UP(InputType.MOUSE_WHEEL, 1, "MWheel_Up"),
-    MOUSE_WHEEL_DOWN(InputType.MOUSE_WHEEL, -1, "MWheel_Down");
+    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "M_Left", "M_1", "MOUSE_LEFT"),
+    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "M_Right", "M_2", "MOUSE_RIGHT"),
+    MOUSE_3(InputType.MOUSE_BUTTON, 2, "M_3", "MOUSE_3"),
+    MOUSE_4(InputType.MOUSE_BUTTON, 3, "M_4", "MOUSE_4"),
+    MOUSE_5(InputType.MOUSE_BUTTON, 4, "M_5", "MOUSE_5"),
+    MOUSE_WHEEL_UP(InputType.MOUSE_WHEEL, 1, "MWheel_Up", "MOUSE_WHEEL_UP"),
+    MOUSE_WHEEL_DOWN(InputType.MOUSE_WHEEL, -1, "MWheel_Down", "MOUSE_WHEEL_DOWN");
 
     private static Map<String, MouseInput> lookup = Maps.newHashMap();
 
@@ -53,7 +53,7 @@ public enum MouseInput {
         }
     }
 
-    private MouseInput(InputType type, int id, String shortString, String ... alternateStrings) {
+    private MouseInput(InputType type, int id, String shortString, String... alternateStrings) {
         this.type = type;
         this.id = id;
         this.shortString = shortString.toUpperCase(Locale.ENGLISH);
