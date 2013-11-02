@@ -26,6 +26,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -61,6 +63,8 @@ import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
+import org.terasology.rendering.assets.atlas.Atlas;
+import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.material.Material;
@@ -71,6 +75,9 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.rendering.assets.subtexture.Subtexture;
+import org.terasology.rendering.assets.subtexture.SubtextureData;
+import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
@@ -408,6 +415,19 @@ public class TerasologyEngine implements GameEngine {
                 return new MeshAnimationImpl(uri, data);
             }
         });
+        assetManager.setAssetFactory(AssetType.ATLAS, new AssetFactory<AtlasData, Atlas>() {
+            @Override
+            public Atlas buildAsset(AssetUri uri, AtlasData data) {
+                return new Atlas(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.SUBTEXTURE, new AssetFactory<SubtextureData, Subtexture>() {
+            @Override
+            public Subtexture buildAsset(AssetUri uri, SubtextureData data) {
+                return new Subtexture(uri, data);
+            }
+        });
+        assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
         CoreRegistry.get(ShaderManager.class).initShaders();
         VertexBufferObjectManager.getInstance();

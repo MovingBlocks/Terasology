@@ -47,6 +47,9 @@ public final class Rect2i {
     }
 
     public static Rect2i createFromMinAndSize(int x, int y, int width, int height) {
+        if (width <= 0 || height <= 0) {
+            return EMPTY;
+        }
         return new Rect2i(x, y, width, height);
     }
 
@@ -125,9 +128,6 @@ public final class Rect2i {
         int maxX = Math.min(maxX(), other.maxX());
         int minY = Math.max(posY, other.posY);
         int maxY = Math.min(maxY(), other.maxY());
-        if (maxX < minX || maxY < minY) {
-            return EMPTY;
-        }
         return createFromMinAndMax(minX, minY, maxX, maxY);
     }
 
@@ -140,7 +140,7 @@ public final class Rect2i {
     }
 
     public boolean contains(int x, int y) {
-        return !isEmpty() && (x >= posX) && (y >= posY) && (x < posX + w) && (y <= posY + h);
+        return !isEmpty() && (x >= posX) && (y >= posY) && (x <= posX + w) && (y <= posY + h);
     }
 
     public boolean encompasses(Rect2i other) {

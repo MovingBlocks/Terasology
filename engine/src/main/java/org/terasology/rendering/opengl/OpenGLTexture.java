@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.math.Rect2f;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -148,5 +149,15 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     @Override
     public TextureData getData() {
         return textureData;
+    }
+
+    @Override
+    public Texture getTexture() {
+        return this;
+    }
+
+    @Override
+    public Rect2f getRegion() {
+        return FULL_TEXTURE_REGION;
     }
 }

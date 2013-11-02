@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.time;
+package org.terasology.rendering.assets.subtexture;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.asset.AssetData;
+import org.terasology.math.Rect2f;
+import org.terasology.rendering.assets.texture.Texture;
 
 /**
- * Sent to a world in the middle of daytime
- *
  * @author Immortius
  */
-public class OnMiddayEvent extends WorldTimeEvent {
+public class SubtextureData implements AssetData {
+    private Texture texture;
+    private Rect2f region;
 
-    public OnMiddayEvent(float worldTime, long worldTimeMS) {
-        super(worldTime, worldTimeMS);
+    public SubtextureData(Texture texture, Rect2f region) {
+        this.texture = texture;
+        this.region = region;
     }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public Rect2f getRegion() {
+        return region;
+    }
+
 }

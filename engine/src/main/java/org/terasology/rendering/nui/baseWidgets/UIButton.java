@@ -17,6 +17,8 @@ package org.terasology.rendering.nui.baseWidgets;
 
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
@@ -28,6 +30,7 @@ public class UIButton implements UIWidget {
     public static final String HOVER_MODE = "hover";
     public static final String DOWN_MODE = "down";
 
+    private TextureRegion image;
     private String text = "";
 
     private boolean down;
@@ -69,6 +72,9 @@ public class UIButton implements UIWidget {
             canvas.setMode(HOVER_MODE);
         }
         canvas.drawBackground();
+        if (image != null) {
+            canvas.drawTexture(image);
+        }
         canvas.drawText(text);
         canvas.addInteractionRegion(listener);
     }
@@ -88,5 +94,17 @@ public class UIButton implements UIWidget {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public void setImage(Subtexture image) {
+        this.image = image;
+    }
+
+    public TextureRegion getImage() {
+        return image;
+    }
+
+    public void setImage(TextureRegion image) {
+        this.image = image;
     }
 }

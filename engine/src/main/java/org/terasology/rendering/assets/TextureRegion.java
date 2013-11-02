@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.time;
+package org.terasology.rendering.assets;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.math.Rect2f;
+import org.terasology.rendering.assets.texture.Texture;
 
 /**
- * Sent to a world in the middle of daytime
- *
+ * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
  * @author Immortius
  */
-public class OnMiddayEvent extends WorldTimeEvent {
+public interface TextureRegion {
 
-    public OnMiddayEvent(float worldTime, long worldTimeMS) {
-        super(worldTime, worldTimeMS);
-    }
+    Texture getTexture();
+
+    /**
+     * @return The region of the texture represented by this asset
+     */
+    Rect2f getRegion();
+
+    int getWidth();
+
+    int getHeight();
+
 }

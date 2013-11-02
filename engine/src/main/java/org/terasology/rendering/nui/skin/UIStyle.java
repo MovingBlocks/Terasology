@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.skin;
 
 import org.terasology.asset.Assets;
+import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Border;
@@ -28,11 +29,13 @@ import org.terasology.rendering.nui.VerticalAlign;
  * @author Immortius
  */
 public class UIStyle {
-    private Texture background;
+    private TextureRegion background;
     private Border backgroundBorder = new Border(0, 0, 0, 0);
     private ScaleMode backgroundScaleMode = ScaleMode.STRETCH;
 
     private Border margin = new Border(0, 0, 0, 0);
+
+    private ScaleMode textureScaleMode = ScaleMode.STRETCH;
 
     private Font font = Assets.getFont("engine:default");
     private Color textColor = Color.WHITE;
@@ -51,6 +54,8 @@ public class UIStyle {
 
         this.margin = other.margin;
 
+        this.textureScaleMode = other.textureScaleMode;
+
         this.font = other.font;
         this.textColor = other.textColor;
         this.textShadowColor = other.textShadowColor;
@@ -58,11 +63,11 @@ public class UIStyle {
         this.textAlignmentH = other.textAlignmentH;
     }
 
-    public Texture getBackground() {
+    public TextureRegion getBackground() {
         return background;
     }
 
-    public void setBackground(Texture background) {
+    public void setBackground(TextureRegion background) {
         this.background = background;
     }
 
@@ -88,6 +93,14 @@ public class UIStyle {
 
     public void setMargin(Border margin) {
         this.margin = margin;
+    }
+
+    public ScaleMode getTextureScaleMode() {
+        return textureScaleMode;
+    }
+
+    public void setTextureScaleMode(ScaleMode textureScaleMode) {
+        this.textureScaleMode = textureScaleMode;
     }
 
     public Font getFont() {

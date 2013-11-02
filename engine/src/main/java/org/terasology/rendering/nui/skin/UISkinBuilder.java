@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Border;
@@ -97,7 +98,7 @@ public class UISkinBuilder {
         return this;
     }
 
-    public UISkinBuilder setBackground(Texture background) {
+    public UISkinBuilder setBackground(TextureRegion background) {
         currentStyle.background = background;
         currentStyle.backgroundSet = true;
         return this;
@@ -115,6 +116,11 @@ public class UISkinBuilder {
 
     public UISkinBuilder setMargin(Border margin) {
         currentStyle.margin = margin;
+        return this;
+    }
+
+    public UISkinBuilder setTextureScaleMode(ScaleMode scaleMode) {
+        currentStyle.textureScaleMode = scaleMode;
         return this;
     }
 
@@ -237,12 +243,13 @@ public class UISkinBuilder {
 
     private static class UIStyleFragment {
         private boolean backgroundSet;
-        private Texture background;
-
+        private TextureRegion background;
         private Border backgroundBorder;
         private ScaleMode backgroundScaleMode;
 
         private Border margin;
+
+        private ScaleMode textureScaleMode;
 
         private Font font;
         private Color textColor;
@@ -263,6 +270,9 @@ public class UISkinBuilder {
             }
             if (margin != null) {
                 style.setMargin(margin);
+            }
+            if (textureScaleMode != null) {
+                style.setTextureScaleMode(textureScaleMode);
             }
             if (font != null) {
                 style.setFont(font);

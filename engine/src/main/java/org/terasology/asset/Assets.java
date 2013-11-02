@@ -25,6 +25,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.List;
@@ -127,6 +128,14 @@ public final class Assets {
      */
     public static Texture getTexture(String module, String assetName) {
         return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
+    }
+
+    public static Subtexture getSubtexture(String simpleUri) {
+        return get(AssetType.SUBTEXTURE, simpleUri, Subtexture.class);
+    }
+
+    public static Subtexture getSubtexture(String module, String assetName) {
+        return get(new AssetUri(AssetType.SUBTEXTURE, module, assetName), Subtexture.class);
     }
 
     /**
@@ -288,4 +297,5 @@ public final class Assets {
     public static void dispose(Asset asset) {
         CoreRegistry.get(AssetManager.class).dispose(asset);
     }
+
 }

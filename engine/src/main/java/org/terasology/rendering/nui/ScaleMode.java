@@ -34,9 +34,9 @@ public enum ScaleMode {
     },
 
     /**
-     * Scales to fill the given space. Parts of the image will be cut off if it is a different shape to the space.
+     * Scales to fit in the given space. There will be gaps if the image is a different shape (aspect) to the space.
      */
-    SCALE_FILL {
+    SCALE_FIT {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
             Vector2f scale = new Vector2f();
@@ -53,9 +53,9 @@ public enum ScaleMode {
     },
 
     /**
-     * Scales to fit in the given space. There will be gaps if the image is a different shape (aspect) to the space.
+     * Scales to fill the given space. Parts of the image will be cut off if it is a different shape to the space.
      */
-    SCALE_FIT {
+    SCALE_FILL {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
             Vector2f scale = new Vector2f();

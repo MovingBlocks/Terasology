@@ -17,6 +17,7 @@ package org.terasology.rendering.nullrenderer;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.math.Rect2f;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -84,5 +85,15 @@ public class NullTexture extends AbstractAsset<TextureData> implements Texture {
     @Override
     public boolean isDisposed() {
         return false;
+    }
+
+    @Override
+    public Texture getTexture() {
+        return this;
+    }
+
+    @Override
+    public Rect2f getRegion() {
+        return FULL_TEXTURE_REGION;
     }
 }

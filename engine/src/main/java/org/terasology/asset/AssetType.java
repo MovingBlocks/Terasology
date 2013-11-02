@@ -23,6 +23,7 @@ import com.google.common.collect.Table;
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
+import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
 import org.terasology.rendering.assets.mesh.ObjMeshLoader;
@@ -70,6 +71,8 @@ public enum AssetType {
     SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader()),
     ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader()),
     FONT("font", "fonts", "fnt", new FontLoader()),
+    SUBTEXTURE("subtexture", new String[] {}, "", null),
+    ATLAS("atlas", "atlas", "atlas", new AtlasLoader()),
     UI_SKIN("skin", "skins", "skin", null);
 
     private static Map<String, AssetType> typeIdLookup;

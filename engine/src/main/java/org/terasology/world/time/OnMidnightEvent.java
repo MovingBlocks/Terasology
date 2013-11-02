@@ -22,5 +22,9 @@ import org.terasology.entitySystem.event.Event;
  *
  * @author Immortius
  */
-public class OnMidnightEvent implements Event {
+public class OnMidnightEvent extends WorldTimeEvent {
+
+    public OnMidnightEvent(float worldTime, long worldTimeMS) {
+        super(worldTime, worldTimeMS);
+    }
 }

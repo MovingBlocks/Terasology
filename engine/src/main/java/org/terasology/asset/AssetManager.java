@@ -15,7 +15,9 @@
  */
 package org.terasology.asset;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
@@ -56,6 +58,7 @@ public class AssetManager {
     private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
     private Map<AssetType, AssetFactory> factories = Maps.newHashMap();
     private Map<AssetType, Table<String, String, AssetUri>> uriLookup = Maps.newHashMap();
+    private ListMultimap<AssetType, AssetResolver> resolvers = ArrayListMultimap.create();
 
     public AssetManager(ModuleManager moduleManager) {
         this.moduleManager = moduleManager;
@@ -76,6 +79,10 @@ public class AssetManager {
         for (AssetType type : AssetType.values()) {
             uriLookup.put(type, HashBasedTable.<String, String, AssetUri>create());
         }
+    }
+
+    public <T extends Asset<U>, U extends AssetData> void addResolver(AssetType assetType, AssetResolver<T, U> resolver) {
+        resolvers.put(assetType, resolver);
     }
 
     public void setAssetFactory(AssetType type, AssetFactory factory) {
@@ -296,6 +303,14 @@ public class AssetManager {
         if (factory == null) {
             logger.error("No asset factory set for assets of type {}", uri.getAssetType());
             return null;
+        }
+
+        for (AssetResolver resolver : resolvers.get(uri.getAssetType())) {
+            Asset result = resolver.resolve(uri, factory);
+            if (result != null) {
+                assetCache.put(uri, asset);
+                return result;
+            }
         }
 
         try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getActiveModule(uri.getNormalisedModuleName()))) {
