@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.manager;
 
+import org.terasology.world.TimerEvent;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldTimeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
 // TODO: merge into WorldTime
 public class WorldTimeEventManager {
 
-    protected final List<WorldTimeEvent> worldTimeEvents = new ArrayList<>();
+    protected final List<TimerEvent> timerEvents = new ArrayList<>();
     protected final WorldProvider parent;
 
     public WorldTimeEventManager(WorldProvider parent) {
@@ -39,8 +39,8 @@ public class WorldTimeEventManager {
      *
      * @param e The time event
      */
-    public void addWorldTimeEvent(WorldTimeEvent e) {
-        worldTimeEvents.add(e);
+    public void addWorldTimeEvent(TimerEvent e) {
+        timerEvents.add(e);
     }
 
     /**
@@ -48,16 +48,16 @@ public class WorldTimeEventManager {
      *
      * @param e The time event
      */
-    public void removeWorldTimeEvent(WorldTimeEvent e) {
-        worldTimeEvents.remove(e);
+    public void removeWorldTimeEvent(TimerEvent e) {
+        timerEvents.remove(e);
     }
 
     /**
      * Executes all time events which event times equal a specified delta value.
      */
     public void fireWorldTimeEvents() {
-        for (int i = worldTimeEvents.size() - 1; i >= 0; i--) {
-            final WorldTimeEvent event = worldTimeEvents.get(i);
+        for (int i = timerEvents.size() - 1; i >= 0; i--) {
+            final TimerEvent event = timerEvents.get(i);
 
             if (event.getExecutionTime() > parent.getTime().getDays() % 1.0) {
                 event.setCanFire(true);
@@ -69,7 +69,7 @@ public class WorldTimeEventManager {
             }
 
             if (!event.isRepeatingEvent()) {
-                worldTimeEvents.remove(i);
+                timerEvents.remove(i);
             }
 
         }

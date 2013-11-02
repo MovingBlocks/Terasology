@@ -18,13 +18,13 @@ package org.terasology.world;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class WorldTimeEvent {
+public abstract class TimerEvent {
 
     private final double executionTime;
     private final boolean repeatingEvent;
     private boolean canFire;
 
-    public WorldTimeEvent(double executionTime, boolean repeatingEvent) {
+    public TimerEvent(double executionTime, boolean repeatingEvent) {
         this.executionTime = executionTime;
         this.repeatingEvent = repeatingEvent;
     }

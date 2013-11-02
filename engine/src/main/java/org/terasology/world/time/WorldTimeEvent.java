@@ -26,6 +26,7 @@ public class WorldTimeEvent implements Event {
 
     public WorldTimeEvent(float worldTime, long worldTimeMS) {
         this.worldTimeMS = worldTimeMS;
+        this.worldTime = worldTime;
     }
 
     public long getWorldTimeMS() {

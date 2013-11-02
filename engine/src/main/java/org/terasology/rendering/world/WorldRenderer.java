@@ -55,9 +55,9 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.ChunkView;
+import org.terasology.world.TimerEvent;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldTimeEvent;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -305,7 +305,7 @@ public final class WorldRenderer {
         final AudioManager audioManager = CoreRegistry.get(AudioManager.class);
 
         // SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
+        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.1, true) {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50) {
@@ -319,7 +319,7 @@ public final class WorldRenderer {
         });
 
         // AFTERNOON
-        worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
+        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.25, true) {
             @Override
             public void run() {
                 //TODO get beter tck instead afternoon
@@ -334,7 +334,7 @@ public final class WorldRenderer {
         });
 
         // SUNSET
-        worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
+        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.4, true) {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50) {
@@ -348,7 +348,7 @@ public final class WorldRenderer {
         });
 
         // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
+        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.6, true) {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50) {
@@ -362,7 +362,7 @@ public final class WorldRenderer {
         });
 
         // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
+        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.75, true) {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50) {
@@ -376,7 +376,7 @@ public final class WorldRenderer {
         });
 
         // BEFORE SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
+        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.9, true) {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50) {
