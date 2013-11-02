@@ -17,9 +17,13 @@
 package org.terasology.input;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -34,18 +38,30 @@ public enum MouseInput {
     MOUSE_WHEEL_UP(InputType.MOUSE_WHEEL, 1, "MWheel_Up"),
     MOUSE_WHEEL_DOWN(InputType.MOUSE_WHEEL, -1, "MWheel_Down");
 
+    private static Map<String, MouseInput> lookup = Maps.newHashMap();
+
     private InputType type;
     private int id;
     private String shortString;
-    private List<String> alternateStrings;
+    private Set<String> identifiers;
+
+    static {
+        for (MouseInput value : values()) {
+            for (String identifier : value.identifiers) {
+                lookup.put(identifier, value);
+            }
+        }
+    }
 
     private MouseInput(InputType type, int id, String shortString, String ... alternateStrings) {
         this.type = type;
         this.id = id;
-        this.shortString = shortString.toLowerCase(Locale.ENGLISH);
-        this.alternateStrings = Lists.newArrayListWithCapacity(alternateStrings.length);
+        this.shortString = shortString.toUpperCase(Locale.ENGLISH);
+        this.identifiers = Sets.newHashSetWithExpectedSize(alternateStrings.length + 2);
+        this.identifiers.add(this.shortString);
+        this.identifiers.add(toString().toUpperCase(Locale.ENGLISH));
         for (String alternate : alternateStrings) {
-            this.alternateStrings.add(alternate.toLowerCase(Locale.ENGLISH));
+            this.identifiers.add(alternate.toUpperCase(Locale.ENGLISH));
         }
     }
 
@@ -66,10 +82,9 @@ public enum MouseInput {
     }
 
     public static MouseInput parse(String id) {
-        for (MouseInput input : values()) {
-            if (input.shortString.equals(id.toLowerCase(Locale.ENGLISH)) || input.alternateStrings.contains(id.toLowerCase(Locale.ENGLISH))) {
-                return input;
-            }
+        MouseInput result = lookup.get(id.toUpperCase(Locale.ENGLISH));
+        if (result != null) {
+            return result;
         }
         return MOUSE_NONE;
     }
