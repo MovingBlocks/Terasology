@@ -33,9 +33,9 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.LwjglCanvas;
 import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
+import org.terasology.rendering.nui.layout.ColumnLayout;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinBuilder;
 import org.terasology.rendering.nui.skin.UISkinData;
@@ -53,7 +53,7 @@ public class UINUITest extends UIWindow {
 
     private UISkin skin;
 
-    private UIButton button;
+    private ColumnLayout grid;
 
 
     public UINUITest() {
@@ -73,7 +73,7 @@ public class UINUITest extends UIWindow {
                 .setBackground(Assets.getTexture("engine", "button"))
                 .setTextHorizontalAlignment(HorizontalAlign.CENTER)
                 .setTextVerticalAlignment(VerticalAlign.MIDDLE)
-                .setBackgroundBorder(new Border(1, 1, 1, 1))
+                .setBackgroundBorder(new Border(2, 2, 2, 2))
                 .setMargin(new Border(4, 4, 4, 4))
                 .setTextShadowed(true)
                 .setTextureScaleMode(ScaleMode.SCALE_FIT)
@@ -88,8 +88,14 @@ public class UINUITest extends UIWindow {
 
         skin = Assets.generateAsset(new AssetUri(AssetType.UI_SKIN, "engine:defaultSkin"), skinData, UISkin.class);
 
-        button = new UIButton("");
-        button.setImage(Assets.getSubtexture("engine:items.cauliflower"));
+        grid = new ColumnLayout();
+        grid.addWidget(new UIButton("Single Player"));
+        grid.addWidget(new UIButton("Host Game"));
+        grid.addWidget(new UIButton("Join Game"));
+        grid.addWidget(new UIButton("Settings"));
+        grid.addWidget(null);
+        grid.addWidget(new UIButton("Exit"));
+        grid.setPadding(new Border(0, 0, 4, 4));
     }
 
     @Override
@@ -103,45 +109,11 @@ public class UINUITest extends UIWindow {
     public void render() {
         checkGLError();
         canvas.preRender();
+
         canvas.setSkin(skin);
+        canvas.drawTextureRaw(Assets.getTexture("engine:menuBackground"), Rect2i.createFromMinAndSize(Vector2i.zero(), canvas.size()), ScaleMode.SCALE_FILL);
 
-        try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(0, 0, 120, 80), true)) {
-            canvas.setWidget(button.getClass());
-            button.draw(canvas);
-        }
-
-        /*canvas.drawTextureRawBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y),
-                new Border(6, 6, 6, 6), true);
-
-        canvas.drawTextureRaw(getTexture(c1), Rect2i.createFromMinAndSize(0, 0, 128, 128), ScaleMode.STRETCH);
-        canvas.addInteractionRegion(Rect2i.createFromMinAndSize(0, 0, 128, 128), c1);
-        canvas.drawTextureRaw(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(12, 12, 104, 104), ScaleMode.STRETCH);
-
-        try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(12, 12, 104, 104), true)) {
-            canvas.drawTextRawShadowed("Stretched with a lot more text than there should be", font, Rect2i.createFromMinAndSize(3, 88, 160, 160), Color.BLACK);
-        }
-
-        canvas.drawTextureRaw(getTexture(c2), Rect2i.createFromMinAndSize(128, 0, 128, 128), ScaleMode.STRETCH);
-        canvas.addInteractionRegion(Rect2i.createFromMinAndSize(128, 0, 128, 128), c2);
-        canvas.drawTextureRaw(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(140, 12, 104, 104), ScaleMode.SCALE_FIT);
-        canvas.drawTextRawShadowed("Scaled Fit", font, Rect2i.createFromMinAndSize(142, 75, 104, 104), Color.BLACK);
-
-        canvas.drawTextureRaw(getTexture(c3), Rect2i.createFromMinAndSize(256, 0, 128, 128), ScaleMode.STRETCH);
-        canvas.addInteractionRegion(Rect2i.createFromMinAndSize(256, 0, 128, 128), c3);
-        canvas.drawTextureRaw(Assets.getTexture("engine:loadingBackground"), Rect2i.createFromMinAndSize(268, 12, 104, 104), ScaleMode.SCALE_FILL);
-        canvas.drawTextRawShadowed("Scaled Fill", font, Rect2i.createFromMinAndMax(270, 100, 104, 104), Color.BLACK);
-
-        canvas.drawTextureRaw(Assets.getTexture("engine:icons"), Rect2i.createFromMinAndSize(0, 256, 64, 64), ScaleMode.STRETCH, 52, 0, 9, 9);
-        canvas.drawTextureRawBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 128, 512, 128), new Border(6, 6, 6, 6), false);
-        canvas.drawTextureRawBordered(Assets.getTexture("engine:testWindowBorder"), Rect2i.createFromMinAndSize(256, 256, 512, 128), new Border(6, 6, 6, 6), true);
-
-        canvas.drawMaterial(Assets.getMaterial("engine:testMaterial"), Rect2i.createFromMinAndSize(0, 128, 256, 256));
-        canvas.drawTextureRaw(Assets.getTexture("engine:icons"), Rect2i.createFromMinAndSize(0, 128, 256, 256), ScaleMode.STRETCH, 52, 0, 9, 9);
-
-        Quat4f rot = new Quat4f(0, 0, 0, 1);
-        QuaternionUtil.setEuler(rot, CoreRegistry.get(Time.class).getGameTime(), 0, 0);
-        canvas.drawMesh(Assets.getMesh("engine:testmonkey"), Assets.getTexture("engine:mhead"),
-                Rect2i.createFromMinAndSize(0, 128, 256, 256), rot, new Vector3f(0, 0, 0), 1.5f);     */
+        canvas.drawWidget(grid, Rect2i.createFromMinAndSize((canvas.size().x - 280) / 2, (canvas.size().y - 192) / 2, 280, 192));
 
         canvas.postRender();
 

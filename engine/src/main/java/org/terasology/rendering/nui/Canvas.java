@@ -36,32 +36,6 @@ import javax.vecmath.Vector3f;
 public interface Canvas {
 
     /**
-     * Allocates a sub region for drawing, until that SubRegion is closed. The top-left corner of the SubRegion
-     * becomes the new offset (0,0), and the value size() is the width/height of the SubRegion. All canvas state is specific
-     * to a region, so a new sub-region will have offset/text color and other options returned to default. When a sub-region
-     * ends the previous canvas settings are restored.
-     * <p/>
-     * SubRegions allow UI elements to be draw in isolation without having to know about their location on the screen.
-     * SubRegions can be marked as cropped, in which case any drawing that falls outside of the region
-     * will not appear.
-     * <p/>
-     * SubRegions are an AutoClosable, so ideally are used as a resource in a try-block, to ensure they are closed
-     * when no longer needed.
-     * <pre>
-     * {@code
-     * try (SubRegion ignored = canvas.subRegion(region, true) {
-     *    //.. draw within SubRegion.
-     * }
-     * </pre>
-     * They may be closed manually as well, in which case it is important they are closed in the reverse order of creation.
-     *
-     * @param region The region to restrict to, relative to the current region, in pixels.
-     * @param crop   Whether to crop elements falling outside this region.
-     * @return A SubRegion, to be closed when no long needed
-     */
-    SubRegion subRegion(Rect2i region, boolean crop);
-
-    /**
      * @return The size of the drawable canvas, in pixels.
      */
     Vector2i size();
@@ -82,13 +56,6 @@ public interface Canvas {
     void setSkin(UISkin skin);
 
     /**
-     * Sets the class of widget being drawn, used to determine what style to use from the skin.
-     * Wipes the current mode selection
-     * @param widgetClass
-     */
-    void setWidget(Class<? extends UIWidget> widgetClass);
-
-    /**
      * Sets the family subset of the current skin to use for drawing operations
      * @param familyName
      */
@@ -104,6 +71,13 @@ public interface Canvas {
      * @return The current style, as determined by the skin/widget/family/mode combination currently set.
      */
     UIStyle getCurrentStyle();
+
+    /**
+     * Draws a widget to the given region of the current canvas
+     * @param widget
+     * @param region
+     */
+    void drawWidget(UIWidget widget, Rect2i region);
 
     /**
      * Draws test, using the current style.
@@ -192,6 +166,39 @@ public interface Canvas {
      * @param region
      */
     void drawBackground(Rect2i region);
+
+    /**
+     * Allocates a sub region for drawing, until that SubRegion is closed. The top-left corner of the SubRegion
+     * becomes the new offset (0,0), and the value size() is the width/height of the SubRegion. All canvas state is specific
+     * to a region, so a new sub-region will have offset/text color and other options returned to default. When a sub-region
+     * ends the previous canvas settings are restored.
+     * <p/>
+     * SubRegions allow UI elements to be draw in isolation without having to know about their location on the screen.
+     * SubRegions can be marked as cropped, in which case any drawing that falls outside of the region
+     * will not appear.
+     * <p/>
+     * SubRegions are an AutoClosable, so ideally are used as a resource in a try-block, to ensure they are closed
+     * when no longer needed.
+     * <pre>
+     * {@code
+     * try (SubRegion ignored = canvas.subRegion(region, true) {
+     *    //.. draw within SubRegion.
+     * }
+     * </pre>
+     * They may be closed manually as well, in which case it is important they are closed in the reverse order of creation.
+     *
+     * @param region The region to restrict to, relative to the current region, in pixels.
+     * @param crop   Whether to crop elements falling outside this region.
+     * @return A SubRegion, to be closed when no long needed
+     */
+    SubRegion subRegion(Rect2i region, boolean crop);
+
+    /**
+     * Sets the class of widget being drawn, used to determine what style to use from the skin.
+     * Wipes the current mode selection
+     * @param widgetClass
+     */
+    void setWidget(Class<? extends UIWidget> widgetClass);
 
     /**
      * Draws text without using the current style. Text may include new lines. This text will always be left-aligned.

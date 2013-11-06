@@ -60,6 +60,14 @@ public final class Rect2i {
         return new Rect2i(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
+    public static Rect2i createFromMinAndSize(Vector2i min, Vector2i size) {
+        return createFromMinAndSize(min.x, min.y, size.x, size.y);
+    }
+
+    public static Rect2i createFromMinAndMax(Vector2i min, Vector2i max) {
+        return createFromMinAndMax(min.x, min.y, max.x, max.y);
+    }
+
     public static Rect2i createEncompassing(Vector2i a, Vector2i b) {
         return createEncompassing(a.x, a.y, b.x, b.y);
     }

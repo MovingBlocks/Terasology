@@ -16,6 +16,7 @@
 
 package org.terasology.utilities;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +43,13 @@ public final class NativeHelper {
             if (envPath == null || envPath.isEmpty()) {
                 System.setProperty("java.library.path", libPath.toAbsolutePath().toString());
             } else {
-                System.setProperty("java.library.path", envPath + File.pathSeparator + libPath.toAbsolutePath().toString());
+                System.setProperty("java.library.path", libPath.toAbsolutePath().toString() + File.pathSeparator + envPath);
             }
 
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
 
-            List<String> paths = new ArrayList<String>(Arrays.asList((String[]) usrPathsField.get(null)));
+            List<String> paths = Lists.newArrayList((String[]) usrPathsField.get(null));
 
             if (paths.contains(libPath.toAbsolutePath().toString())) {
                 return;

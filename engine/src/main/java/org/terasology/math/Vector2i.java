@@ -170,4 +170,7 @@ public class Vector2i {
         return new Vector2d(x, y);
     }
 
+    public static Vector2i zero() {
+        return new Vector2i(0, 0);
+    }
 }

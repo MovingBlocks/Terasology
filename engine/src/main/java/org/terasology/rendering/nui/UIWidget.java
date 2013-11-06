@@ -23,4 +23,5 @@ public interface UIWidget {
     void draw(Canvas canvas);
 
     void update(float delta);
+
 }

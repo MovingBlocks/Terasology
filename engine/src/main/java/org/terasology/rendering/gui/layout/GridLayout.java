@@ -35,7 +35,7 @@ import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
 /**
- * The GridLayout positions display elements within a UIComposite container in a grid depending on the number of columns the grid has.
+ * The ColumnLayout positions display elements within a UIComposite container in a grid depending on the number of columns the grid has.
  * Display elements are laid out in columns from left to right. A new row is created when numColumns + 1 display elements where added.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>

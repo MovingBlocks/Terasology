@@ -249,6 +249,14 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
+    public void drawWidget(UIWidget widget, Rect2i region) {
+        try (SubRegion ignored = subRegion(region, true)) {
+            setWidget(widget.getClass());
+            widget.draw(this);
+        }
+    }
+
+    @Override
     public void drawText(String text) {
         drawText(text, state.getRelativeRegion());
     }

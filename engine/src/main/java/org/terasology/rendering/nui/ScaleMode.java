@@ -39,16 +39,8 @@ public enum ScaleMode {
     SCALE_FIT {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            Vector2f scale = new Vector2f();
-            float aspect = ((float) actualWidth) / actualHeight;
-            if (aspect > 0) {
-                scale.x = (float) Math.ceil(region.height() * aspect);
-                scale.y = region.height();
-            } else {
-                scale.x = region.width();
-                scale.y = (float) Math.ceil(region.width() / aspect);
-            }
-            return scale;
+            float scale = Math.min((float) region.width() / actualWidth, (float) region.height() / actualHeight);
+            return new Vector2f(actualWidth * scale, actualHeight * scale);
         }
     },
 
@@ -58,16 +50,8 @@ public enum ScaleMode {
     SCALE_FILL {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            Vector2f scale = new Vector2f();
-            float aspect = ((float) actualWidth) / actualHeight;
-            if (aspect > 0) {
-                scale.x = region.width();
-                scale.y = (float) Math.ceil(region.width() / aspect);
-            } else {
-                scale.x = (float) Math.ceil(region.height() * aspect);
-                scale.y = region.height();
-            }
-            return scale;
+            float scale = Math.max((float) region.width() / actualWidth, (float) region.height() / actualHeight);
+            return new Vector2f(actualWidth * scale, actualHeight * scale);
         }
     },
 
