@@ -602,6 +602,17 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
 
         /*
+         * OVERLAYS
+         */
+        PerformanceMonitor.startActivity("Render Overlays");
+
+        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
+            renderer.renderOverlay();
+        }
+
+        PerformanceMonitor.endActivity();
+
+        /*
          * FIRST PERSON VIEW
          */
         if (activeCamera != null && !config.getRendering().getDebug().isFirstPersonElementsHidden()) {
@@ -629,16 +640,7 @@ public final class WorldRenderer {
             PerformanceMonitor.endActivity();
         }
 
-        /*
-         * OVERLAYS
-         */
-        PerformanceMonitor.startActivity("Render Overlays");
 
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderOverlay();
-        }
-
-        PerformanceMonitor.endActivity();
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 
         /*
