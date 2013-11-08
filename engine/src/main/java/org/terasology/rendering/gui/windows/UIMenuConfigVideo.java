@@ -164,10 +164,12 @@ public class UIMenuConfigVideo extends UIWindow {
                 config.getRendering().setViewDistance(ViewDistance.forIndex(button.getState()));
             }
         };
+        viewingDistanceButton.addState("Viewing Distance: Legally Blind", viewingDistanceStateAction);
         viewingDistanceButton.addState("Viewing Distance: Near", viewingDistanceStateAction);
         viewingDistanceButton.addState("Viewing Distance: Moderate", viewingDistanceStateAction);
         viewingDistanceButton.addState("Viewing Distance: Far", viewingDistanceStateAction);
         viewingDistanceButton.addState("Viewing Distance: Ultra", viewingDistanceStateAction);
+        viewingDistanceButton.addState("Viewing Distance: Mega (Warning)", viewingDistanceStateAction);
         viewingDistanceButton.addClickListener(clickAction);
         viewingDistanceButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         viewingDistanceButton.setPosition(new Vector2f(-viewingDistanceButton.getSize().x / 2f - 10f, 300f + 40f));
