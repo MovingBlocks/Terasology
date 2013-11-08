@@ -39,7 +39,7 @@ import org.terasology.asset.sources.DirectorySource;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.utilities.FilesUtil;
-import org.terasology.utilities.gson.VersionHandler;
+import org.terasology.utilities.gson.VersionTypeAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -187,7 +187,7 @@ public class ModuleManagerImpl implements ModuleManager {
         modules.clear();
         activeModules.clear();
         activeModules.put(engineModule.getId(), engineModule);
-        Gson gson = new GsonBuilder().registerTypeAdapter(Version.class, new VersionHandler()).create();
+        Gson gson = new GsonBuilder().registerTypeAdapter(Version.class, new VersionTypeAdapter()).create();
         for (Path rootModulePath : PathManager.getInstance().getModulePaths()) {
 
             // Directories first (they should override zips)

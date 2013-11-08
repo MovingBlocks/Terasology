@@ -41,6 +41,12 @@ public interface Canvas {
     Vector2i size();
 
     /**
+     * minX and minY of the region will always be zero.
+     * @return The region of drawable canvas, in pixels.
+     */
+    Rect2i getRegion();
+
+    /**
      * Sets the alpha for drawing all elements.
      * This accumulates across sub regions, so the canvas is set to alpha 0.5f and then a sub region is begun and the canvas is set to alpha 0.5f,
      * elements will be drawn with an effective alpha of 0.25f
@@ -108,52 +114,6 @@ public interface Canvas {
      * @param region  The area to draw the texture in, in pixels
      */
     void drawTexture(TextureRegion texture, Rect2i region);
-
-    /**
-     * Draws a sub-region of a texture to fill the canvas using the current style
-     *
-     * @param texture The texture to draw
-     * @param ux      The leftmost pixel of the sub-region of the texture to draw
-     * @param uy      The topmost pixel of the sub-region of the texture to draw
-     * @param uw      The width of the sub-region of the texture to draw, in pixels
-     * @param uh      The height of the sub-region of the texture to draw, in pixels
-     */
-    void drawTexture(TextureRegion texture, int ux, int uy, int uw, int uh);
-
-    /**
-     * Draws a sub-region of a texture to fill the canvas using the current style
-     *
-     * @param texture The texture to draw
-     * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
-     * @param uy      The topmost pixel of the sub-region of the texture to draw, between 0 and 1
-     * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
-     * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
-     */
-    void drawTexture(TextureRegion texture, float ux, float uy, float uw, float uh);
-
-    /**
-     * Draws a sub-region of a texture to the given area using the current style
-     *
-     * @param texture The texture to draw
-     * @param region  The area to draw the texture in, in pixels
-     * @param ux      The leftmost pixel of the sub-region of the texture to draw
-     * @param uy      The topmost pixel of the sub-region of the texture to draw
-     * @param uw      The width of the sub-region of the texture to draw, in pixels
-     * @param uh      The height of the sub-region of the texture to draw, in pixels
-     */
-    void drawTexture(TextureRegion texture, Rect2i region, int ux, int uy, int uw, int uh);
-
-    /**
-     * Draws a sub-region of a texture to the given area using the current style
-     *
-     * @param texture The texture to draw
-     * @param region  The area to draw the texture in, in pixels
-     * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
-     * @param uy      The topmost pixel of the sub-region of the texture to draw, between 0 and 1
-     * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
-     * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
-     */
-    void drawTexture(TextureRegion texture, Rect2i region, float ux, float uy, float uw, float uh);
 
     /**
      * Draws the background of the current style, filling the entire canvas.
@@ -373,5 +333,4 @@ public interface Canvas {
     void addInteractionRegion(InteractionListener listener);
 
     void addInteractionRegion(Rect2i region, InteractionListener listener);
-
 }

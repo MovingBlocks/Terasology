@@ -13,31 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.utilities.gson;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import org.terasology.engine.module.Version;
 
-import javax.vecmath.Quat4f;
 import java.lang.reflect.Type;
 
 /**
  * @author Immortius
  */
-public class Quat4fHandler implements JsonDeserializer<Quat4f> {
+public class VersionTypeAdapter implements JsonDeserializer<Version>, JsonSerializer<Version> {
 
     @Override
-    public Quat4f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        if (json.isJsonArray()) {
-            JsonArray array = json.getAsJsonArray();
-            if (array.size() == 4) {
-                return new Quat4f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat(), array.get(3).getAsFloat());
-            }
-        }
-        return null;
+    public Version deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return Version.create(json.getAsString());
+    }
+
+    @Override
+    public JsonElement serialize(Version src, Type typeOfSrc, JsonSerializationContext context) {
+        return context.serialize(src.toString());
     }
 }

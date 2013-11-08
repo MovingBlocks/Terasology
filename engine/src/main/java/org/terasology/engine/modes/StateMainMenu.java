@@ -15,6 +15,8 @@
  */
 package org.terasology.engine.modes;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.classMetadata.reflect.ReflectFactory;
@@ -30,8 +32,29 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.Rect2f;
+import org.terasology.math.Vector2i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.rendering.nui.Border;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.baseWidgets.UIButton;
+import org.terasology.rendering.nui.baseWidgets.UIImage;
+import org.terasology.rendering.nui.baseWidgets.UILabel;
+import org.terasology.rendering.nui.baseWidgets.UISpace;
+import org.terasology.rendering.nui.layout.ArbitraryLayout;
+import org.terasology.rendering.nui.layout.ColumnLayout;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UISkinBuilder;
+import org.terasology.rendering.nui.skin.UISkinData;
+
+import javax.vecmath.Vector2f;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -52,6 +75,7 @@ public class StateMainMenu implements GameState {
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
     private GUIManager guiManager;
+    private NUIManager nuiManager;
     private InputSystem inputSystem;
 
     private String messageOnLoad = "";
@@ -72,6 +96,8 @@ public class StateMainMenu implements GameState {
         eventSystem = CoreRegistry.get(EventSystem.class);
 
         guiManager = CoreRegistry.get(GUIManager.class);
+        nuiManager = CoreRegistry.get(NUIManager.class);
+        ((NUIManagerInternal)nuiManager).refreshWidgetsLibrary();
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
@@ -81,6 +107,7 @@ public class StateMainMenu implements GameState {
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 
         eventSystem.registerEventHandler(guiManager);
+        eventSystem.registerEventHandler(CoreRegistry.get(NUIManager.class));
         inputSystem = CoreRegistry.get(InputSystem.class);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
@@ -93,10 +120,62 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        guiManager.openWindow("main");
+        //guiManager.openWindow("main");
+        openMainMenu();
         if (!messageOnLoad.isEmpty()) {
             guiManager.showMessage("", messageOnLoad);
         }
+    }
+
+    private void openMainMenu() {
+        /*UISkinData skinData = new UISkinBuilder()
+                .setTextShadowed(true)
+
+                .setWidgetClass(ArbitraryLayout.class)
+                .setBackgroundMode(ScaleMode.SCALE_FILL)
+                .setBackground(Assets.getTexture("engine:menuBackground"))
+
+                .setWidgetClass(UILabel.class)
+                .setTextVerticalAlignment(VerticalAlign.TOP)
+
+                .setWidgetClass(UIImage.class)
+                .setTextureScaleMode(ScaleMode.SCALE_FIT)
+
+                .setWidgetClass(UIButton.class)
+                .setBackground(Assets.getTexture("engine", "button"))
+                .setTextHorizontalAlignment(HorizontalAlign.CENTER)
+                .setTextVerticalAlignment(VerticalAlign.MIDDLE)
+                .setBackgroundBorder(new Border(2, 2, 2, 2))
+                .setMargin(new Border(4, 4, 4, 4))
+                .setTextureScaleMode(ScaleMode.SCALE_FIT)
+
+                .setWidgetMode("hover")
+                .setBackground(Assets.getTexture("engine", "buttonOver"))
+
+                .setWidgetMode("down")
+                .setBackground(Assets.getTexture("engine", "buttonDown"))
+                .setTextColor(Color.YELLOW)
+                .build();
+
+        UISkin skin = Assets.generateAsset(new AssetUri(AssetType.UI_SKIN, "engine:defaultSkin"), skinData, UISkin.class);    */
+        UISkin skin = Assets.getSkin("engine:mainmenu");
+
+        ColumnLayout grid = new ColumnLayout();
+        grid.addWidget(new UIButton("Single Player"));
+        grid.addWidget(new UIButton("Host Game"));
+        grid.addWidget(new UIButton("Join Game"));
+        grid.addWidget(new UIButton("Settings"));
+        grid.addWidget(new UISpace());
+        grid.addWidget(new UIButton("Exit"));
+        grid.setPadding(new Border(0, 0, 4, 4));
+
+        ArbitraryLayout layout = new ArbitraryLayout();
+        layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
+        layout.addFillWidget(new UILabel("Pre Alpha"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
+        layout.addFixedWidget(grid, new Vector2i(280, 192), new Vector2f(0.5f, 0.7f));
+
+        UIScreen mainMenu = new UIScreen(layout, skin);
+        CoreRegistry.get(NUIManager.class).pushScreen(mainMenu);
     }
 
     @Override
@@ -126,7 +205,7 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void update(float delta) {
-        updateUserInterface();
+        updateUserInterface(delta);
 
         eventSystem.process();
     }
@@ -137,6 +216,7 @@ public class StateMainMenu implements GameState {
         glLoadIdentity();
 
         renderUserInterface();
+        nuiManager.render();
     }
 
     @Override
@@ -148,7 +228,8 @@ public class StateMainMenu implements GameState {
         guiManager.render();
     }
 
-    private void updateUserInterface() {
+    private void updateUserInterface(float delta) {
         guiManager.update();
+        nuiManager.update(delta);
     }
 }

@@ -20,8 +20,12 @@ package org.terasology.rendering.nui;
  */
 public interface UIWidget {
 
-    void draw(Canvas canvas);
+    String DEFAULT_MODE = "";
+
+    void onDraw(Canvas canvas);
 
     void update(float delta);
+
+    String getMode();
 
 }

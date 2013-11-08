@@ -13,38 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui;
 
-import org.terasology.rendering.assets.TextureRegion;
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.skin.UISkin;
 
 /**
  * @author Immortius
  */
-public class UIImage extends AbstractWidget {
-    private TextureRegion texture;
+public class UIScreen {
 
-    public UIImage() {
+    private UIWidget contents;
+    private UISkin skin;
+
+    public UIScreen(UIWidget contents, UISkin skin) {
+        this.contents = contents;
+        this.skin = skin;
     }
 
-    public UIImage(TextureRegion texture) {
-        this.texture = texture;
-    }
-
-    @Override
     public void onDraw(Canvas canvas) {
-        if (texture != null) {
-            canvas.drawTexture(texture);
-        }
+        canvas.setSkin(skin);
+        canvas.drawWidget(contents, canvas.getRegion());
     }
 
-    public TextureRegion getTexture() {
-        return texture;
+    public UISkin getSkin() {
+        return skin;
     }
 
-    public void setTexture(TextureRegion texture) {
-        this.texture = texture;
+    public void setSkin(UISkin skin) {
+        this.skin = skin;
     }
 
+    public void update(float delta) {
+        contents.update(delta);
+    }
 }

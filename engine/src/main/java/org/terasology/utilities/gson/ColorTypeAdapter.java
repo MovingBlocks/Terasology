@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.utilities.gson;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.Color;
 
-import javax.vecmath.Vector2f;
 import java.lang.reflect.Type;
 
 /**
  * @author Immortius
  */
-public class Vector2iHandler implements JsonDeserializer<Vector2i> {
+public class ColorTypeAdapter implements JsonDeserializer<Color> {
     @Override
-    public Vector2i deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonArray jsonArray = json.getAsJsonArray();
-        return new Vector2i(jsonArray.get(0).getAsInt(), jsonArray.get(1).getAsInt());
+    public Color deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+            String value = json.getAsString();
+            return new Color((int)Long.parseLong(value, 16));
+        }
+        throw new JsonParseException("Did not find hexadecimal string for Color value");
     }
 }

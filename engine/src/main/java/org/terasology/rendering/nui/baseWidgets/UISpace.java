@@ -15,36 +15,16 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
  */
-public class UIImage extends AbstractWidget {
-    private TextureRegion texture;
-
-    public UIImage() {
-    }
-
-    public UIImage(TextureRegion texture) {
-        this.texture = texture;
-    }
+public class UISpace extends AbstractWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (texture != null) {
-            canvas.drawTexture(texture);
-        }
     }
-
-    public TextureRegion getTexture() {
-        return texture;
-    }
-
-    public void setTexture(TextureRegion texture) {
-        this.texture = texture;
-    }
-
 }

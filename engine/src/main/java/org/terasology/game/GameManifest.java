@@ -25,7 +25,7 @@ import org.terasology.engine.module.ModuleIdentifier;
 import org.terasology.engine.module.Version;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
-import org.terasology.utilities.gson.VersionHandler;
+import org.terasology.utilities.gson.VersionTypeAdapter;
 import org.terasology.world.internal.WorldInfo;
 
 import java.io.BufferedReader;
@@ -131,7 +131,7 @@ public class GameManifest {
         return new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new UriTypeAdapterFactory())
-                .registerTypeAdapter(Version.class, new VersionHandler())
+                .registerTypeAdapter(Version.class, new VersionTypeAdapter())
                 .setPrettyPrinting()
                 .create();
     }

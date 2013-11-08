@@ -50,6 +50,9 @@ import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
@@ -71,6 +74,8 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLFont;
@@ -84,6 +89,9 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.shapes.BlockShapeData;
+import org.terasology.world.block.shapes.BlockShapeImpl;
 
 import java.nio.file.FileSystem;
 
@@ -137,6 +145,20 @@ public abstract class TerasologyTestingEnvironment {
             Display.setDisplayMode(new DisplayMode(0, 0));
             Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
 
+            assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+
+                @Override
+                public Prefab buildAsset(AssetUri uri, PrefabData data) {
+                    return new PojoPrefab(uri, data);
+                }
+            });
+            assetManager.setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
+
+                @Override
+                public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
+                    return new BlockShapeImpl(uri, data);
+                }
+            });
             assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
                 @Override
                 public Texture buildAsset(AssetUri uri, TextureData data) {
@@ -177,6 +199,12 @@ public abstract class TerasologyTestingEnvironment {
                 @Override
                 public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
                     return new MeshAnimationImpl(uri, data);
+                }
+            });
+            CoreRegistry.get(AssetManager.class).setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
+                @Override
+                public UISkin buildAsset(AssetUri uri, UISkinData data) {
+                    return new UISkin(uri, data);
                 }
             });
 

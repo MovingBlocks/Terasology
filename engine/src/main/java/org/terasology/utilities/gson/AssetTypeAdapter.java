@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,25 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.utilities.gson;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.Assets;
 
-import javax.vecmath.Vector3f;
 import java.lang.reflect.Type;
 
 /**
  * @author Immortius
  */
-public class Vector3fHandler implements JsonDeserializer<Vector3f> {
+public class AssetTypeAdapter<V extends Asset> implements JsonDeserializer<V> {
+
+    private AssetType type;
+
+    public AssetTypeAdapter(AssetType type) {
+        this.type = type;
+    }
+
     @Override
-    public Vector3f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonArray jsonArray = json.getAsJsonArray();
-        return new Vector3f(jsonArray.get(0).getAsFloat(), jsonArray.get(1).getAsFloat(), jsonArray.get(2).getAsFloat());
+    public V deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return (V) Assets.get(type, json.getAsString());
     }
 }

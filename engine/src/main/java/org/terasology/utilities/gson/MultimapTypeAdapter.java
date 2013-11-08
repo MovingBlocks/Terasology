@@ -37,11 +37,11 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class MultimapHandler<V> implements JsonDeserializer<Multimap<String, V>>, JsonSerializer<Multimap<String, V>> {
+public class MultimapTypeAdapter<V> implements JsonDeserializer<Multimap<String, V>>, JsonSerializer<Multimap<String, V>> {
 
     private Class<V> valueType;
 
-    public MultimapHandler(Class<V> valueType) {
+    public MultimapTypeAdapter(Class<V> valueType) {
         this.valueType = valueType;
     }
 

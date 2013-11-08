@@ -64,8 +64,10 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     public void register(SimpleUri uri, Class<? extends T> clazz) {
         ClassMetadata<? extends T, ?> metadata = createMetadata(clazz, reflectFactory, copyStrategyLibrary, uri);
 
-        classLookup.put(clazz, metadata);
-        uriLookup.put(uri.getNormalisedObjectName(), uri.getNormalisedModuleName(), metadata);
+        if (metadata != null) {
+            classLookup.put(clazz, metadata);
+            uriLookup.put(uri.getNormalisedObjectName(), uri.getNormalisedModuleName(), metadata);
+        }
     }
 
     @Override

@@ -13,26 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
-
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
+package org.terasology.entitySystem.systems;
 
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
-    void pushScreen(UIScreen screen);
+public abstract class BaseComponentSystem implements ComponentSystem {
 
-    void popScreen();
+    @Override
+    public void initialise() {
+    }
 
-    void setScreen(UIScreen screen);
-
-    void closeScreens();
-
-    void render();
-
-    void update(float delta);
-
-    ClassLibrary<UIWidget> getWidgetMetadataLibrary();
+    @Override
+    public void shutdown() {
+    }
 }

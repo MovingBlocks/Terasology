@@ -27,7 +27,7 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.subtexture.SubtextureData;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.utilities.gson.Vector2iHandler;
+import org.terasology.utilities.gson.Vector2iTypeAdapter;
 
 import javax.vecmath.Vector2f;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
     private Gson gson;
 
     public AtlasLoader() {
-        gson = new GsonBuilder().registerTypeAdapter(Vector2i.class, new Vector2iHandler()).create();
+        gson = new GsonBuilder().registerTypeAdapter(Vector2i.class, new Vector2iTypeAdapter()).create();
     }
 
     @Override
@@ -95,10 +95,13 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
             logger.error("Bad subimage definition '{}' - requires one of max or size", freeform.getName());
             return;
         }
+        Vector2f min = new Vector2f((float) freeform.getMin().x / size.x, (float) freeform.getMin().y / size.y);
         if (freeform.getSize() != null) {
-            out.put(freeform.getName(), new SubtextureData(texture, Rect2f.createFromMinAndSize(freeform.getMin(), freeform.getSize())));
+            Vector2f itemSize = new Vector2f((float) freeform.getSize().x / size.x, (float) freeform.getSize().y / size.y);
+            out.put(freeform.getName(), new SubtextureData(texture, Rect2f.createFromMinAndSize(min, itemSize)));
         } else if (freeform.getMax() != null) {
-            out.put(freeform.getName(), new SubtextureData(texture, Rect2f.createFromMinAndMax(freeform.getMin(), freeform.getMax())));
+            Vector2f max = new Vector2f((float) freeform.getMax().x / size.x, (float) freeform.getMax().y / size.y);
+            out.put(freeform.getName(), new SubtextureData(texture, Rect2f.createFromMinAndMax(min, max)));
         }
     }
 

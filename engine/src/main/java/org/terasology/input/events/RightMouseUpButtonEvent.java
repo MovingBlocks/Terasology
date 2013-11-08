@@ -16,16 +16,20 @@
 package org.terasology.input.events;
 
 
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
+
 public final class RightMouseUpButtonEvent extends MouseUpButtonEvent {
 
     private static RightMouseUpButtonEvent event = new RightMouseUpButtonEvent(0);
 
     private RightMouseUpButtonEvent(float delta) {
-        super(1, delta);
+        super(MouseInput.MOUSE_RIGHT, delta);
     }
 
-    public static RightMouseUpButtonEvent create(float delta) {
+    public static RightMouseUpButtonEvent create(Vector2i mousePos, float delta) {
         event.reset(delta);
+        event.setMousePosition(mousePos);
         return event;
     }
 

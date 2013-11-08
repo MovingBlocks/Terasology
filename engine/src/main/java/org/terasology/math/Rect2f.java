@@ -53,7 +53,7 @@ public class Rect2f {
         return new Rect2f(x, y, width, height);
     }
 
-    public static Rect2f createFromMinAndSize(Vector2i min, Vector2i size) {
+    public static Rect2f createFromMinAndSize(Vector2f min, Vector2f size) {
         return createFromMinAndSize(min.x, min.y, size.x, size.y);
     }
 
@@ -64,7 +64,7 @@ public class Rect2f {
         return new Rect2f(minX, minY, maxX - minX, maxY - minY);
     }
 
-    public static Rect2f createFromMinAndMax(Vector2i min, Vector2i max) {
+    public static Rect2f createFromMinAndMax(Vector2f min, Vector2f max) {
         return createFromMinAndMax(min.x, min.y, max.x, max.y);
     }
 

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.UIWidget;
@@ -22,21 +23,15 @@ import org.terasology.rendering.nui.UIWidget;
 /**
  * @author Immortius
  */
-public class UILabel implements UIWidget {
+public class UILabel extends AbstractWidget {
 
     private String text = "";
-    private UIStyle style = new UIStyle();
 
     public UILabel() {
     }
 
     public UILabel(String text) {
         this.text = text;
-    }
-
-    public UILabel(String text, UIStyle style) {
-        this.text = text;
-        this.style = style;
     }
 
     public String getText() {
@@ -47,20 +42,8 @@ public class UILabel implements UIWidget {
         this.text = text;
     }
 
-    public UIStyle getStyle() {
-        return style;
-    }
-
-    public void setStyle(UIStyle style) {
-        this.style = style;
-    }
-
     @Override
-    public void draw(Canvas canvas) {
+    public void onDraw(Canvas canvas) {
         canvas.drawText(text);
-    }
-
-    @Override
-    public void update(float delta) {
     }
 }

@@ -13,38 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.internal;
 
-import org.terasology.rendering.assets.TextureRegion;
-import org.terasology.rendering.nui.AbstractWidget;
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 
 /**
  * @author Immortius
  */
-public class UIImage extends AbstractWidget {
-    private TextureRegion texture;
+public interface CanvasInternal extends Canvas {
 
-    public UIImage() {
-    }
+    void preRender();
 
-    public UIImage(TextureRegion texture) {
-        this.texture = texture;
-    }
+    void postRender();
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (texture != null) {
-            canvas.drawTexture(texture);
-        }
-    }
+    void processMouseOver(Vector2i position);
 
-    public TextureRegion getTexture() {
-        return texture;
-    }
+    void processMouseClick(MouseInput button, Vector2i pos);
 
-    public void setTexture(TextureRegion texture) {
-        this.texture = texture;
-    }
+    void processMouseRelease(MouseInput button, Vector2i pos);
+
+    void processMouseWheeled(int amount, Vector2i pos);
 
 }

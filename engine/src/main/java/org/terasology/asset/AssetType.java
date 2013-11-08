@@ -31,6 +31,7 @@ import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;
 import org.terasology.rendering.md5.MD5AnimationLoader;
 import org.terasology.rendering.md5.MD5SkeletonLoader;
+import org.terasology.rendering.nui.skin.UISkinLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
@@ -73,7 +74,7 @@ public enum AssetType {
     FONT("font", "fonts", "fnt", new FontLoader()),
     SUBTEXTURE("subtexture", new String[] {}, "", null),
     ATLAS("atlas", "atlas", "atlas", new AtlasLoader()),
-    UI_SKIN("skin", "skins", "skin", null);
+    UI_SKIN("skin", "skins", "skin", new UISkinLoader());
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;

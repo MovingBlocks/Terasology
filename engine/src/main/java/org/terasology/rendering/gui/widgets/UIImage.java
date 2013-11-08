@@ -62,7 +62,6 @@ public class UIImage extends UIDisplayContainer {
     private Mesh mesh;
 
     public UIImage() {
-
     }
 
     public UIImage(Color color) {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -38,6 +38,16 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.Border;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LineBuilder;
+import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 
@@ -54,9 +64,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
@@ -73,7 +88,7 @@ import static org.lwjgl.opengl.Util.checkGLError;
 /**
  * @author Immortius
  */
-public class LwjglCanvas implements Canvas {
+public class LwjglCanvas implements CanvasInternal {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
     private static final Quat4f IDENTITY_ROT = new Quat4f(0, 0, 0, 1);
@@ -101,18 +116,19 @@ public class LwjglCanvas implements Canvas {
     public LwjglCanvas() {
     }
 
+    @Override
     public void preRender() {
         interactionRegions.clear();
         state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
-        glEnable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         checkGLError();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        checkGLError();
         glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
-        checkGLError();
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
 
@@ -123,8 +139,11 @@ public class LwjglCanvas implements Canvas {
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
         glLoadMatrix(matrixBuffer);
         matrixBuffer.rewind();
+
+
     }
 
+    @Override
     public void postRender() {
         Util.checkGLError();
         if (!subregionStack.isEmpty()) {
@@ -149,6 +168,8 @@ public class LwjglCanvas implements Canvas {
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
         checkGLError();
     }
 
@@ -218,6 +239,11 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
+    public Rect2i getRegion() {
+        return Rect2i.createFromMinAndSize(0, 0, state.drawRegion.width(), state.drawRegion.height());
+    }
+
+    @Override
     public void setAlpha(float value) {
         state.alpha = value;
     }
@@ -252,7 +278,9 @@ public class LwjglCanvas implements Canvas {
     public void drawWidget(UIWidget widget, Rect2i region) {
         try (SubRegion ignored = subRegion(region, true)) {
             setWidget(widget.getClass());
-            widget.draw(this);
+            setMode(widget.getMode());
+            drawBackground();
+            widget.onDraw(this);
         }
     }
 
@@ -278,28 +306,8 @@ public class LwjglCanvas implements Canvas {
     }
 
     @Override
-    public void drawTexture(TextureRegion texture, int ux, int uy, int uw, int uh) {
-        drawTexture(texture, state.getRelativeRegion(), ux, uy, uw, uh);
-    }
-
-    @Override
-    public void drawTexture(TextureRegion texture, float ux, float uy, float uw, float uh) {
-        drawTexture(texture, state.getRelativeRegion(), ux, uy, uw, uh);
-    }
-
-    @Override
     public void drawTexture(TextureRegion texture, Rect2i region) {
         drawTextureRaw(texture, applyStyleToRegion(region), getCurrentStyle().getTextureScaleMode());
-    }
-
-    @Override
-    public void drawTexture(TextureRegion texture, Rect2i region, float ux, float uy, float uw, float uh) {
-        drawTextureRaw(texture, applyStyleToRegion(region), getCurrentStyle().getTextureScaleMode(), uw, uy, uw, uh);
-    }
-
-    @Override
-    public void drawTexture(TextureRegion texture, Rect2i region, int ux, int uy, int uw, int uh) {
-        drawTextureRaw(texture, applyStyleToRegion(region), getCurrentStyle().getTextureScaleMode(), ux, uy, uw, uh);
     }
 
     private Rect2i applyStyleToRegion(Rect2i region) {

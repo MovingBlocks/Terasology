@@ -15,24 +15,17 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
-
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
-    void pushScreen(UIScreen screen);
+public abstract class AbstractWidget implements UIWidget {
 
-    void popScreen();
+    @Override
+    public void update(float delta) {
+    }
 
-    void setScreen(UIScreen screen);
-
-    void closeScreens();
-
-    void render();
-
-    void update(float delta);
-
-    ClassLibrary<UIWidget> getWidgetMetadataLibrary();
+    @Override
+    public String getMode() {
+        return DEFAULT_MODE;
+    }
 }

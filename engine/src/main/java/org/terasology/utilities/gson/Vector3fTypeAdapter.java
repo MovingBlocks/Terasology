@@ -13,30 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.utilities.gson;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import org.terasology.engine.module.Version;
 
+import javax.vecmath.Vector3f;
 import java.lang.reflect.Type;
 
 /**
  * @author Immortius
  */
-public class VersionHandler implements JsonDeserializer<Version>, JsonSerializer<Version> {
-
+public class Vector3fTypeAdapter implements JsonDeserializer<Vector3f> {
     @Override
-    public Version deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return Version.create(json.getAsString());
-    }
-
-    @Override
-    public JsonElement serialize(Version src, Type typeOfSrc, JsonSerializationContext context) {
-        return context.serialize(src.toString());
+    public Vector3f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        JsonArray jsonArray = json.getAsJsonArray();
+        return new Vector3f(jsonArray.get(0).getAsFloat(), jsonArray.get(1).getAsFloat(), jsonArray.get(2).getAsFloat());
     }
 }

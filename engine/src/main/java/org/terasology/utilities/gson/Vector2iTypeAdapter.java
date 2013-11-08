@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,25 +21,18 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import org.terasology.math.Vector2i;
 
-import javax.vecmath.Vector4f;
+import javax.vecmath.Vector2f;
 import java.lang.reflect.Type;
 
 /**
  * @author Immortius
  */
-public class Vector4fHandler implements JsonDeserializer<Vector4f> {
-
+public class Vector2iTypeAdapter implements JsonDeserializer<Vector2i> {
     @Override
-    public Vector4f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        if (json.isJsonArray()) {
-            JsonArray array = json.getAsJsonArray();
-            if (array.size() == 4) {
-                return new Vector4f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat(), array.get(3).getAsFloat());
-            } else if (array.size() == 3) {
-                return new Vector4f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat(), 1);
-            }
-        }
-        return null;
+    public Vector2i deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        JsonArray jsonArray = json.getAsJsonArray();
+        return new Vector2i(jsonArray.get(0).getAsInt(), jsonArray.get(1).getAsInt());
     }
 }

@@ -19,6 +19,7 @@ package org.terasology.asset;
 import org.terasology.audio.Sound;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
@@ -27,6 +28,7 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.skin.UISkin;
 
 import java.util.List;
 
@@ -278,6 +280,10 @@ public final class Assets {
         return get(AssetType.PREFAB, simpleUri, Prefab.class);
     }
 
+    public static UISkin getSkin(String uri) {
+        return get(AssetType.UI_SKIN, uri, UISkin.class);
+    }
+
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {
         Asset<U> asset = CoreRegistry.get(AssetManager.class).generateAsset(uri, data);
         if (assetClass.isInstance(asset)) {
@@ -298,4 +304,15 @@ public final class Assets {
         CoreRegistry.get(AssetManager.class).dispose(asset);
     }
 
+    public static TextureRegion getTextureRegion(String simpleUri) {
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        AssetUri uri = assetManager.resolve(AssetType.TEXTURE, simpleUri);
+        if (uri == null) {
+            uri = assetManager.resolve(AssetType.SUBTEXTURE, simpleUri);
+        }
+        if (uri != null) {
+           return (TextureRegion) assetManager.loadAsset(uri);
+        }
+        return null;
+    }
 }

@@ -17,6 +17,7 @@ package org.terasology.input.lwjgl;
 
 import com.google.common.collect.Queues;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.device.InputAction;
@@ -32,12 +33,12 @@ public class LwjglMouseDevice implements MouseDevice {
 
     @Override
     public Vector2i getPosition() {
-        return new Vector2i(Mouse.getX(), Mouse.getY());
+        return new Vector2i(Mouse.getX(), Display.getHeight() - Mouse.getY());
     }
 
     @Override
     public Vector2i getDelta() {
-        return new Vector2i(Mouse.getDX(), Mouse.getDY());
+        return new Vector2i(Mouse.getDX(), -Mouse.getDY());
     }
 
     @Override

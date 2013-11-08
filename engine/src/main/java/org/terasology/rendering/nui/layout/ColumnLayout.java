@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
@@ -28,7 +29,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ColumnLayout implements UIWidget {
+public class ColumnLayout extends AbstractWidget {
 
     private int columns = 1;
     private Border padding = new Border(0, 0, 0, 0);
@@ -56,8 +57,7 @@ public class ColumnLayout implements UIWidget {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        canvas.drawBackground();
+    public void onDraw(Canvas canvas) {
         if (!widgetList.isEmpty()) {
             Vector2i cellSize = canvas.size();
             cellSize.x /= columns;
@@ -87,7 +87,8 @@ public class ColumnLayout implements UIWidget {
 
     @Override
     public void update(float delta) {
-
+        for (UIWidget widget : widgetList) {
+            widget.update(delta);
+        }
     }
-
 }

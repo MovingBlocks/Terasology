@@ -76,7 +76,7 @@ public class InputSystem implements ComponentSystem {
 
     // Links between primitive inputs and bind buttons
     private Map<Integer, BindableButtonImpl> keyBinds = Maps.newHashMap();
-    private Map<Integer, BindableButtonImpl> mouseButtonBinds = Maps.newHashMap();
+    private Map<MouseInput, BindableButtonImpl> mouseButtonBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
 
@@ -123,7 +123,8 @@ public class InputSystem implements ComponentSystem {
                 linkBindButtonToKey(input.getId(), bindId);
                 break;
             case MOUSE_BUTTON:
-                linkBindButtonToMouse(input.getId(), bindId);
+                MouseInput button = MouseInput.getInputFor(input.getType(), input.getId());
+                linkBindButtonToMouse(button, bindId);
                 break;
             case MOUSE_WHEEL:
                 linkBindButtonToMouseWheel(input.getId(), bindId);
@@ -146,7 +147,7 @@ public class InputSystem implements ComponentSystem {
         keyBinds.put(key, bindInfo);
     }
 
-    public void linkBindButtonToMouse(int mouseButton, String bindId) {
+    public void linkBindButtonToMouse(MouseInput mouseButton, String bindId) {
         BindableButtonImpl bindInfo = buttonLookup.get(bindId);
         mouseButtonBinds.put(mouseButton, bindInfo);
     }
@@ -217,9 +218,10 @@ public class InputSystem implements ComponentSystem {
                 case MOUSE_BUTTON:
                     int id = action.getInput().getId();
                     if (id != -1) {
-                        boolean consumed = sendMouseEvent(id, action.getState().isDown(), delta);
+                        MouseInput button = MouseInput.getInputFor(action.getInput().getType(), action.getInput().getId());
+                        boolean consumed = sendMouseEvent(button, action.getState().isDown(), mouse.getPosition(), delta);
 
-                        BindableButtonImpl bind = mouseButtonBinds.get(id);
+                        BindableButtonImpl bind = mouseButtonBinds.get(button);
                         if (bind != null) {
                             bind.updateBindState(
                                     action.getState().isDown(),
@@ -351,19 +353,19 @@ public class InputSystem implements ComponentSystem {
         return consumed;
     }
 
-    private boolean sendMouseEvent(int button, boolean buttonDown, float delta) {
+    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
         MouseButtonEvent event;
         switch (button) {
-            case -1:
+            case MOUSE_NONE:
                 return false;
-            case 0:
-                event = (buttonDown) ? LeftMouseDownButtonEvent.create(delta) : LeftMouseUpButtonEvent.create(delta);
+            case MOUSE_LEFT:
+                event = (buttonDown) ? LeftMouseDownButtonEvent.create(position, delta) : LeftMouseUpButtonEvent.create(position, delta);
                 break;
-            case 1:
-                event = (buttonDown) ? RightMouseDownButtonEvent.create(delta) : RightMouseUpButtonEvent.create(delta);
+            case MOUSE_RIGHT:
+                event = (buttonDown) ? RightMouseDownButtonEvent.create(position, delta) : RightMouseUpButtonEvent.create(position, delta);
                 break;
             default:
-                event = (buttonDown) ? MouseDownButtonEvent.create(button, delta) : MouseUpButtonEvent.create(button, delta);
+                event = (buttonDown) ? MouseDownButtonEvent.create(button, position, delta) : MouseUpButtonEvent.create(button, position, delta);
                 break;
         }
         setupTarget(event);

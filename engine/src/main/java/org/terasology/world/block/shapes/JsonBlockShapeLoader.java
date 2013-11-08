@@ -38,8 +38,8 @@ import gnu.trove.procedure.TIntProcedure;
 import org.terasology.asset.AssetLoader;
 import org.terasology.engine.module.Module;
 import org.terasology.math.Rotation;
-import org.terasology.utilities.gson.Vector2fHandler;
-import org.terasology.utilities.gson.Vector3fHandler;
+import org.terasology.utilities.gson.Vector2fTypeAdapter;
+import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 
 import javax.vecmath.Matrix4f;
@@ -65,8 +65,8 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
                 .setPrettyPrinting()
                 .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
                 .registerTypeAdapter(BlockMeshPart.class, new BlockMeshPartHandler())
-                .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
-                .registerTypeAdapter(Vector2f.class, new Vector2fHandler())
+                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
+                .registerTypeAdapter(Vector2f.class, new Vector2fTypeAdapter())
                 .create();
     }
 

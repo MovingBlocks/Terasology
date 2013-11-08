@@ -26,8 +26,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -36,6 +34,7 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
@@ -45,6 +44,9 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -80,6 +82,10 @@ import org.terasology.rendering.assets.subtexture.SubtextureData;
 import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
@@ -89,6 +95,9 @@ import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.utilities.NativeHelper;
 import org.terasology.version.TerasologyVersion;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.shapes.BlockShapeData;
+import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.WorldGeneratorManager;
 
 import javax.swing.*;
@@ -161,9 +170,11 @@ public class TerasologyEngine implements GameEngine {
             initDisplay();
             initOpenGL();
             initOpenAL();
+            initAssets();
             initControls();
             updateInputConfig();
             CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
+            CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal());
 
             if (config.getSystem().isMonitoringEnabled()) {
                 new AdvancedMonitor().setVisible(true);
@@ -173,6 +184,30 @@ public class TerasologyEngine implements GameEngine {
             logger.error("Failed to initialise Terasology", t);
             throw new RuntimeException("Failed to initialise Terasology", t);
         }
+    }
+
+    private void initAssets() {
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+
+            @Override
+            public Prefab buildAsset(AssetUri uri, PrefabData data) {
+                return new PojoPrefab(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
+
+            @Override
+            public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
+                return new BlockShapeImpl(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
+            @Override
+            public UISkin buildAsset(AssetUri uri, UISkinData data) {
+                return new UISkin(uri, data);
+            }
+        });
     }
 
     private void initConfig() {

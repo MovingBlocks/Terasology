@@ -17,18 +17,21 @@ package org.terasology.input.events;
 
 
 import org.terasology.input.ButtonState;
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
 
 public class MouseDownButtonEvent extends MouseButtonEvent {
 
-    private static MouseDownButtonEvent event = new MouseDownButtonEvent(0, 0);
+    private static MouseDownButtonEvent event = new MouseDownButtonEvent(MouseInput.MOUSE_NONE, 0);
 
-    protected MouseDownButtonEvent(int button, float delta) {
+    protected MouseDownButtonEvent(MouseInput button, float delta) {
         super(button, ButtonState.DOWN, delta);
     }
 
-    public static MouseDownButtonEvent create(int button, float delta) {
+    public static MouseDownButtonEvent create(MouseInput button, Vector2i mousePos, float delta) {
         event.reset(delta);
         event.setButton(button);
+        event.setMousePosition(mousePos);
         return event;
     }
 }

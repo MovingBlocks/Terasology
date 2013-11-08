@@ -15,24 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
-
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
-    void pushScreen(UIScreen screen);
-
-    void popScreen();
-
-    void setScreen(UIScreen screen);
-
-    void closeScreens();
-
-    void render();
-
-    void update(float delta);
-
-    ClassLibrary<UIWidget> getWidgetMetadataLibrary();
+public enum WidgetCoordinate {
+    TOP,
+    RIGHT,
+    BOTTOM,
+    LEFT,
+    CENTER
 }

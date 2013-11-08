@@ -38,8 +38,8 @@ import org.terasology.math.Side;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
-import org.terasology.utilities.gson.Vector3fHandler;
-import org.terasology.utilities.gson.Vector4fHandler;
+import org.terasology.utilities.gson.Vector3fTypeAdapter;
+import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
@@ -96,8 +96,8 @@ public class BlockLoader implements BlockBuilderHelper {
                 .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
                 .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
                 .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
-                .registerTypeAdapter(Vector3f.class, new Vector3fHandler())
-                .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
+                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
+                .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
                 .create();
         cubeShape = (BlockShape) Assets.get(AssetType.SHAPE, "engine:cube");
         loweredShape = (BlockShape) Assets.get(AssetType.SHAPE, "engine:loweredCube");

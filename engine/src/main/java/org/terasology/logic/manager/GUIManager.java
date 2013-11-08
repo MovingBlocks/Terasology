@@ -442,7 +442,7 @@ public class GUIManager implements ComponentSystem {
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (isConsumingInput()) {
-            processMouseInput(event.getButton(), event.getState() != ButtonState.UP, 0);
+            processMouseInput(event.getButton().getId(), event.getState() != ButtonState.UP, 0);
 
             if (renderer.getWindowFocused() != null) {
                 if (renderer.getWindowFocused().isModal()) {

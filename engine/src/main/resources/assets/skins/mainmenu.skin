@@ -1,0 +1,43 @@
+{
+    "text-shadowed" : true,
+    "font" : "default",
+    "widgets" : {
+        "ArbitraryLayout" : {
+            "background-mode" : "scale_fill",
+            "background" : "menuBackground"
+        },
+        "UILabel" : {
+            "text-vertical-alignment" : "top"
+        },
+        "UIImage" : {
+            "texture-scale-mode" : "scale_fit"
+        },
+        "UIButton" : {
+            "text-horizontal-alignment" : "center",
+            "text-vertical-alignment" : "middle",
+            "background" : "button",
+            "background-border" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 2,
+                "right" : 2
+            },
+            "margin" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 2,
+                "right" : 2
+            },
+            "texture-scale-mode" : "scale_fit",
+            "modes" : {
+                "hover" : {
+                    "background" : "buttonOver"
+                },
+                "down" : {
+                    "background" : "buttonDown",
+                    "text-color" : "FFFF00FF"
+                }
+            }
+        }
+    }
+}

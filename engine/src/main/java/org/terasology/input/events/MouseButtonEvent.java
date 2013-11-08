@@ -16,15 +16,17 @@
 package org.terasology.input.events;
 
 
-import org.lwjgl.input.Mouse;
 import org.terasology.input.ButtonState;
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
 
 public class MouseButtonEvent extends ButtonEvent {
 
-    private int button;
+    private MouseInput button;
     private ButtonState state;
+    private Vector2i mousePosition = new Vector2i();
 
-    public MouseButtonEvent(int button, ButtonState state, float delta) {
+    public MouseButtonEvent(MouseInput button, ButtonState state, float delta) {
         super(delta);
         this.state = state;
         this.button = button;
@@ -34,20 +36,28 @@ public class MouseButtonEvent extends ButtonEvent {
         return state;
     }
 
-    public int getButton() {
+    public MouseInput getButton() {
         return button;
     }
 
     public String getMouseButtonName() {
-        return Mouse.getButtonName(button);
+        return button.toShortString();
     }
 
     public String getButtonName() {
         return "mouse:" + getMouseButtonName();
     }
 
-    protected void setButton(int button) {
+    public Vector2i getMousePosition() {
+        return new Vector2i(mousePosition);
+    }
+
+    protected void setButton(MouseInput button) {
         this.button = button;
+    }
+
+    protected void setMousePosition(Vector2i mousePosition) {
+        this.mousePosition.set(mousePosition);
     }
 
     public void reset() {

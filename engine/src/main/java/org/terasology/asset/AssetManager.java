@@ -62,20 +62,6 @@ public class AssetManager {
 
     public AssetManager(ModuleManager moduleManager) {
         this.moduleManager = moduleManager;
-        setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
-
-            @Override
-            public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                return new PojoPrefab(uri, data);
-            }
-        });
-        setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
-
-            @Override
-            public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
-                return new BlockShapeImpl(uri, data);
-            }
-        });
         for (AssetType type : AssetType.values()) {
             uriLookup.put(type, HashBasedTable.<String, String, AssetUri>create());
         }

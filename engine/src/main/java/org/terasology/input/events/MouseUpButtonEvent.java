@@ -17,18 +17,21 @@ package org.terasology.input.events;
 
 
 import org.terasology.input.ButtonState;
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
 
 public class MouseUpButtonEvent extends MouseButtonEvent {
 
-    private static MouseUpButtonEvent event = new MouseUpButtonEvent(0, 0);
+    private static MouseUpButtonEvent event = new MouseUpButtonEvent(MouseInput.MOUSE_NONE, 0);
 
-    protected MouseUpButtonEvent(int button, float delta) {
+    protected MouseUpButtonEvent(MouseInput button, float delta) {
         super(button, ButtonState.UP, delta);
     }
 
-    public static MouseUpButtonEvent create(int button, float delta) {
+    public static MouseUpButtonEvent create(MouseInput button, Vector2i position, float delta) {
         event.reset(delta);
         event.setButton(button);
+        event.setMousePosition(position);
         return event;
     }
 
