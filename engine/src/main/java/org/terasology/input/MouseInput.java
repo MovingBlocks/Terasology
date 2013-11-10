@@ -16,11 +16,9 @@
 
 package org.terasology.input;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +51,7 @@ public enum MouseInput {
         }
     }
 
-    private MouseInput(InputType type, int id, String shortString, String ... alternateStrings) {
+    private MouseInput(InputType type, int id, String shortString, String... alternateStrings) {
         this.type = type;
         this.id = id;
         this.shortString = shortString.toUpperCase(Locale.ENGLISH);

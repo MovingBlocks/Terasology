@@ -15,33 +15,10 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Canvas;
-
 /**
  * @author Immortius
  */
-public class UILabel extends AbstractWidget {
+public interface ButtonEventListener {
 
-    private String text = "";
-
-    public UILabel() {
-    }
-
-    public UILabel(String text) {
-        this.text = text;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        canvas.drawText(text);
-    }
+    void onButtonActivated(UIButton button);
 }

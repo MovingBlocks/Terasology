@@ -39,7 +39,6 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Border;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.InteractionListener;
@@ -65,7 +64,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -278,6 +276,9 @@ public class LwjglCanvas implements CanvasInternal {
     public void drawWidget(UIWidget widget, Rect2i region) {
         try (SubRegion ignored = subRegion(region, true)) {
             setWidget(widget.getClass());
+            if (widget.getFamily() != null) {
+                setFamily(widget.getFamily());
+            }
             setMode(widget.getMode());
             drawBackground();
             widget.onDraw(this);
@@ -549,8 +550,8 @@ public class LwjglCanvas implements CanvasInternal {
         if (border.getBottom() != 0) {
             // BOTTOM-LEFT CORNER
             if (border.getLeft() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom(), border.getLeft(), border.getBottom()), ScaleMode.STRETCH,
-                        ux, uy + uw - bottom, left, bottom);
+                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom(), border.getLeft(), border.getBottom()),
+                        ScaleMode.STRETCH, ux, uy + uw - bottom, left, bottom);
             }
             // BOTTOM BORDER
             Rect2i bottomArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.maxY() - border.getBottom(), centerHoriz, border.getBottom());
@@ -561,8 +562,8 @@ public class LwjglCanvas implements CanvasInternal {
             }
             // BOTTOM-RIGHT CORNER
             if (border.getRight() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.maxY() - border.getBottom(), border.getRight(), border.getBottom()),
-                        ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
+                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.maxY() - border.getBottom(), border.getRight(),
+                        border.getBottom()), ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
             }
         }
     }

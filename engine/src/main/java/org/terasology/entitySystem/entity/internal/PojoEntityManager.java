@@ -617,9 +617,17 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     }
 
     // For testing
-
-    public int getComponentCount(Class<? extends Component> componentClass) {
-        return store.getComponentCount(componentClass);
+    @Override
+    @SafeVarargs
+    public final int getCountOfEntitiesWith(Class<? extends Component> ... componentClasses) {
+        switch (componentClasses.length) {
+            case 0:
+                return store.numEntities();
+            case 1:
+                return store.getComponentCount(componentClasses[0]);
+            default:
+                return Lists.newArrayList(getEntitiesWith(componentClasses)).size();
+        }
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {

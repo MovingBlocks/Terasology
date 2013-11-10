@@ -272,14 +272,14 @@ public class PojoEntityManagerTest {
 
     @Test
     public void getComponentCountWhenNoComponents() {
-        assertEquals(0, entityManager.getComponentCount(StringComponent.class));
+        assertEquals(0, entityManager.getCountOfEntitiesWith(StringComponent.class));
     }
 
     @Test
     public void getComponentCount() {
         entityManager.create().addComponent(new StringComponent());
         entityManager.create().addComponent(new StringComponent());
-        assertEquals(2, entityManager.getComponentCount(StringComponent.class));
+        assertEquals(2, entityManager.getCountOfEntitiesWith(StringComponent.class));
     }
 
     @Test

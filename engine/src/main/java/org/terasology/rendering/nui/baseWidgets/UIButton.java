@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
@@ -22,7 +23,8 @@ import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIWidget;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -36,7 +38,9 @@ public class UIButton extends AbstractWidget {
 
     private boolean down;
 
-    private BaseInteractionListener listener = new BaseInteractionListener() {
+    private List<ButtonEventListener> listeners = Lists.newArrayList();
+
+    private BaseInteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
@@ -61,7 +65,12 @@ public class UIButton extends AbstractWidget {
     public UIButton() {
     }
 
-    public UIButton(String text) {
+    public UIButton(String id) {
+        super(id);
+    }
+
+    public UIButton(String id, String text) {
+        super(id);
         this.text = text;
     }
 
@@ -71,21 +80,23 @@ public class UIButton extends AbstractWidget {
             canvas.drawTexture(image);
         }
         canvas.drawText(text);
-        canvas.addInteractionRegion(listener);
+        canvas.addInteractionRegion(interactionListener);
     }
 
     @Override
     public String getMode() {
         if (down) {
             return DOWN_MODE;
-        } else if (listener.isMouseOver()) {
+        } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
     }
 
     private void activate() {
-
+        for (ButtonEventListener listener : listeners) {
+            listener.onButtonActivated(this);
+        }
     }
 
     public String getText() {
@@ -106,5 +117,13 @@ public class UIButton extends AbstractWidget {
 
     public void setImage(TextureRegion image) {
         this.image = image;
+    }
+
+    public void subscribe(ButtonEventListener listener) {
+        listeners.add(listener);
+    }
+
+    public void unsubscribe(ButtonEventListener listener) {
+        listeners.remove(listener);
     }
 }

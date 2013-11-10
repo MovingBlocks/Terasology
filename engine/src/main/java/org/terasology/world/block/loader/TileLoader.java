@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.engine.module.Module;
+import org.terasology.math.TeraMath;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -35,8 +36,6 @@ import java.util.List;
  */
 public class TileLoader implements AssetLoader<TileData> {
 
-    private static final int TILE_SIZE = 16;
-
     private static final Logger logger = LoggerFactory.getLogger(TileLoader.class);
 
     public TileLoader() {
@@ -45,10 +44,9 @@ public class TileLoader implements AssetLoader<TileData> {
     @Override
     public TileData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         BufferedImage image = ImageIO.read(stream);
-        if (image.getHeight() == TILE_SIZE && image.getWidth() == TILE_SIZE) {
-            return new TileData(image);
+        if (!TeraMath.isPowerOfTwo(image.getHeight()) || !(image.getWidth() == image.getHeight())) {
+            throw new IOException("Invalid tile - must be square with power-of-two sides");
         }
-        logger.error("Invalid tile '{}', tiles must be 16x16", module);
-        return null;
+        return new TileData(image);
     }
 }

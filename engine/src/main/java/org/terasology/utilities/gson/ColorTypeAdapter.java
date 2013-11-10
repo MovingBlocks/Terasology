@@ -31,7 +31,7 @@ public class ColorTypeAdapter implements JsonDeserializer<Color> {
     public Color deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
             String value = json.getAsString();
-            return new Color((int)Long.parseLong(value, 16));
+            return new Color((int) Long.parseLong(value, 16));
         }
         throw new JsonParseException("Did not find hexadecimal string for Color value");
     }

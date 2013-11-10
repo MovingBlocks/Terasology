@@ -45,7 +45,6 @@ import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.ColorTypeAdapter;
-import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

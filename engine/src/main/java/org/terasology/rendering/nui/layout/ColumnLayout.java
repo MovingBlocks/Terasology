@@ -76,10 +76,12 @@ public class ColumnLayout extends AbstractWidget {
                     canvas.drawWidget(widget, drawRegion);
                 }
 
-                currentOffset.add(cellSize);
                 if (++currentColumn == columns) {
                     currentColumn = 0;
                     currentOffset.x = 0;
+                    currentOffset.y += cellSize.y;
+                } else {
+                    currentOffset.x += cellSize.x;
                 }
             }
         }
@@ -90,5 +92,19 @@ public class ColumnLayout extends AbstractWidget {
         for (UIWidget widget : widgetList) {
             widget.update(delta);
         }
+    }
+
+    @Override
+    public <T extends UIWidget> T find(String targetId, Class<T> type) {
+        T result = super.find(targetId, type);
+        if (result == null) {
+            for (UIWidget widget : widgetList) {
+                result = widget.find(targetId, type);
+                if (result != null) {
+                    break;
+                }
+            }
+        }
+        return result;
     }
 }

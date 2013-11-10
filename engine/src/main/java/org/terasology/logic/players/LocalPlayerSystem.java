@@ -174,7 +174,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     @ReceiveEvent(components = CharacterComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        lookPitch = TeraMath.clamp(character.pitch - event.getValue(), -89, 89);
+        lookPitch = TeraMath.clamp(character.pitch + event.getValue(), -89, 89);
         event.consume();
     }
 

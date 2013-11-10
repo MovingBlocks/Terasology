@@ -19,4 +19,6 @@ package org.terasology.rendering.nui;
  * @author Immortius
  */
 public interface UIContainer extends UIWidget {
+
+    UIWidget find(String id);
 }

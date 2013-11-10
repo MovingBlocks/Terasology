@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.asset.Assets;
 import org.terasology.rendering.nui.skin.UISkin;
 
 /**
@@ -23,11 +24,14 @@ import org.terasology.rendering.nui.skin.UISkin;
 public class UIScreen {
 
     private UIWidget contents;
-    private UISkin skin;
+    private UISkin skin = Assets.getSkin("engine:default");
 
-    public UIScreen(UIWidget contents, UISkin skin) {
+    public void setContents(UIWidget contents) {
         this.contents = contents;
-        this.skin = skin;
+    }
+
+    public UIWidget getContents() {
+        return contents;
     }
 
     public void onDraw(Canvas canvas) {
@@ -45,5 +49,9 @@ public class UIScreen {
 
     public void update(float delta) {
         contents.update(delta);
+    }
+
+    public <T extends UIWidget> T find(String id, Class<T> type) {
+        return contents.find(id, type);
     }
 }

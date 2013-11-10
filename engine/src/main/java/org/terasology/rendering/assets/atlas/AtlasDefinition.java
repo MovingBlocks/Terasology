@@ -16,7 +16,6 @@
 package org.terasology.rendering.assets.atlas;
 
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.List;
 

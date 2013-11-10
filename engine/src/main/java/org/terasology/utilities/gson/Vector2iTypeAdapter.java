@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import org.terasology.math.Vector2i;
 
-import javax.vecmath.Vector2f;
 import java.lang.reflect.Type;
 
 /**

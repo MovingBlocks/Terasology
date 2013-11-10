@@ -16,6 +16,9 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Queues;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.classMetadata.DefaultClassLibrary;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
@@ -24,11 +27,11 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.KeyEvent;
@@ -39,12 +42,15 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIWidget;
 
+import java.lang.reflect.Field;
 import java.util.Deque;
 
 /**
  * @author Immortius
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
     private Deque<UIScreen> screens = Queues.newArrayDeque();
     private CanvasInternal canvas = new LwjglCanvas();
@@ -63,6 +69,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreen screen) {
+        inject(screen);
         screens.push(screen);
     }
 
@@ -76,6 +83,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void setScreen(UIScreen screen) {
         screens.clear();
+        inject(screen);
         screens.push(screen);
     }
 
@@ -86,7 +94,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     public void render() {
         canvas.preRender();
-        screens.peek().onDraw(canvas);
+        if (!screens.isEmpty()) {
+            screens.peek().onDraw(canvas);
+        }
         canvas.postRender();
     }
 
@@ -130,6 +140,20 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+    }
+
+    private void inject(Object object) {
+        for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
+            Object value = CoreRegistry.get(field.getType());
+            if (value != null) {
+                try {
+                    field.setAccessible(true);
+                    field.set(object, value);
+                } catch (IllegalAccessException e) {
+                    logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
+                }
+            }
+        }
     }
 
 }

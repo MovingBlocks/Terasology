@@ -56,6 +56,20 @@ public class ArbitraryLayout extends AbstractWidget {
         }
     }
 
+    @Override
+    public <T extends UIWidget> T find(String targetId, Class<T> type) {
+        T result = super.find(targetId, type);
+        if (result == null) {
+            for (WidgetInfo widgetInfo : widgets) {
+                result = widgetInfo.widget.find(targetId, type);
+                if (result != null) {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private abstract static class WidgetInfo {
         private UIWidget widget;
 
@@ -125,7 +139,4 @@ public class ArbitraryLayout extends AbstractWidget {
         }
     }
 
-    private static class Constraint {
-
-    }
 }

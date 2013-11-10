@@ -41,7 +41,6 @@ public class UIMenuMain extends UIWindow {
     private final UIButton configButton;
     private final UIButton joinButton;
     private final UIButton multiplayerButton;
-    private final UIButton testNewUI;
 
     private final UILabel version;
 
@@ -128,16 +127,6 @@ public class UIMenuMain extends UIWindow {
             }
         });
 
-        testNewUI = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        testNewUI.getLabel().setText("Test NUI");
-        testNewUI.setHorizontalAlign(EHorizontalAlign.CENTER);
-        testNewUI.setPosition(new Vector2f(0, 300f + 5 * 40f));
-        testNewUI.addClickListener(new ClickListener() {
-            @Override
-            public void click(UIDisplayElement element, int button) {
-                getGUIManager().openWindow("nuitest");
-            }
-        });
 
         addDisplayElement(title);
         addDisplayElement(version);
@@ -146,6 +135,5 @@ public class UIMenuMain extends UIWindow {
         addDisplayElement(singlePlayerButton);
         addDisplayElement(multiplayerButton);
         addDisplayElement(joinButton);
-        addDisplayElement(testNewUI);
     }
 }

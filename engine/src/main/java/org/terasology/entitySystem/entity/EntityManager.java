@@ -136,6 +136,12 @@ public interface EntityManager {
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
     /**
+     * @param componentClasses
+     * @return A count of entities with the provided component types
+     */
+    int getCountOfEntitiesWith(Class<? extends Component>... componentClasses);
+
+    /**
      * @return The event system being used by the entity manager
      */
     EventSystem getEventSystem();

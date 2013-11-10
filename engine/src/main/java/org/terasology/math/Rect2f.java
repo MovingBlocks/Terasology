@@ -15,16 +15,13 @@
  */
 package org.terasology.math;
 
-import com.google.common.collect.Lists;
-
 import javax.vecmath.Vector2f;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Immortius
  */
-public class Rect2f {
+public final class Rect2f {
     public static final Rect2f EMPTY = new Rect2f();
 
     // position

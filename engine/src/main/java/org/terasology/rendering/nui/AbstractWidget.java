@@ -20,6 +20,17 @@ package org.terasology.rendering.nui;
  */
 public abstract class AbstractWidget implements UIWidget {
 
+    private final String id;
+    private String family;
+
+    public AbstractWidget() {
+        id = "";
+    }
+
+    public AbstractWidget(String id) {
+        this.id = id;
+    }
+
     @Override
     public void update(float delta) {
     }
@@ -27,5 +38,28 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public String getMode() {
         return DEFAULT_MODE;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getFamily() {
+        return family;
+    }
+
+    @Override
+    public void setFamily(String family) {
+        this.family = family;
+    }
+
+    @Override
+    public <T extends UIWidget> T find(String targetId, Class<T> type) {
+        if (this.id.equals(targetId) && type.isInstance(this)) {
+            return type.cast(this);
+        }
+        return null;
     }
 }

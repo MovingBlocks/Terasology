@@ -28,13 +28,8 @@ import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.utilities.collection.NullIterator;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.shapes.BlockShapeData;
-import org.terasology.world.block.shapes.BlockShapeImpl;
 
 import java.io.IOException;
 import java.io.InputStream;

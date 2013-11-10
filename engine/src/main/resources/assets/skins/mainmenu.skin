@@ -39,5 +39,15 @@
                 }
             }
         }
+    },
+    "families" : {
+        "option-grid" : {
+            "widgets" : {
+                "UILabel" : {
+                    "text-vertical-alignment" : "middle",
+                    "text-horizontal-alignment" : "right"
+                }
+            }
+        }
     }
 }

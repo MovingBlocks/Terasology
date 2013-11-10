@@ -40,7 +40,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
