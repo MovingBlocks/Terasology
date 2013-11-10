@@ -22,10 +22,13 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * @author Immortius
  */
 public enum ViewDistance {
-    NEAR(0, 8),
-    MODERATE(1, 16),
-    FAR(2, 32),
-    ULTRA(3, 64);
+
+    LEGALLY_BLIND(0,4),
+    NEAR(1, 8),
+    MODERATE(2, 16),
+    FAR(3, 32),
+    ULTRA(4, 64),
+    MEGA(5, 128);
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 
@@ -54,7 +57,7 @@ public enum ViewDistance {
     public static ViewDistance forIndex(int viewDistanceLevel) {
         ViewDistance result = indexLookup.get(viewDistanceLevel);
         if (result == null) {
-            return NEAR;
+            return LEGALLY_BLIND;
         }
         return result;
     }
