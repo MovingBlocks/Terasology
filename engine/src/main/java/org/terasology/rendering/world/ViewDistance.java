@@ -23,7 +23,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  */
 public enum ViewDistance {
 
-    LEGALLY_BLIND(0,4),
+    LEGALLY_BLIND(0, 4),
     NEAR(1, 8),
     MODERATE(2, 16),
     FAR(3, 32),
