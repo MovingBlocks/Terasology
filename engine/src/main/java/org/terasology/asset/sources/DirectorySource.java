@@ -52,7 +52,7 @@ public class DirectorySource extends AbstractSource {
                 } else if (Files.isRegularFile(child)) {
                     Path relativePath = basePath.relativize(child);
                     Path modulePath = relativePath.subpath(0, 1);
-                    AssetUri uri = getUri(modulePath.toString(), modulePath.relativize(child));
+                    AssetUri uri = getUri(modulePath.toString(), modulePath.relativize(relativePath));
                     if (uri != null) {
                         try {
                             addOverride(uri, child.toUri().toURL());
