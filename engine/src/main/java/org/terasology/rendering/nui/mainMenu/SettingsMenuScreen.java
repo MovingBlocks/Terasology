@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
@@ -40,6 +41,9 @@ public class SettingsMenuScreen extends UIScreen {
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private Config config;
 
     public SettingsMenuScreen() {
         ColumnLayout grid = new ColumnLayout();
@@ -85,6 +89,7 @@ public class SettingsMenuScreen extends UIScreen {
         find("close", UIButton.class).subscribe(new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
+                config.save();
                 nuiManager.popScreen();
             }
         });

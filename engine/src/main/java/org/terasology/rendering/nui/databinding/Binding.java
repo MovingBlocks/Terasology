@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.databinding;
 
 /**
  * @author Immortius
  */
-public class UIToggleButton {
+public interface Binding<T> {
+
+    T get();
+
+    void set(T value);
 }

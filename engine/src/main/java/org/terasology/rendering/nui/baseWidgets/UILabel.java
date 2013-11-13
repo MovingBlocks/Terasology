@@ -17,31 +17,37 @@ package org.terasology.rendering.nui.baseWidgets;
 
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DirectBinding;
 
 /**
  * @author Immortius
  */
 public class UILabel extends AbstractWidget {
 
-    private String text = "";
+    private Binding<String> text = new DirectBinding<>("");
 
     public UILabel() {
     }
 
     public UILabel(String text) {
+        this.text.set(text);
+    }
+
+    public UILabel(Binding<String> text) {
         this.text = text;
     }
 
     public String getText() {
-        return text;
+        return text.get();
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text.set(text);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.drawText(text);
+        canvas.drawText(text.get());
     }
 }

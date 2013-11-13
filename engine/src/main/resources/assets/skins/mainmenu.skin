@@ -7,14 +7,14 @@
             "background" : "menuBackground"
         },
         "UILabel" : {
-            "text-vertical-alignment" : "top"
+            "text-align-vertical" : "top"
         },
         "UIImage" : {
             "texture-scale-mode" : "scale_fit"
         },
         "UIButton" : {
-            "text-horizontal-alignment" : "center",
-            "text-vertical-alignment" : "middle",
+            "text-align-horizontal" : "center",
+            "text-align-vertical" : "middle",
             "background" : "button",
             "background-border" : {
                 "top" : 2,
@@ -38,14 +38,30 @@
                     "text-color" : "FFFF00FF"
                 }
             }
+        },
+        "UICheckbox" : {
+            "background" : "engine:checkbox",
+            "fixed-width" : 24,
+            "fixed-height" : 24,
+            "modes" : {
+                "hover" : {
+                    "background" : "engine:checkboxHover"
+                },
+                "active" : {
+                    "background" : "engine:checkboxChecked"
+                },
+                "hover-active" : {
+                    "background" : "engine:checkboxCheckedHover"
+                }
+            }
         }
     },
     "families" : {
         "option-grid" : {
             "widgets" : {
                 "UILabel" : {
-                    "text-vertical-alignment" : "middle",
-                    "text-horizontal-alignment" : "right"
+                    "text-align-vertical" : "middle",
+                    "text-align-horizontal" : "right"
                 }
             }
         }

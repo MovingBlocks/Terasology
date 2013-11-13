@@ -21,23 +21,23 @@ package org.terasology.rendering.nui;
 public enum VerticalAlign {
     TOP {
         @Override
-        public int getOffset(int availableHeight, int elementHeight) {
+        public int getOffset(int elementHeight, int availableHeight) {
             return 0;
         }
     },
     MIDDLE {
         @Override
-        public int getOffset(int availableHeight, int elementHeight) {
+        public int getOffset(int elementHeight, int availableHeight) {
             return (availableHeight - elementHeight) / 2;
         }
     },
 
     BOTTOM {
         @Override
-        public int getOffset(int availableHeight, int elementHeight) {
+        public int getOffset(int elementHeight, int availableHeight) {
             return availableHeight - elementHeight;
         }
     };
 
-    public abstract int getOffset(int availableHeight, int elementHeight);
+    public abstract int getOffset(int elementHeight, int availableHeight);
 }

@@ -113,6 +113,31 @@ public class UISkinBuilder {
         return this;
     }
 
+    public UISkinBuilder setBackgroundAutomaticallyDrawn(boolean autoDraw) {
+        currentStyle.autoDrawBackground = autoDraw;
+        return this;
+    }
+
+    public UISkinBuilder setFixedWidth(int width) {
+        currentStyle.fixedWidth = width;
+        return this;
+    }
+
+    public UISkinBuilder setFixedHeight(int height) {
+        currentStyle.fixedHeight = height;
+        return this;
+    }
+
+    public UISkinBuilder setHorizontalAlignment(HorizontalAlign align) {
+        currentStyle.alignmentH = align;
+        return this;
+    }
+
+    public UISkinBuilder setVerticalAlignment(VerticalAlign align) {
+        currentStyle.alignmentV = align;
+        return this;
+    }
+
     public UISkinBuilder setMargin(Border margin) {
         currentStyle.margin = margin;
         return this;
@@ -257,6 +282,12 @@ public class UISkinBuilder {
         private VerticalAlign textAlignmentV;
         private Boolean textShadowed;
 
+        private Boolean autoDrawBackground;
+        private Integer fixedWidth;
+        private Integer fixedHeight;
+        private HorizontalAlign alignmentH;
+        private VerticalAlign alignmentV;
+
         public void applyTo(UIStyle style) {
             if (backgroundSet) {
                 style.setBackground(background);
@@ -290,6 +321,21 @@ public class UISkinBuilder {
             }
             if (textShadowed != null) {
                 style.setTextShadowed(textShadowed);
+            }
+            if (autoDrawBackground != null) {
+                style.setBackgroundAutomaticallyDrawn(autoDrawBackground);
+            }
+            if (fixedWidth != null) {
+                style.setFixedWidth(fixedWidth);
+            }
+            if (fixedHeight != null) {
+                style.setFixedHeight(fixedHeight);
+            }
+            if (alignmentH != null) {
+                style.setHorizontalAlignment(alignmentH);
+            }
+            if (alignmentV != null) {
+                style.setVerticalAlignment(alignmentV);
             }
         }
     }

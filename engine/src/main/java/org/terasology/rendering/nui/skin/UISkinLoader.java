@@ -158,8 +158,18 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         public Border backgroundBorder;
         @SerializedName("background-scale-mode")
         public ScaleMode backgroundScaleMode;
+        @SerializedName("background-auto-draw")
+        public Boolean backgroundAutomaticallyDrawn;
 
         public Border margin;
+        @SerializedName("fixed-width")
+        public Integer fixedWidth;
+        @SerializedName("fixed-height")
+        public Integer fixedHeight;
+        @SerializedName("align-horizontal")
+        public HorizontalAlign alignmentH;
+        @SerializedName("align-vertical")
+        public VerticalAlign alignmentV;
 
         @SerializedName("texture-scale-mode")
         public ScaleMode textureScaleMode;
@@ -170,9 +180,9 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         @SerializedName("text-shadow-color")
         public Color textShadowColor;
 
-        @SerializedName("text-horizontal-alignment")
+        @SerializedName("text-align-horizontal")
         public HorizontalAlign textAlignmentH;
-        @SerializedName("text-vertical-alignment")
+        @SerializedName("text-align-vertical")
         public VerticalAlign textAlignmentV;
         @SerializedName("text-shadowed")
         public Boolean textShadowed;
@@ -210,6 +220,21 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
             }
             if (textShadowed != null) {
                 builder.setTextShadowed(textShadowed);
+            }
+            if (backgroundAutomaticallyDrawn != null) {
+                builder.setBackgroundAutomaticallyDrawn(backgroundAutomaticallyDrawn);
+            }
+            if (fixedWidth != null) {
+                builder.setFixedWidth(fixedWidth);
+            }
+            if (fixedHeight != null) {
+                builder.setFixedHeight(fixedHeight);
+            }
+            if (alignmentH != null) {
+                builder.setHorizontalAlignment(alignmentH);
+            }
+            if (alignmentV != null) {
+                builder.setVerticalAlignment(alignmentV);
             }
         }
     }

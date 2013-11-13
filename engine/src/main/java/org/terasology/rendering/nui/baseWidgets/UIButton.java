@@ -19,10 +19,11 @@ import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
-import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DirectBinding;
 
 import java.util.List;
 
@@ -33,8 +34,8 @@ public class UIButton extends AbstractWidget {
     public static final String HOVER_MODE = "hover";
     public static final String DOWN_MODE = "down";
 
-    private TextureRegion image;
-    private String text = "";
+    private Binding<TextureRegion> image = new DirectBinding<>();
+    private Binding<String> text = new DirectBinding<>("");
 
     private boolean down;
 
@@ -71,15 +72,20 @@ public class UIButton extends AbstractWidget {
 
     public UIButton(String id, String text) {
         super(id);
+        this.text.set(text);
+    }
+
+    public UIButton(String id, Binding<String> text) {
+        super(id);
         this.text = text;
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (image != null) {
-            canvas.drawTexture(image);
+        if (image.get() != null) {
+            canvas.drawTexture(image.get());
         }
-        canvas.drawText(text);
+        canvas.drawText(text.get());
         canvas.addInteractionRegion(interactionListener);
     }
 
@@ -99,24 +105,28 @@ public class UIButton extends AbstractWidget {
         }
     }
 
+    public void bindText(Binding<String> binding) {
+        this.text = binding;
+    }
+
     public String getText() {
-        return text;
+        return text.get();
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text.set(text);
     }
 
-    public void setImage(Subtexture image) {
-        this.image = image;
-    }
-
-    public TextureRegion getImage() {
-        return image;
+    public void bindImage(Binding<TextureRegion> binding) {
+        this.image = binding;
     }
 
     public void setImage(TextureRegion image) {
-        this.image = image;
+        this.image.set(image);
+    }
+
+    public TextureRegion getImage() {
+        return image.get();
     }
 
     public void subscribe(ButtonEventListener listener) {

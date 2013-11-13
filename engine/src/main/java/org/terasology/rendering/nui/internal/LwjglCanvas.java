@@ -274,13 +274,24 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawWidget(UIWidget widget, Rect2i region) {
-        try (SubRegion ignored = subRegion(region, true)) {
+        UIStyle newStyle = state.skin.getStyleFor((widget.getFamily() != null) ? widget.getFamily() : state.family, widget.getClass(), widget.getMode());
+        Rect2i regionArea = region;
+        if (newStyle.getFixedWidth() != 0 || newStyle.getFixedHeight() != 0) {
+            int newWidth = (newStyle.getFixedWidth() != 0) ? newStyle.getFixedWidth() : region.width();
+            int newHeight = (newStyle.getFixedHeight() != 0) ? newStyle.getFixedHeight() : region.height();
+            int newMinX = region.minX() + newStyle.getHorizontalAlignment().getOffset(newWidth, region.width());
+            int newMinY = region.minY() + newStyle.getVerticalAlignment().getOffset(newHeight, region.height());
+            regionArea = Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
+        }
+        try (SubRegion ignored = subRegion(regionArea, true)) {
             setWidget(widget.getClass());
             if (widget.getFamily() != null) {
                 setFamily(widget.getFamily());
             }
             setMode(widget.getMode());
-            drawBackground();
+            if (newStyle.isBackgroundAutomaticallyDrawn()) {
+                drawBackground();
+            }
             widget.onDraw(this);
         }
     }
@@ -379,7 +390,7 @@ public class LwjglCanvas implements CanvasInternal {
         }
 
         Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
-        offset.y += vAlign.getOffset(region.height(), lines.size() * font.getLineHeight());
+        offset.y += vAlign.getOffset(lines.size() * font.getLineHeight(), region.height());
 
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {

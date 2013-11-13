@@ -18,33 +18,39 @@ package org.terasology.rendering.nui.baseWidgets;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DirectBinding;
 
 /**
  * @author Immortius
  */
 public class UIImage extends AbstractWidget {
-    private TextureRegion texture;
+    private Binding<TextureRegion> texture = new DirectBinding<>();
 
     public UIImage() {
     }
 
     public UIImage(TextureRegion texture) {
-        this.texture = texture;
+        this.texture.set(texture);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (texture != null) {
-            canvas.drawTexture(texture);
+        if (texture.get() != null) {
+            canvas.drawTexture(texture.get());
         }
     }
 
     public TextureRegion getTexture() {
-        return texture;
+        return texture.get();
     }
 
     public void setTexture(TextureRegion texture) {
-        this.texture = texture;
+        this.texture.set(texture);
+    }
+
+    public void bindTexture(Binding<TextureRegion> binding) {
+        this.texture = binding;
     }
 
 }
