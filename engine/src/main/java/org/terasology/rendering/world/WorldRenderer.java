@@ -56,7 +56,6 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.ChunkView;
 import org.terasology.world.TimerEvent;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
@@ -178,7 +177,7 @@ public final class WorldRenderer {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
-        chunkTessellator = new ChunkTessellator(worldProvider.getBiomeProvider());
+        chunkTessellator = new ChunkTessellator(worldProvider);
         skysphere = new Skysphere(this);
         chunkUpdateManager = new ChunkUpdateManager(chunkTessellator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
@@ -1232,9 +1231,10 @@ public final class WorldRenderer {
         return skysphere.getDaylight();
     }
 
-    public WorldBiomeProvider.Biome getPlayerBiome() {
+    //TODO: make this data into key value pairs
+    public String getPlayerBiome() {
         Vector3f pos = getPlayerPosition();
-        return worldProvider.getBiomeProvider().getBiomeAt(pos.x, pos.z);
+        return "Unknown";
     }
 
     public WorldProvider getWorldProvider() {

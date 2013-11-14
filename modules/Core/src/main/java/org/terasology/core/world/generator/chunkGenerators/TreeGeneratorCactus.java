@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.block.Block;
 
 /**
- * @author Immortius
+ * Cactus generator.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface WorldGenerator {
-    SimpleUri getUri();
+public class TreeGeneratorCactus extends TreeGenerator {
 
-    void setWorldSeed(String seed);
+    private Block cactus;
 
-    void applySecondPass(Vector3i chunkPos, ChunkView view);
+    @Override
+    public void generate(ChunkView view, Random rand, int posX, int posY, int posZ) {
+        for (int y = posY; y < posY + 3; y++) {
+            view.setBlock(posX, y, posZ, cactus);
+        }
+    }
 
-    Chunk createChunk(Vector3i pos);
-
-    //TODO: create a WorldInfo interface to contain the fog, temp, and humidity
-    float getFog(float x, float y, float z);
-
-    float getTemperature(float x, float y, float z);
-
-    float getHumidity(float x, float y, float z);
-
+    public TreeGenerator setTrunkType(Block b) {
+        cactus = b;
+        return this;
+    }
 }

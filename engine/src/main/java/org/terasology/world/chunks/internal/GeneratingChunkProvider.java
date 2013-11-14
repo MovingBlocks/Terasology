@@ -19,6 +19,8 @@ package org.terasology.world.chunks.internal;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.generator.WorldGenerator;
 
 /**
  * Internal interface used within the chunk generation system, allows a chunk provider to manage "generation" (including
@@ -26,7 +28,7 @@ import org.terasology.world.chunks.Chunk;
  *
  * @author Immortius
  */
-public interface GeneratingChunkProvider {
+public interface GeneratingChunkProvider extends ChunkProvider {
 
     /**
      * @param pos
@@ -64,4 +66,6 @@ public interface GeneratingChunkProvider {
      * @param position
      */
     void onChunkIsReady(Vector3i position);
+
+    WorldGenerator getWorldGenerator();
 }

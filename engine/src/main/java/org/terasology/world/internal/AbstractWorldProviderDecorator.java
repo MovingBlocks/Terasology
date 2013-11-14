@@ -18,7 +18,6 @@ package org.terasology.world.internal;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
@@ -49,11 +48,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public WorldInfo getWorldInfo() {
         return base.getWorldInfo();
-    }
-
-    @Override
-    public WorldBiomeProvider getBiomeProvider() {
-        return base.getBiomeProvider();
     }
 
     @Override
@@ -134,5 +128,15 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public float getFog(float x, float y, float z) {
         return base.getFog(x, y, z);
+    }
+
+    @Override
+    public float getTemperature(float x, float y, float z) {
+        return base.getTemperature(x, y, z);
+    }
+
+    @Override
+    public float getHumidity(float x, float y, float z) {
+        return base.getHumidity(x, y, z);
     }
 }

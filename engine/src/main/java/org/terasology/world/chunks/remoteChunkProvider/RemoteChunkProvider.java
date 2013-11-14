@@ -38,6 +38,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
+import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.LightWorldView;
@@ -220,6 +221,12 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         } catch (InterruptedException e) {
             logger.warn("Failed to add chunk to ready queue", e);
         }
+    }
+
+    @Override
+    public WorldGenerator getWorldGenerator() {
+        //TODO: send this information over the wire
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {

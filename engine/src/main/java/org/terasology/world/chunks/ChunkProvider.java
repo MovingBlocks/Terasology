@@ -105,7 +105,6 @@ public interface ChunkProvider {
      * @return The chunk, or null if the chunk is not ready
      */
     Chunk getChunk(int x, int y, int z);
-
     /**
      * Returns the chunk at the given position if possible.
      *

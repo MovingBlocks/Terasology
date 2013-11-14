@@ -574,6 +574,11 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
+    public WorldGenerator getWorldGenerator() {
+        return generator;
+    }
+
+    @Override
     public boolean isChunkReady(Vector3i pos) {
         return isChunkReady(nearCache.get(pos));
     }

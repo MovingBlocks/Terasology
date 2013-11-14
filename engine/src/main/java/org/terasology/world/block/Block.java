@@ -140,10 +140,6 @@ public final class Block {
     private boolean supportRequired;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
 
-    // Special liquid flags (TODO: clean this up)
-    private boolean water;
-    private boolean lava;
-
     // Rendering related
     private boolean invisible;
     private boolean translucent;
@@ -257,22 +253,6 @@ public final class Block {
 
     public void setLiquid(boolean liquid) {
         this.liquid = liquid;
-    }
-
-    public boolean isWater() {
-        return water;
-    }
-
-    public void setWater(boolean water) {
-        this.water = water;
-    }
-
-    public boolean isLava() {
-        return lava;
-    }
-
-    public void setLava(boolean lava) {
-        this.lava = lava;
     }
 
     /**

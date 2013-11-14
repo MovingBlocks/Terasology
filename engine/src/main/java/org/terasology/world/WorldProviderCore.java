@@ -48,11 +48,6 @@ public interface WorldProviderCore {
     WorldInfo getWorldInfo();
 
     /**
-     * @return Thw world's biome provider
-     */
-    WorldBiomeProvider getBiomeProvider();
-
-    /**
      * Process any propagation, such as light
      */
     void processPropagation();
@@ -157,4 +152,7 @@ public interface WorldProviderCore {
 
     float getFog(float x, float y, float z);
 
+    float getTemperature(float x, float y, float z);
+
+    float getHumidity(float x, float y, float z);
 }

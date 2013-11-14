@@ -26,13 +26,13 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.ChunkView;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
 import org.terasology.world.liquid.LiquidData;
@@ -56,8 +56,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private String seed = "";
     private SimpleUri worldGenerator;
 
-    private WorldBiomeProvider biomeProvider;
-    private ChunkProvider chunkProvider;
+    private GeneratingChunkProvider chunkProvider;
     private WorldTime worldTime;
 
     private PerlinNoise fogNoise;
@@ -67,11 +66,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
-        this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
         this.fogNoise = new PerlinNoise(seed.hashCode() + 42 * 42);
         this.fogNoise.setOctaves(8);
@@ -83,7 +81,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(chunkProvider)));
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider) {
         this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider);
     }
 
@@ -100,11 +98,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public WorldInfo getWorldInfo() {
         return new WorldInfo(title, seed, worldTime.getMilliseconds(), worldGenerator);
-    }
-
-    @Override
-    public WorldBiomeProvider getBiomeProvider() {
-        return biomeProvider;
     }
 
     @Override
@@ -298,6 +291,16 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public float getFog(float x, float y, float z) {
-        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.fBm(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * biomeProvider.getFog(x, y, z);
+        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.fBm(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
+    }
+
+    @Override
+    public float getTemperature(float x, float y, float z) {
+        return chunkProvider.getWorldGenerator().getTemperature(x, y, z);
+    }
+
+    @Override
+    public float getHumidity(float x, float y, float z) {
+        return chunkProvider.getWorldGenerator().getHumidity(x, y, z);
     }
 }
