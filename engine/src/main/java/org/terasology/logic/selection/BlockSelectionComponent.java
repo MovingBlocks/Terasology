@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.selection;
 
+import org.terasology.engine.API;
 import org.terasology.entitySystem.Component;
 
 /**
@@ -26,5 +27,6 @@ import org.terasology.entitySystem.Component;
  *
  * @author synopia
  */
+@API
 public class BlockSelectionComponent implements Component {
 }
