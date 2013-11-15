@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
-
-import org.terasology.engine.API;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.terasology.core.benchmark;
 
 /**
- * @author Immortius
+ * Benchmark is an abstract class which is used to implement one particular benchmark.
+ *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@API
-public @interface RegisterWorldGenerator {
-    String id();
+public interface Benchmark {
 
-    String displayName();
+    String getTitle();
 
-    String description() default "";
+    int getWarmupRepetitions();
 
+    int[] getRepetitions();
+
+    void setup();
+
+    void prerun();
+
+    void run();
+
+    void postrun();
+
+    void finish(boolean aborted);
 }

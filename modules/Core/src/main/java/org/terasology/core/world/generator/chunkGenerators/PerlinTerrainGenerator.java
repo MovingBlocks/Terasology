@@ -17,6 +17,7 @@
 package org.terasology.core.world.generator.chunkGenerators;
 
 import org.terasology.core.world.generator.BiomeProviderDependentFirstPassGenerator;
+import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.PerlinNoise;

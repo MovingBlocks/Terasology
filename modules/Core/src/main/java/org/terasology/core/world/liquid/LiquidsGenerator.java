@@ -15,9 +15,9 @@
  */
 package org.terasology.core.world.liquid;
 
+import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -76,11 +76,6 @@ public class LiquidsGenerator implements FirstPassGenerator {
     @Override
     public void setWorldSeed(String value) {
         this.seed = value;
-    }
-
-    @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider value) {
-        this.biomeProvider = value;
     }
 
     @Override

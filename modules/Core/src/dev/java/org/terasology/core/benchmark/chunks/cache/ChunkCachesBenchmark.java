@@ -13,26 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+package org.terasology.core.benchmark.chunks.cache;
 
-import org.terasology.engine.API;
+public final class ChunkCachesBenchmark {
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+    private ChunkCachesBenchmark() {
+    }
 
-/**
- * @author Immortius
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@API
-public @interface RegisterWorldGenerator {
-    String id();
+    public static void main(String[] args) {
 
-    String displayName();
-
-    String description() default "";
+    }
 
 }

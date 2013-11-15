@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
-
-import org.terasology.engine.API;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.terasology.core.benchmark;
 
 /**
- * @author Immortius
+ * BenchmarkCallback allows to watch the progress of the execution of one or many benchmarks.
+ *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@API
-public @interface RegisterWorldGenerator {
-    String id();
+public interface BenchmarkCallback {
 
-    String displayName();
+    void begin(Benchmark benchmark, int benchmarkIndex, int benchmarkCount);
 
-    String description() default "";
+    void warmup(Benchmark benchmark, boolean finished);
+
+    void progress(Benchmark benchmark, double percent);
+
+    void success(BenchmarkResult result);
+
+    void aborted(BenchmarkResult result);
+
+    void error(BenchmarkError.Type type, Exception e, BenchmarkResult result);
+
+    void fatal(Exception e);
 
 }

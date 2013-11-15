@@ -19,7 +19,6 @@ package org.terasology.testUtil;
 import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
@@ -53,11 +52,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public WorldBiomeProvider getBiomeProvider() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -145,6 +139,16 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public float getFog(float x, float y, float z) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public float getTemperature(float x, float y, float z) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public float getHumidity(float x, float y, float z) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

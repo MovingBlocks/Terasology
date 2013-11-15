@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.core.world.WorldBiomeProvider;
+import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
@@ -54,10 +55,13 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
+        biomeProvider = new WorldBiomeProviderImpl(seed);
         for (final BaseChunkGenerator generator : firstPassGenerators) {
+            setBiome(generator);
             generator.setWorldSeed(seed);
         }
         for (final BaseChunkGenerator generator : secondPassGenerators) {
+            setBiome(generator);
             generator.setWorldSeed(seed);
         }
     }
@@ -73,10 +77,14 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
     }
 
     private void registerBaseChunkGenerator(final BaseChunkGenerator generator) {
+        setBiome(generator);
+        generator.setWorldSeed(worldSeed);
+    }
+
+    private void setBiome(BaseChunkGenerator generator) {
         if( generator instanceof BiomeProviderDependent) {
             ((BiomeProviderDependent)generator).setWorldBiomeProvider(biomeProvider);
         }
-        generator.setWorldSeed(worldSeed);
     }
 
     @Override
