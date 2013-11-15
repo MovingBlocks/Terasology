@@ -55,7 +55,7 @@ public class BlockSelectionRenderer {
     private Material defaultTextured;
 
     public BlockSelectionRenderer() {
-        effectsTexture = Assets.getTexture("Pathfinding:greyMask");
+        effectsTexture = Assets.getTexture("engine:selection");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(1.f / effectsTexture.getWidth(), 1.f / effectsTexture.getHeight());
 
