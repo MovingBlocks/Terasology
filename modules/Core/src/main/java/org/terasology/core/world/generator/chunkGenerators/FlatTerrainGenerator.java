@@ -23,6 +23,7 @@ import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkAPI;
 import org.terasology.world.generator.FirstPassGenerator;
 
 import java.util.HashMap;
@@ -119,7 +120,7 @@ public class FlatTerrainGenerator implements BiomeProviderDependentFirstPassGene
     }
 
     @Override
-    public void generateChunk(final Chunk chunk) {
+    public void generateChunk(final ChunkAPI chunk) {
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));

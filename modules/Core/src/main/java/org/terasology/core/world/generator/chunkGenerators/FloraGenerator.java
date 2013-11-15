@@ -26,6 +26,7 @@ import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkAPI;
 
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class FloraGenerator implements BiomeProviderDependentFirstPassGenerator 
     }
 
     @Override
-    public void generateChunk(Chunk c) {
+    public void generateChunk(ChunkAPI c) {
         // TODO: Better seeding mechanism
         FastRandom random = new FastRandom(worldSeed.hashCode() ^ (c.getPos().x + 39L * (c.getPos().y + 39L * c.getPos().z)));
         for (int y = 0; y < Chunk.SIZE_Y; y++) {
@@ -101,7 +102,7 @@ public class FloraGenerator implements BiomeProviderDependentFirstPassGenerator 
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      */
-    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, Random random) {
+    private void generateGrassAndFlowers(ChunkAPI c, int x, int y, int z, Random random) {
         Block targetBlock = c.getBlock(x, y, z);
         if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 

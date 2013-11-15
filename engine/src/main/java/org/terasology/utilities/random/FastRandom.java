@@ -15,11 +15,14 @@
  */
 package org.terasology.utilities.random;
 
+import org.terasology.engine.API;
+
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+@API
 public class FastRandom extends Random {
 
     private long seed = System.currentTimeMillis();

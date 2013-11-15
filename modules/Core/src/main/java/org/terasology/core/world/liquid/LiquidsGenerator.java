@@ -21,6 +21,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkAPI;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -54,7 +55,7 @@ public class LiquidsGenerator implements FirstPassGenerator {
     }
 
     @Override
-    public void generateChunk(Chunk c) {
+    public void generateChunk(ChunkAPI c) {
         // TODO: Better seeding mechanism
         FastRandom random = new FastRandom(seed.hashCode() ^ (c.getPos().x + 39L * (c.getPos().y + 39L * c.getPos().z)));
         boolean grassGenerated = false;

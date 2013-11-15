@@ -36,7 +36,7 @@ public class MixedWorldGenerator extends AbstractBaseWorldGenerator {
         register(new FloraGenerator());
         register(new LiquidsGenerator());
         ForestGenerator forestGenerator = new ForestGenerator();
-        new DefaultGenerators(forestGenerator);
+        DefaultGenerators.AddDefaultForestGenerators(forestGenerator);
         register(forestGenerator);
     }
 }

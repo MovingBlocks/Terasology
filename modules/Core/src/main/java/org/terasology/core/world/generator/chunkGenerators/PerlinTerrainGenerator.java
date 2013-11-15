@@ -25,6 +25,7 @@ import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkAPI;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -95,7 +96,7 @@ public class PerlinTerrainGenerator implements BiomeProviderDependentFirstPassGe
     }
 
     @Override
-    public void generateChunk(Chunk c) {
+    public void generateChunk(ChunkAPI c) {
         double[][][] densityMap = new double[Chunk.SIZE_X + 1][Chunk.SIZE_Y + 1][Chunk.SIZE_Z + 1];
 
         /*
@@ -180,12 +181,12 @@ public class PerlinTerrainGenerator implements BiomeProviderDependentFirstPassGe
         }
     }
 
-    private void generateInnerLayer(int x, int y, int z, Chunk c, WorldBiomeProvider.Biome type) {
+    private void generateInnerLayer(int x, int y, int z, ChunkAPI c, WorldBiomeProvider.Biome type) {
         // TODO: GENERATE MINERALS HERE - config waiting at org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
         c.setBlock(x, y, z, stone);
     }
 
-    private void generateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, WorldBiomeProvider.Biome type) {
+    private void generateOuterLayer(int x, int y, int z, int firstBlockHeight, ChunkAPI c, WorldBiomeProvider.Biome type) {
 
         int depth = (firstBlockHeight - y);
 

@@ -554,7 +554,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
                         @Override
                         public void enact() {
-                            Chunk chunk = generator.createChunk(getPosition());
+                            Chunk chunk = new Chunk(getPosition());
+                            generator.createChunk(chunk);
                             if (nearCache.putIfAbsent(getPosition(), chunk) != null) {
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }

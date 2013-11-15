@@ -27,6 +27,7 @@ import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkAPI;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -101,7 +102,7 @@ public class BasicHMTerrainGenerator implements BiomeProviderDependentFirstPassG
      *
      * @param c
      */
-    public void generateChunk(Chunk c) {
+    public void generateChunk(ChunkAPI c) {
 
         int hmX = (((c.getChunkWorldPosX() / Chunk.SIZE_X) % 512) + 512) % 512;
         int hmZ = (((c.getChunkWorldPosZ() / Chunk.SIZE_Z) % 512) + 512) % 512;

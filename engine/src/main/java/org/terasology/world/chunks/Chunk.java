@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
-public class Chunk {
+public class Chunk implements ChunkAPI {
 
     public static final int SIZE_X = 16;
     public static final int SIZE_Y = 256;
@@ -234,14 +234,17 @@ public class Chunk {
                 + extraData.getEstimatedMemoryConsumptionInBytes();
     }
 
+    @Override
     public Block getBlock(Vector3i pos) {
         return blockManager.getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
     }
 
+    @Override
     public Block getBlock(int x, int y, int z) {
         return blockManager.getBlock((byte) blockData.get(x, y, z));
     }
 
+    @Override
     public Block setBlock(int x, int y, int z, Block block) {
         int oldValue = blockData.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
@@ -252,6 +255,7 @@ public class Chunk {
         return blockManager.getBlock((short) oldValue);
     }
 
+    @Override
     public Block setBlock(Vector3i pos, Block block) {
         return setBlock(pos.x, pos.y, pos.z, block);
     }
@@ -290,55 +294,68 @@ public class Chunk {
         return lightData.set(x, y, z, amount) != amount;
     }
 
+    @Override
     public void setLiquid(Vector3i pos, LiquidData state) {
         setLiquid(pos.x, pos.y, pos.z, state);
     }
 
+    @Override
     public void setLiquid(int x, int y, int z, LiquidData newState) {
         byte newValue = newState.toByte();
         extraData.set(x, y, z, newValue);
     }
 
+    @Override
     public LiquidData getLiquid(Vector3i pos) {
         return getLiquid(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public LiquidData getLiquid(int x, int y, int z) {
         return new LiquidData((byte) extraData.get(x, y, z));
     }
 
+    @Override
     public Vector3i getChunkWorldPos() {
         return new Vector3i(getChunkWorldPosX(), getChunkWorldPosY(), getChunkWorldPosZ());
     }
 
+    @Override
     public int getChunkWorldPosX() {
         return chunkPos.x * getChunkSizeX();
     }
 
+    @Override
     public int getChunkWorldPosY() {
         return chunkPos.y * getChunkSizeY();
     }
 
+    @Override
     public int getChunkWorldPosZ() {
         return chunkPos.z * getChunkSizeZ();
     }
 
+    @Override
     public Vector3i getBlockWorldPos(Vector3i blockPos) {
         return getBlockWorldPos(blockPos.x, blockPos.y, blockPos.z);
     }
 
+    @Override
     public Vector3i getBlockWorldPos(int x, int y, int z) {
         return new Vector3i(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
     }
 
+    @Override
     public int getBlockWorldPosX(int x) {
         return x + getChunkWorldPosX();
     }
 
+    @Override
     public int getBlockWorldPosY(int y) {
         return y + getChunkWorldPosY();
     }
 
+    @Override
     public int getBlockWorldPosZ(int z) {
         return z + getChunkWorldPosZ();
     }
@@ -512,14 +529,17 @@ public class Chunk {
         return region;
     }
 
+    @Override
     public int getChunkSizeX() {
         return SIZE_X;
     }
 
+    @Override
     public int getChunkSizeY() {
         return SIZE_Y;
     }
 
+    @Override
     public int getChunkSizeZ() {
         return SIZE_Z;
     }

@@ -23,6 +23,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.core.world.WorldBiomeProvider;
+import org.terasology.world.ChunkViewAPI;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.Map;
@@ -41,7 +42,7 @@ public class ForestGenerator implements BiomeProviderDependentSecondPassGenerato
     }
 
     @Override
-    public void postProcessChunk(Vector3i pos, ChunkView view) {
+    public void postProcessChunk(Vector3i pos, ChunkViewAPI view) {
         FastRandom random = new FastRandom(seed.hashCode() ^ (pos.x + 39L * (pos.y + 39L * pos.z)));
         for (int y = 32; y < Chunk.SIZE_Y; y++) {
             for (int x = 4; x < Chunk.SIZE_X; x += 4) {

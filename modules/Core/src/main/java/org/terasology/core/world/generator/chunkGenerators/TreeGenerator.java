@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkViewAPI;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -55,7 +56,7 @@ public abstract class TreeGenerator {
      * @param posY Position on the y-axis
      * @param posZ Position on the z-axis
      */
-    public abstract void generate(ChunkView view, Random rand, int posX, int posY, int posZ);
+    public abstract void generate(ChunkViewAPI view, Random rand, int posX, int posY, int posZ);
 
     public double getGenerationProbability() {
         return generationProbability;
@@ -74,7 +75,7 @@ public abstract class TreeGenerator {
      * @param posY Position on the y-axis
      * @param posZ Position on the z-axis
      */
-    public boolean canGenerateAt(ChunkView view, int x, int y, int z) {
+    public boolean canGenerateAt(ChunkViewAPI view, int x, int y, int z) {
         Block posBlock = view.getBlock(x, y - 1, z);
         if (posBlock == null) {
             logger.error("WorldView.getBlock({}, {}, {}) return null, skipping forest generation (watchdog for issue #534)", x, y, z);
