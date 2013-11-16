@@ -94,11 +94,11 @@ public class LiquidSimulator implements ComponentSystem {
     @Override
     public void initialise() {
         air = BlockManager.getAir();
-        grass = blockManager.getBlock("engine:Grass");
-        snow = blockManager.getBlock("engine:Snow");
-        dirt = blockManager.getBlock("engine:Dirt");
-        water = blockManager.getBlock("engine:Water");
-        lava = blockManager.getBlock("engine:Lava");
+        grass = blockManager.getBlock("core:Grass");
+        snow = blockManager.getBlock("core:Snow");
+        dirt = blockManager.getBlock("core:Dirt");
+        water = blockManager.getBlock("core:Water");
+        lava = blockManager.getBlock("core:Lava");
 
         blockQueue = Queues.newLinkedBlockingQueue();
 

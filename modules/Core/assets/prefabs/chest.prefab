@@ -35,7 +35,7 @@
     ]
   },
   "PlaySoundAction" : {
-    sounds = "engine:click"
+    sounds = "core:click"
   },
   "AccessInventoryAction": {},
   "Network" : {

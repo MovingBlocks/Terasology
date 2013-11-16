@@ -59,7 +59,7 @@ public class LiquidSimulationTest extends TerasologyTestingEnvironment {
         air = BlockManager.getAir();
         dirt = new Block();
         dirt.setDisplayName("Dirt");
-        dirt.setUri(new BlockUri("engine:dirt"));
+        dirt.setUri(new BlockUri("core:dirt"));
         dirt.setId((byte) 1);
         blockManager.addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt), true);
 

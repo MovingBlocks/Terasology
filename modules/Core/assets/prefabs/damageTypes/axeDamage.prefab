@@ -1,0 +1,6 @@
+{
+    "parent" : "core:physicalDamage",
+    "blockDamage" : {
+        "materialDamageMultiplier" : {"wood" : 2}
+    }
+}

@@ -38,10 +38,10 @@ import java.util.Map;
  */
 public class FloraGenerator implements BiomeProviderDependentFirstPassGenerator {
 
-    private static final String[] FLOWER_BLOCKS = new String[]{"engine:YellowFlower", "engine:RedFlower", "engine:BrownShroom", "engine:BigBrownShroom", "engine:RedShroom",
-            "engine:RedClover", "engine:Lavender", "engine:Iris", "engine:GlowbellBloom", "engine:Glowbell",
-            "engine:DeadBush", "engine:Dandelion", "engine:Cotton1", "engine:Cotton2", "engine:Cotton3", "engine:Cotton4",
-            "engine:Cotton5", "engine:Cotton6", "engine:Tulip"};
+    private static final String[] FLOWER_BLOCKS = new String[]{"core:YellowFlower", "core:RedFlower", "core:BrownShroom", "core:BigBrownShroom", "core:RedShroom",
+            "core:RedClover", "core:Lavender", "core:Iris", "core:GlowbellBloom", "core:Glowbell",
+            "core:DeadBush", "core:Dandelion", "core:Cotton1", "core:Cotton2", "core:Cotton3", "core:Cotton4",
+            "core:Cotton5", "core:Cotton6", "core:Tulip"};
 
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
@@ -60,12 +60,12 @@ public class FloraGenerator implements BiomeProviderDependentFirstPassGenerator 
     public FloraGenerator() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         airBlock = BlockManager.getAir();
-        grassBlock = blockManager.getBlock("engine:Grass");
-        snowBlock = blockManager.getBlock("engine:Snow");
-        sandBlock = blockManager.getBlock("engine:Sand");
-        tallGrass1 = blockManager.getBlock("engine:TallGrass1");
-        tallGrass2 = blockManager.getBlock("engine:TallGrass2");
-        tallGrass3 = blockManager.getBlock("engine:TallGrass3");
+        grassBlock = blockManager.getBlock("core:Grass");
+        snowBlock = blockManager.getBlock("core:Snow");
+        sandBlock = blockManager.getBlock("core:Sand");
+        tallGrass1 = blockManager.getBlock("core:TallGrass1");
+        tallGrass2 = blockManager.getBlock("core:TallGrass2");
+        tallGrass3 = blockManager.getBlock("core:TallGrass3");
         for (String blockUrn : FLOWER_BLOCKS) {
             flowers.add(blockManager.getBlock(blockUrn));
         }

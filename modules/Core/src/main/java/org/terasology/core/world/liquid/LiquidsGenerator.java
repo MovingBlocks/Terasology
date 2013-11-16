@@ -47,11 +47,11 @@ public class LiquidsGenerator implements FirstPassGenerator {
 
     public LiquidsGenerator() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        grass = blockManager.getBlock("engine:Grass");
-        snow = blockManager.getBlock("engine:Snow");
-        water = blockManager.getBlock("engine:Water");
-        lava = blockManager.getBlock("engine:Lava");
-        stone = blockManager.getBlock("engine:Stone");
+        grass = blockManager.getBlock("core:Grass");
+        snow = blockManager.getBlock("core:Snow");
+        water = blockManager.getBlock("core:Water");
+        lava = blockManager.getBlock("core:Lava");
+        stone = blockManager.getBlock("core:Stone");
     }
 
     @Override

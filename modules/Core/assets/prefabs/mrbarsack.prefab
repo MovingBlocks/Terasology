@@ -1,5 +1,5 @@
 {
-    "parent" : "engine:iconItem",
+    "parent" : "core:iconItem",
     "Item" : {
         "name" : "Mr Barsack's Axe",
         "icon" : "Axe",

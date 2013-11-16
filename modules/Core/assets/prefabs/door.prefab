@@ -1,5 +1,5 @@
 {
-    "parent" : "engine:iconItem",
+    "parent" : "core:iconItem",
     "Item" : {
         "name" : "Door",
         "icon" : "door",
@@ -9,10 +9,10 @@
         "usage" : "ON_BLOCK"
     },
     "Door" : {
-        "topBlockFamily" : "engine:DoorTop",
-        "bottomBlockFamily" : "engine:DoorBottom",
-        "openSound" : "engine:DoorOpen",
-        "closeSound" : "engine:DoorClose"
+        "topBlockFamily" : "core:DoorTop",
+        "bottomBlockFamily" : "core:DoorBottom",
+        "openSound" : "core:DoorOpen",
+        "closeSound" : "core:DoorClose"
     },
     "Health" : {
         "currentHealth" : 5,

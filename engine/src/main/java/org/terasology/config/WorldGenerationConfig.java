@@ -30,7 +30,7 @@ public class WorldGenerationConfig {
     private float desertGrassDensity = 0.001f;
     private String defaultSeed = "Terasology";
 
-    private SimpleUri defaultGenerator = new SimpleUri("engine:perlin");
+    private SimpleUri defaultGenerator = new SimpleUri("core:perlin");
 
     public String getWorldTitle() {
         return worldTitle;

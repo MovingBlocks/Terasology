@@ -1,5 +1,5 @@
 {
-    "parent" : "engine:iconItem",
+    "parent" : "core:iconItem",
     "Item" : {
         "name" : "Explode Tool",
         "icon" : "Dynamite",
@@ -9,6 +9,6 @@
         "relativeTo" : "Target"
     },
     "PlaySoundAction" : {
-        "sounds" : ["engine:Explode1", "engine:Explode2", "engine:Explode3", "engine:Explode4", "engine:Explode5"]
+        "sounds" : ["core:Explode1", "core:Explode2", "core:Explode3", "core:Explode4", "core:Explode5"]
     }
 }

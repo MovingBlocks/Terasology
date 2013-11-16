@@ -378,7 +378,7 @@ public final class ChunkTessellator {
             if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
-                if (block.getURI().toNormalisedString().equals("engine:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
+                if (block.getURI().toNormalisedString().equals("core:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
                 } else {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);

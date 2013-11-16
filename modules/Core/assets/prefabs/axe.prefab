@@ -1,9 +1,9 @@
 {
-    "parent" : "engine:iconItem",
+    "parent" : "core:iconItem",
     "Item" : {
         "name" : "Axe",
         "icon" : "Axe",
         "renderWithIcon" : true,
-        "damageType" : "engine:axeDamage"
+        "damageType" : "core:axeDamage"
     }
 }

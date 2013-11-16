@@ -51,12 +51,12 @@ public class FlatTerrainGenerator implements BiomeProviderDependentFirstPassGene
     private BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
     private Block air = BlockManager.getAir();
-    private Block mantle = blockManager.getBlock("engine:MantleStone");
-    private Block stone = blockManager.getBlock("engine:Stone");
-    private Block sand = blockManager.getBlock("engine:Sand");
-    private Block grass = blockManager.getBlock("engine:Grass");
-    private Block snow = blockManager.getBlock("engine:Snow");
-    private Block dirt = blockManager.getBlock("engine:Dirt");
+    private Block mantle = blockManager.getBlock("core:MantleStone");
+    private Block stone = blockManager.getBlock("core:Stone");
+    private Block sand = blockManager.getBlock("core:Sand");
+    private Block grass = blockManager.getBlock("core:Grass");
+    private Block snow = blockManager.getBlock("core:Snow");
+    private Block dirt = blockManager.getBlock("core:Dirt");
 
     public FlatTerrainGenerator() {
         surfaceHeight = FlatTerrainGenerator.DEFAULT_HEIGHT;

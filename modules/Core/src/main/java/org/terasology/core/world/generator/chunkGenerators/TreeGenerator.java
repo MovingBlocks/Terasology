@@ -42,9 +42,9 @@ public abstract class TreeGenerator {
 
     public TreeGenerator() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        grassBlock = blockManager.getBlock("engine:Grass");
-        snowBlock = blockManager.getBlock("engine:Snow");
-        sandBlock = blockManager.getBlock("engine:Sand");
+        grassBlock = blockManager.getBlock("core:Grass");
+        snowBlock = blockManager.getBlock("core:Snow");
+        sandBlock = blockManager.getBlock("core:Sand");
     }
 
     /**
