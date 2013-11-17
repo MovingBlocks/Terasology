@@ -37,6 +37,7 @@ import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
@@ -393,10 +394,13 @@ public class TerasologyEngine implements GameEngine {
     private void initDisplay() {
         try {
             setDisplayMode();
+
+            RenderingConfig rc = config.getRendering();
+            Display.setLocation(rc.getWindowPosX(), rc.getWindowPosY());
             Display.setParent(customViewPort);
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
-            Display.create(config.getRendering().getPixelFormat());
-            Display.setVSyncEnabled(config.getRendering().isVSync());
+            Display.create(rc.getPixelFormat());
+            Display.setVSyncEnabled(rc.isVSync());
         } catch (LWJGLException e) {
             logger.error("Can not initialize graphics device.", e);
             System.exit(1);
@@ -590,6 +594,12 @@ public class TerasologyEngine implements GameEngine {
 
     private void cleanup() {
         logger.info("Shutting down Terasology...");
+        
+        if (!Display.isFullscreen()) {
+            config.getRendering().setWindowPosX(Display.getX());
+            config.getRendering().setWindowPosY(Display.getY());
+        }
+
         config.save();
         if (currentState != null) {
             currentState.dispose();
