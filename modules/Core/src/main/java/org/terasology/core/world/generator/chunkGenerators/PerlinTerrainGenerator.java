@@ -63,7 +63,7 @@ public class PerlinTerrainGenerator implements BiomeProviderDependentFirstPassGe
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
         mantle = blockManager.getBlock("core:MantleStone");
-        water = blockManager.getBlock("core:Water");
+        water = blockManager.getBlock("engine:Water");
         ice = blockManager.getBlock("core:Ice");
         stone = blockManager.getBlock("core:Stone");
         sand = blockManager.getBlock("core:Sand");

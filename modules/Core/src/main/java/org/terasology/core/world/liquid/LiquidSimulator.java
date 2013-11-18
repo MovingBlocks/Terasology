@@ -97,8 +97,8 @@ public class LiquidSimulator implements ComponentSystem {
         grass = blockManager.getBlock("core:Grass");
         snow = blockManager.getBlock("core:Snow");
         dirt = blockManager.getBlock("core:Dirt");
-        water = blockManager.getBlock("core:Water");
-        lava = blockManager.getBlock("core:Lava");
+        water = blockManager.getBlock("engine:Water");
+        lava = blockManager.getBlock("engine:Lava");
 
         blockQueue = Queues.newLinkedBlockingQueue();
 
