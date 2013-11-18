@@ -56,6 +56,7 @@ if (!moduleFile.exists()) {
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
 
     println "Dependencies for " + project.name + " will be engine and potentially more on any following lines:"
     moduleDepends.each {
