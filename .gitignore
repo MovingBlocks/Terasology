@@ -19,11 +19,13 @@ engine/engine.iml
 /*.iws
 
 # Ignore Eclipse
+# The /.* already ignores the . files in the root folder
+# Adding the ** ensures that subfolders are included
 /.checkstyle
-/.classpath
-/.project
-/.settings/
-/bin/
+.project
+.classpath
+.settings/
+bin/
 
 # Ignore Linux
 *.directory
