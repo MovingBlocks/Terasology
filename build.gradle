@@ -6,7 +6,10 @@
  */
 
 apply plugin: 'idea'
-apply plugin: 'eclipse'
+
+// The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
+//apply plugin: 'eclipse'
+
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 
