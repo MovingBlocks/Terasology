@@ -63,7 +63,7 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
         mantle = blockManager.getBlock("core:MantleStone");
-        water = blockManager.getBlock("engine:Water");
+        water = blockManager.getBlock("core:water");
         ice = blockManager.getBlock("core:Ice");
         stone = blockManager.getBlock("core:Stone");
         sand = blockManager.getBlock("core:Sand");

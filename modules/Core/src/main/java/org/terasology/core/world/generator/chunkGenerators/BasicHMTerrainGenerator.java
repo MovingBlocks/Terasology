@@ -57,7 +57,7 @@ public class BasicHMTerrainGenerator implements BiomeProviderDependentFirstPassG
     public BasicHMTerrainGenerator() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         mantle = blockManager.getBlock("core:MantleStone");
-        water = blockManager.getBlock("engine:Water");
+        water = blockManager.getBlock("core:water");
         stone = blockManager.getBlock("core:Stone");
         sand = blockManager.getBlock("core:Sand");
         grass = blockManager.getBlock("core:Grass");

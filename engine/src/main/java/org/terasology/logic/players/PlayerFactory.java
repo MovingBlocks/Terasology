@@ -85,8 +85,8 @@ public class PlayerFactory {
         EntityRef innerChest = blockFactory.newInstance(blockManager.getBlockFamily("core:Chest"));
         innerChest.addComponent(new InventoryComponent(30));
 
-        inventoryManager.giveItem(innerChest, blockFactory.newInstance(blockManager.getBlockFamily("engine:Lava"), 99));
-        inventoryManager.giveItem(innerChest, blockFactory.newInstance(blockManager.getBlockFamily("engine:Water"), 99));
+        inventoryManager.giveItem(innerChest, blockFactory.newInstance(blockManager.getBlockFamily("core:lava"), 99));
+        inventoryManager.giveItem(innerChest, blockFactory.newInstance(blockManager.getBlockFamily("core:water"), 99));
 
         inventoryManager.giveItem(innerChest, blockFactory.newInstance(blockManager.getBlockFamily("core:Iris"), 99));
         inventoryManager.giveItem(innerChest, blockFactory.newInstance(blockManager.getBlockFamily("core:Dandelion"), 99));

@@ -293,9 +293,9 @@ public final class ChunkTessellator {
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
         ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
-        if (block.getURI().toNormalisedString().equals("engine:water")) {
+        if (block.getURI().toNormalisedString().equals("core:water")) {
             vertexFlag = ChunkVertexFlag.WATER;
-        } else if (block.getURI().toNormalisedString().equals("engine:lava")) {
+        } else if (block.getURI().toNormalisedString().equals("core:lava")) {
             vertexFlag = ChunkVertexFlag.LAVA;
         } else if (block.isWaving() && block.isDoubleSided()) {
             vertexFlag = ChunkVertexFlag.WAVING;
@@ -322,7 +322,7 @@ public final class ChunkTessellator {
             renderType = ChunkMesh.RenderType.OPAQUE;
         }
         // TODO: Review special case, or alternatively compare uris.
-        if (block.getURI().toNormalisedString().equals("engine:water") || block.getURI().toNormalisedString().equals("engine:ice")) {
+        if (block.getURI().toNormalisedString().equals("core:water") || block.getURI().toNormalisedString().equals("core:ice")) {
             renderType = ChunkMesh.RenderType.WATER_AND_ICE;
         }
         if (block.isDoubleSided()) {
