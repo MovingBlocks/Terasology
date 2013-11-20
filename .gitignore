@@ -18,9 +18,7 @@ engine/engine.iml
 /*.ipr
 /*.iws
 
-# Ignore Eclipse
-# The /.* already ignores the . files in the root folder
-# Adding the ** ensures that subfolders are included
+# Ignore Eclipse - the /.* ignores the . files in the root folder
 /.checkstyle
 .project
 .classpath
