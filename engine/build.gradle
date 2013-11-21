@@ -244,6 +244,15 @@ idea {
     }
 }
 
+eclipse.jdt.file.withProperties { props ->
+	props.setProperty('org.eclipse.jdt.core.compiler.problem.rawTypeReference', 'ignore');
+	props.setProperty('org.eclipse.jdt.core.compiler.problem.unusedLocal', 'ignore');
+	props.setProperty('org.eclipse.jdt.core.compiler.problem.unusedPrivateMember', 'ignore');
+	props.setProperty('org.eclipse.jdt.core.compiler.problem.incompleteEnumSwitch', 'ignore');
+	props.setProperty('org.eclipse.jdt.core.compiler.problem.missingSerialVersion', 'ignore');
+	props.setProperty('org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation', 'ignore');
+}
+
 checkstyle {
     ignoreFailures = true
     configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
