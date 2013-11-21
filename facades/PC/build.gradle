@@ -215,6 +215,18 @@ idea {
     }
 }
 
+task copyEclipseLauncher(type: Copy) {
+	from "$rootDir/config/eclipse"
+	into ".settings"
+	include("*.launch")
+}
+
+tasks.eclipse {
+	dependsOn copyEclipseLauncher
+	dependsOn rootProject.extractNatives
+
+}
+
 checkstyle {
     ignoreFailures = true
     configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
