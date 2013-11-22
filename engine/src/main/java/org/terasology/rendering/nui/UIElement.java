@@ -15,29 +15,26 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
-
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
+public interface UIElement {
 
-    void pushScreen(UIScreen screen);
+    String DEFAULT_MODE = "";
 
-    void popScreen();
+    String getFamily();
 
-    void setScreen(UIScreen screen);
+    void setFamily(String family);
 
-    void closeScreens();
+    String getMode();
 
-    void render();
+    <T extends UIWidget> T find(String id, Class<T> type);
+
+    void onDraw(Canvas canvas);
 
     void update(float delta);
 
-    ClassLibrary<UIElement> getElementMetadataLibrary();
+    void onGainFocus();
 
-    void setFocus(UIElement element);
-
-    UIElement getFocus();
+    void onLoseFocus();
 }

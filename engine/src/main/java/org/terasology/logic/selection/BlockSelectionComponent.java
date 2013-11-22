@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.logic.selection;
 
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.API;
+import org.terasology.entitySystem.Component;
 
 /**
- * @author Immortius
+ * Add this component to any item entity, to make the item to a selection item. When using such items, a temporary
+ * selection is placed in the world. First use sets the starting point, second use finishes the selection and
+ * a ApplyBlockSelectionEvent is fired to the player using the selection item.
+ * <p/>
+ * TODO add customizing properties to this component, like selection color.
+ *
+ * @author synopia
  */
-public interface NUIManager extends ComponentSystem {
-
-    void pushScreen(UIScreen screen);
-
-    void popScreen();
-
-    void setScreen(UIScreen screen);
-
-    void closeScreens();
-
-    void render();
-
-    void update(float delta);
-
-    ClassLibrary<UIElement> getElementMetadataLibrary();
-
-    void setFocus(UIElement element);
-
-    UIElement getFocus();
+@API
+public class BlockSelectionComponent implements Component {
 }

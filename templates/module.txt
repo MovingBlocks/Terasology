@@ -2,7 +2,7 @@
     "id" : "MODULENAME",
     "version" : "0.1.0",
     "author" : "",
-    "displayName" : "",
+    "displayName" : "MODULENAME",
     "description" : "",
     "dependencies" : [],
     "isServerSideOnly" : false

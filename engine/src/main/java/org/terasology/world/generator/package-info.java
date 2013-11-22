@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
 
-/**
- * @author Immortius
- */
-public class UIToggleButton {
-}
+@API package org.terasology.world.generator;
+
+import org.terasology.engine.API;

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -43,9 +44,10 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LineBuilder;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
@@ -91,12 +93,16 @@ public class LwjglCanvas implements CanvasInternal {
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
     private static final Quat4f IDENTITY_ROT = new Quat4f(0, 0, 0, 1);
 
+    private final NUIManager nuiManager;
+
     private CanvasState state;
 
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
 
     private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
+
+    private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
     private Material textureMat = Assets.getMaterial("engine:UITexture");
@@ -107,11 +113,11 @@ public class LwjglCanvas implements CanvasInternal {
     private Deque<InteractionRegion> interactionRegions = Queues.newArrayDeque();
     private Set<InteractionRegion> mouseOverRegions = Sets.newLinkedHashSet();
     private InteractionRegion clickedRegion;
-    private int dragMouseButton;
 
     private Matrix4f modelView;
 
-    public LwjglCanvas() {
+    public LwjglCanvas(NUIManager nuiManager) {
+        this.nuiManager = nuiManager;
     }
 
     @Override
@@ -138,11 +144,16 @@ public class LwjglCanvas implements CanvasInternal {
         glLoadMatrix(matrixBuffer);
         matrixBuffer.rewind();
 
-
+        crop(state.cropRegion);
     }
 
     @Override
     public void postRender() {
+        for (DrawOperation operation : drawOnTopOperations) {
+            operation.draw();
+        }
+        drawOnTopOperations.clear();
+
         Util.checkGLError();
         if (!subregionStack.isEmpty()) {
             logger.error("UI Subregions are not being correctly ended");
@@ -202,6 +213,7 @@ public class LwjglCanvas implements CanvasInternal {
                 Vector2i relPos = new Vector2i(pos).sub(next.region.min());
                 if (next.listener.onMouseClick(button, relPos)) {
                     clickedRegion = next;
+                    nuiManager.setFocus(next.element);
                     break;
                 }
             }
@@ -232,6 +244,11 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
+    public void setDrawOnTop(boolean drawOnTop) {
+        this.state.drawOnTop = drawOnTop;
+    }
+
+    @Override
     public Vector2i size() {
         return new Vector2i(state.drawRegion.width(), state.drawRegion.height());
     }
@@ -252,12 +269,6 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
-    public void setWidget(Class<? extends UIWidget> widgetClass) {
-        state.widget = widgetClass;
-        state.mode = "";
-    }
-
-    @Override
     public void setFamily(String familyName) {
         state.family = familyName;
     }
@@ -273,15 +284,26 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
-    public void drawWidget(UIWidget widget, Rect2i region) {
-        try (SubRegion ignored = subRegion(region, true)) {
-            setWidget(widget.getClass());
-            if (widget.getFamily() != null) {
-                setFamily(widget.getFamily());
+    public void drawElement(UIElement element, Rect2i region) {
+        UIStyle newStyle = state.skin.getStyleFor((element.getFamily() != null) ? element.getFamily() : state.family, element.getClass(), element.getMode());
+        Rect2i regionArea = region;
+        if (newStyle.getFixedWidth() != 0 || newStyle.getFixedHeight() != 0) {
+            int newWidth = (newStyle.getFixedWidth() != 0) ? newStyle.getFixedWidth() : region.width();
+            int newHeight = (newStyle.getFixedHeight() != 0) ? newStyle.getFixedHeight() : region.height();
+            int newMinX = region.minX() + newStyle.getHorizontalAlignment().getOffset(newWidth, region.width());
+            int newMinY = region.minY() + newStyle.getVerticalAlignment().getOffset(newHeight, region.height());
+            regionArea = Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
+        }
+        try (SubRegion ignored = subRegion(regionArea, false)) {
+            state.element = element;
+            if (element.getFamily() != null) {
+                setFamily(element.getFamily());
             }
-            setMode(widget.getMode());
-            drawBackground();
-            widget.onDraw(this);
+            setMode(element.getMode());
+            if (newStyle.isBackgroundAutomaticallyDrawn()) {
+                drawBackground();
+            }
+            element.onDraw(this);
         }
     }
 
@@ -322,7 +344,7 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawBackground() {
-        drawBackground(Rect2i.createFromMinAndMax(0, 0, state.drawRegion.width(), state.drawRegion.height()));
+        drawBackground(Rect2i.createFromMinAndSize(0, 0, state.drawRegion.width(), state.drawRegion.height()));
     }
 
     @Override
@@ -364,40 +386,14 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign) {
-        TextCacheKey key = new TextCacheKey(text, font, region.width(), hAlign);
-        usedText.add(key);
-        Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = LineBuilder.getLines(font, text, region.width());
         Rect2i absoluteRegion = relativeToAbsolute(region);
-        Rect2i croppingRegion = absoluteRegion.intersect(state.cropRegion);
-        if (croppingRegion.isEmpty()) {
-            return;
-        }
-        if (fontMesh == null) {
-            fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
-            cachedText.put(key, fontMesh);
-        }
-
-        Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
-        offset.y += vAlign.getOffset(region.height(), lines.size() * font.getLineHeight());
-
-
-        for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
-            entry.getKey().bindTextures();
-            entry.getKey().setFloat4("croppingBoundaries", croppingRegion.minX(), croppingRegion.maxX() + 1, croppingRegion.minY(), croppingRegion.maxY() + 1);
-            if (shadowColor.a() != 0) {
-                entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
-                Vector4f shadowValues = shadowColor.toVector4f();
-                shadowValues.w *= state.getAlpha();
-                entry.getKey().setFloat4("color", shadowValues);
-                entry.getValue().render();
+        Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
+        if (!cropRegion.isEmpty()) {
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawTextOperation(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha()));
+            } else {
+                drawTextInternal(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha());
             }
-
-            entry.getKey().setFloat2("offset", offset.x, offset.y);
-            Vector4f colorValues = color.toVector4f();
-            colorValues.w *= state.getAlpha();
-            entry.getKey().setFloat4("color", colorValues);
-            entry.getValue().render();
         }
     }
 
@@ -421,34 +417,16 @@ public class LwjglCanvas implements CanvasInternal {
         if (mode == ScaleMode.TILED) {
             drawTextureRawTiled(texture, region, ux, uy, uw, uh);
         } else {
-            Vector2f scale = mode.scaleForRegion(region, texture.getWidth(), texture.getHeight());
-            Rect2f textureArea = texture.getRegion();
-            textureMat.setFloat2("scale", scale);
-            textureMat.setFloat2("offset",
-                    state.drawRegion.minX() + region.minX() + 0.5f * (region.width() - scale.x),
-                    state.drawRegion.minY() + region.minY() + 0.5f * (region.height() - scale.y));
-            textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-            textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
-            textureMat.setTexture("texture", texture.getTexture());
-            textureMat.setFloat4("color", 1.0f, 1.0f, 1.0f, state.getAlpha());
-            textureMat.bindTextures();
-            if (mode == ScaleMode.SCALE_FILL) {
-                Rect2i cropRegion = relativeToAbsolute(region).intersect(state.cropRegion);
-                if (!cropRegion.equals(state.cropRegion)) {
-                    crop(cropRegion);
-                    billboard.render();
-                    crop(state.cropRegion);
+            Rect2i absoluteRegion = relativeToAbsolute(region);
+            Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
+            if (!cropRegion.isEmpty()) {
+                if (state.drawOnTop) {
+                    drawOnTopOperations.add(new DrawTextureOperation(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
                 } else {
-                    billboard.render();
+                    drawTextureInternal(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha());
                 }
-            } else {
-                billboard.render();
             }
         }
-    }
-
-    private void crop(Rect2i cropRegion) {
-        textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
     }
 
     private void drawTextureRawTiled(TextureRegion texture, Rect2i toArea, float ux, float uy, float uw, float uh) {
@@ -465,17 +443,15 @@ public class LwjglCanvas implements CanvasInternal {
             int offsetX = toArea.width() - horizTiles * tileW;
             int offsetY = toArea.height() - vertTiles * tileH;
 
-            Rect2i drawRegion = relativeToAbsolute(toArea).intersect(state.cropRegion);
-            if (!drawRegion.equals(state.cropRegion)) {
-                crop(drawRegion);
+            try (SubRegion ignored = subRegion(toArea, true)) {
                 for (int tileY = 0; tileY < vertTiles; tileY++) {
                     for (int tileX = 0; tileX < horizTiles; tileX++) {
                         Rect2i tileArea = Rect2i.createFromMinAndSize(toArea.minX() + offsetX + tileW * tileX, toArea.minY() + offsetY + tileH * tileY, tileW, tileH);
                         drawTextureRaw(texture, tileArea, ScaleMode.STRETCH, ux, uy, uw, uh);
                     }
                 }
-                crop(state.cropRegion);
             }
+
         }
         Util.checkGLError();
     }
@@ -516,7 +492,7 @@ public class LwjglCanvas implements CanvasInternal {
             }
             // TOP-RIGHT CORNER
             if (border.getRight() != 0) {
-                Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.minY(), border.getRight(), border.getTop());
+                Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.minY(), border.getRight(), border.getTop());
                 drawTextureRaw(texture, area, ScaleMode.STRETCH, ux + uw - right, uy, right, top);
             }
         }
@@ -540,7 +516,7 @@ public class LwjglCanvas implements CanvasInternal {
 
         // RIGHT BORDER
         if (border.getRight() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.minY() + border.getTop(), border.getRight(), centerVert);
+            Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.minY() + border.getTop(), border.getRight(), centerVert);
             if (tile) {
                 drawTextureRawTiled(texture, area, ux + uw - right, uy + top, right, uh - top - bottom);
             } else {
@@ -550,11 +526,11 @@ public class LwjglCanvas implements CanvasInternal {
         if (border.getBottom() != 0) {
             // BOTTOM-LEFT CORNER
             if (border.getLeft() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom(), border.getLeft(), border.getBottom()),
+                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom() + 1, border.getLeft(), border.getBottom()),
                         ScaleMode.STRETCH, ux, uy + uw - bottom, left, bottom);
             }
             // BOTTOM BORDER
-            Rect2i bottomArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.maxY() - border.getBottom(), centerHoriz, border.getBottom());
+            Rect2i bottomArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.maxY() - border.getBottom() + 1, centerHoriz, border.getBottom());
             if (tile) {
                 drawTextureRawTiled(texture, bottomArea, ux + left, uy + uw - bottom, uw - left - right, bottom);
             } else {
@@ -562,7 +538,7 @@ public class LwjglCanvas implements CanvasInternal {
             }
             // BOTTOM-RIGHT CORNER
             if (border.getRight() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight(), region.maxY() - border.getBottom(), border.getRight(),
+                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.maxY() - border.getBottom() + 1, border.getRight(),
                         border.getBottom()), ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
             }
         }
@@ -649,19 +625,86 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
-        addInteractionRegion(Rect2i.createFromMinAndMax(0, 0, size().x, size().y), listener);
+        addInteractionRegion(listener, Rect2i.createFromMinAndMax(0, 0, size().x, size().y));
     }
 
     @Override
-    public void addInteractionRegion(Rect2i region, InteractionListener listener) {
+    public void addInteractionRegion(InteractionListener listener, Rect2i region) {
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));
         if (!finalRegion.isEmpty()) {
-            interactionRegions.addLast(new InteractionRegion(finalRegion, listener));
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawInteractionRegionOperation(finalRegion, listener, state.element));
+            } else {
+                interactionRegions.addLast(new InteractionRegion(finalRegion, listener, state.element));
+            }
         }
+    }
+
+    private void crop(Rect2i cropRegion) {
+        textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
         return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
+    }
+
+    private void drawTextureInternal(TextureRegion texture, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+        Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
+        Rect2f textureArea = texture.getRegion();
+        textureMat.setFloat2("scale", scale);
+        textureMat.setFloat2("offset",
+                absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
+                absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
+        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+        textureMat.setTexture("texture", texture.getTexture());
+        textureMat.setFloat4("color", 1.0f, 1.0f, 1.0f, alpha);
+        textureMat.bindTextures();
+        if (mode == ScaleMode.SCALE_FILL) {
+            if (!cropRegion.equals(state.cropRegion)) {
+                crop(cropRegion);
+                billboard.render();
+                crop(state.cropRegion);
+            } else {
+                billboard.render();
+            }
+        } else {
+            billboard.render();
+        }
+    }
+
+    private void drawTextInternal(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
+                                  Color color, Color shadowColor, float alpha) {
+        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
+        usedText.add(key);
+        Map<Material, Mesh> fontMesh = cachedText.get(key);
+        List<String> lines = LineBuilder.getLines(font, text, absoluteRegion.width());
+        if (fontMesh == null) {
+            fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
+            cachedText.put(key, fontMesh);
+        }
+
+        Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
+        offset.y += vAlign.getOffset(lines.size() * font.getLineHeight(), absoluteRegion.height());
+
+
+        for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
+            entry.getKey().bindTextures();
+            entry.getKey().setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+            if (shadowColor.a() != 0) {
+                entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
+                Vector4f shadowValues = shadowColor.toVector4f();
+                shadowValues.w *= alpha;
+                entry.getKey().setFloat4("color", shadowValues);
+                entry.getValue().render();
+            }
+
+            entry.getKey().setFloat2("offset", offset.x, offset.y);
+            Vector4f colorValues = color.toVector4f();
+            colorValues.w *= alpha;
+            entry.getKey().setFloat4("color", colorValues);
+            entry.getValue().render();
+        }
     }
 
     /**
@@ -670,7 +713,7 @@ public class LwjglCanvas implements CanvasInternal {
     private static class CanvasState {
         public UISkin skin;
         public String family = "";
-        public Class<? extends UIWidget> widget;
+        public UIElement element;
         public String mode = "";
 
         public Rect2i drawRegion;
@@ -679,16 +722,19 @@ public class LwjglCanvas implements CanvasInternal {
         private float alpha = 1.0f;
         private float baseAlpha = 1.0f;
 
+        private boolean drawOnTop;
+
         public CanvasState(CanvasState previous, Rect2i drawRegion) {
-            this(previous, drawRegion, drawRegion);
+            this(previous, drawRegion, (previous != null) ? previous.cropRegion : drawRegion);
         }
 
         public CanvasState(CanvasState previous, Rect2i drawRegion, Rect2i cropRegion) {
             if (previous != null) {
                 this.skin = previous.skin;
                 this.family = previous.family;
-                this.widget = previous.widget;
+                this.element = previous.element;
                 this.mode = previous.mode;
+                this.drawOnTop = previous.drawOnTop;
                 baseAlpha = previous.getAlpha();
             }
             this.drawRegion = drawRegion;
@@ -700,7 +746,7 @@ public class LwjglCanvas implements CanvasInternal {
         }
 
         public UIStyle getCurrentStyle() {
-            return skin.getStyleFor(family, widget, mode);
+            return skin.getStyleFor(family, element.getClass(), mode);
         }
 
         public Rect2i getRelativeRegion() {
@@ -799,10 +845,12 @@ public class LwjglCanvas implements CanvasInternal {
     private static class InteractionRegion {
         public InteractionListener listener;
         public Rect2i region;
+        public UIElement element;
 
-        public InteractionRegion(Rect2i region, InteractionListener listener) {
+        public InteractionRegion(Rect2i region, InteractionListener listener, UIElement element) {
             this.listener = listener;
             this.region = region;
+            this.element = element;
         }
 
         @Override
@@ -819,4 +867,87 @@ public class LwjglCanvas implements CanvasInternal {
             return listener.hashCode();
         }
     }
+
+    private interface DrawOperation {
+        void draw();
+    }
+
+    private final class DrawTextureOperation implements DrawOperation {
+
+        private ScaleMode mode;
+        private TextureRegion texture;
+        private Rect2i absoluteRegion;
+        private Rect2i cropRegion;
+        private float ux;
+        private float uy;
+        private float uw;
+        private float uh;
+        private float alpha;
+
+        private DrawTextureOperation(TextureRegion texture, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+            this.mode = mode;
+            this.texture = texture;
+            this.absoluteRegion = absoluteRegion;
+            this.cropRegion = cropRegion;
+            this.ux = ux;
+            this.uy = uy;
+            this.uw = uw;
+            this.uh = uh;
+            this.alpha = alpha;
+        }
+
+        @Override
+        public void draw() {
+            drawTextureInternal(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+        }
+    }
+
+    private final class DrawTextOperation implements DrawOperation {
+        private String text;
+        private Font font;
+        private Rect2i absoluteRegion;
+        private HorizontalAlign hAlign;
+        private VerticalAlign vAlign;
+        private Rect2i cropRegion;
+        private Color shadowColor;
+        private Color color;
+        private float alpha;
+
+        private DrawTextOperation(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
+                                  Color color, Color shadowColor, float alpha) {
+            this.text = text;
+            this.font = font;
+            this.absoluteRegion = absoluteRegion;
+            this.hAlign = hAlign;
+            this.vAlign = vAlign;
+            this.cropRegion = cropRegion;
+            this.shadowColor = shadowColor;
+            this.color = color;
+            this.alpha = alpha;
+        }
+
+        @Override
+        public void draw() {
+            drawTextInternal(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, alpha);
+        }
+    }
+
+    private final class DrawInteractionRegionOperation implements DrawOperation {
+
+        private final Rect2i region;
+        private final InteractionListener listener;
+        private final UIElement currentElement;
+
+        public DrawInteractionRegionOperation(Rect2i region, InteractionListener listener, UIElement currentElement) {
+            this.region = region;
+            this.listener = listener;
+            this.currentElement = currentElement;
+        }
+
+        @Override
+        public void draw() {
+            interactionRegions.addLast(new InteractionRegion(region, listener, currentElement));
+        }
+    }
+
 }

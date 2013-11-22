@@ -73,7 +73,7 @@ public class ColumnLayout extends AbstractWidget {
             for (UIWidget widget : widgetList) {
                 if (widget != null) {
                     Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x + padding.getLeft(), currentOffset.y + padding.getTop(), drawSize.x, drawSize.y);
-                    canvas.drawWidget(widget, drawRegion);
+                    canvas.drawElement(widget, drawRegion);
                 }
 
                 if (++currentColumn == columns) {

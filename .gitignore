@@ -18,12 +18,12 @@ engine/engine.iml
 /*.ipr
 /*.iws
 
-# Ignore Eclipse
+# Ignore Eclipse - the /.* ignores the . files in the root folder
 /.checkstyle
-/.classpath
-/.project
-/.settings/
-/bin/
+.project
+.classpath
+.settings/
+bin/
 
 # Ignore Linux
 *.directory

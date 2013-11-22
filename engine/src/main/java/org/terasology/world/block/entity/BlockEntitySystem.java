@@ -43,6 +43,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BeforeBlockToItem;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.items.OnBlockToItem;
 
@@ -105,18 +106,24 @@ public class BlockEntitySystem implements ComponentSystem {
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
-            entity.send(new OnBlockToItem(item));
+            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(oldBlock.getBlockFamily(), 1);
+            entity.send(beforeBlockToItemEvent);
+            if (!beforeBlockToItemEvent.isConsumed()) {
+                for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {
+                    EntityRef item = blockItemFactory.newInstance(family, beforeBlockToItemEvent.getQuanityForItem(family));
+                    entity.send(new OnBlockToItem(item));
 
-            if ((oldBlock.isDirectPickup())) {
-                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                    EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
-                    pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+                    if ((family.getArchetypeBlock().isDirectPickup())) {
+                        if (!inventoryManager.giveItem(event.getInstigator(), item)) {
+                            EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
+                            pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+                        }
+                    } else {
+                        /* PHYSICS */
+                        EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
+                        pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+                    }
                 }
-            } else {
-                /* PHYSICS */
-                EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
-                pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
             }
         }
 

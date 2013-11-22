@@ -31,8 +31,13 @@ public class UIStyle {
     private TextureRegion background;
     private Border backgroundBorder = new Border(0, 0, 0, 0);
     private ScaleMode backgroundScaleMode = ScaleMode.STRETCH;
+    private boolean backgroundAutomaticallyDrawn = true;
 
     private Border margin = new Border(0, 0, 0, 0);
+    private int fixedWidth;
+    private int fixedHeight;
+    private HorizontalAlign alignmentH = HorizontalAlign.CENTER;
+    private VerticalAlign alignmentV = VerticalAlign.MIDDLE;
 
     private ScaleMode textureScaleMode = ScaleMode.STRETCH;
 
@@ -43,6 +48,7 @@ public class UIStyle {
     private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
     private boolean textShadowed;
 
+
     public UIStyle() {
     }
 
@@ -50,8 +56,14 @@ public class UIStyle {
         this.background = other.background;
         this.backgroundBorder = other.backgroundBorder;
         this.backgroundScaleMode = other.backgroundScaleMode;
+        this.backgroundAutomaticallyDrawn = other.backgroundAutomaticallyDrawn;
 
         this.margin = other.margin;
+        this.fixedWidth = other.fixedWidth;
+        this.fixedHeight = other.fixedHeight;
+        this.alignmentH = other.alignmentH;
+        this.alignmentV = other.alignmentV;
+
 
         this.textureScaleMode = other.textureScaleMode;
 
@@ -148,5 +160,45 @@ public class UIStyle {
 
     public void setTextShadowed(boolean textShadowed) {
         this.textShadowed = textShadowed;
+    }
+
+    public void setBackgroundAutomaticallyDrawn(boolean backgroundAutomaticallyDrawn) {
+        this.backgroundAutomaticallyDrawn = backgroundAutomaticallyDrawn;
+    }
+
+    public boolean isBackgroundAutomaticallyDrawn() {
+        return backgroundAutomaticallyDrawn;
+    }
+
+    public void setFixedWidth(int fixedWidth) {
+        this.fixedWidth = fixedWidth;
+    }
+
+    public int getFixedWidth() {
+        return fixedWidth;
+    }
+
+    public void setFixedHeight(int fixedHeight) {
+        this.fixedHeight = fixedHeight;
+    }
+
+    public int getFixedHeight() {
+        return fixedHeight;
+    }
+
+    public void setHorizontalAlignment(HorizontalAlign horizontalAlignment) {
+        this.alignmentH = horizontalAlignment;
+    }
+
+    public HorizontalAlign getHorizontalAlignment() {
+        return alignmentH;
+    }
+
+    public void setVerticalAlignment(VerticalAlign verticalAlignment) {
+        this.alignmentV = verticalAlignment;
+    }
+
+    public VerticalAlign getVerticalAlignment() {
+        return alignmentV;
     }
 }

@@ -42,6 +42,7 @@ public interface Canvas {
 
     /**
      * minX and minY of the region will always be zero.
+     *
      * @return The region of drawable canvas, in pixels.
      */
     Rect2i getRegion();
@@ -57,18 +58,21 @@ public interface Canvas {
 
     /**
      * Sets the skin to use for drawing operations
+     *
      * @param skin
      */
     void setSkin(UISkin skin);
 
     /**
      * Sets the family subset of the current skin to use for drawing operations
+     *
      * @param familyName
      */
     void setFamily(String familyName);
 
     /**
      * Sets the mode of the current skin/widget/family selection to use for drawing operations
+     *
      * @param mode
      */
     void setMode(String mode);
@@ -80,10 +84,11 @@ public interface Canvas {
 
     /**
      * Draws a widget to the given region of the current canvas
-     * @param widget
+     *
+     * @param element
      * @param region
      */
-    void drawWidget(UIWidget widget, Rect2i region);
+    void drawElement(UIElement element, Rect2i region);
 
     /**
      * Draws test, using the current style.
@@ -154,11 +159,12 @@ public interface Canvas {
     SubRegion subRegion(Rect2i region, boolean crop);
 
     /**
-     * Sets the class of widget being drawn, used to determine what style to use from the skin.
-     * Wipes the current mode selection
-     * @param widgetClass
+     * When focused is set to true, subsequent drawing will be on top of everything else.
+     * This ceases when focused is set to false or the current subRegion ends.
+     *
+     * @param focused
      */
-    void setWidget(Class<? extends UIWidget> widgetClass);
+    void setDrawOnTop(boolean focused);
 
     /**
      * Draws text without using the current style. Text may include new lines. This text will always be left-aligned.
@@ -332,5 +338,5 @@ public interface Canvas {
 
     void addInteractionRegion(InteractionListener listener);
 
-    void addInteractionRegion(Rect2i region, InteractionListener listener);
+    void addInteractionRegion(InteractionListener listener, Rect2i region);
 }

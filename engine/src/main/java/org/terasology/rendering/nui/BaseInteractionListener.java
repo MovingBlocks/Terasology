@@ -53,6 +53,7 @@ public class BaseInteractionListener implements InteractionListener {
         return false;
     }
 
+    @Override
     public boolean isMouseOver() {
         return mouseOver;
     }

@@ -13,31 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
-
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
+package org.terasology.rendering.nui.databinding;
 
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
+public interface Binding<T> {
 
-    void pushScreen(UIScreen screen);
+    T get();
 
-    void popScreen();
-
-    void setScreen(UIScreen screen);
-
-    void closeScreens();
-
-    void render();
-
-    void update(float delta);
-
-    ClassLibrary<UIElement> getElementMetadataLibrary();
-
-    void setFocus(UIElement element);
-
-    UIElement getFocus();
+    void set(T value);
 }
