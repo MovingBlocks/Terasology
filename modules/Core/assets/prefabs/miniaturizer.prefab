@@ -1,12 +1,12 @@
 {
-    "parent" : "core:iconItem",
+    "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Miniaturizer",
         "icon" : "scissors",
 		"usage" : "ON_BLOCK"
     },
   	"PlaySoundAction" : {
-    	sounds = "core:click"
+    	sounds = "engine:click"
   	},
     "Miniaturizer" : {}
 }

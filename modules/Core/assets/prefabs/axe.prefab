@@ -1,5 +1,5 @@
 {
-    "parent" : "core:iconItem",
+    "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Axe",
         "icon" : "Axe",

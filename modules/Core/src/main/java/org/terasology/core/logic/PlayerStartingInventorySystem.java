@@ -31,7 +31,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
 
 @RegisterSystem
-public class PlayerSystem implements ComponentSystem {
+public class PlayerStartingInventorySystem implements ComponentSystem {
 
     @In
     BlockManager blockManager;
