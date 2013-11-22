@@ -23,7 +23,6 @@ import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkAPI;
 import org.terasology.world.generator.BaseChunkGenerator;
 import org.terasology.world.generator.FirstPassGenerator;

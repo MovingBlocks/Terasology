@@ -17,13 +17,13 @@ package org.terasology.core.logic.generators;
 
 import com.google.common.collect.ImmutableMap;
 import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.math.LSystemRule;
-import org.terasology.world.block.BlockManager;
 import org.terasology.core.world.generator.chunkGenerators.ForestGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorCactus;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorLSystem;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.math.LSystemRule;
+import org.terasology.world.block.BlockManager;
 
 import java.util.Map;
 

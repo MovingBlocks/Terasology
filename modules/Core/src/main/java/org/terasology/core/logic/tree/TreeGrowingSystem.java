@@ -16,6 +16,7 @@
 package org.terasology.core.logic.tree;
 
 import com.google.common.collect.Maps;
+import org.terasology.core.logic.tree.lsystem.*;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -23,13 +24,6 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.core.logic.tree.lsystem.AdvanceAxionElementGeneration;
-import org.terasology.core.logic.tree.lsystem.AdvancedLSystemTreeDefinition;
-import org.terasology.core.logic.tree.lsystem.AxionElementGeneration;
-import org.terasology.core.logic.tree.lsystem.AxionElementReplacement;
-import org.terasology.core.logic.tree.lsystem.DefaultAxionElementGeneration;
-import org.terasology.core.logic.tree.lsystem.SimpleAxionElementReplacement;
-import org.terasology.core.logic.tree.lsystem.SurroundAxionElementGeneration;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;

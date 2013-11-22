@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.ChunkView;
 import org.terasology.world.ChunkViewAPI;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;

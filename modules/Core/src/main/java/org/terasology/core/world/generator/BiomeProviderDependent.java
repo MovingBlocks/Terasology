@@ -16,7 +16,6 @@
 package org.terasology.core.world.generator;
 
 import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.world.generator.BaseChunkGenerator;
 
 public interface BiomeProviderDependent {
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);

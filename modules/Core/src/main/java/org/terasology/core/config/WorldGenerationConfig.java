@@ -17,7 +17,6 @@
 package org.terasology.core.config;
 
 import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.engine.SimpleUri;
 
 /**
  * @author Immortius

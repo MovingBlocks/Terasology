@@ -16,12 +16,12 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
+import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.core.world.generator.BiomeProviderDependentFirstPassGenerator;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.EPNoise;
 import org.terasology.utilities.procedural.Noise;
-import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
