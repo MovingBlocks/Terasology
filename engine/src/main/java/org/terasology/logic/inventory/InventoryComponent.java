@@ -28,7 +28,8 @@ import org.terasology.world.block.ForceBlockActive;
 import java.util.List;
 
 /**
- * Allows an entity to store items
+ * Allows an entity to store items.
+ * You can use the {@link InventoryManager} for assorted utility related to inventories.
  *
  * @author Immortius <immortius@gmail.com>
  */

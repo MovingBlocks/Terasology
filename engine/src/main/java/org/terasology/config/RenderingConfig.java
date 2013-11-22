@@ -29,6 +29,8 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class RenderingConfig {
     private PixelFormat pixelFormat = new PixelFormat().withDepthBits(24);
+    private int windowPosX = -1;
+    private int windowPosY = -1;
     private int windowWidth = 1280;
     private int windowHeight = 720;
     private boolean fullscreen;
@@ -75,6 +77,22 @@ public class RenderingConfig {
 
     public void setPixelFormat(PixelFormat pixelFormat) {
         this.pixelFormat = pixelFormat;
+    }
+
+    public int getWindowPosX() {
+	return windowPosX;
+    }
+    
+    public void setWindowPosX(int posX) {
+        this.windowPosX = posX;
+    }
+    
+    public int getWindowPosY() {
+	return windowPosY;
+    }
+
+    public void setWindowPosY(int posY) {
+        this.windowPosY = posY;
     }
 
     public int getWindowWidth() {
