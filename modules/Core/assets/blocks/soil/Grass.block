@@ -22,6 +22,7 @@
  */
 {
     "basedOn" : "core:soil",
+    "grass" : true,
     // Graphics
     "tiles" : {                     // "tiles" being present means we'll override some with a different graphic
         "sides" : "core:GrassSide",     // sides means all four (not top/bottom) and can itself be overridden

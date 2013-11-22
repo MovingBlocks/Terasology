@@ -140,6 +140,12 @@ public final class Block {
     private boolean supportRequired;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
 
+    // Special rendering flags (TODO: clean this up)
+    private boolean water;
+    private boolean lava;
+    private boolean grass;
+    private boolean ice;
+
     // Rendering related
     private boolean invisible;
     private boolean translucent;
@@ -254,6 +260,39 @@ public final class Block {
     public void setLiquid(boolean liquid) {
         this.liquid = liquid;
     }
+
+    public boolean isWater() {
+        return water;
+    }
+
+    public void setWater(boolean water) {
+        this.water = water;
+    }
+
+    public boolean isLava() {
+        return lava;
+    }
+
+    public void setLava(boolean lava) {
+        this.lava = lava;
+    }
+
+    public boolean isGrass() {
+        return grass;
+    }
+
+    public void setGrass(boolean grass) {
+        this.grass = grass;
+    }
+
+    public boolean isIce() {
+        return ice;
+    }
+
+    public void setIce(boolean ice) {
+        this.ice = ice;
+    }
+
 
     /**
      * @return Whether this block is translucent/alpha masked

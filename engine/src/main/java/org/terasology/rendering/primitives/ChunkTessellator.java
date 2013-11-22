@@ -293,9 +293,9 @@ public final class ChunkTessellator {
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
         ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
-        if (block.getURI().toNormalisedString().equals("core:water")) {
+        if (block.isWater()) {
             vertexFlag = ChunkVertexFlag.WATER;
-        } else if (block.getURI().toNormalisedString().equals("core:lava")) {
+        } else if (block.isLava()) {
             vertexFlag = ChunkVertexFlag.LAVA;
         } else if (block.isWaving() && block.isDoubleSided()) {
             vertexFlag = ChunkVertexFlag.WAVING;
@@ -322,7 +322,7 @@ public final class ChunkTessellator {
             renderType = ChunkMesh.RenderType.OPAQUE;
         }
         // TODO: Review special case, or alternatively compare uris.
-        if (block.getURI().toNormalisedString().equals("core:water") || block.getURI().toNormalisedString().equals("core:ice")) {
+        if (block.isWater() || block.isIce()) {
             renderType = ChunkMesh.RenderType.WATER_AND_ICE;
         }
         if (block.isDoubleSided()) {
@@ -378,7 +378,7 @@ public final class ChunkTessellator {
             if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
-                if (block.getURI().toNormalisedString().equals("core:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
+                if (block.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
                 } else {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
