@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Queues;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -53,15 +55,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
     private Deque<UIScreen> screens = Queues.newArrayDeque();
-    private CanvasInternal canvas = new LwjglCanvas();
-    private ClassLibrary<UIWidget> widgetsLibrary;
+    private CanvasInternal canvas = new LwjglCanvas(this);
+    private ClassLibrary<UIElement> elementsLibrary;
+    private UIElement focus;
 
-    public void refreshWidgetsLibrary() {
-        widgetsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+    public void refreshElementsLibrary() {
+        elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
-            for (Class<? extends UIWidget> widgetType : module.getReflections().getSubTypesOf(UIWidget.class)) {
-                if (!widgetType.isInterface()) {
-                    widgetsLibrary.register(new SimpleUri(module.getId(), widgetType.getSimpleName()), widgetType);
+            for (Class<? extends UIElement> elementType : module.getReflections().getSubTypesOf(UIElement.class)) {
+                if (!elementType.isInterface()) {
+                    elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
                 }
             }
         }
@@ -70,6 +73,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void pushScreen(UIScreen screen) {
         inject(screen);
+        screen.initialise();
         screens.push(screen);
     }
 
@@ -84,6 +88,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void setScreen(UIScreen screen) {
         screens.clear();
         inject(screen);
+        screen.initialise();
         screens.push(screen);
     }
 
@@ -95,7 +100,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void render() {
         canvas.preRender();
         if (!screens.isEmpty()) {
-            screens.peek().onDraw(canvas);
+            canvas.setSkin(screens.peek().getSkin());
+            canvas.drawElement(screens.peek(), canvas.getRegion());
         }
         canvas.postRender();
     }
@@ -108,8 +114,26 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public ClassLibrary<UIWidget> getWidgetMetadataLibrary() {
-        return widgetsLibrary;
+    public ClassLibrary<UIElement> getElementMetadataLibrary() {
+        return elementsLibrary;
+    }
+
+    @Override
+    public void setFocus(UIElement widget) {
+        if (!Objects.equal(widget, focus)) {
+            if (focus != null) {
+                focus.onLoseFocus();
+            }
+            focus = widget;
+            if (focus != null) {
+                focus.onGainFocus();
+            }
+        }
+    }
+
+    @Override
+    public UIElement getFocus() {
+        return focus;
     }
 
     /*

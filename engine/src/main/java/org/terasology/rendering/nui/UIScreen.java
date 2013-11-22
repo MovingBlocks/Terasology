@@ -16,15 +16,29 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
 
 /**
  * @author Immortius
  */
-public class UIScreen {
+public class UIScreen implements UIElement {
 
+    private String family;
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
+    private InteractionListener screenListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+            return true;
+        }
+    };
+
+    public void initialise() {
+
+    }
 
     public void setContents(UIWidget contents) {
         this.contents = contents;
@@ -35,8 +49,8 @@ public class UIScreen {
     }
 
     public void onDraw(Canvas canvas) {
-        canvas.setSkin(skin);
-        canvas.drawWidget(contents, canvas.getRegion());
+        canvas.addInteractionRegion(screenListener);
+        canvas.drawElement(contents, canvas.getRegion());
     }
 
     public UISkin getSkin() {
@@ -49,6 +63,29 @@ public class UIScreen {
 
     public void update(float delta) {
         contents.update(delta);
+    }
+
+    @Override
+    public void onGainFocus() {
+    }
+
+    @Override
+    public void onLoseFocus() {
+    }
+
+    @Override
+    public String getFamily() {
+        return family;
+    }
+
+    @Override
+    public void setFamily(String family) {
+        this.family = family;
+    }
+
+    @Override
+    public String getMode() {
+        return DEFAULT_MODE;
     }
 
     public <T extends UIWidget> T find(String id, Class<T> type) {

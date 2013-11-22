@@ -64,4 +64,10 @@ public interface InteractionListener {
      * @return Whether the mouse input should be consumed, and thus not propagated to other intertaction regions
      */
     boolean onMouseWheeled(int amount, Vector2i pos);
+
+    /**
+     * @return True if the mouse was over the interaction region last frame
+     */
+    boolean isMouseOver();
+
 }

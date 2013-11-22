@@ -27,9 +27,12 @@ import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.utilities.ReflectionUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,60 +42,60 @@ import java.util.Set;
 public class UISkinBuilder {
 
     private Set<String> families = Sets.newLinkedHashSet();
-    private Set<Class<? extends UIWidget>> widgetClasses = Sets.newLinkedHashSet();
-    private SetMultimap<Class<? extends UIWidget>, String> modes = HashMultimap.create();
+    private Set<Class<? extends UIElement>> elementClasses = Sets.newLinkedHashSet();
+    private SetMultimap<Class<? extends UIElement>, String> modes = HashMultimap.create();
 
     private Map<String, UIStyleFragment> baseStyles = Maps.newHashMap();
-    private Map<String, Table<Class<? extends UIWidget>, String, UIStyleFragment>> widgetStyles = Maps.newHashMap();
+    private Map<String, Table<Class<? extends UIElement>, String, UIStyleFragment>> elementStyles = Maps.newHashMap();
 
     private UIStyleFragment currentStyle = new UIStyleFragment();
     private String currentFamily = "";
-    private Class<? extends UIWidget> currentWidget;
+    private Class<? extends UIElement> currentElement;
     private String currentMode = "";
 
     private void saveStyle() {
-        if (currentWidget != null) {
-            Table<Class<? extends UIWidget>, String, UIStyleFragment> widgetTable = getWidgetTable(currentFamily);
-            widgetTable.put(currentWidget, currentMode, currentStyle);
+        if (currentElement != null) {
+            Table<Class<? extends UIElement>, String, UIStyleFragment> elementTable = getElementTable(currentFamily);
+            elementTable.put(currentElement, currentMode, currentStyle);
         } else {
             baseStyles.put(currentFamily, currentStyle);
         }
         currentStyle = new UIStyleFragment();
     }
 
-    private Table<Class<? extends UIWidget>, String, UIStyleFragment> getWidgetTable(String family) {
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> widgetTable = widgetStyles.get(family);
-        if (widgetTable == null) {
-            widgetTable = HashBasedTable.create();
-            widgetStyles.put(family, widgetTable);
+    private Table<Class<? extends UIElement>, String, UIStyleFragment> getElementTable(String family) {
+        Table<Class<? extends UIElement>, String, UIStyleFragment> elementTable = elementStyles.get(family);
+        if (elementTable == null) {
+            elementTable = HashBasedTable.create();
+            elementStyles.put(family, elementTable);
         }
-        return widgetTable;
+        return elementTable;
     }
 
     public UISkinBuilder setFamily(String family) {
         saveStyle();
         families.add(family);
         currentFamily = family;
-        currentWidget = null;
+        currentElement = null;
         currentMode = "";
         return this;
     }
 
-    public UISkinBuilder setWidgetClass(Class<? extends UIWidget> widget) {
+    public UISkinBuilder setElementClass(Class<? extends UIElement> widget) {
         saveStyle();
-        widgetClasses.add(widget);
-        currentWidget = widget;
+        elementClasses.add(widget);
+        currentElement = widget;
         currentMode = "";
         return this;
 
     }
 
-    public UISkinBuilder setWidgetMode(String mode) {
-        if (currentWidget == null) {
-            throw new IllegalStateException("Widget class must be set before widget mode");
+    public UISkinBuilder setElementMode(String mode) {
+        if (currentElement == null) {
+            throw new IllegalStateException("Element class must be set before element mode");
         }
         saveStyle();
-        modes.put(currentWidget, mode);
+        modes.put(currentElement, mode);
         currentMode = mode;
         return this;
     }
@@ -184,8 +187,8 @@ public class UISkinBuilder {
 
         UIStyle defaultStyle = new UIStyle();
         baseStyles.get("").applyTo(defaultStyle);
-        Table<Class<? extends UIWidget>, String, UIStyle> defaultWidgetStyles = buildDefaultWidgetStyles(defaultStyle);
-        skinFamilies.put("", new UIStyleFamily(defaultStyle, defaultWidgetStyles));
+        Table<Class<? extends UIElement>, String, UIStyle> defaultElementStyles = buildDefaultElementStyles(defaultStyle);
+        skinFamilies.put("", new UIStyleFamily(defaultStyle, defaultElementStyles));
         families.remove("");
 
         for (String family : families) {
@@ -199,71 +202,88 @@ public class UISkinBuilder {
         UIStyleFragment fragment = baseStyles.get(family);
         fragment.applyTo(baseStyle);
 
-        Table<Class<? extends UIWidget>, String, UIStyle> familyStyles = HashBasedTable.create();
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> table = getWidgetTable(family);
-        for (Class<? extends UIWidget> widget : widgetClasses) {
-            UIStyle widgetStyle = new UIStyle(baseStyle);
+        Table<Class<? extends UIElement>, String, UIStyle> familyStyles = HashBasedTable.create();
+        Table<Class<? extends UIElement>, String, UIStyleFragment> table = getElementTable(family);
+        for (Class<? extends UIElement> element : elementClasses) {
+            UIStyle elementStyle = new UIStyle(baseStyle);
 
-            UIStyleFragment widgetFrag = table.get(widget, "");
-            UIStyleFragment defaultWidgetFrag = getDefaultWidgetStyleFrag(widget);
-            if (defaultWidgetFrag != null) {
-                defaultWidgetFrag.applyTo(widgetStyle);
+            UIStyleFragment elementFrag = table.get(element, "");
+            UIStyleFragment defaultElementFrag = getDefaultElementStyleFrag(element);
+            if (defaultElementFrag != null) {
+                defaultElementFrag.applyTo(elementStyle);
             }
-            if (widgetFrag != null) {
-                widgetFrag.applyTo(widgetStyle);
+            if (elementFrag != null) {
+                elementFrag.applyTo(elementStyle);
             }
-            if (widgetFrag != null || defaultWidgetFrag != null) {
-                familyStyles.put(widget, "", widgetStyle);
-                for (String mode : modes.get(widget)) {
-                    UIStyleFragment defaultMode = getDefaultWidgetModeFrag(widget, mode);
-                    UIStyleFragment widgetMode = table.get(widget, mode);
+            if (elementFrag != null || defaultElementFrag != null) {
+                familyStyles.put(element, "", elementStyle);
+                for (String mode : modes.get(element)) {
+                    UIStyleFragment defaultMode = getDefaultElementModeFrag(element, mode);
+                    UIStyleFragment elementMode = table.get(element, mode);
 
-                    UIStyle widgetModeStyle = new UIStyle(widgetStyle);
+                    UIStyle elementModeStyle = new UIStyle(elementStyle);
                     if (defaultMode != null) {
-                        defaultMode.applyTo(widgetModeStyle);
+                        defaultMode.applyTo(elementModeStyle);
                     }
-                    if (widgetMode != null) {
-                        widgetMode.applyTo(widgetModeStyle);
+                    if (elementMode != null) {
+                        elementMode.applyTo(elementModeStyle);
                     }
-                    familyStyles.put(widget, mode, widgetModeStyle);
+                    familyStyles.put(element, mode, elementModeStyle);
                 }
             }
         }
         return new UIStyleFamily(baseStyle, familyStyles);
     }
 
-    private UIStyleFragment getDefaultWidgetModeFrag(Class<? extends UIWidget> widget, String mode) {
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> widgetTable = getWidgetTable("");
-        return widgetTable.get(widget, mode);
+    private UIStyleFragment getDefaultElementModeFrag(Class<? extends UIElement> element, String mode) {
+        Table<Class<? extends UIElement>, String, UIStyleFragment> elementTable = getElementTable("");
+        return elementTable.get(element, mode);
     }
 
-    private UIStyleFragment getDefaultWidgetStyleFrag(Class<? extends UIWidget> widget) {
-        return getDefaultWidgetModeFrag(widget, "");
+    private UIStyleFragment getDefaultElementStyleFrag(Class<? extends UIElement> element) {
+        return getDefaultElementModeFrag(element, "");
     }
 
-    private Table<Class<? extends UIWidget>, String, UIStyle> buildDefaultWidgetStyles(UIStyle defaultStyle) {
-        Table<Class<? extends UIWidget>, String, UIStyle> results = HashBasedTable.create();
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> defaultTable = getWidgetTable("");
-        for (Class<? extends UIWidget> widget : widgetClasses) {
-            UIStyleFragment fragment = defaultTable.get(widget, "");
+    private Table<Class<? extends UIElement>, String, UIStyle> buildDefaultElementStyles(UIStyle defaultStyle) {
+        Table<Class<? extends UIElement>, String, UIStyle> results = HashBasedTable.create();
+        Table<Class<? extends UIElement>, String, UIStyleFragment> defaultTable = getElementTable("");
+        for (Class<? extends UIElement> element : elementClasses) {
+            UIStyleFragment fragment = defaultTable.get(element, "");
             if (fragment != null) {
                 UIStyle style = new UIStyle(defaultStyle);
-                fragment.applyTo(style);
-                results.put(widget, "", style);
 
-                for (String state : modes.get(widget)) {
-                    UIStyleFragment stateFrag = defaultTable.get(widget, state);
-                    if (stateFrag != null) {
-                        UIStyle modeStyle = new UIStyle(style);
-                        stateFrag.applyTo(modeStyle);
-                        results.put(widget, state, modeStyle);
+                List<Class<? extends UIElement>> inheritanceTree = ReflectionUtil.getInheritanceTree(element, UIElement.class);
+                for (Class<? extends UIElement> elementType : inheritanceTree) {
+                    UIStyleFragment frag = defaultTable.get(elementType, "");
+                    if (frag != null) {
+                        frag.applyTo(style);
                     }
+                }
+                results.put(element, "", style);
+
+                Map<String, UIStyle> modeStyles = Maps.newLinkedHashMap();
+                for (Class<? extends UIElement> elementType : inheritanceTree) {
+                    for (String state : modes.get(elementType)) {
+                        UIStyleFragment stateFrag = defaultTable.get(element, state);
+                        if (stateFrag != null) {
+                            UIStyle modeStyle = modeStyles.get(state);
+                            if (modeStyle == null) {
+                                modeStyle = new UIStyle(style);
+                                modeStyles.put(state, modeStyle);
+                            }
+                            stateFrag.applyTo(modeStyle);
+                        }
+
+                    }
+                }
+
+                for (Map.Entry<String, UIStyle> entry : modeStyles.entrySet()) {
+                    results.put(element, entry.getKey(), entry.getValue());
                 }
             }
         }
         return results;
     }
-
 
     private static class UIStyleFragment {
         private boolean backgroundSet;

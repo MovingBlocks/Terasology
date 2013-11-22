@@ -22,6 +22,7 @@ public abstract class AbstractWidget implements UIWidget {
 
     private final String id;
     private String family;
+    private boolean focused;
 
     public AbstractWidget() {
         id = "";
@@ -61,5 +62,19 @@ public abstract class AbstractWidget implements UIWidget {
             return type.cast(this);
         }
         return null;
+    }
+
+    @Override
+    public void onGainFocus() {
+        focused = true;
+    }
+
+    @Override
+    public void onLoseFocus() {
+        focused = false;
+    }
+
+    public boolean isFocused() {
+        return focused;
     }
 }

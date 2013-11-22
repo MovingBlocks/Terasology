@@ -15,8 +15,10 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
+import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
@@ -31,6 +33,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UICheckbox;
+import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.baseWidgets.UIImage;
 import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -53,10 +56,14 @@ public class VideoSettingsScreen extends UIScreen {
     private Config config;
 
     public VideoSettingsScreen() {
+
+    }
+
+    public void initialise() {
         ColumnLayout grid = new ColumnLayout();
         grid.setColumns(4);
         grid.addWidget(new UILabel("Graphics Quality:"));
-        grid.addWidget(new UIButton("toggleQuality", "Nice"));
+        grid.addWidget(new UIDropdown<>("quality"));
         grid.addWidget(new UILabel("Environment Effects:"));
         grid.addWidget(new UIButton("environmentEffects", "Off"));
         grid.addWidget(new UILabel("Viewing Distance:"));
@@ -92,6 +99,10 @@ public class VideoSettingsScreen extends UIScreen {
     @Override
     public void setContents(UIWidget contents) {
         super.setContents(contents);
+        UIDropdown<VideoQuality> quality = find("quality", UIDropdown.class);
+        quality.setOptions(Lists.newArrayList(VideoQuality.NICE, VideoQuality.EPIC, VideoQuality.INSANE, VideoQuality.UBER));
+        quality.bindSelection(new VideoQualityBinding(config.getRendering()));
+
         find("fullscreen", UICheckbox.class).bindChecked(new Binding<Boolean>() {
             @Override
             public Boolean get() {
@@ -147,5 +158,96 @@ public class VideoSettingsScreen extends UIScreen {
                 nuiManager.popScreen();
             }
         });
+    }
+
+    private enum VideoQuality {
+        NICE("Nice") {
+            @Override
+            public void apply(RenderingConfig renderConfig) {
+                renderConfig.setVolumetricLighting(false);
+                renderConfig.setVolumetricFog(false);
+                renderConfig.setAnimateGrass(false);
+                renderConfig.setAnimateWater(false);
+            }
+        },
+        EPIC("Epic") {
+            @Override
+            public void apply(RenderingConfig renderConfig) {
+                renderConfig.setVolumetricLighting(false);
+                renderConfig.setVolumetricFog(true);
+                renderConfig.setAnimateGrass(true);
+                renderConfig.setAnimateWater(false);
+            }
+        },
+        INSANE("Insane") {
+            @Override
+            public void apply(RenderingConfig renderConfig) {
+                renderConfig.setVolumetricLighting(false);
+                renderConfig.setVolumetricFog(true);
+                renderConfig.setAnimateGrass(true);
+                renderConfig.setAnimateWater(true);
+            }
+        },
+        UBER("Uber") {
+            @Override
+            public void apply(RenderingConfig renderConfig) {
+                renderConfig.setVolumetricLighting(true);
+                renderConfig.setVolumetricFog(true);
+                renderConfig.setAnimateGrass(true);
+                renderConfig.setAnimateWater(true);
+            }
+        },
+        CUSTOM("Custom") {
+            @Override
+            public void apply(RenderingConfig renderConfig) {
+            }
+        };
+
+        private String displayName;
+
+        private VideoQuality(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public abstract void apply(RenderingConfig renderConfig);
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
+
+    private class VideoQualityBinding implements Binding<VideoQuality> {
+
+        private RenderingConfig config;
+
+        public VideoQualityBinding(RenderingConfig config) {
+            this.config = config;
+        }
+
+        @Override
+        public VideoQuality get() {
+            if (config.isVolumetricLighting()) {
+                if (config.isAnimateWater() && config.isAnimateGrass() && config.isVolumetricFog()) {
+                    return VideoQuality.UBER;
+                }
+            } else if (config.isAnimateWater()) {
+                if (config.isAnimateGrass() && config.isVolumetricFog()) {
+                    return VideoQuality.INSANE;
+                }
+            } else if (config.isAnimateGrass()) {
+                if (config.isVolumetricFog()) {
+                    return VideoQuality.EPIC;
+                }
+            } else if (!config.isVolumetricFog()) {
+                return VideoQuality.NICE;
+            }
+            return VideoQuality.CUSTOM;
+        }
+
+        @Override
+        public void set(VideoQuality value) {
+            value.apply(config);
+        }
     }
 }

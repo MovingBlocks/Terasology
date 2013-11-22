@@ -82,7 +82,7 @@ public class ArbitraryLayout extends AbstractWidget {
         }
 
         public void draw(Canvas canvas) {
-            canvas.drawWidget(widget, Rect2i.createFromMinAndSize(getPosition(canvas.size()), getSize(canvas.size())));
+            canvas.drawElement(widget, Rect2i.createFromMinAndSize(getPosition(canvas.size()), getSize(canvas.size())));
         }
 
         public abstract Vector2i getSize(Vector2i canvasSize);

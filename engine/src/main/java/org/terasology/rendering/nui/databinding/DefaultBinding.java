@@ -18,14 +18,14 @@ package org.terasology.rendering.nui.databinding;
 /**
  * @author Immortius
  */
-public class DirectBinding<T> implements Binding<T> {
+public class DefaultBinding<T> implements Binding<T> {
 
     private T value;
 
-    public DirectBinding() {
+    public DefaultBinding() {
     }
 
-    public DirectBinding(T value) {
+    public DefaultBinding(T value) {
         this.value = value;
     }
 

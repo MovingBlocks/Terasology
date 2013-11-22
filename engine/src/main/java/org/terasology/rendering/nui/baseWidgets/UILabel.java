@@ -18,14 +18,14 @@ package org.terasology.rendering.nui.baseWidgets;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DirectBinding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
  * @author Immortius
  */
 public class UILabel extends AbstractWidget {
 
-    private Binding<String> text = new DirectBinding<>("");
+    private Binding<String> text = new DefaultBinding<>("");
 
     public UILabel() {
     }
@@ -38,12 +38,26 @@ public class UILabel extends AbstractWidget {
         this.text = text;
     }
 
+    public UILabel(String id, String text) {
+        super(id);
+        this.text.set(text);
+    }
+
+    public UILabel(String id, Binding<String> text) {
+        super(id);
+        this.text = text;
+    }
+
     public String getText() {
         return text.get();
     }
 
     public void setText(String text) {
         this.text.set(text);
+    }
+
+    public void bindText(Binding<String> binding) {
+        this.text = binding;
     }
 
     @Override

@@ -17,16 +17,20 @@ package org.terasology.rendering.nui.skin;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.utilities.ReflectionUtil;
+
+import java.util.List;
 
 /**
  * @author Immortius
  */
 public class UIStyleFamily {
     private UIStyle baseStyle;
-    private Table<Class<? extends UIWidget>, String, UIStyle> widgetStyles = HashBasedTable.create();
+    private Table<Class<? extends UIElement>, String, UIStyle> widgetStyles = HashBasedTable.create();
 
-    public UIStyleFamily(UIStyle baseStyle, Table<Class<? extends UIWidget>, String, UIStyle> widgetStyles) {
+    public UIStyleFamily(UIStyle baseStyle, Table<Class<? extends UIElement>, String, UIStyle> widgetStyles) {
         this.baseStyle = baseStyle;
         this.widgetStyles = widgetStyles;
     }
@@ -35,18 +39,26 @@ public class UIStyleFamily {
         return baseStyle;
     }
 
-    public UIStyle getWidgetStyle(Class<? extends UIWidget> widget) {
-        UIStyle style = widgetStyles.get(widget, "");
+    public UIStyle getWidgetStyle(Class<? extends UIElement> element) {
+        List<Class<? extends UIElement>> classes = ReflectionUtil.getInheritanceTree(element, UIElement.class);
+        UIStyle style = null;
+        for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
+            style = widgetStyles.get(classes.get(i), "");
+        }
         if (style == null) {
             return baseStyle;
         }
         return style;
     }
 
-    public UIStyle getWidgetStyle(Class<? extends UIWidget> widget, String mode) {
-        UIStyle style = widgetStyles.get(widget, mode);
+    public UIStyle getElementStyle(Class<? extends UIElement> element, String mode) {
+        List<Class<? extends UIElement>> classes = ReflectionUtil.getInheritanceTree(element, UIElement.class);
+        UIStyle style = null;
+        for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
+            style = widgetStyles.get(classes.get(i), mode);
+        }
         if (style == null) {
-            return getWidgetStyle(widget);
+            return getWidgetStyle(element);
         }
         return style;
     }

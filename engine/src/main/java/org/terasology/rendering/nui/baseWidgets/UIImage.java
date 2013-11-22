@@ -19,13 +19,13 @@ import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DirectBinding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
  * @author Immortius
  */
 public class UIImage extends AbstractWidget {
-    private Binding<TextureRegion> texture = new DirectBinding<>();
+    private Binding<TextureRegion> texture = new DefaultBinding<>();
 
     public UIImage() {
     }

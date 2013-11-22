@@ -32,15 +32,17 @@ import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
+import org.terasology.math.Rect2f;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
@@ -85,6 +87,9 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         @Override
         public TextureRegion deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String uri = json.getAsString();
+            if (uri.isEmpty()) {
+                return new NullTextureRegion();
+            }
             return Assets.getTextureRegion(uri);
         }
     }
@@ -117,19 +122,19 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
     }
 
     private static class FamilyInfo extends StyleInfo {
-        public Map<String, WidgetInfo> widgets;
+        public Map<String, ElementInfo> elements;
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
-            if (widgets != null) {
-                for (Map.Entry<String, WidgetInfo> entry : widgets.entrySet()) {
-                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();
-                    ClassMetadata<? extends UIWidget, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
+            if (elements != null) {
+                for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
+                    ClassLibrary<UIElement> library = CoreRegistry.get(NUIManager.class).getElementMetadataLibrary();
+                    ClassMetadata<? extends UIElement, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
                     if (metadata != null) {
-                        builder.setWidgetClass(metadata.getType());
+                        builder.setElementClass(metadata.getType());
                         entry.getValue().apply(builder);
                     } else {
-                        logger.warn("Failed to resolve widget class {}, skipping style information", entry.getKey());
+                        logger.warn("Failed to resolve UIElement class {}, skipping style information", entry.getKey());
                     }
 
 
@@ -138,14 +143,14 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         }
     }
 
-    private static class WidgetInfo extends StyleInfo {
+    private static class ElementInfo extends StyleInfo {
         public Map<String, StyleInfo> modes;
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
             if (modes != null) {
                 for (Map.Entry<String, StyleInfo> entry : modes.entrySet()) {
-                    builder.setWidgetMode(entry.getKey());
+                    builder.setElementMode(entry.getKey());
                     entry.getValue().apply(builder);
                 }
             }
@@ -189,7 +194,11 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
 
         public void apply(UISkinBuilder builder) {
             if (background != null) {
-                builder.setBackground(background);
+                if (background.getRegion().isEmpty()) {
+                    builder.setBackground(null);
+                } else {
+                    builder.setBackground(background);
+                }
             }
             if (backgroundBorder != null) {
                 builder.setBackgroundBorder(backgroundBorder);
@@ -236,6 +245,29 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
             if (alignmentV != null) {
                 builder.setVerticalAlignment(alignmentV);
             }
+        }
+    }
+
+    private static class NullTextureRegion implements TextureRegion {
+
+        @Override
+        public Texture getTexture() {
+            return null;
+        }
+
+        @Override
+        public Rect2f getRegion() {
+            return Rect2f.EMPTY;
+        }
+
+        @Override
+        public int getWidth() {
+            return 0;
+        }
+
+        @Override
+        public int getHeight() {
+            return 0;
         }
     }
 }
