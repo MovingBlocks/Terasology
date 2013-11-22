@@ -35,7 +35,6 @@ public interface WorldGenerator {
 
     void createChunk(ChunkAPI chunk);
 
-    //TODO: create a WorldInfo interface to contain the fog, temp, and humidity
     float getFog(float x, float y, float z);
 
     float getTemperature(float x, float y, float z);
