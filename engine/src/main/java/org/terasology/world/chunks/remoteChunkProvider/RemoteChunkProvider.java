@@ -38,6 +38,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
+import org.terasology.world.generator.RemoteWorldGenerator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.light.LightPropagationRules;
@@ -63,11 +64,15 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     private ChunkGenerationPipeline pipeline;
     private List<BatchPropagator> loadEdgePropagators = Lists.newArrayList();
 
+    private RemoteWorldGenerator remoteWorldGenerator;
+
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(this, null, new ChunkTaskRelevanceComparator());
         loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
         loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
         ChunkMonitor.fireChunkProviderInitialized(this);
+
+        remoteWorldGenerator = new RemoteWorldGenerator();
     }
 
     public void subscribe(ChunkReadyListener chunkReadyListener) {
@@ -226,7 +231,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public WorldGenerator getWorldGenerator() {
         //TODO: send this information over the wire
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return remoteWorldGenerator;
     }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
