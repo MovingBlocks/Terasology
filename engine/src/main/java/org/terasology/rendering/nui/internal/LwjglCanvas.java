@@ -297,14 +297,7 @@ public class LwjglCanvas implements CanvasInternal {
     @Override
     public void drawElement(UIElement element, Rect2i region) {
         UIStyle newStyle = state.skin.getStyleFor((element.getFamily() != null) ? element.getFamily() : state.family, element.getClass(), element.getMode());
-        Rect2i regionArea = region;
-        if (newStyle.getFixedWidth() != 0 || newStyle.getFixedHeight() != 0) {
-            int newWidth = (newStyle.getFixedWidth() != 0) ? newStyle.getFixedWidth() : region.width();
-            int newHeight = (newStyle.getFixedHeight() != 0) ? newStyle.getFixedHeight() : region.height();
-            int newMinX = region.minX() + newStyle.getHorizontalAlignment().getOffset(newWidth, region.width());
-            int newMinY = region.minY() + newStyle.getVerticalAlignment().getOffset(newHeight, region.height());
-            regionArea = Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
-        }
+        Rect2i regionArea = applyFixedSizesToRegion(region);
         try (SubRegion ignored = subRegion(regionArea, false)) {
             state.element = element;
             if (element.getFamily() != null) {
@@ -326,7 +319,7 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawText(String text, Rect2i region) {
-        Rect2i drawRegion = applyStyleToRegion(region);
+        Rect2i drawRegion = applyMarginToRegion(region);
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
             drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getTextAlignmentH(), style.getTextAlignmentV());
@@ -342,10 +335,10 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawTexture(TextureRegion texture, Rect2i region) {
-        drawTextureRaw(texture, applyStyleToRegion(region), getCurrentStyle().getTextureScaleMode());
+        drawTextureRaw(texture, applyMarginToRegion(region), getCurrentStyle().getTextureScaleMode());
     }
 
-    private Rect2i applyStyleToRegion(Rect2i region) {
+    private Rect2i applyMarginToRegion(Rect2i region) {
         UIStyle style = getCurrentStyle();
         if (!style.getMargin().isEmpty()) {
             return Rect2i.createFromMinAndMax(region.minX() + style.getMargin().getLeft(), region.minY() + style.getMargin().getTop(),
@@ -356,25 +349,30 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawBackground() {
-        drawBackground(Rect2i.createFromMinAndSize(0, 0, state.drawRegion.width(), state.drawRegion.height()));
+        Rect2i region = applyFixedSizesToRegion(getRegion());
+        drawBackground(region);
+    }
+
+    private Rect2i applyFixedSizesToRegion(Rect2i region) {
+        UIStyle style = getCurrentStyle();
+        if (style.getFixedWidth() != 0 || style.getFixedHeight() != 0) {
+            int newWidth = (style.getFixedWidth() != 0) ? style.getFixedWidth() : region.width();
+            int newHeight = (style.getFixedHeight() != 0) ? style.getFixedHeight() : region.height();
+            int newMinX = region.minX() + style.getHorizontalAlignment().getOffset(newWidth, region.width());
+            int newMinY = region.minY() + style.getVerticalAlignment().getOffset(newHeight, region.height());
+            return  Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
+        }
+        return region;
     }
 
     @Override
     public void drawBackground(Rect2i region) {
         UIStyle style = getCurrentStyle();
         if (style.getBackground() != null) {
-            Rect2i regionArea = region;
-            if (style.getFixedWidth() != 0 || style.getFixedHeight() != 0) {
-                int newWidth = (style.getFixedWidth() != 0) ? style.getFixedWidth() : region.width();
-                int newHeight = (style.getFixedHeight() != 0) ? style.getFixedHeight() : region.height();
-                int newMinX = region.minX() + style.getHorizontalAlignment().getOffset(newWidth, region.width());
-                int newMinY = region.minY() + style.getVerticalAlignment().getOffset(newHeight, region.height());
-                regionArea = Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
-            }
             if (style.getBackgroundBorder().isEmpty()) {
-                drawTextureRaw(style.getBackground(), regionArea, style.getBackgroundScaleMode());
+                drawTextureRaw(style.getBackground(), region, style.getBackgroundScaleMode());
             } else {
-                drawTextureRawBordered(style.getBackground(), regionArea, style.getBackgroundBorder(), style.getBackgroundScaleMode() == ScaleMode.TILED);
+                drawTextureRawBordered(style.getBackground(), region, style.getBackgroundBorder(), style.getBackgroundScaleMode() == ScaleMode.TILED);
             }
         }
     }
@@ -645,7 +643,7 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
-        addInteractionRegion(listener, Rect2i.createFromMinAndMax(0, 0, size().x, size().y));
+        addInteractionRegion(listener, applyFixedSizesToRegion(getRegion()));
     }
 
     @Override

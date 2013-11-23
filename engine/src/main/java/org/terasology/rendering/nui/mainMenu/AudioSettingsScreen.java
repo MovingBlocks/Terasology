@@ -28,17 +28,17 @@ import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIImage;
 import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.baseWidgets.UISpace;
+import org.terasology.rendering.nui.baseWidgets.UISlider;
+import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.layout.ArbitraryLayout;
 import org.terasology.rendering.nui.layout.ColumnLayout;
-import org.terasology.rendering.nui.mainMenu.videoSettings.VideoSettingsScreen;
 
 import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
  */
-public class SettingsMenuScreen extends UIScreen {
+public class AudioSettingsScreen extends UIScreen {
 
     @In
     private NUIManager nuiManager;
@@ -46,53 +46,47 @@ public class SettingsMenuScreen extends UIScreen {
     @In
     private Config config;
 
-    public SettingsMenuScreen() {
+    public void initialise() {
         ColumnLayout grid = new ColumnLayout();
-        grid.addWidget(new UIButton("video", "Video"));
-        grid.addWidget(new UIButton("audio", "Audio"));
-        grid.addWidget(new UIButton("controls", "Controls"));
-        grid.addWidget(new UISpace());
-        grid.addWidget(new UISpace());
-        grid.addWidget(new UIButton("close", "Return to Main Menu"));
-        grid.setPadding(new Border(0, 0, 4, 4));
+        grid.setColumns(2);
+        grid.addWidget(new UILabel("Sound Volume:"));
+        grid.addWidget(new UISlider("sound"));
+        grid.addWidget(new UILabel("Music Volume:"));
+        grid.addWidget(new UISlider("music"));
+        grid.setPadding(new Border(4, 4, 4, 4));
+        grid.setFamily("option-grid");
 
         ArbitraryLayout layout = new ArbitraryLayout();
         layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
-        layout.addFillWidget(new UILabel("Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
-        layout.addFixedWidget(grid, new Vector2i(280, 192), new Vector2f(0.5f, 0.7f));
+        layout.addFillWidget(new UILabel("Audio Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
+        layout.addFixedWidget(grid, new Vector2i(500, 192), new Vector2f(0.45f, 0.6f));
+        layout.addFixedWidget(new UIButton("close", "Back"), new Vector2i(280, 32), new Vector2f(0.5f, 0.95f));
 
         setContents(layout);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setContents(UIWidget contents) {
         super.setContents(contents);
-        find("video", UIButton.class).subscribe(new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                UIScreen videoScreen = new VideoSettingsScreen();
-                videoScreen.setSkin(getSkin());
-                nuiManager.pushScreen(videoScreen);
-            }
-        });
-        find("audio", UIButton.class).subscribe(new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                UIScreen audioScreen = new AudioSettingsScreen();
-                audioScreen.setSkin(getSkin());
-                nuiManager.pushScreen(audioScreen);
-            }
-        });
-        find("controls", UIButton.class).subscribe(new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                // Open settings
-            }
-        });
+
+        UISlider sound = find("sound", UISlider.class);
+        sound.setIncrement(0.05f);
+        sound.setPrecision(2);
+        sound.setMinimum(0);
+        sound.setRange(1.0f);
+        sound.bindValue(BindHelper.bindBeanProperty("soundVolume", config.getAudio(), Float.TYPE));
+
+        UISlider music = find("music", UISlider.class);
+        music.setIncrement(0.05f);
+        music.setPrecision(2);
+        music.setMinimum(0);
+        music.setRange(1.0f);
+        music.bindValue(BindHelper.bindBeanProperty("musicVolume", config.getAudio(), Float.TYPE));
+
         find("close", UIButton.class).subscribe(new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                config.save();
                 nuiManager.popScreen();
             }
         });

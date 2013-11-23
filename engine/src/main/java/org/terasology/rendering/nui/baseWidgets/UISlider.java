@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -95,9 +96,11 @@ public class UISlider extends AbstractWidget {
         sliderWidth = canvas.size().x - tickerWidth;
         int drawLocation = pixelOffsetFor(getValue(), sliderWidth);
         Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
-        canvas.drawBackground(tickerRegion);
-        canvas.drawText(display, tickerRegion);
-        canvas.addInteractionRegion(tickerListener, tickerRegion);
+        try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
+            canvas.drawBackground();
+            canvas.drawText(display);
+            canvas.addInteractionRegion(tickerListener);
+        }
     }
 
     @Override
