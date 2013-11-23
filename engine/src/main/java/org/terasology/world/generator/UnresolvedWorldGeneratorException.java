@@ -19,6 +19,9 @@ package org.terasology.world.generator;
  * @author Immortius
  */
 public class UnresolvedWorldGeneratorException extends Exception {
+
+    private static final long serialVersionUID = 2096504461776129337L;
+
     public UnresolvedWorldGeneratorException() {
     }
 
