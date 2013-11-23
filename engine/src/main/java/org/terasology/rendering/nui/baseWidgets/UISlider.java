@@ -88,7 +88,6 @@ public class UISlider extends AbstractWidget {
         canvas.drawBackground();
 
         canvas.setPart(TICKER);
-
         String display = String.format("%." + precision + "f", value.get());
         int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(display);
         tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();

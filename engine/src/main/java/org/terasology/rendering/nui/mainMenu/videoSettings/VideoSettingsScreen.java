@@ -37,6 +37,7 @@ import org.terasology.rendering.nui.baseWidgets.UIImage;
 import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.displayAdapting.DisplayValueAdapter;
 import org.terasology.rendering.nui.layout.ArbitraryLayout;
 import org.terasology.rendering.nui.layout.ColumnLayout;
 import org.terasology.rendering.world.ViewDistance;
@@ -75,23 +76,23 @@ public class VideoSettingsScreen extends UIScreen {
         grid.addWidget(new UILabel("FOV:"));
         grid.addWidget(new UISlider("fov"));
         grid.addWidget(new UILabel("Blur Intensity:"));
-        grid.addWidget(new UIButton("blur", "Normal"));
+        grid.addWidget(new UIDropdown<>("blur"));
         grid.addWidget(new UILabel("Bobbing:"));
         grid.addWidget(new UICheckbox("bobbing"));
         grid.addWidget(new UILabel("Fullscreen:"));
         grid.addWidget(new UICheckbox("fullscreen"));
         grid.addWidget(new UILabel("Dynamic Shadows:"));
-        grid.addWidget(new UIButton("shadows", "Off"));
+        grid.addWidget(new UIDropdown<>("shadows"));
         grid.addWidget(new UILabel("Outline:"));
         grid.addWidget(new UICheckbox("outline"));
         grid.addWidget(new UILabel("VSync:"));
         grid.addWidget(new UICheckbox("vsync"));
-        grid.setPadding(new Border(0, 0, 4, 4));
+        grid.setPadding(new Border(4, 4, 4, 4));
         grid.setFamily("option-grid");
 
         ArbitraryLayout layout = new ArbitraryLayout();
         layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
-        layout.addFillWidget(new UILabel("Pre Alpha"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
+        layout.addFillWidget(new UILabel("Video Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
         layout.addFixedWidget(grid, new Vector2i(720, 192), new Vector2f(0.5f, 0.6f));
         layout.addFixedWidget(new UIButton("close", "Back"), new Vector2i(280, 32), new Vector2f(0.5f, 0.95f));
 
@@ -118,6 +119,29 @@ public class VideoSettingsScreen extends UIScreen {
         UIDropdown<WaterReflection> waterReflection = find("reflections", UIDropdown.class);
         waterReflection.setOptions(Lists.newArrayList(WaterReflection.SKY, WaterReflection.LOCAL, WaterReflection.GLOBAL));
         waterReflection.bindSelection(new WaterReflectionBinding(config.getRendering()));
+
+        UIDropdown<Integer> blur = find("blur", UIDropdown.class);
+        blur.setOptions(Lists.newArrayList(0, 1, 2, 3));
+        blur.bindSelection(BindHelper.bindBeanProperty("blurIntensity", config.getRendering(), Integer.TYPE));
+        blur.setOptionAdapter(new DisplayValueAdapter<Integer>() {
+            @Override
+            public String convert(Integer value) {
+                switch (value) {
+                    case 1:
+                        return "Some";
+                    case 2:
+                        return "Normal";
+                    case 3:
+                        return "Max";
+                    default:
+                        return "Off";
+                }
+            }
+        });
+
+        UIDropdown<DynamicShadows> dynamicShadows = find("shadows", UIDropdown.class);
+        dynamicShadows.setOptions(Arrays.asList(DynamicShadows.values()));
+        dynamicShadows.bindSelection(new DynamicShadowsBinding(config.getRendering()));
 
         UISlider fovSlider = find("fov", UISlider.class);
         fovSlider.setIncrement(5.0f);

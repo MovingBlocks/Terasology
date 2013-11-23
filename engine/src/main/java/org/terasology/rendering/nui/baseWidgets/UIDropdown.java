@@ -27,6 +27,8 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.displayAdapting.DisplayValueAdapter;
+import org.terasology.rendering.nui.displayAdapting.ToStringAdapter;
 
 import java.util.List;
 
@@ -56,6 +58,7 @@ public class UIDropdown<T> extends AbstractWidget {
         }
     };
     private List<InteractionListener> optionListeners = Lists.newArrayList();
+    private DisplayValueAdapter<T> optionAdapter = new ToStringAdapter<>();
 
     private boolean opened;
 
@@ -74,7 +77,7 @@ public class UIDropdown<T> extends AbstractWidget {
         canvas.setPart(BOX);
         canvas.drawBackground();
         if (selection.get() != null) {
-            canvas.drawText(selection.get().toString());
+            canvas.drawText(optionAdapter.convert(selection.get()));
         }
 
         if (opened) {
@@ -98,7 +101,7 @@ public class UIDropdown<T> extends AbstractWidget {
                 }
                 Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
                 canvas.drawBackground(itemRegion);
-                canvas.drawText(options.get().get(i).toString(), itemRegion);
+                canvas.drawText(optionAdapter.convert(options.get().get(i)), itemRegion);
                 canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
             }
         } else {
@@ -142,6 +145,10 @@ public class UIDropdown<T> extends AbstractWidget {
 
     public void setSelection(T value) {
         selection.set(value);
+    }
+
+    public void setOptionAdapter(DisplayValueAdapter<T> displayValueAdapter) {
+        optionAdapter = displayValueAdapter;
     }
 
     private class ItemListener extends BaseInteractionListener {

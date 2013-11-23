@@ -13,15 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.rendering.nui.mainMenu.videoSettings;
+
+import org.terasology.config.RenderingConfig;
+import org.terasology.rendering.nui.databinding.Binding;
 
 /**
  * @author Immortius
  */
-public enum WidgetCoordinate {
-    TOP,
-    RIGHT,
-    BOTTOM,
-    LEFT,
-    CENTER
+public class DynamicShadowsBinding implements Binding<DynamicShadows> {
+
+    private RenderingConfig config;
+
+    public DynamicShadowsBinding(RenderingConfig config) {
+        this.config = config;
+    }
+
+    @Override
+    public DynamicShadows get() {
+        return DynamicShadows.find(config.isDynamicShadows(), config.isDynamicShadowsPcfFiltering());
+    }
+
+    @Override
+    public void set(DynamicShadows value) {
+        value.apply(config);
+    }
 }
