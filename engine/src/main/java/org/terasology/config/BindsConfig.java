@@ -190,7 +190,7 @@ public final class BindsConfig {
     private void updateInputsFor(String packageName, Iterable<Class<?>> classes) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = (RegisterBindButton) buttonEvent.getAnnotation(RegisterBindButton.class);
+                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
                 if (!hasBinds(packageName, info.id())) {
                     addBind(packageName, buttonEvent, info);
                 }
@@ -201,7 +201,7 @@ public final class BindsConfig {
     private void addDefaultsFor(String packageName, Iterable<Class<?>> classes) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = (RegisterBindButton) buttonEvent.getAnnotation(RegisterBindButton.class);
+                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
                 addBind(packageName, buttonEvent, info);
             }
         }
