@@ -297,7 +297,7 @@ public class LwjglCanvas implements CanvasInternal {
     @Override
     public void drawElement(UIElement element, Rect2i region) {
         UIStyle newStyle = state.skin.getStyleFor((element.getFamily() != null) ? element.getFamily() : state.family, element.getClass(), element.getMode());
-        Rect2i regionArea = applyFixedSizesToRegion(region);
+        Rect2i regionArea = applyFixedSizesToRegion(region, newStyle);
         try (SubRegion ignored = subRegion(regionArea, false)) {
             state.element = element;
             if (element.getFamily() != null) {
@@ -354,7 +354,10 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     private Rect2i applyFixedSizesToRegion(Rect2i region) {
-        UIStyle style = getCurrentStyle();
+        return applyFixedSizesToRegion(region, getCurrentStyle());
+    }
+
+    private Rect2i applyFixedSizesToRegion(Rect2i region, UIStyle style) {
         if (style.getFixedWidth() != 0 || style.getFixedHeight() != 0) {
             int newWidth = (style.getFixedWidth() != 0) ? style.getFixedWidth() : region.width();
             int newHeight = (style.getFixedHeight() != 0) ? style.getFixedHeight() : region.height();

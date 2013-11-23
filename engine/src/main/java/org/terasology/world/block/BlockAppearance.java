@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
@@ -41,12 +42,12 @@ public class BlockAppearance {
     }
 
     public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, Vector2f> textureAtlasPos) {
+        Preconditions.checkNotNull(blockParts);
+        Preconditions.checkNotNull(textureAtlasPos);
         this.blockParts = blockParts;
-        this.textureAtlasPos = textureAtlasPos;
+        this.textureAtlasPos.putAll(textureAtlasPos);
         for (BlockPart part : BlockPart.values()) {
-            if (textureAtlasPos == null) {
-                textureAtlasPos.put(part, new Vector2f());
-            }
+            Preconditions.checkNotNull("Missing texture atlas position for part " + part, textureAtlasPos.get(part));
         }
     }
 
